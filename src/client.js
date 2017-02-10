@@ -15,6 +15,7 @@ import queryString from 'query-string';
 import { createPath } from 'history/PathUtils';
 import history from './core/history';
 import App from './components/App';
+import configureStore from './store/configureStore';
 import { ErrorReporter, deepForceUpdate } from './core/devUtils';
 
 // Global (context) variables that can be easily accessed from any React component
@@ -27,6 +28,9 @@ const context = {
     const removeCss = styles.map(x => x._insertCss());
     return () => { removeCss.forEach(f => f()); };
   },
+  // Initialize a new Redux store
+  // http://redux.js.org/docs/basics/UsageWithReact.html
+  store: configureStore(window.APP_STATE, { history }),
 };
 
 function updateTag(tagName, keyName, keyValue, attrName, attrValue) {
@@ -130,6 +134,7 @@ async function onLocationChange(location, initial) {
     // it finds the first route that matches provided URL path string
     // and whose action method returns anything other than `undefined`.
     const route = await UniversalRouter.resolve(routes, {
+      ...context,
       path: location.pathname,
       query: queryString.parse(location.search),
     });
