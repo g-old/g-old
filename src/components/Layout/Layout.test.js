@@ -20,7 +20,14 @@ import Layout from './Layout';
 
 const middlewares = [thunk];
 const mockStore = configureStore(middlewares);
-const initialState = {};
+const initialState = {
+  runtime: {
+    availableLocales: ['en-US'],
+  },
+  intl: {
+    locale: 'en-US',
+  },
+};
 
 describe('Layout', () => {
   it('renders children correctly', () => {

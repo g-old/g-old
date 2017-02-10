@@ -12,6 +12,8 @@ import webpack from 'webpack';
 import AssetsPlugin from 'assets-webpack-plugin';
 import pkg from '../package.json';
 
+const INTL_REQUIRE_DESCRIPTIONS = true;
+
 const isDebug = !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
 
@@ -31,6 +33,57 @@ const config = {
 
   module: {
     rules: [
+      {
+        test: /\.jsx?$/,
+        loader: 'babel-loader',
+        include: [
+          path.resolve(__dirname, '../src'),
+        ],
+        query: {
+          // https://github.com/babel/babel-loader#options
+          cacheDirectory: isDebug,
+
+          // https://babeljs.io/docs/usage/options/
+          babelrc: false,
+          presets: [
+            // Latest stable ECMAScript features
+            // https://github.com/babel/babel/tree/master/packages/babel-preset-latest
+            ['latest', { es2015: { modules: false } }],
+            // Experimental ECMAScript proposals
+            // https://github.com/babel/babel/tree/master/packages/babel-preset-stage-0
+            'stage-0',
+            // JSX, Flow
+            // https://github.com/babel/babel/tree/master/packages/babel-preset-react
+            'react',
+            ...isDebug ? [] : [
+              // Optimize React code for the production build
+              // https://github.com/thejameskyle/babel-react-optimize
+              'react-optimize',
+            ],
+          ],
+          plugins: [
+            // Externalise references to helpers and builtins,
+            // automatically polyfilling your code without polluting globals.
+            // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-runtime
+            'transform-runtime',
+            ...!isDebug ? [] : [
+              // Adds component stack to warning messages
+              // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source
+              'transform-react-jsx-source',
+              // Adds __self attribute to JSX which React will use for some warnings
+              // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-self
+              'transform-react-jsx-self',
+            ],
+
+            // https://github.com/yahoo/babel-plugin-react-intl#options
+            ['react-intl',
+              {
+                enforceDescriptions: INTL_REQUIRE_DESCRIPTIONS,
+              },
+            ],
+          ],
+        },
+      },
       {
         test: /\.css/,
         use: [
@@ -118,7 +171,7 @@ const clientConfig = {
   target: 'web',
 
   entry: {
-    client: ['babel-polyfill', './client.js'],
+    client: './clientLoader.js',
   },
 
   output: {

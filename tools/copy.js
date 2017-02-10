@@ -31,11 +31,13 @@ async function copy() {
     copyFile('LICENSE.txt', 'build/LICENSE.txt'),
     copyDir('src/content', 'build/content'),
     copyDir('public', 'build/public'),
+    copyDir('src/messages', 'build/messages'),
   ]);
 
   if (process.argv.includes('--watch')) {
     const watcher = chokidar.watch([
       'src/content/**/*',
+      'src/messages/**/*',
       'public/**/*',
     ], { ignoreInitial: true });
 

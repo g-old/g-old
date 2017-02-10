@@ -13,11 +13,17 @@ import FastClick from 'fastclick';
 import UniversalRouter from 'universal-router';
 import queryString from 'query-string';
 import { createPath } from 'history/PathUtils';
+import { addLocaleData } from 'react-intl';
+import en from 'react-intl/locale-data/en';
+import cs from 'react-intl/locale-data/cs';
 import history from './core/history';
 import App from './components/App';
 import configureStore from './store/configureStore';
 import { ErrorReporter, deepForceUpdate } from './core/devUtils';
 
+[en, cs].forEach(addLocaleData);
+
+const store = configureStore(window.APP_STATE, { history });
 // Global (context) variables that can be easily accessed from any React component
 // https://facebook.github.io/react/docs/context.html
 const context = {
@@ -30,7 +36,7 @@ const context = {
   },
   // Initialize a new Redux store
   // http://redux.js.org/docs/basics/UsageWithReact.html
-  store: configureStore(window.APP_STATE, { history }),
+  store,
 };
 
 function updateTag(tagName, keyName, keyValue, attrName, attrValue) {
@@ -137,6 +143,7 @@ async function onLocationChange(location, initial) {
       ...context,
       path: location.pathname,
       query: queryString.parse(location.search),
+      locale: store.getState().intl.locale,
     });
 
     // Prevent multiple page renders during the routing process
@@ -194,9 +201,11 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Enable Hot Module Replacement (HMR)
 if (module.hot) {
-  module.hot.accept('./routes', () => {
+  module.hot.accept('./routes', async () => {
     routes = require('./routes').default; // eslint-disable-line global-require
 
+    currentLocation = history.location;
+    await onLocationChange(currentLocation);
     if (appInstance) {
       try {
         // Force-update the whole tree, including components that refuse to update
@@ -205,10 +214,7 @@ if (module.hot) {
         appInstance = null;
         document.title = `Hot Update Error: ${error.message}`;
         ReactDOM.render(<ErrorReporter error={error} />, container);
-        return;
       }
     }
-
-    onLocationChange(currentLocation);
   });
 }

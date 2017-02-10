@@ -18,13 +18,14 @@ class Html extends React.Component {
     style: PropTypes.string,
     scripts: PropTypes.arrayOf(PropTypes.string.isRequired),
     state: PropTypes.object,
+    lang: PropTypes.string,
     children: PropTypes.string,
   };
 
   render() {
-    const { title, description, style, scripts, state, children } = this.props;
+    const { title, description, style, scripts, state, lang, children } = this.props;
     return (
-      <html className="no-js" lang="en">
+      <html className="no-js" lang={lang}>
         <head>
           <meta charSet="utf-8" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />

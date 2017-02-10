@@ -8,6 +8,7 @@
  */
 
 import React, { PropTypes } from 'react';
+import { FormattedRelative } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Home.css';
 
@@ -29,6 +30,10 @@ class Home extends React.Component {
             {this.props.news.map((item, index) => (
               <li key={index} className={s.newsItem}>
                 <a href={item.link} className={s.newsTitle}>{item.title}</a>
+                {' '}
+                <span className={s.publishedDate}>
+                  <FormattedRelative value={item.pubDate} />
+                </span>
                 <span
                   className={s.newsDesc}
                   dangerouslySetInnerHTML={{ __html: item.content.substring(0, 100) }}
