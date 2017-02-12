@@ -32,7 +32,11 @@ async function copy() {
     copyDir('src/content', 'build/content'),
     copyDir('public', 'build/public'),
     copyDir('src/messages', 'build/messages'),
+      // TODO If node env is production
+    copyFile('src/knexfile.js', 'build/knexfile.js'),
+    copyDir('src/data/db', 'build/db'),
   ]);
+
 
   if (process.argv.includes('--watch')) {
     const watcher = chokidar.watch([

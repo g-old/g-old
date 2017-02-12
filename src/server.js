@@ -20,7 +20,7 @@ import ReactDOM from 'react-dom/server';
 import UniversalRouter from 'universal-router';
 import PrettyError from 'pretty-error';
 import { IntlProvider } from 'react-intl';
-
+import knex from './data/knex';
 import './serverIntlPolyfill';
 import App from './components/App';
 import Html from './components/Html';
@@ -78,6 +78,13 @@ app.use(passport.initialize());
 if (process.env.NODE_ENV !== 'production') {
   app.enable('trust proxy');
 }
+app.get('/test', (req, res, next) => {
+  knex('users').where({ name: 'admin' })
+    .join('roles', 'users.role_id', '=', 'roles.id')
+    .select('type')
+    .then((data) => { res.status(200).json(data); })
+    .catch((error) => next(error));
+});
 app.get('/login/facebook',
   passport.authenticate('facebook', { scope: ['email', 'user_location'], session: false }),
 );
