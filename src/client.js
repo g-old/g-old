@@ -14,14 +14,14 @@ import UniversalRouter from 'universal-router';
 import queryString from 'query-string';
 import { createPath } from 'history/PathUtils';
 import { addLocaleData } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-import cs from 'react-intl/locale-data/cs';
+import de from 'react-intl/locale-data/de';
+import it from 'react-intl/locale-data/it';
 import history from './core/history';
 import App from './components/App';
 import configureStore from './store/configureStore';
 import { ErrorReporter, deepForceUpdate } from './core/devUtils';
 
-[en, cs].forEach(addLocaleData);
+[de, it].forEach(addLocaleData);
 
 const store = configureStore(window.APP_STATE, { history });
 // Global (context) variables that can be easily accessed from any React component

@@ -20,26 +20,6 @@ const messages = defineMessages({
     defaultMessage: 'About',
     description: 'About link in header',
   },
-  contact: {
-    id: 'navigation.contact',
-    defaultMessage: 'Contact',
-    description: 'Contact link in header',
-  },
-  login: {
-    id: 'navigation.login',
-    defaultMessage: 'Log in',
-    description: 'Log in link in header',
-  },
-  or: {
-    id: 'navigation.separator.or',
-    defaultMessage: 'or',
-    description: 'Last separator in list, lowercase "or"',
-  },
-  signup: {
-    id: 'navigation.signup',
-    defaultMessage: 'Sign up',
-    description: 'Sign up link in header',
-  },
 });
 
 class Navigation extends React.Component {
@@ -54,19 +34,6 @@ class Navigation extends React.Component {
       <div className={cx(s.root, className)} role="navigation">
         <Link className={s.link} to="/about">
           <FormattedMessage {...messages.about} />
-        </Link>
-        <Link className={s.link} to="/contact">
-          <FormattedMessage {...messages.contact} />
-        </Link>
-        <span className={s.spacer}> | </span>
-        <Link className={s.link} to="/login">
-          <FormattedMessage {...messages.login} />
-        </Link>
-        <span className={s.spacer}>
-          <FormattedMessage {...messages.or} />
-        </span>
-        <Link className={cx(s.link, s.highlight)} to="/register">
-          <FormattedMessage {...messages.signup} />
         </Link>
       </div>
     );

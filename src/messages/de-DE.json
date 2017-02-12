@@ -3,7 +3,7 @@
     "id": "header.banner.desc",
     "description": "Description in header",
     "defaultMessage": "Online democracy",
-    "message": "",
+    "message": "Demokratie online",
     "files": [
       "src/components/Header/Header.js"
     ]
@@ -30,7 +30,7 @@
     "id": "navigation.about",
     "description": "About link in header",
     "defaultMessage": "About",
-    "message": "",
+    "message": "Über",
     "files": [
       "src/components/Navigation/Navigation.js"
     ]

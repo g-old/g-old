@@ -14,23 +14,22 @@ import s from './Header.css';
 import Link from '../Link';
 import Navigation from '../Navigation';
 import LanguageSwitcher from '../LanguageSwitcher';
-import logoUrl from './logo-small.png';
-import logoUrl2x from './logo-small@2x.png';
+
 
 const messages = defineMessages({
   brand: {
     id: 'header.brand',
-    defaultMessage: 'Your Company Brand',
+    defaultMessage: 'M5',
     description: 'Brand name displayed in header',
   },
   bannerTitle: {
     id: 'header.banner.title',
-    defaultMessage: 'React',
+    defaultMessage: 'G O L D',
     description: 'Title in page header',
   },
   bannerDesc: {
     id: 'header.banner.desc',
-    defaultMessage: 'Complex web apps made easy',
+    defaultMessage: 'Online democracy',
     description: 'Description in header',
   },
 });
@@ -42,7 +41,6 @@ class Header extends React.Component {
         <div className={s.container}>
           <Navigation className={s.nav} />
           <Link className={s.brand} to="/">
-            <img src={logoUrl} srcSet={`${logoUrl2x} 2x`} width="38" height="38" alt="React" />
             <span className={s.brandTxt}>
               <FormattedMessage {...messages.brand} />
             </span>
