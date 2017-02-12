@@ -34,5 +34,23 @@
     "files": [
       "src/components/Navigation/Navigation.js"
     ]
+  },
+  {
+    "id": "login.email",
+    "description": "Email-address",
+    "defaultMessage": "Email",
+    "message": "E-Mail-Adresse",
+    "files": [
+      "src/components/Login/Login.js"
+    ]
+  },
+  {
+    "id": "login.password",
+    "description": "Password",
+    "defaultMessage": "Password",
+    "message": "Passwort",
+    "files": [
+      "src/components/Login/Login.js"
+    ]
   }
 ]

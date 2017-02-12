@@ -93,7 +93,7 @@ class App extends React.PureComponent {
         initialNow={initialNow}
         locale={locale}
         messages={localeMessages}
-        defaultLocale="en-US"
+        defaultLocale="de-DE"
       >
         {Children.only(this.props.children)}
       </IntlProvider>

@@ -9,7 +9,6 @@
 
 import React, { PropTypes } from 'react';
 import serialize from 'serialize-javascript';
-import { analytics } from '../config';
 
 class Html extends React.Component {
   static propTypes = {
@@ -44,16 +43,6 @@ class Html extends React.Component {
             />
           )}
           {scripts && scripts.map(script => <script key={script} src={script} />)}
-          {analytics.google.trackingId &&
-            <script
-              dangerouslySetInnerHTML={{ __html:
-              'window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;' +
-              `ga('create','${analytics.google.trackingId}','auto');ga('send','pageview')` }}
-            />
-          }
-          {analytics.google.trackingId &&
-            <script src="https://www.google-analytics.com/analytics.js" async defer />
-          }
         </body>
       </html>
     );
