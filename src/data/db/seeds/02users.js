@@ -1,4 +1,5 @@
 const faker = require('faker');
+/* eslint comma-dangle: ["error", {"functions": "never"}]*/
 
 exports.seed = function (knex, Promise) {
   // Deletes ALL existing entries
@@ -22,6 +23,6 @@ exports.seed = function (knex, Promise) {
 
   return knex('users').del()
     .then(() =>
-       Promise.all(users),
+       Promise.all(users)
     );
 };

@@ -1,7 +1,7 @@
 
 exports.up = function (knex, Promise) {
   return Promise.all([
-    knex.schema.createTable('users', (table) => {
+    knex.schema.createTable('tags', (table) => {
       table.increments();
       table.string('text').notNullable();
       table.integer('count').defaultsTo(0);
