@@ -17,12 +17,14 @@ exports.seed = function (knex, Promise) {
 
 
   return Promise.resolve([
-    'users'])
+    'users',
+    'proposals'])
   .map((table) => knex.select('id').from(table).pluck('id'))
-  .spread((users) => ar.map(() => {
+  .spread((users, proposals) => ar.map(() => {
     time = new Date();
     return {
       author_id: random(users),
+      proposal_id: random(proposals),
       title: faker.lorem.sentence(),
       body: faker.lorem.paragraph(),
       position: Math.random() < 0.5 ? 'pro' : 'con',

@@ -26,6 +26,7 @@
     "intl": "^1.2.5",
     "intl-locales-supported": "^1.0.0",
     "isomorphic-style-loader": "^1.1.0",
+    "join-monster": "^0.9.9",
     "jsonwebtoken": "^7.2.1",
     "knex": "^0.12.6",
     "node-fetch": "^1.6.3",
