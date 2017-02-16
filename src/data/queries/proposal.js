@@ -15,20 +15,26 @@ const proposal = {
   type: ProposalType,
   args: {
     id: {
+      description: 'The proposals ID number',
+      type: GraphQLInt,
+    },
+    userID: {
       description: 'The users ID number',
       type: GraphQLInt,
     },
   },
   where: (proposalsTable, args, context) => { // eslint-disable-line no-unused-vars
-    if (args.id) return `${proposalsTable}.id = ${args.id}`;
+    context.args = args; // eslint-disable-line no-param-reassign
+
+    if (args.id) {
+      return `${proposalsTable}.id = ${args.id} `;
+    }
     return null;
   },
-  resolve: (parent, args, context, resolveInfo) => joinMonster(resolveInfo, context, sql => {
-    if (context) {
-            // context.set('X-SQL-Preview', sql.replace(/\n/g, '%0A'))
-    }
-    return knex.raw(sql).then(result => result);
-  }, options),
+  resolve: (parent, args, context, resolveInfo) =>
+    joinMonster(resolveInfo, context, sql =>
+      knex.raw(sql).then(result => result),
+   options),
 };
 
 export default proposal;

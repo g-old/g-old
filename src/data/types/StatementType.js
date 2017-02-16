@@ -26,6 +26,7 @@ const Statement2Type = new ObjectType({
 
     text: {
       type: GraphQLString,
+      sqlColumn: 'body',
     },
     title: {
       type: GraphQLString,
@@ -37,8 +38,6 @@ const Statement2Type = new ObjectType({
       type: GraphQLString,
       sqlColumn: 'created_at',
     },
-
-
   },
 
 });
