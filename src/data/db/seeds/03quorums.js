@@ -5,6 +5,7 @@ exports.seed = function (knex, Promise) {
 
   return knex
   .raw('ALTER TABLE quorums DISABLE TRIGGER ALL;')
+  .then(() => knex.raw('ALTER SEQUENCE quorums_id_seq RESTART WITH 1;'))
   .then(() => knex('quorums').del())
   .then(() => knex.raw('ALTER TABLE quorums ENABLE TRIGGER ALL;')) // mysql :SET foreign_key_checks = 1;
   .then(() =>

@@ -22,6 +22,7 @@ exports.seed = function (knex, Promise) {
   }
   return knex
   .raw('ALTER TABLE users DISABLE TRIGGER ALL;')
+  .then(() => knex.raw('ALTER SEQUENCE users_id_seq RESTART WITH 1;'))
   .then(() => knex('users').del())
   .then(() => knex.raw('ALTER TABLE users ENABLE TRIGGER ALL;')) // mysql :SET foreign_key_checks = 1;
   .then(() =>

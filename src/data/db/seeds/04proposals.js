@@ -49,6 +49,7 @@ exports.seed = function (knex, Promise) {
   }
   return knex
   .raw('ALTER TABLE proposals DISABLE TRIGGER ALL;')
+  .then(() => knex.raw('ALTER SEQUENCE proposals_id_seq RESTART WITH 1;'))
   .then(() => knex('proposals').del())
   .then(() => knex.raw('ALTER TABLE proposals ENABLE TRIGGER ALL;')) // mysql :SET foreign_key_checks = 1;
   .then(seeding);
