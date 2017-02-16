@@ -17,9 +17,10 @@ exports.seed = function (knex, Promise) {
   let time;
 
 // TODO This fn is wrong as it can insert multiple votes for the same proposal
-  return Promise.resolve([
-    'users',
-    'proposals'])
+  function seeding() {
+    return Promise.resolve([
+      'users',
+      'proposals'])
   .map((table) => knex.select('id').from(table).pluck('id'))
   .spread((users, proposals) => ar.map(() => {
     time = new Date();
@@ -35,4 +36,10 @@ exports.seed = function (knex, Promise) {
 )
 .then((properties) => knex.into('votes').insert(properties)
   );
+  }
+  return knex
+  .raw('ALTER TABLE votes DISABLE TRIGGER ALL;')
+  .then(() => knex('votes').del())
+  .then(() => knex.raw('ALTER TABLE votes ENABLE TRIGGER ALL;')) // mysql :SET foreign_key_checks = 1;
+  .then(seeding);
 };

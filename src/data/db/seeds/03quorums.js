@@ -2,11 +2,14 @@
 
 exports.seed = function (knex, Promise) {
   // Deletes ALL existing entries
-  return knex('quorums').del()
-    .then(() =>
-       Promise.all([
-        // Inserts seed entries
-         knex('quorums').insert({ name: 'ask_vote', percentage: 20, voters: 'all' })
-       ])
+
+  return knex
+  .raw('ALTER TABLE quorums DISABLE TRIGGER ALL;')
+  .then(() => knex('quorums').del())
+  .then(() => knex.raw('ALTER TABLE quorums ENABLE TRIGGER ALL;')) // mysql :SET foreign_key_checks = 1;
+  .then(() =>
+  Promise.all([
+    knex('quorums').insert({ name: 'ask_vote', percentage: 20, voters: 'all' })
+  ])
     );
 };

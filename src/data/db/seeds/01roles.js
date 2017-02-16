@@ -2,8 +2,11 @@
 
 exports.seed = function (knex, Promise) {
   // Deletes ALL existing entries
-  return knex('roles').del()
-    .then(() =>
+  return knex
+  .raw('ALTER TABLE roles DISABLE TRIGGER ALL;')
+  .then(() => knex('roles').del())
+  .then(() => knex.raw('ALTER TABLE roles ENABLE TRIGGER ALL;')) // mysql :SET foreign_key_checks = 1;
+  .then(() =>
        Promise.all([
         // Inserts seed entries
          knex('roles').insert({ id: 1, type: 'admin' }),

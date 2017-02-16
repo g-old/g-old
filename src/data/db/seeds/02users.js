@@ -20,9 +20,11 @@ exports.seed = function (knex, Promise) {
       email_validated: false });
     users.push(user);
   }
-
-  return knex('users').del()
-    .then(() =>
+  return knex
+  .raw('ALTER TABLE users DISABLE TRIGGER ALL;')
+  .then(() => knex('users').del())
+  .then(() => knex.raw('ALTER TABLE users ENABLE TRIGGER ALL;')) // mysql :SET foreign_key_checks = 1;
+  .then(() =>
        Promise.all(users)
     );
 };

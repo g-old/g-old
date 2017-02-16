@@ -16,9 +16,10 @@ exports.seed = function (knex, Promise) {
   let time;
 
 
-  return Promise.resolve([
-    'users',
-    'proposals'])
+  function seeding() {
+    return Promise.resolve([
+      'users',
+      'proposals'])
   .map((table) => knex.select('id').from(table).pluck('id'))
   .spread((users, proposals) => ar.map(() => {
     time = new Date();
@@ -36,4 +37,11 @@ exports.seed = function (knex, Promise) {
 )
 .then((properties) => knex.into('statements').insert(properties)
   );
+  }
+
+  return knex
+  .raw('ALTER TABLE statements DISABLE TRIGGER ALL;')
+  .then(() => knex('statements').del())
+  .then(() => knex.raw('ALTER TABLE statements ENABLE TRIGGER ALL;')) // mysql :SET foreign_key_checks = 1;
+  .then(seeding);
 };
