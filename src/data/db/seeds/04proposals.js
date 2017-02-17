@@ -34,7 +34,7 @@ exports.seed = function (knex, Promise) {
       author_id: random(users),
       quorum_id: random(quorums),
       title: faker.lorem.sentence(),
-      body: faker.lorem.paragraphs(randomNumber(4)),
+      body: faker.lorem.paragraphs(randomNumber(4) || 1),
       state: 'ask_vote',
       created_at: time,
       updated_at: time,
