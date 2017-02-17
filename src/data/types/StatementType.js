@@ -8,7 +8,7 @@ import {
 import AuthorType from './AuthorType';
 
 
-const Statement2Type = new ObjectType({
+const StatementType = new ObjectType({
   name: 'Statement',
   description: 'Statement on proposal',
   sqlTable: 'statements', // the SQL table for this object type is called "accounts"
@@ -41,4 +41,4 @@ const Statement2Type = new ObjectType({
   },
 
 });
-export default Statement2Type;
+export default StatementType;

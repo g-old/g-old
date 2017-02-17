@@ -36,7 +36,7 @@ const ProposalType = new ObjectType({
         return `${proposalsTable}.quorum_id = ${quorumsTable}.id`;
       },
     },
-    text: {
+    body: {
       type: GraphQLString,
       sqlColumn: 'body',
     },
@@ -45,10 +45,13 @@ const ProposalType = new ObjectType({
     },
     tags: {
       type: new GraphQLList(TagType),
-      sqlJoin(proposalsTable, proposalTagsTable) {
-        return `${proposalsTable}.id = ${proposalTagsTable}.proposal_id`;
-      },
+      joinTable: 'proposal_tags',
+      sqlJoins: [
+        (proposalTable, proposalTagsTable) => `${proposalTable}.id = ${proposalTagsTable}.proposal_id`,
+        (proposalTagsTable, tagsTable) => `${proposalTagsTable}.tag_id = ${tagsTable}.id`,
+      ],
     },
+
     statements: {
       type: new GraphQLList(StatementType),
       sqlJoin(proposalsTable, statementsTable) {
@@ -72,7 +75,10 @@ const ProposalType = new ObjectType({
     vote: {
       type: new GraphQLList(VoteInfoType),
       sqlJoin(proposalsTable, votesTable, args, context) {
-        return `${proposalsTable}.id = ${votesTable}.proposal_id and ${votesTable}.user_id = ${context.args.userID} `;
+        if (context.args && context.args.userID) {
+          return `${proposalsTable}.id = ${votesTable}.proposal_id and ${votesTable}.user_id = any(select followee_id from user_follows where user_follows.follower_id = ${context.args.userID} union all select ${context.args.userID})`;
+        }
+        return `${proposalsTable}.id = ${votesTable}.proposal_id`;
       },
 
 /*   resolve(table, args,context,other){

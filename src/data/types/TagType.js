@@ -15,9 +15,11 @@ const TagType = new ObjectType({
     id: { type: new NonNull(ID) },
     text: {
       type: GraphQLString,
+      sqlColumn: 'text',
     },
     count: {
       type: GraphQLInt,
+      sqlColumn: 'count',
     },
     createdAt: {
       type: GraphQLString,
