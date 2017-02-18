@@ -1,0 +1,51 @@
+import {
+  GraphQLString,
+  GraphQLObjectType as ObjectType,
+  GraphQLID as ID,
+  GraphQLBoolean,
+  GraphQLList,
+} from 'graphql';
+
+import RoleType from './RoleType';
+import Role from '../models/Role';
+import User from '../models/User';
+
+const UserType = new ObjectType({
+  name: 'User',
+  fields: () => ({ // we need a lazy evaluated fn , bc we use UserType, which has to be defined
+    id: { type: ID },
+    name: {
+      type: GraphQLString,
+    },
+    surname: {
+      type: GraphQLString,
+    },
+    email: {
+      type: GraphQLString,
+    },
+    avatar: {
+      type: GraphQLString,
+    },
+    email_validated: {
+      type: GraphQLBoolean,
+    },
+    role: {
+      type: RoleType,
+      resolve(data, args, { loaders }) {
+        return Role.gen({}, data.role_id, loaders);
+      },
+    },
+    followees: {
+      type: new GraphQLList(UserType),
+      resolve(data, args, { loaders }) {
+        return Promise.resolve(
+        User.followees(data.id, loaders)
+        .then(ids => ids.map(id => User.gen({}, id, loaders))),
+      );
+      },
+    },
+
+  }),
+});
+
+export default UserType;

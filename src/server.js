@@ -31,6 +31,7 @@ import configureStore from './store/configureStore';
 import { setRuntimeVariable } from './actions/runtime';
 import { setLocale } from './actions/intl';
 import { port, locales } from './config';
+import createLoaders from './data/dataLoader';
 
 const app = express();
 
@@ -75,6 +76,16 @@ app.get('/test', (req, res, next) => {
     .select('type')
     .then((data) => { res.status(200).json(data); })
     .catch((error) => next(error));
+});
+
+//
+// Register DataLoaders
+// -----------------------------------------------------------------------------
+
+app.use('/', (req, res, next) => {
+  // eslint-disable-next-line no-param-reassign
+  req.loaders = createLoaders();
+  next();
 });
 
 

@@ -15,6 +15,8 @@ import {
 import intl from './queries/intl';
 import proposal from './queries/proposal';
 import proposals from './queries/proposals';
+import user from './queries/user';
+
 
 const schema = new Schema({
   query: new ObjectType({
@@ -23,10 +25,9 @@ const schema = new Schema({
       intl,
       proposal,
       proposals,
+      user,
     },
   }),
-
-
 });
 
 export default schema;
