@@ -1,4 +1,4 @@
-exports.module = {
+module.exports = {
   development: {
     database: 'database_name',
     user: 'user',
