@@ -54,7 +54,7 @@ const getRolesById = (roleIds) =>
 function createLoaders() {
   return {
     users: new DataLoader(ids => getUsersById(ids)),
-    followers: new DataLoader(ids => getFolloweeIds(ids)),
+    followees: new DataLoader(ids => getFolloweeIds(ids)),
     roles: new DataLoader(ids => getRolesById(ids)),
   };
 }

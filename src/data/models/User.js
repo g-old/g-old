@@ -21,8 +21,8 @@ class User {
     return canSee ? new User(data) : null;
   }
 
-  static async followees(id, { followers }) {
-    const data = await followers.load(id);
+  static async followees(id, { followees }) {
+    const data = await followees.load(id);
     return data;
   /*  return Promise.resolve(knex('user_follows')
     .where({ follower_id: id }).pluck('followee_id')
