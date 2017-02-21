@@ -18,23 +18,6 @@ function randomNumber(max) {
 
 /* eslint comma-dangle: ["error", {"functions": "never"}]*/
 exports.seed = function (knex, Promise) {
-  function getPhaseOnePollIds() {
-    return knex.select('polls.id').from('polls')
-    .join('polling_modes', 'polls.polling_mode_id', '=', 'polling_modes.id')
-    .where('polling_modes.name', '=', 'propose')
-    .pluck('polls.id');
-  }
-
-  function getPhaseTwoPollIds() {
-    return knex.select('polls.id').from('polls')
-    .join('polling_modes', 'polls.polling_mode_id', '=', 'polling_modes.id')
-    .where('polling_modes.name', '=', 'vote')
-    .pluck('polls.id');
-  }
-
-  function getUserIds() {
-    return knex.select('id').from('users').pluck('id');
-  }
   let records = 10;
   const ar = [];
   while (records) { // TODO move to new Array(x) as soon as it is supported
@@ -43,7 +26,15 @@ exports.seed = function (knex, Promise) {
   }
   let time;
   function seeding() {
-    return Promise.all([getUserIds(), getPhaseOnePollIds(), getPhaseTwoPollIds()])
+    return Promise.all([knex.select('id').from('users').pluck('id'),
+      knex.select('polls.id').from('polls')
+      .join('polling_modes', 'polls.polling_mode_id', '=', 'polling_modes.id')
+      .where('polling_modes.name', '=', 'propose')
+      .pluck('polls.id'),
+      knex.select('polls.id').from('polls')
+      .join('polling_modes', 'polls.polling_mode_id', '=', 'polling_modes.id')
+      .where('polling_modes.name', '=', 'vote')
+      .pluck('polls.id')])
   .then((data) => {
     const res = [];
     let prop;
