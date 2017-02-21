@@ -17,9 +17,9 @@ exports.seed = function (knex, Promise) {
       knex.select('id').from('users').pluck('id').then((data) => resolve(data));
     });
   }
-  function getProposals() {
+  function getPolls() {
     return new Promise((resolve) => {
-      knex.select('id').from('proposals').pluck('id').then((data) => resolve(data));
+      knex.select('id').from('polls').pluck('id').then((data) => resolve(data));
     });
   }
   function getUniqueIDs(proposals, num) {
@@ -35,26 +35,29 @@ exports.seed = function (knex, Promise) {
   function seeding() {
     return new Promise((resolve) => getUsers()
   .then((users) => {
-    getProposals().then((proposals) =>
+    getPolls().then((polls) =>
       new Promise((resolv) => {
         const results = [];
         const updates = [];
         users.map((id) => {
-          const num = randomNumber(proposals.length);
-          const ids = getUniqueIDs(proposals, num);
+          const num = randomNumber(polls.length);
+          const ids = getUniqueIDs(polls, num);
           for (let i = 0; i < num; i += 1) {
             time = new Date();
-            const proposalID = ids[i];
+            const pollID = ids[i];
+            const vote = Math.random();
             const data = {
               user_id: id,
-              proposal_id: proposalID,
-              position: Math.random() < 0.5 ? 'pro' : 'con',
+              poll_id: pollID,
+              position: vote < 0.5 ? 'pro' : 'con',
               created_at: time,
               updated_at: time
             };
-            updates.push(knex('proposals')
-            .where({ id: proposalID })
-            .increment('votes', 1));
+            updates.push((vote < 0.5 ? knex('polls')
+            .where({ id: pollID })
+            .increment('upvotes', 1) : knex('polls')
+            .where({ id: pollID })
+            .increment('downvotes')));
             results.push(data);
           }
           return null;

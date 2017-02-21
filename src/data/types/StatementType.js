@@ -6,6 +6,7 @@ import {
   GraphQLID as ID,
 } from 'graphql';
 import AuthorType from './AuthorType';
+import VoteType from './VoteType';
 
 
 const StatementType = new ObjectType({
@@ -23,7 +24,12 @@ const StatementType = new ObjectType({
         return `${statementsTable}.author_id = ${usersTable}.id`;
       },
     },
-
+    vote: {
+      type: VoteType,
+      sqlJoin(statementsTable, votesTable) {
+        return `${statementsTable}.vote_id = ${votesTable}.id`;
+      },
+    },
     text: {
       type: GraphQLString,
       sqlColumn: 'body',

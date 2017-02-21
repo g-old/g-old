@@ -11,6 +11,7 @@ import StatementType from './StatementType';
 import QuorumType from './QuorumType';
 import TagType from './TagType';
 import VoteInfoType from './VoteInfoType';
+import PollType from './PollType';
 
 const ProposalType = new ObjectType({
   name: 'Proposal',
@@ -50,6 +51,18 @@ const ProposalType = new ObjectType({
         (proposalTable, proposalTagsTable) => `${proposalTable}.id = ${proposalTagsTable}.proposal_id`,
         (proposalTagsTable, tagsTable) => `${proposalTagsTable}.tag_id = ${tagsTable}.id`,
       ],
+    },
+    pollOne: {
+      type: PollType,
+      sqlJoin(proposalsTable, pollsTabel) {
+        return `${proposalsTable}.poll_one_id = ${pollsTabel}.id`;
+      },
+    },
+    pollTwo: {
+      type: PollType,
+      sqlJoin(proposalsTable, pollsTabel) {
+        return `${proposalsTable}.poll_two_id = ${pollsTabel}.id`;
+      },
     },
 
     statements: {

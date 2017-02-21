@@ -19,13 +19,16 @@ exports.seed = function (knex, Promise) {
   function seeding() {
     return Promise.resolve([
       'users',
-      'proposals'])
+      'votes',
+      'polls'])
   .map((table) => knex.select('id').from(table).pluck('id'))
-  .spread((users, proposals) => ar.map(() => {
+  .spread((users, votes, polls) => ar.map(() => {
     time = new Date();
+    console.log(users.length);
     return {
       author_id: random(users),
-      proposal_id: random(proposals),
+      vote_id: random(votes),
+      poll_id: random(polls),
       title: faker.lorem.sentence(),
       body: faker.lorem.paragraph(),
       position: Math.random() < 0.5 ? 'pro' : 'con',

@@ -1,4 +1,5 @@
 exports.up = function (knex, Promise) {
+  // RENAME to statement Likes
   return Promise.all([
     knex.schema.createTable('likes', (table) => {
       table.increments();

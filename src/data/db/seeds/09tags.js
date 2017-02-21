@@ -5,13 +5,9 @@ exports.seed = function (knex, Promise) {
   // Deletes ALL existing entries
   const tags = [];
   let tag;
-  let time;
   for (let i = 0; i < 10; i += 1) {
-    time = new Date();
     tag = knex('tags').insert({
-      text: faker.lorem.word(),
-      created_at: time,
-      updated_at: time
+      text: faker.lorem.word()
     });
     tags.push(tag);
   }

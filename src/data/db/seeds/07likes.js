@@ -62,7 +62,7 @@ exports.seed = function (knex, Promise) {
         });
       })
     )
-    .then((properties) => knex.into('likes').insert(properties))
+    .then((properties) => knex.into('statement_likes').insert(properties))
     .then(() => resolve());
   })
   );
@@ -70,9 +70,9 @@ exports.seed = function (knex, Promise) {
 
 
   return knex
-  .raw('ALTER TABLE likes DISABLE TRIGGER ALL;')
-  .then(() => knex.raw('ALTER SEQUENCE likes_id_seq RESTART WITH 1;'))
-  .then(() => knex('likes').del())
-  .then(() => knex.raw('ALTER TABLE likes ENABLE TRIGGER ALL;')) // mysql :SET foreign_key_checks = 1;
+  .raw('ALTER TABLE statement_likes DISABLE TRIGGER ALL;')
+  .then(() => knex.raw('ALTER SEQUENCE statement_likes_id_seq RESTART WITH 1;'))
+  .then(() => knex('statement_likes').del())
+  .then(() => knex.raw('ALTER TABLE statement_likes ENABLE TRIGGER ALL;')) // mysql :SET foreign_key_checks = 1;
   .then(seeding);
 };

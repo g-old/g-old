@@ -5,7 +5,6 @@ exports.up = function (knex, Promise) {
       table.increments();
       table.string('text').notNullable();
       table.integer('count').defaultsTo(0);
-      table.timestamps();
     }),
   ]);
 };

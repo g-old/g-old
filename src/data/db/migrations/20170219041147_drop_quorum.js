@@ -1,4 +1,11 @@
+
 exports.up = function (knex, Promise) {
+  return Promise.all([
+    knex.schema.dropTable('quorums'),
+  ]);
+};
+
+exports.down = function (knex, Promise) {
   return Promise.all([
     knex.schema.createTable('quorums', (table) => {
       table.increments();
@@ -6,11 +13,5 @@ exports.up = function (knex, Promise) {
       table.integer('percentage').notNullable();
       table.enu('pool', ['all', 'voters']);
     }),
-  ]);
-};
-
-exports.down = function (knex, Promise) {
-  return Promise.all([
-    knex.schema.dropTable('quorums'),
   ]);
 };
