@@ -9,19 +9,26 @@
 
 import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import Statement from '../../components/Statement';
 import s from './Proposal.css';
 
 class Proposal extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { proposalId: -1 };
+    this.state = { };
   }
 
   render() {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          {this.state.proposalId}
+          This is an awesome (and rather static) proposal.
+        </div>
+        <div className={s.container}>
+          <Statement title="yes." position="true" />
+          <Statement title="noo.." position="false" />
+          <Statement title="YES!" position="true" />
+          <Statement title="mavalá!" position="false" />
         </div>
       </div>
     );

@@ -1,0 +1,22 @@
+@import '../../components/variables.css';
+
+.root {
+  border: solid 1px black;
+  padding: 0.6em;
+  margin: 0.1em;
+  font-weight: bold;
+  border-radius: 0.5em;
+}
+
+.pro {
+  margin-right: 10em;
+  border-color: green;
+  background-color: lightgreen;
+}
+
+.contra {
+  margin-left: 10em;
+  border-color: red;
+  background-color: #f33;
+  text-align: right;
+}
