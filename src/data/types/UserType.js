@@ -31,18 +31,17 @@ const UserType = new ObjectType({
     },
     role: {
       type: RoleType,
-      resolve(data, args, { loaders }) {
-        return Role.gen({}, data.role_id, loaders);
+      resolve(data, args, { viewer, loaders }) {
+        return Role.gen(viewer, data.role_id, loaders);
       },
     },
     followees: {
       type: new GraphQLList(UserType),
-      resolve(data, args, { loaders }) {
-        return Promise.resolve(
+      resolve: (data, args, { viewer, loaders }) =>
+      Promise.resolve(
         User.followees(data.id, loaders)
-        .then(ids => ids.map(id => User.gen({}, id, loaders))),
-      );
-      },
+        .then(ids => ids.map(id => User.gen(viewer, id, loaders))),
+      ),
     },
 
   }),

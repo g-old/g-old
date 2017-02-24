@@ -51,11 +51,84 @@ const getRolesById = (roleIds) =>
        ));
    });
 
+const getProposalsById = (proposalIds) =>
+    new Promise((resolve) => {
+      knex('proposals')
+      .whereIn('id', proposalIds)
+      .select()
+      .then(data => resolve(proposalIds.map(
+        // eslint-disable-next-line eqeqeq
+        id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
+        ));
+    });
+
+const getPollsById = (pollIds) =>
+      new Promise((resolve) => {
+        knex('polls')
+        .whereIn('id', pollIds)
+        .select()
+        .then(data => resolve(pollIds.map(
+          // eslint-disable-next-line eqeqeq
+          id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
+          ));
+      });
+const getVotesById = (voteIds) =>
+    new Promise((resolve) => {
+      knex('votes')
+          .whereIn('id', voteIds)
+          .select()
+          .then(data => resolve(voteIds.map(
+            // eslint-disable-next-line eqeqeq
+            id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
+            ));
+    });
+
+
+const getStatementsById = (statementIds) =>
+    new Promise((resolve) => {
+      knex('statements')
+          .whereIn('id', statementIds)
+          .select()
+          .then(data => resolve(statementIds.map(
+            // eslint-disable-next-line eqeqeq
+            id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
+            ));
+    });
+
+const getPollingModesById = (pollingModeIds) =>
+      new Promise((resolve) => {
+        knex('polling_modes')
+            .whereIn('id', pollingModeIds)
+            .select()
+            .then(data => resolve(pollingModeIds.map(
+              // eslint-disable-next-line eqeqeq
+              id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
+              ));
+      });
+
+const getTagsById = (tagIds) =>
+      new Promise((resolve) => {
+        knex('tags')
+             .whereIn('id', tagIds)
+             .select()
+             .then(data => resolve(tagIds.map(
+                // eslint-disable-next-line eqeqeq
+              id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
+              ));
+      });
+
+
 function createLoaders() {
   return {
     users: new DataLoader(ids => getUsersById(ids)),
     followees: new DataLoader(ids => getFolloweeIds(ids)),
     roles: new DataLoader(ids => getRolesById(ids)),
+    proposals: new DataLoader(ids => getProposalsById(ids)),
+    polls: new DataLoader(ids => getPollsById(ids)),
+    votes: new DataLoader(ids => getVotesById(ids)),
+    statements: new DataLoader(ids => getStatementsById(ids)),
+    pollingModes: new DataLoader(ids => getPollingModesById(ids)),
+    tags: new DataLoader(ids => getTagsById(ids)),
   };
 }
 
