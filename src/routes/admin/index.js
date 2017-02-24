@@ -19,7 +19,7 @@ export default {
 
   async action() {
     if (!isAdmin) {
-      return { redirect: '/login' };
+      return { redirect: '/' };
     }
 
     const Admin = await require.ensure([], require => require('./Admin').default, 'admin');
