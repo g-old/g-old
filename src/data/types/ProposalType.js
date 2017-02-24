@@ -7,7 +7,6 @@ import {
   GraphQLInt,
 } from 'graphql';
 import AuthorType from './AuthorType';
-import StatementType from './StatementType';
 import QuorumType from './QuorumType';
 import TagType from './TagType';
 import VoteInfoType from './VoteInfoType';
@@ -65,12 +64,6 @@ const ProposalType = new ObjectType({
       },
     },
 
-    statements: {
-      type: new GraphQLList(StatementType),
-      sqlJoin(proposalsTable, statementsTable) {
-        return `${proposalsTable}.id = ${statementsTable}.proposal_id`;
-      },
-    },
     state: {
       type: GraphQLString,
     },
