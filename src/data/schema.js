@@ -16,6 +16,8 @@ import intl from './queries/intl';
 import proposal from './queries/proposal';
 import proposals from './queries/proposals';
 import user from './queries/user';
+import createStatement from './mutations/createStatement';
+import proposalDL from './queries/proposalDL';
 
 
 const schema = new Schema({
@@ -25,7 +27,15 @@ const schema = new Schema({
       intl,
       proposal,
       proposals,
+      proposalDL,
       user,
+    },
+  }),
+  mutation: new ObjectType({
+    name: 'Mutations',
+    fields: {
+      createStatement,
+
     },
   }),
 });
