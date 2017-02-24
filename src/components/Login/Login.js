@@ -24,14 +24,14 @@ class Login extends React.Component {
         <div className={s.container}>
           <form method="post">
             <div className={s.formGroup}>
-              <label className={s.label} htmlFor="usernameOrEmail">
+              <label className={s.label} htmlFor="email">
                 <FormattedMessage {...messages.email} />:
               </label>
               <input
                 className={s.input}
-                id="usernameOrEmail"
+                id="email"
                 type="text"
-                name="usernameOrEmail"
+                name="email"
                 autoFocus
               />
             </div>

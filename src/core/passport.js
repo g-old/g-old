@@ -14,11 +14,60 @@
  */
 
 import passport from 'passport';
+import bcrypt from 'bcrypt';
+import { Strategy as LocalStrategy } from 'passport-local';
+import knex from '../data/knex';
 
 
-/**
- * Sign in with Facebook.
- */
-passport.use();
+function verifyUser(user, password) {
+  return bcrypt.compare(password, user.password_hash)
+    .then((res) => res);
+}
+
+passport.use(new LocalStrategy({
+  usernameField: 'email',
+  passwordField: 'password',
+},
+(email, password, done) => {
+  knex('users').where({ email }).first()
+  .then((user) => {
+    if (!user) {
+      return done(null, false);
+    }
+    return verifyUser(user, password)
+    .then((verified) => {
+      if (verified) {
+        return done(null, user);
+      }
+      return done(null, false);
+    });
+  })
+.catch((error) => done(error));
+}));
+
+passport.serializeUser((user, done) => {
+  knex('roles')
+  .where({ id: user.role_id })
+  .select('type')
+.then((data) => {
+  if (data) {
+    const role = data[0].type;
+    const sessionUser = {
+      id: user.id,
+      name: user.name,
+      surname: user.surname,
+      email: user.email,
+      role,
+    };
+    done(null, sessionUser);
+  }
+  return Error('Role not found');
+})
+.catch((error) => done(error));
+});
+
+passport.deserializeUser((sessionUser, done) => {
+  done(null, sessionUser);
+});
 
 export default passport;

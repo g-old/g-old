@@ -17,6 +17,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/server';
 import UniversalRouter from 'universal-router';
 import PrettyError from 'pretty-error';
+import session from 'express-session';
+import knexSession from 'connect-session-knex';
+import memorySession from 'session-memory-store';
 import { IntlProvider } from 'react-intl';
 import knex from './data/knex';
 import './serverIntlPolyfill';
@@ -32,6 +35,7 @@ import { setRuntimeVariable } from './actions/runtime';
 import { setLocale } from './actions/intl';
 import { port, locales } from './config';
 import createLoaders from './data/dataLoader';
+import passport from './core/passport';
 
 const app = express();
 
@@ -63,13 +67,44 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 //
-// Authentication
+// Sessions
 // -----------------------------------------------------------------------------
 
+const sessionConfig = {
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  //cookie: { secure: true } // Use with SSL : https://github.com/expressjs/session
+};
+if (process.env.NODE_ENV === 'production') {
+  const SessionStore = knexSession(session);
+  const sessionDB = new SessionStore({
+    knex,
+  });
+  sessionConfig.store = sessionDB;
+} else {
+  const SessionStore = memorySession(session);
+  const sessionDB = new SessionStore();
+  sessionConfig.store = sessionDB;
+}
+
+app.use(session(sessionConfig));
+
+//
+// Authentication
+// -----------------------------------------------------------------------------
+app.use(passport.initialize());
+app.use(passport.session());
 
 if (process.env.NODE_ENV !== 'production') {
   app.enable('trust proxy');
 }
+app.post('/',
+  passport.authenticate('local', {
+    successRedirect: '/about',
+    failureFlash: true }),
+);
+
 app.get('/test', (req, res, next) => {
   knex('users').where({ name: 'admin' })
     .join('roles', 'users.role_id', '=', 'roles.id')
@@ -78,25 +113,20 @@ app.get('/test', (req, res, next) => {
     .catch((error) => next(error));
 });
 
-//
-// Register DataLoaders
-// -----------------------------------------------------------------------------
-
-app.use('/', (req, res, next) => {
-  // eslint-disable-next-line no-param-reassign
-  req.loaders = createLoaders();
-  next();
-});
-
 
 //
 // Register API middleware
 // -----------------------------------------------------------------------------
+
+
 app.use('/graphql', expressGraphQL(req => ({
   schema,
   graphiql: process.env.NODE_ENV !== 'production',
   rootValue: { request: req },
   pretty: process.env.NODE_ENV !== 'production',
+  context: { viewer: req.user,
+    /* { id: 12, role: 'admin', name: 'admin', email: 'admin@example.com' }*/
+    loaders: createLoaders() },
 })));
 
 //
