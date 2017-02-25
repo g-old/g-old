@@ -17,7 +17,6 @@ class Proposal {
   }
   static async gen(viewer, id, { proposals }) {
     const data = await proposals.load(id);
-
     if (data == null) return null;
     if (viewer == null) return null;
     return new Proposal(data);

@@ -74,6 +74,7 @@ const sessionConfig = {
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: true,
+  cookie: { domain: '/' },
   //cookie: { secure: true } // Use with SSL : https://github.com/expressjs/session
 };
 if (process.env.NODE_ENV === 'production') {
@@ -101,7 +102,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 app.post('/',
   passport.authenticate('local', {
-    successRedirect: '/about',
+    successRedirect: '/proposal',
     failureFlash: true }),
 );
 
@@ -120,12 +121,13 @@ app.get('/test', (req, res, next) => {
 
 
 app.use('/graphql', expressGraphQL(req => ({
+
   schema,
   graphiql: process.env.NODE_ENV !== 'production',
   rootValue: { request: req },
   pretty: process.env.NODE_ENV !== 'production',
   context: { viewer: req.user,
-    /* { id: 12, role: 'admin', name: 'admin', email: 'admin@example.com' }*/
+    /* { id: 12, role: 'admin', name: 'admin', email: 'admin@example.com' },*/
     loaders: createLoaders() },
 })));
 
