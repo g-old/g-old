@@ -19,6 +19,7 @@ export default {
     require('./home').default,
     require('./proposal').default,
     require('./about').default,
+    require('./testproposal').default,
     require('./admin').default,
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     require('./notFound').default,

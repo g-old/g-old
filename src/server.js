@@ -50,6 +50,7 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 // Register Node.js middleware
 // -----------------------------------------------------------------------------
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(cookieParser());
 app.use(requestLanguage({
   languages: locales,
@@ -74,7 +75,7 @@ const sessionConfig = {
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: true,
-  cookie: { domain: '/' },
+  cookie: { maxAge: (4 * 60 * 60 * 1000) },
   //cookie: { secure: true } // Use with SSL : https://github.com/expressjs/session
 };
 if (process.env.NODE_ENV === 'production') {
@@ -100,10 +101,11 @@ app.use(passport.session());
 if (process.env.NODE_ENV !== 'production') {
   app.enable('trust proxy');
 }
+
 app.post('/',
   passport.authenticate('local', {
-    successRedirect: '/proposal',
-    failureFlash: true }),
+    successRedirect: '/about',
+  }),
 );
 
 app.get('/test', (req, res, next) => {
@@ -130,6 +132,7 @@ app.use('/graphql', expressGraphQL(req => ({
     /* { id: 12, role: 'admin', name: 'admin', email: 'admin@example.com' },*/
     loaders: createLoaders() },
 })));
+
 
 //
 // Register server-side rendering middleware
@@ -179,7 +182,6 @@ app.get('*', async (req, res, next) => {
       query: req.query,
       locale,
     });
-
     if (route.redirect) {
       res.redirect(route.status || 302, route.redirect);
       return;
