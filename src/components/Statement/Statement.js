@@ -7,7 +7,7 @@ import s from './Statement.css';
 
 class Statement extends React.Component {
   static propTypes = {
-    title: PropTypes.String,
+    title: PropTypes.string,
     position: PropTypes.string,
     text: PropTypes.string,
   };
