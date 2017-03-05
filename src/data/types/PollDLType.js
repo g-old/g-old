@@ -51,6 +51,21 @@ const PollType = new ObjectType({
         .then(ids => ids.map(id => Vote.gen(viewer, id, loaders))),
       ),
     },
+    likedStatementIds: {
+      type: new GraphQLList(ID),
+
+      resolve(data, args, { viewer }) {
+        return Promise.resolve(
+        knex('statement_likes')
+        .where('statement_likes.user_id', '=', viewer.id)
+        .join('statements', 'statements.id', '=', 'statement_likes.statement_id')
+        .where('statements.poll_id', '=', data.id)
+        .pluck('statement_likes.id'),
+
+      );
+      },
+    },
+
     votes: {
       type: new GraphQLList(VoteType),
       resolve(data, args, { viewer, loaders }) {

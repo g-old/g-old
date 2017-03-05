@@ -2,6 +2,7 @@ import {
   GraphQLString,
   GraphQLNonNull as NonNull,
   GraphQLInputObjectType,
+  GraphQLID,
 } from 'graphql';
 import VoteInputType from './VoteInputType';
 
@@ -12,14 +13,24 @@ const StatementInputType = new GraphQLInputObjectType({
   fields: {
 
     vote: {
-      type: new NonNull(VoteInputType),
+      type: VoteInputType,
     },
     text: {
-      type: new NonNull(GraphQLString),
+      type: GraphQLString,
     },
     title: {
-      type: new NonNull(GraphQLString),
+      type: GraphQLString,
     },
+
+    pollId: {
+      type: new NonNull(GraphQLID),
+    },
+
+    id: {
+      type: GraphQLID,
+      description: 'Must be provided for mutations',
+    },
+
 
   },
 

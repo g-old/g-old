@@ -39,6 +39,7 @@ const StatementType = new ObjectType({
     likes: {
       type: GraphQLInt,
     },
+
     createdAt: {
       type: GraphQLString,
       sqlColumn: 'created_at',

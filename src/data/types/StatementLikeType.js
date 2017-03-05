@@ -1,34 +1,30 @@
 import {
-  GraphQLString,
   GraphQLObjectType as ObjectType,
-  GraphQLInt,
+  GraphQLID,
+  GraphQLNonNull,
 } from 'graphql';
 import User from '../models/User';
 import UserType from './UserType';
 
-const VoteType = new ObjectType({
-  name: 'VoteDL',
+const StatementLikeType = new ObjectType({
+  name: 'StatementLikeType',
 
   fields: {
 
     id: {
-      type: GraphQLInt,
+      type: new GraphQLNonNull(GraphQLID),
     },
 
-    position: {
-      type: GraphQLString,
-    //  resolve: (data) => data.position,
-    },
-    voter: {
+    author: {
       type: UserType,
       // resolve: (data) => data.user_id,
       resolve: (parent, { id }, { viewer, loaders }) => User.gen(viewer, parent.userId, loaders),
     },
-    pollId: {
-      type: GraphQLInt,
+    statement: {
+      type: new GraphQLNonNull(GraphQLID),
     },
 
   },
 
 });
-export default VoteType;
+export default StatementLikeType;

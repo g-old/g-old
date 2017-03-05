@@ -31,7 +31,10 @@ const VoteInputType = new GraphQLInputObjectType({
     pollId: {
       type: new NonNull(ID),
     },
-
+    id: {
+      type: ID,
+      description: 'Must be provided for mutations',
+    },
   },
 
 });

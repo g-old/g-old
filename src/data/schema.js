@@ -17,7 +17,14 @@ import proposal from './queries/proposal';
 import proposals from './queries/proposals';
 import user from './queries/user';
 import createStatement from './mutations/createStatement';
+import deleteStatement from './mutations/deleteStatement';
+import updateStatement from './mutations/updateStatement';
+import createStatementLike from './mutations/createStatementLike';
+import deleteStatementLike from './mutations/deleteStatementLike';
 import proposalDL from './queries/proposalDL';
+import createVote from './mutations/createVote';
+import updateVote from './mutations/updateVote';
+import deleteVote from './mutations/deleteVote';
 
 
 const schema = new Schema({
@@ -35,7 +42,13 @@ const schema = new Schema({
     name: 'Mutations',
     fields: {
       createStatement,
-
+      updateStatement,
+      deleteStatement,
+      createStatementLike,
+      deleteStatementLike,
+      createVote,
+      updateVote,
+      deleteVote,
     },
   }),
 });
