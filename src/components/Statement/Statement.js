@@ -7,15 +7,20 @@ import s from './Statement.css';
 
 class Statement extends React.Component {
   static propTypes = {
-    title: PropTypes.string,
-    position: PropTypes.string,
-    text: PropTypes.string,
+    title: PropTypes.string.isRequired,
+    position: PropTypes.string.isRequired,
+    text: PropTypes.string.isRequired,
   };
 
   render() {
     return (
       <div className={cn(s.root, this.props.position === 'pro' ? s.pro : s.contra)}>
-        {this.props.title}
+        <div>
+          {this.props.title}
+        </div>
+        <div>
+          {this.props.text}
+        </div>
       </div>
     );
   }
