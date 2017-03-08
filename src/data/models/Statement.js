@@ -23,8 +23,8 @@ class Statement {
     this.text = data.body;
     this.position = data.position;
     this.likes = data.likes;
-    this.vote_id = data.vote_id;
-    this.poll_id = data.poll_id;
+    this.voteId = data.vote_id;
+    this.pollId = data.poll_id;
   }
 
   static async gen(viewer, id, { statements }) {

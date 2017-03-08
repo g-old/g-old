@@ -3,8 +3,6 @@ import {
   GraphQLID,
   GraphQLNonNull,
 } from 'graphql';
-import User from '../models/User';
-import UserType from './UserType';
 
 const StatementLikeType = new ObjectType({
   name: 'StatementLikeType',
@@ -15,12 +13,12 @@ const StatementLikeType = new ObjectType({
       type: new GraphQLNonNull(GraphQLID),
     },
 
-    author: {
-      type: UserType,
+    authorId: {
+      type: new GraphQLNonNull(GraphQLID),
       // resolve: (data) => data.user_id,
-      resolve: (parent, { id }, { viewer, loaders }) => User.gen(viewer, parent.userId, loaders),
+      resolve: (data) => data.userId,
     },
-    statement: {
+    statementId: {
       type: new GraphQLNonNull(GraphQLID),
     },
 

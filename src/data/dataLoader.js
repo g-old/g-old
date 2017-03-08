@@ -119,7 +119,7 @@ const getTagsById = (tagIds) =>
 
 const getStatementLikesById = (likeIds) =>
     new Promise((resolve) => {
-      knex('tags')
+      knex('statement_likes')
            .whereIn('id', likeIds)
            .select()
            .then(data => resolve(likeIds.map(

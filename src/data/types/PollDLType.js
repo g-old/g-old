@@ -12,6 +12,8 @@ import PollingModeType from './PollingModeDLType';
 import VoteType from './VoteDLType';
 import StatementType from './StatementDLType';
 import Statement from '../models/Statement';
+import StatementLikeType from './StatementLikeType';
+import StatementLike from '../models/StatementLike';
 import Vote from '../models/Vote';
 import knex from '../knex';
 import PollingMode from '../models/PollingMode';
@@ -51,16 +53,17 @@ const PollType = new ObjectType({
         .then(ids => ids.map(id => Vote.gen(viewer, id, loaders))),
       ),
     },
-    likedStatementIds: {
-      type: new GraphQLList(ID),
+    likedStatements: {
+      type: new GraphQLList(StatementLikeType),
 
-      resolve(data, args, { viewer }) {
+      resolve(data, args, { viewer, loaders }) {
         return Promise.resolve(
         knex('statement_likes')
         .where('statement_likes.user_id', '=', viewer.id)
         .join('statements', 'statements.id', '=', 'statement_likes.statement_id')
         .where('statements.poll_id', '=', data.id)
-        .pluck('statement_likes.id'),
+        .pluck('statement_likes.id')
+        .then(ids => ids.map(id => StatementLike.gen(viewer, id, loaders))),
 
       );
       },
@@ -114,8 +117,8 @@ const PollType = new ObjectType({
       type: new GraphQLList(StatementType),
       resolve(data, args, { viewer, loaders }) {
         return Promise.resolve(
-        knex('statements').where({ poll_id: data.id }).pluck('id')
-        .then(ids => ids.map(id => Statement.gen(viewer, id, loaders))),
+          knex('statements').where({ poll_id: data.id }).pluck('id')
+          .then(ids => ids.map(id => Statement.gen(viewer, id, loaders))),
       );
       },
 

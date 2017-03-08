@@ -36,7 +36,6 @@ class User {
 
   static async vote(id, pollId) {
     const data = await knex('votes').where({ user_id: id, poll_id: pollId }).select('id');
-
     return data;
   /*  return Promise.resolve(knex('user_follows')
     .where({ follower_id: id }).pluck('followee_id')

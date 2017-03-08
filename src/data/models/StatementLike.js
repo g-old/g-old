@@ -21,20 +21,24 @@ class StatementLike {
   static async delete(viewer, data) {
     if (!data.id || !viewer) return null;
       // eslint-disable-next-line prefer-arrow-callback
-    const deletedId = await knex.transaction(async function (trx) {
-      const likeInDB = await knex('statement_likes').where({ id: data.id, user_id: viewer.id }).pluck('id');
+    const deletedLike = await knex.transaction(async function (trx) {
+      const likeInDB = await knex('statement_likes').where({ id: data.id, user_id: viewer.id }).select();
       if (likeInDB.length === 0) throw Error('Nothing to delete!');
       await trx.where({ id: data.id, user_id: viewer.id })
         .into('statement_likes')
         .del();
       // update votecount;
       await trx.where({ id: data.statementId }).decrement('likes', 1).into('statements');
-      return data.id;
+      return likeInDB;
     });
-    return deletedId || null;
+    console.log(deletedLike);
+    console.log('deletetdLIKE');
+    const delLike = new StatementLike(deletedLike[0]);
+    console.log(delLike);
+    return delLike || null;
   }
 
-  static async create(viewer, data) {
+  static async create(viewer, data, loaders) {
   // validate
     if (!data.statementId || !viewer) return null;
 
@@ -57,7 +61,8 @@ class StatementLike {
       await trx.where({ id: data.statementId }).increment('likes', 1).into('statements');
       return id[0];
     });
-    return newLikeId || null;
+    if (!newLikeId) return null;
+    return StatementLike.gen(viewer, newLikeId, loaders);
   }
 
 }

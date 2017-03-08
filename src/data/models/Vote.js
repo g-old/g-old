@@ -14,6 +14,8 @@ class Vote {
     this.pollId = data.poll_id;
   }
   static async gen(viewer, id, { votes }) {
+    console.log('GENVOTE');
+    console.log(id);
     const data = await votes.load(id);
     if (data === null) return null;
     const canSee = checkCanSee(viewer, data);

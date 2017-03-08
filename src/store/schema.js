@@ -5,6 +5,7 @@ export const pollingMode = new schema.Entity('pollingModes');
 export const vote = new schema.Entity('votes', {
   voter: user,
 });
+export const statementLike = new schema.Entity('statementLikes');
 
 
 export const statement = new schema.Entity('statements', {
@@ -19,6 +20,7 @@ export const poll = new schema.Entity('polls', {
   votes: [vote],
   ownVote: vote,
   followees: [vote],
+  likedStatements: [statementLike],
 });
 export const proposal = new schema.Entity('proposals', {
   author: user,

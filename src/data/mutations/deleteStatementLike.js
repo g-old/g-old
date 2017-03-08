@@ -1,13 +1,13 @@
 
 import {
   GraphQLNonNull,
-  GraphQLID,
 } from 'graphql';
 import StatementLikeInputType from '../types/StatementLikeInputType';
 import StatementLike from '../models/StatementLike';
+import StatementLikeType from '../types/StatementLikeType';
 
 const deleteStatementLike = {
-  type: new GraphQLNonNull(GraphQLID),
+  type: new GraphQLNonNull(StatementLikeType),
   args: {
     like: {
       type: StatementLikeInputType,
