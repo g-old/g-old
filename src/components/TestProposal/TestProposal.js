@@ -13,8 +13,14 @@ class TestProposal extends React.Component {
       body: PropTypes.string.isRequired,
       pollOne: PropTypes.shape({
         statements: PropTypes.arrayOf(PropTypes.object),
+        id: PropTypes.string,
+        likedStatements: PropTypes.arrayOf(PropTypes.shape({
+          id: PropTypes.string,
+          statementId: PropTypes.string,
+        })),
       }),
     }),
+
   }
 
   render() {
@@ -31,11 +37,18 @@ class TestProposal extends React.Component {
             {this.props.proposal.pollOne.statements.map(statement => (
               <Statement
                 key={statement.id}
-                title={statement.title}
+                data={statement}
+                ownLike={this.props.proposal.pollOne.likedStatements
+                  .find(data => data.statementId === statement.id)}
+                pollId={this.props.proposal.pollOne.id}
+              />
+
+              ))}
+            { /* title={statement.title}
                 text={statement.text}
                 position={statement.vote.position}
-              />
-              ))}
+                likes={statement.likes}
+                likeFn={this.props.likeFn} */}
           </div>
         </div>
       </div>

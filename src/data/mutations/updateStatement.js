@@ -3,17 +3,16 @@ import StatementInputType from '../types/StatementInputType';
 import StatementType from '../types/StatementDLType';
 import Statement from '../models/Statement';
 
-const createStatement = {
+const updateStatement = {
   type: StatementType,
   args: {
     statement: {
       type: StatementInputType,
-      description: 'Create a new Statement',
     },
   },
   resolve: (data, { statement }, { viewer, loaders }) =>
-      Statement.create(viewer, statement, loaders),
+      Statement.update(viewer, statement, loaders),
 
 };
 
-export default createStatement;
+export default updateStatement;

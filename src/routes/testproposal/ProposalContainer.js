@@ -19,6 +19,7 @@ class ProposalContainer extends React.Component {
   static propTypes = {
     proposal: PropTypes.object.isRequired,
     proposalId: PropTypes.number.isRequired,
+    createLike: PropTypes.func,
   }
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
@@ -31,6 +32,7 @@ class ProposalContainer extends React.Component {
     return <div>STILL LOADING ...</div>;
   }
 
+
 }
 ProposalContainer.propTypes = {
 };
@@ -38,7 +40,6 @@ ProposalContainer.propTypes = {
 const mapStateToProps = (state, ownProps) => {
   const data = state.entities.proposals[ownProps.proposalId];
   const proposal = denormalize(data, proposalSchema, state.entities);
-
   return {
     proposal,
   };

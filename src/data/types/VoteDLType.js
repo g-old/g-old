@@ -8,8 +8,6 @@ import UserType from './UserType';
 
 const VoteType = new ObjectType({
   name: 'VoteDL',
-  sqlTable: 'votes', // 'votes', if here join monster will try a join and fail
-  uniqueKey: 'id',
 
   fields: {
 
@@ -26,10 +24,8 @@ const VoteType = new ObjectType({
       // resolve: (data) => data.user_id,
       resolve: (parent, { id }, { viewer, loaders }) => User.gen(viewer, parent.userId, loaders),
     },
-    poll: {
+    pollId: {
       type: GraphQLInt,
-      sqlColumn: 'poll_id',
-    //  resolve: (data) => data.proposal_id,
     },
 
   },

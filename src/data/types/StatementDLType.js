@@ -26,7 +26,7 @@ const StatementType = new ObjectType({
     },
     vote: {
       type: VoteType,
-      resolve: (data, { id }, { viewer, loaders }) => Vote.gen(viewer, data.vote_id, loaders),
+      resolve: (data, { id }, { viewer, loaders }) => Vote.gen(viewer, data.voteId, loaders),
 
     },
     text: {
@@ -39,6 +39,11 @@ const StatementType = new ObjectType({
     likes: {
       type: GraphQLInt,
     },
+
+    pollId: {
+      type: ID,
+    },
+
     createdAt: {
       type: GraphQLString,
       sqlColumn: 'created_at',

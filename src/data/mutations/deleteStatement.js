@@ -1,19 +1,20 @@
-
+import {
+  GraphQLNonNull,
+  GraphQLID,
+} from 'graphql';
 import StatementInputType from '../types/StatementInputType';
-import StatementType from '../types/StatementDLType';
 import Statement from '../models/Statement';
 
-const createStatement = {
-  type: StatementType,
+const deleteStatement = {
+  type: new GraphQLNonNull(GraphQLID),
   args: {
     statement: {
       type: StatementInputType,
-      description: 'Create a new Statement',
     },
   },
   resolve: (data, { statement }, { viewer, loaders }) =>
-      Statement.create(viewer, statement, loaders),
+      Statement.delete(viewer, statement, loaders),
 
 };
 
-export default createStatement;
+export default deleteStatement;

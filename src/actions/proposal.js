@@ -15,6 +15,10 @@ const query = `
       body
       pollOne{
         id
+        likedStatements{
+          id
+          statementId
+        }
         ownVote{
           id
           position
@@ -37,7 +41,9 @@ const query = `
         statements{
           id
           title
+          likes
           text
+          pollId 
           vote{
             id
             position

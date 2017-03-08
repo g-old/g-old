@@ -117,6 +117,17 @@ const getTagsById = (tagIds) =>
               ));
       });
 
+const getStatementLikesById = (likeIds) =>
+    new Promise((resolve) => {
+      knex('statement_likes')
+           .whereIn('id', likeIds)
+           .select()
+           .then(data => resolve(likeIds.map(
+              // eslint-disable-next-line eqeqeq
+            id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
+            ));
+    });
+
 
 function createLoaders() {
   return {
@@ -129,6 +140,7 @@ function createLoaders() {
     statements: new DataLoader(ids => getStatementsById(ids)),
     pollingModes: new DataLoader(ids => getPollingModesById(ids)),
     tags: new DataLoader(ids => getTagsById(ids)),
+    statementLikes: new DataLoader(ids => getStatementLikesById(ids)),
   };
 }
 
