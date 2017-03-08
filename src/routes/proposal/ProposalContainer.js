@@ -10,7 +10,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { denormalize } from 'normalizr';
-import TestProposal from '../../components/Proposal';
+import Proposal from '../../components/Proposal';
 import { proposal as proposalSchema } from '../../store/schema';
 
 
@@ -26,7 +26,7 @@ class ProposalContainer extends React.Component {
   }
   render() {
     if (this.isReady()) {
-      return <TestProposal proposal={this.props.proposal} />;
+      return <Proposal proposal={this.props.proposal} />;
     }
     return <div>STILL LOADING ...</div>;
   }

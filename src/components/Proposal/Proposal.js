@@ -6,14 +6,19 @@ import s from './Proposal.css';
 
 class Proposal extends React.Component {
 
-  static propTypes = {
+  static propTypes ={
     proposal: PropTypes.shape({
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
-      publishedAt: PropTypes.string.isRequired,
       body: PropTypes.string.isRequired,
+      publishedAt: PropTypes.string,
       pollOne: PropTypes.shape({
         statements: PropTypes.arrayOf(PropTypes.object),
+        id: PropTypes.string,
+        likedStatements: PropTypes.arrayOf(PropTypes.shape({
+          id: PropTypes.string,
+          statementId: PropTypes.string,
+        })),
       }),
     }),
   }
@@ -36,9 +41,10 @@ class Proposal extends React.Component {
           {this.props.proposal.pollOne.statements.map(statement => (
             <Statement
               key={statement.id}
-              title={statement.title}
-              text={statement.text}
-              position={statement.vote.position}
+              data={statement}
+              ownLike={this.props.proposal.pollOne.likedStatements
+                .find(data => data.statementId === statement.id)}
+              pollId={this.props.proposal.pollOne.id}
             />
             ))}
         </div>

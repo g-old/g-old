@@ -13,6 +13,7 @@ const query = `
       title
       publishedAt
       body
+      votes
       pollOne{
         id
         likedStatements{
@@ -43,7 +44,7 @@ const query = `
           title
           likes
           text
-          pollId 
+          pollId
           vote{
             id
             position
