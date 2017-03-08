@@ -11,6 +11,7 @@ const query = `
     proposalDL (id:$id) {
       id
       title
+      publishedAt
       body
       pollOne{
         id

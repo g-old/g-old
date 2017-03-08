@@ -14,6 +14,7 @@ class Proposal {
     this.pollOne_id = data.poll_one_id;
     this.pollTwo_id = data.poll_two_id;
     this.state = data.state;
+    this.createdAt = data.created_at;
   }
   static async gen(viewer, id, { proposals }) {
     const data = await proposals.load(id);

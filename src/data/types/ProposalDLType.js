@@ -71,7 +71,10 @@ const ProposalType = new ObjectType({
       type: GraphQLString,
       sqlColumn: 'vote_ends_at',
     },
-
+    publishedAt: {
+      type: GraphQLString,
+      resolve: (data) => data.createdAt,
+    },
 
   },
 
