@@ -1,8 +1,9 @@
-
+import { FormattedRelative } from 'react-intl';
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import Statement from '../../components/Statement';
 import s from './Proposal.css';
+
 
 class Proposal extends React.Component {
 
@@ -31,7 +32,7 @@ class Proposal extends React.Component {
             {this.props.proposal.title}
           </div>
           <div className={s.date}>
-            {this.props.proposal.publishedAt}
+            <FormattedRelative value={this.props.proposal.publishedAt} />
           </div>
           <div className={s.body}>
             {this.props.proposal.body}
