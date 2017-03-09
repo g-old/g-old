@@ -51,8 +51,9 @@ exports.seed = function (knex, Promise) {
         poll_one_id: randomUnique(one),
         poll_two_id: randomUnique(two),
         title: faker.lorem.sentence(),
-        body: faker.lorem.paragraphs(randomNumber(4) || 1),
+        body: faker.lorem.paragraphs(randomNumber(10) || 1),
         state: 'proposed',
+        votes: randomNumber(10),
         created_at: time,
         updated_at: time
       };

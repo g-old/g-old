@@ -57,7 +57,7 @@ exports.seed = function (knex, Promise) {
             .where({ id: pollID })
             .increment('upvotes', 1) : knex('polls')
             .where({ id: pollID })
-            .increment('downvotes')));
+            .increment('downvotes', 1)));
             results.push(data);
           }
           return null;
