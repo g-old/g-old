@@ -1,22 +1,35 @@
 @import '../../components/variables.css';
 
 .root {
-  border: solid 1px black;
+  border: solid 1px gray;
   padding: 0.6em;
-  margin: 0.1em;
-  font-weight: bold;
-  border-radius: 0.5em;
+  margin: 0.1em 0.1em 0.4em;
+  font-size: 0.9em;
+}
+
+.title {
+  font-weight: bolder;
+  margin-right: 4em;
 }
 
 .pro {
   margin-right: 10em;
-  border-color: green;
-  background-color: lightgreen;
+  background-color: #efe;
 }
 
 .contra {
   margin-left: 10em;
-  border-color: red;
-  background-color: #f33;
+  background-color: #fee;
   text-align: right;
+}
+
+.likes {
+  float: right;
+  font-style: italic;
+  font-size: 0.9em;
+
+  .liked {
+    /* background-color: green; */
+    font-weight: bold;
+  }
 }

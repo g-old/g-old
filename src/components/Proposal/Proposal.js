@@ -11,6 +11,7 @@ class Proposal extends React.Component {
     proposal: PropTypes.shape({
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
+      state: PropTypes.string.isRequired,
       body: PropTypes.string.isRequired,
       publishedAt: PropTypes.string,
       pollOne: PropTypes.shape({
@@ -28,6 +29,9 @@ class Proposal extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
+          <div className={s.state}>
+            {this.props.proposal.state}
+          </div>
           <div className={s.title}>
             {this.props.proposal.title}
           </div>

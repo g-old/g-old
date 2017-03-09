@@ -42,21 +42,21 @@ class Statement extends React.Component {
   render() {
     return (
       <div className={cn(s.root, this.props.data.vote.position === 'pro' ? s.pro : s.contra)}>
-        <div>
+        <span className={s.likes}>
+          <button
+            onClick={(e) => this.handleLikeClick(e, this.props.ownLike)}
+            className={this.props.ownLike ? s.liked : s.notLiked}
+          >
+            {this.props.ownLike ? '+' : ''}
+            {this.props.data.likes}
+          </button>
+        </span>
+        <div className={s.title}>
           {this.props.data.title}
         </div>
         <div>
           {this.props.data.text}
         </div>
-        <span>
-          {this.props.data.likes}
-          <button
-            onClick={(e) => this.handleLikeClick(e, this.props.ownLike)}
-            style={{ background: this.props.ownLike ? 'red' : '' }}
-          >
-            {this.props.ownLike ? 'Liked' : 'Like'}
-          </button>
-        </span>
       </div>
     );
   }

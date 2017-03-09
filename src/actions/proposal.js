@@ -12,6 +12,7 @@ const query = `
       id
       title
       publishedAt
+      state
       body
       votes
       pollOne{
