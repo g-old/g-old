@@ -17,6 +17,7 @@ const query = `
       votes
       pollOne{
         id
+        end_time
         likedStatements{
           id
           statementId
