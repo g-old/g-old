@@ -1,10 +1,12 @@
-
+import {
+  GraphQLNonNull,
+} from 'graphql';
 import VoteInputType from '../types/VoteInputType';
 import Vote from '../models/Vote';
 import VoteType from '../types/VoteDLType';
 
 const createVote = {
-  type: VoteType,
+  type: new GraphQLNonNull(VoteType),
   args: {
     vote: {
       type: VoteInputType,

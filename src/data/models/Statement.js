@@ -25,6 +25,8 @@ class Statement {
     this.likes = data.likes;
     this.voteId = data.vote_id;
     this.pollId = data.poll_id;
+    this.createdAt = data.created_at;
+    this.updatedAt = data.updated_at;
   }
 
   static async gen(viewer, id, { statements }) {
@@ -102,11 +104,14 @@ class Statement {
     // authorize
     if (!Statement.canMutate(viewer, data)) return null;
     // validate
+    console.log('CREATE STATEMENTS:SERVER');
+    console.log(data);
 
     if (!data.pollId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders);
     if (!poll) return null;
     const statementsAllowed = await poll.isCommentable(viewer, loaders);
+    console.log(`IS COMMENTABLE${statementsAllowed}`);
     if (!statementsAllowed) return null;
     if (!data.title) return null;
     if (!data.title.length > 0 && typeof (data.title) === 'string') return null;

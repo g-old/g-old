@@ -17,12 +17,12 @@ const VoteType = new ObjectType({
 
     position: {
       type: GraphQLString,
-    //  resolve: (data) => data.position,
+      resolve: (data) => { console.log(data); return data.position; },
     },
     voter: {
       type: UserType,
       // resolve: (data) => data.user_id,
-      resolve: (parent, { id }, { viewer, loaders }) => User.gen(viewer, parent.userId, loaders),
+      resolve: (parent, { id }, { viewer, loaders }) => { console.log('VOTETYPE:USER'); console.log(parent); return User.gen(viewer, parent.userId, loaders); },
     },
     pollId: {
       type: GraphQLInt,

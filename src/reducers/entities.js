@@ -6,6 +6,10 @@ import {
   LOAD_PROPOSAL_ERROR,
   CREATE_LIKE_SUCCESS,
   DELETE_LIKE_SUCCESS,
+  CREATE_VOTE_SUCCESS,
+  UPDATE_VOTE_SUCCESS,
+  DELETE_VOTE_SUCCESS,
+  CREATE_STATEMENT_SUCCESS,
 } from '../constants';
 import { proposal as proposalSchema } from '../store/schema';
 
@@ -19,6 +23,43 @@ function updateStatementLikesCount(state, statementLike, up) {
       likes: up ? statement.likes + 1 : statement.likes - 1,
     },
 
+  };
+}
+
+function updatePollVotesCount(state, vote) {
+  const { pollId, position } = vote;
+  const poll = state[pollId];
+  const voteColumns = ['upvotes', 'downvotes'];
+  const index = position === 'pro' ? 0 : 1;
+  return {
+    ...state,
+    [pollId]: {
+      ...poll,
+      [voteColumns[index]]: poll[voteColumns[index]] + 1,
+      [voteColumns[1 - index]]: poll[voteColumns[1 - index]] - 1,
+      //upvotes: poll.upvotes + add,
+      //downvotes: poll.downvotes + (1 - add),
+    },
+
+  };
+}
+
+function updateProposalVotesCount(state, vote, up) {
+  let proposalId;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const id in state) {
+    if (state[id].pollOne === vote.pollId || state[id].pollTwo === vote.pollId) {
+      proposalId = id;
+      break;
+    }
+  }
+  const proposal = state[proposalId];
+  return {
+    ...state,
+    [proposalId]: {
+      ...proposal,
+      votes: up ? proposal.votes + 1 : proposal.votes - 1,
+    },
   };
 }
 
@@ -86,6 +127,113 @@ export default function entities(state = { proposals: {} }, action) {
           ...other,
         },
       };
+    }
+
+    case CREATE_VOTE_SUCCESS: {
+      const vote = action.payload.createVote;
+      const proposals = updateProposalVotesCount(state.proposals, vote, true);
+      const voteColumns = ['upvotes', 'downvotes'];
+      const index = vote.position === 'pro' ? 0 : 1;
+      return {
+        ...state,
+        proposals: {
+          ...proposals,
+        },
+        polls: {
+          ...state.polls,
+          [vote.pollId]: {
+            ...state.polls[vote.pollId],
+            ownVote: vote.id,
+            [voteColumns[index]]: state.polls[vote.pollId][voteColumns[index]] + 1,
+          },
+        },
+        votes: {
+          ...state.votes,
+          [vote.id]: vote,
+        },
+      };
+    }
+
+    case UPDATE_VOTE_SUCCESS: {
+      const ownVote = action.payload.updateVote;
+      const polls = updatePollVotesCount(state.polls, ownVote);
+      return {
+        ...state,
+        polls: {
+          ...polls,
+        },
+        votes: {
+          ...state.votes,
+          [ownVote.id]: {
+            ...state.votes[ownVote.id],
+            position: ownVote.position,
+          },
+        },
+      };
+    }
+
+    case DELETE_VOTE_SUCCESS: {
+      const ownVote = action.payload.deleteVote;
+      // adjust counters
+      const proposals = updateProposalVotesCount(state.proposals, ownVote);
+      const voteColumns = ['upvotes', 'downvotes'];
+      const index = ownVote.position === 'pro' ? 0 : 1;
+      // delete
+      // eslint-disable-next-line no-unused-vars
+      const { [ownVote.id]: omit, ...other } = state.votes;
+
+      return {
+        ...state,
+        proposals: {
+          ...proposals,
+        },
+        polls: {
+          ...state.polls,
+          [ownVote.pollId]: {
+            ...state.polls[ownVote.pollId],
+            ownVote: null,
+            [voteColumns[index]]: state.polls[ownVote.pollId][voteColumns[index]] - 1,
+          },
+        },
+        votes: {
+          ...other,
+        },
+      };
+    }
+
+    // TODO finish
+    case CREATE_STATEMENT_SUCCESS: {
+      const statement = action.payload.createStatement;
+
+      // check if vote is already storedn
+      /* const voteInStore = state.votes[statement.vote.id];
+      const authorInStore = state.users[statement.author.id];
+      if (!voteInStore && voteInStore.position !== statement.position) {
+        re
+      }
+      */
+      return {
+        ...state,
+        statements: {
+          ...state.statements,
+          [statement.id]: {
+            ...statement,
+            vote: statement.vote.id,
+            author: statement.author.id,
+          },
+        },
+      };
+
+
+      /*
+    // Normalizer throws undefined TODO find out why
+    const normalizedData = normalize(action.payload.createStatement, statementSchema);
+
+      return {
+        ...merge({}, state, normalizedData.entities),
+
+      };
+      */
     }
 
     case LOAD_PROPOSAL_SUCCESS: {

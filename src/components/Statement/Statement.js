@@ -18,10 +18,16 @@ class Statement extends React.Component {
       }),
       text: PropTypes.string.isRequired,
       likes: PropTypes.number.isRequired,
+      author: PropTypes.shape({
+        name: PropTypes.string,
+        surname: PropTypes.string,
+
+      }),
     }),
     createLike: PropTypes.func.isRequired,
     deleteLike: PropTypes.func.isRequired,
     ownLike: PropTypes.object,
+    ownStatement: PropTypes.bool,
   };
 
   handleLikeClick(e, like) {
@@ -43,6 +49,10 @@ class Statement extends React.Component {
     return (
       <div className={cn(s.root, this.props.data.vote.position === 'pro' ? s.pro : s.contra)}>
         <div>
+          {this.props.data.author.name} {this.props.data.author.surname}
+        </div>
+        <br />
+        <div>
           {this.props.data.title}
         </div>
         <div>
@@ -56,6 +66,8 @@ class Statement extends React.Component {
           >
             {this.props.ownLike ? 'Liked' : 'Like'}
           </button>
+          <br />
+          {this.props.ownStatement && <span><button>EDIT</button><button>DELETE</button></span>}
         </span>
       </div>
     );

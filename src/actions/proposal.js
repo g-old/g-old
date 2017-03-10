@@ -6,6 +6,52 @@ LOAD_PROPOSAL_SUCCESS,
   LOAD_PROPOSAL_ERROR,
 } from '../constants';
 
+const pollFields = `{
+  id
+  likedStatements{
+    id
+    statementId
+  }
+  ownVote{
+    id
+    position
+  }
+  upvotes
+  downvotes
+  followees{
+    id
+    position
+    voter{
+      id
+      name
+      surname
+    }
+  }
+  mode{
+    id
+    with_statements
+  }
+  statements{
+    id
+    title
+    likes
+    text
+    pollId
+    createdAt
+    updatedAt
+    vote{
+      id
+      position
+    }
+    author{
+      id
+      name
+      surname
+      avatar
+    }
+  }
+}
+`;
 const query = `
   query ($id:ID!) {
     proposalDL (id:$id) {
@@ -14,46 +60,12 @@ const query = `
       publishedAt
       body
       votes
-      pollOne{
-        id
-        likedStatements{
-          id
-          statementId
-        }
-        ownVote{
-          id
-          position
-        }
-        upvotes
-        downvotes
-        followees{
-          id
-          position
-          voter{
-            id
-            name
-            surname
-          }
-        }
-        mode{
-          id
-          with_statements
-        }
-        statements{
-          id
-          title
-          likes
-          text
-          pollId
-          vote{
-            id
-            position
-          }
-        }
-      }
+      pollOne ${pollFields}
+      pollTwo ${pollFields}
     }
   }
 `;
+
 
 export function loadProposal({ id }) {
   return async (dispatch, getState, { graphqlRequest }) => {

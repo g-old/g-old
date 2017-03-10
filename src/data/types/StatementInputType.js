@@ -1,33 +1,32 @@
 import {
-  GraphQLString,
+  GraphQLString as String,
   GraphQLNonNull as NonNull,
   GraphQLInputObjectType,
-  GraphQLID,
+  GraphQLID as ID,
 } from 'graphql';
 import VoteInputType from './VoteInputType';
 
 
 const StatementInputType = new GraphQLInputObjectType({
   name: 'StatementInput',
-  description: 'Statement on proposal',
   fields: {
 
     vote: {
       type: VoteInputType,
     },
     text: {
-      type: GraphQLString,
+      type: String,
     },
     title: {
-      type: GraphQLString,
+      type: String,
     },
 
     pollId: {
-      type: new NonNull(GraphQLID),
+      type: new NonNull(ID),
     },
 
     id: {
-      type: GraphQLID,
+      type: ID,
       description: 'Must be provided for mutations',
     },
 

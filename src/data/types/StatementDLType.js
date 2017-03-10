@@ -46,7 +46,9 @@ const StatementType = new ObjectType({
 
     createdAt: {
       type: GraphQLString,
-      sqlColumn: 'created_at',
+    },
+    updatedAt: {
+      type: GraphQLString,
     },
   },
 

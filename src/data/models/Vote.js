@@ -14,8 +14,7 @@ class Vote {
     this.pollId = data.poll_id;
   }
   static async gen(viewer, id, { votes }) {
-    console.log('GENVOTE');
-    console.log(id);
+    if (!id) return null;
     const data = await votes.load(id);
     if (data === null) return null;
     const canSee = checkCanSee(viewer, data);
@@ -43,7 +42,7 @@ class Vote {
     if (newPosition !== oldVote.position) return null;
 
     // eslint-disable-next-line prefer-arrow-callback
-    const deletedId = await knex.transaction(async function (trx) {
+    await knex.transaction(async function (trx) {
       await trx.where({ id: data.id })
           .into('votes')
           .del();
@@ -53,10 +52,8 @@ class Vote {
       const index = newPosition === 'con' ? 1 : 0;
       await trx.where({ id: data.pollId }).decrement(columns[index], 1).into('polls');
       await trx.where({ id: data.pollId }).decrement('num_voter', 1).into('polls');
-      return data.id; // TODO change
     });
-
-    return deletedId;
+    return new Vote(oldVote) || null;
   }
 
   static async update(viewer, data, loaders) {
@@ -64,11 +61,9 @@ class Vote {
     if (!data.pollId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
     const oldVote = await Vote.validate(viewer, data, loaders, poll, true);
-
     if (!oldVote || !oldVote.position) return null;
     // eslint-disable-next-line eqeqeq
     if (data.id != oldVote.id) return null;
-
     if (await poll.isUnipolar(viewer, loaders)) {
       return null; // delete is the right method
     }

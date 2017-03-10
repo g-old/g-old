@@ -1,0 +1,6 @@
+{
+  "name": "StatementInput",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./StatementInput.js"
+}

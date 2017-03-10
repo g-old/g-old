@@ -18,6 +18,7 @@ class ProposalContainer extends React.Component {
 
   static propTypes = {
     proposal: PropTypes.object.isRequired,
+    user: PropTypes.object.isRequired,
     proposalId: PropTypes.number.isRequired,
     createLike: PropTypes.func,
   }
@@ -27,7 +28,7 @@ class ProposalContainer extends React.Component {
   }
   render() {
     if (this.isReady()) {
-      return <TestProposal proposal={this.props.proposal} />;
+      return <TestProposal user={this.props.user} proposal={this.props.proposal} />;
     }
     return <div>STILL LOADING ...</div>;
   }
@@ -40,8 +41,10 @@ ProposalContainer.propTypes = {
 const mapStateToProps = (state, ownProps) => {
   const data = state.entities.proposals[ownProps.proposalId];
   const proposal = denormalize(data, proposalSchema, state.entities);
+  const user = state.user; // or pass via context
   return {
     proposal,
+    user,
   };
 };
 

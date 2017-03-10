@@ -16,11 +16,11 @@ const VoteInputType = new GraphQLInputObjectType({
       type: new NonNull(new GraphQLEnumType({
         name: 'Position',
         values: {
-          PRO: {
+          pro: {
             value: 1,
             description: 'You support the proposal',
           },
-          CON: {
+          con: {
             value: 0,
             description: 'You are against the proposal',
           },

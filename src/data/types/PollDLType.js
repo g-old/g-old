@@ -45,13 +45,14 @@ const PollType = new ObjectType({
     },
     ownVote: {
       type: VoteType,
-      resolve: (data, args, { viewer, loaders }) =>
-      Promise.resolve(
+      resolve(data, args, { viewer, loaders }) {
+        return Promise.resolve(
         knex('votes')
         .where({ user_id: viewer.id, poll_id: data.id })
         .pluck('id')
-        .then(ids => ids.map(id => Vote.gen(viewer, id, loaders))),
-      ),
+        .then(id => Vote.gen(viewer, id[0] || null, loaders)),
+      );
+      },
     },
     likedStatements: {
       type: new GraphQLList(StatementLikeType),
@@ -125,7 +126,6 @@ const PollType = new ObjectType({
     },
     createdAt: {
       type: GraphQLString,
-      sqlColumn: 'created_at',
     },
 
 
