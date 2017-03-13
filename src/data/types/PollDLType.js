@@ -31,6 +31,7 @@ const PollType = new ObjectType({
     },
     end_time: {
       type: GraphQLString,
+      resolve: (data) => data.endTime,
     },
     start_time: {
       type: GraphQLString,

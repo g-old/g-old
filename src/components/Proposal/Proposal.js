@@ -17,6 +17,7 @@ class Proposal extends React.Component {
       pollOne: PropTypes.shape({
         statements: PropTypes.arrayOf(PropTypes.object),
         id: PropTypes.string,
+        end_time: PropTypes.string,
         likedStatements: PropTypes.arrayOf(PropTypes.shape({
           id: PropTypes.string,
           statementId: PropTypes.string,
@@ -30,7 +31,7 @@ class Proposal extends React.Component {
       <div className={s.root}>
         <div className={s.container}>
           <div className={s.state}>
-            {this.props.proposal.state}
+            {this.props.proposal.state} (<FormattedRelative value={this.props.proposal.state === 'proposed' ? this.props.proposal.pollOne.end_time : ''} />)
           </div>
           <div className={s.title}>
             {this.props.proposal.title}

@@ -36,7 +36,7 @@ class Navigation extends React.Component {
           <FormattedMessage {...messages.about} />
         </Link>
         <Link className={s.link} to="/proposal/2">
-        Proposal /* test */
+        Proposal
       </Link>
       </div>
     );

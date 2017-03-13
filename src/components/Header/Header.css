@@ -15,7 +15,7 @@
 }
 
 .root {
-  background: #e0b000;
+  background: var(--color-gold);
   color: #2a2a2a;
 }
 
