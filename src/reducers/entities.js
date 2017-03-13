@@ -48,7 +48,8 @@ function updateProposalVotesCount(state, vote, up) {
   let proposalId;
   // eslint-disable-next-line no-restricted-syntax
   for (const id in state) {
-    if (state[id].pollOne === vote.pollId || state[id].pollTwo === vote.pollId) {
+    // eslint-disable-next-line eqeqeq
+    if (state[id].pollOne == vote.pollId || state[id].pollTwo == vote.pollId) {
       proposalId = id;
       break;
     }
