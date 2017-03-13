@@ -16,9 +16,12 @@ function randomNumber(max) {
 }
 
 
+const states = ['proposed', 'voting', 'accepted', 'rejected', 'revoked', 'deleted'];
+
+
 /* eslint comma-dangle: ["error", {"functions": "never"}]*/
 exports.seed = function (knex, Promise) {
-  let records = 10;
+  let records = 20;
   const ar = [];
   while (records) { // TODO move to new Array(x) as soon as it is supported
     ar.push(1);
@@ -45,14 +48,16 @@ exports.seed = function (knex, Promise) {
 
     time = new Date();
     const length = one.length > two.length ? two.length : one.length;
+
     for (let i = 0; i < length; i += 1) {
+      const statesIndex = randomNumber(states.length - 3);
       prop = {
         author_id: random(users),
         poll_one_id: randomUnique(one),
         poll_two_id: randomUnique(two),
         title: faker.lorem.sentence(),
         body: faker.lorem.paragraphs(randomNumber(10) || 1),
-        state: 'proposed',
+        state: states[statesIndex],
         votes: randomNumber(10),
         created_at: time,
         updated_at: time
