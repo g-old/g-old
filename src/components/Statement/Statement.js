@@ -51,24 +51,23 @@ class Statement extends React.Component {
         <div>
           {this.props.data.author.name} {this.props.data.author.surname}
         </div>
-        <br />
-        <div>
+        <span className={s.likes}>
+          <button
+            onClick={(e) => this.handleLikeClick(e, this.props.ownLike)}
+            className={this.props.ownLike ? s.liked : s.notLiked}
+          >
+            {this.props.ownLike ? '+' : ''}
+            {this.props.data.likes}
+          </button>
+          <br />
+          {this.props.ownStatement && <span><button>EDIT</button><button>DELETE</button></span>}
+        </span>
+        <div className={s.title}>
           {this.props.data.title}
         </div>
         <div>
           {this.props.data.text}
         </div>
-        <span>
-          {this.props.data.likes}
-          <button
-            onClick={(e) => this.handleLikeClick(e, this.props.ownLike)}
-            style={{ background: this.props.ownLike ? 'red' : '' }}
-          >
-            {this.props.ownLike ? 'Liked' : 'Like'}
-          </button>
-          <br />
-          {this.props.ownStatement && <span><button>EDIT</button><button>DELETE</button></span>}
-        </span>
       </div>
     );
   }

@@ -10,7 +10,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { denormalize } from 'normalizr';
-import TestProposal from '../../components/TestProposal';
+import TestProposal from '../../components/TestProposal2';
 import { proposal as proposalSchema } from '../../store/schema';
 
 

@@ -1,0 +1,6 @@
+{
+  "name": "PollState",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./PollState.js"
+}

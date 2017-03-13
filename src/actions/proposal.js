@@ -6,32 +6,7 @@ LOAD_PROPOSAL_SUCCESS,
   LOAD_PROPOSAL_ERROR,
 } from '../constants';
 
-const pollFields = `{
-  id
-  likedStatements{
-    id
-    statementId
-  }
-  ownVote{
-    id
-    position
-  }
-  upvotes
-  downvotes
-  followees{
-    id
-    position
-    voter{
-      id
-      name
-      surname
-    }
-  }
-  mode{
-    id
-    with_statements
-  }
-  statements{
+const statementFields = `{
     id
     title
     likes
@@ -49,15 +24,51 @@ const pollFields = `{
       surname
       avatar
     }
-  }
 }
 `;
+const pollFields = `{
+  id
+  likedStatements{
+    id
+    statementId
+  }
+  ownVote{
+    id
+    position
+  }
+  ownStatement ${statementFields}
+  upvotes
+  downvotes
+  threshold
+  start_time
+  end_time
+  allVoters
+  followees{
+    id
+    position
+    voter{
+      id
+      name
+      surname
+    }
+  }
+  mode{
+    id
+    with_statements
+    unipolar
+    threshold_ref
+  }
+  statements ${statementFields}
+}
+`;
+
 const query = `
   query ($id:ID!) {
     proposalDL (id:$id) {
       id
       title
       publishedAt
+      state
       body
       votes
       pollOne ${pollFields}

@@ -8,6 +8,19 @@ class StatementInput extends React.Component {
   static propTypes = {
     onSubmit: PropTypes.func.isRequired,
   }
+  constructor(props) {
+    super(props);
+    this.state = {
+      textInput: { val: '' },
+      textArea: { val: '' },
+    };
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleOnSubmit = this.handleOnSubmit.bind(this);
+    // this.handleTextAreaChange = this.handleTextAreaChange.bind(this);
+  }
+  handleInputChange(e) {
+    this.setState({ textInput: { val: e.target.value } });
+  }
   handleOnSubmit(e) {
     const data = { title: 'NEW TITLE', text: 'NEW TEXT' };
     this.props.onSubmit(data);
@@ -17,11 +30,21 @@ class StatementInput extends React.Component {
   render() {
     return (
       <div>
-      INPUT
-
-        <input />
-        <textarea />
-        <button onClick={(e) => this.handleOnSubmit(e)}> ABSCHICKEN </button>
+        <p>
+          {'Title'}
+          <br />
+          <input
+            type="text"
+            value={this.state.textInput.val}
+            onChange={this.handleInputChange}
+          />
+        </p>
+        <p>
+          {'Text'}
+          <br />
+          <textarea />
+        </p>
+        <button onClick={this.handleOnSubmit}> ABSCHICKEN </button>
       </div>
     );
   }

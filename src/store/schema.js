@@ -19,6 +19,7 @@ export const poll = new schema.Entity('polls', {
   mode: pollingMode,
   votes: [vote],
   ownVote: vote,
+  ownStatement: statement,
   followees: [vote],
   likedStatements: [statementLike],
 });

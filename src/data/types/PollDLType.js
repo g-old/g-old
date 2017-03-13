@@ -50,7 +50,7 @@ const PollType = new ObjectType({
         knex('votes')
         .where({ user_id: viewer.id, poll_id: data.id })
         .pluck('id')
-        .then(id => Vote.gen(viewer, id[0] || null, loaders)),
+        .then(id => (id[0] ? Vote.gen(viewer, id[0], loaders) : null)),
       );
       },
     },
@@ -124,6 +124,17 @@ const PollType = new ObjectType({
       },
 
     },
+    ownStatement: {
+      type: StatementType,
+      resolve(data, args, { viewer, loaders }) {
+        return Promise.resolve(
+          knex('statements').where({ poll_id: data.id, author_id: viewer.id })
+          .pluck('id')
+          .then(id => (id[0] ? Statement.gen(viewer, id[0], loaders) : null)),
+        );
+      },
+    },
+
     createdAt: {
       type: GraphQLString,
     },

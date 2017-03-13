@@ -14,8 +14,9 @@ class Poll {
     this.upvotes = data.upvotes;
     this.downvotes = data.downvotes;
     this.numVoter = data.num_voter;
-    this.startTime = data.start_time;
-    this.endTime = data.end_time;
+    this.start_time = data.start_time;
+    this.end_time = data.end_time;
+    this.closes_at = data.closes_at;
   }
   static async gen(viewer, id, { polls }) {
     const data = await polls.load(id);

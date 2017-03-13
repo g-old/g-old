@@ -11,7 +11,6 @@ import React from 'react';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Header.css';
-import Link from '../Link';
 import Navigation from '../Navigation';
 import LanguageSwitcher from '../LanguageSwitcher';
 
@@ -40,11 +39,6 @@ class Header extends React.Component {
       <div className={s.root}>
         <div className={s.container}>
           <Navigation className={s.nav} />
-          <Link className={s.brand} to="/">
-            <span className={s.brandTxt}>
-              <FormattedMessage {...messages.brand} />
-            </span>
-          </Link>
           <LanguageSwitcher />
           <div className={s.banner}>
             <h1 className={s.bannerTitle}>
