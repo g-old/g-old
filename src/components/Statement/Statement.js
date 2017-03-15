@@ -23,7 +23,6 @@ class Statement extends React.Component {
       author: PropTypes.shape({
         name: PropTypes.string,
         surname: PropTypes.string,
-
       }),
     }),
     createLike: PropTypes.func.isRequired,
@@ -73,9 +72,6 @@ class Statement extends React.Component {
   render() {
     return (
       <div className={cn(s.root, this.props.data.vote.position === 'pro' ? s.pro : s.contra)}>
-        <div>
-          {this.props.data.author.name} {this.props.data.author.surname}
-        </div>
         <span className={s.likes}>
           <button
             onClick={(e) => this.handleLikeClick(e, this.props.ownLike)}
@@ -95,10 +91,18 @@ class Statement extends React.Component {
               </button>
             </span>}
         </span>
+        <img
+          className={cn(s.avatar)} src={`https://api.adorable.io/avatars/256/${
+                                             this.props.data.author.name}${this.props.data.author.surname
+                                            }.io.png`} alt="IMG"
+        />
+        <div className={cn(s.author)}>
+          {this.props.data.author.name} {this.props.data.author.surname}
+        </div>
         <div className={s.title}>
           {this.props.data.title}
         </div>
-        <div>
+        <div className={s.text}>
           {this.props.data.text}
         </div>
       </div>
