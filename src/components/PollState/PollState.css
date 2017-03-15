@@ -1,0 +1,8 @@
+@import '../../components/variables.css';
+
+.root {
+  border: solid 1px gray;
+  margin-top: 1em;
+  padding: 0.4em;
+  font-size: 0.9em;
+}
