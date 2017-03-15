@@ -2,25 +2,28 @@
 
 .root {
   border: solid 1px gray;
-  padding: 0.6em;
+  padding: 0.4em;
   margin: 0.1em 0.1em 0.4em;
   font-size: 0.9em;
 }
 
+.author {
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+.avatar {
+  float: left;
+  margin-right: 0.5em;
+  width: 2.5em;
+
+  /* for the dummy avatar text */
+  font-size: 0.9em;
+  text-align: center;
+}
+
 .title {
   font-weight: bolder;
-  margin-right: 4em;
-}
-
-.pro {
-  margin-right: 10em;
-  background-color: #efe;
-}
-
-.contra {
-  margin-left: 10em;
-  background-color: #fee;
-  text-align: right;
 }
 
 .likes {
@@ -32,4 +35,38 @@
     /* background-color: green; */
     font-weight: bold;
   }
+}
+
+.pro {
+  margin-right: 10%;
+  background-color: #fafffa;
+
+  .title {
+    margin-right: 4em;
+  }
+}
+
+.contra {
+  margin-left: 10%;
+  background-color: #fffafa;
+  text-align: right;
+
+  .title {
+    margin-left: 4em;
+  }
+
+  .avatar {
+    float: right;
+    margin-left: 0.5em;
+    margin-right: 0;
+  }
+
+  .likes {
+    float: left;
+  }
+}
+
+.text {
+  margin-top: 0.3em;
+  line-height: 1.1em;
 }
