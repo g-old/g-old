@@ -10,8 +10,10 @@ import {
   UPDATE_VOTE_SUCCESS,
   DELETE_VOTE_SUCCESS,
   CREATE_STATEMENT_SUCCESS,
+  DELETE_STATEMENT_SUCCESS,
+  UPDATE_STATEMENT_SUCCESS,
 } from '../constants';
-import { proposal as proposalSchema } from '../store/schema';
+import { proposal as proposalSchema, statement as statementSchema } from '../store/schema';
 
 function updateStatementLikesCount(state, statementLike, up) {
   const { statementId } = statementLike;
@@ -202,39 +204,57 @@ export default function entities(state = { proposals: {} }, action) {
       };
     }
 
-    // TODO finish
     case CREATE_STATEMENT_SUCCESS: {
       const statement = action.payload.createStatement;
+      const normalizedData = normalize(statement, statementSchema);
+      return {
+        ...merge({}, state, normalizedData.entities),
+        polls: {
+          ...state.polls,
+          [statement.pollId]: {
+            ...state.polls[statement.pollId],
+            ownStatement: statement.id,
+          },
+        },
 
-      // check if vote is already storedn
-      /* const voteInStore = state.votes[statement.vote.id];
-      const authorInStore = state.users[statement.author.id];
-      if (!voteInStore && voteInStore.position !== statement.position) {
-        re
-      }
-      */
+      };
+    }
+    /* NOTE: If someone has liked his own statement, the references in
+      likedStatements and the copy in statementLikes are currently not
+      being deleted from the store!
+      Suggestion: Don't allow users to like own statements
+    */
+    case DELETE_STATEMENT_SUCCESS: {
+      const statement = action.payload.deleteStatement;
+      // eslint-disable-next-line no-unused-vars
+      const { [statement.id]: omit, ...other } = state.statements;
+      return {
+        ...state,
+        statements: {
+          ...other,
+        },
+        polls: {
+          ...state.polls,
+          [statement.pollId]: {
+            ...state.polls[statement.pollId],
+            ownStatement: null,
+          },
+        },
+      };
+    }
+
+    case UPDATE_STATEMENT_SUCCESS: {
+      const statement = action.payload.updateStatement;
       return {
         ...state,
         statements: {
           ...state.statements,
           [statement.id]: {
+            ...state.statements[statement.id],
             ...statement,
-            vote: statement.vote.id,
-            author: statement.author.id,
           },
         },
       };
-
-
-      /*
-    // Normalizer throws undefined TODO find out why
-    const normalizedData = normalize(action.payload.createStatement, statementSchema);
-
-      return {
-        ...merge({}, state, normalizedData.entities),
-
-      };
-      */
     }
 
     case LOAD_PROPOSAL_SUCCESS: {

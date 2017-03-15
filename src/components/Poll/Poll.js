@@ -33,10 +33,12 @@ class Poll extends React.Component {
     }),
     user: PropTypes.object.isRequired,
     onVoteButtonClicked: PropTypes.func.isRequired,
+    onStatementSubmit: PropTypes.func,
   }
   constructor(props) {
     super(props);
     this.state = {};
+    this.handleOnSubmit = this.handleOnSubmit.bind(this);
   }
   canVote(position) {
     let method; // or take methods better directly in and connect to redux
@@ -52,6 +54,19 @@ class Poll extends React.Component {
     this.props.onVoteButtonClicked({ position, pollId: this.props.poll.id, id }, method);
   }
 
+  handleRetractVote() {
+    alert(`TODO ${this.props.poll.id}`);
+  }
+
+  handleOnSubmit(input) {
+    this.props.onStatementSubmit({
+      ...input,
+      pollId: this.props.poll.id,
+      vote: this.props.poll.ownVote,
+    });
+  }
+
+
   render() {
     const withStatements = this.props.poll.mode.with_statements;
     let statements = null;
@@ -64,6 +79,7 @@ class Poll extends React.Component {
         user={this.props.user}
         voted={this.props.poll.ownVote != null}
         ownStatement={this.props.poll.ownStatement}
+        onSubmit={this.handleOnSubmit}
       />);
     }
     let votingButtons = null;
@@ -75,10 +91,11 @@ class Poll extends React.Component {
       const conBtnColor = this.props.poll.ownVote ? (this.props.poll.ownVote.position === 'con' ? 'green' : '') : '';
       if (this.props.poll.mode.unipolar) {
         votingButtons = <button onClick={() => this.canVote('pro')} style={{ background: proBtnColor }}> WANT TO VOTE </button>;
+      } else if (this.props.poll.ownStatement) {
+        votingButtons = (<button onClick={this.handleRetractVote}>
+          RETRACT VOTE - AND DELETE STATEMENT
+        </button>);
       } else {
-        console.log('RENDER POLL');
-        console.log(this.props.poll);
-
         votingButtons = (<span>
           <button
             onClick={() => this.canVote('pro')}

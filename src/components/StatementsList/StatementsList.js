@@ -13,12 +13,13 @@ class StatementsList extends React.Component {
     user: PropTypes.object.isRequired,
     voted: PropTypes.bool.isRequired,
     ownStatement: PropTypes.bool,
+    onSubmit: PropTypes.func.isRequired,
   }
   render() {
       // show input only if then user has voted and hasnt written a statement
     let input = 'VOTE, THEN DEBATE ;) ';
     if (this.props.voted) {
-      input = <StatementInput onSubmit={() => alert('SUBMITTING')} />;
+      input = <StatementInput onSubmit={this.props.onSubmit} />;
     }
     let ownStatement = null;
     if (this.props.ownStatement) {

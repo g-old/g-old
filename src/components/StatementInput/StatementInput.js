@@ -15,14 +15,18 @@ class StatementInput extends React.Component {
       textArea: { val: '' },
     };
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleTextAreaChange = this.handleTextAreaChange.bind(this);
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
     // this.handleTextAreaChange = this.handleTextAreaChange.bind(this);
   }
   handleInputChange(e) {
-    this.setState({ textInput: { val: e.target.value } });
+    this.setState({ ...this.state, textInput: { val: e.target.value } });
+  }
+  handleTextAreaChange(e) {
+    this.setState({ ...this.state, textArea: { val: e.target.value } });
   }
   handleOnSubmit(e) {
-    const data = { title: 'NEW TITLE', text: 'NEW TEXT' };
+    const data = { title: this.state.textInput.val, text: this.state.textArea.val };
     this.props.onSubmit(data);
     e.preventDefault();
   }
@@ -42,7 +46,10 @@ class StatementInput extends React.Component {
         <p>
           {'Text'}
           <br />
-          <textarea />
+          <textarea
+            value={this.state.textArea.val}
+            onChange={this.handleTextAreaChange}
+          />
         </p>
         <button onClick={this.handleOnSubmit}> ABSCHICKEN </button>
       </div>

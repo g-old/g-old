@@ -6,6 +6,9 @@ import {
   UPDATE_STATEMENT_START,
   UPDATE_STATEMENT_SUCCESS,
   UPDATE_STATEMENT_ERROR,
+  DELETE_STATEMENT_START,
+  DELETE_STATEMENT_SUCCESS,
+  DELETE_STATEMENT_ERROR,
 } from '../constants';
 
 const statementResult = `{
@@ -41,6 +44,11 @@ const updateStatementMutation = `
   }
 `;
 
+const deleteStatementMutation = `
+  mutation ($pollId:ID! $id: ID) {
+    deleteStatement (statement:{pollId:$pollId id:$id })${statementResult}
+  }
+`;
 
 export function createStatement(statement) {
   return async (dispatch, getState, { graphqlRequest }) => {
@@ -80,7 +88,7 @@ export function updateStatement(statement) {
       },
     });
     try {
-      const { data } = await graphqlRequest(updateStatementMutation, { ...statement });
+      const { data } = await graphqlRequest(updateStatementMutation, statement);
 
       dispatch({
         type: UPDATE_STATEMENT_SUCCESS,
@@ -89,6 +97,35 @@ export function updateStatement(statement) {
     } catch (error) {
       dispatch({
         type: UPDATE_STATEMENT_ERROR,
+        payload: {
+          error,
+        },
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function deleteStatement(statement) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: DELETE_STATEMENT_START,
+      payload: {
+        statement,
+      },
+    });
+    try {
+      const { data } = await graphqlRequest(deleteStatementMutation, statement);
+
+      dispatch({
+        type: DELETE_STATEMENT_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: DELETE_STATEMENT_ERROR,
         payload: {
           error,
         },

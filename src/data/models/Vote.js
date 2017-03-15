@@ -18,7 +18,8 @@ class Vote {
     const data = await votes.load(id);
     if (data === null) return null;
     const canSee = checkCanSee(viewer, data);
-    return canSee ? new Vote(data) : null;
+    if (!canSee) return null;
+    return new Vote(data);
   }
 
   static async validate(viewer, data, loaders, poll, mutation = false) {

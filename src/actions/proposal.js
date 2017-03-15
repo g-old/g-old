@@ -35,6 +35,7 @@ const pollFields = `{
   ownVote{
     id
     position
+    pollId
   }
   ownStatement ${statementFields}
   upvotes

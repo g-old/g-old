@@ -57,19 +57,17 @@ class Statement {
     // validate
     if (!data.pollId) return null;
     if (!data.id) return null;
-
-    // update
     // eslint-disable-next-line prefer-arrow-callback
-    const deletedId = await knex.transaction(async function (trx) {
-      const statementInDB = await knex('statements').where({ id: data.id }).pluck('id');
+    const deletedStatement = await knex.transaction(async function (trx) {
+      const statementInDB = await knex('statements').where({ id: data.id }).select();
       if (statementInDB.length !== 1) throw Error('Statement does not exist!');
-      const id = await trx.where({ id: data.id })
+      await trx.where({ id: data.id })
       .into('statements')
       .del();
 
-      return data.id;
+      return statementInDB[0];
     });
-    return deletedId || null;
+    return new Statement(deletedStatement) || null;
   }
 
   static async update(viewer, data, loaders) {
@@ -104,14 +102,11 @@ class Statement {
     // authorize
     if (!Statement.canMutate(viewer, data)) return null;
     // validate
-    console.log('CREATE STATEMENTS:SERVER');
-    console.log(data);
 
     if (!data.pollId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders);
     if (!poll) return null;
     const statementsAllowed = await poll.isCommentable(viewer, loaders);
-    console.log(`IS COMMENTABLE${statementsAllowed}`);
     if (!statementsAllowed) return null;
     if (!data.title) return null;
     if (!data.title.length > 0 && typeof (data.title) === 'string') return null;
@@ -123,7 +118,6 @@ class Statement {
     const newStatementId = await knex.transaction(async function (trx) {
       const vote = await Statement.validateVote(viewer, data.vote, loaders);
       if (!vote) throw Error('Vote not valid');
-
       const statementInDB = await knex('statements').where({ poll_id: data.pollId, author_id: viewer.id }).pluck('id');
       if (statementInDB.length !== 0) throw Error('Already commented!');
       const id = await trx

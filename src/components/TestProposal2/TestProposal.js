@@ -58,18 +58,15 @@ class TestProposal extends React.Component {
     super(props);
     this.state = { currentPoll: props.proposal.state };
     this.handleVote = this.handleVote.bind(this);
+    this.handleOnSubmit = this.handleOnSubmit.bind(this);
   }
 
-  handleOnSubmit(data, pollId) {
+  handleOnSubmit(data) {
     // TODO check for vote
+    console.log(data);
 
-    let vote = this.props.proposal.pollOne.ownVote;
-    if (!vote) {
-      vote = { position: 'pro', pollId };
-    }
-    if (!this.props.proposal.pollOne.ownVote) {
-      this.props.createStatement({ ...data, vote, pollId });
-    }
+
+    this.props.createStatement(data);
   }
 
   handlePollSwitching() {
@@ -108,6 +105,8 @@ class TestProposal extends React.Component {
         poll={this.props.proposal.pollOne}
         user={this.props.user}
         onVoteButtonClicked={this.handleVote}
+        onStatementSubmit={this.handleOnSubmit}
+
       />);
       // eslint-disable-next-line eqeqeq
     } else if (this.state.currentPoll == 'voting') {
@@ -115,6 +114,7 @@ class TestProposal extends React.Component {
         poll={this.props.proposal.pollTwo}
         user={this.props.user}
         onVoteButtonClicked={this.handleVote}
+        onStatementSubmit={this.handleOnSubmit}
       />);
       switchPoll = true;
     } else {

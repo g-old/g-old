@@ -10,7 +10,6 @@ class PollState extends React.Component {
   }
   render() {
     let bgColor = 'red';
-    console.log(this.props.threshold_ref);
     // eslint-disable-next-line eqeqeq
     if (this.props.threshold_ref == 'voters') {
       bgColor = this.props.downvotes < this.props.upvotes ? 'green' : 'red';
