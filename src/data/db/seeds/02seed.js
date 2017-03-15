@@ -454,11 +454,12 @@ exports.seed = function (knex, Promise) {
       endTime.setDate(time.getDate() + randomNumber(10));
       poll = {
         secret: Math.random() > 0.5,
-        threshold: randomNumber(100),
+        threshold: randomNumber(100) || 20,
         created_at: time,
         updated_at: time,
         start_time: time,
         end_time: endTime,
+        num_voter: numUsers - numGuests - numTestGuests,
       };
       if (i % 2 === 0) {
         poll = Object.assign({}, poll, { polling_mode_id: proposeId });
