@@ -37,6 +37,7 @@ function shuffle(array) { // in place!
 exports.seed = function (knex, Promise) {
 /* eslint-disable comma-dangle */
 
+
   function createRoles() {
     return Promise.resolve(
     Promise.all([
@@ -124,7 +125,7 @@ exports.seed = function (knex, Promise) {
         surname: name,
         password_hash: hash,
         email: name + '@example.com',
-        role_id: 3,
+        role_id: 4,
         created_at: time,
         email_validated: true }))
     ));
@@ -475,34 +476,21 @@ exports.seed = function (knex, Promise) {
     );
   }
 
-  return Promise.resolve(
-        createRoles()
-        .then(createPollingmodes)
-        .then(createPolls)
-        .then((pollData) =>
-          createUsers()
-            .then(userIds => createProposals(userIds, pollData)))
-        .then(createVotes)
-        .then(createStatements)
-        .then(createStatementLikes)
-        .then(createFollowees)
-        .then(createTags)
-        .then(createProposalTags)
-        .catch((e) => console.log(e))
-      );
 
-/*  return Promise.resolve(
-        createPollingmodes()
-        .then(createPolls)
-        .then((pollData) =>
-          Promise.resolve(knex('users')
-            .pluck('id')
-            .then((userIds) =>
-              createProposals(userIds, pollData))))
-        .then(createVotes)
-        .then(createStatements)
-        .then(createStatementLikes)
-        .then(() => 'Finished')
-      );
-*/
+  return Promise.resolve(
+
+          createRoles()
+          .then(createPollingmodes)
+          .then(createPolls)
+          .then((pollData) =>
+            createUsers()
+              .then(userIds => createProposals(userIds, pollData)))
+          .then(createVotes)
+          .then(createStatements)
+          .then(createStatementLikes)
+          .then(createFollowees)
+          .then(createTags)
+          .then(createProposalTags)
+          .catch((e) => console.log(e))
+        );
 };
