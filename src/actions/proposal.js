@@ -8,7 +8,6 @@ LOAD_PROPOSAL_SUCCESS,
 
 const statementFields = `{
     id
-    title
     likes
     text
     pollId

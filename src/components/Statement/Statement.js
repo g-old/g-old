@@ -12,7 +12,6 @@ class Statement extends React.Component {
 
   static propTypes = {
     data: PropTypes.shape({
-      title: PropTypes.string.isRequired,
       id: PropTypes.string.isRequired,
       vote: PropTypes.shape({
         position: PropTypes.string.isRequired,
@@ -50,7 +49,6 @@ class Statement extends React.Component {
     this.props.updateStatement({
       pollId: this.props.data.pollId,
       id: this.props.data.id,
-      title: 'my new updated title',
       text: 'my new updated text',
     });
   }
@@ -98,9 +96,6 @@ class Statement extends React.Component {
         />
         <div className={cn(s.author)}>
           {this.props.data.author.name} {this.props.data.author.surname}
-        </div>
-        <div className={s.title}>
-          {this.props.data.title}
         </div>
         <div className={s.text}>
           {this.props.data.text}

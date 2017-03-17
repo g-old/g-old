@@ -13,7 +13,6 @@ import {
 
 const statementResult = `{
   id
-  title
   likes
   text
   pollId
@@ -33,14 +32,14 @@ const statementResult = `{
 `;
 
 const createStatementMutation = `
-  mutation ($vote:VoteInput $text:String $title:String $pollId:ID! $id: ID) {
-    createStatement (statement:{vote:$vote text:$text title:$title pollId:$pollId id:$id })${statementResult}
+  mutation ($vote:VoteInput $text:String $pollId:ID! $id: ID) {
+    createStatement (statement:{vote:$vote text:$text pollId:$pollId id:$id })${statementResult}
   }
 `;
 
 const updateStatementMutation = `
-  mutation ($vote:VoteInput $text:String $title:String $pollId:ID! $id: ID) {
-    updateStatement (statement:{vote:$vote text:$text title:$title pollId:$pollId id:$id })${statementResult}
+  mutation ($vote:VoteInput $text:String $pollId:ID! $id: ID) {
+    updateStatement (statement:{vote:$vote text:$text pollId:$pollId id:$id })${statementResult}
   }
 `;
 

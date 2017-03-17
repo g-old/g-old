@@ -33,9 +33,7 @@ const StatementType = new ObjectType({
       type: GraphQLString,
       sqlColumn: 'body',
     },
-    title: {
-      type: GraphQLString,
-    },
+
     likes: {
       type: GraphQLInt,
     },

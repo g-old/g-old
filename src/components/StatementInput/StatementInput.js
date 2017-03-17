@@ -11,22 +11,17 @@ class StatementInput extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      textInput: { val: '' },
       textArea: { val: '' },
     };
-    this.handleInputChange = this.handleInputChange.bind(this);
     this.handleTextAreaChange = this.handleTextAreaChange.bind(this);
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
     // this.handleTextAreaChange = this.handleTextAreaChange.bind(this);
-  }
-  handleInputChange(e) {
-    this.setState({ ...this.state, textInput: { val: e.target.value } });
   }
   handleTextAreaChange(e) {
     this.setState({ ...this.state, textArea: { val: e.target.value } });
   }
   handleOnSubmit(e) {
-    const data = { title: this.state.textInput.val, text: this.state.textArea.val };
+    const data = { text: this.state.textArea.val };
     this.props.onSubmit(data);
     e.preventDefault();
   }
@@ -34,23 +29,12 @@ class StatementInput extends React.Component {
   render() {
     return (
       <div>
-        <p>
-          {'Title'}
-          <br />
-          <input
-            type="text"
-            value={this.state.textInput.val}
-            onChange={this.handleInputChange}
-          />
-        </p>
-        <p>
-          {'Text'}
-          <br />
-          <textarea
-            value={this.state.textArea.val}
-            onChange={this.handleTextAreaChange}
-          />
-        </p>
+        {'Text'}
+        <br />
+        <textarea
+          value={this.state.textArea.val}
+          onChange={this.handleTextAreaChange}
+        />
         <button onClick={this.handleOnSubmit}> ABSCHICKEN </button>
       </div>
     );

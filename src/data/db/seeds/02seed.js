@@ -300,7 +300,6 @@ exports.seed = function (knex, Promise) {
         author_id: voteData[i].user_id,
         vote_id: voteIds[i],
         poll_id: voteData[i].poll_id,
-        title: faker.lorem.sentence(),
         body: faker.lorem.paragraphs(randomNumber(3) || 1),
         position: voteData[i].position,
         created_at: time,

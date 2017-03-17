@@ -19,7 +19,6 @@ class Statement {
   constructor(data) {
     this.id = data.id;
     this.author_id = data.author_id;
-    this.title = data.title;
     this.text = data.body;
     this.position = data.position;
     this.likes = data.likes;
@@ -77,15 +76,13 @@ class Statement {
     if (!data.pollId) return null;
     if (!data.id) return null;
 
-    if (data.title && data.title.length < 1 && (data.title) !== 'string') return null;
     if (data.text && data.text.length < 1 && (data.text) !== 'string') return null;
-    if (!data.title && !data.text) return null;
     // update
     // eslint-disable-next-line prefer-arrow-callback
     const updatedId = await knex.transaction(async function (trx) {
       const statementInDB = await knex('statements').where({ id: data.id }).pluck('id');
       if (statementInDB.length !== 1) throw Error('Statement does not exist!');
-      const newData = { updated_at: new Date(), title: data.title, body: data.text };
+      const newData = { updated_at: new Date(), body: data.text };
       const id = await trx.where({ id: data.id })
       .update({
         ...newData,
@@ -108,8 +105,6 @@ class Statement {
     if (!poll) return null;
     const statementsAllowed = await poll.isCommentable(viewer, loaders);
     if (!statementsAllowed) return null;
-    if (!data.title) return null;
-    if (!data.title.length > 0 && typeof (data.title) === 'string') return null;
     if (!data.text) return null;
     if (!data.text.length > 0 && typeof (data.text) === 'string') return null;
 
@@ -124,7 +119,6 @@ class Statement {
       .insert({
         author_id: viewer.id,
         poll_id: data.pollId,
-        title: data.title,
         body: data.text,
         position: vote.position,
         vote_id: vote.id,

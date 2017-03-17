@@ -1,11 +1,9 @@
-
 exports.up = function (knex, Promise) {
   return Promise.all([
-    knex.schema.createTable('statements', (table) => {
+    knex.schema.createTable('statements', table => {
       table.increments();
       table.integer('author_id').unsigned().notNullable();
       table.foreign('author_id').references('users.id');
-      table.string('title').notNullable();
       table.text('body').notNullable();
       table.enu('position', ['pro', 'con']).notNullable();
       table.integer('likes').defaultsTo(0);
@@ -16,7 +14,5 @@ exports.up = function (knex, Promise) {
 };
 
 exports.down = function (knex, Promise) {
-  return Promise.all([
-    knex.schema.dropTable('statements'),
-  ]);
+  return Promise.all([knex.schema.dropTable('statements')]);
 };

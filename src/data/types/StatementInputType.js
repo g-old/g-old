@@ -17,10 +17,6 @@ const StatementInputType = new GraphQLInputObjectType({
     text: {
       type: String,
     },
-    title: {
-      type: String,
-    },
-
     pollId: {
       type: new NonNull(ID),
     },
