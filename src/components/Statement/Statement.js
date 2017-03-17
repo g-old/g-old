@@ -9,7 +9,6 @@ import { createLike, deleteLike } from '../../actions/statement_like';
 import { deleteStatement, updateStatement } from '../../actions/statement';
 
 class Statement extends React.Component {
-
   static propTypes = {
     data: PropTypes.shape({
       id: PropTypes.string.isRequired,
@@ -61,8 +60,7 @@ class Statement extends React.Component {
       this.props.deleteLike({
         statementId: this.props.data.id,
         likeId: like.id,
-      },
-      );
+      });
     }
     e.preventDefault();
   }
@@ -72,7 +70,7 @@ class Statement extends React.Component {
       <div className={cn(s.root, this.props.data.vote.position === 'pro' ? s.pro : s.contra)}>
         <span className={s.likes}>
           <button
-            onClick={(e) => this.handleLikeClick(e, this.props.ownLike)}
+            onClick={e => this.handleLikeClick(e, this.props.ownLike)}
             className={this.props.ownLike ? s.liked : s.notLiked}
           >
             {this.props.ownLike ? '+' : ''}
@@ -90,9 +88,11 @@ class Statement extends React.Component {
             </span>}
         </span>
         <img
-          className={cn(s.avatar)} src={`https://api.adorable.io/avatars/256/${
-                                             this.props.data.author.name}${this.props.data.author.surname
-                                            }.io.png`} alt="IMG"
+          className={cn(s.avatar)}
+          src={
+            `https://api.adorable.io/avatars/256/${this.props.data.author.name}${this.props.data.author.surname}.io.png`
+          }
+          alt="IMG"
         />
         <div className={cn(s.author)}>
           {this.props.data.author.name} {this.props.data.author.surname}
@@ -109,7 +109,6 @@ const mapDispatch = {
   deleteLike,
   deleteStatement,
   updateStatement,
-
 };
 
 export default connect(null, mapDispatch)(withStyles(s)(Statement));
