@@ -87,7 +87,7 @@ function removeLikeIdFromArray(state, statementLike) {
   const pollId = state.statements[statementLike.statementId].pollId;
   const poll = state.polls[pollId];
   return {
-    ...state,
+    ...state.polls,
     [pollId]: {
       ...poll,
       likedStatements: poll.likedStatements.filter(id => id !== statementLike.id),
@@ -122,12 +122,8 @@ export default function entities(state = { proposals: {} }, action) {
       const polls = addLikeIdToLikedArray(state, statementLike);
       return {
         ...state,
-        polls: {
-          ...polls,
-        },
-        statements: {
-          ...statements,
-        },
+        polls,
+        statements,
         statementLikes: {
           ...state.statementLikes,
           [statementLike.id]: statementLike,
@@ -143,12 +139,8 @@ export default function entities(state = { proposals: {} }, action) {
       const { [statementLike.id]: omit, ...other } = state.statementLikes;
       return {
         ...state,
-        polls: {
-          ...polls,
-        },
-        statements: {
-          ...statements,
-        },
+        polls,
+        statements,
         statementLikes: {
           ...other,
         },
