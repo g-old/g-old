@@ -12,8 +12,15 @@ import {
   CREATE_STATEMENT_SUCCESS,
   DELETE_STATEMENT_SUCCESS,
   UPDATE_STATEMENT_SUCCESS,
+  LOAD_PROPOSAL_LIST_SUCCESS,
 } from '../constants';
-import { proposal as proposalSchema, statement as statementSchema } from '../store/schema';
+import {
+  proposal as proposalSchema,
+  statement as statementSchema,
+  proposalList as proposalListSchema,
+} from '../store/schema';
+
+// TODO https://www.npmjs.com/package/babel-plugin-transform-object-rest-spread
 
 function updateStatementLikesCount(state, statementLike, up) {
   const { statementId } = statementLike;
@@ -24,7 +31,6 @@ function updateStatementLikesCount(state, statementLike, up) {
       ...statement,
       likes: up ? statement.likes + 1 : statement.likes - 1,
     },
-
   };
 }
 
@@ -42,7 +48,6 @@ function updatePollVotesCount(state, vote) {
       //upvotes: poll.upvotes + add,
       //downvotes: poll.downvotes + (1 - add),
     },
-
   };
 }
 
@@ -90,6 +95,25 @@ function removeLikeIdFromArray(state, statementLike) {
   };
 }
 
+function removeStatement({ statements, polls }, statement) {
+  // eslint-disable-next-line no-unused-vars
+  const { [statement.id]: omit, ...other } = statements;
+  return {
+    statements: {
+      ...other,
+    },
+    polls: {
+      polls,
+      [statement.pollId]: {
+        ...polls[statement.pollId],
+        ownStatement: null,
+        // eslint-disable-next-line eqeqeq
+        statements: polls[statement.pollId].statements.filter(id => id != statement.id),
+      },
+    },
+  };
+}
+
 export default function entities(state = { proposals: {} }, action) {
   switch (action.type) {
     case CREATE_LIKE_SUCCESS: {
@@ -110,7 +134,6 @@ export default function entities(state = { proposals: {} }, action) {
         },
       };
     }
-
 
     case DELETE_LIKE_SUCCESS: {
       const statementLike = action.payload.deleteStatementLike;
@@ -174,33 +197,47 @@ export default function entities(state = { proposals: {} }, action) {
         },
       };
     }
-
+    // TODO Refactor!
     case DELETE_VOTE_SUCCESS: {
       const ownVote = action.payload.deleteVote;
-      // adjust counters
-      const proposals = updateProposalVotesCount(state.proposals, ownVote);
+      const updatedProposals = updateProposalVotesCount(state.proposals, ownVote);
       const voteColumns = ['upvotes', 'downvotes'];
       const index = ownVote.position === 'pro' ? 0 : 1;
-      // delete
+      let updatedPolls = {
+        ...state.polls,
+        [ownVote.pollId]: {
+          ...state.polls[ownVote.pollId],
+          ownVote: null,
+          [voteColumns[index]]: state.polls[ownVote.pollId][voteColumns[index]] - 1,
+        },
+      };
       // eslint-disable-next-line no-unused-vars
       const { [ownVote.id]: omit, ...other } = state.votes;
 
+      const statementId = state.polls[ownVote.pollId].ownStatement;
+      let updatedStatements = state.statements;
+      if (statementId) {
+        const { statements, polls } = removeStatement(state, state.statements[statementId]);
+
+        updatedStatements = statements;
+        updatedPolls = {
+          ...updatedPolls,
+          [ownVote.pollId]: {
+            ...updatedPolls[ownVote.pollId], // ownVote: null
+            statements: polls[ownVote.pollId].statements, // ownvote not null
+            ownStatement: null,
+          },
+        };
+      }
+
       return {
         ...state,
-        proposals: {
-          ...proposals,
-        },
-        polls: {
-          ...state.polls,
-          [ownVote.pollId]: {
-            ...state.polls[ownVote.pollId],
-            ownVote: null,
-            [voteColumns[index]]: state.polls[ownVote.pollId][voteColumns[index]] - 1,
-          },
-        },
         votes: {
           ...other,
         },
+        statements: updatedStatements,
+        proposals: updatedProposals,
+        polls: updatedPolls,
       };
     }
 
@@ -216,7 +253,6 @@ export default function entities(state = { proposals: {} }, action) {
             ownStatement: statement.id,
           },
         },
-
       };
     }
     /* NOTE: If someone has liked his own statement, the references in
@@ -238,6 +274,8 @@ export default function entities(state = { proposals: {} }, action) {
           [statement.pollId]: {
             ...state.polls[statement.pollId],
             ownStatement: null,
+            // eslint-disable-next-line eqeqeq
+            statements: state.polls[statement.pollId].statements.filter(id => id != statement.id),
           },
         },
       };
@@ -245,15 +283,17 @@ export default function entities(state = { proposals: {} }, action) {
 
     case UPDATE_STATEMENT_SUCCESS: {
       const statement = action.payload.updateStatement;
+      const normalizedData = normalize(statement, statementSchema);
       return {
-        ...state,
+        ...merge({}, state, normalizedData.entities),
+        /*  ...state,
         statements: {
           ...state.statements,
           [statement.id]: {
             ...state.statements[statement.id],
             ...statement,
           },
-        },
+        },*/
       };
     }
 
@@ -261,11 +301,17 @@ export default function entities(state = { proposals: {} }, action) {
       const normalizedData = normalize(action.payload.proposalDL, proposalSchema);
       return {
         ...merge({}, state, normalizedData.entities),
-
       };
     }
+    case LOAD_PROPOSAL_LIST_SUCCESS: {
+      const normalizedData = normalize(action.payload.proposalsDL, proposalListSchema);
+      return {
+        ...merge({}, state, normalizedData.entities),
+      };
+    }
+
     case LOAD_PROPOSAL_START: {
-    //  TODO insert id with isFetching set to true - change success and error accordingly
+      //  TODO insert id with isFetching set to true - change success and error accordingly
       return {
         ...state,
       };

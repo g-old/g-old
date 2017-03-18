@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import cn from 'classnames';
 import s from './Statement.css';
 import { createLike, deleteLike } from '../../actions/statement_like';
-import { deleteStatement, updateStatement } from '../../actions/statement';
+import { deleteStatement } from '../../actions/statement';
 
 class Statement extends React.Component {
   static propTypes = {
@@ -28,7 +28,7 @@ class Statement extends React.Component {
     ownLike: PropTypes.object,
     ownStatement: PropTypes.bool,
     deleteStatement: PropTypes.func,
-    updateStatement: PropTypes.func,
+    hideStatement: PropTypes.func,
   };
 
   constructor(props) {
@@ -45,11 +45,14 @@ class Statement extends React.Component {
   }
 
   onEditStatement() {
-    this.props.updateStatement({
+    this.props.hideStatement();
+
+  /*  this.props.updateStatement({
       pollId: this.props.data.pollId,
       id: this.props.data.id,
       text: 'my new updated text',
     });
+    */
   }
   handleLikeClick(e, like) {
     if (!like) {
@@ -108,7 +111,6 @@ const mapDispatch = {
   createLike,
   deleteLike,
   deleteStatement,
-  updateStatement,
 };
 
 export default connect(null, mapDispatch)(withStyles(s)(Statement));

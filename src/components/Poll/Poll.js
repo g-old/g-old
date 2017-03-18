@@ -3,8 +3,7 @@ import StatementsList from '../StatementsList';
 import PollState from '../PollState';
 
 class Poll extends React.Component {
-
-  static propTypes= {
+  static propTypes = {
     poll: PropTypes.shape({
       id: PropTypes.string,
       secret: PropTypes.bool,
@@ -26,19 +25,29 @@ class Poll extends React.Component {
         unipolar: PropTypes.bool,
         threshold_ref: PropTypes.string,
       }),
-      likedStatements: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.string,
-        statementId: PropTypes.string,
-      })),
+      likedStatements: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.string,
+          statementId: PropTypes.string,
+        }),
+      ),
+      followees: PropTypes.arrayOf(
+        PropTypes.shape({
+          position: PropTypes.string,
+          voter: PropTypes.object,
+        }),
+      ),
     }),
     user: PropTypes.object.isRequired,
     onVoteButtonClicked: PropTypes.func.isRequired,
     onStatementSubmit: PropTypes.func,
-  }
+    onDeleteStatement: PropTypes.func.isRequired,
+  };
   constructor(props) {
     super(props);
     this.state = {};
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
+    this.handleRetractVote = this.handleRetractVote.bind(this);
   }
   canVote(position) {
     let method; // or take methods better directly in and connect to redux
@@ -55,57 +64,74 @@ class Poll extends React.Component {
   }
 
   handleRetractVote() {
-    alert(`TODO ${this.props.poll.id}`);
+    // TODO Add some sort of validation
+    // will delete vote and the statement too bc of cascade on delete
+    this.canVote(this.props.poll.ownVote.position);
   }
 
-  handleOnSubmit(input) {
-    this.props.onStatementSubmit({
-      ...input,
-      pollId: this.props.poll.id,
-      vote: this.props.poll.ownVote,
-    });
+  handleOnSubmit(input, update) {
+    this.props.onStatementSubmit(
+      {
+        ...input,
+        pollId: this.props.poll.id,
+        vote: this.props.poll.ownVote,
+      },
+      update,
+    );
   }
-
 
   render() {
     const withStatements = this.props.poll.mode.with_statements;
     let statements = null;
     // render StatementsList or not?
     if (withStatements) {
-      statements = (<StatementsList
-        statements={this.props.poll.statements}
-        likedStatements={this.props.poll.likedStatements}
-        pollId={this.props.poll.id}
-        user={this.props.user}
-        voted={this.props.poll.ownVote != null}
-        ownStatement={this.props.poll.ownStatement}
-        onSubmit={this.handleOnSubmit}
-      />);
+      statements = (
+        <StatementsList
+          statements={this.props.poll.statements}
+          likedStatements={this.props.poll.likedStatements}
+          pollId={this.props.poll.id}
+          user={this.props.user}
+          voted={this.props.poll.ownVote != null}
+          ownStatement={this.props.poll.ownStatement}
+          onSubmit={this.handleOnSubmit}
+        />
+      );
     }
     let votingButtons = null;
 
-    if (!this.props.poll.closed_at) { // TODO Find better check
+    if (!this.props.poll.closed_at) {
+      // TODO Find better check
       // eslint-disable-next-line no-nested-ternary
-      const proBtnColor = this.props.poll.ownVote ? (this.props.poll.ownVote.position === 'pro' ? 'green' : '') : '';
+      const proBtnColor = this.props.poll.ownVote
+        ? this.props.poll.ownVote.position === 'pro' ? 'green' : ''
+        : '';
       // eslint-disable-next-line no-nested-ternary
-      const conBtnColor = this.props.poll.ownVote ? (this.props.poll.ownVote.position === 'con' ? 'green' : '') : '';
+      const conBtnColor = this.props.poll.ownVote
+        ? this.props.poll.ownVote.position === 'con' ? 'green' : ''
+        : '';
       if (this.props.poll.mode.unipolar) {
-        votingButtons = <button onClick={() => this.canVote('pro')} style={{ background: proBtnColor }}> WANT TO VOTE </button>;
+        votingButtons = (
+          <button onClick={() => this.canVote('pro')} style={{ background: proBtnColor }}>
+            {' '}WANT TO VOTE{' '}
+          </button>
+        );
       } else if (this.props.poll.ownStatement) {
-        votingButtons = (<button onClick={this.handleRetractVote}>
-          RETRACT VOTE - AND DELETE STATEMENT
-        </button>);
+        votingButtons = (
+          <button onClick={this.handleRetractVote}>
+            RETRACT VOTE - AND DELETE STATEMENT
+          </button>
+        );
       } else {
-        votingButtons = (<span>
-          <button
-            onClick={() => this.canVote('pro')}
-            style={{ background: proBtnColor }}
-          > YES </button>
-          <button
-            onClick={() => this.canVote('con')}
-            style={{ background: conBtnColor }}
-          > NO </button>
-        </span>);
+        votingButtons = (
+          <span>
+            <button onClick={() => this.canVote('pro')} style={{ background: proBtnColor }}>
+              {' '}YES{' '}
+            </button>
+            <button onClick={() => this.canVote('con')} style={{ background: conBtnColor }}>
+              {' '}NO{' '}
+            </button>
+          </span>
+        );
       }
     }
 
@@ -116,7 +142,6 @@ class Poll extends React.Component {
           upvotes={this.props.poll.upvotes}
           downvotes={this.props.poll.downvotes}
           threshold={this.props.poll.threshold}
-          unipolar={this.props.poll.mode.unipolar}
           threshold_ref={this.props.poll.mode.threshold_ref}
         />
         <p>

@@ -1,10 +1,12 @@
-
+import {
+  GraphQLNonNull,
+} from 'graphql';
 import StatementInputType from '../types/StatementInputType';
 import StatementType from '../types/StatementDLType';
 import Statement from '../models/Statement';
 
 const updateStatement = {
-  type: StatementType,
+  type: new GraphQLNonNull(StatementType),
   args: {
     statement: {
       type: StatementInputType,

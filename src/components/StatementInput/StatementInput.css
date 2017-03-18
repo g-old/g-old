@@ -1,0 +1,13 @@
+@import '../../components/variables.css';
+
+.root {
+  border: solid 1px gray;
+  padding: 0.4em;
+  margin: 0.1em 0.1em 0.4em;
+  font-size: 0.9em;
+}
+
+.text {
+  margin-top: 0.3em;
+  line-height: 1.1em;
+}

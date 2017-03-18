@@ -97,6 +97,7 @@ export function updateStatement(statement) {
       dispatch({
         type: UPDATE_STATEMENT_ERROR,
         payload: {
+          statement,
           error,
         },
       });

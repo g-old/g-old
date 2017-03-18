@@ -75,7 +75,6 @@ class Statement {
     // validate
     if (!data.pollId) return null;
     if (!data.id) return null;
-
     if (data.text && data.text.length < 1 && (data.text) !== 'string') return null;
     // update
     // eslint-disable-next-line prefer-arrow-callback
