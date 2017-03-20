@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './PollState.css';
 
@@ -10,26 +11,36 @@ class PollState extends React.Component {
     threshold: PropTypes.number,
     unipolar: PropTypes.bool,
     threshold_ref: PropTypes.string,
-  }
+  };
   render() {
-    let bgColor = 'red';
-    if (this.props.threshold_ref !== 'voters' || this.props.upvotes === this.props.downvotes) {
-      bgColor = 'yellow'; // this.props.downvotes < this.props.upvotes? 'green' : 'red';
-    } else {
-      bgColor = this.props.downvotes < this.props.upvotes
-      ? 'green' : 'red';
-    }
+    const voteClass = this.props.unipolar ? s.unipolar : s.bipolar;
+
+    const sum = this.props.unipolar
+      ? this.props.allVoters
+      : this.props.upvotes + this.props.downvotes;
+
+    const percent = `${100 * (this.props.upvotes / sum)}%`;
+    const voteBar = <div className={cn(s.bar)} style={{ width: percent }} />;
+
+    const threshMargin = this.props.threshold < 50
+      ? this.props.threshold
+      : 100 - this.props.threshold;
+    const threshWidth = 100 - threshMargin - threshMargin;
 
     return (
-      <div
-        className={s.root} style={{
-          background: bgColor,
-        }}
-      >
-        POLLSTATE
-        <div>
-          {this.props.unipolar ? 'VOTES' : 'UPVOTES'}: {this.props.upvotes}
-          <br /> {!this.props.unipolar ? `DOWNVOTES :${this.props.downvotes}` : ''}
+      <div className={cn(s.root, voteClass)}>
+        <div className={s.votes}>
+          {this.props.upvotes}
+        </div>
+        <div className={s.barContainer}>
+          {voteBar}
+          <div
+            className={s.threshold}
+            style={{ marginLeft: `${threshMargin}%`, width: `${threshWidth}%` }}
+          />
+        </div>
+        <div className={s.votes} style={{ textAlign: 'right' }}>
+          {!this.props.unipolar ? `${this.props.downvotes}` : ''}
         </div>
       </div>
     );

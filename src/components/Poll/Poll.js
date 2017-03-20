@@ -141,6 +141,7 @@ class Poll extends React.Component {
           allVoters={this.props.poll.allVoters}
           upvotes={this.props.poll.upvotes}
           downvotes={this.props.poll.downvotes}
+          unipolar={this.props.poll.mode.unipolar}
           threshold={this.props.poll.threshold}
           threshold_ref={this.props.poll.mode.threshold_ref}
         />

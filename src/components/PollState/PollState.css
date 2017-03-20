@@ -1,8 +1,60 @@
 @import '../../components/variables.css';
 
+:root {
+  --bar-height: 0.6em;
+}
+
 .root {
   border: solid 1px gray;
   margin-top: 1em;
-  padding: 0.4em;
-  font-size: 0.9em;
+  font-size: 1em;
+  padding: 0 0.5em;
+}
+
+.barContainer {
+  display: inline-block;
+  height: var(--bar-height);
+  width: calc(100% - 4.1em);
+  border: solid 1px #555;
+}
+
+.votes {
+  position: relative;
+  width: 2em;
+  display: inline-block;
+}
+
+.bar {
+  height: 100%;
+}
+
+.threshold {
+  position: relative;
+  border-left: solid 2px #555;
+  height: 100%;
+  margin-top: -var(--bar-height);
+}
+
+.unipolar {
+  .barContainer {
+    background-color: #ddd;
+  }
+
+  .bar {
+    background-color: yellow;
+  }
+}
+
+.bipolar {
+  .barContainer {
+    background-color: red;
+  }
+
+  .bar {
+    background-color: #0c2;
+  }
+
+  .threshold {
+    border-right: solid 2px #555;
+  }
 }
