@@ -10,8 +10,8 @@ class Navigation extends React.Component {
 
   render() {
     return (
-      <p>
-        <div role="navigation">
+      <div role="navigation">
+        <p>
           <Link className={s.link} to="/proposals/active">
             ACTIVE
           </Link>
@@ -21,8 +21,8 @@ class Navigation extends React.Component {
           <Link className={s.link} to="/proposals/repelled">
             REPELLED
           </Link>
-        </div>
-      </p>
+        </p>
+      </div>
     );
   }
 }
