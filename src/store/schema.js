@@ -7,7 +7,6 @@ export const vote = new schema.Entity('votes', {
 });
 export const statementLike = new schema.Entity('statementLikes');
 
-
 export const statement = new schema.Entity('statements', {
   author: user,
   vote,
@@ -28,3 +27,4 @@ export const proposal = new schema.Entity('proposals', {
   pollOne: poll,
   pollTwo: poll,
 });
+export const proposalList = [proposal];

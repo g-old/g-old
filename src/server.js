@@ -107,7 +107,7 @@ if (process.env.NODE_ENV !== 'production') {
 app.post(
   '/',
   passport.authenticate('local', {
-    successRedirect: '/about',
+    successRedirect: '/proposals/active',
   }),
 );
 

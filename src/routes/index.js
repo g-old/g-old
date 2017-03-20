@@ -11,13 +11,13 @@
 
 // The top-level (parent) route
 export default {
-
   path: '/',
 
   // Keep in mind, routes are evaluated in order
   children: [
     require('./home').default,
     require('./proposal').default,
+    require('./proposals').default,
     require('./about').default,
     require('./testproposal').default,
     require('./admin').default,
@@ -35,5 +35,4 @@ export default {
 
     return route;
   },
-
 };

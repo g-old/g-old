@@ -7,10 +7,7 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import {
-  GraphQLSchema as Schema,
-  GraphQLObjectType as ObjectType,
-} from 'graphql';
+import { GraphQLSchema as Schema, GraphQLObjectType as ObjectType } from 'graphql';
 
 import intl from './queries/intl';
 import proposal from './queries/proposal';
@@ -22,10 +19,10 @@ import updateStatement from './mutations/updateStatement';
 import createStatementLike from './mutations/createStatementLike';
 import deleteStatementLike from './mutations/deleteStatementLike';
 import proposalDL from './queries/proposalDL';
+import proposalsDL from './queries/proposalsDL';
 import createVote from './mutations/createVote';
 import updateVote from './mutations/updateVote';
 import deleteVote from './mutations/deleteVote';
-
 
 const schema = new Schema({
   query: new ObjectType({
@@ -35,6 +32,7 @@ const schema = new Schema({
       proposal,
       proposals,
       proposalDL,
+      proposalsDL,
       user,
     },
   }),

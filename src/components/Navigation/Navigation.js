@@ -23,7 +23,6 @@ const messages = defineMessages({
 });
 
 class Navigation extends React.Component {
-
   static propTypes = {
     className: PropTypes.string,
   };
@@ -35,9 +34,9 @@ class Navigation extends React.Component {
         <Link className={s.link} to="/about">
           <FormattedMessage {...messages.about} />
         </Link>
-        <Link className={s.link} to="/proposal/2">
-        Proposal
-      </Link>
+        <Link className={s.link} to="/proposals/active">
+          Proposals
+        </Link>
       </div>
     );
   }
