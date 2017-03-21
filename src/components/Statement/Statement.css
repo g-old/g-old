@@ -8,8 +8,7 @@
 }
 
 .author {
-  font-size: 0.9em;
-  font-style: italic;
+  font-weight: bold;
 }
 
 .avatar {
@@ -49,24 +48,9 @@
 .contra {
   margin-left: 10%;
   background-color: #fffafa;
-  text-align: right;
-
-  .title {
-    margin-left: 4em;
-  }
-
-  .avatar {
-    float: right;
-    margin-left: 0.5em;
-    margin-right: 0;
-  }
-
-  .likes {
-    float: left;
-  }
 }
 
 .text {
-  margin-top: 0.3em;
-  line-height: 1.1em;
+  margin-left: 2.6em;
+  line-height: 1.3em;
 }
