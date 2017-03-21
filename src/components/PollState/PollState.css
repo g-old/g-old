@@ -7,21 +7,21 @@
 .root {
   display: flex;
   border: none 1px gray;
-  margin-top: 1em;
   font-size: 1em;
-  padding: 0 0.4em;
-  background-color: #ddd;
+  margin: auto;
+  height: 100%;
 }
 
 .barContainer {
-  height: var(--bar-height);
   width: 100%;
   border: solid 1px #555;
-  margin: auto 0.5em;
 }
 
 .votes {
   flex-grow: 0;
+  font-size: 2vh;
+  height: 100%;
+  margin: -0.5vh 0.2em;
 }
 
 .bar {
@@ -31,9 +31,9 @@
 
 .threshold {
   position: relative;
+  top: -100%;
   border-left: solid 2px #555;
   height: 100%;
-  margin-top: -var(--bar-height);
   transition: opacity 0.5s, background-color 0.5s;
 }
 

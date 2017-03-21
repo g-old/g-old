@@ -5,6 +5,7 @@ import s from './PollState.css';
 
 class PollState extends React.Component {
   static propTypes = {
+    showVoteCount: PropTypes.bool,
     allVoters: PropTypes.number,
     upvotes: PropTypes.number,
     downvotes: PropTypes.number,
@@ -37,9 +38,11 @@ class PollState extends React.Component {
 
     return (
       <div className={cn(s.root, voteClass)}>
-        <div className={s.votes}>
-          {this.props.upvotes}
-        </div>
+        {this.props.showVoteCount
+          ? <div className={s.votes}>
+            {this.props.upvotes}
+          </div>
+          : ''}
         <div className={s.barContainer}>
           {voteBar}
           <div
@@ -47,9 +50,11 @@ class PollState extends React.Component {
             style={{ marginLeft: `${threshMargin}%`, width: `${threshWidth}%` }}
           />
         </div>
-        <div className={s.votes} style={{ textAlign: 'right' }}>
-          {!this.props.unipolar ? `${this.props.downvotes}` : ''}
-        </div>
+        {this.props.showVoteCount
+          ? <div className={s.votes} style={{ textAlign: 'right' }}>
+            {!this.props.unipolar ? `${this.props.downvotes}` : ''}
+          </div>
+          : ''}
       </div>
     );
   }

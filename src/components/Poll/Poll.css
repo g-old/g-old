@@ -1,0 +1,8 @@
+@import '../../components/variables.css';
+
+.pollState {
+  margin-top: 1em;
+  padding: 0.4em;
+  background-color: #eee;
+  height: 0.6em;
+}

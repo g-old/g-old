@@ -11,38 +11,41 @@
 @import '../../components/variables.css';
 
 .root {
-  margin: 20px auto;
+  margin: auto;
   max-width: var(--max-content-width);
+}
+
+a:link,
+a:visited {
+  text-decoration: none;
+}
+
+.pollState {
+  height: 0.5em;
+  width: 100%;
+  max-width: 400px;
 }
 
 .container {
   margin: 0 auto;
   border: solid 1px gray;
-  padding: 1em;
+  padding: 0.5em;
 
   .title {
-    font-size: 1.5em;
     font-weight: bold;
     padding-top: 0;
-  }
-
-  .state {
-    text-align: right;
-    float: right;
-    font-size: 0.8em;
-    font-style: italic;
+    color: black;
+    position: relative;
   }
 
   .date {
+    text-align: right;
     font-size: 0.8em;
     font-style: italic;
+    float: right;
   }
 
   .body {
-    padding-top: 1em;
+    margin: 0 auto;
   }
-}
-
-.poll {
-  margin: 2em auto 1em;
 }
