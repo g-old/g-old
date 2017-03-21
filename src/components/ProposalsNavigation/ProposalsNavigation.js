@@ -6,6 +6,7 @@ import Link from '../Link';
 class Navigation extends React.Component {
   static propTypes = {
     className: PropTypes.string,
+    filter: PropTypes.string.isRequired,
   };
 
   render() {
@@ -13,13 +14,13 @@ class Navigation extends React.Component {
       <div role="navigation">
         <p>
           <Link className={s.link} to="/proposals/active">
-            ACTIVE
+            {this.props.filter === 'active' ? 'ACTIVE' : 'active'}
           </Link>
           <Link className={s.link} to="/proposals/accepted">
-            ACCEPTED
+            {this.props.filter === 'accepted' ? 'ACCEPTED' : 'accepted'}
           </Link>
           <Link className={s.link} to="/proposals/repelled">
-            REPELLED
+            {this.props.filter === 'repelled' ? 'REPELLED' : 'repelled'}
           </Link>
         </p>
       </div>

@@ -25,7 +25,7 @@ class ProposalContainer extends React.Component {
   static propTypes = {
     proposals: PropTypes.arrayOf(PropTypes.object),
     user: PropTypes.object.isRequired,
-    state: PropTypes.string.isRequired,
+    filter: PropTypes.string.isRequired,
   };
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
@@ -36,7 +36,7 @@ class ProposalContainer extends React.Component {
     if (this.isReady()) {
       return (
         <div>
-          <Navigation />
+          <Navigation filter={this.props.filter} />
           {this.props.proposals.map(proposal => (
             <ProposalPreview key={proposal.id} proposal={proposal} />
           ))}
@@ -62,6 +62,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     proposals,
     user,
+    filter: ownProps.state,
   };
 };
 

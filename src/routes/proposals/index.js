@@ -14,7 +14,13 @@ export default {
     }
     // Not sure if this is the right way to hydrate the store
     // Minus: Can't  show loading
-    const loadingSuccessful = await store.dispatch(loadProposalsList(state));
+    let loadingSuccessful;
+    if (!process.env.BROWSER) {
+      loadingSuccessful = await store.dispatch(loadProposalsList(state));
+    } else {
+      store.dispatch(loadProposalsList(state));
+      loadingSuccessful = true;
+    }
     if (loadingSuccessful) {
       return {
         title,
