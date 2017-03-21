@@ -34,6 +34,11 @@
   margin-top: -var(--bar-height);
 }
 
+.greyZone {
+  opacity: 0.3;
+  background-color: #eee;
+}
+
 .unipolar {
   .barContainer {
     background-color: #ddd;
@@ -55,7 +60,5 @@
 
   .threshold {
     border-right: solid 2px #555;
-    opacity: 0.5;
-    background-color: grey;
   }
 }
