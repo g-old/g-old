@@ -42,14 +42,14 @@ class Proposal extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
+          <div className={s.date}>
+            <FormattedRelative value={this.props.proposal.publishedAt} />
+          </div>
           <Link to={`/testproposal/${this.props.proposal.id}`}>
             <div className={s.title}>
               {this.props.proposal.title}
             </div>
           </Link>
-          <div className={s.date}>
-            <FormattedRelative value={this.props.proposal.publishedAt} />
-          </div>
           <div
             className={s.body}
             onClick={() => {
@@ -58,14 +58,16 @@ class Proposal extends React.Component {
           >
             {body}
           </div>
-          <PollState
-            allVoters={poll.allVoters}
-            upvotes={poll.upvotes}
-            downvotes={poll.downvotes}
-            threshold_ref={poll.mode.threshold_ref}
-            threshold={poll.threshold}
-            unipolar={poll.mode.unipolar}
-          />
+          <div className={s.pollState}>
+            <PollState
+              allVoters={poll.allVoters}
+              upvotes={poll.upvotes}
+              downvotes={poll.downvotes}
+              threshold_ref={poll.mode.threshold_ref}
+              threshold={poll.threshold}
+              unipolar={poll.mode.unipolar}
+            />
+          </div>
         </div>
 
       </div>

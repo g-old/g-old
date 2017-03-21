@@ -1,6 +1,8 @@
 import React, { PropTypes } from 'react';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import StatementsList from '../StatementsList';
 import PollState from '../PollState';
+import s from './Poll.css';
 
 class Poll extends React.Component {
   static propTypes = {
@@ -137,14 +139,17 @@ class Poll extends React.Component {
 
     return (
       <div>
-        <PollState
-          allVoters={this.props.poll.allVoters}
-          upvotes={this.props.poll.upvotes}
-          downvotes={this.props.poll.downvotes}
-          unipolar={this.props.poll.mode.unipolar}
-          threshold={this.props.poll.threshold}
-          threshold_ref={this.props.poll.mode.threshold_ref}
-        />
+        <div className={s.pollState}>
+          <PollState
+            showVoteCount="true"
+            allVoters={this.props.poll.allVoters}
+            upvotes={this.props.poll.upvotes}
+            downvotes={this.props.poll.downvotes}
+            unipolar={this.props.poll.mode.unipolar}
+            threshold={this.props.poll.threshold}
+            threshold_ref={this.props.poll.mode.threshold_ref}
+          />
+        </div>
         <p>
           {`CLOSES AT ${this.props.poll.end_time}`}
           <br />
@@ -157,4 +162,4 @@ class Poll extends React.Component {
   }
 }
 
-export default Poll;
+export default withStyles(s)(Poll);
