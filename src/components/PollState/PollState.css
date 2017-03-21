@@ -5,6 +5,7 @@
 }
 
 .root {
+  display: flex;
   border: solid 1px gray;
   margin-top: 1em;
   font-size: 1em;
@@ -12,16 +13,14 @@
 }
 
 .barContainer {
-  display: inline-block;
   height: var(--bar-height);
-  width: calc(100% - 4.1em);
+  width: 100%;
   border: solid 1px #555;
+  margin: auto 0.5em;
 }
 
 .votes {
-  position: relative;
-  width: 2em;
-  display: inline-block;
+  flex-grow: 0;
 }
 
 .bar {
