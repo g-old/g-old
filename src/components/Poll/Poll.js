@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import cn from 'classnames';
 import StatementsList from '../StatementsList';
 import PollState from '../PollState';
 import s from './Poll.css';
@@ -51,6 +52,26 @@ class Poll extends React.Component {
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
     this.handleRetractVote = this.handleRetractVote.bind(this);
   }
+
+  getFolloweeVotes(pos) {
+    return (
+      <div>
+        {this.props.poll.followees
+          .filter(user => user.position === pos)
+          .map(user => (
+            <img
+              className={s.followee}
+              src={
+                `https://api.adorable.io/avatars/256/${user.voter.name}${user.voter.surname}.io.png`
+              }
+              title={`${user.voter.name} ${user.voter.surname}`}
+              alt="IMG"
+            />
+          ))}
+      </div>
+    );
+  }
+
   canVote(position) {
     let method; // or take methods better directly in and connect to redux
 
@@ -150,10 +171,16 @@ class Poll extends React.Component {
             threshold_ref={this.props.poll.mode.threshold_ref}
           />
         </div>
+        <div className={s.followeeContainer}>
+          <div className={s.followeeBlock}>
+            {this.getFolloweeVotes('pro')}
+          </div>
+          <div className={cn(s.followeeBlock, s.contra)}>
+            {this.getFolloweeVotes('contra')}
+          </div>
+        </div>
         <p>
           {`CLOSES AT ${this.props.poll.end_time}`}
-          <br />
-          {'FOLLOWEE VOTES HERE'}
         </p>
         {votingButtons}
         {statements}
