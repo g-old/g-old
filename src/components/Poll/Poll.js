@@ -176,7 +176,7 @@ class Poll extends React.Component {
             {this.getFolloweeVotes('pro')}
           </div>
           <div className={cn(s.followeeBlock, s.contra)}>
-            {this.getFolloweeVotes('contra')}
+            {this.getFolloweeVotes('con')}
           </div>
         </div>
         <p>
