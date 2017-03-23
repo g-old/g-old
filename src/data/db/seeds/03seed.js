@@ -106,11 +106,11 @@ exports.seed = function (knex, Promise) {
         });
       updates.push(updateFn);
     } else {
-      // pros must be over the threshold - delete con votes
-      if (pollTwo.upvotes < pollTwo.downvotes) {
-        const diff = pollTwo.downvotes - pollTwo.upvotes - 1;
+      // more pros then cons needed - delete con votes
+      if (pollTwo.downvotes >= pollTwo.upvotes) {
+        const diff = (pollTwo.downvotes - pollTwo.upvotes) + 1;
         updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'con' }).limit(diff).del());
-        updates.push(knex('polls').where({ id: pollTwo.id }).update({ upvotes: pollTwo.upvotes - diff }));
+        updates.push(knex('polls').where({ id: pollTwo.id }).update({ downvotes: pollTwo.downvotes - diff }));
       }
       // correct dates on poll
       const updateFn = knex('polls')
@@ -128,39 +128,24 @@ exports.seed = function (knex, Promise) {
     const numNeededVotes = thresholdInVotes(pollOne);
     const updates = [];
     const dates = getDates(true);
-    if (pollOne.upvotes > numNeededVotes) {
+    if (pollOne.upvotes < numNeededVotes) {
+      // lower threshold
+      const oneVotePercentage = Math.floor(100 / pollOne.num_voter);
+      const newThreshold = calcNewThreshold(pollOne) - oneVotePercentage;
+      updates.push(knex('polls').where({ id: pollOne.id }).update({ threshold: newThreshold }));
+    }
       // rejected in phase 2
-      // del pro votes
-      if (pollTwo.upvotes >= pollTwo.downvotes) {
-        const diff = (pollTwo.upvotes - pollTwo.downvotes) + 1;
-        updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'pro' }).limit(diff).del());
-        updates.push(knex('polls').where({ id: pollTwo.id }).update({ upvotes: pollTwo.upvotes - diff }));
-      }
+      // more cons then pros needed  del pro votes
+    if (pollTwo.upvotes >= pollTwo.downvotes) {
+      const diff = (pollTwo.upvotes - pollTwo.downvotes) + 1;
+      updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'pro' }).limit(diff).del());
+      updates.push(knex('polls').where({ id: pollTwo.id }).update({ upvotes: pollTwo.upvotes - diff }));
+    }
       // correct dates pollTwo
 
-      updates.push(
-        knex('votes')
-          .where({ poll_id: pollTwo.id })
-          .update({
-            created_at: dates.startDate,
-            start_time: dates.startDate,
-            end_time: dates.endDate,
-            closed_at: dates.endDate,
-          })
-      );
-    } else {
-      // rejected in phase 1
-      // del votes from poll 2
-      updates.push(knex('votes').where({ poll_id: pollTwo.id }).del());
-      updates.push(knex('polls').where({ id: pollTwo.id }).update({
-        upvotes: 0,
-        downvotes: 0,
-        start_time: null,
-        end_time: null,
-        closed_at: null }));
-      updates.push(
+    updates.push(
         knex('polls')
-          .where({ id: pollOne.id })
+          .where({ id: pollTwo.id })
           .update({
             created_at: dates.startDate,
             start_time: dates.startDate,
@@ -168,8 +153,9 @@ exports.seed = function (knex, Promise) {
             closed_at: dates.endDate,
           })
       );
-    }
+
     // dates
+    return updates;
   };
 
   function correct(data) {
