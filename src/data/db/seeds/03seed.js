@@ -21,9 +21,9 @@ const getDates = finished => {
   const closeDate = new Date();
   const daysAgo = randomNumber(20) || 1;
   const daysToEnd = randomNumber(10) || 1;
-  endDate.setDate(date.getDate() + finished ? -daysToEnd : daysToEnd);
-  startDate.setDate(endDate.getDate() - daysAgo);
+  endDate.setDate(date.getDate() + (finished ? -daysToEnd : daysToEnd));
   closeDate.setDate(endDate.getDate() - daysAgo - (randomNumber(20) || 1));
+  startDate.setDate(closeDate.getDate() - daysAgo);
   return {
     startDate,
     endDate,
@@ -45,7 +45,14 @@ exports.seed = function (knex, Promise) {
       updates.push(knex('polls').where({ id: pollOne.id }).update({ threshold: newThreshold }));
     }
     // delete all votes and statements from polltwo
-    updates.push(knex('votes').where({ id: pollTwo.id }).del());
+    updates.push(knex('votes').where({ poll_id: pollTwo.id }).del());
+    updates.push(knex('polls').where({ id: pollTwo.id }).update({
+      upvotes: 0,
+      downvotes: 0,
+      start_time: null,
+      end_time: null,
+      closed_at: null }));
+
     // update end_time
     updates.push(knex('polls').where({ id: pollOne.id }).update({ end_time: dates.endDate }));
     return updates;
@@ -55,7 +62,7 @@ exports.seed = function (knex, Promise) {
     const numNeededVotes = thresholdInVotes(pollOne);
     const oneVotePercentage = Math.floor(100 / pollOne.num_voter);
     const updates = [];
-    const dates = getDates(true);
+    const dates = getDates(false);
     if (pollOne.upvotes <= numNeededVotes) {
       const newThreshold = calcNewThreshold(pollOne) - oneVotePercentage;
       updates.push(knex('polls').where({ id: pollOne.id }).update({ threshold: newThreshold }));
@@ -65,7 +72,11 @@ exports.seed = function (knex, Promise) {
     updates.push(
       knex('polls')
         .where({ id: pollOne.id })
-        .update({ created_at: dates.startDate, end_time: dates.endDate, closed_at: dates.endDate })
+        .update({
+          start_time: dates.startDate,
+          created_at: dates.startDate,
+          end_time: dates.endDate,
+          closed_at: dates.endDate })
     );
     return updates;
   };
@@ -74,15 +85,22 @@ exports.seed = function (knex, Promise) {
     const numNeededVotes = thresholdInVotes(pollOne);
     const updates = [];
     const dates = getDates(true);
-    if (pollOne.upvotes >= numNeededVotes) {
+    if (pollOne.upvotes <= numNeededVotes) {
       // delete all votes and statements from polltwo
-      updates.push(knex('votes').where({ id: pollTwo.id }).del());
+      updates.push(knex('votes').where({ poll_id: pollTwo.id }).del());
+      updates.push(knex('polls').where({ id: pollTwo.id }).update({
+        upvotes: 0,
+        downvotes: 0,
+        start_time: null,
+        end_time: null,
+        closed_at: null }));
 
       // correct dates on poll
       const updateFn = knex('polls')
         .where({ id: pollOne.id })
         .update({
           created_at: dates.startDate,
+          start_time: dates.startDate,
           end_time: dates.endDate,
           closed_at: dates.closeDate,
         });
@@ -91,12 +109,16 @@ exports.seed = function (knex, Promise) {
       // pros must be over the threshold - delete con votes
       if (pollTwo.upvotes < pollTwo.downvotes) {
         const diff = pollTwo.downvotes - pollTwo.upvotes - 1;
-        updates.push(knex('votes').where({ poll_id: pollTwo.id }).limit(diff).del());
+        updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'con' }).limit(diff).del());
+        updates.push(knex('polls').where({ id: pollTwo.id }).update({ upvotes: pollTwo.upvotes - diff }));
       }
       // correct dates on poll
       const updateFn = knex('polls')
         .where({ id: pollTwo.id })
-        .update({ created_at: dates.startDate, end_time: dates.endDate, closed_at: dates.endDate });
+        .update({ created_at: dates.startDate,
+          start_time: dates.startDate,
+          end_time: dates.endDate,
+          closed_at: dates.endDate });
       updates.push(updateFn);
     }
     return updates;
@@ -108,9 +130,11 @@ exports.seed = function (knex, Promise) {
     const dates = getDates(true);
     if (pollOne.upvotes > numNeededVotes) {
       // rejected in phase 2
+      // del pro votes
       if (pollTwo.upvotes >= pollTwo.downvotes) {
         const diff = (pollTwo.upvotes - pollTwo.downvotes) + 1;
-        updates.push(knex('votes').where({ poll_id: pollTwo.id }).limit(diff).del());
+        updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'pro' }).limit(diff).del());
+        updates.push(knex('polls').where({ id: pollTwo.id }).update({ upvotes: pollTwo.upvotes - diff }));
       }
       // correct dates pollTwo
 
@@ -118,6 +142,7 @@ exports.seed = function (knex, Promise) {
         knex('votes')
           .where({ poll_id: pollTwo.id })
           .update({
+            created_at: dates.startDate,
             start_time: dates.startDate,
             end_time: dates.endDate,
             closed_at: dates.endDate,
@@ -127,10 +152,17 @@ exports.seed = function (knex, Promise) {
       // rejected in phase 1
       // del votes from poll 2
       updates.push(knex('votes').where({ poll_id: pollTwo.id }).del());
+      updates.push(knex('polls').where({ id: pollTwo.id }).update({
+        upvotes: 0,
+        downvotes: 0,
+        start_time: null,
+        end_time: null,
+        closed_at: null }));
       updates.push(
         knex('polls')
           .where({ id: pollOne.id })
           .update({
+            created_at: dates.startDate,
             start_time: dates.startDate,
             end_time: dates.endDate,
             closed_at: dates.endDate,
@@ -152,7 +184,7 @@ exports.seed = function (knex, Promise) {
 
   function correctPolls(data) {
     const updates = correct(data);
-    return Promise.resolve(Promise.all(updates).then(x => x));
+    return Promise.resolve(Promise.all(updates));
   }
 
   function mapData(proposalData) {
