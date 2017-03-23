@@ -54,22 +54,17 @@ class Poll extends React.Component {
   }
 
   getFolloweeVotes(pos) {
-    return (
-      <div>
-        {this.props.poll.followees
-          .filter(user => user.position === pos)
-          .map(user => (
-            <img
-              className={s.followee}
-              src={
-                `https://api.adorable.io/avatars/256/${user.voter.name}${user.voter.surname}.io.png`
-              }
-              title={`${user.voter.name} ${user.voter.surname}`}
-              alt="IMG"
-            />
-          ))}
-      </div>
-    );
+    return this.props.poll.followees
+      .filter(user => user.position === pos)
+      .map(user => (
+        <img
+          key={user.id}
+          className={s.followee}
+          src={`https://api.adorable.io/avatars/256/${user.voter.name}${user.voter.surname}.io.png`}
+          title={`${user.voter.name} ${user.voter.surname}`}
+          alt="IMG"
+        />
+      ));
   }
 
   canVote(position) {
@@ -162,7 +157,7 @@ class Poll extends React.Component {
       <div>
         <div className={s.pollState}>
           <PollState
-            showVoteCount="true"
+            showVoteCount
             allVoters={this.props.poll.allVoters}
             upvotes={this.props.poll.upvotes}
             downvotes={this.props.poll.downvotes}
