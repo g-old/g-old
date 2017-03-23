@@ -23,16 +23,12 @@ class PollState extends React.Component {
     const upPercent = 100 * (this.props.upvotes / sum);
     const voteBar = <div className={cn(s.bar)} style={{ width: `${upPercent}%` }} />;
 
-    const correctedThresh = this.props.threshold >= 50
-      ? this.props.threshold
-      : 100 - this.props.threshold;
-
-    const threshMargin = 100 - correctedThresh;
+    const threshMargin = 100 - this.props.threshold;
     const threshWidth = 100 - threshMargin - threshMargin;
 
     const greyZone = !this.props.unipolar &&
-      upPercent > 100 - correctedThresh &&
-      upPercent < correctedThresh
+      upPercent > 100 - this.props.threshold &&
+      upPercent < this.props.threshold
       ? s.greyZone
       : '';
 
