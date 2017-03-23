@@ -43,6 +43,7 @@ const pollFields = `{
   upvotes
   downvotes
   threshold
+  closed_at
   start_time
   end_time
   allVoters

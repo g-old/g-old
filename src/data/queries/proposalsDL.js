@@ -18,8 +18,8 @@ const proposals = {
         .modify(queryBuilder => {
           if (state === 'active') {
             queryBuilder.where({ state: 'proposed' }).orWhere({ state: 'voting' });
-          } else if (state === 'closed') {
-            queryBuilder.where({ state: 'accepted' }).orWhere({ state: 'rejected' });
+          } else if (state === 'repelled') {
+            queryBuilder.where({ state: 'revoked' }).orWhere({ state: 'rejected' });
           } else if (state) {
             queryBuilder.where({ state });
           }

@@ -16,7 +16,7 @@ class Poll {
     this.numVoter = data.num_voter;
     this.start_time = data.start_time;
     this.end_time = data.end_time;
-    this.closes_at = data.closes_at;
+    this.closed_at = data.closed_at;
   }
   static async gen(viewer, id, { polls }) {
     const data = await polls.load(id);
@@ -35,6 +35,7 @@ class Poll {
     return mode.unipolar === true;
   }
   async isCommentable(viewer, loaders) {
+    if (this.closed_at) return false;
     const mode = await PollingMode.gen(viewer, this.pollingModeId, loaders);
     return mode.with_statements === true;
   }

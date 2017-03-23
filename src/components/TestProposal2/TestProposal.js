@@ -4,6 +4,7 @@ import { createStatement, updateStatement, deleteStatement } from '../../actions
 import { createVote, updateVote, deleteVote } from '../../actions/vote';
 import Poll from '../Poll';
 import Proposal from '../Proposal2';
+import { thresholdPassed } from '../../core/helpers';
 
 class TestProposal extends React.Component {
   static propTypes = {
@@ -75,11 +76,13 @@ class TestProposal extends React.Component {
       this.props.createStatement(data);
     }
   }
+
   handlePollSwitching() {
     // eslint-disable-next-line eqeqeq
     const newPollState = this.state.currentPoll == 'voting' ? 'proposed' : 'voting';
     this.setState({ currentPoll: newPollState });
   }
+
   handleVote(data, method) {
     switch (method) {
       case 'create': {
@@ -105,9 +108,9 @@ class TestProposal extends React.Component {
     let poll = null;
     let switchPoll = false;
     // eslint-disable-next-line eqeqeq
-    if (this.state.currentPoll == 'proposed') {
+    if (this.state.currentPoll === 'proposed') {
       // eslint-disable-next-line eqeqeq
-      switchPoll = this.props.proposal.state != 'proposed';
+      switchPoll = this.props.proposal.state !== 'proposed';
       poll = (
         <Poll
           poll={this.props.proposal.pollOne}
@@ -118,7 +121,7 @@ class TestProposal extends React.Component {
         />
       );
       // eslint-disable-next-line eqeqeq
-    } else if (this.state.currentPoll == 'voting') {
+    } else if (this.state.currentPoll === 'voting') {
       poll = (
         <Poll
           poll={this.props.proposal.pollTwo}
@@ -129,6 +132,35 @@ class TestProposal extends React.Component {
         />
       );
       switchPoll = true;
+    } else if (this.state.currentPoll === 'accepted') {
+      // how was it accepted? a) time, b) votes
+      poll = (
+        <Poll
+          poll={
+            thresholdPassed(this.props.proposal.pollOne)
+              ? this.props.proposal.pollTwo
+              : this.props.proposal.pollOne
+          }
+          user={this.props.user}
+          onVoteButtonClicked={this.handleVote}
+          onStatementSubmit={this.handleOnSubmit}
+          onDeleteStatement={this.onDeleteStatement}
+        />
+      );
+    } else if (this.state.currentPoll === 'rejected') {
+      poll = (
+        <Poll
+          poll={
+            thresholdPassed(this.props.proposal.pollOne)
+              ? this.props.proposal.pollTwo
+              : this.props.proposal.pollOne
+          }
+          user={this.props.user}
+          onVoteButtonClicked={this.handleVote}
+          onStatementSubmit={this.handleOnSubmit}
+          onDeleteStatement={this.onDeleteStatement}
+        />
+      );
     } else {
       poll = 'TO IMPLEMENT';
     }

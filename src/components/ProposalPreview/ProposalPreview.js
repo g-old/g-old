@@ -4,6 +4,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './ProposalPreview.css';
 import PollState from '../PollState';
 import Link from '../Link';
+import { thresholdPassed } from '../../core/helpers';
 
 class Proposal extends React.Component {
   static propTypes = {
@@ -30,7 +31,15 @@ class Proposal extends React.Component {
       poll = this.props.proposal.pollTwo;
     } else if (this.props.proposal.state === 'accepted') {
       // TODO how should we decide which poll has to be displayed
-      poll = this.props.proposal.pollOne;
+      poll = thresholdPassed(this.props.proposal.pollOne)
+        ? this.props.proposal.pollTwo
+        : this.props.proposal.pollOne;
+    } else if (
+      this.props.proposal.state === 'rejected' || this.props.proposal.state === 'revoked'
+    ) {
+      poll = thresholdPassed(this.props.proposal.pollOne)
+        ? this.props.proposal.pollTwo
+        : this.props.proposal.pollOne;
     }
     let body = '';
     if (this.state.fullText) {
