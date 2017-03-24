@@ -5,14 +5,12 @@ function randomNumber(max) {
   return Math.floor(max * Math.random());
 }
 
-// https://www.frankmitchell.org/2015/01/fisher-yates/
-/* eslint-disable no-param-reassign */
-
-const thresholdInVotes = (pollOne) =>
-  Math.floor((pollOne.num_voter / 100) * pollOne.threshold);
+const thresholdInVotes = (poll) =>
+  Math.floor((poll.num_voter / 100) * poll.threshold);
 
 const calcNewThreshold = (poll) =>
   Math.floor((poll.upvotes * 100) / poll.num_voter);
+
 
 const getDates = finished => {
   const date = new Date();
@@ -106,12 +104,21 @@ exports.seed = function (knex, Promise) {
         });
       updates.push(updateFn);
     } else {
-      // more pros then cons needed - delete con votes
-      if (pollTwo.downvotes >= pollTwo.upvotes) {
-        const diff = (pollTwo.downvotes - pollTwo.upvotes) + 1;
+      // check against threshold
+      const actualThreshold = Math.floor(((pollTwo.upvotes + pollTwo.downvotes) / 100)
+        * pollTwo.threshold);
+      if (pollTwo.upvotes <= actualThreshold) {
+        // get diff
+        const numDownvotes = Math.floor((pollTwo.upvotes * 100) / pollTwo.threshold)
+        - pollTwo.upvotes - 1;
+        const diff = pollTwo.downvotes <= numDownvotes ? 0 : numDownvotes - pollTwo.downvotes;
         updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'con' }).limit(diff).del());
-        updates.push(knex('polls').where({ id: pollTwo.id }).update({ downvotes: pollTwo.downvotes - diff }));
+        updates.push(knex('polls').where({ id: pollTwo.id }).update({
+          downvotes: pollTwo.downvotes - diff,
+          num_voter: (pollTwo.upvotes + pollTwo.downvotes) - diff
+        }));
       }
+
       // correct dates on poll
       const updateFn = knex('polls')
         .where({ id: pollTwo.id })
@@ -136,10 +143,23 @@ exports.seed = function (knex, Promise) {
     }
       // rejected in phase 2
       // more cons then pros needed  del pro votes
+    const actualThreshold = Math.floor(((pollTwo.upvotes + pollTwo.downvotes) / 100)
+        * pollTwo.threshold);
+    if (pollTwo.downvotes <= actualThreshold) {
+        // get diff
+      const numUpvotes = Math.floor((pollTwo.downvotes * 100) / pollTwo.threshold)
+        - pollTwo.downvotes - 1;
+      const diff = pollTwo.upvotes <= numUpvotes ? 0 : numUpvotes - pollTwo.upvotes;
+      updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'pro' }).limit(diff).del());
+      updates.push(knex('polls').where({ id: pollTwo.id }).update({
+        downvotes: pollTwo.downvotes - diff,
+        num_voter: pollTwo.num_voter - diff }));
+    }
     if (pollTwo.upvotes >= pollTwo.downvotes) {
       const diff = (pollTwo.upvotes - pollTwo.downvotes) + 1;
       updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'pro' }).limit(diff).del());
-      updates.push(knex('polls').where({ id: pollTwo.id }).update({ upvotes: pollTwo.upvotes - diff }));
+      updates.push(knex('polls').where({ id: pollTwo.id }).update({ upvotes: pollTwo.upvotes - diff,
+        num_voter: (pollTwo.downvotes + pollTwo.upvotes) - diff }));
     }
       // correct dates pollTwo
 

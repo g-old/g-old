@@ -468,7 +468,8 @@ exports.seed = function (knex, Promise) {
         poll = Object.assign({}, poll, { polling_mode_id: proposeId });
         phaseOnePolls.push(poll);
       } else {
-        poll = Object.assign({}, poll, { polling_mode_id: voteId });
+        poll = Object.assign({}, poll, { polling_mode_id: voteId,
+          threshold: poll.threshold < 50 ? 50 : poll.threshold });
         phaseTwoPolls.push(poll);
       }
     }
