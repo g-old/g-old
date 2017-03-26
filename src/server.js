@@ -19,7 +19,6 @@ import UniversalRouter from 'universal-router';
 import PrettyError from 'pretty-error';
 import session from 'express-session';
 import knexSession from 'connect-session-knex';
-import memorySession from 'session-memory-store';
 import { IntlProvider } from 'react-intl';
 import knex from './data/knex';
 import './serverIntlPolyfill';
@@ -80,17 +79,12 @@ const sessionConfig = {
   cookie: { maxAge: 4 * 60 * 60 * 1000 },
   //cookie: { secure: true } // Use with SSL : https://github.com/expressjs/session
 };
-if (process.env.NODE_ENV === 'production') {
-  const SessionStore = knexSession(session);
-  const sessionDB = new SessionStore({
-    knex,
-  });
-  sessionConfig.store = sessionDB;
-} else {
-  const SessionStore = memorySession(session);
-  const sessionDB = new SessionStore();
-  sessionConfig.store = sessionDB;
-}
+
+const SessionStore = knexSession(session);
+const sessionDB = new SessionStore({
+  knex,
+});
+sessionConfig.store = sessionDB;
 
 app.use(session(sessionConfig));
 
