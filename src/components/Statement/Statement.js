@@ -10,6 +10,7 @@ import { deleteStatement } from '../../actions/statement';
 
 class Statement extends React.Component {
   static propTypes = {
+    onSubmit: PropTypes.func.isRequired,
     data: PropTypes.shape({
       id: PropTypes.string.isRequired,
       vote: PropTypes.shape({
@@ -33,8 +34,16 @@ class Statement extends React.Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      textArea: { val: this.props.data.text || '' },
+      edit: false,
+    };
+
     this.onDeleteStatement = this.onDeleteStatement.bind(this);
     this.onEditStatement = this.onEditStatement.bind(this);
+    this.onTextChange = this.onTextChange.bind(this);
+    this.onTextSubmit = this.onTextSubmit.bind(this);
+    this.onEndEditing = this.onEndEditing.bind(this);
   }
 
   onDeleteStatement() {
@@ -45,15 +54,28 @@ class Statement extends React.Component {
   }
 
   onEditStatement() {
-    this.props.hideStatement();
-
-  /*  this.props.updateStatement({
-      pollId: this.props.data.pollId,
-      id: this.props.data.id,
-      text: 'my new updated text',
-    });
-    */
+    this.setState({ ...this.state, edit: true });
   }
+
+  onTextChange(e) {
+    this.setState({ ...this.state, textArea: { val: e.target.value } });
+  }
+
+  onTextSubmit(e) {
+    const text = this.state.textArea.val.trim();
+    if (text) {
+      // TODO validation
+      this.props.onSubmit({ id: this.props.data.id, text }, this.props.data.text != null);
+    }
+
+    this.onEndEditing();
+    e.preventDefault();
+  }
+
+  onEndEditing() {
+    this.setState({ ...this.state, edit: false });
+  }
+
   handleLikeClick(e, like) {
     if (!like) {
       this.props.createLike({
@@ -72,6 +94,24 @@ class Statement extends React.Component {
     return (
       <div className={cn(s.root, this.props.data.vote.position === 'pro' ? s.pro : s.contra)}>
         <span className={s.likes}>
+          {this.props.ownStatement &&
+            <span style={{ marginRight: '0.5em' }}>
+              {this.state.edit
+                ? <span>
+                  <button onClick={this.onTextSubmit}>
+                      SAVE
+                    </button>
+                  <button onClick={this.onEndEditing}>
+                      CANCEL
+                    </button>
+                </span>
+                : <button onClick={this.onEditStatement}>
+                    EDIT
+                  </button>}
+              <button onClick={this.onDeleteStatement}>
+                DELETE
+              </button>
+            </span>}
           <button
             onClick={e => this.handleLikeClick(e, this.props.ownLike)}
             className={this.props.ownLike ? s.liked : s.notLiked}
@@ -79,16 +119,6 @@ class Statement extends React.Component {
             {this.props.ownLike ? '+' : ''}
             {this.props.data.likes}
           </button>
-          <br />
-          {this.props.ownStatement &&
-            <span>
-              <button onClick={this.onEditStatement}>
-                EDIT
-              </button>
-              <button onClick={this.onDeleteStatement}>
-                DELETE
-              </button>
-            </span>}
         </span>
         <img
           className={cn(s.avatar)}
@@ -101,7 +131,16 @@ class Statement extends React.Component {
           {this.props.data.author.name} {this.props.data.author.surname}
         </div>
         <div className={s.text}>
-          {this.props.data.text}
+          {this.state.edit
+            ? <div>
+              <textarea
+                placeholder="Leave a statement (optional)"
+                className={s.textEdit}
+                value={this.state.textArea.val}
+                onChange={this.onTextChange}
+              />
+            </div>
+            : this.props.data.text}
         </div>
       </div>
     );

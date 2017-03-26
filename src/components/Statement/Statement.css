@@ -15,14 +15,6 @@
   float: left;
   margin-right: 0.5em;
   width: 2.5em;
-
-  /* for the dummy avatar text */
-  font-size: 0.9em;
-  text-align: center;
-}
-
-.title {
-  font-weight: bolder;
 }
 
 .likes {
@@ -39,10 +31,6 @@
 .pro {
   margin-right: 10%;
   background-color: #fafffa;
-
-  .title {
-    margin-right: 4em;
-  }
 }
 
 .contra {
@@ -51,6 +39,11 @@
 }
 
 .text {
-  margin-left: 2.6em;
-  line-height: 1.3em;
+  margin-left: 3em;
+}
+
+.textEdit {
+  font-family: var(--font-family-base);
+  width: 99%;
+  height: 2.8em;
 }

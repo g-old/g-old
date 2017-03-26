@@ -34,7 +34,6 @@ class StatementsList extends React.Component {
         input = (
           <StatementInput
             onSubmit={this.props.onSubmit}
-            title={this.props.ownStatement.title}
             text={this.props.ownStatement.text}
             statementId={this.props.ownStatement.id}
             showOwnStatement={this.toggleStatement}
@@ -48,6 +47,7 @@ class StatementsList extends React.Component {
     if (this.props.ownStatement && this.state.showOwnStatement) {
       ownStatement = (
         <Statement
+          onSubmit={this.props.onSubmit}
           key={this.props.ownStatement.id}
           data={this.props.ownStatement}
           ownLike={this.props.likedStatements.find(
