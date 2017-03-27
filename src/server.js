@@ -80,7 +80,7 @@ const sessionConfig = {
   cookie: { maxAge: 4 * 60 * 60 * 1000 },
   //cookie: { secure: true } // Use with SSL : https://github.com/expressjs/session
 };
-if (process.env.NODE_ENV === 'production') {
+if (/* process.env.NODE_ENV === 'production'*/ true) {
   const SessionStore = knexSession(session);
   const sessionDB = new SessionStore({
     knex,

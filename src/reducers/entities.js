@@ -13,11 +13,13 @@ import {
   DELETE_STATEMENT_SUCCESS,
   UPDATE_STATEMENT_SUCCESS,
   LOAD_PROPOSAL_LIST_SUCCESS,
+  LOAD_VOTES_SUCCESS,
 } from '../constants';
 import {
   proposal as proposalSchema,
   statement as statementSchema,
   proposalList as proposalListSchema,
+  votesList as votesListSchema,
 } from '../store/schema';
 
 // TODO https://www.npmjs.com/package/babel-plugin-transform-object-rest-spread
@@ -299,6 +301,24 @@ export default function entities(state = { proposals: {} }, action) {
       const normalizedData = normalize(action.payload.proposalsDL, proposalListSchema);
       return {
         ...merge({}, state, normalizedData.entities),
+      };
+    }
+
+    case LOAD_VOTES_SUCCESS: {
+      // TODO Add votes to poll
+      console.log('LOADVOTES', action.payload);
+      const normalizedData = normalize(action.payload.data.votes, votesListSchema);
+      const pollId = action.payload.pollId;
+      console.log('LOADVOTESNORMALIZED', normalizedData);
+      return {
+        ...merge({}, state, normalizedData.entities),
+        polls: {
+          ...state.polls,
+          [pollId]: {
+            ...state.polls[pollId],
+            votes: [...normalizedData.result],
+          },
+        },
       };
     }
 

@@ -12,6 +12,7 @@ import { GraphQLSchema as Schema, GraphQLObjectType as ObjectType } from 'graphq
 import intl from './queries/intl';
 import proposal from './queries/proposal';
 import proposals from './queries/proposals';
+import votes from './queries/votes';
 import user from './queries/user';
 import createStatement from './mutations/createStatement';
 import deleteStatement from './mutations/deleteStatement';
@@ -34,6 +35,7 @@ const schema = new Schema({
       proposalDL,
       proposalsDL,
       user,
+      votes,
     },
   }),
   mutation: new ObjectType({

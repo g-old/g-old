@@ -109,9 +109,9 @@ exports.seed = function (knex, Promise) {
         * pollTwo.threshold);
       if (pollTwo.upvotes <= actualThreshold) {
         // get diff
-        const numDownvotes = Math.floor((pollTwo.upvotes * 100) / pollTwo.threshold)
-        - pollTwo.upvotes - 1;
-        const diff = pollTwo.downvotes <= numDownvotes ? 0 : numDownvotes - pollTwo.downvotes;
+        const numDownvotes = Math.max((Math.floor((pollTwo.upvotes * 100) / pollTwo.threshold)
+        - pollTwo.upvotes - 1), 0);
+        const diff = pollTwo.downvotes <= numDownvotes ? 0 : pollTwo.downvotes - numDownvotes;
         updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'con' }).limit(diff).del());
         updates.push(knex('polls').where({ id: pollTwo.id }).update({
           downvotes: pollTwo.downvotes - diff,
@@ -147,9 +147,9 @@ exports.seed = function (knex, Promise) {
         * pollTwo.threshold);
     if (pollTwo.downvotes <= actualThreshold) {
         // get diff
-      const numUpvotes = Math.floor((pollTwo.downvotes * 100) / pollTwo.threshold)
-        - pollTwo.downvotes - 1;
-      const diff = pollTwo.upvotes <= numUpvotes ? 0 : numUpvotes - pollTwo.upvotes;
+      const numUpvotes = Math.max((Math.floor((pollTwo.downvotes * 100) / pollTwo.threshold)
+        - pollTwo.downvotes - 1), 0);
+      const diff = pollTwo.upvotes <= numUpvotes ? 0 : pollTwo.upvotes - numUpvotes;
       updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'pro' }).limit(diff).del());
       updates.push(knex('polls').where({ id: pollTwo.id }).update({
         downvotes: pollTwo.downvotes - diff,

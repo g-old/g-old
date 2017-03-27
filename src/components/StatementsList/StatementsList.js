@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import Statement from '../Statement';
-import StatementInput from '../StatementInput';
 
 class StatementsList extends React.Component {
   static propTypes = {
@@ -16,35 +15,30 @@ class StatementsList extends React.Component {
     voted: PropTypes.bool.isRequired,
     ownStatement: PropTypes.object,
     onSubmit: PropTypes.func.isRequired,
+    ownVote: PropTypes.object,
   };
-  constructor(props) {
-    super(props);
-    this.state = { showOwnStatement: true };
-    this.toggleStatement = this.toggleStatement.bind(this);
-  }
-  toggleStatement() {
-    this.setState({ ...this.state, showOwnStatement: !this.state.showOwnStatement });
-  }
+
   render() {
     // show input only if then user has voted and hasnt written a statement
     let input = 'VOTE, THEN DEBATE ;) ';
-
-    if (this.props.voted) {
-      if (!this.state.showOwnStatement) {
-        input = (
-          <StatementInput
-            onSubmit={this.props.onSubmit}
-            text={this.props.ownStatement.text}
-            statementId={this.props.ownStatement.id}
-            showOwnStatement={this.toggleStatement}
-          />
-        );
-      } else {
-        input = <StatementInput onSubmit={this.props.onSubmit} />;
-      }
-    }
     let ownStatement = null;
-    if (this.props.ownStatement && this.state.showOwnStatement) {
+    if (this.props.voted) {
+      input = null;
+    }
+    if (!this.props.ownStatement && this.props.voted) {
+      const data = {
+        vote: this.props.ownVote,
+        author: this.props.user,
+        pollId: this.props.pollId,
+        likes: 0,
+        text: '',
+      };
+      ownStatement = (
+        <Statement data={data} onSubmit={this.props.onSubmit} pollId={this.props.pollId} asInput />
+      );
+    }
+
+    if (this.props.ownStatement) {
       ownStatement = (
         <Statement
           onSubmit={this.props.onSubmit}
@@ -55,7 +49,6 @@ class StatementsList extends React.Component {
           )}
           pollId={this.props.pollId}
           ownStatement
-          hideStatement={this.toggleStatement}
         />
       );
 
@@ -66,7 +59,7 @@ class StatementsList extends React.Component {
     return (
       <div>
         {input}
-
+        {}
         {ownStatement}
         {/* eslint-disable no-confusing-arrow */}
         {this.props.statements.map(
@@ -81,6 +74,7 @@ class StatementsList extends React.Component {
                   )}
                 pollId={this.props.pollId}
                 ownStatement={false}
+                onSubmit={this.props.onSubmit}
               />
               : null,
         )}

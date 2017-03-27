@@ -3,6 +3,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import StatementsList from '../StatementsList';
 import PollState from '../PollState';
+import VotesList from '../VotesList';
 import s from './Poll.css';
 
 class Poll extends React.Component {
@@ -19,6 +20,7 @@ class Poll extends React.Component {
       statements: PropTypes.arrayOf(PropTypes.object),
       upvotes: PropTypes.number,
       downvotes: PropTypes.number,
+      votes: PropTypes.arrayOf(PropTypes.object),
       ownVote: PropTypes.shape({
         id: PropTypes.string,
         position: PropTypes.string,
@@ -42,6 +44,7 @@ class Poll extends React.Component {
       ),
     }),
     user: PropTypes.object.isRequired,
+    fetchVotes: PropTypes.func,
     onVoteButtonClicked: PropTypes.func.isRequired,
     onStatementSubmit: PropTypes.func,
     onDeleteStatement: PropTypes.func.isRequired,
@@ -101,6 +104,16 @@ class Poll extends React.Component {
   render() {
     const withStatements = this.props.poll.mode.with_statements;
     let statements = null;
+    let votes = null;
+    if (this.props.poll.closed_at) {
+      votes = (
+        <VotesList
+          votes={this.props.poll.votes || []}
+          getVotes={() => this.props.fetchVotes(this.props.poll.id)}
+        />
+      );
+    }
+
     // render StatementsList or not?
     if (withStatements) {
       statements = (
@@ -112,12 +125,13 @@ class Poll extends React.Component {
           voted={this.props.poll.ownVote != null}
           ownStatement={this.props.poll.ownStatement}
           onSubmit={this.handleOnSubmit}
+          ownVote={this.props.poll.ownVote}
         />
       );
     }
     let votingButtons = null;
 
-    if (!this.props.poll.closed_at) {
+    if (!this.props.poll.closed_at && this.props.user.role !== 'guest') {
       // TODO Find better check
       // eslint-disable-next-line no-nested-ternary
       const proBtnColor = this.props.poll.ownVote
@@ -179,6 +193,7 @@ class Poll extends React.Component {
         </p>
         {votingButtons}
         {statements}
+        {votes}
       </div>
     );
   }

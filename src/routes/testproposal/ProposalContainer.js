@@ -13,15 +13,13 @@ import { denormalize } from 'normalizr';
 import TestProposal from '../../components/TestProposal2';
 import { proposal as proposalSchema } from '../../store/schema';
 
-
 class ProposalContainer extends React.Component {
-
   static propTypes = {
     proposal: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
     proposalId: PropTypes.number.isRequired,
     createLike: PropTypes.func,
-  }
+  };
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
     return this.props.proposal != null;
@@ -32,21 +30,18 @@ class ProposalContainer extends React.Component {
     }
     return <div>STILL LOADING ...</div>;
   }
-
-
 }
-ProposalContainer.propTypes = {
-};
+ProposalContainer.propTypes = {};
 // TODO implement memoiziation with reselect
 const mapStateToProps = (state, ownProps) => {
   const data = state.entities.proposals[ownProps.proposalId];
   const proposal = denormalize(data, proposalSchema, state.entities);
   const user = state.user; // or pass via context
+  console.log('PROPOSALPROPS', proposal);
   return {
     proposal,
     user,
   };
 };
-
 
 export default connect(mapStateToProps)(ProposalContainer);

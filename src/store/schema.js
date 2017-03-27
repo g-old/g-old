@@ -28,3 +28,4 @@ export const proposal = new schema.Entity('proposals', {
   pollTwo: poll,
 });
 export const proposalList = [proposal];
+export const votesList = [vote];

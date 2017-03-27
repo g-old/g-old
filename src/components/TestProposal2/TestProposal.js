@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { createStatement, updateStatement, deleteStatement } from '../../actions/statement';
-import { createVote, updateVote, deleteVote } from '../../actions/vote';
+import { createVote, updateVote, deleteVote, getVotes } from '../../actions/vote';
 import Poll from '../Poll';
 import Proposal from '../Proposal2';
 import { thresholdPassed } from '../../core/helpers';
@@ -53,6 +53,7 @@ class TestProposal extends React.Component {
     createStatement: PropTypes.func.isRequired,
     updateStatement: PropTypes.func.isRequired,
     deleteStatement: PropTypes.func.isRequired,
+    getVotes: PropTypes.func.isRequired,
     createVote: PropTypes.func.isRequired,
     updateVote: PropTypes.func.isRequired,
     deleteVote: PropTypes.func.isRequired,
@@ -68,9 +69,9 @@ class TestProposal extends React.Component {
   onDeleteStatement(data) {
     this.props.deleteStatement(data);
   }
-  handleOnSubmit(data, update) {
+  handleOnSubmit(data) {
     // TODO check for vote
-    if (update) {
+    if (data.id) {
       this.props.updateStatement(data);
     } else {
       this.props.createStatement(data);
@@ -81,6 +82,10 @@ class TestProposal extends React.Component {
     // eslint-disable-next-line eqeqeq
     const newPollState = this.state.currentPoll == 'voting' ? 'proposed' : 'voting';
     this.setState({ currentPoll: newPollState });
+  }
+
+  handleFetchVotes(pollId) {
+    this.props.getVotes(pollId);
   }
 
   handleVote(data, method) {
@@ -118,6 +123,7 @@ class TestProposal extends React.Component {
           onVoteButtonClicked={this.handleVote}
           onStatementSubmit={this.handleOnSubmit}
           onDeleteStatement={this.onDeleteStatement}
+          fetchVotes={this.props.getVotes}
         />
       );
       // eslint-disable-next-line eqeqeq
@@ -129,36 +135,34 @@ class TestProposal extends React.Component {
           onVoteButtonClicked={this.handleVote}
           onStatementSubmit={this.handleOnSubmit}
           onDeleteStatement={this.onDeleteStatement}
+          fetchVotes={this.props.getVotes}
         />
       );
       switchPoll = true;
     } else if (this.state.currentPoll === 'accepted') {
       // how was it accepted? a) time, b) votes
+
+      const passed = thresholdPassed(this.props.proposal.pollOne);
       poll = (
         <Poll
-          poll={
-            thresholdPassed(this.props.proposal.pollOne)
-              ? this.props.proposal.pollTwo
-              : this.props.proposal.pollOne
-          }
+          poll={passed ? this.props.proposal.pollTwo : this.props.proposal.pollOne}
           user={this.props.user}
           onVoteButtonClicked={this.handleVote}
           onStatementSubmit={this.handleOnSubmit}
           onDeleteStatement={this.onDeleteStatement}
+          fetchVotes={this.props.getVotes}
         />
       );
     } else if (this.state.currentPoll === 'rejected') {
+      const passed = thresholdPassed(this.props.proposal.pollOne);
       poll = (
         <Poll
-          poll={
-            thresholdPassed(this.props.proposal.pollOne)
-              ? this.props.proposal.pollTwo
-              : this.props.proposal.pollOne
-          }
+          poll={passed ? this.props.proposal.pollTwo : this.props.proposal.pollOne}
           user={this.props.user}
           onVoteButtonClicked={this.handleVote}
           onStatementSubmit={this.handleOnSubmit}
           onDeleteStatement={this.onDeleteStatement}
+          fetchVotes={this.props.getVotes}
         />
       );
     } else {
@@ -194,6 +198,7 @@ const mapDispatch = {
   createStatement,
   updateStatement,
   deleteStatement,
+  getVotes,
   createVote,
   updateVote,
   deleteVote,

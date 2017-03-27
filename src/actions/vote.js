@@ -9,6 +9,9 @@ import {
   DELETE_VOTE_START,
   DELETE_VOTE_SUCCESS,
   DELETE_VOTE_ERROR,
+  LOAD_VOTES_START,
+  LOAD_VOTES_SUCCESS,
+  LOAD_VOTES_ERROR,
 } from '../constants';
 
 const createVoteMutation = `
@@ -36,6 +39,22 @@ const deleteVoteMutation = `
       id
       position
       pollId
+    }
+  }
+`;
+
+const votesList = `
+  query ($pollId:ID!) {
+    votes (pollId:$pollId) {
+    id
+    position
+    pollId
+    voter{
+      id
+      name
+      surname
+      avatar
+    }
     }
   }
 `;
@@ -73,8 +92,6 @@ export function createVote(vote) {
 }
 
 export function updateVote(vote) {
-  console.log('UPDATEVOTE');
-  console.log(vote);
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: UPDATE_VOTE_START,
@@ -84,8 +101,6 @@ export function updateVote(vote) {
     });
     try {
       const { data } = await graphqlRequest(updateVoteMutation, vote);
-      console.log(data);
-
       dispatch({
         type: UPDATE_VOTE_SUCCESS,
         payload: data,
@@ -105,8 +120,6 @@ export function updateVote(vote) {
 }
 
 export function deleteVote(vote) {
-  console.log('DELETEVOTE');
-  console.log(vote);
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: DELETE_VOTE_START,
@@ -116,8 +129,6 @@ export function deleteVote(vote) {
     });
     try {
       const { data } = await graphqlRequest(deleteVoteMutation, vote);
-      console.log(data);
-
       dispatch({
         type: DELETE_VOTE_SUCCESS,
         payload: data,
@@ -126,6 +137,38 @@ export function deleteVote(vote) {
       dispatch({
         type: DELETE_VOTE_ERROR,
         payload: {
+          error,
+        },
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function getVotes(pollId) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    // TODO check cache
+
+    dispatch({
+      type: LOAD_VOTES_START,
+      payload: {
+        pollId,
+      },
+    });
+
+    try {
+      const { data } = await graphqlRequest(votesList, { pollId });
+      dispatch({
+        type: LOAD_VOTES_SUCCESS,
+        payload: { data, pollId },
+      });
+    } catch (error) {
+      dispatch({
+        type: LOAD_VOTES_ERROR,
+        payload: {
+          pollId,
           error,
         },
       });

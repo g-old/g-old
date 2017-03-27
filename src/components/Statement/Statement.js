@@ -12,7 +12,7 @@ class Statement extends React.Component {
   static propTypes = {
     onSubmit: PropTypes.func.isRequired,
     data: PropTypes.shape({
-      id: PropTypes.string.isRequired,
+      id: PropTypes.string,
       vote: PropTypes.shape({
         position: PropTypes.string.isRequired,
       }),
@@ -29,16 +29,16 @@ class Statement extends React.Component {
     ownLike: PropTypes.object,
     ownStatement: PropTypes.bool,
     deleteStatement: PropTypes.func,
-    hideStatement: PropTypes.func,
+    user: PropTypes.object,
+    asInput: PropTypes.bool,
   };
 
   constructor(props) {
     super(props);
     this.state = {
       textArea: { val: this.props.data.text || '' },
-      edit: false,
+      edit: props.asInput === true,
     };
-
     this.onDeleteStatement = this.onDeleteStatement.bind(this);
     this.onEditStatement = this.onEditStatement.bind(this);
     this.onTextChange = this.onTextChange.bind(this);
@@ -73,7 +73,12 @@ class Statement extends React.Component {
   }
 
   onEndEditing() {
-    this.setState({ ...this.state, edit: false });
+    //
+    this.setState({
+      ...this.state,
+      textArea: this.props.asInput ? { ...this.state.textArea, val: '' } : this.state.textArea,
+      edit: this.props.asInput === true,
+    });
   }
 
   handleLikeClick(e, like) {
@@ -94,13 +99,13 @@ class Statement extends React.Component {
     return (
       <div className={cn(s.root, this.props.data.vote.position === 'pro' ? s.pro : s.contra)}>
         <span className={s.likes}>
-          {this.props.ownStatement &&
+          {
             <span style={{ marginRight: '0.5em' }}>
               {this.state.edit
                 ? <span>
                   <button onClick={this.onTextSubmit}>
-                      SAVE
-                    </button>
+                    {this.props.asInput ? 'SEND' : 'SAVE'}
+                  </button>
                   <button onClick={this.onEndEditing}>
                       CANCEL
                     </button>
@@ -108,17 +113,21 @@ class Statement extends React.Component {
                 : <button onClick={this.onEditStatement}>
                     EDIT
                   </button>}
-              <button onClick={this.onDeleteStatement}>
-                DELETE
-              </button>
-            </span>}
-          <button
-            onClick={e => this.handleLikeClick(e, this.props.ownLike)}
-            className={this.props.ownLike ? s.liked : s.notLiked}
-          >
-            {this.props.ownLike ? '+' : ''}
-            {this.props.data.likes}
-          </button>
+              {!this.props.asInput &&
+                <button onClick={this.onDeleteStatement}>
+                  DELETE
+                </button>}
+            </span>
+          }
+          {this.props.user.role !== 'guest' &&
+            !this.props.asInput &&
+            <button
+              onClick={e => this.handleLikeClick(e, this.props.ownLike)}
+              className={this.props.ownLike ? s.liked : s.notLiked}
+            >
+              {this.props.ownLike ? '+' : ''}
+              {this.props.data.likes}
+            </button>}
         </span>
         <img
           className={cn(s.avatar)}
@@ -151,5 +160,6 @@ const mapDispatch = {
   deleteLike,
   deleteStatement,
 };
+const mapPropsToState = state => ({ user: state.user });
 
-export default connect(null, mapDispatch)(withStyles(s)(Statement));
+export default connect(mapPropsToState, mapDispatch)(withStyles(s)(Statement));
