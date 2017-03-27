@@ -36,6 +36,7 @@ class Html extends React.Component {
             href="https://fonts.googleapis.com/css?family=Open+Sans|Work+Sans"
             rel="stylesheet"
           />
+          <script src="https://use.fontawesome.com/e75656a902.js" />
           {style && <style id="css" dangerouslySetInnerHTML={{ __html: style }} />}
         </head>
         <body>

@@ -20,11 +20,12 @@
 .menu {
   font-style: italic;
   font-size: 0.9em;
+}
 
-  .liked {
-    /* background-color: green; */
-    font-weight: bold;
-  }
+.like {
+  border: none;
+  background: none;
+  outline: none;
 }
 
 .avatar {

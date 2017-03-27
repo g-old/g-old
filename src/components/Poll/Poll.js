@@ -139,7 +139,7 @@ class Poll extends React.Component {
         : '';
       // eslint-disable-next-line no-nested-ternary
       const conBtnColor = this.props.poll.ownVote
-        ? this.props.poll.ownVote.position === 'con' ? 'green' : ''
+        ? this.props.poll.ownVote.position === 'con' ? 'red' : ''
         : '';
       if (this.props.poll.mode.unipolar) {
         votingButtons = (
@@ -157,10 +157,10 @@ class Poll extends React.Component {
         votingButtons = (
           <span>
             <button onClick={() => this.canVote('pro')} style={{ background: proBtnColor }}>
-              {' '}YES{' '}
+              <i className="fa fa-thumbs-up" />
             </button>
             <button onClick={() => this.canVote('con')} style={{ background: conBtnColor }}>
-              {' '}NO{' '}
+              <i className="fa fa-thumbs-down" />
             </button>
           </span>
         );

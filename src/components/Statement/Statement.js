@@ -76,7 +76,7 @@ class Statement extends React.Component {
     //
     this.setState({
       ...this.state,
-      textArea: this.props.asInput ? { ...this.state.textArea, val: '' } : this.state.textArea,
+      textArea: { ...this.state.textArea, val: this.props.asInput ? '' : this.props.data.text },
       edit: this.props.asInput === true,
     });
   }
@@ -96,6 +96,8 @@ class Statement extends React.Component {
   }
 
   render() {
+    const minInputLen = this.state.textArea.val.length >= 3;
+
     return (
       <div className={cn(s.root, this.props.data.vote.position === 'pro' ? s.pro : s.contra)}>
         <img
@@ -107,42 +109,45 @@ class Statement extends React.Component {
         />
         <div style={{ width: '100%' }}>
           <div className={s.header}>
-            <div className={s.author}>
-              {this.props.data.author.name} {this.props.data.author.surname}
-            </div>
-            <span className={s.menu}>
-              <span className={s.likes}>
-                {
-                  <span style={{ marginRight: '0.5em' }}>
-                    {this.state.edit
-                      ? <span>
-                        <button onClick={this.onTextSubmit}>
-                          {this.props.asInput ? 'SEND' : 'SAVE'}
-                        </button>
-                        <button onClick={this.onEndEditing}>
-                            CANCEL
-                          </button>
-                      </span>
-                      : <button onClick={this.onEditStatement}>
-                          EDIT
-                        </button>}
-                    {!this.props.asInput &&
-                      <button onClick={this.onDeleteStatement}>
-                        DELETE
-                      </button>}
-                  </span>
-                }
+            <div>
+              <span className={s.author}>
+                {this.props.data.author.name} {this.props.data.author.surname}
+              </span>
+              <span>
+                {this.props.data.likes ? ` (+${this.props.data.likes})` : ''}
                 {this.props.user.role !== 'guest' &&
                   !this.props.asInput &&
                   <button
                     onClick={e => this.handleLikeClick(e, this.props.ownLike)}
-                    className={this.props.ownLike ? s.liked : s.notLiked}
-                  >
-                    {this.props.ownLike ? '+' : ''}
-                    {this.props.data.likes}
+                    className={cn(
+                      s.like,
+                      this.props.ownLike ? 'fa fa-thumbs-up' : 'fa fa-thumbs-o-up',
+                    )}
+                  />}
+              </span>
+            </div>
+            <span className={s.menu}>
+              <span style={{ marginRight: '0.5em' }}>
+                {this.state.edit
+                  ? <span>
+                    <button onClick={this.onTextSubmit} disabled={!minInputLen}>
+                      <i className="fa fa-check" />
+                    </button>
+                    <button
+                      onClick={this.onEndEditing}
+                      disabled={this.props.asInput && !minInputLen}
+                    >
+                      <i className="fa fa-times" />
+                    </button>
+                  </span>
+                  : <button onClick={this.onEditStatement}>
+                    <i className="fa fa-pencil" />
+                  </button>}
+                {!this.props.asInput &&
+                  <button onClick={this.onDeleteStatement}>
+                    <i className="fa fa-trash" />
                   </button>}
               </span>
-
             </span>
           </div>
           <div className={s.text}>
