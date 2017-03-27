@@ -1,24 +1,23 @@
 @import '../../components/variables.css';
 
 .root {
+  display: flex;
   border: solid 1px gray;
   padding: 0.4em;
   margin: 0.1em 0.1em 0.4em;
   font-size: 0.9em;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
 .author {
   font-weight: bold;
 }
 
-.avatar {
-  float: left;
-  margin-right: 0.5em;
-  width: 2.5em;
-}
-
-.likes {
-  float: right;
+.menu {
   font-style: italic;
   font-size: 0.9em;
 
@@ -26,6 +25,12 @@
     /* background-color: green; */
     font-weight: bold;
   }
+}
+
+.avatar {
+  margin-right: 0.4em;
+  width: 2.2em;
+  height: 2.2em;
 }
 
 .pro {
@@ -39,11 +44,15 @@
 }
 
 .text {
-  margin-left: 3em;
+  -ms-word-break: break-all;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.3em;
+  width: 100%;
 }
 
 .textEdit {
   font-family: var(--font-family-base);
-  width: 99%;
   height: 2.8em;
+  width: 99%;
 }
