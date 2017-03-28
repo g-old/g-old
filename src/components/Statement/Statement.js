@@ -97,7 +97,7 @@ class Statement extends React.Component {
 
   render() {
     const minInputLen = this.state.textArea.val.length >= 3;
-
+    console.log('STATEMENT:STATE:EDIT', this.state.edit);
     return (
       <div className={cn(s.root, this.props.data.vote.position === 'pro' ? s.pro : s.contra)}>
         <img
@@ -127,27 +127,30 @@ class Statement extends React.Component {
               </span>
             </div>
             <span className={s.menu}>
-              <span style={{ marginRight: '0.5em' }}>
-                {this.state.edit
-                  ? <span>
-                    <button onClick={this.onTextSubmit} disabled={!minInputLen}>
-                      <i className="fa fa-check" />
-                    </button>
-                    <button
-                      onClick={this.onEndEditing}
-                      disabled={this.props.asInput && !minInputLen}
-                    >
-                      <i className="fa fa-times" />
-                    </button>
-                  </span>
-                  : <button onClick={this.onEditStatement}>
-                    <i className="fa fa-pencil" />
-                  </button>}
-                {!this.props.asInput &&
-                  <button onClick={this.onDeleteStatement}>
-                    <i className="fa fa-trash" />
-                  </button>}
-              </span>
+              {(this.props.asInput ||
+                this.props.ownStatement ||
+                ['admin', 'mod'].includes(this.props.user.role)) &&
+                <span style={{ marginRight: '0.5em' }}>
+                  {this.state.edit
+                    ? <span>
+                      <button onClick={this.onTextSubmit} disabled={!minInputLen}>
+                        <i className="fa fa-check" />
+                      </button>
+                      <button
+                        onClick={this.onEndEditing}
+                        disabled={this.props.asInput && !minInputLen}
+                      >
+                        <i className="fa fa-times" />
+                      </button>
+                    </span>
+                    : <button onClick={this.onEditStatement}>
+                      <i className="fa fa-pencil" />
+                    </button>}
+                  {!this.props.asInput &&
+                    <button onClick={this.onDeleteStatement}>
+                      <i className="fa fa-trash" />
+                    </button>}
+                </span>}
             </span>
           </div>
           <div className={s.text}>
