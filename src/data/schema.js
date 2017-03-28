@@ -25,6 +25,7 @@ import createVote from './mutations/createVote';
 import updateVote from './mutations/updateVote';
 import deleteVote from './mutations/deleteVote';
 import createProposal from './mutations/createProposal';
+import updateProposal from './mutations/updateProposal';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -51,6 +52,7 @@ const schema = new Schema({
       updateVote,
       deleteVote,
       createProposal,
+      updateProposal,
     },
   }),
 });

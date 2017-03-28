@@ -40,6 +40,32 @@ class Proposal {
     .then(ids => {return ids; }));
       */
   }
+  static async update(viewer, data, loaders) {
+    // authorize
+    if (!Proposal.canMutate(viewer, data)) return null;
+    // validate
+    if (!data.id) return null;
+    if (!data.title && !data.text) return null;
+    const proposalInDb = await Proposal.gen(viewer, data.id, loaders);
+    if (!proposalInDb) return null;
+    if (proposalInDb.title === data.title && proposalInDb.body === data.text) return null;
+
+    // update
+    await knex.transaction(async trx => {
+      await trx
+        .where({
+          id: data.id,
+        })
+        .update({
+          // Not sure if await needed
+          body: data.text,
+          title: data.title,
+          updated_at: new Date(),
+        })
+        .into('proposals');
+    });
+    return Proposal.gen(viewer, data.id, loaders) || null;
+  }
 
   static async create(viewer, data, loaders) {
     // authorize
