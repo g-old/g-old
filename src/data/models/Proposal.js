@@ -1,6 +1,9 @@
+import knex from '../knex';
+import Poll from './Poll';
 
 // eslint-disable-next-line no-unused-vars
-function checkCanSee(viewer, data) { // TODO change data returned based on permissions
+function checkCanSee(viewer, data) {
+  // TODO change data returned based on permissions
   return true;
 }
 
@@ -24,13 +27,61 @@ class Proposal {
     // return canSee ? new Proposal(data) : new Proposal(data.email = null);
   }
 
+  // eslint-disable-next-line no-unused-vars
+  static canMutate(viewer, data) {
+    return ['admin', 'mod'].includes(viewer.role);
+  }
+
   static async followees(id, { followees }) {
     const data = await followees.load(id);
     return data;
-  /*  return Promise.resolve(knex('user_follows')
+    /*  return Promise.resolve(knex('user_follows')
     .where({ follower_id: id }).pluck('followee_id')
     .then(ids => {return ids; }));
       */
+  }
+
+  static async create(viewer, data, loaders) {
+    // authorize
+    if (!Proposal.canMutate(viewer, data)) return null;
+    // validate
+    if (!data.text) return null;
+    if (!data.title) return null;
+    if (!data.pollingModeId) return null;
+    // create
+
+    const newProposalId = await knex.transaction(async trx => {
+      // ONLY testing!
+      const date = new Date();
+      const endDate = new Date();
+      endDate.setDate(date.getDate() + 5);
+      const pollOneData = {
+        polling_mode_id: data.pollingModeId,
+        secret: false,
+        threshold: 20,
+        start_time: new Date(),
+        end_time: endDate,
+      };
+      const pollOne = await Poll.create(viewer, pollOneData, loaders);
+      if (!pollOne) throw Error('No pollOne provided');
+
+      const id = await trx
+        .insert(
+        {
+          author_id: viewer.id,
+          title: data.title,
+          body: data.text,
+          poll_one_id: pollOne.id,
+          state: 'proposed',
+          created_at: new Date(),
+        },
+          'id',
+        )
+        .into('proposals');
+      return id[0];
+    });
+    if (!newProposalId) return null;
+    return Proposal.gen(viewer, newProposalId, loaders);
   }
 }
 

@@ -60,8 +60,6 @@ const votesList = `
 `;
 
 export function createVote(vote) {
-  console.log('CREATEVOTE');
-  console.log(vote);
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: CREATE_VOTE_START,
@@ -71,8 +69,6 @@ export function createVote(vote) {
     });
     try {
       const { data } = await graphqlRequest(createVoteMutation, vote);
-      console.log(data);
-
       dispatch({
         type: CREATE_VOTE_SUCCESS,
         payload: data,

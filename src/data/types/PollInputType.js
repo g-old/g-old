@@ -1,0 +1,28 @@
+import {
+  GraphQLString as String,
+  GraphQLInputObjectType,
+  GraphQLID as ID,
+  GraphQLBoolean,
+  GraphQLInt,
+} from 'graphql';
+
+const PollInputType = new GraphQLInputObjectType({
+  name: 'PollInput',
+  fields: {
+    secret: {
+      type: GraphQLBoolean,
+    },
+    threshold: {
+      type: GraphQLInt,
+    },
+    end_time: {
+      type: String,
+    },
+
+    id: {
+      type: ID,
+      description: 'Must be provided for mutations',
+    },
+  },
+});
+export default PollInputType;

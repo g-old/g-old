@@ -306,10 +306,8 @@ export default function entities(state = { proposals: {} }, action) {
 
     case LOAD_VOTES_SUCCESS: {
       // TODO Add votes to poll
-      console.log('LOADVOTES', action.payload);
       const normalizedData = normalize(action.payload.data.votes, votesListSchema);
       const pollId = action.payload.pollId;
-      console.log('LOADVOTESNORMALIZED', normalizedData);
       return {
         ...merge({}, state, normalizedData.entities),
         polls: {

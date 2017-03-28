@@ -18,6 +18,7 @@ export default {
     require('./home').default,
     require('./proposal').default,
     require('./proposals').default,
+    require('./proposalInput').default,
     require('./about').default,
     require('./testproposal').default,
     require('./admin').default,

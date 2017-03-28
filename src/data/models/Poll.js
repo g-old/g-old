@@ -1,9 +1,10 @@
+import knex from '../knex';
 import PollingMode from './PollingMode';
 // eslint-disable-next-line no-unused-vars
-function checkCanSee(viewer, data) { // TODO change data returned based on permissions
+function checkCanSee(viewer, data) {
+  // TODO change data returned based on permissions
   return true;
 }
-
 
 class Poll {
   constructor(data) {
@@ -24,10 +25,14 @@ class Poll {
     const canSee = checkCanSee(viewer, data);
     return canSee ? new Poll(data) : null;
   }
-// eslint-disable-next-line class-methods-use-this
+  // eslint-disable-next-line no-unused-vars
+  static canMutate(viewer, data) {
+    return true;
+  }
+  // eslint-disable-next-line class-methods-use-this
   isVotable() {
     return true;
-  //  TODO return this.endTime >= new Date();
+    //  TODO return this.endTime >= new Date();
   }
 
   async isUnipolar(viewer, loaders) {
@@ -39,7 +44,46 @@ class Poll {
     const mode = await PollingMode.gen(viewer, this.pollingModeId, loaders);
     return mode.with_statements === true;
   }
+  /* eslint-disable class-methods-use-this*/
+  // eslint-disable-next-line no-unused-vars
+  async validate(viewer) {
+    // TODO
+    return true;
+  }
+  /* eslint-enable class-methods-use-this*/
+  static async create(viewer, data, loaders) {
+    // authorize
+    if (!Poll.canMutate(viewer, data)) return null;
+    // validate
+    if (!data.polling_mode_id) return null;
+    if (!data.threshold) return null;
+    if (!data.end_time) return null;
+    // create
+    const newPollId = await knex.transaction(async trx => {
+      const pollingMode = await PollingMode.gen(viewer, data.polling_mode_id, loaders);
+      if (!pollingMode) throw Error('No valid PollingMode provided');
+      let numVoter = -1;
 
+      if (pollingMode.threshold_ref === 'all') {
+        numVoter = await trx.whereNot('role_id', 4).count('id').into('users');
+        numVoter = Number(numVoter[0].count);
+      }
+
+      if (numVoter < 1) throw Error('Not enough user');
+      const id = await trx
+        .insert(
+        {
+          ...data,
+          num_voter: numVoter,
+        },
+          'id',
+        )
+        .into('polls');
+      return id[0];
+    });
+    if (!newPollId) return null;
+    return Poll.gen(viewer, newPollId, loaders) || null;
+  }
 }
 
 export default Poll;

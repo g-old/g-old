@@ -3,7 +3,7 @@ exports.up = function (knex, Promise) {
     knex.schema.table('proposals', table => {
       table.integer('poll_one_id').unsigned().notNullable().unique();
       table.foreign('poll_one_id').references('polls.id');
-      table.integer('poll_two_id').unsigned().notNullable().unique();
+      table.integer('poll_two_id').unsigned().unique();
       table.foreign('poll_two_id').references('polls.id');
     }),
     knex.schema.table('votes', table => {

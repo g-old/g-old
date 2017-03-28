@@ -7,6 +7,9 @@ import {
   LOAD_PROPOSAL_LIST_START,
   LOAD_PROPOSAL_LIST_SUCCESS,
   LOAD_PROPOSAL_LIST_ERROR,
+  CREATE_PROPOSAL_START,
+  CREATE_PROPOSAL_SUCCESS,
+  CREATE_PROPOSAL_ERROR,
 } from '../constants';
 
 const statementFields = `{
@@ -66,17 +69,21 @@ const pollFields = `{
 }
 `;
 
+const proposal = `
+id
+title
+publishedAt
+state
+body
+votes
+pollOne ${pollFields}
+pollTwo ${pollFields}
+`;
+
 const query = `
   query ($id:ID!) {
     proposalDL (id:$id) {
-      id
-      title
-      publishedAt
-      state
-      body
-      votes
-      pollOne ${pollFields}
-      pollTwo ${pollFields}
+      ${proposal}
     }
   }
 `;
@@ -108,6 +115,14 @@ query ($state:String) {
     body
     pollOne ${pollFieldsForList}
     pollTwo ${pollFieldsForList}
+  }
+}
+`;
+
+const createProposalMutation = `
+mutation($pollingModeId:ID $title: String, $text:String){
+  createProposal(proposal:{title:$title, text:$text pollingModeId:$pollingModeId}){
+    ${proposal}
   }
 }
 `;
@@ -170,6 +185,34 @@ export function loadProposalsList(state) {
         type: LOAD_PROPOSAL_LIST_ERROR,
         payload: {
           state,
+          error,
+        },
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function createProposal(proposalData) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: CREATE_PROPOSAL_START,
+      payload: {
+        proposal: proposalData,
+      },
+    });
+    try {
+      const { data } = await graphqlRequest(createProposalMutation, proposalData);
+      dispatch({
+        type: CREATE_PROPOSAL_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: CREATE_PROPOSAL_ERROR,
+        payload: {
           error,
         },
       });

@@ -1,19 +1,16 @@
-
 import Poll from './Poll';
 import Vote from './Vote';
 import knex from '../knex';
 
 /* eslint-disable no-unused-vars */
-function checkCanSee(viewer, data) { // TODO change data returned based on permissions
+function checkCanSee(viewer, data) {
+  // TODO change data returned based on permissions
   return true;
 }
 
-function validateVoter(viewer, data) {
-}
-function validateTitle(viewer, data) {
-}
-function validateBody(viewer, data) {
-}
+function validateVoter(viewer, data) {}
+function validateTitle(viewer, data) {}
+function validateBody(viewer, data) {}
 
 class Statement {
   constructor(data) {
@@ -38,7 +35,7 @@ class Statement {
   static canMutate(viewer, data) {
     return true;
   }
-
+  /* eslint-enable no-unused-vars */
   static async validateVote(viewer, vote, loaders) {
     if (!vote) return null;
     let voteInDb;
@@ -50,7 +47,7 @@ class Statement {
     return voteInDb || null;
   }
 
-  static async delete(viewer, data, loaders) {
+  static async delete(viewer, data) {
     if (!Statement.canMutate(viewer, data)) return null;
 
     // validate
@@ -60,9 +57,7 @@ class Statement {
     const deletedStatement = await knex.transaction(async function (trx) {
       const statementInDB = await knex('statements').where({ id: data.id }).select();
       if (statementInDB.length !== 1) throw Error('Statement does not exist!');
-      await trx.where({ id: data.id })
-      .into('statements')
-      .del();
+      await trx.where({ id: data.id }).into('statements').del();
 
       return statementInDB[0];
     });
@@ -75,17 +70,18 @@ class Statement {
     // validate
     if (!data.pollId) return null;
     if (!data.id) return null;
-    if (data.text && data.text.length < 1 && (data.text) !== 'string') return null;
+    if (data.text && data.text.length < 1 && data.text !== 'string') return null;
     // update
     // eslint-disable-next-line prefer-arrow-callback
     const updatedId = await knex.transaction(async function (trx) {
       const statementInDB = await knex('statements').where({ id: data.id }).pluck('id');
       if (statementInDB.length !== 1) throw Error('Statement does not exist!');
       const newData = { updated_at: new Date(), body: data.text };
-      const id = await trx.where({ id: data.id })
-      .update({
-        ...newData,
-      })
+      await trx
+        .where({ id: data.id })
+        .update({
+          ...newData,
+        })
         .into('statements');
 
       return data.id;
@@ -105,23 +101,29 @@ class Statement {
     const statementsAllowed = await poll.isCommentable(viewer, loaders);
     if (!statementsAllowed) return null;
     if (!data.text) return null;
-    if (!data.text.length > 0 && typeof (data.text) === 'string') return null;
+    if (!data.text.length > 0 && typeof data.text === 'string') return null;
 
     // create
     // eslint-disable-next-line prefer-arrow-callback
     const newStatementId = await knex.transaction(async function (trx) {
       const vote = await Statement.validateVote(viewer, data.vote, loaders);
       if (!vote) throw Error('Vote not valid');
-      const statementInDB = await knex('statements').where({ poll_id: data.pollId, author_id: viewer.id }).pluck('id');
+      const statementInDB = await knex('statements')
+        .where({ poll_id: data.pollId, author_id: viewer.id })
+        .pluck('id');
       if (statementInDB.length !== 0) throw Error('Already commented!');
       const id = await trx
-      .insert({
-        author_id: viewer.id,
-        poll_id: data.pollId,
-        body: data.text,
-        position: vote.position,
-        vote_id: vote.id,
-        created_at: new Date() }, 'id')
+        .insert(
+        {
+          author_id: viewer.id,
+          poll_id: data.pollId,
+          body: data.text,
+          position: vote.position,
+          vote_id: vote.id,
+          created_at: new Date(),
+        },
+          'id',
+        )
         .into('statements');
 
       if (id.length === 0) throw Error('No Id returned');
@@ -130,7 +132,6 @@ class Statement {
     if (!newStatementId) return null;
     return Statement.gen(viewer, newStatementId, loaders);
   }
-
 }
 
 export default Statement;
