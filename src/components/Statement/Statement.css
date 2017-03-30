@@ -37,11 +37,13 @@
 .pro {
   margin-right: 10%;
   background-color: #fafffa;
+  border-color: #3a3;
 }
 
 .contra {
   margin-left: 10%;
   background-color: #fffafa;
+  border-color: #d33;
 }
 
 .text {
