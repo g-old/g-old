@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const numUsers = 50;
 const numMods = numUsers / 10 > 0 ? numUsers / 10 : 1;
 const numTestUsers = numMods;
-const numTestGuests = 1;
+const numTestGuests = 2;
 const numGuests = numMods;
 const numUsersWithFollowees = Math.floor((numUsers / 10) * 7);
 const numTags = 10;
@@ -270,7 +270,7 @@ exports.seed = function (knex, Promise) {
       }
     }
     const chunkSize = 1000;
-    knex.batchInsert('statement_likes', likes, chunkSize);
+    // knex.batchInsert('statement_likes', likes, chunkSize);
 
     return Promise.resolve(
       //  knex('statement_likes').insert(likes)

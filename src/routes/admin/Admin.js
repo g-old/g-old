@@ -10,6 +10,12 @@
 import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Admin.css';
+import Tab from '../../components/Tab';
+import Tabs from '../../components/Tabs';
+import UserPanel from '../../components/UserPanel';
+import ProposalPanel from '../../components/ProposalPanel';
+import SupervisionPanel from '../../components/SupervisionPanel';
+import TechPanel from '../../components/TechPanel';
 
 class Admin extends React.Component {
   static propTypes = {
@@ -20,8 +26,20 @@ class Admin extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <h1>{this.props.title}</h1>
-          <p>...</p>
+          <Tabs>
+            <Tab title="USERMANAGEMENT">
+              <UserPanel />
+            </Tab>
+            <Tab title="PROPOSALPANEL">
+              <ProposalPanel />
+            </Tab>
+            <Tab title="TECHPANEL">
+              <TechPanel />
+            </Tab>
+            <Tab title="SUPERVISIONPANEL">
+              <SupervisionPanel />
+            </Tab>
+          </Tabs>
         </div>
       </div>
     );

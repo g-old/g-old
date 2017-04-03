@@ -1,0 +1,6 @@
+{
+  "name": "UserPanel",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./UserPanel.js"
+}

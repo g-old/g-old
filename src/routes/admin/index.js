@@ -11,17 +11,15 @@ import React from 'react';
 import Layout from '../../components/Layout';
 
 const title = 'Admin Page';
-const isAdmin = false;
 
 export default {
-
-  path: '/admin',
+  path: '/admin/',
 
   async action() {
-    if (!isAdmin) {
+    /*  if (!isAdmin) {
       return { redirect: '/' };
     }
-
+*/
     const Admin = await require.ensure([], require => require('./Admin').default, 'admin');
 
     return {
@@ -30,5 +28,4 @@ export default {
       component: <Layout><Admin title={title} /></Layout>,
     };
   },
-
 };

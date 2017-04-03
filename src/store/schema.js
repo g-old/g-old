@@ -1,6 +1,9 @@
 import { schema } from 'normalizr';
 
-export const user = new schema.Entity('users');
+export const role = new schema.Entity('role');
+export const user = new schema.Entity('users', {
+  role,
+});
 export const pollingMode = new schema.Entity('pollingModes');
 export const vote = new schema.Entity('votes', {
   voter: user,
@@ -28,4 +31,5 @@ export const proposal = new schema.Entity('proposals', {
   pollTwo: poll,
 });
 export const proposalList = [proposal];
-export const votesList = [vote];
+export const voteList = [vote];
+export const userList = [user];

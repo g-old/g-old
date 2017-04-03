@@ -5,12 +5,9 @@ function randomNumber(max) {
   return Math.floor(max * Math.random());
 }
 
-const thresholdInVotes = (poll) =>
-  Math.floor((poll.num_voter / 100) * poll.threshold);
+const thresholdInVotes = poll => Math.floor((poll.num_voter / 100) * poll.threshold);
 
-const calcNewThreshold = (poll) =>
-  Math.floor((poll.upvotes * 100) / poll.num_voter);
-
+const calcNewThreshold = poll => Math.floor((poll.upvotes * 100) / poll.num_voter);
 
 const getDates = finished => {
   const date = new Date();
@@ -44,19 +41,22 @@ exports.seed = function (knex, Promise) {
     }
     // delete all votes and statements from polltwo
     updates.push(knex('votes').where({ poll_id: pollTwo.id }).del());
-    updates.push(knex('polls').where({ id: pollTwo.id }).update({
-      upvotes: 0,
-      downvotes: 0,
-      start_time: null,
-      end_time: null,
-      closed_at: null }));
+    updates.push(
+      knex('polls').where({ id: pollTwo.id }).update({
+        upvotes: 0,
+        downvotes: 0,
+        start_time: null,
+        end_time: null,
+        closed_at: null,
+      })
+    );
 
     // update end_time
     updates.push(knex('polls').where({ id: pollOne.id }).update({ end_time: dates.endDate }));
     return updates;
   };
 
-  const correctVoting = (pollOne) => {
+  const correctVoting = pollOne => {
     const numNeededVotes = thresholdInVotes(pollOne);
     const oneVotePercentage = Math.floor(100 / pollOne.num_voter);
     const updates = [];
@@ -68,13 +68,12 @@ exports.seed = function (knex, Promise) {
     // nothing to do for pollTwo
     // update dates for pollOne
     updates.push(
-      knex('polls')
-        .where({ id: pollOne.id })
-        .update({
-          start_time: dates.startDate,
-          created_at: dates.startDate,
-          end_time: dates.endDate,
-          closed_at: dates.endDate })
+      knex('polls').where({ id: pollOne.id }).update({
+        start_time: dates.startDate,
+        created_at: dates.startDate,
+        end_time: dates.endDate,
+        closed_at: dates.endDate,
+      })
     );
     return updates;
   };
@@ -86,46 +85,54 @@ exports.seed = function (knex, Promise) {
     if (pollOne.upvotes <= numNeededVotes) {
       // delete all votes and statements from polltwo
       updates.push(knex('votes').where({ poll_id: pollTwo.id }).del());
-      updates.push(knex('polls').where({ id: pollTwo.id }).update({
-        upvotes: 0,
-        downvotes: 0,
-        start_time: null,
-        end_time: null,
-        closed_at: null }));
+      updates.push(
+        knex('polls').where({ id: pollTwo.id }).update({
+          upvotes: 0,
+          downvotes: 0,
+          start_time: null,
+          end_time: null,
+          closed_at: null,
+        })
+      );
 
       // correct dates on poll
-      const updateFn = knex('polls')
-        .where({ id: pollOne.id })
-        .update({
-          created_at: dates.startDate,
-          start_time: dates.startDate,
-          end_time: dates.endDate,
-          closed_at: dates.closeDate,
-        });
+      const updateFn = knex('polls').where({ id: pollOne.id }).update({
+        created_at: dates.startDate,
+        start_time: dates.startDate,
+        end_time: dates.endDate,
+        closed_at: dates.closeDate,
+      });
       updates.push(updateFn);
     } else {
       // check against threshold
-      const actualThreshold = Math.floor(((pollTwo.upvotes + pollTwo.downvotes) / 100)
-        * pollTwo.threshold);
+      const actualThreshold = Math.floor(
+        ((pollTwo.upvotes + pollTwo.downvotes) / 100) * pollTwo.threshold
+      );
       if (pollTwo.upvotes <= actualThreshold) {
         // get diff
-        const numDownvotes = Math.max((Math.floor((pollTwo.upvotes * 100) / pollTwo.threshold)
-        - pollTwo.upvotes - 1), 0);
+        const numDownvotes = Math.max(
+          Math.floor((pollTwo.upvotes * 100) / pollTwo.threshold) - pollTwo.upvotes - 1,
+          0
+        );
         const diff = pollTwo.downvotes <= numDownvotes ? 0 : pollTwo.downvotes - numDownvotes;
-        updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'con' }).limit(diff).del());
-        updates.push(knex('polls').where({ id: pollTwo.id }).update({
-          downvotes: pollTwo.downvotes - diff,
-          num_voter: (pollTwo.upvotes + pollTwo.downvotes) - diff
-        }));
+        updates.push(
+          knex('votes').where({ poll_id: pollTwo.id, position: 'con' }).limit(diff).del()
+        );
+        updates.push(
+          knex('polls').where({ id: pollTwo.id }).update({
+            downvotes: pollTwo.downvotes - diff,
+            num_voter: (pollTwo.upvotes + pollTwo.downvotes) - diff,
+          })
+        );
       }
 
       // correct dates on poll
-      const updateFn = knex('polls')
-        .where({ id: pollTwo.id })
-        .update({ created_at: dates.startDate,
-          start_time: dates.startDate,
-          end_time: dates.endDate,
-          closed_at: dates.endDate });
+      const updateFn = knex('polls').where({ id: pollTwo.id }).update({
+        created_at: dates.startDate,
+        start_time: dates.startDate,
+        end_time: dates.endDate,
+        closed_at: dates.endDate,
+      });
       updates.push(updateFn);
     }
     return updates;
@@ -140,39 +147,59 @@ exports.seed = function (knex, Promise) {
       const oneVotePercentage = Math.floor(100 / pollOne.num_voter);
       const newThreshold = calcNewThreshold(pollOne) - oneVotePercentage;
       updates.push(knex('polls').where({ id: pollOne.id }).update({ threshold: newThreshold }));
-    }
+      const pollOneDates = getDates(true);
+      // set dates
+      updates.push(
+        knex('polls').where({ id: pollOne.id }).update({
+          start_time: pollOneDates.startDate,
+          end_time: pollOneDates.endDate,
+          closed_at: pollOneDates.closeDate,
+        })
+      );
+      // reset pollTwo
+      updates.push(knex('votes').where({ poll_id: pollTwo.id }).del());
+      updates.push(
+        knex('polls').where({ id: pollTwo.id }).update({
+          upvotes: 0,
+          downvotes: 0,
+          start_time: null,
+          end_time: null,
+          closed_at: null,
+        })
+      );
+    } else {
       // rejected in phase 2
       // more cons then pros needed  del pro votes
-    const actualThreshold = Math.floor(((pollTwo.upvotes + pollTwo.downvotes) / 100)
-        * pollTwo.threshold);
-    if (pollTwo.downvotes <= actualThreshold) {
+      const actualThreshold = Math.floor(
+        ((pollTwo.upvotes + pollTwo.downvotes) / 100) * pollTwo.threshold
+      );
+      if (pollTwo.downvotes <= actualThreshold) {
         // get diff
-      const numUpvotes = Math.max((Math.floor((pollTwo.downvotes * 100) / pollTwo.threshold)
-        - pollTwo.downvotes - 1), 0);
-      const diff = pollTwo.upvotes <= numUpvotes ? 0 : pollTwo.upvotes - numUpvotes;
-      updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'pro' }).limit(diff).del());
-      updates.push(knex('polls').where({ id: pollTwo.id }).update({
-        downvotes: pollTwo.downvotes - diff,
-        num_voter: pollTwo.num_voter - diff }));
+        const numUpvotes = Math.max(
+          Math.floor((pollTwo.downvotes * 100) / pollTwo.threshold) - pollTwo.downvotes - 1,
+          0
+        );
+        const diff = pollTwo.upvotes <= numUpvotes ? 0 : pollTwo.upvotes - numUpvotes;
+        updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'pro' }).limit(diff).del());
+        updates.push(
+          knex('polls').where({ id: pollTwo.id }).update({
+            upvotes: pollTwo.upvotes - diff,
+            num_voter: (pollTwo.upvotes + pollTwo.downvotes) - diff
+          })
+        );
+      }
     }
-    if (pollTwo.upvotes >= pollTwo.downvotes) {
-      const diff = (pollTwo.upvotes - pollTwo.downvotes) + 1;
-      updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'pro' }).limit(diff).del());
-      updates.push(knex('polls').where({ id: pollTwo.id }).update({ upvotes: pollTwo.upvotes - diff,
-        num_voter: (pollTwo.downvotes + pollTwo.upvotes) - diff }));
-    }
-      // correct dates pollTwo
+
+    // correct dates pollTwo
 
     updates.push(
-        knex('polls')
-          .where({ id: pollTwo.id })
-          .update({
-            created_at: dates.startDate,
-            start_time: dates.startDate,
-            end_time: dates.endDate,
-            closed_at: dates.endDate,
-          })
-      );
+      knex('polls').where({ id: pollTwo.id }).update({
+        created_at: dates.startDate,
+        start_time: dates.startDate,
+        end_time: dates.endDate,
+        closed_at: dates.endDate,
+      })
+    );
 
     // dates
     return updates;
@@ -249,7 +276,7 @@ exports.seed = function (knex, Promise) {
         .where({ state: 'rejected' })
         .limit(numProposalsToCorrect)
         .select()
-        .then(data => data)
+        .then(data => data),
     ];
 
     return Promise.all(proposals).then(data => data.reduce((a, b) => a.concat(b)));

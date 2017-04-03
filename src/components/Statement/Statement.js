@@ -97,7 +97,6 @@ class Statement extends React.Component {
 
   render() {
     const minInputLen = this.state.textArea.val.length >= 3;
-    console.log('STATEMENT:STATE:EDIT', this.state.edit);
     return (
       <div className={cn(s.root, this.props.data.vote.position === 'pro' ? s.pro : s.contra)}>
         <img

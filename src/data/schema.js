@@ -13,7 +13,7 @@ import intl from './queries/intl';
 import proposal from './queries/proposal';
 import proposals from './queries/proposals';
 import votes from './queries/votes';
-import user from './queries/user';
+import users from './queries/users';
 import createStatement from './mutations/createStatement';
 import deleteStatement from './mutations/deleteStatement';
 import updateStatement from './mutations/updateStatement';
@@ -26,6 +26,7 @@ import updateVote from './mutations/updateVote';
 import deleteVote from './mutations/deleteVote';
 import createProposal from './mutations/createProposal';
 import updateProposal from './mutations/updateProposal';
+import updateUser from './mutations/updateUser';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -36,7 +37,7 @@ const schema = new Schema({
       proposals,
       proposalDL,
       proposalsDL,
-      user,
+      users,
       votes,
     },
   }),
@@ -53,6 +54,7 @@ const schema = new Schema({
       deleteVote,
       createProposal,
       updateProposal,
+      updateUser,
     },
   }),
 });
