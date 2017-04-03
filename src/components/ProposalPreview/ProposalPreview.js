@@ -16,6 +16,7 @@ class Proposal extends React.Component {
       publishedAt: PropTypes.string,
       pollOne: PropTypes.object,
       pollTwo: PropTypes.object,
+      tags: PropTypes.arrayOf(PropTypes.object).isRequired,
     }),
   };
   constructor(props) {
@@ -77,6 +78,8 @@ class Proposal extends React.Component {
               unipolar={poll.mode.unipolar}
             />
           </div>
+          TAGS :
+          {this.props.proposal.tags.map(tag => `${tag.text} `)}
         </div>
 
       </div>

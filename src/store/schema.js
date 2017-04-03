@@ -25,10 +25,12 @@ export const poll = new schema.Entity('polls', {
   followees: [vote],
   likedStatements: [statementLike],
 });
+export const tag = new schema.Entity('tags');
 export const proposal = new schema.Entity('proposals', {
   author: user,
   pollOne: poll,
   pollTwo: poll,
+  tags: [tag],
 });
 export const proposalList = [proposal];
 export const voteList = [vote];

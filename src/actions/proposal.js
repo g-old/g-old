@@ -113,6 +113,11 @@ query ($state:String) {
     publishedAt
     state
     body
+    tags{
+      id
+      text
+      count
+    }
     pollOne ${pollFieldsForList}
     pollTwo ${pollFieldsForList}
   }
