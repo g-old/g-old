@@ -9,9 +9,11 @@ const numGuests = numMods;
 const numUsersWithFollowees = Math.floor((numUsers / 10) * 7);
 const numTags = 10;
 const maxNumFollowees = 5;
-const numPolls = 50;
+const numPolls = 200;
 const numProposals = numPolls / 2;
 const statementPercentage = 40; // how many of the voters have written a statement
+
+const chunkSize = 1000;
 
 function randomNumber(max) {
   return Math.floor(max * Math.random());
@@ -269,11 +271,8 @@ exports.seed = function (knex, Promise) {
         likes.push(like);
       }
     }
-    const chunkSize = 1000;
-    // knex.batchInsert('statement_likes', likes, chunkSize);
 
     return Promise.resolve(
-      //  knex('statement_likes').insert(likes)
       knex
         .batchInsert('statement_likes', likes, chunkSize)
         .then(() => Promise.all(updates).then(data => data))
@@ -297,12 +296,11 @@ exports.seed = function (knex, Promise) {
       };
       statements.push(statement);
     }
-
     return Promise.resolve(
-      knex('statements')
-        .insert(statements)
-        .returning('id')
-        .then(stmtIds => ({ stmtIds, stmtData: statements, userIds }))
+      knex
+      .batchInsert('statements', statements, chunkSize)
+      .returning('id')
+      .then(stmtIds => ({ stmtIds, stmtData: statements, userIds }))
     );
   }
 
@@ -370,11 +368,10 @@ exports.seed = function (knex, Promise) {
     }
 
     // create votes
-
     return Promise.resolve(
       Promise.all([
-        knex('votes').insert(userVotes).returning('id'),
-        knex('votes').insert(votesWithStatement).returning('id'),
+        knex.batchInsert('votes', userVotes, chunkSize).returning('id'),
+        knex.batchInsert('votes', votesWithStatement, chunkSize).returning('id'),
       ])
         .then(voteIds =>
           updatePolls(pollOneVoteCount)
@@ -423,11 +420,11 @@ exports.seed = function (knex, Promise) {
 
     return Promise.resolve(
       Promise.all([
-        knex.insert(proposedProposal).into('proposals').returning('id'),
-        knex.insert(votableProposals).into('proposals').returning('id'),
-        knex.insert(acceptedProposals).into('proposals').returning('id'),
-        knex.insert(rejectedProposals).into('proposals').returning('id'),
-        knex.insert(revokedProposals).into('proposals').returning('id'),
+        knex.batchInsert('proposals', proposedProposal, chunkSize).returning('id'),
+        knex.batchInsert('proposals', votableProposals, chunkSize).returning('id'),
+        knex.batchInsert('proposals', acceptedProposals, chunkSize).returning('id'),
+        knex.batchInsert('proposals', rejectedProposals, chunkSize).returning('id'),
+        knex.batchInsert('proposals', revokedProposals, chunkSize).returning('id'),
       ]).then(data => ({ userIds, proposalIds: data, pollData }))
     );
   }
@@ -476,8 +473,8 @@ exports.seed = function (knex, Promise) {
 
     return Promise.resolve(
       Promise.all([
-        knex.insert(phaseOnePolls).into('polls').returning('id'),
-        knex.insert(phaseTwoPolls).into('polls').returning('id'),
+        knex.batchInsert('polls', phaseOnePolls, chunkSize).returning('id'),
+        knex.batchInsert('polls', phaseTwoPolls, chunkSize).returning('id'),
       ]).then(ids => ids)
     );
   }

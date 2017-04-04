@@ -1,5 +1,5 @@
 /* eslint-disable comma-dangle */
-const numProposalsToCorrect = 5;
+const numProposalsToCorrect = 500;
 
 function randomNumber(max) {
   return Math.floor(max * Math.random());
@@ -156,37 +156,23 @@ exports.seed = function (knex, Promise) {
           closed_at: pollOneDates.closeDate,
         })
       );
-      // reset pollTwo
-      updates.push(knex('votes').where({ poll_id: pollTwo.id }).del());
-      updates.push(
-        knex('polls').where({ id: pollTwo.id }).update({
-          upvotes: 0,
-          downvotes: 0,
-          start_time: null,
-          end_time: null,
-          closed_at: null,
-        })
-      );
-    } else {
+    }
+    // Rejection only possible if not enough  pro-votes
+    {
       // rejected in phase 2
       // more cons then pros needed  del pro votes
       const actualThreshold = Math.floor(
         ((pollTwo.upvotes + pollTwo.downvotes) / 100) * pollTwo.threshold
       );
-      if (pollTwo.downvotes <= actualThreshold) {
-        // get diff
-        const numUpvotes = Math.max(
-          Math.floor((pollTwo.downvotes * 100) / pollTwo.threshold) - pollTwo.downvotes - 1,
-          0
-        );
-        const diff = pollTwo.upvotes <= numUpvotes ? 0 : pollTwo.upvotes - numUpvotes;
-        updates.push(knex('votes').where({ poll_id: pollTwo.id, position: 'pro' }).limit(diff).del());
-        updates.push(
-          knex('polls').where({ id: pollTwo.id }).update({
-            upvotes: pollTwo.upvotes - diff,
-            num_voter: (pollTwo.upvotes + pollTwo.downvotes) - diff
-          })
-        );
+      if (pollTwo.upvotes >= actualThreshold) {
+        // set new threshold
+        const numVoters = pollTwo.upvotes + pollTwo.downvotes;
+        if (numVoters > 0) {
+          const higherThreshold = Math.floor((pollTwo.upvotes * 100)
+         / numVoters)
+        + Math.floor(100 / numVoters);
+          updates.push(knex('polls').where({ id: pollTwo.id }).update({ threshold: higherThreshold, num_voter: pollTwo.upvotes + pollTwo.downvotes }));
+        }
       }
     }
 
