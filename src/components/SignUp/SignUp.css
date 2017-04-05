@@ -8,6 +8,17 @@
  */
 @import '../../components/variables.css';
 
+.root {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.container {
+  margin: 0 auto;
+  padding: 0 0 40px;
+  max-width: 380px;
+}
+
 .formGroup {
   margin-bottom: 15px;
 }
@@ -39,6 +50,10 @@
 .input:focus {
   border-color: #0074c2;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(0, 116, 194, 0.6);
+}
+
+.error {
+  border: 1px solid #f00;
 }
 
 .button {

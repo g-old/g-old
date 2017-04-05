@@ -17,43 +17,27 @@ const messages = defineMessages({
 });
 
 class Login extends React.Component {
-
   render() {
     return (
-      <div className={s.root}>
-        <div className={s.container}>
-          <form method="post">
-            <div className={s.formGroup}>
-              <label className={s.label} htmlFor="email">
-                <FormattedMessage {...messages.email} />:
-              </label>
-              <input
-                className={s.input}
-                id="email"
-                type="text"
-                name="email"
-                autoFocus
-              />
-            </div>
-            <div className={s.formGroup}>
-              <label className={s.label} htmlFor="password">
-                <FormattedMessage {...messages.password} />:
-              </label>
-              <input
-                className={s.input}
-                id="password"
-                type="password"
-                name="password"
-              />
-            </div>
-            <div className={s.formGroup}>
-              <button className={s.button} type="submit">
-                Log in
-              </button>
-            </div>
-          </form>
+      <form method="post">
+        <div className={s.formGroup}>
+          <label className={s.label} htmlFor="email">
+            <FormattedMessage {...messages.email} />:
+          </label>
+          <input className={s.input} id="email" type="text" name="email" autoFocus />
         </div>
-      </div>
+        <div className={s.formGroup}>
+          <label className={s.label} htmlFor="password">
+            <FormattedMessage {...messages.password} />:
+          </label>
+          <input className={s.input} id="password" type="password" name="password" />
+        </div>
+        <div className={s.formGroup}>
+          <button className={s.button} type="submit">
+            Log in
+          </button>
+        </div>
+      </form>
     );
   }
 }

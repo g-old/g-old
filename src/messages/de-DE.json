@@ -52,5 +52,113 @@
     "files": [
       "src/components/Login/Login.js"
     ]
+  },
+  {
+    "id": "signup.name",
+    "description": "Name",
+    "defaultMessage": "Name",
+    "message": "Namen",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.passwordAgain",
+    "description": "PasswordAgain",
+    "defaultMessage": "Confirm your password",
+    "message": "Passwort bestätigen",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.surname",
+    "description": "Surname",
+    "defaultMessage": "Surname",
+    "message": "Nachname",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.email",
+    "description": "Email-address",
+    "defaultMessage": "Your current email address",
+    "message": "Aktuelle E-Mail-Adresse",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.forename",
+    "description": "Forename",
+    "defaultMessage": "First",
+    "message": "Vorname",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.error-empty",
+    "description": "Help for empty fields",
+    "defaultMessage": "You can't leave this empty",
+    "message": "Dieses Feld ist erforderlich",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.error-invalidEmail",
+    "description": "Help for email",
+    "defaultMessage": "Your email address seems to be invalid",
+    "message": "Ihre E-Mail-Adresse scheint nicht korrekt zu sein",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.error-passwordMismatch",
+    "description": "Help for mismatching passwords",
+    "defaultMessage": "These passwords don't match. Try again?",
+    "message": "Die Passwörter stimmen nicht überein. Erneut versuchen?",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.error-shortPassword",
+    "description": "Help for short passwords",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
+    "message": "Kurze Passwörter sind leicht zu erraten. Bitte verwenden Sie mindestens 6 Zeichen",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.next",
+    "description": "Next",
+    "defaultMessage": "Next step",
+    "message": "Nächster Schritt",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.title",
+    "description": "Title for signup",
+    "defaultMessage": "Create your account",
+    "message": "Konto erstellen",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.password",
+    "description": "Password",
+    "defaultMessage": "Create a password",
+    "message": "Passwort erstellen",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
   }
 ]

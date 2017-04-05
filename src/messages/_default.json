@@ -52,5 +52,113 @@
     "files": [
       "src/components/Login/Login.js"
     ]
+  },
+  {
+    "id": "signup.name",
+    "description": "Name",
+    "defaultMessage": "Name",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.passwordAgain",
+    "description": "PasswordAgain",
+    "defaultMessage": "Confirm your password",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.surname",
+    "description": "Surname",
+    "defaultMessage": "Surname",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.email",
+    "description": "Email-address",
+    "defaultMessage": "Your current email address",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.forename",
+    "description": "Forename",
+    "defaultMessage": "First",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.error-empty",
+    "description": "Help for empty fields",
+    "defaultMessage": "You can't leave this empty",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.error-invalidEmail",
+    "description": "Help for email",
+    "defaultMessage": "Your email address seems to be invalid",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.error-passwordMismatch",
+    "description": "Help for mismatching passwords",
+    "defaultMessage": "These passwords don't match. Try again?",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.error-shortPassword",
+    "description": "Help for short passwords",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.next",
+    "description": "Next",
+    "defaultMessage": "Next step",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.title",
+    "description": "Title for signup",
+    "defaultMessage": "Create your account",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "signup.password",
+    "description": "Password",
+    "defaultMessage": "Create a password",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
   }
 ]

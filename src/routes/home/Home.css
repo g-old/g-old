@@ -16,8 +16,64 @@
   padding-top: 20px;
 }
 
-.container {
+.box {
   margin: 0 auto;
   padding: 0 0 40px;
-  max-width: var(--max-content-width);
+  max-width: 380px;
+}
+
+.button {
+  display: block;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px 16px;
+  width: 100%;
+  outline: 0;
+  border: 1px solid #2a2a2a;
+  border-radius: 0;
+  background: var(--color-gold);
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  font-size: 18px;
+  line-height: 1.3333333;
+  cursor: pointer;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+}
+
+.lineThrough {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-bottom: 15px;
+  width: 100%;
+  color: #757575;
+  text-align: center;
+  font-size: 80%;
+}
+
+.lineThrough::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  margin-top: -5px;
+  margin-left: -20px;
+  width: 40px;
+  height: 10px;
+  background-color: #fff;
+  content: '';
+}
+
+.lineThrough::after {
+  position: absolute;
+  top: 49%;
+  z-index: -2;
+  display: block;
+  width: 100%;
+  border-bottom: 1px solid #ddd;
+  content: '';
 }
