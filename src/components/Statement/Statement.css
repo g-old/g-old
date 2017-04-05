@@ -6,6 +6,7 @@
   padding: 0.4em;
   margin: 0.1em 0.1em 0.4em;
   font-size: 0.9em;
+  transition: margin 0.5s;
 }
 
 .header {
@@ -58,4 +59,22 @@
   font-family: var(--font-family-base);
   height: 2.8em;
   width: 99%;
+}
+
+.inactive {
+  .avatar {
+    opacity: 0.5;
+  }
+
+  .textEdit {
+    height: 1.2em;
+  }
+}
+
+.pro.inactive {
+  margin-right: 50%;
+}
+
+.contra.inactive {
+  margin-left: 50%;
 }
