@@ -1,0 +1,11 @@
+.bipolar {
+  display: flex;
+
+  .votes {
+    width: 50%;
+  }
+
+  .con {
+    text-align: right;
+  }
+}

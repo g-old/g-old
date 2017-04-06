@@ -108,6 +108,7 @@ class Poll extends React.Component {
     if (this.props.poll.closed_at) {
       votes = (
         <VotesList
+          unipolar={this.props.poll.mode.unipolar}
           votes={this.props.poll.votes || []}
           getVotes={() => this.props.fetchVotes(this.props.poll.id)}
         />
@@ -144,7 +145,7 @@ class Poll extends React.Component {
       if (this.props.poll.mode.unipolar) {
         votingButtons = (
           <button onClick={() => this.canVote('pro')} style={{ background: proBtnColor }}>
-            {' '}WANT TO VOTE{' '}
+            <i className="fa fa-hand-paper-o" />
           </button>
         );
       } else if (this.props.poll.ownStatement) {
