@@ -105,6 +105,15 @@ app.post(
   }),
 );
 
+app.post('/logout', (req, res) => {
+  if (req.isAuthenticated()) {
+    req.logout();
+    res.status(200).json({ loggedOut: true, redirect: '/logged-out' });
+  } else {
+    res.status(500).json({ error: true });
+  }
+});
+
 app.get('/test', (req, res, next) => {
   knex('users')
     .where({ name: 'admin' })
@@ -142,7 +151,7 @@ app.get('*', async (req, res, next) => {
   try {
     const store = configureStore(
       {
-        user: req.user || null,
+        user: req.user || {}, // changed from null
       },
       {
         cookie: req.headers.cookie,

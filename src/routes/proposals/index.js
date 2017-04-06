@@ -9,7 +9,8 @@ export default {
   path: '/proposals/:state',
 
   async action({ store }, { state }) {
-    if (!store.getState().user) {
+    const user = store.getState().user;
+    if (!user.id) {
       return { redirect: '/' };
     }
     // Not sure if this is the right way to hydrate the store

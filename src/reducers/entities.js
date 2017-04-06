@@ -16,6 +16,7 @@ import {
   LOAD_VOTES_SUCCESS,
   LOAD_USERS_SUCCESS,
   UPDATE_USER_SUCCESS,
+  SESSION_LOGOUT_SUCCESS,
 } from '../constants';
 import {
   proposal as proposalSchema,
@@ -336,6 +337,13 @@ export default function entities(state = { proposals: {} }, action) {
       return {
         ...merge({}, state, normalizedData.entities),
       };
+    }
+    case SESSION_LOGOUT_SUCCESS: {
+      /*
+      // clear all entities --> better way?
+      http://stackoverflow.com/questions/35622588/how-to-reset-the-state-of-a-redux-store
+      */
+      return { proposals: {} };
     }
 
     case LOAD_PROPOSAL_START: {

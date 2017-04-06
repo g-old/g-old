@@ -3,6 +3,7 @@ import thunk from 'redux-thunk';
 import rootReducer from '../reducers';
 import createHelpers from './createHelpers';
 import createLogger from './logger';
+// import { SESSION_LOGOUT_SUCCESS } from '../constants';
 
 export default function configureStore(initialState, helpersConfig) {
   const helpers = createHelpers(helpersConfig);
@@ -19,14 +20,20 @@ export default function configureStore(initialState, helpersConfig) {
       devToolsExtension = window.devToolsExtension();
     }
 
-    enhancer = compose(
-      applyMiddleware(...middleware),
-      devToolsExtension,
-    );
+    enhancer = compose(applyMiddleware(...middleware), devToolsExtension);
   } else {
     enhancer = applyMiddleware(...middleware);
   }
+  /*
+  const rootReducer = (state, action) => {
+    if (action.type === SESSION_LOGOUT_SUCCESS) {
+      // eslint-disable-next-line no-param-reassign
+      state = undefined;
+    }
 
+    return appReducer(state, action);
+  };
+*/
   // See https://github.com/rackt/redux/releases/tag/v3.1.0
   const store = createStore(rootReducer, initialState, enhancer);
 
@@ -34,8 +41,7 @@ export default function configureStore(initialState, helpersConfig) {
   if (__DEV__ && module.hot) {
     module.hot.accept('../reducers', () =>
       // eslint-disable-next-line global-require
-      store.replaceReducer(require('../reducers').default),
-    );
+      store.replaceReducer(require('../reducers').default));
   }
 
   return store;

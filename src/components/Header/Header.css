@@ -59,3 +59,9 @@
   font-size: 1.25em;
   margin: 0;
 }
+
+.avatar {
+  margin-right: 0.4em;
+  width: 2.2em;
+  height: 2.2em;
+}

@@ -22,6 +22,7 @@ export default {
     require('./testproposal').default,
     require('./admin').default,
     require('./signup').default,
+    require('./loggedOut').default,
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     require('./notFound').default,
   ],
