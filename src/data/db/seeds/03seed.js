@@ -82,7 +82,7 @@ exports.seed = function (knex, Promise) {
     const numNeededVotes = thresholdInVotes(pollOne);
     const updates = [];
     const dates = getDates(true);
-    if (pollOne.upvotes <= numNeededVotes) {
+    if (pollOne.upvotes < numNeededVotes) {
       // delete all votes and statements from polltwo
       updates.push(knex('votes').where({ poll_id: pollTwo.id }).del());
       updates.push(
@@ -109,21 +109,16 @@ exports.seed = function (knex, Promise) {
         ((pollTwo.upvotes + pollTwo.downvotes) / 100) * pollTwo.threshold
       );
       if (pollTwo.upvotes <= actualThreshold) {
-        // get diff
-        const numDownvotes = Math.max(
-          Math.floor((pollTwo.upvotes * 100) / pollTwo.threshold) - pollTwo.upvotes - 1,
-          0
-        );
-        const diff = pollTwo.downvotes <= numDownvotes ? 0 : pollTwo.downvotes - numDownvotes;
-        updates.push(
-          knex('votes').where({ poll_id: pollTwo.id, position: 'con' }).limit(diff).del()
-        );
-        updates.push(
-          knex('polls').where({ id: pollTwo.id }).update({
-            downvotes: pollTwo.downvotes - diff,
-            num_voter: (pollTwo.upvotes + pollTwo.downvotes) - diff,
-          })
-        );
+        // lower threshold
+
+          // set new threshold
+        const numVoters = pollTwo.upvotes + pollTwo.downvotes;
+        if (numVoters > 0) {
+          const lowerThreshold = Math.floor((pollTwo.upvotes * 100)
+         / numVoters)
+        - Math.floor(100 / numVoters);
+          updates.push(knex('polls').where({ id: pollTwo.id }).update({ threshold: lowerThreshold, num_voter: pollTwo.upvotes + pollTwo.downvotes }));
+        }
       }
 
       // correct dates on poll
@@ -160,7 +155,6 @@ exports.seed = function (knex, Promise) {
     // Rejection only possible if not enough  pro-votes
     {
       // rejected in phase 2
-      // more cons then pros needed  del pro votes
       const actualThreshold = Math.floor(
         ((pollTwo.upvotes + pollTwo.downvotes) / 100) * pollTwo.threshold
       );
