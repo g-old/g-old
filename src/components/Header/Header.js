@@ -7,14 +7,13 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { PropTypes } from 'react';
-import { connect } from 'react-redux';
+import React from 'react';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Header.css';
 import Navigation from '../Navigation';
 import LanguageSwitcher from '../LanguageSwitcher';
-import { logout } from '../../actions/session';
+import UserStatus from '../UserStatus';
 
 const messages = defineMessages({
   brand: {
@@ -35,34 +34,13 @@ const messages = defineMessages({
 });
 
 class Header extends React.Component {
-  static propTypes = {
-    user: PropTypes.object,
-    logout: PropTypes.func.isRequired,
-  };
   render() {
     return (
       <div className={s.root}>
         <div className={s.container}>
           <Navigation className={s.nav} />
           <LanguageSwitcher />
-          {this.props.user.id &&
-            <span>
-              <img
-                className={s.avatar}
-                src={
-                  `https://api.adorable.io/avatars/256/${this.props.user.name}${this.props.user.surname}.io.png`
-                }
-                alt="IMG"
-              />
-              {this.props.user.name}
-              <button
-                onClick={() => {
-                  this.props.logout();
-                }}
-              >
-                LOGOUT
-              </button>
-            </span>}
+          <UserStatus />
           <div className={s.banner}>
             <h1 className={s.bannerTitle}>
               <FormattedMessage {...messages.bannerTitle} />
@@ -74,14 +52,5 @@ class Header extends React.Component {
     );
   }
 }
-const mapStateToProps = store => {
-  const user = store.user;
-  return {
-    user,
-  };
-};
-const mapDispatch = {
-  logout,
-};
 
-export default connect(mapStateToProps, mapDispatch)(withStyles(s)(Header));
+export default withStyles(s)(Header);

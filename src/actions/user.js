@@ -6,6 +6,9 @@ import {
   UPDATE_USER_START,
   UPDATE_USER_SUCCESS,
   UPDATE_USER_ERROR,
+  CREATE_USER_START,
+  CREATE_USER_SUCCESS,
+  CREATE_USER_ERROR,
 } from '../constants';
 
 const userFields = `
@@ -56,6 +59,54 @@ export function loadUserList(roleId) {
         type: LOAD_USERS_ERROR,
         payload: {
           roleId,
+          error,
+        },
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function createUser(newUser) {
+  return async dispatch => {
+    dispatch({
+      type: CREATE_USER_START,
+      payload: {
+        newUser,
+      },
+    });
+    try {
+      const resp = await fetch('/signup', {
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user: newUser,
+        }),
+        credentials: 'include',
+      });
+      const { error, user } = await resp.json();
+      if (error) {
+        dispatch({
+          type: CREATE_USER_ERROR,
+          payload: {
+            error,
+          },
+        });
+        return false;
+      }
+      dispatch({
+        type: CREATE_USER_SUCCESS,
+        payload: { user },
+      });
+    } catch (error) {
+      dispatch({
+        type: CREATE_USER_ERROR,
+        payload: {
           error,
         },
       });

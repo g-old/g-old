@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import cn from 'classnames';
@@ -66,9 +66,20 @@ const messages = defineMessages({
     defaultMessage: 'Your email address seems to be invalid',
     description: 'Help for email',
   },
+  emailTaken: {
+    id: 'signup.error-emailTaken',
+    defaultMessage: 'Email address already in use',
+    description: 'Help for not unique email',
+  },
 });
 
 class SignUp extends React.Component {
+  static propTypes = {
+    createUser: PropTypes.func.isRequired,
+    error: PropTypes.bool,
+    notUniqueEmail: PropTypes.bool,
+    processing: PropTypes.bool,
+  };
   constructor(props) {
     super(props);
     this.state = {
@@ -77,26 +88,22 @@ class SignUp extends React.Component {
       name: '',
       surname: '',
       email: '',
+      notUniqueEmail: null,
       errors: {
         password: {
           touched: false,
-          error: '',
         },
         passwordAgain: {
           touched: false,
-          error: '',
         },
         name: {
           touched: false,
-          error: '',
         },
         email: {
           touched: false,
-          error: '',
         },
         surname: {
           touched: false,
-          error: '',
         },
       },
     };
@@ -108,12 +115,22 @@ class SignUp extends React.Component {
     this.onSurnameChange = this.onSurnameChange.bind(this);
     this.validateForm = this.validateForm.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-
+    this.validateEmail = this.validateEmail.bind(this);
     this.onNameBlur = this.onNameBlur.bind(this);
     this.onSurnameBlur = this.onSurnameBlur.bind(this);
     this.onPasswordBlur = this.onPasswordBlur.bind(this);
     this.onPasswordAgainBlur = this.onPasswordAgainBlur.bind(this);
     this.onEmailBlur = this.onEmailBlur.bind(this);
+  }
+
+  componentWillReceiveProps({ notUniqueEmail }) {
+    if (notUniqueEmail) {
+      this.setState({
+        ...this.state,
+        notUniqueEmail: this.state.email.trim().toLowerCase(),
+        errors: { ...this.state.errors, email: { touched: true, errorName: 'emailTaken' } },
+      });
+    }
   }
 
   onPasswordChange(e) {
@@ -185,7 +202,8 @@ class SignUp extends React.Component {
   }
   onPasswordBlur() {
     const password = this.validatePassword(6);
-    this.setState({ errors: { ...this.state.errors, password } });
+    const passwordAgain = this.validatePasswordAgain();
+    this.setState({ errors: { ...this.state.errors, password, passwordAgain } });
   }
   onPasswordAgainBlur() {
     const passwordAgain = this.validatePasswordAgain();
@@ -195,23 +213,21 @@ class SignUp extends React.Component {
   onSubmit() {
     const valid = this.validateForm();
     if (valid) {
-      let { name, surname, email, password, passwordAgain } = this.state;
+      let { name, surname, email, password } = this.state;
       name = name.trim();
       surname = surname.trim();
-      email = email.trim();
+      email = email.trim().toLowerCase();
       password = password.trim();
-      passwordAgain = passwordAgain.trim();
-      alert(
-        JSON.stringify({
-          name,
-          surname,
-          email,
-          password,
-          passwordAgain,
-        }),
-      );
+      const data = {
+        name,
+        surname,
+        email,
+        password,
+      };
+      //  alert(JSON.stringify(data));
+      this.props.createUser(data);
     } else {
-      alert('FORM not valid');
+      // alert('FORM not valid');
     }
   }
 
@@ -298,6 +314,11 @@ class SignUp extends React.Component {
         touched: true,
         errorName: 'invalidEmail',
       };
+    } else if (this.state.email.trim().toLowerCase() === this.state.notUniqueEmail) {
+      result = {
+        touched: true,
+        errorName: 'emailTaken',
+      };
     }
     return result;
   }
@@ -348,6 +369,7 @@ class SignUp extends React.Component {
       <div className={s.root}>
         <div className={s.container}>
           <h1> <FormattedMessage {...messages.title} /></h1>
+          {this.props.error && 'SOMETHING WENT WRONG'}
           <form>
             <fieldset>
               <div className={s.formGroup}>
@@ -449,9 +471,10 @@ class SignUp extends React.Component {
 
           </form>
           <div className={s.formGroup}>
-            <button className={s.button} onClick={this.onSubmit}>
+            <button className={s.button} onClick={this.onSubmit} disabled={this.props.processing}>
               <FormattedMessage {...messages.nextStep} />
             </button>
+            {this.props.processing && 'PROCESSING...'}
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from '../../components/Layout';
-import SignUp from '../../components/SignUp';
+import SignupContainer from './SignupContainer';
 
 const title = 'SignUp';
 
@@ -10,7 +10,7 @@ export default {
   async action() {
     return {
       title,
-      component: <Layout><SignUp /> </Layout>,
+      component: <Layout><SignupContainer /> </Layout>,
     };
   },
 };

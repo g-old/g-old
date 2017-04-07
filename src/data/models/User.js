@@ -1,4 +1,6 @@
+import bcrypt from 'bcrypt';
 import knex from '../knex.js';
+import { validateEmail } from '../../core/helpers';
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
@@ -18,7 +20,7 @@ class User {
     const data = await users.load(id);
 
     if (data == null) return null;
-    if (viewer == null) return null;
+    if (viewer.id == null) return null;
     const canSee = checkCanSee(viewer, data);
     if (!canSee) data.email = null;
     return new User(data);
@@ -65,19 +67,36 @@ class User {
     return User.gen(viewer, data.id, loaders) || null;
   }
 
-  static async create(viewer, data, loaders) {
+  static async create(data) {
     // authenticate
     // validate
-    if (!data.name) return null;
-    if (!data.surname) return null;
-    if (!data.email) return null;
+    let { name, surname, email, password } = data;
+
+    name = name.trim();
+    if (!name) return null;
+    surname = surname.trim();
+    if (!surname) return null;
+    email = email.trim().toLowerCase();
+    if (!email) return null;
+    if (!validateEmail(email)) return null;
+    password = password.trim();
+    if (!password) return null;
+    if (password.length < 6) return null;
     // create
+    // TODO check if locking with forUpdate is necessary (duplicate emails)
     const newUserId = await knex.transaction(async trx => {
-      const id = trx
+      const hash = await bcrypt.hash(data.password, 10);
+      if (!hash) throw Error('Something went wrong');
+      const id = await trx
         .insert(
         {
-          ...data,
+          name,
+          surname,
+          email,
+          email_validated: false,
+          password_hash: hash,
           role_id: 4, // TODO make better
+          created_at: new Date(),
         },
           'id',
         )
@@ -85,7 +104,13 @@ class User {
       return id[0];
     });
     if (!newUserId) return null;
-    return User.gen(loaders, newUserId, loaders) || null;
+    return new User({
+      id: newUserId,
+      name: data.name,
+      surname: data.surname,
+      role_id: 4,
+      email: data.email,
+    });
   }
 }
 

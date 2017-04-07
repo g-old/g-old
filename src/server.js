@@ -35,6 +35,7 @@ import { setLocale } from './actions/intl';
 import { port, locales } from './config';
 import createLoaders from './data/dataLoader';
 import passport from './core/passport';
+import User from './data/models/User';
 
 const app = express();
 
@@ -112,6 +113,27 @@ app.post('/logout', (req, res) => {
   } else {
     res.status(500).json({ error: true });
   }
+});
+
+app.post('/signup', (req, res) => {
+  // OR post to graphql
+  User.create(req.body.user)
+    .then(user => {
+      if (!user) throw Error('User creation failed');
+      req.login(user, error => {
+        if (!error) {
+          res.status(200).json({ user: req.session.passport.user });
+        } else {
+          res.status(500).json({ error: true });
+        }
+      });
+    })
+    .catch(error => {
+      if (error.code === '23505') {
+        res.status(500).json({ error: { detail: 'email' } });
+      }
+      res.status(500).json({ error: true });
+    });
 });
 
 app.get('/test', (req, res, next) => {

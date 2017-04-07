@@ -26,6 +26,7 @@ import updateVote from './mutations/updateVote';
 import deleteVote from './mutations/deleteVote';
 import createProposal from './mutations/createProposal';
 import updateProposal from './mutations/updateProposal';
+// import createUser from './mutations/createUser';
 import updateUser from './mutations/updateUser';
 
 const schema = new Schema({
@@ -54,6 +55,7 @@ const schema = new Schema({
       deleteVote,
       createProposal,
       updateProposal,
+      //  createUser,
       updateUser,
     },
   }),

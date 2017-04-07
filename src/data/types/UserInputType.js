@@ -18,6 +18,14 @@ const UserInputType = new GraphQLInputObjectType({
       type: String,
     },
 
+    email: {
+      type: String, // TODO write custom EmailType
+    },
+
+    password: {
+      type: String,
+    },
+
     id: {
       type: ID,
       description: 'Must be provided for mutations',

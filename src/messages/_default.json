@@ -160,5 +160,14 @@
     "files": [
       "src/components/SignUp/SignUp.js"
     ]
+  },
+  {
+    "id": "signup.error-emailTaken",
+    "description": "Help for not unique email",
+    "defaultMessage": "Email address already in use",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
   }
 ]

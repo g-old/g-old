@@ -23,7 +23,6 @@ export function logout() {
       });
       const { redirect } = await resp.json();
       if (redirect) {
-        console.log('REDIRECT', redirect);
         history.push(redirect);
         dispatch({
           type: SESSION_LOGOUT_SUCCESS,
