@@ -28,6 +28,7 @@ import createProposal from './mutations/createProposal';
 import updateProposal from './mutations/updateProposal';
 // import createUser from './mutations/createUser';
 import updateUser from './mutations/updateUser';
+import uploadAvatar from './mutations/uploadAvatar';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -57,6 +58,7 @@ const schema = new Schema({
       updateProposal,
       //  createUser,
       updateUser,
+      uploadAvatar,
     },
   }),
 });

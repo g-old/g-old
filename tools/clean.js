@@ -17,7 +17,7 @@ function clean() {
     cleanDir('build/*', {
       nosort: true,
       dot: true,
-      ignore: ['build/.git', 'build/public'],
+      ignore: ['build/.git', 'build/public', 'build/avatars'],
     }),
 
     cleanDir('build/public/*', {

@@ -9,6 +9,9 @@ import {
   CREATE_USER_SUCCESS,
   CREATE_USER_ERROR,
   SESSION_LOGOUT_SUCCESS,
+  UPLOAD_AVATAR_SUCCESS,
+  UPLOAD_AVATAR_START,
+  UPLOAD_AVATAR_ERROR,
 } from '../constants';
 
 export default function ui(state = { statements: {} }, action) {
@@ -94,6 +97,29 @@ export default function ui(state = { statements: {} }, action) {
     }
     case SESSION_LOGOUT_SUCCESS: {
       return { statements: {} };
+    }
+
+    case UPLOAD_AVATAR_SUCCESS: {
+      return {
+        ...state,
+        avatarUploadPending: false,
+        avatarUploaded: true,
+      };
+    }
+
+    case UPLOAD_AVATAR_START: {
+      return {
+        ...state,
+        avatarUploadPending: true,
+        avatarUploaded: false,
+      };
+    }
+    case UPLOAD_AVATAR_ERROR: {
+      return {
+        ...state,
+        avatarUploadPending: false,
+        avatarUploaded: false,
+      };
     }
 
     case SHOW_STATEMENTINPUT: {

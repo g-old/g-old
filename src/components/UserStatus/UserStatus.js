@@ -17,7 +17,9 @@ class UserStatus extends React.Component {
             <img
               className={s.avatar}
               src={
-                `https://api.adorable.io/avatars/256/${this.props.user.name}${this.props.user.surname}.io.png`
+                this.props.user.avatar
+                  ? this.props.user.avatar
+                  : `https://api.adorable.io/avatars/256/${this.props.user.name}${this.props.user.surname}.io.png`
               }
               alt="IMG"
             />

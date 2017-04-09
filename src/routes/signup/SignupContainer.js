@@ -1,8 +1,10 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import SignUp from '../../components/SignUp';
+import ImageUpload from '../../components/ImageUpload';
 import AccountSettings from '../../components/AccountSettings';
 import { createUser } from '../../actions/user';
+import { uploadAvatar } from '../../actions/file';
 
 class SignupContainer extends React.Component {
   static propTypes = {
@@ -11,6 +13,9 @@ class SignupContainer extends React.Component {
     signupError: PropTypes.bool,
     notUniqueEmail: PropTypes.bool,
     processing: PropTypes.bool,
+    uploadAvatar: PropTypes.func.isRequired,
+    uploadPending: PropTypes.bool,
+    uploaded: PropTypes.bool,
   };
 
   render() {
@@ -25,7 +30,19 @@ class SignupContainer extends React.Component {
           />
         );
       case 2:
-        return <AccountSettings />;
+        return (
+          <div>
+            <h1>
+              UPLOAD AVATAR - or later
+            </h1>
+            <ImageUpload
+              uploadPending={this.props.uploadPending}
+              uploadAvatar={this.props.uploadAvatar}
+              uploaded={this.props.uploaded}
+            />
+            <AccountSettings />
+          </div>
+        );
       default:
         return <div />;
     }
@@ -47,10 +64,13 @@ const mapStateToProps = store => {
     notUniqueEmail,
     signupError,
     processing: store.ui.signupProcessing || false,
+    uploadPending: store.ui.avatarUploadPending || false,
+    uploaded: store.ui.avatarUploaded || false,
     intl, // fix for forceUpdate
   };
 };
 const mapDispatch = {
   createUser,
+  uploadAvatar,
 };
 export default connect(mapStateToProps, mapDispatch)(SignupContainer);

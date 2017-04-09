@@ -202,7 +202,11 @@ class SignUp extends React.Component {
   }
   onPasswordBlur() {
     const password = this.validatePassword(6);
-    const passwordAgain = this.validatePasswordAgain();
+    let passwordAgain = { touched: false };
+    if (this.state.passwordAgain.length > 0) {
+      passwordAgain = this.validatePasswordAgain();
+    }
+
     this.setState({ errors: { ...this.state.errors, password, passwordAgain } });
   }
   onPasswordAgainBlur() {

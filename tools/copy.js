@@ -19,20 +19,28 @@ import { format } from './run';
  */
 async function copy() {
   await makeDir('build');
+  await makeDir('build/avatars');
   await Promise.all([
-    writeFile('build/package.json', JSON.stringify({
-      private: true,
-      engines: pkg.engines,
-      dependencies: pkg.dependencies,
-      scripts: {
-        start: 'node server.js',
-      },
-    }, null, 2)),
+    writeFile(
+      'build/package.json',
+      JSON.stringify(
+        {
+          private: true,
+          engines: pkg.engines,
+          dependencies: pkg.dependencies,
+          scripts: {
+            start: 'node server.js',
+          },
+        },
+        null,
+        2,
+      ),
+    ),
     copyFile('LICENSE.txt', 'build/LICENSE.txt'),
     copyDir('src/content', 'build/content'),
     copyDir('public', 'build/public'),
     copyDir('src/messages', 'build/messages'),
-      // TODO If node env is production
+    // TODO If node env is production
     copyDir('src/data/db', 'build/db'),
     copyFile('private_configs.js', 'build/private_configs.js'),
   ]);
@@ -40,11 +48,9 @@ async function copy() {
   await copyFile('src/knexfile.js', 'build/db/knexfile.js');
 
   if (process.argv.includes('--watch')) {
-    const watcher = chokidar.watch([
-      'src/content/**/*',
-      'src/messages/**/*',
-      'public/**/*',
-    ], { ignoreInitial: true });
+    const watcher = chokidar.watch(['src/content/**/*', 'src/messages/**/*', 'public/**/*'], {
+      ignoreInitial: true,
+    });
 
     watcher.on('all', async (event, filePath) => {
       const start = new Date();

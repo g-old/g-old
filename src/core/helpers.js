@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/prefer-default-export
 export const thresholdPassed = poll =>
-  poll.upvotes >= Math.floor((poll.allVoters / 100) * poll.threshold);
+// eslint-disable-next-line no-mixed-operators
+  poll.upvotes >= Math.floor(poll.allVoters / 100 * poll.threshold);
 
 export const validateEmail = email => {
   // http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
@@ -11,3 +12,13 @@ export const validateEmail = email => {
   //  let re = /^(?=[A-Z0-9][A-Z0-9@._%+-]{5,253}$)[A-Z0-9._%+-]{1,64}@(?:(?=[A-Z0-9-]{1,63}\.)[A-Z0-9]+(?:-[A-Z0-9]+)*\.){1,8}[A-Z]{2,63}$/;
   return re.test(email);
 };
+
+// https://gist.github.com/jed/982883
+// This is quite slow in comparison to uuid
+/* eslint-disable */
+export function b(a) {
+  return a
+    ? (a ^ Math.random() * 16 >> a / 4).toString(16)
+    : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
+}
+/* eslint-enable */

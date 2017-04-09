@@ -4,9 +4,7 @@ class AccountSettings extends React.Component {
   render() {
     return (
       <div>
-        <h1>
-          UPLOAD IMAGE
-        </h1>
+
         <h1>
           ADDITIONAL DETAILS
         </h1>

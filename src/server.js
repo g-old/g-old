@@ -20,6 +20,7 @@ import PrettyError from 'pretty-error';
 import session from 'express-session';
 import knexSession from 'connect-session-knex';
 import { IntlProvider } from 'react-intl';
+import multer from 'multer';
 import knex from './data/knex';
 import './serverIntlPolyfill';
 import App from './components/App';
@@ -36,6 +37,7 @@ import { port, locales } from './config';
 import createLoaders from './data/dataLoader';
 import passport from './core/passport';
 import User from './data/models/User';
+import FileStorage, { AvatarManager } from './core/FileStorage';
 
 const app = express();
 
@@ -50,7 +52,7 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 // Register Node.js middleware
 // -----------------------------------------------------------------------------
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(express.static(path.join(__dirname, '/avatars')));
 app.use(cookieParser());
 app.use(
   requestLanguage({
@@ -135,7 +137,15 @@ app.post('/signup', (req, res) => {
       res.status(500).json({ error: true });
     });
 });
-
+const storage = multer.memoryStorage();
+const FileStore = FileStorage(AvatarManager);
+app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
+  if (!req.user) res.status(505);
+  FileStore.save({ viewer: req.user, data: req.body.avatar, loaders: createLoaders() }, 'avatars/')
+    // eslint-disable-next-line no-confusing-arrow
+    .then(user => user ? res.status(200).json(user) : res.status(500))
+    .catch(() => res.status(500));
+});
 app.get('/test', (req, res, next) => {
   knex('users')
     .where({ name: 'admin' })
@@ -150,7 +160,8 @@ app.get('/test', (req, res, next) => {
 //
 // Register API middleware
 // -----------------------------------------------------------------------------
-
+// const storage = multer.memoryStorage(); // risk of runnig out of memory
+// app.use('/graphql', multer({ storage }).single('file')); // or switch to own route ? Performance
 app.use(
   '/graphql',
   expressGraphQL(req => ({
@@ -160,7 +171,6 @@ app.use(
     pretty: process.env.NODE_ENV !== 'production',
     context: {
       viewer: req.user,
-      /* { id: 12, role: 'admin', name: 'admin', email: 'admin@example.com' },*/
       loaders: createLoaders(),
     },
   })),
