@@ -12,6 +12,8 @@ import {
   UPLOAD_AVATAR_SUCCESS,
   UPLOAD_AVATAR_START,
   UPLOAD_AVATAR_ERROR,
+  RESET_PASSWORD_ERROR,
+  RESET_PASSWORD_SUCCESS,
 } from '../constants';
 
 export default function ui(state = { statements: {} }, action) {
@@ -119,6 +121,20 @@ export default function ui(state = { statements: {} }, action) {
         ...state,
         avatarUploadPending: false,
         avatarUploaded: false,
+      };
+    }
+    case RESET_PASSWORD_ERROR: {
+      return {
+        ...state,
+        resetError: true,
+        resetSuccess: false,
+      };
+    }
+    case RESET_PASSWORD_SUCCESS: {
+      return {
+        ...state,
+        resetError: false,
+        resetSuccess: true,
       };
     }
 

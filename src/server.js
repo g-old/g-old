@@ -38,6 +38,8 @@ import createLoaders from './data/dataLoader';
 import passport from './core/passport';
 import User from './data/models/User';
 import FileStorage, { AvatarManager } from './core/FileStorage';
+import PasswordReset from './data/models/PasswordReset';
+import { sendMail, resetLinkMail, resetSuccessMail } from './core/mailer';
 
 const app = express();
 
@@ -76,7 +78,7 @@ app.use(bodyParser.json());
 // -----------------------------------------------------------------------------
 
 const sessionConfig = {
-  secret: 'keyboard cat',
+  secret: 'keyboard cat', // TODO change
   resave: false,
   saveUninitialized: true,
   cookie: { maxAge: 4 * 60 * 60 * 1000 },
@@ -111,10 +113,9 @@ app.post(
 app.post('/logout', (req, res) => {
   if (req.isAuthenticated()) {
     req.logout();
-    res.status(200).json({ loggedOut: true, redirect: '/logged-out' });
-  } else {
-    res.status(500).json({ error: true });
   }
+  // Logout from other tab -not sure how handle errors
+  res.status(200).json({ loggedOut: true, redirect: '/logged-out' });
 });
 
 app.post('/signup', (req, res) => {
@@ -143,9 +144,75 @@ app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
   if (!req.user) res.status(505);
   FileStore.save({ viewer: req.user, data: req.body.avatar, loaders: createLoaders() }, 'avatars/')
     // eslint-disable-next-line no-confusing-arrow
-    .then(user => user ? res.status(200).json(user) : res.status(500))
+    // TODO update session
+    // .then(user => user ? res.status(200).json(user) : res.status(500))
+    .then(user => {
+      if (!user) {
+        throw Error('User update failed');
+      }
+      return new Promise((resolve, reject) => {
+        // eslint-disable-next-line no-confusing-arrow
+        req.login(user, err => err ? reject(err) : resolve(user));
+      });
+    })
+    .then(user => res.status(200).json(user))
     .catch(() => res.status(500));
 });
+
+app.post(
+  '/forgot',
+  (req, res) =>
+    PasswordReset.createToken(req.body.email)
+      .then(token => {
+        if (!token) throw Error('Token not generated');
+        return sendMail(resetLinkMail(req.body.email.email, req.headers.host, token));
+      })
+      .then(info => {
+        // TODO ONLY for TESTING!
+        console.log(info.envelope);
+        console.log(info.messageId);
+        console.log(info.message);
+        res.status(200).json({ ok: true });
+      })
+      .catch(error => {
+        console.log('ERROR: ', error);
+        res.status(200).json({ ok: true });
+      }), // give no feedback!
+);
+// TODO change to /reset only ?
+app.post('/reset/:token', (req, res) => {
+  PasswordReset.checkToken({ token: req.params.token }) // TODO checkToken and delete it
+    .then(data => {
+      if (!data) throw Error('Token invalid');
+      return User.update(
+        { id: 0, role: 'system' },
+        { password: req.body.password, id: data.userId },
+        createLoaders(),
+      );
+    })
+    .then(user => {
+      if (!user) throw Error('Update failed');
+      // TODO Mail user
+      return Promise.all([
+        sendMail(resetSuccessMail(user.email)).then(
+          info => {
+            // TODO ONLY for TESTING!
+            console.log(info.envelope);
+            console.log(info.messageId);
+            console.log(info.message);
+          },
+          err => console.log('MAILING failed', err),
+        ),
+        new Promise((resolve, reject) => {
+          // eslint-disable-next-line no-confusing-arrow
+          req.login(user, err => err ? reject(err) : resolve());
+        }),
+      ]);
+    })
+    .then(() => res.status(200).json({ user: req.user }))
+    .catch(error => res.status(500).json({ error }));
+});
+
 app.get('/test', (req, res, next) => {
   knex('users')
     .where({ name: 'admin' })

@@ -23,6 +23,8 @@ export default {
     require('./admin').default,
     require('./signup').default,
     require('./loggedOut').default,
+    require('./passwordRecovery').default,
+    require('./passwordReset').default,
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     require('./notFound').default,
   ],

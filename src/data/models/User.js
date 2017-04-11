@@ -4,7 +4,10 @@ import { validateEmail } from '../../core/helpers';
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
-  return viewer.id === data.id || viewer.role === 'admin' || viewer.role === 'mod';
+  return viewer.id === data.id ||
+    viewer.role === 'admin' ||
+    viewer.role === 'mod' ||
+    viewer.role === 'system';
 }
 
 class User {
@@ -47,23 +50,45 @@ class User {
   // eslint-disable-next-line no-unused-vars
   static canMutate(viewer, data) {
     // TODO Allow mutation of own data - attention to guests
-    return ['admin', 'mod'].includes(viewer.role);
+    return ['admin', 'mod', 'system', 'user'].includes(viewer.role);
   }
 
   static async update(viewer, data, loaders) {
     // authenticate
+    if (!data.id) return null;
     if (!User.canMutate(viewer, data)) return null;
-    // validate
+    // validate - if something seems corrupted, return.
+    if (data.email && !validateEmail(data.email)) return null;
+    if (data.password && data.password.trim() > 6) return null;
+    // TODO write fn which gets all the props with the right name
+    // TODO Allow only specific updates, take car of role
+    const newData = {};
+    if (data.email) {
+      newData.email = data.email;
+    }
+    if (data.password) {
+      const hash = await bcrypt.hash(data.password, 10);
+      if (!hash) return null;
+      newData.password_hash = hash;
+    }
+    if (data.role) {
+      const roleId = ['admin', 'mod', 'user', 'guest'].indexOf(data.role);
+      if (roleId > -1) {
+        newData.role_id = roleId;
+      }
+    }
 
     // update
-    await knex.transaction(async trx => {
+    const updatedId = await knex.transaction(async trx => {
       await trx
         .where({
           id: data.id,
         })
-        .update({ role_id: data.roleId })
+        .update(newData)
         .into('users');
+      return data.id;
     });
+    if (!updatedId) return null;
     return User.gen(viewer, data.id, loaders) || null;
   }
 

@@ -36,6 +36,7 @@
     "lodash.merge": "^4.6.0",
     "multer": "^1.3.0",
     "node-fetch": "^1.6.3",
+    "nodemailer": "^4.0.0",
     "normalize.css": "^5.0.0",
     "normalizr": "^3.2.2",
     "passport": "^0.3.2",

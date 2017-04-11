@@ -41,7 +41,8 @@
     "defaultMessage": "Email",
     "message": "",
     "files": [
-      "src/components/Login/Login.js"
+      "src/components/Login/Login.js",
+      "src/routes/passwordRecovery/PasswordRecovery.js"
     ]
   },
   {
@@ -68,7 +69,8 @@
     "defaultMessage": "Confirm your password",
     "message": "",
     "files": [
-      "src/components/SignUp/SignUp.js"
+      "src/components/SignUp/SignUp.js",
+      "src/routes/passwordReset/PasswordReset.js"
     ]
   },
   {
@@ -104,7 +106,8 @@
     "defaultMessage": "You can't leave this empty",
     "message": "",
     "files": [
-      "src/components/SignUp/SignUp.js"
+      "src/components/SignUp/SignUp.js",
+      "src/routes/passwordReset/PasswordReset.js"
     ]
   },
   {
@@ -122,7 +125,8 @@
     "defaultMessage": "These passwords don't match. Try again?",
     "message": "",
     "files": [
-      "src/components/SignUp/SignUp.js"
+      "src/components/SignUp/SignUp.js",
+      "src/routes/passwordReset/PasswordReset.js"
     ]
   },
   {
@@ -131,7 +135,8 @@
     "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
     "message": "",
     "files": [
-      "src/components/SignUp/SignUp.js"
+      "src/components/SignUp/SignUp.js",
+      "src/routes/passwordReset/PasswordReset.js"
     ]
   },
   {
@@ -158,7 +163,8 @@
     "defaultMessage": "Create a password",
     "message": "",
     "files": [
-      "src/components/SignUp/SignUp.js"
+      "src/components/SignUp/SignUp.js",
+      "src/routes/passwordReset/PasswordReset.js"
     ]
   },
   {
@@ -168,6 +174,43 @@
     "message": "",
     "files": [
       "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "login.resetPassword",
+    "description": "Help for password",
+    "defaultMessage": "Forgot your password?",
+    "message": "",
+    "files": [
+      "src/components/Login/Login.js"
+    ]
+  },
+  {
+    "id": "passwordRecovery.reset",
+    "description": "Reset Password",
+    "defaultMessage": "Reset Password",
+    "message": "",
+    "files": [
+      "src/routes/passwordRecovery/PasswordRecovery.js",
+      "src/routes/passwordReset/PasswordReset.js"
+    ]
+  },
+  {
+    "id": "passwordRecovery.stepOne",
+    "description": "Password recovery instruction",
+    "defaultMessage": "Enter your email address below and we'll send you a link to reset your password",
+    "message": "",
+    "files": [
+      "src/routes/passwordRecovery/PasswordRecovery.js"
+    ]
+  },
+  {
+    "id": "passwordRecovery.stepTwo",
+    "description": "Password recovery instruction",
+    "defaultMessage": "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
+    "message": "",
+    "files": [
+      "src/routes/passwordRecovery/PasswordRecovery.js"
     ]
   }
 ]

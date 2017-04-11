@@ -1,6 +1,7 @@
 import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
+import Link from '../Link';
 import s from './Login.css';
 
 const messages = defineMessages({
@@ -13,6 +14,11 @@ const messages = defineMessages({
     id: 'login.password',
     defaultMessage: 'Password',
     description: 'Password',
+  },
+  resetPassword: {
+    id: 'login.resetPassword',
+    defaultMessage: 'Forgot your password?',
+    description: 'Help for password',
   },
 });
 
@@ -37,6 +43,9 @@ class Login extends React.Component {
             Log in
           </button>
         </div>
+        <Link to={'/account/password/reset'}>
+          {' '}<FormattedMessage {...messages.resetPassword} />
+        </Link>
       </form>
     );
   }
