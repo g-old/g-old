@@ -22,6 +22,7 @@ class Statement extends React.Component {
       author: PropTypes.shape({
         name: PropTypes.string,
         surname: PropTypes.string,
+        avatar: PropTypes.string,
       }),
     }),
     createLike: PropTypes.func.isRequired,
@@ -115,7 +116,9 @@ class Statement extends React.Component {
           <img
             className={cn(s.avatar)}
             src={
-              `https://api.adorable.io/avatars/256/${this.props.data.author.name}${this.props.data.author.surname}.io.png`
+              this.props.data.author.avatar
+                ? this.props.data.author.avatar
+                : `https://api.adorable.io/avatars/256/${this.props.data.author.name}${this.props.data.author.surname}.io.png`
             }
             alt="IMG"
           />}

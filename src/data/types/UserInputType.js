@@ -1,15 +1,10 @@
-import {
-  GraphQLString as String,
-  GraphQLInputObjectType,
-  GraphQLID as ID,
-  GraphQLInt,
-} from 'graphql';
+import { GraphQLString as String, GraphQLInputObjectType, GraphQLID as ID } from 'graphql';
 
 const UserInputType = new GraphQLInputObjectType({
   name: 'UserInput',
   fields: {
-    roleId: {
-      type: GraphQLInt,
+    role: {
+      type: String,
     },
     surname: {
       type: String,

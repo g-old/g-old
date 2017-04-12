@@ -7,28 +7,59 @@ import { updateUser, loadUserList } from '../../actions/user';
 class UserPanel extends React.Component {
   static propTypes = {
     userList: PropTypes.arrayOf(PropTypes.object),
-    filter: PropTypes.string.isRequired,
+    //  filter: PropTypes.string.isRequired,
     loadUserList: PropTypes.func,
     updateUser: PropTypes.func,
   };
 
   componentDidMount() {
-    this.props.loadUserList(4);
+    this.props.loadUserList('guest');
   }
   render() {
     return (
       <div>
         <h1>USERS WITH STATUS VIEWER</h1>
         {this.props.userList.map(user => (
-          <p>
-            {' '}{user.id} {user.name} {user.surname} {user.role && user.role.type} <button
-              onClick={() => {
-                this.props.updateUser({ id: user.id, roleId: 3 });
-              }}
-            >
-              RANK UP{' '}
-            </button>
-          </p>
+          <div key={user.id} style={{ marginBottom: '0.5em' }}>
+            <span>
+              <img
+                style={{ width: '4em', height: '4em', borderRadius: '30%' }}
+                src={
+                  user.avatar
+                    ? user.avatar
+                    : `https://api.adorable.io/avatars/256/${user.name}${user.surname}.io.png`
+                }
+                alt="IMG"
+              />
+
+              {user.name}
+              {' '}
+              {user.surname}
+              {' '}
+              {user.role && user.role.type}
+              {' '}
+              {!user.avatar &&
+                <span style={{ borderBottom: '1px solid red' }}>
+                  {'PIC MISSING!'}
+                </span>}
+              <span style={{ marginLeft: '5em' }}>
+                <button
+                  onClick={() => {
+                    alert('TO IMPLEMENT');
+                  }}
+                >
+                  INSPECT
+                </button>
+                <button
+                  onClick={() => {
+                    this.props.updateUser({ id: user.id, role: 'user' });
+                  }}
+                >
+                  RANK UP{' '}
+                </button>
+              </span>
+            </span>
+          </div>
         ))}
         <h1>USERS WITH STATUS GUEST</h1>
         <h1>FIND USER</h1>
@@ -44,7 +75,6 @@ const mapStateToProps = state => {
   const userList = denormalize(userData, userListSchema, state.entities).filter(
     u => u.role.type === 'guest',
   );
-
   const user = state.user;
   return {
     user,

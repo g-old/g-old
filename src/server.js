@@ -192,7 +192,7 @@ app.post('/reset/:token', (req, res) => {
     })
     .then(user => {
       if (!user) throw Error('Update failed');
-      // TODO Mail user
+      // TODO separate errorhandling for mail and login
       return Promise.all([
         sendMail(resetSuccessMail(user.email)).then(
           info => {

@@ -22,34 +22,34 @@ id,
     }
     `;
 const userList = `
-query ($role_id:Int) {
-  users (role_id:$role_id) {
+query ($role:String) {
+  users (role:$role) {
     ${userFields}
   }
 }
 `;
 
 const updateUserMutation = `
-mutation($id:ID $name:String, $surname:String, $roleId: Int){
-  updateUser(user:{id:$id name:$name, surname:$surname, roleId:$roleId}){
+mutation($id:ID $name:String, $surname:String, $role: String){
+  updateUser(user:{id:$id name:$name, surname:$surname, role:$role}){
     ${userFields}
   }
 }
 `;
 
-export function loadUserList(roleId) {
+export function loadUserList(role) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
 
     dispatch({
       type: LOAD_USERS_START,
       payload: {
-        roleId,
+        role,
       },
     });
 
     try {
-      const { data } = await graphqlRequest(userList, { role_id: roleId });
+      const { data } = await graphqlRequest(userList, { role });
       dispatch({
         type: LOAD_USERS_SUCCESS,
         payload: data,
@@ -58,7 +58,7 @@ export function loadUserList(roleId) {
       dispatch({
         type: LOAD_USERS_ERROR,
         payload: {
-          roleId,
+          role,
           error,
         },
       });

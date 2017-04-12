@@ -1,4 +1,4 @@
-import { GraphQLList, GraphQLInt } from 'graphql';
+import { GraphQLList, GraphQLString } from 'graphql';
 
 import UserType from '../types/UserType';
 import User from '../models/User';
@@ -7,15 +7,15 @@ import knex from '../knex';
 const users = {
   type: new GraphQLList(UserType),
   args: {
-    role_id: {
-      type: GraphQLInt,
+    role: {
+      type: GraphQLString,
     },
   },
 
-  resolve: (parent, { role_id }, { viewer, loaders }) =>
+  resolve: (parent, { role }, { viewer, loaders }) =>
     Promise.resolve(
       knex('users')
-        .where({ role_id })
+        .where({ role_id: ['admin', 'mod', 'user', 'guest'].indexOf(role) + 1 })
         .pluck('id')
         .then(ids => ids.map(id => User.gen(viewer, id, loaders))),
     ),

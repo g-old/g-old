@@ -12,7 +12,8 @@ import User from '../models/User';
 
 const UserType = new ObjectType({
   name: 'User',
-  fields: () => ({ // we need a lazy evaluated fn , bc we use UserType, which has to be defined
+  fields: () => ({
+    // we need a lazy evaluated fn , bc we use UserType, which has to be defined
     id: { type: ID },
     name: {
       type: GraphQLString,
@@ -38,12 +39,11 @@ const UserType = new ObjectType({
     followees: {
       type: new GraphQLList(UserType),
       resolve: (data, args, { viewer, loaders }) =>
-      Promise.resolve(
-        User.followees(data.id, loaders)
-        .then(ids => ids.map(id => User.gen(viewer, id, loaders))),
-      ),
+        Promise.resolve(
+          User.followees(data.id, loaders).then(ids =>
+            ids.map(id => User.gen(viewer, id, loaders))),
+        ),
     },
-
   }),
 });
 

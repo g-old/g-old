@@ -1,4 +1,5 @@
 import React from 'react';
+import history from '../../core/history';
 
 class AccountSettings extends React.Component {
   render() {
@@ -14,6 +15,7 @@ class AccountSettings extends React.Component {
         <h1>
           NEXT STEPS
         </h1>
+        <button onClick={() => history.push('/account')}>NEXT</button>
       </div>
     );
   }

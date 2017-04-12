@@ -11,7 +11,6 @@ const updateUser = {
     },
   },
   resolve: (data, { user }, { viewer, loaders }) => {
-    console.log('USER:UPDATE:ARGS', user);
     const res = User.update(viewer, user, loaders);
     return res;
   },

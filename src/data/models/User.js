@@ -72,7 +72,7 @@ class User {
       newData.password_hash = hash;
     }
     if (data.role) {
-      const roleId = ['admin', 'mod', 'user', 'guest'].indexOf(data.role);
+      const roleId = ['admin', 'mod', 'user', 'guest'].indexOf(data.role) + 1;
       if (roleId > -1) {
         newData.role_id = roleId;
       }

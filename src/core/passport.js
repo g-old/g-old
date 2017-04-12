@@ -28,8 +28,7 @@ passport.use(
       usernameField: 'email',
       passwordField: 'password',
     },
-    (email, password, done) => {
-      knex('users')
+    (email, password, done) => knex('users')
         .where({ email })
         .first()
         .then(user => {
@@ -43,13 +42,11 @@ passport.use(
             return done(null, false);
           });
         })
-        .catch(error => done(error));
-    },
+        .catch(error => done(error)),
   ),
 );
 
-passport.serializeUser((user, done) => {
-  knex('roles')
+passport.serializeUser((user, done) => knex('roles')
     .where({ id: user.role_id })
     .select('type')
     .then(data => {
@@ -67,8 +64,7 @@ passport.serializeUser((user, done) => {
       }
       return Error('Role not found');
     })
-    .catch(error => done(error));
-});
+    .catch(error => done(error)));
 
 passport.deserializeUser((sessionUser, done) => {
   done(null, sessionUser);

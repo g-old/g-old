@@ -20,6 +20,7 @@ export default {
     require('./proposals').default,
     require('./about').default,
     require('./testproposal').default,
+    require('./account').default,
     require('./admin').default,
     require('./signup').default,
     require('./loggedOut').default,

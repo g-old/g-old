@@ -15,11 +15,10 @@ const title = 'Admin Page';
 export default {
   path: '/admin/',
 
-  async action() {
-    /*  if (!isAdmin) {
-      return { redirect: '/' };
-    }
-*/
+  async action({ store }) {
+    const user = store.getState().user;
+    if (!['admin', 'mod'].includes(user.role)) return { redirect: '/' };
+
     const Admin = await require.ensure([], require => require('./Admin').default, 'admin');
 
     return {
