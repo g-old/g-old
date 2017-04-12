@@ -3,10 +3,8 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Proposal.css';
 
-
 class Proposal extends React.Component {
-
-  static propTypes ={
+  static propTypes = {
     proposal: PropTypes.shape({
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
@@ -14,8 +12,7 @@ class Proposal extends React.Component {
       body: PropTypes.string.isRequired,
       publishedAt: PropTypes.string,
     }),
-  }
-
+  };
   render() {
     return (
       <div className={s.root}>
@@ -29,15 +26,11 @@ class Proposal extends React.Component {
           <div className={s.date}>
             <FormattedRelative value={this.props.proposal.publishedAt} />
           </div>
-          <div className={s.body}>
-            {this.props.proposal.body}
-          </div>
+          <div className={s.body} dangerouslySetInnerHTML={{ __html: this.props.proposal.body }} />
         </div>
       </div>
     );
   }
-
 }
-
 
 export default withStyles(s)(Proposal);

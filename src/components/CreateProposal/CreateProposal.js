@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import MarkdownIt from 'markdown-it';
 import { createProposal } from '../../actions/proposal';
 import s from './CreateProposal.css';
 
@@ -15,9 +16,16 @@ class CreateProposal extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.onModeChange = this.onModeChange.bind(this);
     this.onTitleChange = this.onTitleChange.bind(this);
+    this.rawMarkup = ::this.rawMarkup;
+    this.md = new MarkdownIt({
+      html: true,
+      linkify: true,
+    });
   }
   onTextChange(e) {
-    this.setState({ ...this.state, textArea: { val: e.target.value } });
+    const html = this.md.render(this.state.textArea.val);
+
+    this.setState({ ...this.state, markup: html, textArea: { val: e.target.value } });
   }
   onTitleChange(e) {
     this.setState({ ...this.state, title: { val: e.target.value } });
@@ -28,10 +36,16 @@ class CreateProposal extends React.Component {
   onSubmit() {
     // TODO validate
     const title = this.state.title.val.trim();
-    const text = this.state.textArea.val.trim();
-    if (title && text) {
-      this.props.createProposal({ title, text, pollingModeId: this.state.value });
+    const markup = this.md.render(this.state.textArea.val); // trim?
+    // TODO sanitize input
+    if (title && markup) {
+      alert('Implement proper sanitizing!');
+      this.props.createProposal({ title, text: markup, pollingModeId: this.state.value });
     }
+  }
+  rawMarkup() {
+    const rawMarkup = this.md.render(this.state.textArea.val);
+    return { __html: rawMarkup };
   }
   render() {
     return (
@@ -55,7 +69,7 @@ class CreateProposal extends React.Component {
           </div>
           <div className={s.formGroup}>
             <label className={s.label} htmlFor="textarea">
-              Text
+              Text - you can use Markdown!
             </label>
             <textarea
               className={s.input}
@@ -65,6 +79,8 @@ class CreateProposal extends React.Component {
               onChange={this.onTextChange}
             />
           </div>
+          <h2> PREVIEW</h2>
+          <div dangerouslySetInnerHTML={this.rawMarkup()} />
           <div className={s.formGroup}>
             <button className={s.button} onClick={this.onSubmit}> SUBMIT</button>
           </div>
