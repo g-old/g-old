@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react';
 import AvatarEditor from 'react-avatar-editor';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import s from './ImageUpload.css';
 
 class ImageUpload extends React.Component {
   static propTypes = {
@@ -64,33 +66,37 @@ class ImageUpload extends React.Component {
   }
 
   render() {
-    return !this.props.uploaded
-      ? <div style={{ width: '100%' }}>
-        <input type="file" accept="image/*" onChange={this.onChange} />
+    let uploader = null;
+    let editor = null;
 
-        <br style={{ clear: 'both' }} />
-        {this.state.src &&
-        <div>
-          <AvatarEditor
-            ref={this.setEditorRef}
-            image={this.state.src}
-            onSave={this.handleSave}
-            borderRadius={10}
-            width={250}
-            height={250}
-            border={50}
-            color={[255, 255, 255, 0.6]} // RGBA
-            scale={this.state.scale}
-            rotate={this.state.rotate || 0}
-            onLoadFailure={() => alert('Image could not been loaded -> load another one')}
-            onLoadSuccess={() => this.setState({ loaded: true })}
-          />
-          <br />
+    if (!this.props.uploaded) {
+      if (this.state.src) {
+        editor = (
           <div>
-            {this.state.loaded && 'Drag, rotate or zoom, then upload!'}
-          </div>
-              Zoom:
+            <AvatarEditor
+              ref={this.setEditorRef}
+              image={this.state.src}
+              onSave={this.handleSave}
+              borderRadius={10}
+              width={256}
+              height={256}
+              border={50}
+              color={[255, 255, 255, 0.6]} // RGBA
+              scale={this.state.scale}
+              rotate={this.state.rotate || 0}
+              onLoadFailure={() => alert('Image could not been loaded -> load another one')}
+              onLoadSuccess={() => this.setState({ loaded: true })}
+            />
+            <br />
+            <div>
+              {this.state.loaded && 'Drag, rotate or zoom, then upload!'}
+            </div>
+            <div>
+
+              {'Zoom:'}
+              <br />
               <input
+                className={s.slider}
                 name="scale"
                 type="range"
                 onChange={this.handleScale}
@@ -99,26 +105,51 @@ class ImageUpload extends React.Component {
                 step="0.01"
                 defaultValue="1"
               />
-          <br />
-
-          <span>
-            <button onClick={this.handleRightRotation}>RIGHT</button>
-          </span>
-          <br />
-          <button onClick={this.handleSave} disabled={this.props.uploadPending}>
+              <br />
+              <span>
+                {'Rotate :'}
+                <button onClick={this.handleRightRotation}>RIGHT</button>
+              </span>
+            </div>
+            <div style={{ marginTop: '2em' }}>
+              <button
+                className={s.button}
+                onClick={this.handleSave}
+                disabled={this.props.uploadPending}
+              >
                 UPLOAD
               </button>
-          <br />
-          {this.uploadPending && 'Uploading...'}
-
-          {/*  <img
-            src={this.state.preview}
-            style={{ borderRadius: `${this.state.borderRadius / 2}%` }}
-          />*/}
-        </div>}
+            </div>
+            {this.uploadPending && 'Uploading...'}
+          </div>
+        );
+      }
+      uploader = (
+        <div style={{ width: '100%' }}>
+          <input
+            className={s.inputfile}
+            name="file"
+            type="file"
+            id="file"
+            accept="image/*"
+            onChange={this.onChange}
+          />
+          <label htmlFor="file">Click to choose your image</label>
+          <br style={{ clear: 'both' }} />
+          {editor}
+        </div>
+      );
+    } else {
+      uploader = <div><h2>UPLOAD FINISHED</h2></div>;
+    }
+    return (
+      <div className={s.root}>
+        <div className={s.container}>
+          {uploader}
+        </div>
       </div>
-      : <div><h2>UPLOAD FINISHED</h2></div>;
+    );
   }
 }
 
-export default ImageUpload;
+export default withStyles(s)(ImageUpload);

@@ -1,3 +1,86 @@
+@import '../../components/variables.css';
+
 .root {
-  background-color: 'red';
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.container {
+  margin: 0 auto;
+  padding: 0 0 40px;
+  max-width: 380px;
+}
+
+.inputfile {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+/* https://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-way/ */
+.inputfile + label {
+  font-size: 2em;
+  font-weight: 700;
+  color: white;
+  background-color: black;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.inputfile:focus + label,
+.inputfile + label:hover {
+  background-color: red;
+}
+
+/*
+.inputfile:focus + label {
+  outline: 1px dotted #000;
+  outline: -webkit-focus-ring-color auto 5px;
+}
+*/
+.inputfile + label * {
+  pointer-events: none; /* to work with fastclick */
+}
+
+/* https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/ */
+.slider {
+  margin-top: 1em;
+  width: 10em;
+  border-radius: 5px;
+  background: #2c3e50;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-runnable-track {
+  background: #d7dcdf;
+}
+
+.button {
+  display: block;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px 16px;
+  width: 100%;
+  outline: 0;
+  border: 1px solid #2a2a2a;
+  border-radius: 0;
+  background: var(--color-gold);
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  font-size: 18px;
+  line-height: 1.3333333;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--color-gold);
+}
+
+.button:focus {
+  border-color: #0074c2;
+  box-shadow: 0 0 8px rgba(0, 116, 194, 0.6);
 }
