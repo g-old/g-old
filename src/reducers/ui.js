@@ -14,9 +14,12 @@ import {
   UPLOAD_AVATAR_ERROR,
   RESET_PASSWORD_ERROR,
   RESET_PASSWORD_SUCCESS,
+  UPDATE_USER_START,
+  UPDATE_USER_ERROR,
+  UPDATE_USER_SUCCESS,
 } from '../constants';
 
-export default function ui(state = { statements: {} }, action) {
+export default function ui(state = { statements: {}, updates: {} }, action) {
   switch (action.type) {
     case UPDATE_STATEMENT_START: {
       const statementId = action.payload.statement.id;
@@ -135,6 +138,77 @@ export default function ui(state = { statements: {} }, action) {
         ...state,
         resetError: false,
         resetSuccess: true,
+      };
+    }
+
+    case UPDATE_USER_START: {
+      // TODO reset success
+      return {
+        ...state,
+        updates: {
+          ...state.updates,
+          [action.payload.user.id]: {
+            ...state.updates[action.payload.user.id],
+            ...action.payload.ui,
+          },
+        },
+      };
+    }
+
+    case UPDATE_USER_SUCCESS: {
+      const { updateUser: { id }, properties } = action.payload;
+      const current = state.updates[id];
+      const newState = Object.keys(current).reduce(
+        (acc, curr) => {
+          if (curr in properties && current[curr].pending) {
+            // eslint-disable-next-line no-param-reassign
+            acc[curr] = {
+              pending: false,
+              success: true,
+            };
+          }
+          return acc;
+        },
+        {},
+      );
+
+      return {
+        ...state,
+        updates: {
+          ...state.updates,
+          [id]: {
+            ...state.updates[id],
+            ...newState,
+          },
+        },
+      };
+    }
+
+    case UPDATE_USER_ERROR: {
+      const { user: { id }, properties } = action.payload;
+      const current = state.updates[id];
+      const newState = Object.keys(current).reduce(
+        (acc, curr) => {
+          if (curr in properties && current[curr].pending) {
+            // eslint-disable-next-line no-param-reassign
+            acc[curr] = {
+              pending: false,
+              error: true,
+            };
+          }
+          return acc;
+        },
+        {},
+      );
+      return {
+        ...state,
+        updates: {
+          ...state.updates,
+          [id]: {
+            ...state.updates[id],
+            ...newState,
+          },
+        },
       };
     }
 

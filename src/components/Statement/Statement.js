@@ -190,6 +190,6 @@ const mapDispatch = {
   deleteLike,
   deleteStatement,
 };
-const mapPropsToState = state => ({ user: state.user });
+const mapPropsToState = state => ({ user: state.entities.users[state.user] });
 
 export default connect(mapPropsToState, mapDispatch)(withStyles(s)(Statement));

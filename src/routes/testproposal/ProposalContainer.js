@@ -36,8 +36,7 @@ ProposalContainer.propTypes = {};
 const mapStateToProps = (state, ownProps) => {
   const data = state.entities.proposals[ownProps.proposalId];
   const proposal = denormalize(data, proposalSchema, state.entities);
-  const user = state.user; // or pass via context
-  console.log('PROPOSALPROPS', proposal);
+  const user = state.entities.users[state.user]; // or pass via context
   return {
     proposal,
     user,

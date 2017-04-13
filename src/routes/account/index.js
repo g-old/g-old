@@ -9,7 +9,8 @@ export default {
 
   async action({ store }) {
     // TODO check if token is valid and not expirated
-    const user = store.getState().user;
+    const data = store.getState();
+    const user = data.entities.users[data.user];
     if (!user.id) {
       return { redirect: '/' };
     }

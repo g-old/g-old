@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
-  // return viewer.role === data.type || ['admin', 'mods'].includes(viewer.role);
+  // return viewer.role === data.type || ['admin', 'mods'].includes(viewer.role.type);
   return true;
 }
 

@@ -136,7 +136,7 @@ export function loadProposal({ id }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO
     const { proposals } = getState().entities;
-    if (proposals[id] && proposals[id].statements) {
+    if (proposals && proposals[id] && proposals[id].statements) {
       // TODO: Add checks to ensure we have a valid, cached object.
       return true;
     }

@@ -28,7 +28,8 @@ passport.use(
       usernameField: 'email',
       passwordField: 'password',
     },
-    (email, password, done) => knex('users')
+    (email, password, done) =>
+      knex('users')
         .where({ email })
         .first()
         .then(user => {
@@ -46,19 +47,23 @@ passport.use(
   ),
 );
 
-passport.serializeUser((user, done) => knex('roles')
+passport.serializeUser((user, done) =>
+  knex('roles')
     .where({ id: user.role_id })
-    .select('type')
+    .select('id', 'type')
     .then(data => {
       if (data) {
-        const role = data[0].type;
+        const role = data[0]; // .type;
         const sessionUser = {
           id: user.id,
           name: user.name,
           surname: user.surname,
           email: user.email,
           avatar: user.avatar_path,
-          role,
+          role: {
+            id: role.id,
+            type: role.type,
+          },
         };
         done(null, sessionUser);
       }

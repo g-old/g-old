@@ -14,3 +14,11 @@
 .avatar {
   border-radius: 50%;
 }
+
+.input {
+  display: block;
+}
+
+.error {
+  border: 1px solid #f00;
+}

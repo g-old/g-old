@@ -12,7 +12,8 @@ class UserStatus extends React.Component {
   render() {
     return (
       <div>
-        {this.props.user.id &&
+        {this.props.user &&
+          this.props.user.id &&
           <span>
             <img
               className={s.avatar}
@@ -37,7 +38,7 @@ class UserStatus extends React.Component {
   }
 }
 const mapStateToProps = store => {
-  const user = store.user;
+  const user = store.entities.users ? store.entities.users[store.user] : {};
   return {
     user,
   };

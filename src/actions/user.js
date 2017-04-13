@@ -15,6 +15,7 @@ const userFields = `
 id,
     name,
     surname,
+    email,
     avatar
     role{
       id,
@@ -30,8 +31,8 @@ query ($role:String) {
 `;
 
 const updateUserMutation = `
-mutation($id:ID $name:String, $surname:String, $role: String){
-  updateUser(user:{id:$id name:$name, surname:$surname, role:$role}){
+mutation($id:ID $name:String, $surname:String, $role: String, $email: String, $password: String){
+  updateUser(user:{id:$id name:$name, surname:$surname, role:$role, email:$email, password: $password}){
     ${userFields}
   }
 }
@@ -119,11 +120,23 @@ export function createUser(newUser) {
 
 export function updateUser(user) {
   return async (dispatch, getState, { graphqlRequest }) => {
-    // TODO caching!
+    // eslint-disable-next-line no-unused-vars
+    const { id, ...rest } = user;
+    const properties = Object.keys(rest).reduce(
+      (acc, curr) => {
+        // eslint-disable-next-line no-param-reassign
+        acc[curr] = {
+          pending: true,
+        };
+        return acc;
+      },
+      {},
+    );
 
     dispatch({
       type: UPDATE_USER_START,
       payload: {
+        ui: properties,
         user,
       },
     });
@@ -132,14 +145,14 @@ export function updateUser(user) {
       const { data } = await graphqlRequest(updateUserMutation, user);
       dispatch({
         type: UPDATE_USER_SUCCESS,
-        payload: data,
+        payload: { ...data, properties },
       });
     } catch (error) {
       dispatch({
         type: UPDATE_USER_ERROR,
         payload: {
           user,
-          error,
+          ui: { properties },
         },
       });
       return false;

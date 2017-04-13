@@ -29,7 +29,7 @@ class Proposal {
 
   // eslint-disable-next-line no-unused-vars
   static canMutate(viewer, data) {
-    return ['admin', 'mod'].includes(viewer.role);
+    return ['admin', 'mod'].includes(viewer.role.type);
   }
 
   static async followees(id, { followees }) {

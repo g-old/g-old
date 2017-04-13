@@ -50,7 +50,7 @@ class ProposalContainer extends React.Component {
 ProposalContainer.propTypes = {};
 // TODO implement memoiziation with reselect
 const mapStateToProps = (state, ownProps) => {
-  const data = state.entities.proposals;
+  const data = state.entities.proposals || {};
   // TODO allProposals in store?
   const proposalsData = Object.keys(data).map(key => data[key]);
   const proposals = getVisibleProposals(

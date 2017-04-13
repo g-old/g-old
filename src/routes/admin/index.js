@@ -16,8 +16,10 @@ export default {
   path: '/admin/',
 
   async action({ store }) {
-    const user = store.getState().user;
-    if (!['admin', 'mod'].includes(user.role)) return { redirect: '/' };
+    const data = store.getState();
+    const user = data.entities.users[data.user];
+    const role = data.entities.roles[user.role].type;
+    if (!['admin', 'mod'].includes(role)) return { redirect: '/' };
 
     const Admin = await require.ensure([], require => require('./Admin').default, 'admin');
 

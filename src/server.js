@@ -21,6 +21,7 @@ import session from 'express-session';
 import knexSession from 'connect-session-knex';
 import { IntlProvider } from 'react-intl';
 import multer from 'multer';
+import { normalize } from 'normalizr';
 import knex from './data/knex';
 import './serverIntlPolyfill';
 import App from './components/App';
@@ -40,6 +41,7 @@ import User from './data/models/User';
 import FileStorage, { AvatarManager } from './core/FileStorage';
 import PasswordReset from './data/models/PasswordReset';
 import { sendMail, resetLinkMail, resetSuccessMail } from './core/mailer';
+import { user as userSchema } from './store/schema';
 
 const app = express();
 
@@ -248,9 +250,17 @@ app.use(
 // -----------------------------------------------------------------------------
 app.get('*', async (req, res, next) => {
   try {
+    const userData = {};
+    if (req.user) {
+      const normalized = normalize(req.user, userSchema);
+      userData.user = normalized.result;
+      userData.entities = normalized.entities;
+      //  userData.entities.users[req.user.id].id = req.user.id.toString(); // TODO find better way
+    }
     const store = configureStore(
       {
-        user: req.user || {}, // changed from null
+        user: userData.user || {},
+        entities: userData.entities || {},
       },
       {
         cookie: req.headers.cookie,

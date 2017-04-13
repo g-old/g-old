@@ -5,9 +5,9 @@ import { validateEmail } from '../../core/helpers';
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
   return viewer.id === data.id ||
-    viewer.role === 'admin' ||
-    viewer.role === 'mod' ||
-    viewer.role === 'system';
+    viewer.role.type === 'admin' ||
+    viewer.role.type === 'mod' ||
+    viewer.role.type === 'system';
 }
 
 class User {
@@ -50,7 +50,7 @@ class User {
   // eslint-disable-next-line no-unused-vars
   static canMutate(viewer, data) {
     // TODO Allow mutation of own data - attention to guests
-    return ['admin', 'mod', 'system', 'user'].includes(viewer.role);
+    return ['admin', 'mod', 'system', 'user'].includes(viewer.role.type);
   }
 
   static async update(viewer, data, loaders) {
@@ -64,7 +64,8 @@ class User {
     // TODO Allow only specific updates, take car of role
     const newData = {};
     if (data.email) {
-      newData.email = data.email;
+      newData.email = data.email.trim();
+      newData.email_validated = false;
     }
     if (data.password) {
       const hash = await bcrypt.hash(data.password, 10);

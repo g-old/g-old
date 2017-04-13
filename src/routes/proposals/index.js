@@ -9,7 +9,8 @@ export default {
   path: '/proposals/:state',
 
   async action({ store }, { state }) {
-    const user = store.getState().user;
+    const data = store.getState();
+    const user = data.entities.users[data.user];
     if (!user.id) {
       return { redirect: '/' };
     }
