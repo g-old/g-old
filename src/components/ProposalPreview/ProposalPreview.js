@@ -82,8 +82,11 @@ class Proposal extends React.Component {
               unipolar={poll.mode.unipolar}
             />
           </div>
-          TAGS :
-          {this.props.proposal.tags.map(tag => `${tag.text} `)}
+          <div className={s.tags}>
+            {this.props.proposal.tags.map(tag =>
+              <span className={s.tag}>{`${tag.text}`}</span>)
+            }
+          </div>
         </div>
 
       </div>
