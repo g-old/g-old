@@ -3,7 +3,6 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import StatementsList from '../StatementsList';
 import PollState from '../PollState';
-import VotesList from '../VotesList';
 import s from './Poll.css';
 
 class Poll extends React.Component {
@@ -104,16 +103,6 @@ class Poll extends React.Component {
   render() {
     const withStatements = this.props.poll.mode.with_statements;
     let statements = null;
-    let votes = null;
-    if (this.props.poll.closed_at) {
-      votes = (
-        <VotesList
-          unipolar={this.props.poll.mode.unipolar}
-          votes={this.props.poll.votes || []}
-          getVotes={() => this.props.fetchVotes(this.props.poll.id)}
-        />
-      );
-    }
 
     // render StatementsList or not?
     if (withStatements) {
@@ -132,7 +121,7 @@ class Poll extends React.Component {
     }
     let votingButtons = null;
 
-    if (!this.props.poll.closed_at && (!['viewer', 'guest'].includes(this.props.user.role.type))) {
+    if (!this.props.poll.closed_at && !['viewer', 'guest'].includes(this.props.user.role.type)) {
       // TODO Find better check
       // eslint-disable-next-line no-nested-ternary
       const proBtnColor = this.props.poll.ownVote
@@ -172,13 +161,14 @@ class Poll extends React.Component {
       <div>
         <div className={s.pollState}>
           <PollState
-            showVoteCount
             allVoters={this.props.poll.allVoters}
             upvotes={this.props.poll.upvotes}
             downvotes={this.props.poll.downvotes}
             unipolar={this.props.poll.mode.unipolar}
             threshold={this.props.poll.threshold}
             threshold_ref={this.props.poll.mode.threshold_ref}
+            votes={this.props.poll.votes || []}
+            getVotes={() => this.props.fetchVotes(this.props.poll.id)}
           />
         </div>
         <div className={s.followeeContainer}>
@@ -194,7 +184,6 @@ class Poll extends React.Component {
         </p>
         {votingButtons}
         {statements}
-        {votes}
       </div>
     );
   }

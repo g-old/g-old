@@ -1,11 +1,20 @@
 @import '../../components/variables.css';
 
 .root {
-  display: flex;
   border: none 1px gray;
   font-size: 1em;
   margin: auto;
-  height: 100%;
+}
+
+.header {
+  display: flex;
+  height: 0.6em;
+}
+
+.compact {
+  .header {
+    height: 0.5em;
+  }
 }
 
 .barContainer {
@@ -14,7 +23,7 @@
   border: solid 1px #555;
 }
 
-.votes {
+.voteCount {
   flex-grow: 0;
   font-size: 2vh;
   height: 100%;
@@ -61,4 +70,8 @@
   .threshold {
     border-right: solid 2px #555;
   }
+}
+
+.votesList {
+  margin: 0.5em 0 0;
 }

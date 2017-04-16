@@ -8,6 +8,7 @@ class VotesList extends React.Component {
     unipolar: PropTypes.bool.isRequired,
     votes: PropTypes.arrayOf(PropTypes.object),
     getVotes: PropTypes.func.isRequired,
+    autoLoadVotes: PropTypes.bool,
   };
 
   static renderVote(vote) {
@@ -25,7 +26,7 @@ class VotesList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      showVotes: false,
+      showVotes: props.autoLoadVotes,
     };
     this.onGetVotes = this.onGetVotes.bind(this);
   }

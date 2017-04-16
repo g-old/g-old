@@ -73,6 +73,7 @@ class Proposal extends React.Component {
           </div>
           <div className={s.pollState}>
             <PollState
+              compact
               allVoters={poll.allVoters}
               upvotes={poll.upvotes}
               downvotes={poll.downvotes}
