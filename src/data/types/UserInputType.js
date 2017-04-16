@@ -21,6 +21,10 @@ const UserInputType = new GraphQLInputObjectType({
       type: String,
     },
 
+    passwordOld: {
+      type: String,
+    },
+
     id: {
       type: ID,
       description: 'Must be provided for mutations',

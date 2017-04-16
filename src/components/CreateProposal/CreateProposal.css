@@ -78,3 +78,17 @@
   border-color: #0074c2;
   box-shadow: 0 0 8px rgba(0, 116, 194, 0.6);
 }
+
+.preview {
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: 0.25rem;
+    text-align: left;
+    border: 1px solid #ccc;
+  }
+}

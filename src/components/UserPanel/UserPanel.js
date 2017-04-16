@@ -13,7 +13,7 @@ class UserPanel extends React.Component {
   };
 
   componentDidMount() {
-    this.props.loadUserList('guest');
+    this.props.loadUserList('viewer');
   }
   render() {
     return (
@@ -52,7 +52,7 @@ class UserPanel extends React.Component {
                 </button>
                 <button
                   onClick={() => {
-                    this.props.updateUser({ id: user.id, role: 'user' });
+                    this.props.updateUser({ id: user.id, role: 'guest' });
                   }}
                 >
                   RANK UP{' '}
@@ -73,7 +73,7 @@ const mapStateToProps = state => {
   // TODO allProposals in store?
   const userData = Object.keys(data).map(key => data[key]);
   const userList = denormalize(userData, userListSchema, state.entities).filter(
-    u => u.role.type === 'guest',
+    u => u.role.type === 'viewer',
   );
   const user = state.user;
   return {

@@ -25,7 +25,7 @@ export function uploadAvatar(avatar) {
       if (!user.avatar) throw new Error('Avatar upload failed');
       dispatch({
         type: UPLOAD_AVATAR_SUCCESS,
-        payload: { avatar: user.avatar },
+        payload: { user },
       });
     } catch (error) {
       dispatch({

@@ -20,6 +20,7 @@ class Poll {
     this.closed_at = data.closed_at;
   }
   static async gen(viewer, id, { polls }) {
+    if (!id) return null;
     const data = await polls.load(id);
     if (data === null) return null;
     const canSee = checkCanSee(viewer, data);

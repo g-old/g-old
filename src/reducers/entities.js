@@ -1,7 +1,6 @@
 import { normalize } from 'normalizr';
 import merge from 'lodash.merge';
 import {
-  LOAD_PROPOSAL_START,
   LOAD_PROPOSAL_SUCCESS,
   LOAD_PROPOSAL_ERROR,
   CREATE_LIKE_SUCCESS,
@@ -17,6 +16,9 @@ import {
   LOAD_USERS_SUCCESS,
   UPDATE_USER_SUCCESS,
   SESSION_LOGOUT_SUCCESS,
+  CREATE_USER_SUCCESS,
+  RESET_PASSWORD_SUCCESS,
+  UPLOAD_AVATAR_SUCCESS,
 } from '../constants';
 import {
   proposal as proposalSchema,
@@ -332,8 +334,28 @@ export default function entities(state = { proposals: {} }, action) {
       };
     }
 
+    case CREATE_USER_SUCCESS: {
+      const normalizedData = normalize(action.payload.user, userSchema);
+      return {
+        ...merge({}, state, normalizedData.entities),
+      };
+    }
+
+    case RESET_PASSWORD_SUCCESS: {
+      const normalizedData = normalize(action.payload.user, userSchema);
+      return {
+        ...merge({}, state, normalizedData.entities),
+      };
+    }
+
     case UPDATE_USER_SUCCESS: {
       const normalizedData = normalize(action.payload.updateUser, userSchema);
+      return {
+        ...merge({}, state, normalizedData.entities),
+      };
+    }
+    case UPLOAD_AVATAR_SUCCESS: {
+      const normalizedData = normalize(action.payload.user, userSchema);
       return {
         ...merge({}, state, normalizedData.entities),
       };
@@ -346,12 +368,6 @@ export default function entities(state = { proposals: {} }, action) {
       return { proposals: {} };
     }
 
-    case LOAD_PROPOSAL_START: {
-      //  TODO insert id with isFetching set to true - change success and error accordingly
-      return {
-        ...state,
-      };
-    }
     case LOAD_PROPOSAL_ERROR: {
       return {
         ...state,

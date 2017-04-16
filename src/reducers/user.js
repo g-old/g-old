@@ -12,18 +12,18 @@ export default function user(state = {}, action) {
     }
     case CREATE_USER_SUCCESS: {
       // rename?
-      return {
-        ...action.payload.user,
-      };
+      return action.payload.user.id;
     }
     case UPLOAD_AVATAR_SUCCESS: {
-      return {
+      /* return {
         ...state,
         avatar: action.payload.avatar,
-      };
+      }; */
+      return state;
     }
     case RESET_PASSWORD_SUCCESS: {
-      return action.payload.user || {};
+      // return action.payload.user || {};
+      return state;
     }
     default:
       return state;

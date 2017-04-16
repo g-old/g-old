@@ -125,14 +125,12 @@ app.post('/signup', (req, res) => {
   User.create(req.body.user)
     .then(user => {
       if (!user) throw Error('User creation failed');
-      req.login(user, error => {
-        if (!error) {
-          res.status(200).json({ user: req.session.passport.user });
-        } else {
-          res.status(500).json({ error: true });
-        }
+      return new Promise((resolve, reject) => {
+        // eslint-disable-next-line no-confusing-arrow
+        req.login(user, err => err ? reject(err) : resolve());
       });
     })
+    .then(() => res.status(200).json({ user: req.session.passport.user }))
     .catch(error => {
       if (error.code === '23505') {
         res.status(500).json({ error: { detail: 'email' } });
@@ -187,7 +185,7 @@ app.post('/reset/:token', (req, res) => {
     .then(data => {
       if (!data) throw Error('Token invalid');
       return User.update(
-        { id: 0, role: 'system' },
+        { id: 0, role: { type: 'system' } },
         { password: req.body.password, id: data.userId },
         createLoaders(),
       );

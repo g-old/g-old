@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { logout } from '../../actions/session';
 import s from './UserStatus.css';
+import Link from '../Link';
 
 class UserStatus extends React.Component {
   static propTypes = {
@@ -15,15 +16,17 @@ class UserStatus extends React.Component {
         {this.props.user &&
           this.props.user.id &&
           <span>
-            <img
-              className={s.avatar}
-              src={
-                this.props.user.avatar
-                  ? this.props.user.avatar
-                  : `https://api.adorable.io/avatars/256/${this.props.user.name}${this.props.user.surname}.io.png`
-              }
-              alt="IMG"
-            />
+            <Link to={'/account'}>
+              <img
+                className={s.avatar}
+                src={
+                  this.props.user.avatar
+                    ? this.props.user.avatar
+                    : `https://api.adorable.io/avatars/256/${this.props.user.name}${this.props.user.surname}.io.png`
+                }
+                alt="IMG"
+              />
+            </Link>
             {this.props.user.name}
             <button
               onClick={() => {

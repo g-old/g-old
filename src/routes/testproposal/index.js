@@ -11,7 +11,8 @@ export default {
   async action({ store }, { id }) {
     const data = store.getState();
     const user = data.entities.users[data.user];
-    if (!user.id) {
+    const role = data.entities.roles[user.role] || user.role;
+    if (!user.id || role.type === 'viewer') {
       return { redirect: '/' };
     }
     // Not sure if this is the right way to hydrate the store

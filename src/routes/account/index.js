@@ -2,7 +2,7 @@ import React from 'react';
 import Layout from '../../components/Layout';
 import UserProfile from '../../components/UserProfile';
 
-const title = 'Reset your Password';
+const title = 'User account';
 
 export default {
   path: '/account',

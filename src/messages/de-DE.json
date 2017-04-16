@@ -107,6 +107,7 @@
     "message": "Dieses Feld ist erforderlich",
     "files": [
       "src/components/SignUp/SignUp.js",
+      "src/components/UserProfile/UserProfile.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
   },
@@ -116,7 +117,8 @@
     "defaultMessage": "Your email address seems to be invalid",
     "message": "Ihre E-Mail-Adresse scheint nicht korrekt zu sein",
     "files": [
-      "src/components/SignUp/SignUp.js"
+      "src/components/SignUp/SignUp.js",
+      "src/components/UserProfile/UserProfile.js"
     ]
   },
   {
@@ -126,6 +128,7 @@
     "message": "Die Passwörter stimmen nicht überein. Erneut versuchen?",
     "files": [
       "src/components/SignUp/SignUp.js",
+      "src/components/UserProfile/UserProfile.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
   },
@@ -136,6 +139,7 @@
     "message": "Kurze Passwörter sind leicht zu erraten. Bitte verwenden Sie mindestens 6 Zeichen",
     "files": [
       "src/components/SignUp/SignUp.js",
+      "src/components/UserProfile/UserProfile.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
   },
@@ -173,7 +177,8 @@
     "defaultMessage": "Email address already in use",
     "message": "E-Mail-Adresse wird bereits verwendet",
     "files": [
-      "src/components/SignUp/SignUp.js"
+      "src/components/SignUp/SignUp.js",
+      "src/components/UserProfile/UserProfile.js"
     ]
   },
   {

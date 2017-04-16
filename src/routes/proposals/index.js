@@ -11,7 +11,8 @@ export default {
   async action({ store }, { state }) {
     const data = store.getState();
     const user = data.entities.users[data.user];
-    if (!user.id) {
+    const role = data.entities.roles[user.role];
+    if (!user.id || role.type === 'viewer') {
       return { redirect: '/' };
     }
     // Not sure if this is the right way to hydrate the store
@@ -20,7 +21,7 @@ export default {
     if (!process.env.BROWSER) {
       loadingSuccessful = await store.dispatch(loadProposalsList(state));
     } else {
-      store.dispatch(loadProposalsList(state));
+      await store.dispatch(loadProposalsList(state)); // TODO find error, without await;
       loadingSuccessful = true;
     }
     if (loadingSuccessful) {

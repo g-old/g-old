@@ -18,7 +18,7 @@ class CreateProposal extends React.Component {
     this.onTitleChange = this.onTitleChange.bind(this);
     this.rawMarkup = ::this.rawMarkup;
     this.md = new MarkdownIt({
-      html: true,
+      // html: true,
       linkify: true,
     });
   }
@@ -41,6 +41,8 @@ class CreateProposal extends React.Component {
     if (title && markup) {
       alert('Implement proper sanitizing!');
       this.props.createProposal({ title, text: markup, pollingModeId: this.state.value });
+    } else if (!title) {
+      alert('TITLE MISSING');
     }
   }
   rawMarkup() {
@@ -80,7 +82,7 @@ class CreateProposal extends React.Component {
             />
           </div>
           <h2> PREVIEW</h2>
-          <div dangerouslySetInnerHTML={this.rawMarkup()} />
+          <div className={s.preview} dangerouslySetInnerHTML={this.rawMarkup()} />
           <div className={s.formGroup}>
             <button className={s.button} onClick={this.onSubmit}> SUBMIT</button>
           </div>

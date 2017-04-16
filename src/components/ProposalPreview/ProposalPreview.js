@@ -5,6 +5,7 @@ import s from './ProposalPreview.css';
 import PollState from '../PollState';
 import Link from '../Link';
 import { thresholdPassed } from '../../core/helpers';
+// import { DOMParser } from 'xmldom';
 
 class Proposal extends React.Component {
   static propTypes = {
@@ -42,14 +43,16 @@ class Proposal extends React.Component {
         ? this.props.proposal.pollTwo
         : this.props.proposal.pollOne;
     }
-    let body = '';
-    if (this.state.fullText) {
+    const body = null; /* eslint-disable jsx-a11y/no-static-element-interactions */
+    // Disabled bc Nodejs Domparser (xmldom) has dep problems
+    /*  if (this.state.fullText) {
       body = this.props.proposal.body;
     } else {
-      body = `${this.props.proposal.body.substring(0, 100)} (...)`;
-    }
-    /* eslint-disable jsx-a11y/no-static-element-interactions */
-    return (
+      body = `${new DOMParser()
+        .parseFromString(this.props.proposal.body, 'text/html')
+        .documentElement.textContent.substring(0, 100)}( ... )`;
+        // `${this.props.proposal.body.substring(0, 100)} (...)`;
+    } */ return (
       <div className={s.root}>
         <div className={s.container}>
           <div className={s.date}>

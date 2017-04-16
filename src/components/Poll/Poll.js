@@ -132,7 +132,7 @@ class Poll extends React.Component {
     }
     let votingButtons = null;
 
-    if (!this.props.poll.closed_at && this.props.user.role !== 'guest') {
+    if (!this.props.poll.closed_at && (!['viewer', 'guest'].includes(this.props.user.role.type))) {
       // TODO Find better check
       // eslint-disable-next-line no-nested-ternary
       const proBtnColor = this.props.poll.ownVote

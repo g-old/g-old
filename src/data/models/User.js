@@ -50,7 +50,7 @@ class User {
   // eslint-disable-next-line no-unused-vars
   static canMutate(viewer, data) {
     // TODO Allow mutation of own data - attention to guests
-    return ['admin', 'mod', 'system', 'user'].includes(viewer.role.type);
+    return ['admin', 'mod', 'system', 'user', 'guest', 'viewer'].includes(viewer.role.type);
   }
 
   static async update(viewer, data, loaders) {
@@ -60,6 +60,7 @@ class User {
     // validate - if something seems corrupted, return.
     if (data.email && !validateEmail(data.email)) return null;
     if (data.password && data.password.trim() > 6) return null;
+    if (data.passwordOld && data.passwordOld.trim() > 6) return null;
     // TODO write fn which gets all the props with the right name
     // TODO Allow only specific updates, take car of role
     const newData = {};
@@ -68,10 +69,18 @@ class User {
       newData.email_validated = false;
     }
     if (data.password) {
+      if (data.passwordOld) {
+        let passwordHash = await knex('users').where({ id: data.id }).pluck('password_hash');
+        passwordHash = passwordHash[0];
+        const same = await bcrypt.compare(data.passwordOld, passwordHash);
+        if (!same) return null;
+      } else if (viewer.role.type !== 'system') return null; // password resets
+
       const hash = await bcrypt.hash(data.password, 10);
       if (!hash) return null;
       newData.password_hash = hash;
     }
+
     if (data.role) {
       const roleId = ['admin', 'mod', 'user', 'guest'].indexOf(data.role) + 1;
       if (roleId > -1) {
@@ -121,7 +130,7 @@ class User {
           email,
           email_validated: false,
           password_hash: hash,
-          role_id: 4, // TODO make better
+          role_id: 5, // TODO make better
           created_at: new Date(),
         },
           'id',
@@ -134,7 +143,7 @@ class User {
       id: newUserId,
       name: data.name,
       surname: data.surname,
-      role_id: 4,
+      role_id: 5,
       email: data.email,
     });
   }

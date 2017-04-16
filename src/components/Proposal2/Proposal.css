@@ -40,6 +40,22 @@
 
   .body {
     padding-top: 1em;
+
+    img {
+      max-width: calc(var(--max-content-width) - 100px);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      padding: 0.25rem;
+      text-align: left;
+      border: 1px solid #ccc;
+    }
   }
 }
 

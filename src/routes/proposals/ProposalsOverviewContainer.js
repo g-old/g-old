@@ -53,10 +53,17 @@ const mapStateToProps = (state, ownProps) => {
   const data = state.entities.proposals || {};
   // TODO allProposals in store?
   const proposalsData = Object.keys(data).map(key => data[key]);
+
   const proposals = getVisibleProposals(
     denormalize(proposalsData, proposalListSchema, state.entities),
     ownProps.state,
-  );
+  ).sort((a, b) => {
+    /* eslint-disable*/
+    a = new Date(a.publishedAt); // TESTING only!
+    b = new Date(b.publishedAt);
+    return a < b ? 1 : -1;
+  });
+  /* eslint-enable */
 
   const user = state.user; // or pass via context
   return {

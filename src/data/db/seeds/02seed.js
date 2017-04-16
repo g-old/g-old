@@ -49,6 +49,7 @@ exports.seed = function (knex, Promise) {
         knex('roles').insert({ id: 2, type: 'mod' }),
         knex('roles').insert({ id: 3, type: 'user' }),
         knex('roles').insert({ id: 4, type: 'guest' }),
+        knex('roles').insert({ id: 5, type: 'viewer' }),
       ])
     );
   }
@@ -228,7 +229,7 @@ exports.seed = function (knex, Promise) {
         return knex('proposal_tags').insert(tagsData).then(() => {
           const updates = [];
           // eslint-disable-next-line no-restricted-syntax
-          for (const id in tagCounter) { // eslint-disable-line guard-for-in
+          for (const id in tagCounter) {  // eslint-disable-line guard-for-in
             updates.push(knex('tags').where({ id }).update({ count: tagCounter[id] }));
           }
 
@@ -298,9 +299,9 @@ exports.seed = function (knex, Promise) {
     }
     return Promise.resolve(
       knex
-      .batchInsert('statements', statements, chunkSize)
-      .returning('id')
-      .then(stmtIds => ({ stmtIds, stmtData: statements, userIds }))
+        .batchInsert('statements', statements, chunkSize)
+        .returning('id')
+        .then(stmtIds => ({ stmtIds, stmtData: statements, userIds }))
     );
   }
 
@@ -465,8 +466,10 @@ exports.seed = function (knex, Promise) {
         poll = Object.assign({}, poll, { polling_mode_id: proposeId });
         phaseOnePolls.push(poll);
       } else {
-        poll = Object.assign({}, poll, { polling_mode_id: voteId,
-          threshold: poll.threshold < 50 ? 50 : poll.threshold });
+        poll = Object.assign({}, poll, {
+          polling_mode_id: voteId,
+          threshold: poll.threshold < 50 ? 50 : poll.threshold,
+        });
         phaseTwoPolls.push(poll);
       }
     }

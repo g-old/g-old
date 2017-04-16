@@ -101,7 +101,7 @@ export default function ui(state = { statements: {}, updates: {} }, action) {
       };
     }
     case SESSION_LOGOUT_SUCCESS: {
-      return { statements: {} };
+      return { statements: {}, updates: {} };
     }
 
     case UPLOAD_AVATAR_SUCCESS: {
@@ -149,7 +149,7 @@ export default function ui(state = { statements: {}, updates: {} }, action) {
           ...state.updates,
           [action.payload.user.id]: {
             ...state.updates[action.payload.user.id],
-            ...action.payload.ui,
+            ...action.payload.properties,
           },
         },
       };

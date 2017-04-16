@@ -31,8 +31,8 @@ query ($role:String) {
 `;
 
 const updateUserMutation = `
-mutation($id:ID $name:String, $surname:String, $role: String, $email: String, $password: String){
-  updateUser(user:{id:$id name:$name, surname:$surname, role:$role, email:$email, password: $password}){
+mutation($id:ID $name:String, $surname:String, $role:String, $email:String, $password:String, $passwordOld:String){
+  updateUser(user:{id:$id name:$name, surname:$surname, role:$role, email:$email, password:$password passwordOld:$passwordOld}){
     ${userFields}
   }
 }
@@ -136,7 +136,7 @@ export function updateUser(user) {
     dispatch({
       type: UPDATE_USER_START,
       payload: {
-        ui: properties,
+        properties,
         user,
       },
     });
@@ -152,7 +152,7 @@ export function updateUser(user) {
         type: UPDATE_USER_ERROR,
         payload: {
           user,
-          ui: { properties },
+          properties,
         },
       });
       return false;
