@@ -16,7 +16,7 @@ class VotesList extends React.Component {
       <img
         key={vote.id}
         style={{ width: '2em', height: '2em', margin: '2px' }}
-        src={`https://api.adorable.io/avatars/32/${vote.voter.name}${vote.voter.surname}.io.png`}
+        src={vote.voter.avatar}
         title={`${vote.voter.name} ${vote.voter.surname}`}
         alt="IMG"
       />

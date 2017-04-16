@@ -114,11 +114,7 @@ class Statement extends React.Component {
         {!inactive &&
           <img
             className={cn(s.avatar)}
-            src={
-              this.props.data.author.avatar
-                ? this.props.data.author.avatar
-                : `https://api.adorable.io/avatars/32/${this.props.data.author.name}${this.props.data.author.surname}.io.png`
-            }
+            src={this.props.data.author.avatar}
             alt="IMG"
           />}
         <div style={{ width: '100%' }}>
