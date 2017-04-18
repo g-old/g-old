@@ -53,21 +53,29 @@ exports.seed = function (knex, Promise) {
       ])
     );
   }
+
+  function createUser(name, surname, passwordHash, email, roleId, time, emailValidated) {
+    return knex('users').insert({
+      name,
+      surname,
+      password_hash: passwordHash,
+      email,
+      role_id: roleId,
+      created_at: time,
+      updated_at: time,
+      email_validated: emailValidated,
+      avatar_path: `https://api.adorable.io/avatars/32/${name}${surname}.io.png`,
+    });
+  }
+
   /* eslint-disable prefer-template */
   function createUsers() {
     const time = new Date();
     let users = [];
     const testAdmin = Promise.resolve(
-      bcrypt.hash('password', 10).then(hash =>
-        knex('users').insert({
-          name: 'admin',
-          surname: 'admin',
-          password_hash: hash,
-          email: 'admin@example.com',
-          role_id: 1,
-          created_at: time,
-          email_validated: true,
-        }))
+      bcrypt
+        .hash('password', 10)
+        .then(hash => createUser('admin', 'admin', hash, 'admin@example.com', 1, time, true))
     );
     users.push(testAdmin);
     const testMods = [];
@@ -75,16 +83,9 @@ exports.seed = function (knex, Promise) {
       const name = 'mod_' + i;
       testMods.push(
         Promise.resolve(
-          bcrypt.hash('password', 10).then(hash =>
-            knex('users').insert({
-              name,
-              surname: name,
-              password_hash: hash,
-              email: name + '@example.com',
-              role_id: 2,
-              created_at: time,
-              email_validated: true,
-            }))
+          bcrypt
+            .hash('password', 10)
+            .then(hash => createUser(name, name, hash, name + '@example.com', 2, time, true))
         )
       );
     }
@@ -94,31 +95,18 @@ exports.seed = function (knex, Promise) {
       const name = 'user_' + i;
       testUsers.push(
         Promise.resolve(
-          bcrypt.hash('password', 10).then(hash =>
-            knex('users').insert({
-              name,
-              surname: name,
-              password_hash: hash,
-              email: name + '@example.com',
-              role_id: 3,
-              created_at: time,
-              email_validated: true,
-            }))
+          bcrypt
+            .hash('password', 10)
+            .then(hash => createUser(name, name, hash, name + '@example.com', 3, time, true))
         )
       );
     }
     users = users.concat(testUsers);
     const numUsersCalculated = numUsers - numMods - 1 - numTestUsers - numTestGuests - numGuests;
     for (let i = 0; i < numUsersCalculated; i += 1) {
-      const user = knex('users').insert({
-        name: faker.name.firstName(),
-        surname: faker.name.lastName(),
-        email: faker.internet.email(),
-        created_at: time,
-        updated_at: time,
-        role_id: 3,
-        email_validated: true,
-      });
+      const name = faker.name.firstName();
+      const surname = faker.name.lastName();
+      const user = createUser(name, surname, null, faker.internet.email(), 3, time, true);
       users.push(user);
     }
 
@@ -128,16 +116,9 @@ exports.seed = function (knex, Promise) {
       const name = 'guest_' + i;
       testGuests.push(
         Promise.resolve(
-          bcrypt.hash('password', 10).then(hash =>
-            knex('users').insert({
-              name,
-              surname: name,
-              password_hash: hash,
-              email: name + '@example.com',
-              role_id: 4,
-              created_at: time,
-              email_validated: true,
-            }))
+          bcrypt
+            .hash('password', 10)
+            .then(hash => createUser(name, name, hash, name + '@example.com', 4, time, true))
         )
       );
     }
@@ -145,15 +126,17 @@ exports.seed = function (knex, Promise) {
     guestUsers = guestUsers.concat(testGuests);
 
     for (let i = 0; i < numGuests; i += 1) {
-      const guest = knex('users').insert({
-        name: faker.name.firstName(),
-        surname: faker.name.lastName(),
-        email: faker.internet.email(),
-        created_at: time,
-        updated_at: time,
-        role_id: 4,
-        email_validated: Math.random() > 0.5,
-      });
+      const name = faker.name.firstName();
+      const surname = faker.name.lastName();
+      const guest = createUser(
+        name,
+        surname,
+        null,
+        faker.internet.email(),
+        4,
+        time,
+        Math.random() > 0.5
+      );
       guestUsers.push(guest);
     }
 
