@@ -75,7 +75,7 @@ const messages = defineMessages({
 
 class SignUp extends React.Component {
   static propTypes = {
-    createUser: PropTypes.func.isRequired,
+    onCreateUser: PropTypes.func.isRequired,
     error: PropTypes.bool,
     notUniqueEmail: PropTypes.bool,
     processing: PropTypes.bool,
@@ -229,7 +229,7 @@ class SignUp extends React.Component {
         password,
       };
       //  alert(JSON.stringify(data));
-      this.props.createUser(data);
+      this.props.onCreateUser(data);
     } else {
       // alert('FORM not valid');
     }

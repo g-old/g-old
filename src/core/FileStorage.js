@@ -20,7 +20,14 @@ function writeFile(filePath, content) {
 
 // TODO Integrate with Usermodel!
 export const AvatarManager = {
-  save: async ({ viewer, data, loaders }, folder) => {
+  save: async function saveFile({ viewer, data, loaders }, folder) {
+    const user = await User.gen(viewer, viewer.id, loaders);
+    if (user.avatar) {
+      if (user.avatar.indexOf('http:') === -1) {
+        throw new Error('Avatar already set');
+        // TODO let avatars beeing changed, delete old file first!
+      }
+    }
     const regex = /^data:.+\/(.+);base64,(.*)$/;
     const matches = data.match(regex);
     const ext = matches[1];
@@ -48,7 +55,13 @@ export const AvatarManager = {
         throw Error(error);
       }
     });
-    return User.gen(viewer, viewer.id, loaders) || null;
+    // invalidate cache
+    loaders.users.clear(viewer.id);
+    //
+    const result = await knex('users')
+      .where({ id: viewer.id })
+      .select('id', 'name', 'surname', 'email', 'avatar_path', 'role_id'); // await User.gen(viewer, viewer.id, loaders);
+    return result[0] || null;
   },
 };
 

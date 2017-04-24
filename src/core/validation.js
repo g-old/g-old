@@ -60,6 +60,7 @@ export function emailValidation(email, { invalidEmails }) {
     const duplicate = invalidEmails.reduce(
       // eslint-disable-next-line
       (acc, curr) => acc += mailAddress === curr ? 1 : 0,
+      0,
     );
     if (duplicate) {
       result = {

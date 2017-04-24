@@ -1,9 +1,18 @@
 import React, { PropTypes } from 'react';
+import { connect } from 'react-redux';
+
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import StatementsList from '../StatementsList';
 import PollState from '../PollState';
 import s from './Poll.css';
+import {
+  getVotingListIsFetching,
+  getVotingListErrorMessage,
+  getVoteMutationIsPending,
+  getVoteMutationSuccess,
+  getVoteMutationError,
+} from '../../reducers';
 
 class Poll extends React.Component {
   static propTypes = {
@@ -23,6 +32,7 @@ class Poll extends React.Component {
       ownVote: PropTypes.shape({
         id: PropTypes.string,
         position: PropTypes.string,
+        pollId: PropTypes.string,
       }),
       mode: PropTypes.shape({
         with_statements: PropTypes.bool,
@@ -47,6 +57,11 @@ class Poll extends React.Component {
     onVoteButtonClicked: PropTypes.func.isRequired,
     onStatementSubmit: PropTypes.func,
     onDeleteStatement: PropTypes.func.isRequired,
+    mutationSuccess: PropTypes.bool,
+    mutationErrorMessage: PropTypes.string,
+    mutationIsPending: PropTypes.bool,
+    votingListIsFetching: PropTypes.bool,
+    votingListErrorMessage: PropTypes.string,
   };
   constructor(props) {
     super(props);
@@ -56,6 +71,9 @@ class Poll extends React.Component {
   }
 
   getFolloweeVotes(pos) {
+    if (!this.props.poll.followees) {
+      return null;
+    }
     return this.props.poll.followees
       .filter(user => user.position === pos)
       .map(user => (
@@ -90,11 +108,12 @@ class Poll extends React.Component {
   }
 
   handleOnSubmit(input, update) {
+    const { id, pollId, position } = this.props.poll.ownVote;
     this.props.onStatementSubmit(
       {
         ...input,
         pollId: this.props.poll.id,
-        vote: this.props.poll.ownVote,
+        vote: { id, pollId, position },
       },
       update,
     );
@@ -120,6 +139,7 @@ class Poll extends React.Component {
       );
     }
     let votingButtons = null;
+    const { mutationIsPending, mutationErrorMessage } = this.props;
 
     if (!this.props.poll.closed_at && !['viewer', 'guest'].includes(this.props.user.role.type)) {
       // TODO Find better check
@@ -133,30 +153,50 @@ class Poll extends React.Component {
         : '';
       if (this.props.poll.mode.unipolar) {
         votingButtons = (
-          <button onClick={() => this.canVote('pro')} style={{ background: proBtnColor }}>
-            <i className="fa fa-hand-paper-o" />
-          </button>
+          <div>
+            <button
+              disabled={mutationIsPending}
+              onClick={() => this.canVote('pro')}
+              style={{ background: proBtnColor }}
+            >
+              <i className="fa fa-hand-paper-o" />
+            </button>
+            {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
+          </div>
         );
       } else if (this.props.poll.ownStatement) {
         votingButtons = (
-          <button onClick={this.handleRetractVote}>
-            RETRACT VOTE - AND DELETE STATEMENT
-          </button>
+          <div>
+            <button disabled={mutationIsPending} onClick={this.handleRetractVote}>
+              RETRACT VOTE - AND DELETE STATEMENT
+            </button>
+            {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
+          </div>
         );
       } else {
         votingButtons = (
-          <span>
-            <button onClick={() => this.canVote('pro')} style={{ background: proBtnColor }}>
-              <i className="fa fa-thumbs-up" />
-            </button>
-            <button onClick={() => this.canVote('con')} style={{ background: conBtnColor }}>
-              <i className="fa fa-thumbs-down" />
-            </button>
-          </span>
+          <div>
+            <span>
+              <button
+                disabled={mutationIsPending}
+                onClick={() => this.canVote('pro')}
+                style={{ background: proBtnColor }}
+              >
+                <i className="fa fa-thumbs-up" />
+              </button>
+              <button
+                disabled={mutationIsPending}
+                onClick={() => this.canVote('con')}
+                style={{ background: conBtnColor }}
+              >
+                <i className="fa fa-thumbs-down" />
+              </button>
+            </span>
+            {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
+          </div>
         );
       }
     }
-
     return (
       <div>
         <div className={s.pollState}>
@@ -169,6 +209,8 @@ class Poll extends React.Component {
             threshold_ref={this.props.poll.mode.threshold_ref}
             votes={this.props.poll.votes || []}
             getVotes={() => this.props.fetchVotes(this.props.poll.id)}
+            votingListIsFetching={this.props.votingListIsFetching}
+            votingListErrorMessage={this.props.votingListErrorMessage}
           />
         </div>
         <div className={s.followeeContainer}>
@@ -182,11 +224,19 @@ class Poll extends React.Component {
         <p>
           {`CLOSES AT ${this.props.poll.end_time}`}
         </p>
+        {mutationErrorMessage && <div> {'ERROR:'} </div>}
         {votingButtons}
         {statements}
       </div>
     );
   }
 }
+const mapPropsToState = (state, { poll: { id } }) => ({
+  votingListIsFetching: getVotingListIsFetching(state, id),
+  votingListErrorMessage: getVotingListErrorMessage(state, id),
+  mutationIsPending: getVoteMutationIsPending(state, id),
+  mutationSuccess: getVoteMutationSuccess(state, id),
+  mutationErrorMessage: getVoteMutationError(state, id),
+});
 
-export default withStyles(s)(Poll);
+export default connect(mapPropsToState)(withStyles(s)(Poll));

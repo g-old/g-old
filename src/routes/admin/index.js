@@ -9,6 +9,7 @@
 
 import React from 'react';
 import Layout from '../../components/Layout';
+import { getSessionUser } from '../../reducers';
 
 const title = 'Admin Page';
 
@@ -16,10 +17,8 @@ export default {
   path: '/admin/',
 
   async action({ store }) {
-    const data = store.getState();
-    const user = data.entities.users[data.user];
-    const role = data.entities.roles[user.role].type;
-    if (!['admin', 'mod'].includes(role)) return { redirect: '/' };
+    const user = getSessionUser(store.getState());
+    if (!user || !['admin', 'mod'].includes(user.role.type)) return { redirect: '/' };
 
     const Admin = await require.ensure([], require => require('./Admin').default, 'admin');
 

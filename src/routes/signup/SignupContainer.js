@@ -5,40 +5,65 @@ import ImageUpload from '../../components/ImageUpload';
 import AccountSettings from '../../components/AccountSettings';
 import { createUser } from '../../actions/user';
 import { uploadAvatar } from '../../actions/file';
+import { getAccountUpdates, getLocale } from '../../reducers';
 
 class SignupContainer extends React.Component {
   static propTypes = {
     createUser: PropTypes.func.isRequired,
     currentStep: PropTypes.number.isRequired,
     signupError: PropTypes.bool,
-    notUniqueEmail: PropTypes.bool,
     processing: PropTypes.bool,
     uploadAvatar: PropTypes.func.isRequired,
-    uploadPending: PropTypes.bool,
-    uploaded: PropTypes.bool,
+    updates: PropTypes.object,
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      step: 0,
+      serverCalled: false,
+    };
+    this.onCreateUser = ::this.onCreateUser;
+  }
+
+  componentWillReceiveProps({ updates }) {
+    if (updates) {
+      const success = Object.keys(updates).find(key => !updates[key].success) == null;
+      if (success && this.state.serverCalled) {
+        this.setState({ step: 1 });
+      }
+    }
+  }
+  onCreateUser(data) {
+    // dispatch
+    this.props.createUser(data);
+    this.setState({ serverCalled: true });
+  }
+
   render() {
-    switch (this.props.currentStep) {
-      case 1:
+    const { updates } = this.props;
+
+    switch (this.state.step) {
+      case 0:
         return (
           <SignUp
             processing={this.props.processing}
-            notUniqueEmail={this.props.notUniqueEmail}
+            notUniqueEmail={(updates.email && updates.email.error) != null}
             error={this.props.signupError}
-            createUser={this.props.createUser}
+            onCreateUser={this.onCreateUser}
           />
         );
-      case 2:
+      case 1:
         return (
           <div>
             <h1>
               UPLOAD AVATAR - or later
             </h1>
             <ImageUpload
-              uploadPending={this.props.uploadPending}
+              uploadPending={updates.avatar && updates.avatar.pending}
+              uploadSuccess={updates.avatar && updates.avatar.success}
+              uploadError={updates.avatar && updates.avatar.error}
               uploadAvatar={this.props.uploadAvatar}
-              uploaded={this.props.uploaded}
             />
             <AccountSettings />
           </div>
@@ -48,27 +73,12 @@ class SignupContainer extends React.Component {
     }
   }
 }
-const mapStateToProps = store => {
-  const currentStep = store.ui.signupStep ? store.ui.signupStep : 1;
-  const intl = store.intl;
-  let notUniqueEmail = false;
-  let signupError = false;
-  if (store.ui.signupError) {
-    notUniqueEmail = store.ui.signupError.detail === 'email';
-    if (!notUniqueEmail) {
-      signupError = true;
-    }
-  }
-  return {
-    currentStep,
-    notUniqueEmail,
-    signupError,
-    processing: store.ui.signupProcessing || false,
-    uploadPending: store.ui.avatarUploadPending || false,
-    uploaded: store.ui.avatarUploaded || false,
-    intl, // fix for forceUpdate
-  };
-};
+const mapStateToProps = (state, { updates = {} }) => ({
+  updates: getAccountUpdates(state, '0000'),
+  signupError: Object.keys(updates).find(key => updates[key].error) != null,
+  processing: Object.keys(updates).find(key => updates[key].pending) != null,
+  intl: getLocale(state), // fix for forceUpdate
+});
 const mapDispatch = {
   createUser,
   uploadAvatar,

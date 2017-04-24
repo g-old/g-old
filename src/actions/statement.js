@@ -1,4 +1,6 @@
 /* eslint-disable import/prefer-default-export */
+import { normalize } from 'normalizr';
+
 import {
   CREATE_STATEMENT_START,
   CREATE_STATEMENT_SUCCESS,
@@ -10,6 +12,7 @@ import {
   DELETE_STATEMENT_SUCCESS,
   DELETE_STATEMENT_ERROR,
 } from '../constants';
+import { statement as statementSchema } from '../store/schema';
 
 const statementResult = `{
   id
@@ -51,18 +54,18 @@ const deleteStatementMutation = `
 
 export function createStatement(statement) {
   return async (dispatch, getState, { graphqlRequest }) => {
+    const virtualId = '0000';
     dispatch({
       type: CREATE_STATEMENT_START,
-      payload: {
-        statement,
-      },
+      id: virtualId,
     });
     try {
       const { data } = await graphqlRequest(createStatementMutation, statement);
-
+      const normalizedData = normalize(data.createStatement, statementSchema);
       dispatch({
         type: CREATE_STATEMENT_SUCCESS,
-        payload: data,
+        payload: normalizedData,
+        id: virtualId,
       });
     } catch (error) {
       dispatch({
@@ -70,6 +73,9 @@ export function createStatement(statement) {
         payload: {
           error,
         },
+        message: error.message || 'Something went wrong',
+
+        id: virtualId,
       });
       return false;
     }
@@ -82,24 +88,24 @@ export function updateStatement(statement) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: UPDATE_STATEMENT_START,
-      payload: {
-        statement,
-      },
+      id: statement.id,
     });
     try {
       const { data } = await graphqlRequest(updateStatementMutation, statement);
-
+      const normalizedData = normalize(data.updateStatement, statementSchema);
       dispatch({
         type: UPDATE_STATEMENT_SUCCESS,
-        payload: data,
+        payload: normalizedData,
       });
     } catch (error) {
       dispatch({
         type: UPDATE_STATEMENT_ERROR,
         payload: {
-          statement,
           error,
         },
+        message: error.message || 'Something went wrong',
+
+        id: statement.id,
       });
       return false;
     }
@@ -112,16 +118,14 @@ export function deleteStatement(statement) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: DELETE_STATEMENT_START,
-      payload: {
-        statement,
-      },
+      id: statement.id,
     });
     try {
       const { data } = await graphqlRequest(deleteStatementMutation, statement);
-
+      const normalizedData = normalize(data.deleteStatement, statementSchema);
       dispatch({
         type: DELETE_STATEMENT_SUCCESS,
-        payload: data,
+        payload: normalizedData,
       });
     } catch (error) {
       dispatch({
@@ -129,6 +133,8 @@ export function deleteStatement(statement) {
         payload: {
           error,
         },
+        message: error.message || 'Something went wrong',
+        id: statement.id,
       });
       return false;
     }

@@ -5,6 +5,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import cn from 'classnames';
 import s from './PasswordReset.css';
 import { resetPassword } from '../../actions/password_reset';
+import { getAccountUpdates } from '../../reducers';
 
 const messages = defineMessages({
   password: {
@@ -43,8 +44,7 @@ class PasswordReset extends React.Component {
   static propTypes = {
     resetPassword: PropTypes.func.isRequired,
     token: PropTypes.string.isRequired,
-    error: PropTypes.bool,
-    success: PropTypes.bool,
+    updates: PropTypes.object,
   };
   constructor(props) {
     super(props);
@@ -187,7 +187,8 @@ class PasswordReset extends React.Component {
 
   render() {
     let content;
-    if (this.props.success) {
+    const { password } = this.props.updates;
+    if (password && password.success) {
       content = <div> YOU ARE LOGGED IN!</div>;
     } else {
       content = (
@@ -242,7 +243,9 @@ class PasswordReset extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          {this.props.error && <div className={s.error}> <h3>SOMETHING WENT WRONG</h3> </div>}
+          {password &&
+            password.error &&
+            <div className={s.error}> <h3>SOMETHING WENT WRONG</h3> </div>}
           {content}
         </div>
       </div>
@@ -254,8 +257,7 @@ const mapDispatch = {
   resetPassword,
 };
 const mapStateToProps = state => ({
-  error: state.ui.resetError || null,
-  success: state.ui.resetSuccess || null,
+  updates: getAccountUpdates(state, 'pw'),
 });
 
 export default connect(mapStateToProps, mapDispatch)(withStyles(s)(PasswordReset));

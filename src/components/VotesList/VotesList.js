@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import s from './VotesList.css';
+import FetchError from '../FetchError';
 
 class VotesList extends React.Component {
   static propTypes = {
@@ -9,6 +10,8 @@ class VotesList extends React.Component {
     votes: PropTypes.arrayOf(PropTypes.object),
     getVotes: PropTypes.func.isRequired,
     autoLoadVotes: PropTypes.bool,
+    isFetching: PropTypes.bool.isRequired,
+    errorMessage: PropTypes.string,
   };
 
   static renderVote(vote) {
@@ -41,11 +44,19 @@ class VotesList extends React.Component {
     const con = [];
     if (this.state.showVotes && this.props.votes) {
       this.props.votes.forEach(vote => {
-        if (vote.position === 'pro') pro.push(vote);
+        // TODO check why votes are undefined when ownvote is deleted
+        if (vote && vote.position === 'pro') pro.push(vote);
         else con.push(vote);
       });
     }
 
+    const { isFetching, errorMessage } = this.props;
+    if (isFetching && !(pro.length || con.length)) {
+      return <p>{'Loading...'} </p>;
+    }
+    if (errorMessage && !(pro.length || con.length)) {
+      return <FetchError message={errorMessage} onRetry={this.props.getVotes} />;
+    }
     return (
       <div>
         {this.state.showVotes

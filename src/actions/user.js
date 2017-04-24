@@ -1,4 +1,7 @@
 /* eslint-disable import/prefer-default-export */
+import { normalize } from 'normalizr';
+
+import { user as userSchema, userList as userArray } from '../store/schema';
 import {
   LOAD_USERS_START,
   LOAD_USERS_SUCCESS,
@@ -47,21 +50,25 @@ export function loadUserList(role) {
       payload: {
         role,
       },
+      filter: role,
     });
 
     try {
       const { data } = await graphqlRequest(userList, { role });
+      const normalizedData = normalize(data.users, userArray);
       dispatch({
         type: LOAD_USERS_SUCCESS,
-        payload: data,
+        payload: normalizedData,
+        filter: role,
       });
     } catch (error) {
       dispatch({
         type: LOAD_USERS_ERROR,
         payload: {
-          role,
           error,
         },
+        message: error.message || 'Something went wrong',
+        filter: role,
       });
       return false;
     }
@@ -70,13 +77,25 @@ export function loadUserList(role) {
   };
 }
 
+const initialId = '0000';
 export function createUser(newUser) {
   return async dispatch => {
+    const properties = Object.keys(newUser).reduce(
+      (acc, curr) => {
+        // eslint-disable-next-line no-param-reassign
+        acc[curr] = {
+          pending: true,
+          success: false,
+          error: null,
+        };
+        return acc;
+      },
+      {},
+    );
     dispatch({
       type: CREATE_USER_START,
-      payload: {
-        newUser,
-      },
+      properties,
+      id: initialId,
     });
     try {
       const resp = await fetch('/signup', {
@@ -97,12 +116,18 @@ export function createUser(newUser) {
           payload: {
             error,
           },
+          message: error || 'Something went wrong',
+          properties,
+          id: initialId,
         });
         return false;
       }
+      const normalizedData = normalize(user, userSchema);
       dispatch({
         type: CREATE_USER_SUCCESS,
-        payload: { user },
+        payload: normalizedData,
+        id: initialId,
+        properties,
       });
     } catch (error) {
       dispatch({
@@ -110,6 +135,9 @@ export function createUser(newUser) {
         payload: {
           error,
         },
+        message: error || 'Something went wrong',
+        id: initialId,
+        properties,
       });
       return false;
     }
@@ -127,6 +155,8 @@ export function updateUser(user) {
         // eslint-disable-next-line no-param-reassign
         acc[curr] = {
           pending: true,
+          success: false,
+          error: null,
         };
         return acc;
       },
@@ -135,25 +165,27 @@ export function updateUser(user) {
 
     dispatch({
       type: UPDATE_USER_START,
-      payload: {
-        properties,
-        user,
-      },
+      properties,
+      id: user.id,
     });
 
     try {
       const { data } = await graphqlRequest(updateUserMutation, user);
+      const normalizedData = normalize(data.updateUser, userSchema);
       dispatch({
         type: UPDATE_USER_SUCCESS,
-        payload: { ...data, properties },
+        payload: normalizedData,
+        properties,
       });
     } catch (error) {
       dispatch({
         type: UPDATE_USER_ERROR,
         payload: {
-          user,
-          properties,
+          error,
         },
+        message: error.message || 'Something went wrong',
+        properties,
+        id: user.id,
       });
       return false;
     }

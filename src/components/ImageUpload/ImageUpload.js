@@ -3,21 +3,26 @@ import AvatarEditor from 'react-avatar-editor';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './ImageUpload.css';
 
+const standardValues = {
+  scale: 1,
+  borderRadius: 0,
+  preview: null,
+  rotate: 0,
+  loaded: false,
+};
 class ImageUpload extends React.Component {
   static propTypes = {
     uploadAvatar: PropTypes.func.isRequired,
-    uploadPending: PropTypes.bool.isRequired,
-    uploaded: PropTypes.bool.isRequired,
+    uploadPending: PropTypes.bool,
+    uploadSuccess: PropTypes.bool,
+    uploadError: PropTypes.object,
   };
   constructor(props) {
     super(props);
     this.state = {
+      ...standardValues,
       src: null,
-      scale: 1,
-      borderRadius: 0,
-      preview: null,
-      rotate: 0,
-      loaded: false,
+      showEditor: false,
     };
 
     this.setEditorRef = ::this.setEditorRef; // es2016 bind syntax!
@@ -27,6 +32,11 @@ class ImageUpload extends React.Component {
     this.handleRightRotation = ::this.handleRightRotation;
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.uploadSuccess) {
+      this.setState({ showEditor: false, src: '' });
+    }
+  }
   onChange(e) {
     e.preventDefault();
     let files;
@@ -37,10 +47,11 @@ class ImageUpload extends React.Component {
     }
     const reader = new FileReader();
     reader.onload = () => {
-      this.setState({ src: reader.result });
+      this.setState({ src: reader.result, showEditor: true, ...standardValues });
     };
     reader.readAsDataURL(files[0]);
   }
+
   setEditorRef(editor) {
     if (editor) this.editor = editor;
   }
@@ -68,80 +79,80 @@ class ImageUpload extends React.Component {
   render() {
     let uploader = null;
     let editor = null;
+    const { uploadPending, uploadError } = this.props;
 
-    if (!this.props.uploaded) {
-      if (this.state.src) {
-        editor = (
+    if (this.state.src) {
+      editor = (
+        <div>
+          <AvatarEditor
+            ref={this.setEditorRef}
+            image={this.state.src}
+            onSave={this.handleSave}
+            borderRadius={10}
+            width={256}
+            height={256}
+            border={50}
+            color={[255, 255, 255, 0.6]} // RGBA
+            scale={this.state.scale}
+            rotate={this.state.rotate || 0}
+            onLoadFailure={() => alert('Image could not been loaded -> load another one')}
+            onLoadSuccess={() => this.setState({ loaded: true })}
+          />
+          <br />
           <div>
-            <AvatarEditor
-              ref={this.setEditorRef}
-              image={this.state.src}
-              onSave={this.handleSave}
-              borderRadius={10}
-              width={256}
-              height={256}
-              border={50}
-              color={[255, 255, 255, 0.6]} // RGBA
-              scale={this.state.scale}
-              rotate={this.state.rotate || 0}
-              onLoadFailure={() => alert('Image could not been loaded -> load another one')}
-              onLoadSuccess={() => this.setState({ loaded: true })}
+            {this.state.loaded && 'Drag, rotate or zoom, then upload!'}
+          </div>
+          <div>
+
+            {'Zoom:'}
+            <br />
+            <input
+              className={s.slider}
+              name="scale"
+              type="range"
+              onChange={this.handleScale}
+              min="1"
+              max="2"
+              step="0.01"
+              defaultValue="1"
             />
             <br />
-            <div>
-              {this.state.loaded && 'Drag, rotate or zoom, then upload!'}
-            </div>
-            <div>
-
-              {'Zoom:'}
-              <br />
-              <input
-                className={s.slider}
-                name="scale"
-                type="range"
-                onChange={this.handleScale}
-                min="1"
-                max="2"
-                step="0.01"
-                defaultValue="1"
-              />
-              <br />
-              <span>
-                {'Rotate :'}
-                <button onClick={this.handleRightRotation}>RIGHT</button>
-              </span>
-            </div>
-            <div style={{ marginTop: '2em' }}>
+            <span>
+              {'Rotate :'}
               <button
-                className={s.button}
-                onClick={this.handleSave}
-                disabled={this.props.uploadPending}
+                style={{ marginLeft: '1em', marginTop: '2em' }}
+                onClick={this.handleRightRotation}
               >
-                UPLOAD
+                RIGHT
               </button>
-            </div>
-            {this.uploadPending && 'Uploading...'}
+            </span>
           </div>
-        );
-      }
-      uploader = (
-        <div style={{ width: '100%' }}>
-          <input
-            className={s.inputfile}
-            name="file"
-            type="file"
-            id="file"
-            accept="image/*"
-            onChange={this.onChange}
-          />
-          <label htmlFor="file">Click to choose your image</label>
-          <br style={{ clear: 'both' }} />
-          {editor}
+          <div style={{ marginTop: '2em' }}>
+            <button className={s.button} onClick={this.handleSave} disabled={uploadPending}>
+              UPLOAD
+            </button>
+          </div>
+          {uploadPending && 'Uploading...'}
+          {uploadError && uploadError}
         </div>
       );
-    } else {
-      uploader = <div><h2>UPLOAD FINISHED</h2></div>;
     }
+    uploader = (
+      <div style={{ width: '100%' }}>
+        <input
+          className={s.inputfile}
+          name="file"
+          type="file"
+          id="file"
+          accept="image/*"
+          onChange={this.onChange}
+        />
+        <label htmlFor="file">Click to choose your image</label>
+        <br style={{ clear: 'both' }} />
+        {this.state.showEditor && editor}
+      </div>
+    );
+
     return (
       <div className={s.root}>
         <div className={s.container}>

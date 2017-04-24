@@ -15,6 +15,8 @@ class PollState extends React.Component {
     threshold_ref: PropTypes.string,
     votes: PropTypes.arrayOf(PropTypes.object),
     getVotes: PropTypes.func.isRequired,
+    votingListIsFetching: PropTypes.bool,
+    votingListErrorMessage: PropTypes.string,
   };
 
   constructor(props) {
@@ -78,7 +80,13 @@ class PollState extends React.Component {
         </div>
         {this.state.expand &&
           <div className={s.votesList}>
-            <VotesList autoLoadVotes unipolar={this.props.unipolar} votes={this.props.votes} />
+            <VotesList
+              autoLoadVotes
+              unipolar={this.props.unipolar}
+              votes={this.props.votes}
+              isFetching={this.props.votingListIsFetching}
+              errorMessage={this.props.votingListErrorMessage}
+            />
           </div>}
       </div>
     );

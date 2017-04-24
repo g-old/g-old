@@ -1,6 +1,7 @@
 import React from 'react';
 import Layout from '../../components/Layout';
 import UserProfile from '../../components/UserProfile';
+import { getSessionUser } from '../../reducers';
 
 const title = 'User account';
 
@@ -9,8 +10,7 @@ export default {
 
   async action({ store }) {
     // TODO check if token is valid and not expirated
-    const data = store.getState();
-    const user = data.entities.users[data.user];
+    const user = getSessionUser(store.getState());
     if (!user.id) {
       return { redirect: '/' };
     }

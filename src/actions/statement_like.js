@@ -1,5 +1,7 @@
 /* eslint-disable import/prefer-default-export */
+import { normalize } from 'normalizr';
 
+import { statementLike as statementLikeSchema } from '../store/schema';
 import {
   CREATE_LIKE_START,
   CREATE_LIKE_SUCCESS,
@@ -26,20 +28,19 @@ const deleteStatementLike = `
   }
 `;
 
-export function createLike({ statementId }) {
+export function createLike({ statementId, pollId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: CREATE_LIKE_START,
-      payload: {
-        statementId,
-      },
     });
 
     try {
       const { data } = await graphqlRequest(createStatementLike, { id: statementId });
+      const normalizedData = normalize(data.createStatementLike, statementLikeSchema);
       dispatch({
         type: CREATE_LIKE_SUCCESS,
-        payload: data,
+        payload: normalizedData,
+        pollId,
       });
     } catch (error) {
       dispatch({
@@ -47,6 +48,7 @@ export function createLike({ statementId }) {
         payload: {
           error,
         },
+        message: error.message || 'Something went wrong',
       });
       return false;
     }
@@ -55,7 +57,7 @@ export function createLike({ statementId }) {
   };
 }
 
-export function deleteLike({ statementId, likeId }) {
+export function deleteLike({ statementId, likeId, pollId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: DELETE_LIKE_START,
@@ -67,9 +69,11 @@ export function deleteLike({ statementId, likeId }) {
 
     try {
       const { data } = await graphqlRequest(deleteStatementLike, { sId: statementId, id: likeId });
+      const normalizedData = normalize(data.deleteStatementLike, statementLikeSchema);
       dispatch({
         type: DELETE_LIKE_SUCCESS,
-        payload: data,
+        payload: normalizedData,
+        pollId,
       });
     } catch (error) {
       dispatch({
@@ -77,6 +81,7 @@ export function deleteLike({ statementId, likeId }) {
         payload: {
           error,
         },
+        message: error.message || 'Something went wrong',
       });
       return false;
     }

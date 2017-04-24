@@ -1,8 +1,4 @@
-import {
-  SET_LOCALE_START,
-  SET_LOCALE_SUCCESS,
-  SET_LOCALE_ERROR,
-} from '../constants';
+import { SET_LOCALE_START, SET_LOCALE_SUCCESS, SET_LOCALE_ERROR } from '../constants';
 
 export default function intl(state = null, action) {
   if (state === null) {
@@ -45,3 +41,5 @@ export default function intl(state = null, action) {
     }
   }
 }
+
+export const getLocale = state => state.locale;

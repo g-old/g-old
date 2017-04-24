@@ -7,6 +7,12 @@ import cn from 'classnames';
 import s from './Statement.css';
 import { createLike, deleteLike } from '../../actions/statement_like';
 import { deleteStatement } from '../../actions/statement';
+import {
+  getStatementMutationIsPending,
+  getStatementMutationSuccess,
+  getStatementMutationError,
+  getSessionUser,
+} from '../../reducers';
 
 class Statement extends React.Component {
   static propTypes = {
@@ -86,17 +92,20 @@ class Statement extends React.Component {
     if (!like) {
       this.props.createLike({
         statementId: this.props.data.id,
+        pollId: this.props.data.pollId,
       });
     } else {
       this.props.deleteLike({
         statementId: this.props.data.id,
         likeId: like.id,
+        pollId: this.props.data.pollId,
       });
     }
     e.preventDefault();
   }
 
   render() {
+    //  const { mutationIsPending, mutationSuccess, mutationError } = this.props;
     const isEmpty = this.state.textArea.val.length === 0;
     const hasMinimumInput = this.state.textArea.val.length >= 5;
     const inactive = this.props.asInput && isEmpty;
@@ -190,6 +199,14 @@ const mapDispatch = {
   deleteLike,
   deleteStatement,
 };
-const mapPropsToState = state => ({ user: state.entities.users[state.user] });
+const mapPropsToState = (state, { data }) => {
+  const id = data.id || '0000'; // for creations
+  return {
+    mutationIsPending: getStatementMutationIsPending(state, id),
+    mutationSuccess: getStatementMutationSuccess(state, id),
+    mutationError: getStatementMutationError(state, id),
+    user: getSessionUser(state),
+  };
+};
 
 export default connect(mapPropsToState, mapDispatch)(withStyles(s)(Statement));

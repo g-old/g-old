@@ -57,6 +57,8 @@ class TestProposal extends React.Component {
     createVote: PropTypes.func.isRequired,
     updateVote: PropTypes.func.isRequired,
     deleteVote: PropTypes.func.isRequired,
+    votingListErrorMessage: PropTypes.string,
+    votingListIsFetching: PropTypes.bool,
   };
   constructor(props) {
     super(props);
@@ -124,6 +126,8 @@ class TestProposal extends React.Component {
           onStatementSubmit={this.handleOnSubmit}
           onDeleteStatement={this.onDeleteStatement}
           fetchVotes={this.props.getVotes}
+          votingListErrorMessage={this.props.votingListErrorMessage}
+          votingListIsFetching={this.props.votingListIsFetching}
         />
       );
       // eslint-disable-next-line eqeqeq

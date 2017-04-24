@@ -133,17 +133,17 @@ app.post('/signup', (req, res) => {
     .then(() => res.status(200).json({ user: req.session.passport.user }))
     .catch(error => {
       if (error.code === '23505') {
-        res.status(500).json({ error: { detail: 'email' } });
+        res.status(500).json({ error: { fields: { email: 'Email not unique' } } });
       }
-      res.status(500).json({ error: true });
+      res.status(500).json({ error: {} });
     });
 });
 const storage = multer.memoryStorage();
 const FileStore = FileStorage(AvatarManager);
+
 app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
   if (!req.user) res.status(505);
-  FileStore.save({ viewer: req.user, data: req.body.avatar, loaders: createLoaders() }, 'avatars/')
-    // eslint-disable-next-line no-confusing-arrow
+  FileStore.save({ viewer: req.user, data: req.body.avatar, loaders: createLoaders() }, 'avatars/') // eslint-disable-next-line no-confusing-arrow
     // TODO update session
     // .then(user => user ? res.status(200).json(user) : res.status(500))
     .then(user => {
@@ -155,8 +155,15 @@ app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
         req.login(user, err => err ? reject(err) : resolve(user));
       });
     })
-    .then(user => res.status(200).json(user))
-    .catch(() => res.status(500));
+    .then(
+      () =>
+        new Promise((resolve, reject) => {
+          // eslint-disable-next-line no-confusing-arrow
+          req.session.save(err => err ? reject(err) : resolve());
+        }),
+    )
+    .then(() => res.json(req.session.passport.user))
+    .catch(e => res.status(500).json({ message: e.message }));
 });
 
 app.post(
@@ -248,17 +255,19 @@ app.use(
 // -----------------------------------------------------------------------------
 app.get('*', async (req, res, next) => {
   try {
-    const userData = {};
+    let normalizedData = { entities: {}, result: null };
     if (req.user) {
-      const normalized = normalize(req.user, userSchema);
-      userData.user = normalized.result;
-      userData.entities = normalized.entities;
-      //  userData.entities.users[req.user.id].id = req.user.id.toString(); // TODO find better way
+      normalizedData = normalize(req.user, userSchema);
     }
     const store = configureStore(
       {
-        user: userData.user || {},
-        entities: userData.entities || {},
+        user: normalizedData.result || null,
+        entities: {
+          users: {
+            byId: normalizedData.entities.users || {},
+          },
+          roles: normalizedData.entities.roles || {},
+        },
       },
       {
         cookie: req.headers.cookie,

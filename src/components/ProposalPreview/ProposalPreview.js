@@ -83,7 +83,7 @@ class Proposal extends React.Component {
             />
           </div>
           TAGS :
-          {this.props.proposal.tags.map(tag => `${tag.text} `)}
+          {this.props.proposal.tags && this.props.proposal.tags.map(tag => `${tag.text} `)}
         </div>
 
       </div>

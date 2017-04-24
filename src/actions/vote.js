@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import { normalize } from 'normalizr';
 import {
   CREATE_VOTE_START,
   CREATE_VOTE_SUCCESS,
@@ -14,32 +15,33 @@ import {
   LOAD_VOTES_ERROR,
 } from '../constants';
 
+import { voteList as voteListSchema, vote as voteSchema } from '../store/schema';
+
+const voteInfo = `{
+  id
+  position
+  pollId
+  voter{
+    id
+    name
+    surname
+    avatar
+  }
+}`;
 const createVoteMutation = `
   mutation($pollId:ID! $position:Position!) {
-    createVote(vote:{pollId:$pollId position:$position}) {
-      id
-      position
-      pollId
-    }
+    createVote(vote:{pollId:$pollId position:$position}) ${voteInfo}
   }
 `;
 const updateVoteMutation = `
   mutation($pollId:ID! $position:Position! $id:ID) {
-    updateVote(vote:{pollId:$pollId position:$position id:$id}) {
-      id
-      position
-      pollId
-    }
+    updateVote(vote:{pollId:$pollId position:$position id:$id}) ${voteInfo}
   }
 `;
 
 const deleteVoteMutation = `
   mutation($pollId:ID! $position:Position! $id:ID) {
-    deleteVote( vote:{pollId:$pollId position:$position id:$id}) {
-      id
-      position
-      pollId
-    }
+    deleteVote( vote:{pollId:$pollId position:$position id:$id}) ${voteInfo}
   }
 `;
 
@@ -66,19 +68,21 @@ export function createVote(vote) {
       payload: {
         vote,
       },
+      pollId: vote.pollId,
     });
     try {
       const { data } = await graphqlRequest(createVoteMutation, vote);
+      const normalized = normalize(data.createVote, voteSchema);
       dispatch({
         type: CREATE_VOTE_SUCCESS,
-        payload: data,
+        payload: normalized,
       });
     } catch (error) {
       dispatch({
         type: CREATE_VOTE_ERROR,
-        payload: {
-          error,
-        },
+        message: error.message || 'Something went wrong',
+        pollId: vote.pollId,
+        payload: error,
       });
       return false;
     }
@@ -91,22 +95,21 @@ export function updateVote(vote) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: UPDATE_VOTE_START,
-      payload: {
-        vote,
-      },
+      pollId: vote.pollId,
     });
     try {
       const { data } = await graphqlRequest(updateVoteMutation, vote);
+      const normalized = normalize(data.updateVote, voteSchema);
       dispatch({
         type: UPDATE_VOTE_SUCCESS,
-        payload: data,
+        payload: normalized,
       });
     } catch (error) {
       dispatch({
         type: UPDATE_VOTE_ERROR,
-        payload: {
-          error,
-        },
+        message: error.message || 'Something went wrong',
+        pollId: vote.pollId,
+        payload: error,
       });
       return false;
     }
@@ -119,22 +122,21 @@ export function deleteVote(vote) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: DELETE_VOTE_START,
-      payload: {
-        vote,
-      },
+      pollId: vote.pollId,
     });
     try {
       const { data } = await graphqlRequest(deleteVoteMutation, vote);
+      const normalized = normalize(data.deleteVote, voteSchema);
       dispatch({
         type: DELETE_VOTE_SUCCESS,
-        payload: data,
+        payload: normalized,
       });
     } catch (error) {
       dispatch({
         type: DELETE_VOTE_ERROR,
-        payload: {
-          error,
-        },
+        message: error.message || 'Something went wrong',
+        payload: error,
+        pollId: vote.pollId,
       });
       return false;
     }
@@ -152,21 +154,23 @@ export function getVotes(pollId) {
       payload: {
         pollId,
       },
+      id: pollId,
     });
 
     try {
       const { data } = await graphqlRequest(votesList, { pollId });
+      const normalized = normalize(data.votes, voteListSchema);
       dispatch({
         type: LOAD_VOTES_SUCCESS,
-        payload: { data, pollId },
+        payload: normalized,
+        id: pollId,
       });
     } catch (error) {
       dispatch({
         type: LOAD_VOTES_ERROR,
-        payload: {
-          pollId,
-          error,
-        },
+        message: error.message || 'Something went wrong',
+        payload: error,
+        id: pollId,
       });
       return false;
     }

@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { logout } from '../../actions/session';
 import s from './UserStatus.css';
+import { getSessionUser } from '../../reducers';
 import Link from '../Link';
 
 class UserStatus extends React.Component {
@@ -40,12 +41,9 @@ class UserStatus extends React.Component {
     );
   }
 }
-const mapStateToProps = store => {
-  const user = store.entities.users ? store.entities.users[store.user] : {};
-  return {
-    user,
-  };
-};
+const mapStateToProps = state => ({
+  user: getSessionUser(state),
+});
 const mapDispatch = {
   logout,
 };

@@ -2,6 +2,7 @@ import React from 'react';
 import Layout from '../../components/Layout';
 import { loadProposalsList } from '../../actions/proposal';
 import ProposalOverviewContainer from './ProposalsOverviewContainer';
+import { getSessionUser } from '../../reducers';
 
 const title = 'Proposals';
 
@@ -9,30 +10,15 @@ export default {
   path: '/proposals/:state',
 
   async action({ store }, { state }) {
-    const data = store.getState();
-    const user = data.entities.users[data.user];
-    const role = data.entities.roles[user.role];
-    if (!user.id || role.type === 'viewer') {
+    const user = getSessionUser(store.getState());
+    if (!user || user.role.type === 'viewer') {
       return { redirect: '/' };
     }
-    // Not sure if this is the right way to hydrate the store
-    // Minus: Can't  show loading
-    let loadingSuccessful;
-    if (!process.env.BROWSER) {
-      loadingSuccessful = await store.dispatch(loadProposalsList(state));
-    } else {
-      await store.dispatch(loadProposalsList(state)); // TODO find error, without await;
-      loadingSuccessful = true;
-    }
-    if (loadingSuccessful) {
-      return {
-        title,
-        component: <Layout><ProposalOverviewContainer state={state} /> </Layout>,
-      };
-    }
+
+    store.dispatch(loadProposalsList(state));
     return {
       title,
-      component: <Layout>{'Something BAD happened'} </Layout>,
+      component: <Layout><ProposalOverviewContainer state={state} /> </Layout>,
     };
   },
 };

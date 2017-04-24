@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-
+import { normalize } from 'normalizr';
 import {
   LOAD_PROPOSAL_START,
   LOAD_PROPOSAL_SUCCESS,
@@ -11,6 +11,7 @@ import {
   CREATE_PROPOSAL_SUCCESS,
   CREATE_PROPOSAL_ERROR,
 } from '../constants';
+import { proposal as proposalSchema, proposalList as proposalListSchema } from '../store/schema';
 
 const statementFields = `{
     id
@@ -131,35 +132,43 @@ mutation($pollingModeId:ID $title: String, $text:String){
   }
 }
 `;
+const getFilter = status => {
+  switch (status) {
+    case 'accepted':
+      return 'accepted';
+    case 'proposed':
+    case 'voting':
+      return 'active';
+    default:
+      return 'repelled';
 
+  }
+};
 export function loadProposal({ id }) {
   return async (dispatch, getState, { graphqlRequest }) => {
-    // TODO
-    const { proposals } = getState().entities;
-    if (proposals && proposals[id] && proposals[id].statements) {
-      // TODO: Add checks to ensure we have a valid, cached object.
-      return true;
-    }
     dispatch({
       type: LOAD_PROPOSAL_START,
-      payload: {
-        id,
-      },
+      id,
     });
 
     try {
       const { data } = await graphqlRequest(query, { id });
+      const normalizedData = normalize(data.proposalDL, proposalSchema);
+      // dispatch(addEntities(normalizedData.entities, 'all'));
+      const filter = getFilter(data.proposalDL.state);
       dispatch({
         type: LOAD_PROPOSAL_SUCCESS,
-        payload: data,
+        payload: normalizedData,
+        filter,
+        id,
       });
     } catch (error) {
       dispatch({
         type: LOAD_PROPOSAL_ERROR,
         payload: {
-          id,
           error,
         },
+        id,
       });
       return false;
     }
@@ -174,24 +183,27 @@ export function loadProposalsList(state) {
 
     dispatch({
       type: LOAD_PROPOSAL_LIST_START,
-      payload: {
-        state,
-      },
+      payload: {},
+      filter: state,
     });
 
     try {
       const { data } = await graphqlRequest(listQuery, { state });
+      const normalizedData = normalize(data.proposalsDL, proposalListSchema);
+      // dispatch(addEntities(normalizedData.entities, state));
       dispatch({
         type: LOAD_PROPOSAL_LIST_SUCCESS,
-        payload: data,
+        payload: normalizedData,
+        filter: state,
       });
     } catch (error) {
       dispatch({
         type: LOAD_PROPOSAL_LIST_ERROR,
         payload: {
-          state,
           error,
         },
+        filter: state,
+        message: error.message || 'Something went wrong',
       });
       return false;
     }

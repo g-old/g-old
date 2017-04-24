@@ -62,22 +62,23 @@ class StatementsList extends React.Component {
         {}
         {ownStatement}
         {/* eslint-disable no-confusing-arrow */}
-        {this.props.statements.map(
-          statement =>
-          // eslint-disable-next-line eqeqeq
-            this.props.user.id != statement.author.id // to eliminate ownstatement from rendering
-              ? <Statement
-                key={statement.id}
-                data={statement}
-                ownLike={this.props.likedStatements.find(
-                    data => data.statementId === statement.id,
-                  )}
-                pollId={this.props.pollId}
-                ownStatement={false}
-                onSubmit={this.props.onSubmit}
-              />
-              : null,
-        )}
+        {this.props.statements &&
+          this.props.statements.map(
+            statement =>
+            // eslint-disable-next-line eqeqeq
+              this.props.user.id != statement.author.id // to eliminate ownstatement from rendering
+                ? <Statement
+                  key={statement.id}
+                  data={statement}
+                  ownLike={this.props.likedStatements.find(
+                      data => data.statementId === statement.id,
+                    )}
+                  pollId={this.props.pollId}
+                  ownStatement={false}
+                  onSubmit={this.props.onSubmit}
+                />
+                : null,
+          )}
         {/* eslint-enable no-confusing-arrow */}
       </div>
     );

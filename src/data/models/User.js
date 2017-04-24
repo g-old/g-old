@@ -99,6 +99,8 @@ class User {
       return data.id;
     });
     if (!updatedId) return null;
+    // invalidate cache
+    loaders.users.clear(updatedId);
     return User.gen(viewer, data.id, loaders) || null;
   }
 

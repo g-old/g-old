@@ -6,6 +6,7 @@ import cn from 'classnames';
 import { validateEmail as checkEmail } from '../../core/helpers';
 import { updateUser } from '../../actions/user';
 import s from './UserProfile.css';
+import { getSessionUser, getAccountUpdates } from '../../reducers';
 import {
   createValidator,
   passwordValidation,
@@ -44,7 +45,7 @@ const messages = defineMessages({
 
 class UserProfile extends React.Component {
   static propTypes = {
-    user: PropTypes.object.isRequired,
+    user: PropTypes.object,
     updateUser: PropTypes.func.isRequired,
     updates: PropTypes.object,
   };
@@ -96,6 +97,10 @@ class UserProfile extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.updates.email) {
       this.setState({ showEmailInput: false });
+    }
+    const { password } = nextProps.updates;
+    if ((password && password.error) || (password && password.success)) {
+      this.setState({ passwordOld: '', password: '', passwordAgain: '' });
     }
   }
   onEditEmail() {
@@ -181,6 +186,7 @@ class UserProfile extends React.Component {
   }
 
   render() {
+    if (!this.props.user) return null;
     const updates = this.props.updates;
     // const showEmail = !updates.email.pending || updates.email.success || updates.email.error;
 
@@ -200,6 +206,9 @@ class UserProfile extends React.Component {
           UPDATE
         </button>)
       : null;
+
+    const { password } = this.props.updates;
+
     return (
       <div className={s.root}>
         <div className={s.container}>
@@ -254,6 +263,7 @@ class UserProfile extends React.Component {
                     : ''}
                 </div>
               </div>
+
               <div className={s.formGroup}>
                 <label htmlFor="password" className={s.label}>
                   New Password
@@ -296,15 +306,13 @@ class UserProfile extends React.Component {
                 <button
                   className={s.button}
                   onClick={this.onSubmit}
-                  disabled={updates.password && updates.password.pending}
+                  disabled={password && password.pending}
                 >
                   Update Password
                 </button>
               </div>
-              {updates &&
-                updates.password &&
-                updates.password.error &&
-                <div>Something bad happened</div>}
+              {password && password.error && <div>Something bad happened</div>}
+              {password && password.success && 'PASSWORD SET'}
             </div>
           </div>
         </div>
@@ -315,13 +323,9 @@ class UserProfile extends React.Component {
 const mapDispatch = {
   updateUser,
 };
-const mapStateToProps = state => {
-  const updates = state.ui.updates ? state.ui.updates[state.user] || {} : {};
-  const user = state.entities.users[state.user];
-  return {
-    updates,
-    user,
-  };
-};
+const mapStateToProps = (state, { user }) => ({
+  user: getSessionUser(state),
+  updates: getAccountUpdates(state, user.id),
+});
 
 export default connect(mapStateToProps, mapDispatch)(withStyles(s)(UserProfile));

@@ -9,9 +9,9 @@
 
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { denormalize } from 'normalizr';
 import TestProposal from '../../components/TestProposal2';
-import { proposal as proposalSchema } from '../../store/schema';
+import { getProposal, getIsProposalFetching, getProposalErrorMessage } from '../../reducers';
+import FetchError from '../../components/FetchError';
 
 class ProposalContainer extends React.Component {
   static propTypes = {
@@ -19,12 +19,23 @@ class ProposalContainer extends React.Component {
     user: PropTypes.object.isRequired,
     proposalId: PropTypes.number.isRequired,
     createLike: PropTypes.func,
+    isFetching: PropTypes.bool,
+    fetchData: PropTypes.func.isRequired,
+    errorMessage: PropTypes.string,
   };
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
     return this.props.proposal != null;
   }
   render() {
+    const { proposal, isFetching, errorMessage } = this.props;
+
+    if (isFetching && !proposal) {
+      return <p>{'Loading...'} </p>;
+    }
+    if (errorMessage && !proposal) {
+      return <FetchError message={errorMessage} onRetry={this.props.fetchData} />;
+    }
     if (this.isReady()) {
       return <TestProposal user={this.props.user} proposal={this.props.proposal} />;
     }
@@ -33,19 +44,10 @@ class ProposalContainer extends React.Component {
 }
 ProposalContainer.propTypes = {};
 // TODO implement memoiziation with reselect
-const mapStateToProps = (state, ownProps) => {
-  const data = state.entities.proposals[ownProps.proposalId];
-  const proposal = denormalize(data, proposalSchema, state.entities);
-  const userData = state.entities.users[state.user]; // or pass via context
-  const role = state.entities.roles[userData.role]; // TODO denormalize with normalizr
-  const user = {
-    ...userData,
-    role,
-  };
-  return {
-    proposal,
-    user,
-  };
-};
+const mapStateToProps = (state, ownProps) => ({
+  proposal: getProposal(state, ownProps.proposalId),
+  isFetching: getIsProposalFetching(state, ownProps.proposalId),
+  errorMessage: getProposalErrorMessage(state, ownProps.proposalId),
+});
 
 export default connect(mapStateToProps)(ProposalContainer);

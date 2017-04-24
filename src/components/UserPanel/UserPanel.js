@@ -1,23 +1,39 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { denormalize } from 'normalizr';
-import { userList as userListSchema } from '../../store/schema';
 import { updateUser, loadUserList } from '../../actions/user';
+import FetchError from '../FetchError';
+import {
+  getVisibleUsers,
+  getUsersIsFetching,
+  getUsersErrorMessage,
+  getSessionUser,
+} from '../../reducers';
 
 class UserPanel extends React.Component {
   static propTypes = {
     userList: PropTypes.arrayOf(PropTypes.object),
-    //  filter: PropTypes.string.isRequired,
     loadUserList: PropTypes.func,
     updateUser: PropTypes.func,
+    isFetching: PropTypes.bool,
+    errorMessage: PropTypes.string,
   };
 
   componentDidMount() {
     this.props.loadUserList('viewer');
   }
   render() {
+    const { isFetching, errorMessage, userList } = this.props;
+    if (isFetching && !userList.length) {
+      return <p>Loading...</p>;
+    }
+    if (errorMessage && !userList.length) {
+      return (
+        <FetchError message={errorMessage} onRetry={() => this.props.loadUserList('viewer')} />
+      );
+    }
     return (
       <div>
+
         <h1>USERS WITH STATUS VIEWER</h1>
         {this.props.userList.map(user => (
           <div key={user.id} style={{ marginBottom: '0.5em' }}>
@@ -69,16 +85,12 @@ class UserPanel extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const data = state.entities.users || {};
-  // TODO allProposals in store?
-  const userData = Object.keys(data).map(key => data[key]);
-  const userList = denormalize(userData, userListSchema, state.entities).filter(
-    u => u.role.type === 'viewer',
-  );
-  const user = state.user;
+  const filter = 'viewer';
   return {
-    user,
-    userList,
+    user: getSessionUser(state),
+    userList: getVisibleUsers(state, filter),
+    isFetching: getUsersIsFetching(state, filter),
+    errorMessage: getUsersErrorMessage(state, filter),
   };
 };
 
