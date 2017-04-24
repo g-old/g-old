@@ -214,7 +214,7 @@ class UserProfile extends React.Component {
         <div className={s.container}>
           <img
             className={s.avatar}
-            src={avatar || `https://api.adorable.io/avatars/256/${name}${surname}.io.png`}
+            src={avatar}
             alt="IMG"
           />
           <div>

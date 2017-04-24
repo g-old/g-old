@@ -40,11 +40,7 @@ class UserPanel extends React.Component {
             <span>
               <img
                 style={{ width: '4em', height: '4em', borderRadius: '30%' }}
-                src={
-                  user.avatar
-                    ? user.avatar
-                    : `https://api.adorable.io/avatars/256/${user.name}${user.surname}.io.png`
-                }
+                src={user.avatar}
                 alt="IMG"
               />
 

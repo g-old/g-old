@@ -80,7 +80,7 @@ class Poll extends React.Component {
         <img
           key={user.id}
           className={s.followee}
-          src={`https://api.adorable.io/avatars/256/${user.voter.name}${user.voter.surname}.io.png`}
+          src={user.voter.avatar}
           title={`${user.voter.name} ${user.voter.surname}`}
           alt="IMG"
         />

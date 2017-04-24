@@ -109,9 +109,8 @@ class Statement extends React.Component {
     const isEmpty = this.state.textArea.val.length === 0;
     const hasMinimumInput = this.state.textArea.val.length >= 5;
     const inactive = this.props.asInput && isEmpty;
-    const canLike = this.props.user.role !== 'guest' &&
-      !this.props.asInput &&
-      !this.props.ownStatement;
+    const canLike =
+      this.props.user.role !== 'guest' && !this.props.asInput && !this.props.ownStatement;
 
     return (
       <div
@@ -124,11 +123,7 @@ class Statement extends React.Component {
         {!inactive &&
           <img
             className={cn(s.avatar)}
-            src={
-              this.props.data.author.avatar
-                ? this.props.data.author.avatar
-                : `https://api.adorable.io/avatars/256/${this.props.data.author.name}${this.props.data.author.surname}.io.png`
-            }
+            src={this.props.data.author.avatar}
             alt="IMG"
           />}
         <div style={{ width: '100%' }}>
