@@ -14,11 +14,11 @@ import {
 export default function byId(state = {}, action) {
   switch (action.type) {
     case LOAD_PROPOSAL_SUCCESS: {
-      return merge({}, state, action.payload.users);
+      return merge({}, state, action.payload.entities.users);
     }
     case LOAD_PROPOSAL_LIST_SUCCESS: {
       // change
-      return merge({}, state, action.payload.users);
+      return merge({}, state, action.payload.entities.users);
     }
     case LOAD_VOTES_SUCCESS: {
       return merge({}, state, action.payload.entities.users);

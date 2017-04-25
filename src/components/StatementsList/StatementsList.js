@@ -55,7 +55,6 @@ class StatementsList extends React.Component {
       // dont show input
       input = 'EVERYTHING ALREADY SAID';
     }
-
     return (
       <div>
         {input}

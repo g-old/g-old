@@ -119,6 +119,8 @@ class User {
     password = password.trim();
     if (!password) return null;
     if (password.length < 6) return null;
+    // eslint-disable-next-line camelcase
+    const avatar_path = `https://api.adorable.io/avatars/32/${name}${surname}.io.png`;
     // create
     // TODO check if locking with forUpdate is necessary (duplicate emails)
     const newUserId = await knex.transaction(async trx => {
@@ -130,6 +132,7 @@ class User {
           name,
           surname,
           email,
+          avatar_path,
           email_validated: false,
           password_hash: hash,
           role_id: 5, // TODO make better
@@ -147,6 +150,7 @@ class User {
       surname: data.surname,
       role_id: 5,
       email: data.email,
+      avatar_path,
     });
   }
 }

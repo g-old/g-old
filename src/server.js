@@ -15,7 +15,6 @@ import bodyParser from 'body-parser';
 import expressGraphQL from 'express-graphql';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
-import UniversalRouter from 'universal-router';
 import PrettyError from 'pretty-error';
 import session from 'express-session';
 import knexSession from 'connect-session-knex';
@@ -23,13 +22,13 @@ import { IntlProvider } from 'react-intl';
 import multer from 'multer';
 import { normalize } from 'normalizr';
 import knex from './data/knex';
+import router from './core/router';
 import './serverIntlPolyfill';
 import App from './components/App';
 import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import errorPageStyle from './routes/error/ErrorPage.css';
 import schema from './data/schema';
-import routes from './routes';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
 import { setRuntimeVariable } from './actions/runtime';
@@ -130,6 +129,13 @@ app.post('/signup', (req, res) => {
         req.login(user, err => err ? reject(err) : resolve());
       });
     })
+    .then(
+      () =>
+        new Promise((resolve, reject) => {
+          // eslint-disable-next-line no-confusing-arrow
+          req.session.save(err => err ? reject(err) : resolve());
+        }),
+    )
     .then(() => res.status(200).json({ user: req.session.passport.user }))
     .catch(error => {
       if (error.code === '23505') {
@@ -311,7 +317,7 @@ app.get('*', async (req, res, next) => {
       store,
     };
 
-    const route = await UniversalRouter.resolve(routes, {
+    const route = await router.resolve({
       ...context,
       path: req.path,
       query: req.query,

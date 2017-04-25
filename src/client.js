@@ -10,7 +10,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import FastClick from 'fastclick';
-import UniversalRouter from 'universal-router';
 import queryString from 'query-string';
 import { createPath } from 'history/PathUtils';
 import { addLocaleData } from 'react-intl';
@@ -32,7 +31,9 @@ const context = {
   insertCss: (...styles) => {
     // eslint-disable-next-line no-underscore-dangle
     const removeCss = styles.map(x => x._insertCss());
-    return () => { removeCss.forEach(f => f()); };
+    return () => {
+      removeCss.forEach(f => f());
+    };
   },
   // Initialize a new Redux store
   // http://redux.js.org/docs/basics/UsageWithReact.html
@@ -57,13 +58,17 @@ function updateTag(tagName, keyName, keyValue, attrName, attrValue) {
 function updateMeta(name, content) {
   updateTag('meta', 'name', name, 'content', content);
 }
-function updateCustomMeta(property, content) { // eslint-disable-line no-unused-vars
+/*eslint-disable */
+function updateCustomMeta(property, content) {
+  // eslint-disable-line no-unused-vars
   updateTag('meta', 'property', property, 'content', content);
 }
-function updateLink(rel, href) { // eslint-disable-line no-unused-vars
+// eslint-disable-line no-unused-vars
+function updateLink(rel, href) {
+  // eslint-disable-line no-unused-vars
   updateTag('link', 'rel', rel, 'href', href);
 }
-
+/* eslint-enable */
 // Switch off the native scroll restoration behavior and handle it manually
 // https://developers.google.com/web/updates/2015/09/history-api-scroll-restoration
 const scrollPositionsHistory = {};
@@ -120,7 +125,7 @@ FastClick.attach(document.body);
 const container = document.getElementById('app');
 let appInstance;
 let currentLocation = history.location;
-let routes = require('./routes').default;
+let router = require('./core/router').default;
 
 // Re-render the app when window.location changes
 async function onLocationChange(location, initial) {
@@ -139,7 +144,7 @@ async function onLocationChange(location, initial) {
     // Traverses the list of routes in the order they are defined until
     // it finds the first route that matches provided URL path string
     // and whose action method returns anything other than `undefined`.
-    const route = await UniversalRouter.resolve(routes, {
+    const route = await router.resolve({
       ...context,
       path: location.pathname,
       query: queryString.parse(location.search),
@@ -156,11 +161,8 @@ async function onLocationChange(location, initial) {
       return;
     }
 
-    appInstance = ReactDOM.render(
-      <App context={context}>{route.component}</App>,
-      container,
-      () => onRenderComplete(route, location),
-    );
+    appInstance = ReactDOM.render(<App context={context}>{route.component}</App>, container, () =>
+      onRenderComplete(route, location));
   } catch (error) {
     console.error(error); // eslint-disable-line no-console
 
@@ -192,7 +194,7 @@ onLocationChange(currentLocation, true);
 // Handle errors that might happen after rendering
 // Display the error in full-screen for development mode
 if (process.env.NODE_ENV !== 'production') {
-  window.addEventListener('error', (event) => {
+  window.addEventListener('error', event => {
     appInstance = null;
     document.title = `Runtime Error: ${event.error.message}`;
     ReactDOM.render(<ErrorReporter error={event.error} />, container);
@@ -201,8 +203,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Enable Hot Module Replacement (HMR)
 if (module.hot) {
-  module.hot.accept('./routes', async () => {
-    routes = require('./routes').default; // eslint-disable-line global-require
+  module.hot.accept('./core/router', async () => {
+    router = require('./core/router').default; // eslint-disable-line global-require
 
     currentLocation = history.location;
     await onLocationChange(currentLocation);

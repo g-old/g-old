@@ -29,6 +29,7 @@ import updateProposal from './mutations/updateProposal';
 // import createUser from './mutations/createUser';
 import updateUser from './mutations/updateUser';
 import uploadAvatar from './mutations/uploadAvatar';
+import search from './queries/search';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -41,6 +42,7 @@ const schema = new Schema({
       proposalsDL,
       users,
       votes,
+      search,
     },
   }),
   mutation: new ObjectType({

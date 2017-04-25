@@ -59,7 +59,7 @@ passport.serializeUser((user, done) =>
           name: user.name,
           surname: user.surname,
           email: user.email,
-          avatar: user.avatar_path,
+          avatar: user.avatar_path || user.avatar, // TODO change!
           role: {
             id: role.id,
             type: role.type,
