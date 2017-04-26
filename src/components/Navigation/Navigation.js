@@ -7,9 +7,8 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import cx from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Navigation.css';
 import Link from '../Link';
@@ -23,14 +22,9 @@ const messages = defineMessages({
 });
 
 class Navigation extends React.Component {
-  static propTypes = {
-    className: PropTypes.string,
-  };
-
   render() {
-    const { className } = this.props;
     return (
-      <div className={cx(s.root, className)} role="navigation">
+      <div className={s.root} role="navigation">
         <Link className={s.link} to="/about">
           <FormattedMessage {...messages.about} />
         </Link>

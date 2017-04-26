@@ -1,4 +1,4 @@
-import { createStore, applyMiddleware, compose } from 'redux';
+import {createStore, applyMiddleware, compose} from 'redux';
 import thunk from 'redux-thunk';
 import rootReducer from '../reducers';
 import createHelpers from './createHelpers';
@@ -30,7 +30,6 @@ export default function configureStore(initialState, helpersConfig) {
       // eslint-disable-next-line no-param-reassign
       state = undefined;
     }
-
     return appReducer(state, action);
   };
 */

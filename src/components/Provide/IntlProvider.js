@@ -1,13 +1,11 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types;';
 import { connect } from 'react-redux';
 import { IntlProvider } from 'react-intl';
 
 function ProvideIntl({ intl, children }) {
   return (
-    <IntlProvider
-      {...intl}
-      messages={intl.messages[intl.locale]}
-    >
+    <IntlProvider {...intl} messages={intl.messages[intl.locale]}>
       {children}
     </IntlProvider>
   );

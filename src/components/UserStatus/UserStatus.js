@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { logout } from '../../actions/session';
@@ -18,11 +19,7 @@ class UserStatus extends React.Component {
           this.props.user.id &&
           <span>
             <Link to={'/account'}>
-              <img
-                className={s.avatar}
-                src={this.props.user.avatar}
-                alt="IMG"
-              />
+              <img className={s.avatar} src={this.props.user.avatar} alt="IMG" />
             </Link>
             {this.props.user.name}
             <button

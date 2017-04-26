@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import MarkdownIt from 'markdown-it';
@@ -16,7 +17,7 @@ class CreateProposal extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.onModeChange = this.onModeChange.bind(this);
     this.onTitleChange = this.onTitleChange.bind(this);
-    this.rawMarkup = ::this.rawMarkup;
+    this.rawMarkup = this.rawMarkup.bind(this);
     this.md = new MarkdownIt({
       // html: true,
       linkify: true,

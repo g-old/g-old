@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import AvatarEditor from 'react-avatar-editor';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './ImageUpload.css';
@@ -25,11 +26,11 @@ class ImageUpload extends React.Component {
       showEditor: false,
     };
 
-    this.setEditorRef = ::this.setEditorRef; // es2016 bind syntax!
-    this.handleSave = ::this.handleSave;
-    this.onChange = ::this.onChange;
-    this.handleScale = ::this.handleScale;
-    this.handleRightRotation = ::this.handleRightRotation;
+    this.setEditorRef = this.setEditorRef.bind(this); // es2016 bind syntax!
+    this.handleSave = this.handleSave.bind(this);
+    this.onChange = this.onChange.bind(this);
+    this.handleScale = this.handleScale.bind(this);
+    this.handleRightRotation = this.handleRightRotation.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {

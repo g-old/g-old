@@ -1,10 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 
-import {
-  SET_LOCALE_START,
-  SET_LOCALE_SUCCESS,
-  SET_LOCALE_ERROR,
-} from '../constants';
+import { SET_LOCALE_START, SET_LOCALE_SUCCESS, SET_LOCALE_ERROR } from '../constants';
 
 const query = `
   query ($locale:String!) {
@@ -26,10 +22,13 @@ export function setLocale({ locale }) {
 
     try {
       const { data } = await graphqlRequest(query, { locale });
-      const messages = data.intl.reduce((msgs, msg) => {
-        msgs[msg.id] = msg.message; // eslint-disable-line no-param-reassign
-        return msgs;
-      }, {});
+      const messages = data.intl.reduce(
+        (msgs, msg) => {
+          msgs[msg.id] = msg.message; // eslint-disable-line no-param-reassign
+          return msgs;
+        },
+        {},
+      );
       dispatch({
         type: SET_LOCALE_SUCCESS,
         payload: {
@@ -42,6 +41,9 @@ export function setLocale({ locale }) {
       if (process.env.BROWSER) {
         const maxAge = 3650 * 24 * 3600; // 10 years in seconds
         document.cookie = `lang=${locale};path=/;max-age=${maxAge}`;
+
+        // re-run router on client
+        window.RSK_ENTRY();
       }
     } catch (error) {
       dispatch({

@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
@@ -36,7 +37,7 @@ class PasswordRecovery extends React.Component {
   constructor(props) {
     super(props);
     this.state = { email: '' };
-    this.onEmailChange = ::this.onEmailChange;
+    this.onEmailChange = this.onEmailChange.bind(this);
   }
   onEmailChange(e) {
     const email = e.target.value;

@@ -7,8 +7,10 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { Children, PropTypes } from 'react';
+import React, { Children } from 'react';
+import PropTypes from 'prop-types';
 import { IntlProvider } from 'react-intl';
+import deepForceUpdate from 'react-deep-force-update';
 
 const ContextType = {
   // Enables critical path CSS rendering
@@ -46,7 +48,6 @@ const ContextType = {
  *   );
  */
 class App extends React.PureComponent {
-
   static propTypes = {
     context: PropTypes.shape(ContextType).isRequired,
     children: PropTypes.element.isRequired,
@@ -66,8 +67,11 @@ class App extends React.PureComponent {
         const newIntl = state.intl;
         if (this.intl !== newIntl) {
           this.intl = newIntl;
-          console.log('Intl changed'); // eslint-disable-line no-console
-          this.forceUpdate();
+          if (__DEV__) {
+            // eslint-disable-next-line no-console
+            console.log('Intl changed — Force rendering');
+          }
+          deepForceUpdate(this);
         }
       });
     }
@@ -99,7 +103,6 @@ class App extends React.PureComponent {
       </IntlProvider>
     );
   }
-
 }
 
 export default App;

@@ -7,21 +7,19 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
- import React from 'react';
- import Layout from '../../components/Layout';
- import Home from './Home';
+import React from 'react';
+import Layout from '../../components/Layout';
+import Home from './Home';
 
- const title = 'Home';
+const title = 'Home';
 
- export default {
+export default {
+  path: '/',
 
-   path: '/',
-
-   action() {
-     return {
-       title,
-       component: <Layout><Home title={title} /></Layout>,
-     };
-   },
-
- };
+  action() {
+    return {
+      title,
+      component: <Layout><Home title={title} /></Layout>,
+    };
+  },
+};

@@ -35,11 +35,6 @@
   margin-left: px;
 }
 
-.nav {
-  float: right;
-  margin-top: 6px;
-}
-
 .banner {
   text-align: center;
 }
@@ -51,11 +46,4 @@
   font-size: 4em;
   line-height: 0.7em;
   font-family: 'Segoe UI', sans-serif;
-}
-
-.bannerDesc {
-  padding: 0;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 1.25em;
-  margin: 0;
 }

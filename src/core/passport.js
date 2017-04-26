@@ -32,11 +32,11 @@ passport.use(
       knex('users')
         .where({ email })
         .first()
-        .then(user => {
+        .then((user) => {
           if (!user) {
             return done(null, false);
           }
-          return verifyUser(user, password).then(verified => {
+          return verifyUser(user, password).then((verified) => {
             if (verified) {
               return done(null, user);
             }
@@ -51,7 +51,7 @@ passport.serializeUser((user, done) =>
   knex('roles')
     .where({ id: user.role_id })
     .select('id', 'type')
-    .then(data => {
+    .then((data) => {
       if (data) {
         const role = data[0]; // .type;
         const sessionUser = {

@@ -1,5 +1,5 @@
-
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import Statement from '../../components/Statement';
@@ -8,10 +8,8 @@ import StatementInput from '../StatementInput';
 import { createStatement, updateStatement } from '../../actions/statement';
 import { createVote, updateVote, deleteVote } from '../../actions/vote';
 
-
 class TestProposal extends React.Component {
-
-  static propTypes ={
+  static propTypes = {
     proposal: PropTypes.shape({
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
@@ -26,10 +24,12 @@ class TestProposal extends React.Component {
           position: PropTypes.string,
         }),
         id: PropTypes.string,
-        likedStatements: PropTypes.arrayOf(PropTypes.shape({
-          id: PropTypes.string,
-          statementId: PropTypes.string,
-        })),
+        likedStatements: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.string,
+            statementId: PropTypes.string,
+          }),
+        ),
       }),
     }),
     user: PropTypes.object.isRequired,
@@ -39,7 +39,7 @@ class TestProposal extends React.Component {
     createVote: PropTypes.func.isRequired,
     updateVote: PropTypes.func.isRequired,
     deleteVote: PropTypes.func.isRequired,
-  }
+  };
 
   handleOnSubmit(data, pollId) {
     // TODO check for vote
@@ -88,40 +88,51 @@ class TestProposal extends React.Component {
             <br />
             <button
               onClick={() => this.handleVote('pro')}
-              style={{ background: this.props.proposal.pollOne.ownVote ? (this.props.proposal.pollOne.ownVote.position === 'pro' ? 'red' : '') : '' }}
+              style={{
+                background: this.props.proposal.pollOne.ownVote
+                  ? this.props.proposal.pollOne.ownVote.position === 'pro' ? 'red' : ''
+                  : '',
+              }}
             >
               VOTE YES
             </button>
             <br />
             <button
               onClick={() => this.handleVote('con')}
-              style={{ background: this.props.proposal.pollOne.ownVote ? (this.props.proposal.pollOne.ownVote.position === 'con' ? 'red' : '') : '' }}
+              style={{
+                background: this.props.proposal.pollOne.ownVote
+                  ? this.props.proposal.pollOne.ownVote.position === 'con' ? 'red' : ''
+                  : '',
+              }}
             >
               VOTE NO
             </button>
           </div>
           <button onClick={() => alert('clicked')}> ADD STATEMENT </button>
-          <div className={s.container}> {/* This should be a list component */}
-            {this.props.hasWrittenStatement ? <StatementInput
-              isVisible
-              onSubmit={(data) => this.handleOnSubmit(data, this.props.proposal.pollOne.id)}
-            /> : 'NO STATEMENTS WRITTEN'}
+          <div className={s.container}>
+            {' '}{/* This should be a list component */}
+            {this.props.hasWrittenStatement
+              ? <StatementInput
+                isVisible
+                onSubmit={data => this.handleOnSubmit(data, this.props.proposal.pollOne.id)}
+              />
+              : 'NO STATEMENTS WRITTEN'}
             <br />
-            {`UPVOTES: ${this.props.proposal.pollOne.upvotes}` }
+            {`UPVOTES: ${this.props.proposal.pollOne.upvotes}`}
             <br />
-            {`DOWNVOTES: ${this.props.proposal.pollOne.downvotes}` }
+            {`DOWNVOTES: ${this.props.proposal.pollOne.downvotes}`}
             {this.props.proposal.pollOne.statements.map(statement => (
               <Statement
                 key={statement.id}
                 data={statement}
-                ownLike={this.props.proposal.pollOne.likedStatements
-                  .find(data => data.statementId === statement.id)}
+                ownLike={this.props.proposal.pollOne.likedStatements.find(
+                  data => data.statementId === statement.id,
+                )}
                 pollId={this.props.proposal.pollOne.id}
                 ownStatement={this.props.user.id === statement.author.id}
               />
-
-              ))}
-            { /* title={statement.title}
+            ))}
+            {/* title={statement.title}
                 text={statement.text}
                 position={statement.vote.position}
                 likes={statement.likes}
@@ -131,7 +142,6 @@ class TestProposal extends React.Component {
       </div>
     );
   }
-
 }
 
 const mapDispatch = {

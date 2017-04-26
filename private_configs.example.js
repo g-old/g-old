@@ -1,8 +1,12 @@
 module.exports = {
   development: {
-    database: 'database_name',
-    user: 'user',
-    password: 'password',
+    dbConfig: {
+      database: 'database_name',
+      user: 'user',
+      password: 'password',
+      host: '127.0.0.1',
+      port: '5432',
+    },
     mailer: {
       config: {
         jsonTransport: true, // stream output to console
@@ -11,9 +15,14 @@ module.exports = {
     },
   },
   production: {
-    database: 'database_name',
-    user: 'user',
-    password: 'password',
+    dbConfig: {
+      // or dbConfig: process.env.DATABASE_URL,
+      database: 'database_name',
+      user: 'user',
+      password: 'password',
+      host: '127.0.0.1',
+      port: '5432',
+    },
     mailer: {
       config: {
         // https://nodemailer.com/smtp/

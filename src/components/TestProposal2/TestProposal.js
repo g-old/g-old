@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStatement, updateStatement, deleteStatement } from '../../actions/statement';
 import { createVote, updateVote, deleteVote, getVotes } from '../../actions/vote';

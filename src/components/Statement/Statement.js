@@ -1,6 +1,7 @@
 /* eslint-disable no-shadow */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
 import cn from 'classnames';
@@ -109,8 +110,9 @@ class Statement extends React.Component {
     const isEmpty = this.state.textArea.val.length === 0;
     const hasMinimumInput = this.state.textArea.val.length >= 5;
     const inactive = this.props.asInput && isEmpty;
-    const canLike =
-      this.props.user.role !== 'guest' && !this.props.asInput && !this.props.ownStatement;
+    const canLike = this.props.user.role !== 'guest' &&
+      !this.props.asInput &&
+      !this.props.ownStatement;
 
     return (
       <div
@@ -121,11 +123,7 @@ class Statement extends React.Component {
         )}
       >
         {!inactive &&
-          <img
-            className={cn(s.avatar)}
-            src={this.props.data.author.avatar}
-            alt="IMG"
-          />}
+          <img className={cn(s.avatar)} src={this.props.data.author.avatar} alt="IMG" />}
         <div style={{ width: '100%' }}>
           {!inactive &&
             <div className={s.header}>

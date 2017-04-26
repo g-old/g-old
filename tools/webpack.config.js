@@ -1,4 +1,4 @@
-/**
+/*
  * React Starter Kit (https://www.reactstarterkit.com/)
  *
  * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
@@ -10,12 +10,12 @@
 import path from 'path';
 import webpack from 'webpack';
 import AssetsPlugin from 'assets-webpack-plugin';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import pkg from '../package.json';
-
-const INTL_REQUIRE_DESCRIPTIONS = true;
 
 const isDebug = !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
+const isAnalyze = process.argv.includes('--analyze') || process.argv.includes('--analyse');
 
 //
 // Common configuration chunk to be used for both
@@ -23,7 +23,7 @@ const isVerbose = process.argv.includes('--verbose');
 // -----------------------------------------------------------------------------
 
 const config = {
-  context: path.resolve(__dirname, '../src'),
+  context: path.resolve(__dirname, '..'),
 
   output: {
     path: path.resolve(__dirname, '../build/public/assets'),
@@ -36,9 +36,7 @@ const config = {
       {
         test: /\.jsx?$/,
         loader: 'babel-loader',
-        include: [
-          path.resolve(__dirname, '../src'),
-        ],
+        include: [path.resolve(__dirname, '../src')],
         query: {
           // https://github.com/babel/babel-loader#options
           cacheDirectory: isDebug,
@@ -46,41 +44,37 @@ const config = {
           // https://babeljs.io/docs/usage/options/
           babelrc: false,
           presets: [
-            // Latest stable ECMAScript features
-            // https://github.com/babel/babel/tree/master/packages/babel-preset-latest
-            ['latest', { es2015: { modules: false } }],
+            // A Babel preset that can automatically determine the Babel plugins and polyfills
+            // https://github.com/babel/babel-preset-env
+            [
+              'env',
+              {
+                targets: {
+                  browsers: pkg.browserslist,
+                },
+                modules: false,
+                useBuiltIns: false,
+                debug: false,
+              },
+            ],
             // Experimental ECMAScript proposals
-            // https://github.com/babel/babel/tree/master/packages/babel-preset-stage-0
+            // https://babeljs.io/docs/plugins/#presets-stage-x-experimental-presets-
             'stage-0',
             // JSX, Flow
             // https://github.com/babel/babel/tree/master/packages/babel-preset-react
             'react',
-            ...isDebug ? [] : [
-              // Optimize React code for the production build
-              // https://github.com/thejameskyle/babel-react-optimize
-              'react-optimize',
-            ],
+            // Optimize React code for the production build
+            // https://github.com/thejameskyle/babel-react-optimize
+            ...(isDebug ? [] : ['react-optimize']),
           ],
           plugins: [
-            // Externalise references to helpers and builtins,
-            // automatically polyfilling your code without polluting globals.
-            // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-runtime
-            'transform-runtime',
-            ...!isDebug ? [] : [
-              // Adds component stack to warning messages
-              // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source
-              'transform-react-jsx-source',
-              // Adds __self attribute to JSX which React will use for some warnings
-              // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-self
-              'transform-react-jsx-self',
-            ],
-
-            // https://github.com/yahoo/babel-plugin-react-intl#options
-            ['react-intl',
-              {
-                enforceDescriptions: INTL_REQUIRE_DESCRIPTIONS,
-              },
-            ],
+            // Adds component stack to warning messages
+            // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source
+            ...(isDebug ? ['transform-react-jsx-source'] : []),
+            // Adds __self attribute to JSX which React will use for some warnings
+            // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-self
+            ...(isDebug ? ['transform-react-jsx-self'] : []),
+            'react-intl',
           ],
         },
       },
@@ -135,11 +129,12 @@ const config = {
           limit: 10000,
         },
       },
+      {
+        test: /\.(graphql|gql)$/,
+        exclude: /node_modules/,
+        loader: 'graphql-tag/loader',
+      },
     ],
-  },
-
-  resolve: {
-    modules: [path.resolve(__dirname, '../src'), 'node_modules'],
   },
 
   // Don't attempt to continue if there are any errors.
@@ -171,7 +166,7 @@ const clientConfig = {
   target: 'web',
 
   entry: {
-    client: './clientLoader.js',
+    client: ['babel-polyfill', './src/clientLoader.js'],
   },
 
   output: {
@@ -180,53 +175,7 @@ const clientConfig = {
     chunkFilename: isDebug ? '[name].chunk.js' : '[name].[chunkhash:8].chunk.js',
   },
 
-  module: {
-    rules: [
-      {
-        test: /\.jsx?$/,
-        loader: 'babel-loader',
-        include: [
-          path.resolve(__dirname, '../src'),
-        ],
-        query: {
-          // https://github.com/babel/babel-loader#options
-          cacheDirectory: isDebug,
-
-          // https://babeljs.io/docs/usage/options/
-          presets: [ // override package.json/babel.presets
-            // A Babel preset that can automatically determine the Babel plugins and polyfills
-            // https://github.com/babel/babel-preset-env
-            ['env', {
-              targets: {
-                browsers: pkg.browserslist,
-              },
-              modules: false,
-              useBuiltIns: false,
-              debug: false,
-            }],
-            // Experimental ECMAScript proposals
-            // https://babeljs.io/docs/plugins/#presets-stage-x-experimental-presets-
-            'stage-2',
-            // JSX, Flow
-            // https://github.com/babel/babel/tree/master/packages/babel-preset-react
-            'react',
-          ],
-        },
-      },
-      ...config.module.rules,
-    ],
-  },
-
-  resolve: { ...config.resolve },
-
   plugins: [
-    // For compatability with old loaders
-    // https://webpack.js.org/guides/migrating/#loaderoptionsplugin-context
-    new webpack.LoaderOptionsPlugin({
-      minimize: !isDebug,
-      debug: isDebug,
-    }),
-
     // Define free variables
     // https://webpack.github.io/docs/list-of-plugins.html#defineplugin
     new webpack.DefinePlugin({
@@ -250,26 +199,32 @@ const clientConfig = {
       minChunks: module => /node_modules/.test(module.resource),
     }),
 
-    ...isDebug ? [] : [
-      // Minimize all JavaScript output of chunks
-      // https://github.com/mishoo/UglifyJS2#compressor-options
-      new webpack.optimize.UglifyJsPlugin({
-        sourceMap: true,
-        compress: {
-          screw_ie8: true, // React doesn't support IE8
-          warnings: isVerbose,
-          unused: true,
-          dead_code: true,
-        },
-        mangle: {
-          screw_ie8: true,
-        },
-        output: {
-          comments: false,
-          screw_ie8: true,
-        },
-      }),
-    ],
+    ...(isDebug
+      ? []
+      : [
+          // Minimize all JavaScript output of chunks
+          // https://github.com/mishoo/UglifyJS2#compressor-options
+        new webpack.optimize.UglifyJsPlugin({
+          sourceMap: true,
+          compress: {
+            screw_ie8: true, // React doesn't support IE8
+            warnings: isVerbose,
+            unused: true,
+            dead_code: true,
+          },
+          mangle: {
+            screw_ie8: true,
+          },
+          output: {
+            comments: false,
+            screw_ie8: true,
+          },
+        }),
+      ]),
+
+    // Webpack Bundle Analyzer
+    // https://github.com/th0r/webpack-bundle-analyzer
+    ...(isAnalyze ? [new BundleAnalyzerPlugin()] : []),
   ],
 
   // Choose a developer tool to enhance debugging
@@ -298,7 +253,7 @@ const serverConfig = {
   target: 'node',
 
   entry: {
-    server: ['babel-polyfill', './server.js'],
+    server: ['babel-polyfill', './src/server.js'],
   },
 
   output: {
@@ -308,40 +263,42 @@ const serverConfig = {
   },
 
   module: {
-    rules: [
-      {
-        test: /\.jsx?$/,
-        loader: 'babel-loader',
-        include: [
-          path.resolve(__dirname, '../src'),
-        ],
-        query: {
-          cacheDirectory: isDebug,
-          presets: [ // override package.json/babel.presets
-            ['env', {
-              targets: {
-                node: parseFloat(pkg.engines.node.replace(/^\D+/g, '')),
-              },
-              modules: false,
-              useBuiltIns: false,
-              debug: false,
-            }],
-            'stage-2',
-            'react',
-          ],
-        },
-      },
-      ...config.module.rules,
-    ],
-  },
+    ...config.module,
 
-  resolve: { ...config.resolve },
+    // Override babel-preset-env configuration for Node.js
+    rules: config.module.rules.map(
+      rule =>
+        rule.loader !== 'babel-loader'
+          ? rule
+          : {
+            ...rule,
+            query: {
+              ...rule.query,
+              presets: rule.query.presets.map(
+                  preset =>
+                    preset[0] !== 'env'
+                      ? preset
+                      : [
+                        'env',
+                        {
+                          targets: {
+                            node: parseFloat(pkg.engines.node.replace(/^\D+/g, '')),
+                          },
+                          modules: false,
+                          useBuiltIns: false,
+                          debug: false,
+                        },
+                      ],
+                ),
+            },
+          },
+    ),
+  },
 
   externals: [
     /^\.\/assets\.json$/,
     (context, request, callback) => {
-      const isExternal =
-        request.match(/^[@a-z][a-z/.\-0-9]*$/i) &&
+      const isExternal = request.match(/^[@a-z][a-z/.\-0-9]*$/i) &&
         !request.match(/\.(css|less|scss|sss)$/i);
       callback(null, Boolean(isExternal));
     },

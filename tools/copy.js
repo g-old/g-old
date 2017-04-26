@@ -9,9 +9,9 @@
 
 import path from 'path';
 import chokidar from 'chokidar';
-import { writeFile, copyFile, makeDir, copyDir, cleanDir } from './lib/fs';
+import {writeFile, copyFile, makeDir, copyDir, cleanDir} from './lib/fs';
 import pkg from '../package.json';
-import { format } from './run';
+import {format} from './run';
 
 /**
  * Copies static files such as robots.txt, favicon.ico to the
@@ -37,7 +37,6 @@ async function copy() {
       ),
     ),
     copyFile('LICENSE.txt', 'build/LICENSE.txt'),
-    copyDir('src/content', 'build/content'),
     copyDir('public', 'build/public'),
     copyDir('src/messages', 'build/messages'),
     // TODO If node env is production
@@ -48,14 +47,17 @@ async function copy() {
   await copyFile('src/knexfile.js', 'build/db/knexfile.js');
 
   if (process.argv.includes('--watch')) {
-    const watcher = chokidar.watch(['src/content/**/*', 'src/messages/**/*', 'public/**/*'], {
+    const watcher = chokidar.watch(['src/messages/**/*', 'public/**/*'], {
       ignoreInitial: true,
     });
 
     watcher.on('all', async (event, filePath) => {
       const start = new Date();
       const src = path.relative('./', filePath);
-      const dist = path.join('build/', src.startsWith('src') ? path.relative('src', src) : src);
+      const dist = path.join(
+        'build/',
+        src.startsWith('src') ? path.relative('src', src) : src,
+      );
       switch (event) {
         case 'add':
         case 'change':
@@ -64,7 +66,7 @@ async function copy() {
           break;
         case 'unlink':
         case 'unlinkDir':
-          cleanDir(dist, { nosort: true, dot: true });
+          cleanDir(dist, {nosort: true, dot: true});
           break;
         default:
           return;

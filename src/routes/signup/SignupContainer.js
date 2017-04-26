@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import SignUp from '../../components/SignUp';
 import ImageUpload from '../../components/ImageUpload';
@@ -23,7 +24,7 @@ class SignupContainer extends React.Component {
       step: 0,
       serverCalled: false,
     };
-    this.onCreateUser = ::this.onCreateUser;
+    this.onCreateUser = this.onCreateUser.bind(this);
   }
 
   componentWillReceiveProps({ updates }) {

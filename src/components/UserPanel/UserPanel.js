@@ -1,7 +1,9 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { updateUser, loadUserList } from '../../actions/user';
 import FetchError from '../FetchError';
+import SearchForm from '../SearchField';
 import {
   getVisibleUsers,
   getUsersIsFetching,
@@ -33,7 +35,7 @@ class UserPanel extends React.Component {
     }
     return (
       <div>
-
+        <SearchForm />
         <h1>USERS WITH STATUS VIEWER</h1>
         {this.props.userList.map(user => (
           <div key={user.id} style={{ marginBottom: '0.5em' }}>
@@ -80,7 +82,7 @@ class UserPanel extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const filter = 'viewer';
   return {
     user: getSessionUser(state),

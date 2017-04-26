@@ -23,7 +23,7 @@ export const AvatarManager = {
   save: async function saveFile({ viewer, data, loaders }, folder) {
     const user = await User.gen(viewer, viewer.id, loaders);
     if (user.avatar) {
-      if (user.avatar.indexOf('http:') === -1) {
+      if (user.avatar.indexOf('http') === -1) {
         throw new Error('Avatar already set');
         // TODO let avatars beeing changed, delete old file first!
       }
@@ -38,7 +38,7 @@ export const AvatarManager = {
     const buffer = new Buffer(img, 'base64');
     const avatarPath = path.join('/', name);
     // update
-    await knex.transaction(async trx => {
+    await knex.transaction(async (trx) => {
       // utf8 encoding! Problem?
       // TODO delete old avatar if existing
       // TODO resizing serverside

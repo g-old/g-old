@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
@@ -65,15 +66,15 @@ class UserProfile extends React.Component {
       showEmailInput: false,
       invalidEmails: [],
     };
-    this.onEditEmail = ::this.onEditEmail;
-    this.onPasswordChange = ::this.onPasswordChange;
-    this.onPasswordAgainChange = ::this.onPasswordAgainChange;
-    this.onPasswordOldChange = ::this.onPasswordOldChange;
-    this.onUpdatePassword = ::this.onUpdatePassword;
-    this.onUpdateEmail = ::this.onUpdateEmail;
-    this.onEmailChange = ::this.onEmailChange;
-    this.onSubmit = ::this.onSubmit;
-    this.onPropertyBlur = ::this.onPropertyBlur;
+    this.onEditEmail = this.onEditEmail.bind(this);
+    this.onPasswordChange = this.onPasswordChange.bind(this);
+    this.onPasswordAgainChange = this.onPasswordAgainChange.bind(this);
+    this.onPasswordOldChange = this.onPasswordOldChange.bind(this);
+    this.onUpdatePassword = this.onUpdatePassword.bind(this);
+    this.onUpdateEmail = this.onUpdateEmail.bind(this);
+    this.onEmailChange = this.onEmailChange.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+    this.onPropertyBlur = this.onPropertyBlur.bind(this);
     const testValues = {
       passwordOld: { fn: 'password' },
       password: { fn: 'password' },
@@ -212,11 +213,7 @@ class UserProfile extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <img
-            className={s.avatar}
-            src={avatar}
-            alt="IMG"
-          />
+          <img className={s.avatar} src={avatar} alt="IMG" />
           <div>
             <h3>{name}</h3>
             <h3>{surname}</h3>

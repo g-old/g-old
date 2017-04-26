@@ -22,10 +22,13 @@ const middlewares = [thunk];
 const mockStore = configureStore(middlewares);
 const initialState = {
   runtime: {
-    availableLocales: ['en-US'],
+    availableLocales: ['de-DE'],
   },
   intl: {
-    locale: 'en-US',
+    locale: 'de-DE',
+  },
+  entities: {
+    users: { byId: {} },
   },
 };
 
@@ -42,5 +45,4 @@ describe('Layout', () => {
     );
     expect(wrapper.find('div.child').length).to.eq(1);
   });
-
 });

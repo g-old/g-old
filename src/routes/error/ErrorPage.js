@@ -7,17 +7,22 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './ErrorPage.css';
 
 class ErrorPage extends React.Component {
   static propTypes = {
-    error: PropTypes.object.isRequired,
+    error: PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      message: PropTypes.string.isRequired,
+      stack: PropTypes.string.isRequired,
+    }).isRequired,
   };
 
   render() {
-    if (process.env.NODE_ENV !== 'production') {
+    if (__DEV__) {
       const { error } = this.props;
       return (
         <div>

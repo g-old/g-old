@@ -2,18 +2,16 @@ import DataLoader from 'dataloader';
 import knex from './knex';
 
 // TODO parallelize requests with Promise.all()
-const getUsersById = (userIds) =>
+const getUsersById = userIds =>
   new Promise((resolve) => {
-    knex('users')
-    .whereIn('id', userIds)
-    .select()
-    .then(data => resolve(userIds.map(
-      // eslint-disable-next-line eqeqeq
-      id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
-      ),
-    );
+    knex('users').whereIn('id', userIds).select().then(data =>
+      resolve(
+        userIds.map(
+          // eslint-disable-next-line eqeqeq
+          id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
+        ),
+      ));
   });
-
 
 // TODO check if this behaviour can be achieved with SQL
 /*
@@ -26,108 +24,111 @@ function groupFollowers(data, requestedIds) {
   for (let i = 0, l = data.length; i < l; i += 1) {
     if (!(data[i].follower_id in store)) {
       store[data[i].follower_id] = [data[i].followee_id];
-      continue;  // eslint-disable-line no-continue
+      continue; // eslint-disable-line no-continue
     }
     store[data[i].follower_id].push(data[i].followee_id);
   }
   // eslint-disable-next-line arrow-body-style
-  const result = requestedIds.map(ids => { return store[ids] ? store[ids] : []; });
+  const result = requestedIds.map((ids) => {
+    return store[ids] ? store[ids] : [];
+  });
   return result;
 }
 
-const getFolloweeIds = (followerIds) =>
-     Promise.resolve(knex('user_follows')
-    .whereIn('follower_id', followerIds).select('followee_id', 'follower_id')
-    .then(ids => groupFollowers(ids, followerIds)));
+const getFolloweeIds = followerIds =>
+  Promise.resolve(
+    knex('user_follows')
+      .whereIn('follower_id', followerIds)
+      .select('followee_id', 'follower_id')
+      .then(ids => groupFollowers(ids, followerIds)),
+  );
 
-const getRolesById = (roleIds) =>
-   new Promise((resolve) => {
-     knex('roles')
-     .whereIn('id', roleIds)
-     .select()
-     .then(data => resolve(roleIds.map(
-       // eslint-disable-next-line eqeqeq
-       id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
-       ));
-   });
-
-const getProposalsById = (proposalIds) =>
-    new Promise((resolve) => {
-      knex('proposals')
-      .whereIn('id', proposalIds)
-      .select()
-      .then(data => resolve(proposalIds.map(
-        // eslint-disable-next-line eqeqeq
-        id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
-        ));
-    });
-
-const getPollsById = (pollIds) =>
-      new Promise((resolve) => {
-        knex('polls')
-        .whereIn('id', pollIds)
-        .select()
-        .then(data => resolve(pollIds.map(
+const getRolesById = roleIds =>
+  new Promise((resolve) => {
+    knex('roles').whereIn('id', roleIds).select().then(data =>
+      resolve(
+        roleIds.map(
           // eslint-disable-next-line eqeqeq
-          id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
-          ));
-      });
-const getVotesById = (voteIds) =>
-    new Promise((resolve) => {
-      knex('votes')
-          .whereIn('id', voteIds)
-          .select()
-          .then(data => resolve(voteIds.map(
-            // eslint-disable-next-line eqeqeq
-            id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
-            ));
-    });
+          id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
+        ),
+      ));
+  });
 
+const getProposalsById = proposalIds =>
+  new Promise((resolve) => {
+    knex('proposals').whereIn('id', proposalIds).select().then(data =>
+      resolve(
+        proposalIds.map(
+          // eslint-disable-next-line eqeqeq
+          id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
+        ),
+      ));
+  });
 
-const getStatementsById = (statementIds) =>
-    new Promise((resolve) => {
-      knex('statements')
-          .whereIn('id', statementIds)
-          .select()
-          .then(data => resolve(statementIds.map(
-            // eslint-disable-next-line eqeqeq
-            id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
-            ));
-    });
+const getPollsById = pollIds =>
+  new Promise((resolve) => {
+    knex('polls').whereIn('id', pollIds).select().then(data =>
+      resolve(
+        pollIds.map(
+          // eslint-disable-next-line eqeqeq
+          id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
+        ),
+      ));
+  });
+const getVotesById = voteIds =>
+  new Promise((resolve) => {
+    knex('votes').whereIn('id', voteIds).select().then(data =>
+      resolve(
+        voteIds.map(
+          // eslint-disable-next-line eqeqeq
+          id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
+        ),
+      ));
+  });
 
-const getPollingModesById = (pollingModeIds) =>
-      new Promise((resolve) => {
-        knex('polling_modes')
-            .whereIn('id', pollingModeIds)
-            .select()
-            .then(data => resolve(pollingModeIds.map(
-              // eslint-disable-next-line eqeqeq
-              id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
-              ));
-      });
+const getStatementsById = statementIds =>
+  new Promise((resolve) => {
+    knex('statements').whereIn('id', statementIds).select().then(data =>
+      resolve(
+        statementIds.map(
+          // eslint-disable-next-line eqeqeq
+          id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
+        ),
+      ));
+  });
 
-const getTagsById = (tagIds) =>
-      new Promise((resolve) => {
-        knex('tags')
-             .whereIn('id', tagIds)
-             .select()
-             .then(data => resolve(tagIds.map(
-                // eslint-disable-next-line eqeqeq
-              id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
-              ));
-      });
+const getPollingModesById = pollingModeIds =>
+  new Promise((resolve) => {
+    knex('polling_modes').whereIn('id', pollingModeIds).select().then(data =>
+      resolve(
+        pollingModeIds.map(
+          // eslint-disable-next-line eqeqeq
+          id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
+        ),
+      ));
+  });
 
-const getStatementLikesById = (likeIds) =>
-    new Promise((resolve) => {
-      knex('statement_likes')
-           .whereIn('id', likeIds)
-           .select()
-           .then(data => resolve(likeIds.map(
-              // eslint-disable-next-line eqeqeq
-            id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`)),
-            ));
-    });
+const getTagsById = tagIds =>
+  new Promise((resolve) => {
+    knex('tags').whereIn('id', tagIds).select().then(data =>
+      resolve(
+        tagIds.map(
+          // eslint-disable-next-line eqeqeq
+          id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
+        ),
+      ));
+  });
 
+const getStatementLikesById = likeIds =>
+  new Promise((resolve) => {
+    knex('statement_likes').whereIn('id', likeIds).select().then(data =>
+      resolve(
+        likeIds.map(
+          // eslint-disable-next-line eqeqeq
+          id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
+        ),
+      ));
+  });
 
 function createLoaders() {
   return {

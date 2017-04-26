@@ -1,5 +1,6 @@
 import { FormattedRelative } from 'react-intl';
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import Statement from '../../components/Statement';
 import s from './Proposal.css';

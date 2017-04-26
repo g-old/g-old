@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
@@ -60,13 +61,13 @@ class PasswordReset extends React.Component {
         },
       },
     };
-    this.onPasswordChange = ::this.onPasswordChange;
-    this.onPasswordAgainChange = ::this.onPasswordAgainChange;
-    this.validatePassword = ::this.validatePassword;
-    this.validatePasswordAgain = ::this.validatePasswordAgain;
-    this.onPasswordBlur = ::this.onPasswordBlur;
-    this.onPasswordAgainBlur = ::this.onPasswordAgainBlur;
-    this.onSubmit = ::this.onSubmit;
+    this.onPasswordChange = this.onPasswordChange.bind(this);
+    this.onPasswordAgainChange = this.onPasswordAgainChange.bind(this);
+    this.validatePassword = this.validatePassword.bind(this);
+    this.validatePasswordAgain = this.validatePasswordAgain.bind(this);
+    this.onPasswordBlur = this.onPasswordBlur.bind(this);
+    this.onPasswordAgainBlur = this.onPasswordAgainBlur.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
   }
   onPasswordChange(e) {
     const password = e.target.value;

@@ -2,16 +2,9 @@
 const config = require('../private_configs');
 
 module.exports = {
-
   development: {
     client: 'postgresql',
-    connection: {
-      host: config.development.host || '127.0.0.1',
-      port: config.development.port || '5432',
-      database: config.development.database,
-      user: config.development.user,
-      password: config.development.password,
-    },
+    connection: config.development.dbConfig,
     pool: {
       min: 2,
       max: 10,
@@ -25,10 +18,9 @@ module.exports = {
     },
     debug: true,
   },
-
   production: {
     client: 'postgresql',
-    connection: process.env.DATABASE_URL,
+    connection: config.production.dbConfig, // process.env.DATABASE_URL,
     pool: {
       min: 2,
       max: 10,
@@ -42,5 +34,4 @@ module.exports = {
     },
     ssl: true,
   },
-
 };

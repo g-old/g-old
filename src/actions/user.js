@@ -79,7 +79,7 @@ export function loadUserList(role) {
 
 const initialId = '0000';
 export function createUser(newUser) {
-  return async dispatch => {
+  return async (dispatch) => {
     const properties = Object.keys(newUser).reduce(
       (acc, curr) => {
         // eslint-disable-next-line no-param-reassign

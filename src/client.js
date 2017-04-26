@@ -18,11 +18,14 @@ import it from 'react-intl/locale-data/it';
 import history from './core/history';
 import App from './components/App';
 import configureStore from './store/configureStore';
+import { updateMeta } from './core/DOMUtils';
 import { ErrorReporter, deepForceUpdate } from './core/devUtils';
 
 [de, it].forEach(addLocaleData);
 
 const store = configureStore(window.APP_STATE, { history });
+/* eslint-disable global-require */
+
 // Global (context) variables that can be easily accessed from any React component
 // https://facebook.github.io/react/docs/context.html
 const context = {
@@ -40,35 +43,6 @@ const context = {
   store,
 };
 
-function updateTag(tagName, keyName, keyValue, attrName, attrValue) {
-  const node = document.head.querySelector(`${tagName}[${keyName}="${keyValue}"]`);
-  if (node && node.getAttribute(attrName) === attrValue) return;
-
-  // Remove and create a new tag in order to make it work with bookmarks in Safari
-  if (node) {
-    node.parentNode.removeChild(node);
-  }
-  if (typeof attrValue === 'string') {
-    const nextNode = document.createElement(tagName);
-    nextNode.setAttribute(keyName, keyValue);
-    nextNode.setAttribute(attrName, attrValue);
-    document.head.appendChild(nextNode);
-  }
-}
-function updateMeta(name, content) {
-  updateTag('meta', 'name', name, 'content', content);
-}
-/*eslint-disable */
-function updateCustomMeta(property, content) {
-  // eslint-disable-line no-unused-vars
-  updateTag('meta', 'property', property, 'content', content);
-}
-// eslint-disable-line no-unused-vars
-function updateLink(rel, href) {
-  // eslint-disable-line no-unused-vars
-  updateTag('link', 'rel', rel, 'href', href);
-}
-/* eslint-enable */
 // Switch off the native scroll restoration behavior and handle it manually
 // https://developers.google.com/web/updates/2015/09/history-api-scroll-restoration
 const scrollPositionsHistory = {};
@@ -128,14 +102,14 @@ let currentLocation = history.location;
 let router = require('./core/router').default;
 
 // Re-render the app when window.location changes
-async function onLocationChange(location, initial) {
+async function onLocationChange(location, action) {
   // Remember the latest scroll position for the previous location
   scrollPositionsHistory[currentLocation.key] = {
     scrollX: window.pageXOffset,
     scrollY: window.pageYOffset,
   };
   // Delete stored scroll position for next page if any
-  if (history.action === 'PUSH') {
+  if (action === 'PUSH') {
     delete scrollPositionsHistory[location.key];
   }
   currentLocation = location;
@@ -164,37 +138,42 @@ async function onLocationChange(location, initial) {
     appInstance = ReactDOM.render(<App context={context}>{route.component}</App>, container, () =>
       onRenderComplete(route, location));
   } catch (error) {
-    console.error(error); // eslint-disable-line no-console
-
-    // Current url has been changed during navigation process, do nothing
-    if (currentLocation.key !== location.key) {
-      return;
-    }
-
     // Display the error in full-screen for development mode
-    if (process.env.NODE_ENV !== 'production') {
+    if (__DEV__) {
       appInstance = null;
       document.title = `Error: ${error.message}`;
       ReactDOM.render(<ErrorReporter error={error} />, container);
-      return;
+      throw error;
     }
 
-    if (!initial) {
-      // Avoid broken navigation in production mode by a full page reload on error
+    console.error(error); // eslint-disable-line no-console
+
+    // Do a full page reload if error occurs during client-side navigation
+    if (action && currentLocation.key === location.key) {
       window.location.reload();
     }
   }
 }
 
-// Handle client-side navigation by using HTML5 History API
-// For more information visit https://github.com/mjackson/history#readme
-history.listen(onLocationChange);
-onLocationChange(currentLocation, true);
+let isHistoryObserved = false;
+export default function main() {
+  // Handle client-side navigation by using HTML5 History API
+  // For more information visit https://github.com/mjackson/history#readme
+  currentLocation = history.location;
+  if (!isHistoryObserved) {
+    isHistoryObserved = true;
+    history.listen(onLocationChange);
+  }
+  onLocationChange(currentLocation);
+}
+
+// globally accesible entry point
+window.RSK_ENTRY = main;
 
 // Handle errors that might happen after rendering
 // Display the error in full-screen for development mode
-if (process.env.NODE_ENV !== 'production') {
-  window.addEventListener('error', event => {
+if (__DEV__) {
+  window.addEventListener('error', (event) => {
     appInstance = null;
     document.title = `Runtime Error: ${event.error.message}`;
     ReactDOM.render(<ErrorReporter error={event.error} />, container);
@@ -205,7 +184,6 @@ if (process.env.NODE_ENV !== 'production') {
 if (module.hot) {
   module.hot.accept('./core/router', async () => {
     router = require('./core/router').default; // eslint-disable-line global-require
-
     currentLocation = history.location;
     await onLocationChange(currentLocation);
     if (appInstance) {

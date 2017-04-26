@@ -1,6 +1,5 @@
-import React, { PropTypes } from 'react';
-// import withStyles from 'isomorphic-style-loader/lib/withStyles';
-// import s from './StatementInput.css';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 class StatementInput extends React.Component {
   static propTypes = {

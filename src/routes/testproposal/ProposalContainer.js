@@ -7,7 +7,8 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import TestProposal from '../../components/TestProposal2';
 import { getProposal, getIsProposalFetching, getProposalErrorMessage } from '../../reducers';

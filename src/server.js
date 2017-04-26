@@ -8,6 +8,7 @@
  */
 
 import path from 'path';
+import Promise from 'bluebird';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import requestLanguage from 'express-request-language';
@@ -22,12 +23,12 @@ import { IntlProvider } from 'react-intl';
 import multer from 'multer';
 import { normalize } from 'normalizr';
 import knex from './data/knex';
-import router from './core/router';
 import './serverIntlPolyfill';
 import App from './components/App';
 import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import errorPageStyle from './routes/error/ErrorPage.css';
+import router from './core/router';
 import schema from './data/schema';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
@@ -100,7 +101,7 @@ app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
 
-if (process.env.NODE_ENV !== 'production') {
+if (__DEV__) {
   app.enable('trust proxy');
 }
 
@@ -122,7 +123,7 @@ app.post('/logout', (req, res) => {
 app.post('/signup', (req, res) => {
   // OR post to graphql
   User.create(req.body.user)
-    .then(user => {
+    .then((user) => {
       if (!user) throw Error('User creation failed');
       return new Promise((resolve, reject) => {
         // eslint-disable-next-line no-confusing-arrow
@@ -137,7 +138,7 @@ app.post('/signup', (req, res) => {
         }),
     )
     .then(() => res.status(200).json({ user: req.session.passport.user }))
-    .catch(error => {
+    .catch((error) => {
       if (error.code === '23505') {
         res.status(500).json({ error: { fields: { email: 'Email not unique' } } });
       }
@@ -152,7 +153,7 @@ app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
   FileStore.save({ viewer: req.user, data: req.body.avatar, loaders: createLoaders() }, 'avatars/') // eslint-disable-next-line no-confusing-arrow
     // TODO update session
     // .then(user => user ? res.status(200).json(user) : res.status(500))
-    .then(user => {
+    .then((user) => {
       if (!user) {
         throw Error('User update failed');
       }
@@ -176,18 +177,18 @@ app.post(
   '/forgot',
   (req, res) =>
     PasswordReset.createToken(req.body.email)
-      .then(token => {
+      .then((token) => {
         if (!token) throw Error('Token not generated');
         return sendMail(resetLinkMail(req.body.email.email, req.headers.host, token));
       })
-      .then(info => {
+      .then((info) => {
         // TODO ONLY for TESTING!
         console.log(info.envelope);
         console.log(info.messageId);
         console.log(info.message);
         res.status(200).json({ ok: true });
       })
-      .catch(error => {
+      .catch((error) => {
         console.log('ERROR: ', error);
         res.status(200).json({ ok: true });
       }), // give no feedback!
@@ -195,7 +196,7 @@ app.post(
 // TODO change to /reset only ?
 app.post('/reset/:token', (req, res) => {
   PasswordReset.checkToken({ token: req.params.token }) // TODO checkToken and delete it
-    .then(data => {
+    .then((data) => {
       if (!data) throw Error('Token invalid');
       return User.update(
         { id: 0, role: { type: 'system' } },
@@ -203,12 +204,12 @@ app.post('/reset/:token', (req, res) => {
         createLoaders(),
       );
     })
-    .then(user => {
+    .then((user) => {
       if (!user) throw Error('Update failed');
       // TODO separate errorhandling for mail and login
       return Promise.all([
         sendMail(resetSuccessMail(user.email)).then(
-          info => {
+          (info) => {
             // TODO ONLY for TESTING!
             console.log(info.envelope);
             console.log(info.messageId);
@@ -231,7 +232,7 @@ app.get('/test', (req, res, next) => {
     .where({ name: 'admin' })
     .join('roles', 'users.role_id', '=', 'roles.id')
     .select('type')
-    .then(data => {
+    .then((data) => {
       res.status(200).json(data);
     })
     .catch(error => next(error));
@@ -242,19 +243,19 @@ app.get('/test', (req, res, next) => {
 // -----------------------------------------------------------------------------
 // const storage = multer.memoryStorage(); // risk of runnig out of memory
 // app.use('/graphql', multer({ storage }).single('file')); // or switch to own route ? Performance
-app.use(
-  '/graphql',
-  expressGraphQL(req => ({
-    schema,
-    graphiql: process.env.NODE_ENV !== 'production',
-    rootValue: { request: req },
-    pretty: process.env.NODE_ENV !== 'production',
-    context: {
-      viewer: req.user,
-      loaders: createLoaders(),
-    },
-  })),
-);
+
+const graphqlMiddleware = expressGraphQL(req => ({
+  schema,
+  graphiql: __DEV__,
+  rootValue: { request: req },
+  pretty: __DEV__,
+  context: {
+    viewer: req.user,
+    loaders: createLoaders(),
+  },
+}));
+
+app.use('/graphql', graphqlMiddleware);
 
 //
 // Register server-side rendering middleware
@@ -329,13 +330,22 @@ app.get('*', async (req, res, next) => {
     }
 
     const data = { ...route };
-    data.children = ReactDOM.renderToString(<App context={context}>{route.component}</App>);
-    data.style = [...css].join('');
+    const rootComponent = <App context={context}>{route.component}</App>;
+
+    data.children = await ReactDOM.renderToString(rootComponent);
+    data.styles = [{ id: 'css', cssText: [...css].join('') }];
     data.scripts = [assets.vendor.js, assets.client.js];
+
+    // Furthermore invoked actions will be ignored, client will not receive them!
+    if (__DEV__) {
+      // eslint-disable-next-line no-console
+      console.log('Serializing store...');
+    }
+    data.state = context.store.getState();
+
     if (assets[route.chunk]) {
       data.scripts.push(assets[route.chunk].js);
     }
-    data.state = context.store.getState();
     data.lang = locale;
 
     const html = ReactDOM.renderToStaticMarkup(<Html {...data} />);
@@ -361,7 +371,7 @@ app.use((err, req, res, next) => {
     <Html
       title="Internal Server Error"
       description={err.message}
-      style={errorPageStyle._getCss()} // eslint-disable-line no-underscore-dangle
+      styles={[{ id: 'css', cssText: errorPageStyle._getCss() }]} // eslint-disable-line no-underscore-dangle
       lang={locale}
     >
       {ReactDOM.renderToString(

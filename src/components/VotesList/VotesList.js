@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import s from './VotesList.css';
@@ -43,7 +44,7 @@ class VotesList extends React.Component {
     const pro = [];
     const con = [];
     if (this.state.showVotes && this.props.votes) {
-      this.props.votes.forEach(vote => {
+      this.props.votes.forEach((vote) => {
         // TODO check why votes are undefined when ownvote is deleted
         if (vote && vote.position === 'pro') pro.push(vote);
         else con.push(vote);
