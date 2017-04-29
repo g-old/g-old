@@ -1,13 +1,9 @@
-import {
-  GraphQLNonNull,
-  GraphQLID,
-} from 'graphql';
+import { GraphQLNonNull, GraphQLID } from 'graphql';
 
 import ProposalType from '../types/ProposalDLType';
 import Proposal from '../models/Proposal';
 
-
-const proposals = {
+const proposal = {
   type: ProposalType,
   args: {
     id: {
@@ -18,5 +14,4 @@ const proposals = {
   resolve: (parent, { id }, { viewer, loaders }) => Proposal.gen(viewer, id, loaders),
 };
 
-
-export default proposals;
+export default proposal;

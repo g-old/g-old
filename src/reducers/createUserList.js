@@ -1,17 +1,32 @@
 import { combineReducers } from 'redux';
-import { LOAD_USERS_SUCCESS, LOAD_USERS_ERROR, LOAD_USERS_START } from '../constants';
+import {
+  LOAD_USERS_SUCCESS,
+  LOAD_USERS_ERROR,
+  LOAD_USERS_START,
+  FIND_USER_SUCCESS,
+  UPDATE_USER_SUCCESS,
+} from '../constants';
 
 // TODO handle DELETE_USER
 
-const createList = filter => {
+const createList = (filter) => {
+  const handleRoleChange = (state, action) => {
+    const { result: userId, entities } = action.payload;
+    const { type } = entities.roles[entities.users[userId].role];
+    return type === filter ? [...new Set([...state, userId])] : state.filter(id => id !== userId);
+  };
   const ids = (state = [], action) => {
-    if (action.filter !== filter) {
-      return state;
-    }
     switch (action.type) {
       case LOAD_USERS_SUCCESS: {
-        const newEntries = action.payload.result;
-        return [...new Set([...state, ...newEntries])];
+        return filter === action.filter || filter === 'all'
+          ? [...new Set([...state, ...action.payload.result])]
+          : state;
+      }
+      case FIND_USER_SUCCESS: {
+        return filter === 'all' ? [...new Set([...state, ...action.payload.result])] : state;
+      }
+      case UPDATE_USER_SUCCESS: {
+        return action.properties.role && filter !== 'all' ? handleRoleChange(state, action) : state;
       }
       default:
         return state;

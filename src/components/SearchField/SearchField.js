@@ -1,54 +1,58 @@
+/* eslint-disable css-modules/no-unused-class */
 import React from 'react';
 import PropTypes from 'prop-types';
 import Autosuggest from 'react-autosuggest';
+import AutosuggestHighlightMatch from 'autosuggest-highlight/match';
+import AutosuggestHighlightParse from 'autosuggest-highlight/parse';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import s from './SearchField.css';
 
-// Imagine you have a list of languages that you'd like to autosuggest.
-const languages = [
-  {
-    name: 'C',
-    year: 1972,
-  },
-  {
-    name: 'Elm',
-    year: 2012,
-  },
-];
+function getSuggestionValue(suggestion) {
+  return `${suggestion.name} ${suggestion.surname}`;
+}
 
-// Teach Autosuggest how to calculate suggestions for any given input value.
-const getSuggestions = value => {
-  const inputValue = value.trim().toLowerCase();
-  const inputLength = inputValue.length;
+function renderSuggestion(suggestion, { query }) {
+  const suggestionText = `${suggestion.name} ${suggestion.surname}`;
+  const matches = AutosuggestHighlightMatch(suggestionText, query);
+  const parts = AutosuggestHighlightParse(suggestionText, matches);
 
-  return inputLength === 0
-    ? []
-    : languages.filter(lang => lang.name.toLowerCase().slice(0, inputLength) === inputValue);
-};
-
-// When suggestion is clicked, Autosuggest needs to populate the input element
-// based on the clicked suggestion. Teach Autosuggest how to calculate the
-// input value for every given suggestion.
-const getSuggestionValue = suggestion => suggestion.name;
-
-// Use your imagination to render suggestions.
-const renderSuggestion = suggestion => (
-  <div>
-    {suggestion.name}
-  </div>
-);
+  return (
+    <span
+      className={s.suggestionContent}
+      style={{
+        backgroundImage: `url(${suggestion.avatar})`,
+        backgroundSize: '3em 3em',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
+      <span className={s.name}>
+        {parts.map((part, index) => {
+          const className = part.highlight ? 'highlight' : null;
+          // eslint-disable-next-line react/no-array-index-key
+          return <span className={className && s.highlight} key={index}>{part.text}</span>;
+        })}
+      </span>
+    </span>
+  );
+}
+function escapeRegexCharacters(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 class SearchField extends React.Component {
+  static propTypes = {
+    data: PropTypes.arrayOf(PropTypes.object),
+    fetch: PropTypes.func.isRequired,
+    displaySelected: PropTypes.func.isRequired,
+  };
   constructor() {
     super();
-
-    // Autosuggest is a controlled component.
-    // This means that you need to provide an input value
-    // and an onChange handler that updates this value (see below).
-    // Suggestions also need to be provided to the Autosuggest,
-    // and they are initially empty because the Autosuggest is closed.
     this.state = {
       value: '',
       suggestions: [],
     };
+    this.getSuggestions = this.getSuggestions.bind(this);
+    this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
   }
 
   onChange = (event, { newValue }) => {
@@ -61,7 +65,7 @@ class SearchField extends React.Component {
   // You already implemented this logic above, so just use it.
   onSuggestionsFetchRequested = ({ value }) => {
     this.setState({
-      suggestions: getSuggestions(value),
+      suggestions: this.getSuggestions(value),
     });
   };
 
@@ -72,28 +76,48 @@ class SearchField extends React.Component {
     });
   };
 
+  onSuggestionSelected(
+    event,
+    { suggestion /* suggestionValue, suggestionIndex, sectionIndex, method*/ },
+  ) {
+    this.props.displaySelected(suggestion);
+  }
+
+  getSuggestions(value) {
+    const escapedValue = escapeRegexCharacters(value.trim());
+
+    if (escapedValue === '') {
+      return [];
+    }
+    this.props.fetch({ term: escapedValue });
+    const regex = new RegExp(`\\b${escapedValue}`, 'i');
+    const res = this.props.data.filter(person => regex.test(getSuggestionValue(person)));
+    return res;
+  }
   render() {
     const { value, suggestions } = this.state;
 
     // Autosuggest will pass through all these props to the input element.
     const inputProps = {
-      placeholder: 'Type a programming language',
+      placeholder: 'Type a name ',
       value,
       onChange: this.onChange,
     };
 
-    // Finally, render it!
+    // http://codepen.io/moroshko/pen/KVaGJE for debouncing!
     return (
       <Autosuggest
+        theme={s}
         suggestions={suggestions}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         getSuggestionValue={getSuggestionValue}
         renderSuggestion={renderSuggestion}
         inputProps={inputProps}
+        onSuggestionSelected={this.onSuggestionSelected}
       />
     );
   }
 }
 
-export default SearchField;
+export default withStyles(s)(SearchField);

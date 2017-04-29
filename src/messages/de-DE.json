@@ -217,5 +217,86 @@
     "files": [
       "src/routes/passwordRecovery/PasswordRecovery.js"
     ]
+  },
+  {
+    "id": "account.avatarMissing",
+    "description": "Avatar missing",
+    "defaultMessage": "No photo set",
+    "message": "",
+    "files": [
+      "src/components/AccountProfile/AccountProfile.js"
+    ]
+  },
+  {
+    "id": "account.emailValidationMissing",
+    "description": "Email not validated",
+    "defaultMessage": "Email not validated",
+    "message": "",
+    "files": [
+      "src/components/AccountProfile/AccountProfile.js"
+    ]
+  },
+  {
+    "id": "account.lastLogin",
+    "description": "Last login date",
+    "defaultMessage": "Last login at",
+    "message": "",
+    "files": [
+      "src/components/AccountProfile/AccountProfile.js"
+    ]
+  },
+  {
+    "id": "account.role",
+    "description": "Role of the user",
+    "defaultMessage": "Role",
+    "message": "",
+    "files": [
+      "src/components/AccountProfile/AccountProfile.js"
+    ]
+  },
+  {
+    "id": "navigation.admin",
+    "description": "Admin link in header",
+    "defaultMessage": "Admin",
+    "message": "",
+    "files": [
+      "src/components/Navigation/Navigation.js"
+    ]
+  },
+  {
+    "id": "navigation.proposals",
+    "description": "Proposals link in header",
+    "defaultMessage": "Proposals",
+    "message": "",
+    "files": [
+      "src/components/Navigation/Navigation.js"
+    ]
+  },
+  {
+    "id": "account.changeRights",
+    "description": "Changing the rights of the user",
+    "defaultMessage": "Change users rights",
+    "message": "",
+    "files": [
+      "src/components/AccountProfile/AccountProfile.js"
+    ]
+  },
+  {
+    "id": "account.delete",
+    "description": "Deleting the account",
+    "defaultMessage": "Delete account",
+    "message": "",
+    "files": [
+      "src/components/AccountProfile/AccountProfile.js"
+    ]
+  },
+  {
+    "id": "account.notify",
+    "description": "Contact user",
+    "defaultMessage": "Notify user",
+    "message": "",
+    "files": [
+      "src/components/AccountProfile/AccountProfile.js"
+    ]
   }
 ]

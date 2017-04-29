@@ -48,8 +48,8 @@ exports.seed = function (knex, Promise) {
         knex('roles').insert({ id: 1, type: 'admin' }),
         knex('roles').insert({ id: 2, type: 'mod' }),
         knex('roles').insert({ id: 3, type: 'user' }),
-        knex('roles').insert({ id: 4, type: 'guest' }),
-        knex('roles').insert({ id: 5, type: 'viewer' }),
+        knex('roles').insert({ id: 4, type: 'viewer' }),
+        knex('roles').insert({ id: 5, type: 'guest' }),
       ])
     );
   }
@@ -118,7 +118,7 @@ exports.seed = function (knex, Promise) {
         Promise.resolve(
           bcrypt
             .hash('password', 10)
-            .then(hash => createUser(name, name, hash, name + '@example.com', 4, time, true))
+            .then(hash => createUser(name, name, hash, name + '@example.com', 5, time, true))
         )
       );
     }
@@ -133,7 +133,7 @@ exports.seed = function (knex, Promise) {
         surname,
         null,
         faker.internet.email(),
-        4,
+        5,
         time,
         Math.random() > 0.5
       );
@@ -149,7 +149,7 @@ exports.seed = function (knex, Promise) {
   }
 
   function createFollowees() {
-    return knex('users').pluck('id').then(userIds => {
+    return knex('users').pluck('id').then((userIds) => {
       const users = userIds.slice(0);
       shuffle(users);
       const time = new Date();
@@ -187,7 +187,7 @@ exports.seed = function (knex, Promise) {
 
   function createProposalTags(tagIds) {
     return Promise.resolve(
-      knex('proposals').pluck('id').then(proposalIds => {
+      knex('proposals').pluck('id').then((proposalIds) => {
         const time = new Date();
         const tagsData = [];
 

@@ -1,100 +1,145 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { updateUser, loadUserList } from '../../actions/user';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import s from './UserPanel.css';
+import { updateUser, loadUserList, findUser } from '../../actions/user';
 import FetchError from '../FetchError';
-import SearchForm from '../SearchField';
-import {
-  getVisibleUsers,
-  getUsersIsFetching,
-  getUsersErrorMessage,
-  getSessionUser,
-} from '../../reducers';
+import AccountProfile from '../AccountProfile';
+import Accordion from '../../components/Accordion';
+import AccordionPanel from '../../components/AccordionPanel';
+import SearchField from '../../components/SearchField';
+
+import { getVisibleUsers, getUsersIsFetching, getUsersErrorMessage } from '../../reducers';
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+
+function UserItem(user, obj) {
+  return (
+    <span
+      style={{
+        backgroundImage: `url(${user.avatar})`,
+        backgroundSize: '3em 3em',
+        backgroundRepeat: 'no-repeat',
+        marginBottom: '1em',
+      }}
+      key={user.id}
+      className={s.suggestionContent}
+      onClick={() => {
+        alert(`Move to list! id: ${user.id}`);
+        obj.setState({ showAccount: true, accountId: user.id });
+      }}
+    >
+      <span className={s.name}>
+        <span>{`${user.name} ${user.surname}`}</span>
+      </span>
+    </span>
+  );
+}
+/* eslint-enable jsx-a11y/no-static-element-interactions */
 
 class UserPanel extends React.Component {
   static propTypes = {
-    userList: PropTypes.arrayOf(PropTypes.object),
+    guestArray: PropTypes.arrayOf(PropTypes.object),
+    viewerArray: PropTypes.arrayOf(PropTypes.object),
     loadUserList: PropTypes.func,
     updateUser: PropTypes.func,
-    isFetching: PropTypes.bool,
-    errorMessage: PropTypes.string,
+    guestArrayIsFetching: PropTypes.bool,
+    guestArrayErrorMessage: PropTypes.string,
+    viewerArrayIsFetching: PropTypes.bool,
+    viewerArrayErrorMessage: PropTypes.string,
+    findUser: PropTypes.func.isRequired,
+    userArray: PropTypes.arrayOf(PropTypes.object),
   };
-
+  constructor(props) {
+    super(props);
+    this.state = { selectedAccount: null, showAccount: false };
+  }
   componentDidMount() {
-    this.props.loadUserList('viewer');
+    // this.props.loadUserList('viewer');
   }
   render() {
-    const { isFetching, errorMessage, userList } = this.props;
-    if (isFetching && !userList.length) {
-      return <p>Loading...</p>;
-    }
-    if (errorMessage && !userList.length) {
-      return (
-        <FetchError message={errorMessage} onRetry={() => this.props.loadUserList('viewer')} />
-      );
-    }
-    return (
-      <div>
-        <SearchForm />
-        <h1>USERS WITH STATUS VIEWER</h1>
-        {this.props.userList.map(user => (
-          <div key={user.id} style={{ marginBottom: '0.5em' }}>
-            <span>
-              <img
-                style={{ width: '4em', height: '4em', borderRadius: '30%' }}
-                src={user.avatar}
-                alt="IMG"
-              />
+    const {
+      guestArrayIsFetching,
+      guestArrayErrorMessage,
+      viewerArrayIsFetching,
+      viewerArrayErrorMessage,
+      viewerArray,
+      guestArray,
+    } = this.props;
 
-              {user.name}
-              {' '}
-              {user.surname}
-              {' '}
-              {user.role && user.role.type}
-              {' '}
-              {!user.avatar &&
-                <span style={{ borderBottom: '1px solid red' }}>
-                  {'PIC MISSING!'}
-                </span>}
-              <span style={{ marginLeft: '5em' }}>
-                <button
-                  onClick={() => {
-                    alert('TO IMPLEMENT');
-                  }}
-                >
-                  INSPECT
-                </button>
-                <button
-                  onClick={() => {
-                    this.props.updateUser({ id: user.id, role: 'guest' });
-                  }}
-                >
-                  RANK UP{' '}
-                </button>
-              </span>
-            </span>
-          </div>
-        ))}
-        <h1>USERS WITH STATUS GUEST</h1>
-        <h1>FIND USER</h1>
+    return (
+      <div className={s.container}>
+        <SearchField
+          data={this.props.userArray}
+          fetch={this.props.findUser}
+          displaySelected={(data) => {
+            this.setState({ accountId: data.id, showAccount: true });
+          }}
+        />
+        {this.state.showAccount &&
+          <div>
+            <AccountProfile accountId={this.state.accountId} update={this.props.updateUser} />
+            <button
+              onClick={() => {
+                this.setState({ showAccount: false });
+              }}
+            >
+              CLOSE{' '}
+            </button>
+          </div>}
+        <Accordion openMulti>
+          <AccordionPanel
+            heading="Accounts with status guest"
+            onActive={() => {
+              this.props.loadUserList('guest');
+            }}
+          >
+            {guestArrayIsFetching && !guestArray.length && <p>Loading...</p>}
+            {!guestArrayIsFetching &&
+              !guestArray.length &&
+              !guestArrayErrorMessage &&
+              <p> No data</p>}
+            {guestArrayErrorMessage &&
+              <FetchError
+                message={guestArrayErrorMessage}
+                onRetry={() => this.props.loadUserList('guest')}
+              />}
+            {this.props.guestArray.map(user => UserItem(user, this))}
+          </AccordionPanel>
+          <AccordionPanel
+            heading="Accounts with status viewer"
+            onActive={() => {
+              this.props.loadUserList('viewer');
+            }}
+          >
+            {viewerArrayIsFetching && !viewerArray.length && <p>Loading...</p>}
+            {viewerArrayErrorMessage &&
+              <FetchError
+                message={viewerArrayErrorMessage}
+                onRetry={() => this.props.loadUserList('viewer')}
+              />}
+            {this.props.viewerArray.map(user => UserItem(user, this))}
+          </AccordionPanel>
+        </Accordion>
       </div>
     );
   }
 }
 
-const mapStateToProps = (state) => {
-  const filter = 'viewer';
-  return {
-    user: getSessionUser(state),
-    userList: getVisibleUsers(state, filter),
-    isFetching: getUsersIsFetching(state, filter),
-    errorMessage: getUsersErrorMessage(state, filter),
-  };
-};
+const mapStateToProps = state => ({
+  guestArray: getVisibleUsers(state, 'guest'),
+  viewerArray: getVisibleUsers(state, 'viewer'),
+  guestArrayIsFetching: getUsersIsFetching(state, 'guest'),
+  viewerArrayIsFetching: getUsersIsFetching(state, 'viewer'),
+  guestArrayErrorMessage: getUsersErrorMessage(state, 'guest'),
+  viewerArrayErrorMessage: getUsersErrorMessage(state, 'viewer'),
+  userArray: getVisibleUsers(state, 'all'),
+});
 
 const mapDispatch = {
   updateUser,
   loadUserList,
+  findUser,
 };
 
-export default connect(mapStateToProps, mapDispatch)(UserPanel);
+export default connect(mapStateToProps, mapDispatch)(withStyles(s)(UserPanel));

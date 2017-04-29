@@ -19,6 +19,16 @@ const messages = defineMessages({
     defaultMessage: 'About',
     description: 'About link in header',
   },
+  proposals: {
+    id: 'navigation.proposals',
+    defaultMessage: 'Proposals',
+    description: 'Proposals link in header',
+  },
+  admin: {
+    id: 'navigation.admin',
+    defaultMessage: 'Admin',
+    description: 'Admin link in header',
+  },
 });
 
 class Navigation extends React.Component {
@@ -30,6 +40,9 @@ class Navigation extends React.Component {
         </Link>
         <Link className={s.link} to="/proposals/active">
           Proposals
+        </Link>
+        <Link className={s.link} to="/admin">
+          Admin
         </Link>
       </div>
     );

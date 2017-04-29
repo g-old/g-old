@@ -27,7 +27,7 @@ export function recoverPassword(email) {
 
 const initialId = 'pw';
 export function resetPassword({ token, password }) {
-  return async dispatch => {
+  return async (dispatch) => {
     const properties = ['password'].reduce(
       (acc, curr) => {
         // eslint-disable-next-line no-param-reassign

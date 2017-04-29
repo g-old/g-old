@@ -1,0 +1,16 @@
+.name {
+  margin-left: 68px;
+  line-height: 45px;
+}
+
+.suggestionContent {
+  display: flex;
+  align-items: center;
+  background-repeat: no-repeat;
+}
+
+.container {
+  margin: 0 auto;
+  padding: 0 0 40px;
+  max-width: 380px;
+}

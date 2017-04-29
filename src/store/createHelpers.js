@@ -8,7 +8,7 @@ function createGraphqlRequest(fetchKnowingCookie) {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({query, variables}),
+      body: JSON.stringify({ query, variables }),
       credentials: 'include',
     };
     const resp = await fetchKnowingCookie('/graphql', fetchConfig);
@@ -17,7 +17,7 @@ function createGraphqlRequest(fetchKnowingCookie) {
   };
 }
 
-function createFetchKnowingCookie({cookie}) {
+function createFetchKnowingCookie({ cookie }) {
   if (!process.env.BROWSER) {
     return (url, options = {}) => {
       const isLocalUrl = /^\/($|[^/])/.test(url);
@@ -29,7 +29,7 @@ function createFetchKnowingCookie({cookie}) {
           ...options.headers,
           cookie,
         };
-        return fetch(url, {...options, headers});
+        return fetch(url, { ...options, headers });
       }
 
       return fetch(url, options);

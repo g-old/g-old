@@ -12,6 +12,7 @@ import {
   CREATE_PROPOSAL_ERROR,
 } from '../constants';
 import { proposal as proposalSchema, proposalList as proposalListSchema } from '../store/schema';
+import { getProposalsIsFetching, getIsProposalFetching } from '../reducers';
 
 const statementFields = `{
     id
@@ -132,7 +133,7 @@ mutation($pollingModeId:ID $title: String, $text:String){
   }
 }
 `;
-const getFilter = status => {
+const getFilter = (status) => {
   switch (status) {
     case 'accepted':
       return 'accepted';
@@ -146,6 +147,10 @@ const getFilter = status => {
 };
 export function loadProposal({ id }) {
   return async (dispatch, getState, { graphqlRequest }) => {
+    // Dont fetch if pending
+    if (getIsProposalFetching(getState(), id)) {
+      return false;
+    }
     dispatch({
       type: LOAD_PROPOSAL_START,
       id,
@@ -180,7 +185,10 @@ export function loadProposal({ id }) {
 export function loadProposalsList(state) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
-
+    // Dont fetch if pending
+    if (getProposalsIsFetching(getState(), state)) {
+      return false;
+    }
     dispatch({
       type: LOAD_PROPOSAL_LIST_START,
       payload: {},

@@ -4,6 +4,9 @@ import {
   LOAD_PROPOSAL_SUCCESS,
   LOAD_USERS_SUCCESS,
   CREATE_USER_SUCCESS,
+  FIND_USER_SUCCESS,
+  FETCH_USER_SUCCESS,
+  UPDATE_USER_SUCCESS,
 } from '../constants';
 
 export default function roles(state = {}, action) {
@@ -12,6 +15,9 @@ export default function roles(state = {}, action) {
     case LOAD_PROPOSAL_LIST_SUCCESS: {
       return merge({}, state, action.payload.entities.roles);
     }
+    case UPDATE_USER_SUCCESS:
+    case FETCH_USER_SUCCESS:
+    case FIND_USER_SUCCESS:
     case LOAD_USERS_SUCCESS:
     case CREATE_USER_SUCCESS: {
       return merge({}, state, action.payload.entities.roles);

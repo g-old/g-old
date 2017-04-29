@@ -27,8 +27,11 @@ const UserType = new ObjectType({
     avatar: {
       type: GraphQLString,
     },
-    email_validated: {
+    emailValidated: {
       type: GraphQLBoolean,
+    },
+    lastLogin: {
+      type: GraphQLString,
     },
     role: {
       type: RoleType,

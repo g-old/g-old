@@ -2,7 +2,6 @@ import { GraphQLList, GraphQLString } from 'graphql';
 
 import UserType from '../types/UserType';
 import User from '../models/User';
-import knex from '../knex';
 
 const search = {
   type: new GraphQLList(UserType),
@@ -12,13 +11,7 @@ const search = {
     },
   },
 
-  resolve: (parent, { term }, { viewer, loaders }) =>
-    Promise.resolve(
-      knex('users')
-        .where('email', 'ilike', `%${term}%`)
-        .pluck('id')
-        .then(ids => ids.map(id => User.gen(viewer, id, loaders))),
-    ),
+  resolve: (parent, { term }, { viewer, loaders }) => User.find(viewer, term, loaders),
 };
 
 export default search;

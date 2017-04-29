@@ -1,0 +1,36 @@
+@import '../../components/variables.css';
+
+.closed {
+  display: none;
+}
+
+.open {
+  display: block;
+}
+
+.button {
+  display: block;
+  box-sizing: border-box;
+  margin: 0;
+  width: 100%;
+  outline: none;
+  border: transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #f8f;
+  text-decoration: none;
+  font-size: 18px;
+  line-height: 1.3333333em;
+  cursor: pointer;
+}
+
+.header {
+  align-items: center;
+  min-height: 5em;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.listItem {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+}

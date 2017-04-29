@@ -63,3 +63,5 @@ export const getUsersErrorMessage = (state, filter) =>
 export const getAccountUpdates = (state, id) => fromUi.getAccountUpdates(state.ui, id);
 
 export const getLocale = state => fromIntl.getLocale(state.intl);
+
+export const getUser = (state, id) => fromEntity.getUser(state.entities, id);

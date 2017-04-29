@@ -15,7 +15,7 @@ const users = {
   resolve: (parent, { role }, { viewer, loaders }) =>
     Promise.resolve(
       knex('users')
-        .where({ role_id: ['admin', 'mod', 'user', 'guest', 'viewer'].indexOf(role) + 1 })
+        .where({ role_id: ['admin', 'mod', 'user', 'viewer', 'guest'].indexOf(role) + 1 })
         .pluck('id')
         .then(ids => ids.map(id => User.gen(viewer, id, loaders))),
     ),

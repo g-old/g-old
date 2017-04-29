@@ -16,6 +16,7 @@ import {
 } from '../constants';
 
 import { voteList as voteListSchema, vote as voteSchema } from '../store/schema';
+import { getVotingListIsFetching } from '../reducers';
 
 const voteInfo = `{
   id
@@ -149,6 +150,9 @@ export function getVotes(pollId) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO check cache
 
+    if (getVotingListIsFetching(getState(), pollId)) {
+      return false;
+    }
     dispatch({
       type: LOAD_VOTES_START,
       payload: {

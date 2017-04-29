@@ -12,13 +12,18 @@ import {
   CREATE_USER_START,
   CREATE_USER_SUCCESS,
   CREATE_USER_ERROR,
+  FIND_USER_SUCCESS,
+  FIND_USER_ERROR,
+  FETCH_USER_START,
+  FETCH_USER_SUCCESS,
+  FETCH_USER_ERROR,
 } from '../constants';
+import { getUsersIsFetching } from '../reducers';
 
 const userFields = `
 id,
     name,
     surname,
-    email,
     avatar
     role{
       id,
@@ -33,6 +38,17 @@ query ($role:String) {
 }
 `;
 
+const userQuery = `
+query ($id:ID!) {
+  user (id:$id) {
+    emailValidated
+    lastLogin
+    ${userFields}
+
+  }
+}
+`;
+
 const updateUserMutation = `
 mutation($id:ID $name:String, $surname:String, $role:String, $email:String, $password:String, $passwordOld:String){
   updateUser(user:{id:$id name:$name, surname:$surname, role:$role, email:$email, password:$password passwordOld:$passwordOld}){
@@ -41,10 +57,21 @@ mutation($id:ID $name:String, $surname:String, $role:String, $email:String, $pas
 }
 `;
 
+const userSearch = `
+query ($term:String) {
+  searchUser (term:$term) {
+  ${userFields}
+  }
+}
+`;
+
 export function loadUserList(role) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
 
+    if (getUsersIsFetching(getState(), role)) {
+      return false;
+    }
     dispatch({
       type: LOAD_USERS_START,
       payload: {
@@ -186,6 +213,67 @@ export function updateUser(user) {
         message: error.message || 'Something went wrong',
         properties,
         id: user.id,
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function findUser(term) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    // eslint-disable-next-line no-unused-vars
+    /*
+    dispatch({
+      type: FIND_USER_START,
+    });
+*/
+    try {
+      const { data } = await graphqlRequest(userSearch, term);
+      const normalizedData = normalize(data.searchUser, userArray);
+      dispatch({
+        type: FIND_USER_SUCCESS,
+        payload: normalizedData,
+      });
+    } catch (error) {
+      dispatch({
+        type: FIND_USER_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function fetchUser({ id }) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    // eslint-disable-next-line no-unused-vars
+
+    dispatch({
+      type: FETCH_USER_START,
+    });
+
+    try {
+      const { data } = await graphqlRequest(userQuery, { id });
+      const normalizedData = normalize(data.user, userSchema);
+      dispatch({
+        type: FETCH_USER_SUCCESS,
+        payload: normalizedData,
+        filter: 'all',
+      });
+    } catch (error) {
+      dispatch({
+        type: FETCH_USER_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
       });
       return false;
     }

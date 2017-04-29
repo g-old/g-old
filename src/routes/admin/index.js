@@ -18,7 +18,7 @@ export default {
 
   async action({ store }) {
     const user = getSessionUser(store.getState());
-    if (!user || !['admin', 'mod'].includes(user.role.type)) return { redirect: '/' };
+    if (!user || !['admin', 'mod'].includes(user.role.type)) { return { component: <div> You have to login as admin or mod!</div> }; }
 
     const Admin = await require.ensure([], require => require('./Admin').default, 'admin');
 

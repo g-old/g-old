@@ -18,6 +18,8 @@ class User {
     this.email = data.email;
     this.role_id = data.role_id;
     this.avatar = data.avatar_path;
+    this.emailValidated = data.email_validated;
+    this.lastLogin = data.last_login_at;
   }
   static async gen(viewer, id, { users }) {
     const data = await users.load(id);
@@ -50,7 +52,7 @@ class User {
   // eslint-disable-next-line no-unused-vars
   static canMutate(viewer, data) {
     // TODO Allow mutation of own data - attention to guests
-    return ['admin', 'mod', 'system', 'user', 'guest', 'viewer'].includes(viewer.role.type);
+    return ['admin', 'mod', 'system', 'user', 'viewer', 'guest'].includes(viewer.role.type);
   }
 
   static async update(viewer, data, loaders) {
@@ -82,14 +84,15 @@ class User {
     }
 
     if (data.role) {
-      const roleId = ['admin', 'mod', 'user', 'guest'].indexOf(data.role) + 1;
+      const roleId = ['admin', 'mod', 'user', 'viewer', 'guest'].indexOf(data.role) + 1;
       if (roleId > -1) {
         newData.role_id = roleId;
       }
     }
 
     // update
-    const updatedId = await knex.transaction(async trx => {
+    const updatedId = await knex.transaction(async (trx) => {
+      // TODO log certain actions in a separate table (role changes, rights, deletions)
       await trx
         .where({
           id: data.id,
@@ -123,7 +126,7 @@ class User {
     const avatar_path = `https://api.adorable.io/avatars/32/${name}${surname}.io.png`;
     // create
     // TODO check if locking with forUpdate is necessary (duplicate emails)
-    const newUserId = await knex.transaction(async trx => {
+    const newUserId = await knex.transaction(async (trx) => {
       const hash = await bcrypt.hash(data.password, 10);
       if (!hash) throw Error('Something went wrong');
       const id = await trx
@@ -152,6 +155,40 @@ class User {
       email: data.email,
       avatar_path,
     });
+  }
+
+  static async find(viewer, data, loaders) {
+    if (!data) return null;
+    // TODO validate data
+
+    // Since checks are applied in the gen method, we can skip authorization for now
+    const searchTerms = data.split(' ');
+    return knex('users')
+      .modify((queryBuilder) => {
+        if (searchTerms.length === 1) {
+          queryBuilder
+            .where('name', 'ilike', `${searchTerms[0]}%`)
+            .orWhere('surname', 'ilike', `${searchTerms[0]}%`);
+        } else if (searchTerms.length > 1) {
+          queryBuilder
+            .where(function () {
+              this.where('name', 'ilike', `${searchTerms[0]}%`).orWhere(
+                'surname',
+                'ilike',
+                `${searchTerms[1]}%`,
+              );
+            })
+            .orWhere(function () {
+              this.where('name', 'ilike', `${searchTerms[1]}%`).orWhere(
+                'surname',
+                'ilike',
+                `${searchTerms[0]}%`,
+              );
+            });
+        }
+      })
+      .pluck('id')
+      .then(ids => ids.map(id => User.gen(viewer, id, loaders)));
   }
 }
 

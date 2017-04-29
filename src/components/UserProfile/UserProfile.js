@@ -46,9 +46,16 @@ const messages = defineMessages({
 
 class UserProfile extends React.Component {
   static propTypes = {
-    user: PropTypes.object,
+    user: PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      email: PropTypes.string,
+      name: PropTypes.string,
+      surname: PropTypes.string,
+      avatar: PropTypes.string,
+    }).isRequired,
     updateUser: PropTypes.func.isRequired,
-    updates: PropTypes.object,
+    // eslint-disable-next-line react/forbid-prop-types
+    updates: PropTypes.object.isRequired,
   };
   constructor(props) {
     super(props);
