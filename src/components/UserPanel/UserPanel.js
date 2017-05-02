@@ -13,7 +13,7 @@ import SearchField from '../../components/SearchField';
 import { getVisibleUsers, getUsersIsFetching, getUsersErrorMessage } from '../../reducers';
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 
-function UserItem(user, obj) {
+function renderUserSuggestion(user, obj) {
   return (
     <span
       style={{
@@ -104,7 +104,7 @@ class UserPanel extends React.Component {
                 message={guestArrayErrorMessage}
                 onRetry={() => this.props.loadUserList('guest')}
               />}
-            {this.props.guestArray.map(user => UserItem(user, this))}
+            {this.props.guestArray.map(user => renderUserSuggestion(user, this))}
           </AccordionPanel>
           <AccordionPanel
             heading="Accounts with status viewer"
@@ -113,12 +113,16 @@ class UserPanel extends React.Component {
             }}
           >
             {viewerArrayIsFetching && !viewerArray.length && <p>Loading...</p>}
+            {!viewerArrayIsFetching &&
+              !viewerArray.length &&
+              !viewerArrayErrorMessage &&
+              <p> No data</p>}
             {viewerArrayErrorMessage &&
               <FetchError
                 message={viewerArrayErrorMessage}
                 onRetry={() => this.props.loadUserList('viewer')}
               />}
-            {this.props.viewerArray.map(user => UserItem(user, this))}
+            {this.props.viewerArray.map(user => renderUserSuggestion(user, this))}
           </AccordionPanel>
         </Accordion>
       </div>

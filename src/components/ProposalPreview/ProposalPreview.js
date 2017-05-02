@@ -19,7 +19,7 @@ class Proposal extends React.Component {
       pollOne: PropTypes.object,
       pollTwo: PropTypes.object,
       tags: PropTypes.arrayOf(PropTypes.object).isRequired,
-    }),
+    }).isRequired,
   };
   constructor(props) {
     super(props);
@@ -38,7 +38,8 @@ class Proposal extends React.Component {
         ? this.props.proposal.pollTwo
         : this.props.proposal.pollOne;
     } else if (
-      this.props.proposal.state === 'rejected' || this.props.proposal.state === 'revoked'
+      this.props.proposal.state === 'rejected' ||
+      this.props.proposal.state === 'revoked'
     ) {
       poll = thresholdPassed(this.props.proposal.pollOne)
         ? this.props.proposal.pollTwo
@@ -83,7 +84,6 @@ class Proposal extends React.Component {
               unipolar={poll.mode.unipolar}
             />
           </div>
-          {'TAGS :'}
           <div className={s.tags}>
             {this.props.proposal.tags &&
               this.props.proposal.tags.map(tag => <span className={s.tag}>{`${tag.text}`}</span>)}

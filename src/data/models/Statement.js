@@ -1,6 +1,7 @@
 import Poll from './Poll';
 import Vote from './Vote';
 import knex from '../knex';
+import User from './User';
 
 /* eslint-disable no-unused-vars */
 function checkCanSee(viewer, data) {
@@ -76,6 +77,7 @@ class Statement {
     const updatedId = await knex.transaction(async function (trx) {
       const statementInDB = await knex('statements').where({ id: data.id }).pluck('id');
       if (statementInDB.length !== 1) throw Error('Statement does not exist!');
+      if (statementInDB.deleted_at) throw Error('Statement cannot be changed');
       const newData = { updated_at: new Date(), body: data.text };
       await trx
         .where({ id: data.id })
@@ -131,6 +133,111 @@ class Statement {
     });
     if (!newStatementId) return null;
     return Statement.gen(viewer, newStatementId, loaders);
+  }
+
+  static async flag(viewer, data, loaders) {
+    // authorize
+    if (!Statement.canMutate(viewer, data)) return null;
+    // validate
+    if (!data) return null;
+    if (!data.statementId || !data.content) return null;
+    const content = data.content.trim();
+    if (!content.length > 1) return null;
+    const newFlaggedId = await knex.transaction(async (trx) => {
+      // get statement
+      const statementInDB = await Statement.gen(viewer, data.statementId, loaders);
+      if (!statementInDB) return null;
+      const author = await User.gen(viewer, statementInDB.author_id, loaders);
+      if (!author) return null;
+      // check if already flagged
+      let id = null;
+      const flagged = await trx
+        .where({ flagged_id: author.id, statement_id: statementInDB.id })
+        .pluck('id')
+        .into('flagged_statements');
+      id = flagged[0];
+      if (id) {
+        // update count;
+        await knex('flagged_statements')
+          .transacting('trx')
+          .forUpdate()
+          .where({ id })
+          .increment('flag_count', 1);
+      } else {
+        id = await trx
+          .insert({
+            flagger_id: viewer.id,
+            flagged_id: author.id,
+            statement_id: statementInDB.id,
+            content,
+            flag_count: 1,
+            created_at: new Date(),
+          })
+          .into('flagged_statements')
+          .returning('id');
+
+        id = id[0];
+      }
+      return id || null;
+      // should throw automatically if flagger, flagged or statment does not exist
+    });
+    if (!newFlaggedId) return null;
+    const res = await knex('flagged_statements').where({ id: newFlaggedId }).select();
+    return res[0];
+  }
+
+  static async solveFlag(viewer, data, loaders) {
+    // authorize
+    if (!Statement.canMutate(viewer, data)) return null;
+
+    // validate
+    if (!data) return null;
+    if (!data.id) return null;
+
+    const id = await knex.transaction(async (trx) => {
+      // update
+      let flaggedStmt = await knex('flagged_statements')
+        .transacting(trx)
+        .forUpdate()
+        .where({ id: data.id })
+        .select();
+      flaggedStmt = flaggedStmt[0];
+      if (!flaggedStmt || flaggedStmt.state !== 'open') return null;
+      // check statement exists
+      const statementInDB = await Statement.gen(viewer, flaggedStmt.statement_id, loaders);
+      if (!statementInDB) {
+        // already deleted by user
+        return null;
+      }
+
+      if (data.action === 1) {
+        // delete
+
+        // check if flaggedStatements
+        const text = `Deleted by moderation at ${new Date()}`;
+        await knex('statements')
+          .transacting(trx)
+          .forUpdate()
+          .where({ id: flaggedStmt.statement_id })
+          .update({ body: text, deleted_at: new Date() });
+        await knex('flagged_statements')
+          .transacting(trx)
+          .forUpdate()
+          .where({ id: flaggedStmt.id })
+          .update({ state: 'deleted', solver_id: viewer.id });
+      } else {
+        // reject
+        await knex('flagged_statements')
+          .transacting(trx)
+          .forUpdate()
+          .where({ id: flaggedStmt.id })
+          .update({ state: 'rejected', solver_id: viewer.id });
+      }
+      loaders.statements.clear(flaggedStmt.statement_id);
+      return flaggedStmt.id;
+    });
+    const res = await knex('flagged_statements').where({ id }).select();
+    return res[0];
   }
 }
 

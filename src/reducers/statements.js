@@ -8,6 +8,8 @@ import {
   DELETE_STATEMENT_SUCCESS,
   CREATE_LIKE_SUCCESS,
   DELETE_LIKE_SUCCESS,
+  LOAD_FLAGGEDSTMTS_SUCCESS,
+  UPDATE_FLAGGEDSTMT_SUCCESS,
 } from '../constants';
 
 export default function statements(state = {}, action) {
@@ -29,6 +31,12 @@ export default function statements(state = {}, action) {
       return merge({}, state, action.payload.entities.statements);
     }
     case UPDATE_STATEMENT_SUCCESS: {
+      return merge({}, state, action.payload.entities.statements);
+    }
+    case LOAD_FLAGGEDSTMTS_SUCCESS: {
+      return merge({}, state, action.payload.entities.statements);
+    }
+    case UPDATE_FLAGGEDSTMT_SUCCESS: {
       return merge({}, state, action.payload.entities.statements);
     }
     case DELETE_STATEMENT_SUCCESS: {

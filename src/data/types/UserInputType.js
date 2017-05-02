@@ -25,6 +25,10 @@ const UserInputType = new GraphQLInputObjectType({
       type: String,
     },
 
+    followee: {
+      type: ID,
+    },
+
     id: {
       type: ID,
       description: 'Must be provided for mutations',

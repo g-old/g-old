@@ -84,6 +84,7 @@ class CreateProposal extends React.Component {
           </div>
           <h2> PREVIEW</h2>
           <div className={s.preview} dangerouslySetInnerHTML={this.rawMarkup()} />
+
           <div className={s.formGroup}>
             <button className={s.button} onClick={this.onSubmit}> SUBMIT</button>
           </div>

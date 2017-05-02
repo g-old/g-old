@@ -17,13 +17,13 @@ export default combineReducers({
 });
 
 const hydrateUser = (data, entities) => denormalize(data, userSchema, entities);
-export const getUser = (state, id, entities) => {
-  const user = fromById.getUser(state.byId, id);
-  return hydrateUser(user, entities);
-};
-
 const hydrateUsers = (state, data, entities) =>
   denormalize(data, userArray, { ...entities, users: state.byId });
+
+export const getUser = (state, id, entities) => {
+  const user = fromById.getUser(state.byId, id);
+  return hydrateUser(user, { ...entities, users: entities.users.byId });
+};
 
 export const getVisibleUsers = (state, filter, entities) => {
   const ids = fromList.getIds(state.listByFilter[filter]);

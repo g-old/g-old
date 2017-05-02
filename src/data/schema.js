@@ -31,6 +31,10 @@ import updateUser from './mutations/updateUser';
 import uploadAvatar from './mutations/uploadAvatar';
 import searchUser from './queries/search';
 import user from './queries/user';
+import tags from './queries/tags';
+import flaggedStatements from './queries/flaggedStatements';
+import flag from './mutations/createFlaggedStatement';
+import solveFlag from './mutations/updateFlaggedStatement';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -45,6 +49,8 @@ const schema = new Schema({
       votes,
       searchUser,
       user,
+      tags,
+      flaggedStatements,
     },
   }),
   mutation: new ObjectType({
@@ -63,6 +69,8 @@ const schema = new Schema({
       //  createUser,
       updateUser,
       uploadAvatar,
+      flag,
+      solveFlag,
     },
   }),
 });

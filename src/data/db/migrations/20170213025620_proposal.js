@@ -1,4 +1,3 @@
-
 exports.up = function (knex, Promise) {
   return Promise.all([
     knex.schema.createTable('proposals', (table) => {
@@ -7,7 +6,10 @@ exports.up = function (knex, Promise) {
       table.foreign('author_id').references('users.id');
       table.string('title').notNullable();
       table.text('body').notNullable();
-      table.enu('state', ['proposed', 'voting', 'accepted', 'rejected', 'revoked', 'deleted']).notNullable().defaultsTo('ask_vote');
+      table
+        .enu('state', ['proposed', 'voting', 'accepted', 'rejected', 'revoked', 'deleted'])
+        .notNullable()
+        .defaultsTo('proposed');
       table.integer('votes').defaultsTo(0);
       table.timestamp('deleted_at');
       table.timestamps();
@@ -16,7 +18,5 @@ exports.up = function (knex, Promise) {
 };
 
 exports.down = function (knex, Promise) {
-  return Promise.all([
-    knex.schema.dropTable('proposals'),
-  ]);
+  return Promise.all([knex.schema.dropTable('proposals')]);
 };

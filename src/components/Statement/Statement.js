@@ -7,7 +7,8 @@ import { connect } from 'react-redux';
 import cn from 'classnames';
 import s from './Statement.css';
 import { createLike, deleteLike } from '../../actions/statement_like';
-import { deleteStatement } from '../../actions/statement';
+import { updateUser } from '../../actions/user';
+import { deleteStatement, flag } from '../../actions/statement';
 import {
   getStatementMutationIsPending,
   getStatementMutationSuccess,
@@ -30,15 +31,33 @@ class Statement extends React.Component {
         name: PropTypes.string,
         surname: PropTypes.string,
         avatar: PropTypes.string,
+        id: PropTypes.string,
       }),
-    }),
+    }).isRequired,
+    isFollowee: PropTypes.bool.isRequired,
     createLike: PropTypes.func.isRequired,
     deleteLike: PropTypes.func.isRequired,
-    ownLike: PropTypes.object,
+    updateUser: PropTypes.func.isRequired,
+    flag: PropTypes.func.isRequired,
+    ownLike: PropTypes.shape({ id: PropTypes.string }),
     ownStatement: PropTypes.bool,
-    deleteStatement: PropTypes.func,
-    user: PropTypes.object,
-    asInput: PropTypes.bool,
+    deleteStatement: PropTypes.func.isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.string,
+
+      role: PropTypes.shape({
+        type: PropTypes.string,
+      }),
+    }).isRequired,
+    asInput: PropTypes.bool.isRequired,
+  };
+
+  static defaultProps = {
+    ownLike: null,
+    ownStatement: false,
+    onSubmit() {
+      alert('NO ONSUBMIT');
+    },
   };
 
   constructor(props) {
@@ -110,10 +129,8 @@ class Statement extends React.Component {
     const isEmpty = this.state.textArea.val.length === 0;
     const hasMinimumInput = this.state.textArea.val.length >= 5;
     const inactive = this.props.asInput && isEmpty;
-    const canLike = this.props.user.role !== 'guest' &&
-      !this.props.asInput &&
-      !this.props.ownStatement;
-
+    const canLike =
+      this.props.user.role.type !== 'guest' && !this.props.asInput && !this.props.ownStatement;
     return (
       <div
         className={cn(
@@ -143,10 +160,33 @@ class Statement extends React.Component {
                     />}
                 </span>
               </div>
+              {!this.props.ownStatement &&
+                !this.props.isFollowee &&
+                <button
+                  onClick={() => {
+                    alert('IMPLEMENT FOLLOWING');
+                    this.props.updateUser({
+                      id: this.props.user.id,
+                      followee: this.props.data.author.id,
+                    });
+                  }}
+                >
+                  {' '}+Follow{' '}
+                </button>}
+              {!this.props.ownStatement &&
+                <button
+                  onClick={() =>
+                    this.props.flag({
+                      statementId: this.props.data.id,
+                      content: this.props.data.text,
+                    })}
+                >
+                  !Flag!
+                </button>}
               <span className={s.menu}>
                 {(this.props.asInput ||
                   this.props.ownStatement ||
-                  ['admin', 'mod'].includes(this.props.user.role)) &&
+                  ['admin', 'mod'].includes(this.props.user.role.type)) &&
                   <span style={{ marginRight: '0.5em' }}>
                     {this.state.edit
                       ? <span>
@@ -191,6 +231,8 @@ const mapDispatch = {
   createLike,
   deleteLike,
   deleteStatement,
+  updateUser,
+  flag,
 };
 const mapPropsToState = (state, { data }) => {
   const id = data.id || '0000'; // for creations

@@ -39,7 +39,7 @@ class Vote {
     if (!data.pollId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
 
-    const deletedVote = await knex.transaction(async trx => {
+    const deletedVote = await knex.transaction(async (trx) => {
       const oldVote = await Vote.validate(viewer, data, loaders, poll, trx, true);
       if (!oldVote || !oldVote.position) throw Error('Request invalid!');
       // eslint-disable-next-line eqeqeq
@@ -74,7 +74,7 @@ class Vote {
     if (await poll.isUnipolar(viewer, loaders)) {
       return null; // delete is the right method
     }
-    await knex.transaction(async trx => {
+    await knex.transaction(async (trx) => {
       const oldVote = await Vote.validate(viewer, data, loaders, poll, trx, true);
       if (!oldVote || !oldVote.position) throw Error('Position mismatch');
       // eslint-disable-next-line eqeqeq
@@ -117,7 +117,7 @@ class Vote {
     if (await poll.isUnipolar(viewer, loaders)) {
       position = 'pro';
     }
-    const newVoteId = await knex.transaction(async trx => {
+    const newVoteId = await knex.transaction(async (trx) => {
       const voteInDB = await knex('votes')
         .transacting(trx)
         .forUpdate()

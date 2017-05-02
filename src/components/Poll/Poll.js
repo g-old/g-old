@@ -11,7 +11,7 @@ import {
   getVotingListIsFetching,
   getVotingListErrorMessage,
   getVoteMutationIsPending,
-  getVoteMutationSuccess,
+  //  getVoteMutationSuccess,
   getVoteMutationError,
 } from '../../reducers';
 
@@ -52,17 +52,21 @@ class Poll extends React.Component {
           voter: PropTypes.object,
         }),
       ),
-    }),
-    user: PropTypes.object.isRequired,
-    fetchVotes: PropTypes.func,
+    }).isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.string,
+      role: PropTypes.shape({
+        type: PropTypes.string,
+      }),
+    }).isRequired,
+    fetchVotes: PropTypes.func.isRequired,
     onVoteButtonClicked: PropTypes.func.isRequired,
-    onStatementSubmit: PropTypes.func,
-    onDeleteStatement: PropTypes.func.isRequired,
-    mutationSuccess: PropTypes.bool,
-    mutationErrorMessage: PropTypes.string,
-    mutationIsPending: PropTypes.bool,
-    votingListIsFetching: PropTypes.bool,
-    votingListErrorMessage: PropTypes.string,
+    onStatementSubmit: PropTypes.func.isRequired,
+    // mutationSuccess: PropTypes.bool.isRequired,
+    mutationErrorMessage: PropTypes.string.isRequired,
+    mutationIsPending: PropTypes.bool.isRequired,
+    votingListIsFetching: PropTypes.bool.isRequired,
+    votingListErrorMessage: PropTypes.string.isRequired,
   };
   constructor(props) {
     super(props);
@@ -109,15 +113,19 @@ class Poll extends React.Component {
   }
 
   handleOnSubmit(input, update) {
-    const { id, pollId, position } = this.props.poll.ownVote;
-    this.props.onStatementSubmit(
-      {
-        ...input,
-        pollId: this.props.poll.id,
-        vote: { id, pollId, position },
-      },
-      update,
-    );
+    if (!this.props.poll.ownVote) {
+      alert('CHANGE: ADMIN/MODS CANNOT EDIT ANYMORE!');
+    } else {
+      const { id, pollId, position } = this.props.poll.ownVote;
+      this.props.onStatementSubmit(
+        {
+          ...input,
+          pollId: this.props.poll.id,
+          vote: { id, pollId, position },
+        },
+        update,
+      );
+    }
   }
 
   render() {
@@ -136,6 +144,7 @@ class Poll extends React.Component {
           ownStatement={this.props.poll.ownStatement}
           onSubmit={this.handleOnSubmit}
           ownVote={this.props.poll.ownVote}
+          followees={this.props.poll.followees}
         />
       );
     }
@@ -236,7 +245,7 @@ const mapPropsToState = (state, { poll: { id } }) => ({
   votingListIsFetching: getVotingListIsFetching(state, id),
   votingListErrorMessage: getVotingListErrorMessage(state, id),
   mutationIsPending: getVoteMutationIsPending(state, id),
-  mutationSuccess: getVoteMutationSuccess(state, id),
+  // mutationSuccess: getVoteMutationSuccess(state, id),
   mutationErrorMessage: getVoteMutationError(state, id),
 });
 

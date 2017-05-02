@@ -14,8 +14,11 @@ export default {
     if (!user || user.role.type === 'viewer') {
       return { redirect: '/' };
     }
-
-    store.dispatch(loadProposalsList(state));
+    if (!process.env.BROWSER) {
+      await store.dispatch(loadProposalsList(state));
+    } else {
+      store.dispatch(loadProposalsList(state));
+    }
     return {
       title,
       component: <Layout><ProposalOverviewContainer state={state} /> </Layout>,

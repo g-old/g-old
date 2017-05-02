@@ -4,19 +4,31 @@ import Statement from '../Statement';
 
 class StatementsList extends React.Component {
   static propTypes = {
-    statements: PropTypes.arrayOf(PropTypes.object),
+    statements: PropTypes.arrayOf(PropTypes.object).isRequired,
     likedStatements: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string,
         statementId: PropTypes.string,
       }),
-    ),
-    pollId: PropTypes.string,
-    user: PropTypes.object.isRequired,
+    ).isRequired,
+    pollId: PropTypes.string.isRequired,
+    user: PropTypes.shape({ id: PropTypes.string }).isRequired,
     voted: PropTypes.bool.isRequired,
-    ownStatement: PropTypes.object,
+    ownStatement: PropTypes.shape({ id: PropTypes.string }),
     onSubmit: PropTypes.func.isRequired,
-    ownVote: PropTypes.object,
+    ownVote: PropTypes.shape({
+      id: PropTypes.string,
+    }),
+    followees: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      }),
+    ).isRequired,
+  };
+
+  static defaultProps = {
+    ownVote: null,
+    ownStatement: null,
   };
 
   render() {
@@ -65,8 +77,8 @@ class StatementsList extends React.Component {
         {this.props.statements &&
           this.props.statements.map(
             statement =>
-            // eslint-disable-next-line eqeqeq
-              this.props.user.id != statement.author.id // to eliminate ownstatement from rendering
+              // eslint-disable-next-line eqeqeq
+              (this.props.user.id != statement.author.id // to eliminate ownstatement from rendering
                 ? <Statement
                   key={statement.id}
                   data={statement}
@@ -76,8 +88,11 @@ class StatementsList extends React.Component {
                   pollId={this.props.pollId}
                   ownStatement={false}
                   onSubmit={this.props.onSubmit}
+                  isFollowee={
+                      this.props.followees.find(f => f.voter.id === statement.author.id) != null
+                    }
                 />
-                : null,
+                : null),
           )}
         {/* eslint-enable no-confusing-arrow */}
       </div>

@@ -5,7 +5,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import cn from 'classnames';
 import { validateEmail as checkEmail } from '../../core/helpers';
-import { updateUser } from '../../actions/user';
+import { updateUser, fetchUser } from '../../actions/user';
 import s from './UserProfile.css';
 import { getSessionUser, getAccountUpdates } from '../../reducers';
 import {
@@ -52,10 +52,17 @@ class UserProfile extends React.Component {
       name: PropTypes.string,
       surname: PropTypes.string,
       avatar: PropTypes.string,
+      followees: PropTypes.arrayOf(
+        PropTypes.shape({
+          avatar: PropTypes.isRequired,
+        }),
+      ),
     }).isRequired,
     updateUser: PropTypes.func.isRequired,
     // eslint-disable-next-line react/forbid-prop-types
     updates: PropTypes.object.isRequired,
+    fetchUser: PropTypes.func.isRequired,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   };
   constructor(props) {
     super(props);
@@ -102,6 +109,11 @@ class UserProfile extends React.Component {
     );
   }
 
+  componentDidMount() {
+    const { id } = this.props.user;
+    this.props.fetchUser({ id });
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.updates.email) {
       this.setState({ showEmailInput: false });
@@ -111,6 +123,7 @@ class UserProfile extends React.Component {
       this.setState({ passwordOld: '', password: '', passwordAgain: '' });
     }
   }
+
   onEditEmail() {
     this.setState({ showEmailInput: !this.state.showEmailInput, email: this.props.user.email });
   }
@@ -198,7 +211,7 @@ class UserProfile extends React.Component {
     const updates = this.props.updates;
     // const showEmail = !updates.email.pending || updates.email.success || updates.email.error;
 
-    const { avatar, name, surname, email } = this.props.user;
+    const { avatar, name, surname, email, followees } = this.props.user;
     const emailField = this.state.showEmailInput
       ? (<input
         type="text"
@@ -216,7 +229,6 @@ class UserProfile extends React.Component {
       : null;
 
     const { password } = this.props.updates;
-
     return (
       <div className={s.root}>
         <div className={s.container}>
@@ -225,6 +237,27 @@ class UserProfile extends React.Component {
             <h3>{name}</h3>
             <h3>{surname}</h3>
             <h3>{'Some Data'}</h3>
+            <div>
+              Followees
+              <p>
+                {/* eslint-disable jsx-a11y/no-static-element-interactions */}
+                {followees &&
+                  followees.map(f => (
+                    <img
+                      onClick={() => {
+                        this.props.updateUser({
+                          id: this.props.user.id,
+                          followee: f.id,
+                        });
+                      }}
+                      src={f.avatar}
+                      alt=""
+                    />
+                  ))}
+                {/* eslint-enable jsx-a11y/no-static-element-interactions */}
+
+              </p>
+            </div>
           </div>
           <div>
             <h3> Settings</h3>
@@ -326,6 +359,7 @@ class UserProfile extends React.Component {
 }
 const mapDispatch = {
   updateUser,
+  fetchUser,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getSessionUser(state),

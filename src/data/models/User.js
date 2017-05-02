@@ -33,12 +33,9 @@ class User {
   }
 
   static async followees(id, { followees }) {
+    if (!id) return null;
     const data = await followees.load(id);
     return data;
-    /*  return Promise.resolve(knex('user_follows')
-    .where({ follower_id: id }).pluck('followee_id')
-    .then(ids => {return ids; }));
-      */
   }
 
   static async vote(id, pollId) {
@@ -57,6 +54,7 @@ class User {
 
   static async update(viewer, data, loaders) {
     // authenticate
+    console.log('UPDATINGUSER', data);
     if (!data.id) return null;
     if (!User.canMutate(viewer, data)) return null;
     // validate - if something seems corrupted, return.
@@ -65,7 +63,7 @@ class User {
     if (data.passwordOld && data.passwordOld.trim() > 6) return null;
     // TODO write fn which gets all the props with the right name
     // TODO Allow only specific updates, take car of role
-    const newData = {};
+    const newData = { updated_at: new Date() };
     if (data.email) {
       newData.email = data.email.trim();
       newData.email_validated = false;
@@ -82,6 +80,9 @@ class User {
       if (!hash) return null;
       newData.password_hash = hash;
     }
+    if (data.followee) {
+      console.log('FOLLOWEES', data.followee);
+    }
 
     if (data.role) {
       const roleId = ['admin', 'mod', 'user', 'viewer', 'guest'].indexOf(data.role) + 1;
@@ -93,6 +94,37 @@ class User {
     // update
     const updatedId = await knex.transaction(async (trx) => {
       // TODO log certain actions in a separate table (role changes, rights, deletions)
+
+      if (data.followee) {
+        // check if they are already following each others
+        const followee = await trx
+          .where({ follower_id: data.id, followee_id: data.followee })
+          .pluck('id')
+          .into('user_follows');
+        if (followee[0]) {
+          // delete
+          await trx
+            .where({ follower_id: data.id, followee_id: data.followee })
+            .del()
+            .into('user_follows');
+        } else {
+          // check if they are less than 5;
+          const numFollowees = await trx
+            .where({ follower_id: data.id })
+            .count('id')
+            .into('user_follows');
+
+          console.log('NUMFOLLOWEES', numFollowees);
+          if (numFollowees[0].count < 5) {
+            await trx
+              .insert({ follower_id: data.id, followee_id: data.followee })
+              .into('user_follows');
+          } else {
+            throw Error('To many followees');
+          }
+        }
+      }
+
       await trx
         .where({
           id: data.id,

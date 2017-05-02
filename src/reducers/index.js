@@ -65,3 +65,5 @@ export const getAccountUpdates = (state, id) => fromUi.getAccountUpdates(state.u
 export const getLocale = state => fromIntl.getLocale(state.intl);
 
 export const getUser = (state, id) => fromEntity.getUser(state.entities, id);
+
+export const getFlaggedStatements = state => fromEntity.getFlaggedStatements(state.entities);

@@ -40,21 +40,22 @@ const ProposalType = new ObjectType({
     tags: {
       type: new GraphQLList(TagType),
       resolve: (data, { id }, { loaders }) =>
-        Promise.resolve(knex('proposal_tags')
-        .where({ proposal_id: data.id })
-        .pluck('tag_id')
-      .then(tagIds => tagIds.map(tId => loaders.tags.load(tId)))),
+        Promise.resolve(
+          knex('proposal_tags')
+            .where({ proposal_id: data.id })
+            .pluck('tag_id')
+            .then(tagIds => tagIds.map(tId => loaders.tags.load(tId))),
+        ),
     },
     pollOne: {
       type: PollType,
       resolve: (parent, { id }, { viewer, loaders }) =>
-      Poll.gen(viewer, parent.pollOne_id, loaders),
-
+        Poll.gen(viewer, parent.pollOne_id, loaders),
     },
     pollTwo: {
       type: PollType,
       resolve: (parent, { id }, { viewer, loaders }) =>
-      Poll.gen(viewer, parent.pollTwo_id, loaders),
+        Poll.gen(viewer, parent.pollTwo_id, loaders),
     },
 
     state: {
@@ -65,18 +66,14 @@ const ProposalType = new ObjectType({
     },
     starts: {
       type: GraphQLString,
-      sqlColumn: 'vote_started_at',
     },
     ends: {
       type: GraphQLString,
-      sqlColumn: 'vote_ends_at',
     },
     publishedAt: {
       type: GraphQLString,
-      resolve: (data) => data.createdAt,
+      resolve: data => data.createdAt,
     },
-
   },
-
 });
 export default ProposalType;

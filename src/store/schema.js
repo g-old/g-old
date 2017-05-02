@@ -1,8 +1,10 @@
 import { schema } from 'normalizr';
 
 export const role = new schema.Entity('roles');
-export const user = new schema.Entity('users', {
+export const user = new schema.Entity('users');
+user.define({
   role,
+  followees: [user],
 });
 export const pollingMode = new schema.Entity('pollingModes');
 export const vote = new schema.Entity('votes', {
@@ -14,7 +16,12 @@ export const statement = new schema.Entity('statements', {
   author: user,
   vote,
 });
-
+export const flaggedStatement = new schema.Entity('flaggedStatements', {
+  flagger: user,
+  flaggedUser: user,
+  solver: user,
+  statement,
+});
 export const poll = new schema.Entity('polls', {
   author: user,
   statements: [statement],
@@ -35,3 +42,4 @@ export const proposal = new schema.Entity('proposals', {
 export const proposalList = [proposal];
 export const voteList = [vote];
 export const userList = [user];
+export const flaggedStatementArray = [flaggedStatement];

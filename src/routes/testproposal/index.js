@@ -14,8 +14,12 @@ export default {
     if (!user || user.role.type === 'viewer') {
       return { redirect: '/' };
     }
+    if (!process.env.BROWSER) {
+      await store.dispatch(loadProposal({ id }));
+    } else {
+      store.dispatch(loadProposal({ id }));
+    }
 
-    store.dispatch(loadProposal({ id }));
     return {
       title,
       component: (
