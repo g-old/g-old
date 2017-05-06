@@ -1,5 +1,7 @@
 import knex from '../knex';
 import Poll from './Poll';
+import Activity from './Activity';
+
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
@@ -152,6 +154,33 @@ class Vote {
     });
     if (!newVoteId) return null;
     return Vote.gen(viewer, newVoteId, loaders);
+  }
+
+  static async insertInFeed(viewer, vote, verb) {
+    // create activity;
+    const activityId = await Activity.create(
+      { id: viewer.id },
+      { action: 'create', verb, type: 'vote', objectId: vote.id },
+    );
+    // add activity to feed
+    // create activity;
+
+    // TODO extract
+    // insert only in  own feed to for followers
+    let aIds = await knex('feeds').where({ user_id: viewer.id }).select('activity_ids');
+    if (!aIds[0]) {
+      await knex('feeds').insert({
+        user_id: viewer.id,
+        activity_ids: JSON.stringify(activityId),
+        created_at: new Date(),
+      });
+    } else {
+      aIds = aIds[0].activity_ids || [];
+      aIds.push(activityId[0]);
+      await knex('feeds')
+        .where({ user_id: viewer.id })
+        .update({ activity_ids: JSON.stringify(aIds), updated_at: new Date() });
+    }
   }
 }
 

@@ -1,6 +1,4 @@
-import {
-  GraphQLNonNull,
-} from 'graphql';
+import { GraphQLNonNull } from 'graphql';
 import VoteInputType from '../types/VoteInputType';
 import Vote from '../models/Vote';
 import VoteType from '../types/VoteDLType';
@@ -12,11 +10,11 @@ const createVote = {
       type: VoteInputType,
     },
   },
-  resolve: (data, { vote }, { viewer, loaders }) => {
-    const res = Vote.create(viewer, vote, loaders);
-    return res;
-  },
-
+  resolve: (data, { vote }, { viewer, loaders }) =>
+    Vote.create(viewer, vote, loaders).then((res) => {
+      Vote.insertInFeed(viewer, res, 'create');
+      return res;
+    }),
 };
 
 export default createVote;

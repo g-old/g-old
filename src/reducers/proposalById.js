@@ -1,5 +1,5 @@
 import merge from 'lodash.merge';
-import { LOAD_PROPOSAL_LIST_SUCCESS, LOAD_PROPOSAL_SUCCESS } from '../constants';
+import { LOAD_PROPOSAL_LIST_SUCCESS, LOAD_PROPOSAL_SUCCESS, LOAD_FEED_SUCCESS } from '../constants';
 
 export default function byId(state = {}, action) {
   /* if (action.payload.entities.proposals) {
@@ -9,6 +9,9 @@ export default function byId(state = {}, action) {
     };
   } */
   switch (action.type) {
+    case LOAD_FEED_SUCCESS: {
+      return merge({}, state, action.payload.entities.proposals);
+    }
     case LOAD_PROPOSAL_SUCCESS: {
       return merge({}, state, action.payload.entities.proposals);
     }

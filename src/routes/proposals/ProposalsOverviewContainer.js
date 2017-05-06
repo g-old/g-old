@@ -13,11 +13,13 @@ import FetchError from '../../components/FetchError';
 
 class ProposalContainer extends React.Component {
   static propTypes = {
-    proposals: PropTypes.arrayOf(PropTypes.object),
+    proposals: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.string,
+    })).isRequired,
     filter: PropTypes.string.isRequired,
     isFetching: PropTypes.bool.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
-    errorMessage: PropTypes.string,
+    errorMessage: PropTypes.string.isRequired,
   };
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
@@ -44,7 +46,6 @@ class ProposalContainer extends React.Component {
     );
   }
 }
-ProposalContainer.propTypes = {};
 // TODO implement memoiziation with reselect
 const mapStateToProps = (state, ownProps) => ({
   proposals: getVisibleProposals(state, ownProps.state),

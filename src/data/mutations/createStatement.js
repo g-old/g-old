@@ -1,6 +1,4 @@
-import {
-  GraphQLNonNull,
-} from 'graphql';
+import { GraphQLNonNull } from 'graphql';
 import StatementInputType from '../types/StatementInputType';
 import StatementType from '../types/StatementDLType';
 import Statement from '../models/Statement';
@@ -14,8 +12,10 @@ const createStatement = {
     },
   },
   resolve: (data, { statement }, { viewer, loaders }) =>
-      Statement.create(viewer, statement, loaders),
-
+    Statement.create(viewer, statement, loaders).then((res) => {
+      Statement.insertInFeed(viewer, res, 'create');
+      return res;
+    }),
 };
 
 export default createStatement;

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { FormattedDate } from 'react-intl';
 import Statement from '../Statement';
 import { loadFlaggedStatements, solveFlag } from '../../actions/statement';
 import { getFlaggedStatements } from '../../reducers';
@@ -16,10 +17,22 @@ const renderMenu = (solveFn, id, statementId) => (
   </div>
 );
 const renderFlaggedStatement = (data, flagFn) => (
-  <div style={{ backgroundColor: 'yellow', marginBottom: '1em' }}>
+  <div style={{ backgroundColor: '#FFD602', marginBottom: '1em' }}>
     Flagged by: {renderUserInfo(data.flagger)}
     Flagged user: {renderUserInfo(data.flaggedUser)}
-    Flagged at: {data.createdAt} <br />
+    Flagged at:
+    <FormattedDate
+      value={data.createdAt}
+      weekday="long"
+      day="numeric"
+      month="long"
+      year="numeric"
+      hour="numeric"
+      minute="numeric"
+      second="numeric"
+    />
+
+    <br />
     Flag count: {data.count} <br />
     State: {data.state} <br />
     Flagged content: <p>{data.content}</p>

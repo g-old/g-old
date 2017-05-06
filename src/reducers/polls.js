@@ -10,6 +10,7 @@ import {
   DELETE_STATEMENT_SUCCESS,
   CREATE_LIKE_SUCCESS,
   DELETE_LIKE_SUCCESS,
+  LOAD_FEED_SUCCESS,
 } from '../constants';
 
 export default function polls(state = {}, action) {
@@ -46,6 +47,9 @@ export default function polls(state = {}, action) {
       return merge({}, state, action.payload.entities.polls);
 
     case LOAD_PROPOSAL_LIST_SUCCESS: {
+      return merge({}, state, action.payload.entities.polls);
+    }
+    case LOAD_FEED_SUCCESS: {
       return merge({}, state, action.payload.entities.polls);
     }
     case UPDATE_VOTE_SUCCESS: {

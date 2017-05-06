@@ -9,6 +9,7 @@ import pollingModes from './pollingModes';
 import votes from './votes';
 import statementLikes from './statementLikes';
 import flaggedStatements, * as fromFlaggedStatements from './flaggedStatements';
+import activities, * as fromActivities from './activities';
 
 export default combineReducers({
   users,
@@ -21,6 +22,7 @@ export default combineReducers({
   votes,
   statementLikes,
   flaggedStatements,
+  activities,
 });
 
 export const getVisibleProposals = (state, filter) =>
@@ -46,3 +48,9 @@ export const getUsersErrorMessage = (state, filter) =>
 
 export const getFlaggedStatements = state =>
   fromFlaggedStatements.getStatements(state.flaggedStatements, state);
+
+export const getActivities = state => fromActivities.getActivities(state.activities, state);
+
+export const getFeedIsFetching = state => fromActivities.getIsFetching(state.activities);
+
+export const getFeedErrorMessage = state => fromActivities.getErrorMessage(state.activities);

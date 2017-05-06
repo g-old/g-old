@@ -2,6 +2,13 @@ exports.seed = function (knex, Promise) {
   // Deletes ALL existing entries
   // TODO maybe put in a transaction
   const deleteQueue = [
+    knex('activities')
+      .del()
+      .then(() => knex.raw('ALTER SEQUENCE activities_id_seq RESTART WITH 1;')),
+    knex('feeds').del().then(() => knex.raw('ALTER SEQUENCE feeds_id_seq RESTART WITH 1;')),
+    knex('system_feeds')
+      .del()
+      .then(() => knex.raw('ALTER SEQUENCE system_feeds_id_seq RESTART WITH 1;')),
     knex('flagged_statements')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE flagged_statements_id_seq RESTART WITH 1;')),

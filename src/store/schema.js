@@ -39,7 +39,20 @@ export const proposal = new schema.Entity('proposals', {
   pollTwo: poll,
   tags: [tag],
 });
+export const unionSchema = new schema.Union(
+  {
+    ProposalDL: proposal,
+    VoteDL: vote,
+    StatementDL: statement,
+  },
+  '__typename',
+);
+export const activity = new schema.Entity('activities', {
+  actor: user,
+  object: unionSchema,
+});
 export const proposalList = [proposal];
 export const voteList = [vote];
 export const userList = [user];
 export const flaggedStatementArray = [flaggedStatement];
+export const activityArray = [activity];

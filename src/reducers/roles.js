@@ -8,6 +8,7 @@ import {
   FETCH_USER_SUCCESS,
   UPDATE_USER_SUCCESS,
   LOAD_FLAGGEDSTMTS_SUCCESS,
+  LOAD_FEED_SUCCESS,
 } from '../constants';
 
 export default function roles(state = {}, action) {
@@ -16,6 +17,7 @@ export default function roles(state = {}, action) {
     case LOAD_PROPOSAL_LIST_SUCCESS: {
       return merge({}, state, action.payload.entities.roles);
     }
+    case LOAD_FEED_SUCCESS:
     case UPDATE_USER_SUCCESS:
     case FETCH_USER_SUCCESS:
     case FIND_USER_SUCCESS:

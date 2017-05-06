@@ -11,7 +11,11 @@ const createProposal = {
       description: 'Create a new Proposal',
     },
   },
-  resolve: (data, { proposal }, { viewer, loaders }) => Proposal.create(viewer, proposal, loaders),
+  resolve: (data, { proposal }, { viewer, loaders }) =>
+    Proposal.create(viewer, proposal, loaders).then((res) => {
+      Proposal.insertInFeed(viewer, res, 'create');
+      return res;
+    }),
 };
 
 export default createProposal;

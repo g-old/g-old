@@ -12,10 +12,14 @@ import {
   FIND_USER_SUCCESS,
   FETCH_USER_SUCCESS,
   LOAD_FLAGGEDSTMTS_SUCCESS,
+  LOAD_FEED_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
   switch (action.type) {
+    case LOAD_FEED_SUCCESS: {
+      return merge({}, state, action.payload.entities.users);
+    }
     case LOAD_PROPOSAL_SUCCESS: {
       return merge({}, state, action.payload.entities.users);
     }

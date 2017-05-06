@@ -6,6 +6,8 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import s from './AccountProfile.css';
 import { fetchUser } from '../../actions/user';
 import { getUser, getAccountUpdates } from '../../reducers';
+import Accordion from '../Accordion';
+import AccordionPanel from '../AccordionPanel';
 
 const messages = defineMessages({
   role: {
@@ -116,23 +118,45 @@ class AccountProfile extends React.Component {
             {role.type === 'guest' &&
               <button onClick={this.onPromoteToViewer}> PromoteToViewer </button>}
           </p>
+
           <p>
-            <button
-              onClick={() => {
-                alert('TO IMPLEMENT! \n mail, sms, accountmsg, messenger ?');
-              }}
-            >
-              <FormattedMessage {...messages.notify} />
-            </button>
-          </p>
-          <p>
-            <button
-              onClick={() => {
-                alert('TO IMPLEMENT! \n voteing, as mod, etc');
-              }}
-            >
-              <FormattedMessage {...messages.changeRights} />
-            </button>
+
+            <Accordion>
+              <AccordionPanel heading={'Notify user'}>
+                {'If you see this, you can notify users'} <br />
+
+                WRITE
+                <textarea />
+                <p>
+                  <button
+                    onClick={() => {
+                      alert('TO IMPLEMENT! \n mail, sms, accountmsg, messenger ?');
+                    }}
+                  >
+                    <FormattedMessage {...messages.notify} />
+                  </button>
+                </p>
+              </AccordionPanel>
+              <AccordionPanel heading={'Rights'}>
+                {'If you see this, you can change permissions/privileges'} <br />
+                <input type="checkbox" value="Bike" /> {'can unlock Viewer'} <br />
+                <input type="checkbox" value="Bike" /> {'can unlock User'}<br />
+                <input type="checkbox" value="Bike" /> {'can unlock Mod'}<br />
+                <input type="checkbox" value="Bike" /> {'can unlock Admin'}<br />
+                <input type="checkbox" value="Bike" /> {'can change roles'}<br />
+                <input type="checkbox" value="Bike" /> {'can change rights'}<br />
+                <input type="checkbox" value="Bike" /> {'can notify users'}<br />
+
+                <button
+                  onClick={() => {
+                    alert('TO IMPLEMENT! \n voteing, as mod, etc');
+                  }}
+                >
+                  <FormattedMessage {...messages.changeRights} />
+                </button>
+                <br />
+              </AccordionPanel>
+            </Accordion>
           </p>
           <p>
             <button

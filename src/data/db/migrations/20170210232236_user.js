@@ -1,5 +1,3 @@
-
-
 exports.up = function (knex, Promise) {
   return Promise.all([
     knex.schema.createTable('users', (table) => {
@@ -12,6 +10,7 @@ exports.up = function (knex, Promise) {
       table.string('password_hash');
       table.integer('role_id').unsigned().notNullable();
       table.foreign('role_id').references('roles.id');
+      table.integer('privilege').defaultsTo(0);
       table.timestamp('last_login_at');
       table.timestamps();
       table.timestamp('deleted_at'); // defaultTo(knex.raw('now()')).notNullable();
@@ -20,7 +19,5 @@ exports.up = function (knex, Promise) {
 };
 
 exports.down = function (knex, Promise) {
-  return Promise.all([
-    knex.schema.dropTable('users'),
-  ]);
+  return Promise.all([knex.schema.dropTable('users')]);
 };

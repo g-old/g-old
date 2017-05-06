@@ -8,6 +8,7 @@ import {
   DELETE_VOTE_SUCCESS,
   CREATE_STATEMENT_SUCCESS,
   LOAD_FLAGGEDSTMTS_SUCCESS,
+  LOAD_FEED_SUCCESS,
 } from '../constants';
 
 export default function votes(state = {}, action) {
@@ -15,6 +16,8 @@ export default function votes(state = {}, action) {
     case CREATE_VOTE_SUCCESS:
       return merge({}, state, action.payload.entities.votes);
     case LOAD_VOTES_SUCCESS:
+      return merge({}, state, action.payload.entities.votes);
+    case LOAD_FEED_SUCCESS:
       return merge({}, state, action.payload.entities.votes);
     case LOAD_FLAGGEDSTMTS_SUCCESS: {
       return merge({}, state, action.payload.entities.votes);

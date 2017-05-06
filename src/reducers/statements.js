@@ -10,6 +10,7 @@ import {
   DELETE_LIKE_SUCCESS,
   LOAD_FLAGGEDSTMTS_SUCCESS,
   UPDATE_FLAGGEDSTMT_SUCCESS,
+  LOAD_FEED_SUCCESS,
 } from '../constants';
 
 export default function statements(state = {}, action) {
@@ -26,6 +27,9 @@ export default function statements(state = {}, action) {
       // eslint-disable-next-line no-unused-vars
       const { ownStatementId: omit, ...other } = state;
       return other;
+    }
+    case LOAD_FEED_SUCCESS: {
+      return merge({}, state, action.payload.entities.statements);
     }
     case CREATE_STATEMENT_SUCCESS: {
       return merge({}, state, action.payload.entities.statements);

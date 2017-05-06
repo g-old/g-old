@@ -10,7 +10,8 @@ const getUsersById = userIds =>
           // eslint-disable-next-line eqeqeq
           id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
         ),
-      ));
+      ),
+    );
   });
 
 // TODO check if this behaviour can be achieved with SQL
@@ -51,7 +52,8 @@ const getRolesById = roleIds =>
           // eslint-disable-next-line eqeqeq
           id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
         ),
-      ));
+      ),
+    );
   });
 
 const getProposalsById = proposalIds =>
@@ -62,7 +64,8 @@ const getProposalsById = proposalIds =>
           // eslint-disable-next-line eqeqeq
           id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
         ),
-      ));
+      ),
+    );
   });
 
 const getPollsById = pollIds =>
@@ -73,7 +76,8 @@ const getPollsById = pollIds =>
           // eslint-disable-next-line eqeqeq
           id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
         ),
-      ));
+      ),
+    );
   });
 const getVotesById = voteIds =>
   new Promise((resolve) => {
@@ -83,7 +87,8 @@ const getVotesById = voteIds =>
           // eslint-disable-next-line eqeqeq
           id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
         ),
-      ));
+      ),
+    );
   });
 
 const getStatementsById = statementIds =>
@@ -94,7 +99,8 @@ const getStatementsById = statementIds =>
           // eslint-disable-next-line eqeqeq
           id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
         ),
-      ));
+      ),
+    );
   });
 
 const getPollingModesById = pollingModeIds =>
@@ -105,7 +111,8 @@ const getPollingModesById = pollingModeIds =>
           // eslint-disable-next-line eqeqeq
           id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
         ),
-      ));
+      ),
+    );
   });
 
 const getTagsById = tagIds =>
@@ -116,7 +123,8 @@ const getTagsById = tagIds =>
           // eslint-disable-next-line eqeqeq
           id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
         ),
-      ));
+      ),
+    );
   });
 
 const getStatementLikesById = likeIds =>
@@ -127,7 +135,20 @@ const getStatementLikesById = likeIds =>
           // eslint-disable-next-line eqeqeq
           id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
         ),
-      ));
+      ),
+    );
+  });
+
+const getActivitiesById = activityIds =>
+  new Promise((resolve) => {
+    knex('activities').whereIn('id', activityIds).select().then(data =>
+      resolve(
+        activityIds.map(
+          // eslint-disable-next-line eqeqeq
+          id => data.find(row => row.id == id) || new Error(`Row not found: ${id}`),
+        ),
+      ),
+    );
   });
 
 function createLoaders() {
@@ -142,6 +163,7 @@ function createLoaders() {
     pollingModes: new DataLoader(ids => getPollingModesById(ids)),
     tags: new DataLoader(ids => getTagsById(ids)),
     statementLikes: new DataLoader(ids => getStatementLikesById(ids)),
+    activities: new DataLoader(ids => getActivitiesById(ids)),
   };
 }
 

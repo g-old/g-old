@@ -2,6 +2,7 @@ import Poll from './Poll';
 import Vote from './Vote';
 import knex from '../knex';
 import User from './User';
+import Activity from './Activity';
 
 /* eslint-disable no-unused-vars */
 function checkCanSee(viewer, data) {
@@ -238,6 +239,42 @@ class Statement {
     });
     const res = await knex('flagged_statements').where({ id }).select();
     return res[0];
+  }
+
+  static async insertInFeed(viewer, statement, verb) {
+    // create activity;
+    const userId = 2;
+    const activityId = await Activity.create(
+      { id: viewer.id },
+      { action: 'create', verb, type: 'statement', objectId: statement.id },
+    );
+    // add activity to feed
+    // create activity;
+
+    let aIds = await knex('system_feeds').where({ user_id: userId }).select('activity_ids');
+    aIds = aIds[0].activity_ids || [];
+    aIds.push(activityId[0]);
+    await knex('system_feeds')
+      .where({ user_id: userId })
+      .update({ activity_ids: JSON.stringify(aIds), updated_at: new Date() });
+
+    // TODO extract
+    // insert also in own feed to for followers
+    aIds = await knex('feeds').where({ user_id: viewer.id }).select('activity_ids');
+
+    if (!aIds[0]) {
+      await knex('feeds').insert({
+        user_id: viewer.id,
+        activity_ids: JSON.stringify(activityId),
+        created_at: new Date(),
+      });
+    } else {
+      aIds = aIds[0].activity_ids || [];
+      aIds.push(activityId[0]);
+      await knex('feeds')
+        .where({ user_id: viewer.id })
+        .update({ activity_ids: JSON.stringify(aIds), updated_at: new Date() });
+    }
   }
 }
 

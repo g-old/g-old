@@ -74,5 +74,25 @@ export const FLAG_STATEMENT_ERROR = 'FLAG_STATEMENT_ERROR';
 export const UPDATE_FLAGGEDSTMT_START = 'UPDATE_FLAGGEDSTMT_START';
 export const UPDATE_FLAGGEDSTMT_SUCCESS = 'UPDATE_FLAGGEDSTMT_SUCCESS';
 export const UPDATE_FLAGGEDSTMT_ERROR = 'UPDATE_FLAGGEDSTMT_ERROR';
+export const LOAD_FEED_START = 'LOAD_FEED_START';
+export const LOAD_FEED_SUCCESS = 'LOAD_FEED_SUCCESS';
+export const LOAD_FEED_ERROR = 'LOAD_FEED_ERROR';
 
 export const ADD_ENTITIES = 'ADD_ENTITIES';
+
+// Con: Not very flexible, you cannot see the role/group/right
+export const PRIVILEGES = {
+  guest: 1,
+  viewer: 2,
+  user: 4,
+  mod: 8,
+  system: 512,
+  admin: 1024,
+  canUnlockViewer: 2048,
+  canUnlockUser: 4096,
+  canUnlockMod: 8192,
+  canUnlockAdmin: 16384,
+  canNotifyUser: 32768,
+  canModifyRights: 65536,
+  canModifyRoles: 131072,
+};
