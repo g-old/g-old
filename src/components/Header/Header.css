@@ -25,16 +25,6 @@
   padding: 0.1em;
 }
 
-.brand {
-  color: color(var(--brand-color) lightness(+10%));
-  text-decoration: none;
-  font-size: 1.75em; /* ~28px */
-}
-
-.brandTxt {
-  margin-left: px;
-}
-
 .banner {
   text-align: center;
 }

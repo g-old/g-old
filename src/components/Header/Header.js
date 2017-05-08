@@ -12,7 +12,6 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Header.css';
 import Navigation from '../Navigation';
-import LanguageSwitcher from '../LanguageSwitcher';
 import UserStatus from '../UserStatus';
 
 const messages = defineMessages({
@@ -38,8 +37,7 @@ class Header extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <Navigation className={s.nav} />
-          <LanguageSwitcher />
+          <Navigation />
           <UserStatus />
           <div className={s.banner}>
             <h1 className={s.bannerTitle}>

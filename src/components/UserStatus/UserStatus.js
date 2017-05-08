@@ -9,7 +9,11 @@ import Link from '../Link';
 
 class UserStatus extends React.Component {
   static propTypes = {
-    user: PropTypes.object,
+    user: PropTypes.shape({
+      id: PropTypes.int,
+      avatar: PropTypes.string,
+      name: PropTypes.string,
+    }).isRequired,
     logout: PropTypes.func.isRequired,
   };
   render() {
@@ -17,19 +21,25 @@ class UserStatus extends React.Component {
       <div>
         {this.props.user &&
           this.props.user.id &&
-          <span>
-            <Link to={'/account'}>
-              <img className={s.avatar} src={this.props.user.avatar} alt="IMG" />
-            </Link>
-            {this.props.user.name}
-            <button
-              onClick={() => {
-                this.props.logout();
-              }}
-            >
-              LOGOUT
-            </button>
-          </span>}
+          <div style={{ display: 'flex' }}>
+            <span>
+              <Link to={'/account'}>
+                <img className={s.avatar} src={this.props.user.avatar} alt="IMG" />
+              </Link>
+            </span>
+            <span>
+              <div>
+                {this.props.user.name}
+              </div>
+              <button
+                onClick={() => {
+                  this.props.logout();
+                }}
+              >
+                LOGOUT
+              </button>
+            </span>
+          </div>}
       </div>
     );
   }

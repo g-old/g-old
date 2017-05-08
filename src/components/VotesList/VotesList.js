@@ -8,18 +8,23 @@ import FetchError from '../FetchError';
 class VotesList extends React.Component {
   static propTypes = {
     unipolar: PropTypes.bool.isRequired,
-    votes: PropTypes.arrayOf(PropTypes.object),
+    votes: PropTypes.arrayOf(PropTypes.object).isRequired,
     getVotes: PropTypes.func.isRequired,
     autoLoadVotes: PropTypes.bool,
     isFetching: PropTypes.bool.isRequired,
     errorMessage: PropTypes.string,
   };
 
+  static defaultProps = {
+    autoLoadVotes: false,
+    errorMessage: 'Error.',
+  }
+
   static renderVote(vote) {
     return (
       <img
         key={vote.id}
-        style={{ width: '2em', height: '2em', margin: '2px' }}
+        className={s.avatar}
         src={vote.voter.avatar}
         title={`${vote.voter.name} ${vote.voter.surname}`}
         alt="IMG"

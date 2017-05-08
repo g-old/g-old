@@ -9,6 +9,7 @@
 
 import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import LanguageSwitcher from '../LanguageSwitcher';
 import s from './Footer.css';
 import Link from '../Link';
 
@@ -20,6 +21,7 @@ class Footer extends React.Component {
           <span className={s.text}>© G O L D</span>
           <span className={s.spacer}>·</span>
           <Link className={s.link} to="/">Home</Link>
+          <LanguageSwitcher />
         </div>
       </div>
     );
