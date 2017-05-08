@@ -46,7 +46,7 @@ a:visited {
 }
 
 .tag {
-  margin: 0 2px;
+  margin: 0 2px 2px;
   padding: 0 2px;
   border: solid 1px gray;
   border-radius: 3px;
