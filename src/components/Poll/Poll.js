@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-
+import { FormattedRelative } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import StatementsList from '../StatementsList';
@@ -232,7 +232,9 @@ class Poll extends React.Component {
           </div>
         </div>
         <p>
-          {`CLOSES AT ${this.props.poll.end_time}`}
+          {'CLOSES AT '}
+          <FormattedRelative value={this.props.poll.end_time} />
+
         </p>
         {mutationErrorMessage && <div> {'ERROR:'} </div>}
         {votingButtons}

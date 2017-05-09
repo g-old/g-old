@@ -82,17 +82,12 @@ export const ADD_ENTITIES = 'ADD_ENTITIES';
 
 // Con: Not very flexible, you cannot see the role/group/right
 export const PRIVILEGES = {
-  guest: 1,
-  viewer: 2,
-  user: 4,
-  mod: 8,
-  system: 512,
-  admin: 1024,
-  canUnlockViewer: 2048,
-  canUnlockUser: 4096,
-  canUnlockMod: 8192,
-  canUnlockAdmin: 16384,
-  canNotifyUser: 32768,
-  canModifyRights: 65536,
-  canModifyRoles: 131072,
+  none: 1,
+  canUnlockViewer: 2,
+  canUnlockUser: 4,
+  canUnlockMod: 8,
+  canUnlockAdmin: 16,
+  canNotifyUser: 32,
+  canModifyRights: 64,
+  canModifyRoles: 128,
 };

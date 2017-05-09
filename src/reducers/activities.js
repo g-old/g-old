@@ -23,5 +23,5 @@ export const getActivities = (state, entities) => {
   return hydrateActivities(state, data, entities);
 };
 
-export const getIsFetching = state => fromList.getIsFetching(state);
-export const getErrorMessage = state => fromList.getErrorMessage(state);
+export const getIsFetching = state => fromList.getIsFetching(state.allIds);
+export const getErrorMessage = state => fromList.getErrorMessage(state.allIds);

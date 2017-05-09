@@ -298,5 +298,77 @@
     "files": [
       "src/components/AccountProfile/AccountProfile.js"
     ]
+  },
+  {
+    "id": "privilege.changeRights",
+    "description": "Account can change rights",
+    "defaultMessage": "change rights",
+    "message": "",
+    "files": [
+      "src/components/PrivilegeManager/PrivilegeManager.js"
+    ]
+  },
+  {
+    "id": "privilege.changeRoles",
+    "description": "Account can change roles",
+    "defaultMessage": "change roles",
+    "message": "",
+    "files": [
+      "src/components/PrivilegeManager/PrivilegeManager.js"
+    ]
+  },
+  {
+    "id": "privilege.notifyUser",
+    "description": "Account can send messages to other account",
+    "defaultMessage": "notify accounts",
+    "message": "",
+    "files": [
+      "src/components/PrivilegeManager/PrivilegeManager.js"
+    ]
+  },
+  {
+    "id": "privilege.unlockAdmin",
+    "description": "Account can unlock admin rank",
+    "defaultMessage": "unlock admin",
+    "message": "",
+    "files": [
+      "src/components/PrivilegeManager/PrivilegeManager.js"
+    ]
+  },
+  {
+    "id": "privilege.unlockMod",
+    "description": "Account can unlock mod rank",
+    "defaultMessage": "unlock mod",
+    "message": "",
+    "files": [
+      "src/components/PrivilegeManager/PrivilegeManager.js"
+    ]
+  },
+  {
+    "id": "privilege.unlockUser",
+    "description": "Account can unlock user rank",
+    "defaultMessage": "unlock user",
+    "message": "",
+    "files": [
+      "src/components/PrivilegeManager/PrivilegeManager.js"
+    ]
+  },
+  {
+    "id": "privilege.unlockViewer",
+    "description": "Account can unlock viewer rank",
+    "defaultMessage": "unlock viewer",
+    "message": "",
+    "files": [
+      "src/components/PrivilegeManager/PrivilegeManager.js"
+    ]
+  },
+  {
+    "id": "privilege.header",
+    "description": "Header of privilegemanager",
+    "defaultMessage": "Set & Change Privileges",
+    "message": "",
+    "files": [
+      "src/components/PrivilegeManager/PrivilegeManager.js"
+    ]
   }
 ]

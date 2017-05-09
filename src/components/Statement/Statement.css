@@ -9,6 +9,12 @@
   transition: margin 0.5s;
 }
 
+.iconButton {
+  background-color: transparent;
+  border-color: transparent;
+  cursor: pointer;
+}
+
 .header {
   display: flex;
   justify-content: space-between;

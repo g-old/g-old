@@ -86,7 +86,9 @@ class Proposal extends React.Component {
           </div>
           <div className={s.tags}>
             {this.props.proposal.tags &&
-              this.props.proposal.tags.map(tag => <span className={s.tag}>{`${tag.text}`}</span>)}
+              this.props.proposal.tags.map(tag => (
+                <span key={tag.id} className={s.tag}>{`${tag.text}`}</span>
+              ))}
           </div>
 
         </div>

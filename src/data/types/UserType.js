@@ -4,6 +4,7 @@ import {
   GraphQLID as ID,
   GraphQLBoolean,
   GraphQLList,
+  GraphQLInt,
 } from 'graphql';
 
 import RoleType from './RoleType';
@@ -33,6 +34,9 @@ const UserType = new ObjectType({
     lastLogin: {
       type: GraphQLString,
     },
+    privilege: {
+      type: GraphQLInt,
+    },
     role: {
       type: RoleType,
       resolve(data, args, { viewer, loaders }) {
@@ -44,7 +48,8 @@ const UserType = new ObjectType({
       resolve: (data, args, { viewer, loaders }) =>
         Promise.resolve(
           User.followees(data.id, loaders).then(ids =>
-            ids.map(id => User.gen(viewer, id, loaders))),
+            ids.map(id => User.gen(viewer, id, loaders)),
+          ),
         ),
     },
   }),

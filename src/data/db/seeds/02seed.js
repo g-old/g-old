@@ -54,7 +54,7 @@ exports.seed = function (knex, Promise) {
     );
   }
 
-  function createUser(name, surname, passwordHash, email, roleId, time, emailValidated) {
+  function createUser(name, surname, passwordHash, email, roleId, time, emailValidated, privilege) {
     return knex('users').insert({
       name,
       surname,
@@ -64,6 +64,7 @@ exports.seed = function (knex, Promise) {
       created_at: time,
       updated_at: time,
       email_validated: emailValidated,
+      privilege: privilege || 1,
       avatar_path: `https://api.adorable.io/avatars/32/${name}${surname}.io.png`,
     });
   }
@@ -75,7 +76,7 @@ exports.seed = function (knex, Promise) {
     const testAdmin = Promise.resolve(
       bcrypt
         .hash('password', 10)
-        .then(hash => createUser('admin', 'admin', hash, 'admin@example.com', 1, time, true))
+        .then(hash => createUser('admin', 'admin', hash, 'admin@example.com', 1, time, true, 255))
     );
     users.push(testAdmin);
     const testMods = [];

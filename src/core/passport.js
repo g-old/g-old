@@ -60,6 +60,7 @@ passport.serializeUser((user, done) =>
           surname: user.surname,
           email: user.email,
           avatar: user.avatar_path || user.avatar, // TODO change!
+          privilege: user.privilege,
           role: {
             id: role.id,
             type: role.type,
@@ -69,7 +70,8 @@ passport.serializeUser((user, done) =>
       }
       return Error('Role not found');
     })
-    .catch(error => done(error)));
+    .catch(error => done(error)),
+);
 
 passport.deserializeUser((sessionUser, done) => {
   done(null, sessionUser);

@@ -1,4 +1,9 @@
-import { GraphQLString as String, GraphQLInputObjectType, GraphQLID as ID } from 'graphql';
+import {
+  GraphQLString as String,
+  GraphQLInt,
+  GraphQLInputObjectType,
+  GraphQLID as ID,
+} from 'graphql';
 
 const UserInputType = new GraphQLInputObjectType({
   name: 'UserInput',
@@ -23,6 +28,9 @@ const UserInputType = new GraphQLInputObjectType({
 
     passwordOld: {
       type: String,
+    },
+    privilege: {
+      type: GraphQLInt,
     },
 
     followee: {

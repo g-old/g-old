@@ -6,6 +6,7 @@ import { createVote, updateVote, deleteVote, getVotes } from '../../actions/vote
 import Poll from '../Poll';
 import Proposal from '../Proposal2';
 import { thresholdPassed } from '../../core/helpers';
+import Icon from '../Icon';
 
 class TestProposal extends React.Component {
   static propTypes = {
@@ -17,7 +18,11 @@ class TestProposal extends React.Component {
       state: PropTypes.string,
       publishedAt: PropTypes.string,
       pollOne: PropTypes.shape({
-        statements: PropTypes.arrayOf(PropTypes.object),
+        statements: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.string,
+          }),
+        ),
         upvotes: PropTypes.number,
         downvotes: PropTypes.number,
         ownVote: PropTypes.shape({
@@ -33,7 +38,11 @@ class TestProposal extends React.Component {
         ),
       }),
       pollTwo: PropTypes.shape({
-        statements: PropTypes.arrayOf(PropTypes.object),
+        statements: PropTypes.arrayOf(
+          PropTypes.shape({
+            id: PropTypes.string,
+          }),
+        ),
         upvotes: PropTypes.number,
         downvotes: PropTypes.number,
         ownVote: PropTypes.shape({
@@ -48,9 +57,10 @@ class TestProposal extends React.Component {
           }),
         ),
       }),
-    }),
-    user: PropTypes.object.isRequired,
-    hasWrittenStatement: PropTypes.func,
+    }).isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.string,
+    }).isRequired,
     createStatement: PropTypes.func.isRequired,
     updateStatement: PropTypes.func.isRequired,
     deleteStatement: PropTypes.func.isRequired,
@@ -59,7 +69,10 @@ class TestProposal extends React.Component {
     updateVote: PropTypes.func.isRequired,
     deleteVote: PropTypes.func.isRequired,
     votingListErrorMessage: PropTypes.string,
-    votingListIsFetching: PropTypes.bool,
+    votingListIsFetching: PropTypes.bool.isRequired,
+  };
+  static defaultProps = {
+    votingListErrorMessage: null,
   };
   constructor(props) {
     super(props);
@@ -107,7 +120,6 @@ class TestProposal extends React.Component {
       }
       default:
         throw Error('Unknown method');
-
     }
   }
   /* eslint-disable no-nested-ternary */
@@ -178,7 +190,17 @@ class TestProposal extends React.Component {
     let switchPollButton = null;
 
     if (switchPoll) {
-      switchPollButton = <button onClick={() => this.handlePollSwitching()}>OTHER POLL</button>;
+      switchPollButton = (
+        <button onClick={() => this.handlePollSwitching()}>
+          OTHER POLL
+          {' '}
+          <Icon
+            icon={
+              'M12.586 27.414l-10-10c-0.781-0.781-0.781-2.047 0-2.828l10-10c0.781-0.781 2.047-0.781 2.828 0s0.781 2.047 0 2.828l-6.586 6.586h19.172c1.105 0 2 0.895 2 2s-0.895 2-2 2h-19.172l6.586 6.586c0.39 0.39 0.586 0.902 0.586 1.414s-0.195 1.024-0.586 1.414c-0.781 0.781-2.047 0.781-2.828 0z'
+            }
+          />
+        </button>
+      );
     }
 
     const proposalData = {

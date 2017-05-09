@@ -6,6 +6,7 @@ import s from './Activity.css';
 import Avatar from '../Avatar';
 import Statement from '../Statement';
 import ProposalPreview from '../ProposalPreview';
+import Icon from '../Icon';
 
 class Activity extends React.Component {
   static propTypes = {
@@ -13,6 +14,8 @@ class Activity extends React.Component {
       __typename: PropTypes.string,
       voter: PropTypes.shape({
         id: PropTypes.string,
+        name: PropTypes.string,
+        surname: PropTypes.string,
       }),
     }).isRequired,
     verb: PropTypes.string.isRequired,
@@ -40,9 +43,10 @@ class Activity extends React.Component {
     } else if (this.props.content.__typename === 'VoteDL') {
       content = (
         <div>
-          <Avatar user={this.props.content.voter} />
+          <Avatar user={this.props.content.voter} isFollowee />
+          {`${this.props.content.voter.name} ${this.props.content.voter.surname}`}
           <br />
-
+          <Icon icon={'M27 4l-15 15-7-7-5 5 12 12 20-20z'} color={'green'} size={'64'} />
         </div>
       );
       header = 'Just voted!';

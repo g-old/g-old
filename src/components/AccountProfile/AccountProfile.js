@@ -8,6 +8,9 @@ import { fetchUser } from '../../actions/user';
 import { getUser, getAccountUpdates } from '../../reducers';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
+import PrivilegeManager from '../PrivilegeManager';
+import RoleManager from '../RoleManager';
+import { PRIVILEGES } from '../../constants';
 
 const messages = defineMessages({
   role: {
@@ -48,6 +51,7 @@ const messages = defineMessages({
   },
 });
 const checkAvatar = url => url && url.indexOf('http') === -1;
+
 class AccountProfile extends React.Component {
   static propTypes = {
     accountData: PropTypes.shape({
@@ -56,6 +60,7 @@ class AccountProfile extends React.Component {
       name: PropTypes.string,
       surname: PropTypes.string,
       avatar: PropTypes.string,
+      privilege: PropTypes.string,
       emailValidated: PropTypes.bool,
       lastLogin: PropTypes.string,
       role: PropTypes.shape({
@@ -65,10 +70,16 @@ class AccountProfile extends React.Component {
     update: PropTypes.func.isRequired,
     fetchUser: PropTypes.func.isRequired,
     accountId: PropTypes.string.isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.string,
+      privilege: PropTypes.string,
+      role: PropTypes.shape({ type: PropTypes.string }),
+    }).isRequired,
   };
 
   constructor(props) {
     super(props);
+    this.props.fetchUser({ id: props.accountId });
     this.onPromoteToViewer = this.onPromoteToViewer.bind(this);
   }
 
@@ -92,7 +103,23 @@ class AccountProfile extends React.Component {
     if (!this.props.accountData) {
       return null;
     }
-    const { avatar, name, surname, role, emailValidated, lastLogin } = this.props.accountData;
+    const {
+      id,
+      avatar,
+      name,
+      surname,
+      role,
+      emailValidated,
+      lastLogin,
+      privilege,
+    } = this.props.accountData;
+    let PrivilegePanel = null;
+    // eslint-disable-next-line no-bitwise
+    if (privilege && this.props.user.privilege & PRIVILEGES.canModifyRights) {
+      PrivilegePanel = (
+        <PrivilegeManager updateFn={this.props.update} privilege={privilege} id={id} />
+      );
+    }
     const avatarSet = checkAvatar(avatar);
     return (
       <div>
@@ -114,14 +141,17 @@ class AccountProfile extends React.Component {
           <div>
             <FormattedMessage {...messages.lastLogin} /> : {lastLogin || 'No Data'}
           </div>
-          <p>
-            {role.type === 'guest' &&
-              <button onClick={this.onPromoteToViewer}> PromoteToViewer </button>}
-          </p>
 
           <p>
-
+            <RoleManager
+              accountId={id}
+              updateFn={this.props.update}
+              userRole={this.props.user.role.type}
+              accountRole={role.type}
+            />
+            {PrivilegePanel}
             <Accordion>
+
               <AccordionPanel heading={'Notify user'}>
                 {'If you see this, you can notify users'} <br />
 
@@ -136,25 +166,6 @@ class AccountProfile extends React.Component {
                     <FormattedMessage {...messages.notify} />
                   </button>
                 </p>
-              </AccordionPanel>
-              <AccordionPanel heading={'Rights'}>
-                {'If you see this, you can change permissions/privileges'} <br />
-                <input type="checkbox" value="Bike" /> {'can unlock Viewer'} <br />
-                <input type="checkbox" value="Bike" /> {'can unlock User'}<br />
-                <input type="checkbox" value="Bike" /> {'can unlock Mod'}<br />
-                <input type="checkbox" value="Bike" /> {'can unlock Admin'}<br />
-                <input type="checkbox" value="Bike" /> {'can change roles'}<br />
-                <input type="checkbox" value="Bike" /> {'can change rights'}<br />
-                <input type="checkbox" value="Bike" /> {'can notify users'}<br />
-
-                <button
-                  onClick={() => {
-                    alert('TO IMPLEMENT! \n voteing, as mod, etc');
-                  }}
-                >
-                  <FormattedMessage {...messages.changeRights} />
-                </button>
-                <br />
               </AccordionPanel>
             </Accordion>
           </p>

@@ -13,13 +13,13 @@ const Icon = (props) => {
       fill: props.color,
     },
   };
-
+  // viewBox is a hack - should be 1024 1024
   return (
     <svg
       style={styles.svg}
       width={`${props.size}px`}
       height={`${props.size}px`}
-      viewBox="0 0 1024 1024"
+      viewBox={`0 0 ${props.vBox} ${props.vBox}`}
     >
       <path style={styles.path} d={props.icon} />
     </svg>
@@ -30,9 +30,13 @@ Icon.propTypes = {
   icon: PropTypes.string.isRequired,
   size: PropTypes.number,
   color: PropTypes.string,
+  vBox: PropTypes.number,
 };
 
 Icon.defaultProps = {
   size: 32,
   color: 'black',
+  vBox: 32,
 };
+
+export default Icon;

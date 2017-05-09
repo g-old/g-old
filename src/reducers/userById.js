@@ -57,7 +57,12 @@ export default function byId(state = {}, action) {
       return merge({}, state, action.payload.entities.users);
     }
     case FETCH_USER_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
+      // bc of deleted followees
+      return {
+        ...state,
+        ...action.payload.entities.users,
+      };
+      // return merge({}, state, action.payload.entities.users);
     }
     case LOAD_FLAGGEDSTMTS_SUCCESS: {
       return merge({}, state, action.payload.entities.users);

@@ -9,6 +9,7 @@ import s from './Statement.css';
 import { createLike, deleteLike } from '../../actions/statement_like';
 import { updateUser } from '../../actions/user';
 import { deleteStatement, flag } from '../../actions/statement';
+import Icon from '../Icon';
 import {
   getStatementMutationIsPending,
   getStatementMutationSuccess,
@@ -49,12 +50,13 @@ class Statement extends React.Component {
         type: PropTypes.string,
       }),
     }).isRequired,
-    asInput: PropTypes.bool.isRequired,
+    asInput: PropTypes.bool,
   };
 
   static defaultProps = {
     ownLike: null,
     ownStatement: false,
+    asInput: false,
     onSubmit() {
       alert('NO ONSUBMIT');
     },
@@ -175,13 +177,20 @@ class Statement extends React.Component {
                 </button>}
               {!this.props.ownStatement &&
                 <button
+                  className={s.iconButton}
                   onClick={() =>
                     this.props.flag({
                       statementId: this.props.data.id,
                       content: this.props.data.text,
                     })}
                 >
-                  !Flag!
+                  <Icon
+                    icon={
+                      'M0 0h4v32h-4v-32z M26 20.094c2.582 0 4.83-0.625 6-1.547v-16c-1.17 0.922-3.418 1.547-6 1.547s-4.83-0.625-6-1.547v16c1.17 0.922 3.418 1.547 6 1.547z M19 1.016c-1.466-0.623-3.61-1.016-6-1.016-3.012 0-5.635 0.625-7 1.547v16c1.365-0.922 3.988-1.547 7-1.547 2.39 0 4.534 0.393 6 1.016v-16z'
+                    }
+                    size={16}
+                    color={'grey'}
+                  />
                 </button>}
               <span className={s.menu}>
                 {(this.props.asInput ||

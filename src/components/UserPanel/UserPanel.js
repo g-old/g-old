@@ -10,7 +10,12 @@ import Accordion from '../../components/Accordion';
 import AccordionPanel from '../../components/AccordionPanel';
 import SearchField from '../../components/SearchField';
 
-import { getVisibleUsers, getUsersIsFetching, getUsersErrorMessage } from '../../reducers';
+import {
+  getVisibleUsers,
+  getUsersIsFetching,
+  getUsersErrorMessage,
+  getSessionUser,
+} from '../../reducers';
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 
 function renderUserSuggestion(user, obj) {
@@ -25,7 +30,6 @@ function renderUserSuggestion(user, obj) {
       key={user.id}
       className={s.suggestionContent}
       onClick={() => {
-        alert(`Move to list! id: ${user.id}`);
         obj.setState({ showAccount: true, accountId: user.id });
       }}
     >
@@ -49,6 +53,9 @@ class UserPanel extends React.Component {
     viewerArrayErrorMessage: PropTypes.string,
     findUser: PropTypes.func.isRequired,
     userArray: PropTypes.arrayOf(PropTypes.object),
+    user: PropTypes.shape({
+      id: PropTypes.string,
+    }).isRequired,
   };
   constructor(props) {
     super(props);
@@ -78,7 +85,11 @@ class UserPanel extends React.Component {
         />
         {this.state.showAccount &&
           <div>
-            <AccountProfile accountId={this.state.accountId} update={this.props.updateUser} />
+            <AccountProfile
+              user={this.props.user}
+              accountId={this.state.accountId}
+              update={this.props.updateUser}
+            />
             <button
               onClick={() => {
                 this.setState({ showAccount: false });
@@ -138,6 +149,7 @@ const mapStateToProps = state => ({
   guestArrayErrorMessage: getUsersErrorMessage(state, 'guest'),
   viewerArrayErrorMessage: getUsersErrorMessage(state, 'viewer'),
   userArray: getVisibleUsers(state, 'all'),
+  user: getSessionUser(state),
 });
 
 const mapDispatch = {

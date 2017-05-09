@@ -1,13 +1,28 @@
 import bcrypt from 'bcrypt';
 import knex from '../knex.js';
 import { validateEmail } from '../../core/helpers';
+import { PRIVILEGES } from '../../constants';
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
-  return viewer.id === data.id ||
+  return (
+    viewer.id === data.id ||
     viewer.role.type === 'admin' ||
     viewer.role.type === 'mod' ||
-    viewer.role.type === 'system';
+    viewer.role.type === 'system'
+  );
+}
+const roles = ['admin', 'mod', 'user', 'viewer', 'guest'];
+
+async function getIsLowerLevel(viewer, accountId) {
+  const accountRole = await knex
+    .from('roles')
+    .innerJoin('users', 'users.role_id', 'roles.id')
+    .where('users.id', '=', accountId)
+    .select('type');
+  const accountPos = roles.indexOf(accountRole[0].type);
+  const viewerPos = roles.indexOf(viewer.role.type);
+  return accountPos > viewerPos;
 }
 
 class User {
@@ -17,6 +32,7 @@ class User {
     this.surname = data.surname;
     this.email = data.email;
     this.role_id = data.role_id;
+    this.privilege = data.privilege;
     this.avatar = data.avatar_path;
     this.emailValidated = data.email_validated;
     this.lastLogin = data.last_login_at;
@@ -61,6 +77,7 @@ class User {
     if (data.email && !validateEmail(data.email)) return null;
     if (data.password && data.password.trim() > 6) return null;
     if (data.passwordOld && data.passwordOld.trim() > 6) return null;
+    if (data.privilege && data.privilege < 1) return null;
     // TODO write fn which gets all the props with the right name
     // TODO Allow only specific updates, take car of role
     const newData = { updated_at: new Date() };
@@ -85,9 +102,38 @@ class User {
     }
 
     if (data.role) {
-      const roleId = ['admin', 'mod', 'user', 'viewer', 'guest'].indexOf(data.role) + 1;
-      if (roleId > -1) {
-        newData.role_id = roleId;
+      const reg = new RegExp(data.role, 'i');
+      const neededPrivilege = Object.keys(PRIVILEGES).find((key) => {
+        const res = reg.exec(key);
+        return res !== null;
+      });
+      /* eslint-disable no-bitwise */
+      if (
+        neededPrivilege &&
+        (viewer.privilege & PRIVILEGES[neededPrivilege] ||
+          viewer.privilege & PRIVILEGES.canModifyRoles)
+      ) {
+        /* eslint-enable no-bitwise */
+        // check level
+
+        if (getIsLowerLevel(viewer, data.id)) {
+          // check if right level
+
+          const roleId = roles.indexOf(data.role) + 1;
+          if (roleId > -1) {
+            newData.role_id = roleId;
+          }
+        }
+      }
+    }
+
+    if (data.privilege) {
+      // eslint-disable-next-line no-bitwise
+      if (viewer.privilege & PRIVILEGES.canModifyRights) {
+        // check if lower level
+        if (getIsLowerLevel(viewer, data.id)) {
+          newData.privilege = data.privilege;
+        }
       }
     }
 
@@ -114,7 +160,6 @@ class User {
             .count('id')
             .into('user_follows');
 
-          console.log('NUMFOLLOWEES', numFollowees);
           if (numFollowees[0].count < 5) {
             await trx
               .insert({ follower_id: data.id, followee_id: data.followee })
