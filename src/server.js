@@ -43,6 +43,9 @@ import PasswordReset from './data/models/PasswordReset';
 import { sendMail, resetLinkMail, resetSuccessMail } from './core/mailer';
 import { user as userSchema } from './store/schema';
 
+import worker from './core/worker';
+
+worker();
 const app = express();
 
 //
@@ -127,14 +130,14 @@ app.post('/signup', (req, res) => {
       if (!user) throw Error('User creation failed');
       return new Promise((resolve, reject) => {
         // eslint-disable-next-line no-confusing-arrow
-        req.login(user, err => err ? reject(err) : resolve());
+        req.login(user, err => (err ? reject(err) : resolve()));
       });
     })
     .then(
       () =>
         new Promise((resolve, reject) => {
           // eslint-disable-next-line no-confusing-arrow
-          req.session.save(err => err ? reject(err) : resolve());
+          req.session.save(err => (err ? reject(err) : resolve()));
         }),
     )
     .then(() => res.status(200).json({ user: req.session.passport.user }))
@@ -159,14 +162,14 @@ app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
       }
       return new Promise((resolve, reject) => {
         // eslint-disable-next-line no-confusing-arrow
-        req.login(user, err => err ? reject(err) : resolve(user));
+        req.login(user, err => (err ? reject(err) : resolve(user)));
       });
     })
     .then(
       () =>
         new Promise((resolve, reject) => {
           // eslint-disable-next-line no-confusing-arrow
-          req.session.save(err => err ? reject(err) : resolve());
+          req.session.save(err => (err ? reject(err) : resolve()));
         }),
     )
     .then(() => res.json(req.session.passport.user))
@@ -219,7 +222,7 @@ app.post('/reset/:token', (req, res) => {
         ),
         new Promise((resolve, reject) => {
           // eslint-disable-next-line no-confusing-arrow
-          req.login(user, err => err ? reject(err) : resolve());
+          req.login(user, err => (err ? reject(err) : resolve()));
         }),
       ]);
     })
