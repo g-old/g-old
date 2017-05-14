@@ -6,6 +6,8 @@ import {
   GraphQLInt,
 } from 'graphql';
 
+import PollingModeInput from './PollingModeInputType';
+
 const PollInputType = new GraphQLInputObjectType({
   name: 'PollInput',
   fields: {
@@ -15,8 +17,14 @@ const PollInputType = new GraphQLInputObjectType({
     threshold: {
       type: GraphQLInt,
     },
-    end_time: {
+    startTime: {
       type: String,
+    },
+    endTime: {
+      type: String,
+    },
+    mode: {
+      type: PollingModeInput,
     },
 
     id: {

@@ -48,6 +48,11 @@ const messages = defineMessages({
     defaultMessage: 'change rights',
     description: 'Account can change rights',
   },
+  canPostProposals: {
+    id: 'privilege.postProposals',
+    defaultMessage: 'post proposals',
+    description: 'Account can post proposals',
+  },
 });
 const readPrivileges = (privilege) => {
   const rights = Object.keys(PRIVILEGES).reduce((acc, curr) => {

@@ -4,14 +4,16 @@ import {
   LOAD_PROPOSAL_LIST_ERROR,
   LOAD_PROPOSAL_LIST_SUCCESS,
   LOAD_PROPOSAL_SUCCESS,
+  CREATE_PROPOSAL_SUCCESS,
 } from '../constants';
 
-const createList = filter => {
+const createList = (filter) => {
   const ids = (state = [], action) => {
     if (action.filter !== filter) {
       return state;
     }
     switch (action.type) {
+      case CREATE_PROPOSAL_SUCCESS:
       case LOAD_PROPOSAL_SUCCESS: {
         return [...new Set([...state, action.payload.result])];
       }
@@ -51,7 +53,6 @@ const createList = filter => {
 
       default:
         return state;
-
     }
   };
   return combineReducers({

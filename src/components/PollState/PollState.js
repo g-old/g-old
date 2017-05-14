@@ -11,13 +11,19 @@ class PollState extends React.Component {
     allVoters: PropTypes.number,
     upvotes: PropTypes.number,
     downvotes: PropTypes.number,
-    threshold: PropTypes.number,
-    unipolar: PropTypes.bool,
-    threshold_ref: PropTypes.string,
-    votes: PropTypes.arrayOf(PropTypes.object),
+    threshold: PropTypes.number.isRequired,
+    unipolar: PropTypes.bool.isRequired,
+    votes: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.string })).isRequired,
     getVotes: PropTypes.func.isRequired,
-    votingListIsFetching: PropTypes.bool,
-    votingListErrorMessage: PropTypes.string,
+    votingListIsFetching: PropTypes.bool.isRequired,
+    votingListErrorMessage: PropTypes.string.isRequired,
+  };
+
+  static defaultProps = {
+    compact: false,
+    allVoters: 0,
+    upvotes: 0,
+    downvotes: 0,
   };
 
   constructor(props) {
@@ -88,6 +94,7 @@ class PollState extends React.Component {
               isFetching={this.props.votingListIsFetching}
               errorMessage={this.props.votingListErrorMessage}
             />
+            {`THRESHOLD ${this.props.threshold}`}
           </div>}
       </div>
     );

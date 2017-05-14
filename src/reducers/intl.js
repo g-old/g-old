@@ -43,3 +43,4 @@ export default function intl(state = null, action) {
 }
 
 export const getLocale = state => state.locale;
+export const getMessages = state => state.messages[state.locale];

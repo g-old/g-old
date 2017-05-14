@@ -36,6 +36,7 @@ import flaggedStatements from './queries/flaggedStatements';
 import flag from './mutations/createFlaggedStatement';
 import solveFlag from './mutations/updateFlaggedStatement';
 import feed from './queries/feed';
+import pollingModes from './queries/pollingModes';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -53,6 +54,7 @@ const schema = new Schema({
       tags,
       flaggedStatements,
       feed,
+      pollingModes,
     },
   }),
   mutation: new ObjectType({

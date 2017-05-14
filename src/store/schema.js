@@ -56,3 +56,4 @@ export const voteList = [vote];
 export const userList = [user];
 export const flaggedStatementArray = [flaggedStatement];
 export const activityArray = [activity];
+export const tagArray = [tag];

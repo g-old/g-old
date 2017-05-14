@@ -59,7 +59,7 @@ export function emailValidation(email, { invalidEmails }) {
     // TODO UI feedback not implemented!
     const duplicate = invalidEmails.reduce(
       // eslint-disable-next-line
-      (acc, curr) => acc += mailAddress === curr ? 1 : 0,
+      (acc, curr) => (acc += mailAddress === curr ? 1 : 0),
       0,
     );
     if (duplicate) {
@@ -74,7 +74,7 @@ export function emailValidation(email, { invalidEmails }) {
 }
 
 export function createValidator(allValues, validators, options, obj) {
-  return properties => {
+  return (properties) => {
     const result = properties.reduce(
       (acc, curr) => {
         const value = obj.state[curr];

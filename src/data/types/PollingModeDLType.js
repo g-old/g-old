@@ -10,13 +10,13 @@ const PollingModeDLType = new ObjectType({
   name: 'PollingModeDL',
   fields: {
     id: { type: ID },
-    with_statements: {
+    withStatements: {
       type: GraphQLBoolean,
     },
     unipolar: {
       type: GraphQLBoolean,
     },
-    threshold_ref: {
+    thresholdRef: {
       type: GraphQLString,
     },
     name: {

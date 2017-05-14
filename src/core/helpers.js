@@ -1,9 +1,9 @@
 // eslint-disable-next-line import/prefer-default-export
 export const thresholdPassed = poll =>
-// eslint-disable-next-line no-mixed-operators
+  // eslint-disable-next-line no-mixed-operators
   poll.upvotes >= Math.floor(poll.allVoters / 100 * poll.threshold);
 
-export const validateEmail = email => {
+export const validateEmail = (email) => {
   // http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
   // eslint-disable-next-line no-useless-escape
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line max-len
@@ -18,7 +18,19 @@ export const validateEmail = email => {
 /* eslint-disable */
 export function b(a) {
   return a
-    ? (a ^ Math.random() * 16 >> a / 4).toString(16)
+    ? (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
     : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
 }
 /* eslint-enable */
+
+// http://www.jstips.co/en/javascript/deduplicate-an-array/
+export const dedup = (arr) => {
+  const hashTable = {};
+
+  return arr.filter((el) => {
+    const key = JSON.stringify(el);
+    const match = Boolean(hashTable[key]);
+
+    return match ? false : (hashTable[key] = true);
+  });
+};

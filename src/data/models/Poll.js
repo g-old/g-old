@@ -43,7 +43,7 @@ class Poll {
   async isCommentable(viewer, loaders) {
     if (this.closed_at) return false;
     const mode = await PollingMode.gen(viewer, this.pollingModeId, loaders);
-    return mode.with_statements === true;
+    return mode.withStatements === true;
   }
   /* eslint-disable class-methods-use-this*/
   // eslint-disable-next-line no-unused-vars
@@ -60,17 +60,18 @@ class Poll {
     if (!data.threshold) return null;
     if (!data.end_time) return null;
     // create
-    const newPollId = await knex.transaction(async trx => {
+    const newPollId = await knex.transaction(async (trx) => {
       const pollingMode = await PollingMode.gen(viewer, data.polling_mode_id, loaders);
       if (!pollingMode) throw Error('No valid PollingMode provided');
-      let numVoter = -1;
+      let numVoter = 0;
 
-      if (pollingMode.threshold_ref === 'all') {
-        numVoter = await trx.whereNot('role_id', 4).count('id').into('users');
+      if (pollingMode.thresholdRef === 'all') {
+        numVoter = await trx.whereIn('role_id', [1, 2, 3, 4]).count('id').into('users');
+        console.log('NUM VOTER', numVoter);
         numVoter = Number(numVoter[0].count);
+        if (numVoter < 1) throw Error('Not enough user');
       }
 
-      if (numVoter < 1) throw Error('Not enough user');
       const id = await trx
         .insert(
         {

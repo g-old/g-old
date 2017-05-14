@@ -4,7 +4,7 @@ import statements from './statements';
 import polls from './polls';
 import proposals, * as fromProposals from './proposals';
 import roles from './roles';
-import tags from './tags';
+import tags, * as fromTags from './tags';
 import pollingModes from './pollingModes';
 import votes from './votes';
 import statementLikes from './statementLikes';
@@ -54,3 +54,5 @@ export const getActivities = state => fromActivities.getActivities(state.activit
 export const getFeedIsFetching = state => fromActivities.getIsFetching(state.activities);
 
 export const getFeedErrorMessage = state => fromActivities.getErrorMessage(state.activities);
+
+export const getTags = state => fromTags.getTags(state.tags);

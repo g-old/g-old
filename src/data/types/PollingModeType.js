@@ -13,13 +13,13 @@ const PollingModeType = new ObjectType({
   uniqueKey: 'id',
   fields: {
     id: { type: new NonNull(ID) },
-    with_statements: {
+    withStatements: {
       type: GraphQLBoolean,
     },
     unipolar: {
       type: GraphQLBoolean,
     },
-    threshold_ref: {
+    thresholdRef: {
       type: GraphQLString,
     },
     name: {

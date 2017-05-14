@@ -1,0 +1,6 @@
+{
+  "name": "TagInput",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./TagInput.js"
+}

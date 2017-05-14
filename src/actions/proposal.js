@@ -10,8 +10,15 @@ import {
   CREATE_PROPOSAL_START,
   CREATE_PROPOSAL_SUCCESS,
   CREATE_PROPOSAL_ERROR,
+  LOAD_TAGS_START,
+  LOAD_TAGS_ERROR,
+  LOAD_TAGS_SUCCESS,
 } from '../constants';
-import { proposal as proposalSchema, proposalList as proposalListSchema } from '../store/schema';
+import {
+  proposal as proposalSchema,
+  proposalList as proposalListSchema,
+  tagArray as tagArraySchema,
+} from '../store/schema';
 import { getProposalsIsFetching, getIsProposalFetching } from '../reducers';
 
 const statementFields = `{
@@ -63,9 +70,9 @@ const pollFields = `{
   }
   mode{
     id
-    with_statements
+    withStatements
     unipolar
-    threshold_ref
+    thresholdRef
   }
   statements ${statementFields}
 }
@@ -100,9 +107,9 @@ const pollFieldsForList = `{
   allVoters
   mode{
     id
-    with_statements
+    withStatements
     unipolar
-    threshold_ref
+    thresholdRef
   }
 }
 `;
@@ -126,10 +133,24 @@ query ($state:String) {
 }
 `;
 
+const tagsQuery = `
+query{
+  tags{
+    id
+    text
+  }
+}
+`;
+
 const createProposalMutation = `
-mutation($pollingModeId:ID $title: String, $text:String){
-  createProposal(proposal:{title:$title, text:$text pollingModeId:$pollingModeId}){
+mutation($pollingModeId:ID $title: String, $text:String, $endTime: String,  $poll:PollInput $tags:[TagInput]){
+  createProposal(proposal:{title:$title, text:$text pollingModeId:$pollingModeId endTime:$endTime poll:$poll tags:$tags}){
     ${proposal}
+    tags{
+      id
+      text
+      count
+    }
   }
 }
 `;
@@ -142,7 +163,6 @@ const getFilter = (status) => {
       return 'active';
     default:
       return 'repelled';
-
   }
 };
 export function loadProposal({ id }) {
@@ -230,13 +250,44 @@ export function createProposal(proposalData) {
     });
     try {
       const { data } = await graphqlRequest(createProposalMutation, proposalData);
+      const normalizedData = normalize(data.createProposal, proposalSchema);
+      // TODO change filter structure of reducer
+      const filter = getFilter(data.createProposal.state);
+
       dispatch({
         type: CREATE_PROPOSAL_SUCCESS,
-        payload: data,
+        payload: normalizedData,
+        filter,
       });
     } catch (error) {
       dispatch({
         type: CREATE_PROPOSAL_ERROR,
+        payload: {
+          error,
+        },
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function loadTags() {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: LOAD_TAGS_START,
+    });
+    try {
+      const { data } = await graphqlRequest(tagsQuery);
+      const normalizedData = normalize(data.tags, tagArraySchema);
+      dispatch({
+        type: LOAD_TAGS_SUCCESS,
+        payload: normalizedData,
+      });
+    } catch (error) {
+      dispatch({
+        type: LOAD_TAGS_ERROR,
         payload: {
           error,
         },

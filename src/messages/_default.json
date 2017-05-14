@@ -370,5 +370,41 @@
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
+  },
+  {
+    "id": "calendar.blank",
+    "description": "Blank calendar",
+    "defaultMessage": "No date set",
+    "message": "",
+    "files": [
+      "src/components/Calendar/Calendar.js"
+    ]
+  },
+  {
+    "id": "calendar.today.long",
+    "description": "Today",
+    "defaultMessage": "Today",
+    "message": "",
+    "files": [
+      "src/components/Calendar/Calendar.js"
+    ]
+  },
+  {
+    "id": "calendar.today.short",
+    "description": "Today",
+    "defaultMessage": "Today",
+    "message": "",
+    "files": [
+      "src/components/Calendar/Calendar.js"
+    ]
+  },
+  {
+    "id": "privilege.postProposals",
+    "description": "Account can post proposals",
+    "defaultMessage": "post proposals",
+    "message": "",
+    "files": [
+      "src/components/PrivilegeManager/PrivilegeManager.js"
+    ]
   }
 ]

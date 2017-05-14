@@ -77,6 +77,9 @@ export const UPDATE_FLAGGEDSTMT_ERROR = 'UPDATE_FLAGGEDSTMT_ERROR';
 export const LOAD_FEED_START = 'LOAD_FEED_START';
 export const LOAD_FEED_SUCCESS = 'LOAD_FEED_SUCCESS';
 export const LOAD_FEED_ERROR = 'LOAD_FEED_ERROR';
+export const LOAD_TAGS_START = 'LOAD_TAGS_START';
+export const LOAD_TAGS_SUCCESS = 'LOAD_TAGS_SUCCESS';
+export const LOAD_TAGS_ERROR = 'LOAD_TAGS_ERROR';
 
 export const ADD_ENTITIES = 'ADD_ENTITIES';
 
@@ -90,4 +93,5 @@ export const PRIVILEGES = {
   canNotifyUser: 32,
   canModifyRights: 64,
   canModifyRoles: 128,
+  canPostProposals: 256,
 };

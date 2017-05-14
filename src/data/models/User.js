@@ -116,7 +116,7 @@ class User {
         /* eslint-enable no-bitwise */
         // check level
 
-        if (getIsLowerLevel(viewer, data.id)) {
+        if (await getIsLowerLevel(viewer, data.id)) {
           // check if right level
 
           const roleId = roles.indexOf(data.role) + 1;
@@ -131,7 +131,7 @@ class User {
       // eslint-disable-next-line no-bitwise
       if (viewer.privilege & PRIVILEGES.canModifyRights) {
         // check if lower level
-        if (getIsLowerLevel(viewer, data.id)) {
+        if (await getIsLowerLevel(viewer, data.id)) {
           newData.privilege = data.privilege;
         }
       }

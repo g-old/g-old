@@ -36,9 +36,9 @@ class Poll extends React.Component {
         pollId: PropTypes.string,
       }),
       mode: PropTypes.shape({
-        with_statements: PropTypes.bool,
+        withStatements: PropTypes.bool,
         unipolar: PropTypes.bool,
-        threshold_ref: PropTypes.string,
+        thresholdRef: PropTypes.string,
       }),
       likedStatements: PropTypes.arrayOf(
         PropTypes.shape({
@@ -129,7 +129,7 @@ class Poll extends React.Component {
   }
 
   render() {
-    const withStatements = this.props.poll.mode.with_statements;
+    const withStatements = this.props.poll.mode.withStatements;
     let statements = null;
 
     // render StatementsList or not?
@@ -216,7 +216,7 @@ class Poll extends React.Component {
             downvotes={this.props.poll.downvotes}
             unipolar={this.props.poll.mode.unipolar}
             threshold={this.props.poll.threshold}
-            threshold_ref={this.props.poll.mode.threshold_ref}
+            thresholdRef={this.props.poll.mode.thresholdRef}
             votes={this.props.poll.votes || []}
             getVotes={() => this.props.fetchVotes(this.props.poll.id)}
             votingListIsFetching={this.props.votingListIsFetching}

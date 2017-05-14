@@ -15,7 +15,11 @@ class FeedContainer extends React.Component {
     ).isRequired,
     isFetching: PropTypes.bool.isRequired,
     loadFeed: PropTypes.func.isRequired,
-    errorMessage: PropTypes.string.isRequired,
+    errorMessage: PropTypes.string,
+  };
+
+  static defaultProps = {
+    errorMessage: '',
   };
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow

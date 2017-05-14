@@ -11,6 +11,7 @@ import {
   CREATE_LIKE_SUCCESS,
   DELETE_LIKE_SUCCESS,
   LOAD_FEED_SUCCESS,
+  CREATE_PROPOSAL_SUCCESS,
 } from '../constants';
 
 export default function polls(state = {}, action) {
@@ -43,6 +44,7 @@ export default function polls(state = {}, action) {
           votes: [...action.payload.result], // TODO merge!
         },
       };
+    case CREATE_PROPOSAL_SUCCESS:
     case LOAD_PROPOSAL_SUCCESS:
       return merge({}, state, action.payload.entities.polls);
 

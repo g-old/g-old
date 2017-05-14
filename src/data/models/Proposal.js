@@ -1,12 +1,40 @@
 import knex from '../knex';
 import Poll from './Poll';
+import PollingMode from './PollingMode';
 import Activity from './Activity';
+import { dedup } from '../../core/helpers';
 
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
   return true;
 }
+
+const validateTags = async (tags) => {
+  let existingTags;
+  let newTags;
+  // max tags
+  if (!tags || tags.length > 8) return {};
+  existingTags = tags.filter(tag => 'id' in tag);
+  newTags = tags.filter(tag => 'text' in tag);
+
+  // check if new tags don't already exist
+  const queries = newTags.map(tag => knex('tags').where('text', 'ilike', tag.text).select());
+
+  let duplicates = await Promise.all(queries);
+  duplicates = duplicates.reduce((acc, curr) => acc.concat(curr), []);
+  duplicates.forEach((dup) => {
+    if (dup.id) {
+      existingTags.push(dup);
+      newTags = newTags.filter(t => t.text.toLowerCase() !== dup.text.toLowerCase());
+    }
+  });
+
+  // deduplicate
+  existingTags = dedup(existingTags);
+  newTags = dedup(newTags);
+  return { existingTags, newTags };
+};
 
 class Proposal {
   constructor(data) {
@@ -74,20 +102,70 @@ class Proposal {
     // validate
     if (!data.text) return null;
     if (!data.title) return null;
-    if (!data.pollingModeId) return null;
-    // create
+    let createPollingMode = false;
+    let pollingModeData;
+    if (data.poll) {
+      // validate poll
+      let pollingMode;
+      if (data.poll.mode && data.poll.mode.id) {
+        pollingMode = await PollingMode.gen(viewer, data.poll.mode.id, loaders);
 
+        if (!pollingMode) throw Error('PollingMode not found');
+        // check if modifications
+        const { id, ...props } = data.poll.mode;
+        const keys = Object.keys(props);
+        if (keys.length > 0) {
+          // check if values are different
+          const diff = keys.reduce((acc, curr) => {
+            if (props[curr] !== pollingMode[curr]) {
+              // eslint-disable-next-line no-param-reassign
+              acc += 1;
+            }
+            return acc;
+          }, 0);
+          createPollingMode = diff > 0;
+          pollingModeData = { ...pollingMode, ...props };
+        }
+      }
+    }
+    // check Times
+    const startTime = data.poll && data.poll.startTime ? new Date(data.poll.startTime) : new Date();
+    if (!startTime.getMonth || typeof startTime.getMonth !== 'function') return null;
+
+    let endTime;
+    if (data.poll && data.poll.endTime) {
+      endTime = new Date(data.poll.endTime);
+    } else {
+      endTime = new Date();
+      endTime.setDate(startTime.getDate() + 3);
+    }
+    if (!endTime.getMonth || typeof endTime.getMonth !== 'function') return null;
+    if (startTime >= endTime) throw Error('DateTime wrong');
+
+    // check threshold;
+    const threshold = data.poll.threshold || 20;
+
+    const pollData = {
+      secret: data.poll.secret || false,
+      start_time: startTime,
+      end_time: endTime,
+      threshold,
+    };
+
+    // tags
+    const { existingTags, newTags } = await validateTags(data.tags);
     const newProposalId = await knex.transaction(async (trx) => {
-      // ONLY testing!
-      const date = new Date();
-      const endDate = new Date();
-      endDate.setDate(date.getDate() + 5);
+      let pId = data.poll.mode.id;
+      // TODO check if they get reverted in case of rollback
+      if (createPollingMode && pollingModeData) {
+        const pMode = await PollingMode.create(viewer, pollingModeData, loaders);
+        if (!pMode) throw Error('PollingMode failed');
+        pId = pMode.id;
+      }
+
       const pollOneData = {
-        polling_mode_id: data.pollingModeId,
-        secret: false,
-        threshold: 20,
-        start_time: new Date(),
-        end_time: endDate,
+        polling_mode_id: pId,
+        ...pollData,
       };
       const pollOne = await Poll.create(viewer, pollOneData, loaders);
       if (!pollOne) throw Error('No pollOne provided');
@@ -105,6 +183,30 @@ class Proposal {
           'id',
         )
         .into('proposals');
+
+      // tags
+
+      if (existingTags && existingTags.length) {
+        await trx
+          .insert(existingTags.map(t => ({ proposal_id: id[0], tag_id: t.id })))
+          .into('proposal_tags');
+
+        // update counts
+        await Promise.all(
+          existingTags.map(t => trx.where({ id: t.id }).increment('count', 1).into('tags')),
+        );
+      }
+
+      if (newTags && newTags.length) {
+        const ids = await trx
+          .insert(newTags.map(t => ({ text: t.text, count: 1 })))
+          .into('tags')
+          .returning('id');
+        await Promise.all(
+          ids.map(tId => trx.insert({ proposal_id: id[0], tag_id: tId }).into('proposal_tags')),
+        );
+        //
+      }
       return id[0];
     });
     if (!newProposalId) return null;

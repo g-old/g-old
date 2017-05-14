@@ -36,9 +36,9 @@ query{
         allVoters
         mode{
           id
-          with_statements
+          withStatements
           unipolar
-          threshold_ref
+          thresholdRef
         }}
       pollTwo {  id
         upvotes
@@ -49,9 +49,9 @@ query{
         allVoters
         mode{
           id
-          with_statements
+          withStatements
           unipolar
-          threshold_ref
+          thresholdRef
         }}
     }
     ... on StatementDL {

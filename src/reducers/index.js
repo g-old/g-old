@@ -64,6 +64,8 @@ export const getAccountUpdates = (state, id) => fromUi.getAccountUpdates(state.u
 
 export const getLocale = state => fromIntl.getLocale(state.intl);
 
+export const getMessages = state => fromIntl.getMessages(state.intl);
+
 export const getUser = (state, id) => fromEntity.getUser(state.entities, id);
 
 export const getFlaggedStatements = state => fromEntity.getFlaggedStatements(state.entities);
@@ -73,3 +75,5 @@ export const getActivities = state => fromEntity.getActivities(state.entities);
 export const getFeedIsFetching = state => fromEntity.getFeedIsFetching(state.entities);
 
 export const getFeedErrorMessage = state => fromEntity.getFeedErrorMessage(state.entities);
+
+export const getTags = state => fromEntity.getTags(state.entities);

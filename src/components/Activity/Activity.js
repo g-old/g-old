@@ -17,19 +17,22 @@ class Activity extends React.Component {
         name: PropTypes.string,
         surname: PropTypes.string,
       }),
-    }).isRequired,
+    }),
     verb: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
+  };
+  static defaultProps = {
+    content: {},
   };
 
   render() {
     let content = null;
     let header = null;
     /* eslint-disable no-underscore-dangle */
-    if (this.props.content.__typename === 'StatementDL') {
+    if (this.props.content && this.props.content.__typename === 'StatementDL') {
       content = <Statement data={this.props.content} />;
       header = 'Look at that statement!';
-    } else if (this.props.content.__typename === 'ProposalDL') {
+    } else if (this.props.content && this.props.content.__typename === 'ProposalDL') {
       content = <ProposalPreview proposal={this.props.content} />;
       if (this.props.verb === 'create') {
         header = 'NEW Proposal!';
@@ -40,7 +43,7 @@ class Activity extends React.Component {
       } else if (this.props.verb === 'reject') {
         header = 'This proposal is now valid!';
       }
-    } else if (this.props.content.__typename === 'VoteDL') {
+    } else if (this.props.content && this.props.content.__typename === 'VoteDL') {
       content = (
         <div>
           <Avatar user={this.props.content.voter} isFollowee />

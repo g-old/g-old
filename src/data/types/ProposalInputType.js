@@ -1,4 +1,11 @@
-import { GraphQLString as String, GraphQLInputObjectType, GraphQLID as ID } from 'graphql';
+import {
+  GraphQLString as String,
+  GraphQLInputObjectType,
+  GraphQLID as ID,
+  GraphQLList,
+} from 'graphql';
+import PollInput from './PollInputType';
+import TagInputType from './TagInputType';
 
 const ProposalInputType = new GraphQLInputObjectType({
   name: 'ProposalInput',
@@ -6,10 +13,16 @@ const ProposalInputType = new GraphQLInputObjectType({
     pollingModeId: {
       type: ID,
     },
+    poll: {
+      type: PollInput,
+    },
     text: {
       type: String,
     },
     title: {
+      type: String,
+    },
+    startTime: {
       type: String,
     },
     endTime: {
@@ -17,6 +30,9 @@ const ProposalInputType = new GraphQLInputObjectType({
     },
     modeId: {
       type: ID,
+    },
+    tags: {
+      type: new GraphQLList(TagInputType),
     },
     id: {
       type: ID,
