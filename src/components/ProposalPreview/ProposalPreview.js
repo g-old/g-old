@@ -79,7 +79,6 @@ class Proposal extends React.Component {
               allVoters={poll.allVoters}
               upvotes={poll.upvotes}
               downvotes={poll.downvotes}
-              threshold_ref={poll.mode.threshold_ref}
               threshold={poll.threshold}
               unipolar={poll.mode.unipolar}
             />

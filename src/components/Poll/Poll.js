@@ -216,7 +216,6 @@ class Poll extends React.Component {
             downvotes={this.props.poll.downvotes}
             unipolar={this.props.poll.mode.unipolar}
             threshold={this.props.poll.threshold}
-            threshold_ref={this.props.poll.mode.threshold_ref}
             votes={this.props.poll.votes || []}
             getVotes={() => this.props.fetchVotes(this.props.poll.id)}
             votingListIsFetching={this.props.votingListIsFetching}

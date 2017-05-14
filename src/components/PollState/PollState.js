@@ -8,16 +8,26 @@ import VotesList from '../VotesList';
 class PollState extends React.Component {
   static propTypes = {
     compact: PropTypes.bool,
-    allVoters: PropTypes.number,
-    upvotes: PropTypes.number,
+    allVoters: PropTypes.number.isRequired,
+    upvotes: PropTypes.number.isRequired,
     downvotes: PropTypes.number,
     threshold: PropTypes.number,
-    unipolar: PropTypes.bool,
-    threshold_ref: PropTypes.string,
+    unipolar: PropTypes.bool.isRequired,
+    /* threshold_ref: PropTypes.string, */
     votes: PropTypes.arrayOf(PropTypes.object),
     getVotes: PropTypes.func.isRequired,
     votingListIsFetching: PropTypes.bool,
     votingListErrorMessage: PropTypes.string,
+  };
+
+  static defaultProps = {
+    compact: false,
+    downvotes: 0,
+    threshold: 50,
+    /* threshold_ref: 'all', */
+    votes: [],
+    votingListIsFetching: false,
+    votingListErrorMessage: 'error',
   };
 
   constructor(props) {
@@ -29,8 +39,9 @@ class PollState extends React.Component {
   }
 
   onToggleExpand() {
-    this.setState({ ...this.state, expand: !this.state.expand });
-    this.props.getVotes();
+    const newExpand = !this.state.expand;
+    this.setState({ ...this.state, expand: newExpand });
+    if (newExpand) this.props.getVotes();
   }
 
   render() {
