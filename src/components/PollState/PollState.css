@@ -1,33 +1,32 @@
 @import '../../components/variables.css';
 
 .root {
-  border: none 1px gray;
   font-size: 1em;
   margin: auto;
 }
 
 .header {
   display: flex;
-  height: 0.6em;
-}
-
-.compact {
-  .header {
-    height: 0.5em;
-  }
+  align-items: center;
 }
 
 .barContainer {
   width: 100%;
-  height: 80%;
-  border: solid 1px #555;
+  height: 0.6em;
+  outline: solid 1px #555;
+}
+
+.compact {
+  .barContainer {
+    height: 0.3em;
+  }
 }
 
 .voteCount {
   flex-grow: 0;
   font-size: 2vh;
   height: 100%;
-  margin: -0.5vh 0.2em;
+  margin: 0 0.2em;
 }
 
 .bar {
