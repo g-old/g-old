@@ -114,7 +114,7 @@ class TagInput extends React.Component {
   }
 
   addTag(tag) {
-    //  const possibleMatches = this.filteredSuggestions(tag, this.props.suggestions);
+    //  const possibleMatches = filteredSuggestions(tag, this.props.suggestions);
 
     this.props.handleAddition(tag);
 
@@ -143,7 +143,7 @@ class TagInput extends React.Component {
 
   handleInputChange(e) {
     const query = e.target.value.trim();
-    const suggestions = this.filteredSuggestions(query, this.props.availableTags);
+    const suggestions = filteredSuggestions(query, this.props.availableTags);
 
     let selectedIndex = this.state.selectedIndex;
     if (selectedIndex >= suggestions.length) {
