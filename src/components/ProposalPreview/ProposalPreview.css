@@ -41,6 +41,8 @@ a:visited {
 }
 
 .tags {
+  display: flex;
+  flex-wrap: wrap;
   margin: 0.4em 0 0;
   font-size: 0.8em;
 }
