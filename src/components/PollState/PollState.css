@@ -24,7 +24,6 @@
 
 .voteCount {
   flex-grow: 0;
-  font-size: 2vh;
   height: 100%;
   margin: 0 0.2em;
 }
@@ -37,14 +36,14 @@
 .threshold {
   position: relative;
   top: -100%;
-  border-left: solid 2px #555;
+  outline: solid 1px #555;
   height: 100%;
   transition: opacity 0.5s, background-color 0.5s;
 }
 
 .greyZone {
   opacity: 0.4;
-  background-color: #ddd;
+  background-color: #fff;
 }
 
 .unipolar {
@@ -64,10 +63,6 @@
 
   .bar {
     background-color: #0c2;
-  }
-
-  .threshold {
-    border-right: solid 2px #555;
   }
 }
 

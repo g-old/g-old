@@ -53,15 +53,13 @@ class PollState extends React.Component {
     const upPercent = 100 * (this.props.upvotes / sum);
     const voteBar = <div className={cn(s.bar)} style={{ width: `${upPercent}%` }} />;
 
-    const threshMargin = this.props.unipolar ? this.props.threshold : 100 - this.props.threshold;
+    const threshMargin = this.props.unipolar
+      ? this.props.threshold
+      : Math.min(this.props.threshold, 100 - this.props.threshold);
     const doubleMargin = 2 * threshMargin;
-    const threshWidth = 100 - doubleMargin;
-
-    const greyZone = !this.props.unipolar &&
-      upPercent > 100 - this.props.threshold &&
-      upPercent < this.props.threshold
-      ? s.greyZone
-      : '';
+    const threshWidth = this.props.unipolar ? 0 : 100 - doubleMargin;
+    const greyZone =
+      true || (!this.props.unipolar && upPercent > threshMargin && upPercent < 100 - threshMargin);
 
     /* eslint-disable jsx-a11y/no-static-element-interactions */
     return (
@@ -79,7 +77,7 @@ class PollState extends React.Component {
           <div className={s.barContainer}>
             {voteBar}
             <div
-              className={cn(s.threshold, greyZone)}
+              className={cn(s.threshold, greyZone && s.greyZone)}
               style={{ marginLeft: `${threshMargin}%`, width: `${threshWidth}%` }}
             />
           </div>
@@ -99,6 +97,7 @@ class PollState extends React.Component {
               errorMessage={this.props.votingListErrorMessage}
             />
             {`THRESHOLD ${this.props.threshold}`}
+            {!this.props.unipolar && this.props.threshold < 50 ? ' (IMPOSSIBLE)' : ''}
           </div>}
       </div>
     );
