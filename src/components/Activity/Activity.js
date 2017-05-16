@@ -17,6 +17,7 @@ class Activity extends React.Component {
         name: PropTypes.string,
         surname: PropTypes.string,
       }),
+      state: PropTypes.string,
     }),
     verb: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
@@ -42,6 +43,12 @@ class Activity extends React.Component {
         header = 'This voting has been accepted!';
       } else if (this.props.verb === 'reject') {
         header = 'This proposal is now valid!';
+      } else if (this.props.verb === 'update') {
+        if (this.props.content.state === 'voting') {
+          header = 'Voting open!';
+        } else if (this.props.content.state === 'revoked') {
+          header = 'Proposal has been revoked';
+        }
       }
     } else if (this.props.content && this.props.content.__typename === 'VoteDL') {
       content = (

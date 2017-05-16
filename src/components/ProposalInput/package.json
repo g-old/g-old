@@ -1,0 +1,6 @@
+{
+  "name": "ProposalInput",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ProposalInput.js"
+}

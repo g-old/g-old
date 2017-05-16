@@ -1,12 +1,40 @@
 import React from 'react';
-import CreateProposal from '../CreateProposal';
+import ProposalInput from '../ProposalInput';
+import ProposalsManager from '../ProposalsManager';
+import Accordion from '../Accordion';
+import AccordionPanel from '../AccordionPanel';
+
+const defaultPollValues = {
+  1: {
+    withStatements: false,
+    unipolar: true,
+    threshold: 20,
+    secret: false,
+    thresholdRef: 'all',
+  },
+  2: {
+    withStatements: true,
+    unipolar: false,
+    threshold: 50,
+    secret: false,
+    thresholdRef: 'voters',
+  },
+};
 
 class ProposalPanel extends React.Component {
   render() {
     return (
       <div>
-        <CreateProposal maxTags={8} />
-        <h1> ACTIVATE PHASE TWO </h1>
+        <Accordion>
+          <AccordionPanel heading="CREATE">
+            <ProposalInput maxTags={8} defaultPollValues={defaultPollValues} />
+          </AccordionPanel>
+          <AccordionPanel heading="MANIPULATE">
+            <ProposalsManager defaultPollValues={defaultPollValues} />
+          </AccordionPanel>
+
+        </Accordion>
+
       </div>
     );
   }

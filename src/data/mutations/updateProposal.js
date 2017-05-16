@@ -10,7 +10,11 @@ const updateProposal = {
       type: ProposalInputType,
     },
   },
-  resolve: (data, { proposal }, { viewer, loaders }) => Proposal.update(viewer, proposal, loaders),
+  resolve: (data, { proposal }, { viewer, loaders }) =>
+    Proposal.update(viewer, proposal, loaders).then((res) => {
+      Proposal.insertInFeed(viewer, res, 'update');
+      return res;
+    }),
 };
 
 export default updateProposal;

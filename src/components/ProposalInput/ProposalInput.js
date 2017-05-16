@@ -6,10 +6,11 @@ import MarkdownIt from 'markdown-it';
 import cn from 'classnames';
 // import Calendar from '../Calendar';
 import { createProposal, loadTags } from '../../actions/proposal';
-import s from './CreateProposal.css';
+import s from './ProposalInput.css';
 import { getTags } from '../../reducers';
-import CheckBox from '../CheckBox';
 import TagInput from '../TagInput';
+import PollInput from '../PollInput';
+import { concatDateAndTime } from '../../core/helpers';
 
 // http://stackoverflow.com/questions/6982692/html5-input-type-date-default-value-to-today
 const utcCorrectedDate = (daysAdded) => {
@@ -21,11 +22,6 @@ const utcCorrectedDate = (daysAdded) => {
   return local.toJSON();
 };
 
-const concatDateAndTime = (date, time) => {
-  const d = date || new Date().toJSON().slice(0, 10);
-  const t = time || new Date().toJSON().slice(11, 16);
-  return new Date(`${d} ${t}`);
-};
 const DateInput = props => (
   <div>
     <p>
@@ -69,7 +65,7 @@ DateInput.propTypes = {
   handleChange: PropTypes.func.isRequired,
 };
 
-class CreateProposal extends React.Component {
+class ProposalInput extends React.Component {
   static propTypes = {
     createProposal: PropTypes.func.isRequired,
     //  intl: PropTypes.shape({}).isRequired,
@@ -82,6 +78,7 @@ class CreateProposal extends React.Component {
         id: PropTypes.string,
       }),
     ).isRequired,
+    defaultPollValues: PropTypes.shape({}).isRequired,
   };
   constructor(props) {
     super(props);
@@ -89,13 +86,8 @@ class CreateProposal extends React.Component {
     this.state = {
       textArea: { val: '', selection: [0, 0] },
       title: { val: '' },
-      value: 1,
-      dateFrom: '',
-      dateTo: '',
-      timeFrom: '',
-      timeTo: '',
-      threshold: 20,
-      thresholdRef: 'all',
+      pollOption: '1',
+      settings: {},
       tags: {},
       showInput: false,
       tagId: 'xt0',
@@ -114,6 +106,8 @@ class CreateProposal extends React.Component {
     this.onStrong = this.onStrong.bind(this);
     this.onItalic = this.onItalic.bind(this);
     this.onAddLink = this.onAddLink.bind(this);
+    this.handleValueChanges = this.handleValueChanges.bind(this);
+    this.toggleSettings = this.toggleSettings.bind(this);
     this.md = new MarkdownIt({
       // html: true,
       linkify: true,
@@ -181,11 +175,9 @@ class CreateProposal extends React.Component {
     if (dateTo || timeTo) {
       endTime = concatDateAndTime(dateTo, timeTo);
     }
-    const withStatements = this.state.withStatements || false;
-    const secret = this.state.secret || false;
-    const threshold = this.state.threshold || 20;
-    const unipolar = this.state.unipolar;
-    const thresholdRef = this.state.thresholdRef || null;
+    const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
+
+    const pollingModeId = this.state.pollOption;
 
     /* eslint-disable no-confusing-arrow */
     const tags =
@@ -196,22 +188,19 @@ class CreateProposal extends React.Component {
             : { id: this.state.tags[id].id },
       ) || null;
     /* eslint-enable no-confusing-arrow */
-    if ((title && markup) || true) {
+    if (title && markup) {
       alert('Implement proper sanitizing!');
       this.props.createProposal({
         title,
         text: markup,
-        pollingModeId: this.state.value,
-        startTime,
-        endTime,
         poll: {
           startTime,
           endTime,
           secret,
-          threshold,
+          threshold: threshold || 20,
           mode: {
             withStatements,
-            id: this.state.value,
+            id: pollingModeId,
             unipolar,
             thresholdRef,
           },
@@ -221,6 +210,25 @@ class CreateProposal extends React.Component {
     } else if (!title) {
       alert('TITLE MISSING');
     }
+  }
+
+  handleValueChanges(e) {
+    if (e.target.name === 'threshold' || e.target.checked == null) {
+      const value = e.target.value;
+      if (e.target.name === 'pollOption') {
+        this.setState({
+          [e.target.name]: value,
+          settings: { threshold: this.props.defaultPollValues[value].threshold },
+        });
+      } else {
+        this.setState({ settings: { ...this.state.settings, [e.target.name]: value } });
+      }
+    } else {
+      this.setState({ settings: { ...this.state.settings, [e.target.name]: e.target.checked } });
+    }
+  }
+  toggleSettings() {
+    this.setState({ displaySettings: !this.state.displaySettings });
   }
 
   isSomethingSelected() {
@@ -267,56 +275,16 @@ class CreateProposal extends React.Component {
         <div className={s.container}>
           {/* <Calendar lang={this.props.locale} /> */}
 
-          <DateInput handleChange={this.handleDateTimeChange} />
-          <div className={s.formGroup}>
-            <select onChange={this.onModeChange}>
-              <option disabled selected value> -- select a default mode -- </option>
-              <option value={1}>TR: 20 UNIPOLAR: NOSTATEMENTS </option>
-              <option value={2}>TR: 20 BIPOLAR: WITHSTATEMENTS </option>
-            </select>
-          </div>
-          <CheckBox
-            label={'with statements'}
-            checked={this.state.withStatements}
-            onChange={(e) => {
-              this.setState({ withStatements: e.target.checked });
-            }}
+          <PollInput
+            onValueChange={this.handleValueChanges}
+            handleDateChange={this.handleValueChanges}
+            selectedPMode={this.state.pollOption}
+            displaySettings={this.state.displaySettings}
+            defaultPollValues={this.props.defaultPollValues}
+            pollValues={this.state.settings}
+            toggleSettings={this.toggleSettings}
           />
-          <CheckBox
-            label={'secret'}
-            checked={this.state.secret}
-            onChange={(e) => {
-              this.setState({ secret: e.target.checked });
-            }}
-          />
-          <CheckBox
-            label={'unipolar'}
-            checked={this.state.unipolar}
-            onChange={(e) => {
-              this.setState({ unipolar: e.target.checked });
-            }}
-          />
-          <p>
-            Threshold <input
-              value={this.state.threshold}
-              onChange={(e) => {
-                this.setState({ threshold: e.target.value });
-              }}
-              min={10}
-              step={5}
-              max={90}
-              type="range"
-            />
-            <label htmlFor="threshold">
-              <span name="threshold">{this.state.threshold}</span>
-            </label>
-          </p>
-          <p>
-            Threshold Reference: <select onChange={this.onTRefChange}>
-              <option value={'all'}>ALL </option>
-              <option value={'voters'}>VOTERS</option>
-            </select>
-          </p>
+
           <div className={s.formGroup}>
             <label className={s.label} htmlFor="titleinput">
               Titel
@@ -406,4 +374,4 @@ const mapDispatch = {
   createProposal,
   loadTags,
 };
-export default connect(mapStateToProps, mapDispatch)(withStyles(s)(CreateProposal));
+export default connect(mapStateToProps, mapDispatch)(withStyles(s)(ProposalInput));

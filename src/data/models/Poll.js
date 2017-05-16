@@ -67,7 +67,6 @@ class Poll {
 
       if (pollingMode.thresholdRef === 'all') {
         numVoter = await trx.whereIn('role_id', [1, 2, 3, 4]).count('id').into('users');
-        console.log('NUM VOTER', numVoter);
         numVoter = Number(numVoter[0].count);
         if (numVoter < 1) throw Error('Not enough user');
       }
@@ -85,6 +84,31 @@ class Poll {
     });
     if (!newPollId) return null;
     return Poll.gen(viewer, newPollId, loaders) || null;
+  }
+
+  static async update(viewer, data, loaders) {
+    // authorize
+    if (!Poll.canMutate(viewer, data)) return null;
+    // validate
+    if (!data.id) return null;
+    const newData = {};
+    if (data.closedAt) {
+      newData.closed_at = data.closedAt;
+    }
+
+    const pollId = await knex.transaction(async (trx) => {
+      await trx
+        .where({ id: data.id })
+        .update({
+          ...newData,
+          updated_at: new Date(),
+        })
+        .into('polls');
+      return data.id;
+    });
+    if (!pollId) return null;
+    loaders.polls.clear(pollId);
+    return Poll.gen(viewer, pollId, loaders);
   }
 }
 

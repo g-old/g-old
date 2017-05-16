@@ -232,8 +232,10 @@ class Poll extends React.Component {
           </div>
         </div>
         <p>
-          {'CLOSES AT '}
-          <FormattedRelative value={this.props.poll.end_time} />
+          {this.props.poll.closed_at ? ' CLOSED AT ' : ' CLOSES AT '}
+          <FormattedRelative
+            value={this.props.poll.closed_at ? this.props.poll.closed_at : this.props.poll.end_time}
+          />
 
         </p>
         {mutationErrorMessage && <div> {'ERROR:'} </div>}

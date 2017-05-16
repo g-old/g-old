@@ -47,13 +47,14 @@ const Tag = props => (
 /* eslint-enable jsx-a11y/no-static-element-interactions */
 Tag.propTypes = {
   label: PropTypes.string.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
   readOnly: PropTypes.bool,
   onClick: PropTypes.func,
 };
 Tag.defaultProps = {
   readOnly: false,
   onClick: () => {},
+  onDelete: () => {},
 };
 
 class TagInput extends React.Component {

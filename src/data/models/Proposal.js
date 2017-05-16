@@ -36,6 +36,59 @@ const validateTags = async (tags) => {
   return { existingTags, newTags };
 };
 
+const validateDates = ({ poll }) => {
+  const startTime = poll && poll.startTime ? new Date(poll.startTime) : new Date();
+  if (!startTime.getMonth || typeof startTime.getMonth !== 'function') return null;
+
+  let endTime;
+  if (poll && poll.endTime) {
+    endTime = new Date(poll.endTime);
+  } else {
+    endTime = new Date();
+    endTime.setDate(startTime.getDate() + 3);
+  }
+  if (!endTime.getMonth || typeof endTime.getMonth !== 'function') return null;
+  if (startTime < new Date() || startTime >= endTime) throw Error('DateTime wrong');
+  return { startTime, endTime };
+};
+
+// TODO  implement this  in Poll create instead
+const validatePoll = async (viewer, poll, loaders) => {
+  if (!poll) return {};
+  let pollingMode;
+  let createPollingMode = false;
+  let pollingModeData;
+  if (poll.mode && poll.mode.id) {
+    pollingMode = await PollingMode.gen(viewer, poll.mode.id, loaders);
+
+    if (!pollingMode) throw Error('PollingMode not found');
+    // check if modifications
+    const { id, ...props } = poll.mode;
+    const keys = Object.keys(props);
+    if (keys.length > 0) {
+      // check if values are different
+      const diff = keys.reduce((acc, curr) => {
+        if (props[curr] !== pollingMode[curr]) {
+          // eslint-disable-next-line no-param-reassign
+          acc += 1;
+        }
+        return acc;
+      }, 0);
+      createPollingMode = diff > 0;
+      pollingModeData = { ...pollingMode, ...props };
+    }
+  }
+  const { startTime, endTime } = validateDates(poll);
+  const pollData = {
+    secret: poll.secret || false,
+    start_time: startTime,
+    end_time: endTime,
+    threshold: poll.threshold || 50,
+  };
+
+  return { pollData, pollingModeData, createPollingMode };
+};
+
 class Proposal {
   constructor(data) {
     this.id = data.id;
@@ -74,26 +127,61 @@ class Proposal {
     if (!Proposal.canMutate(viewer, data)) return null;
     // validate
     if (!data.id) return null;
-    if (!data.title && !data.text) return null;
     const proposalInDb = await Proposal.gen(viewer, data.id, loaders);
     if (!proposalInDb) return null;
-    if (proposalInDb.title === data.title && proposalInDb.body === data.text) return null;
+    if (data.state && ['revoked'].indexOf(data.state) === -1) return null;
+
+    const { pollData, pollingModeData, createPollingMode } = await validatePoll(
+      viewer,
+      data.poll,
+      loaders,
+    );
+
+    const newValues = { state: 'voting', updated_at: new Date() };
 
     // update
-    await knex.transaction(async (trx) => {
+    if (data.state) {
+      newValues.state = data.state;
+    }
+    const proposalId = await knex.transaction(async (trx) => {
+      if (pollData) {
+        // create poll
+        let pId = data.poll.mode.id;
+        // TODO check if they get reverted in case of rollback
+        if (createPollingMode && pollingModeData) {
+          const pMode = await PollingMode.create(viewer, pollingModeData, loaders);
+          if (!pMode) throw Error('PollingMode failed');
+          pId = pMode.id;
+        }
+
+        const pollTwoData = {
+          polling_mode_id: pId,
+          ...pollData,
+        };
+        const pollTwo = await Poll.create(viewer, pollTwoData, loaders);
+        if (!pollTwo) throw Error('No pollTwo provided');
+        // update/close pollOne
+        const pollOne = await Poll.update(
+          viewer,
+          { id: proposalInDb.pollOne_id, closedAt: new Date() },
+          loaders,
+        );
+        if (!pollOne) throw Error('No pollOne provided');
+        newValues.poll_two_id = pollTwo.id;
+      }
       await trx
         .where({
           id: data.id,
         })
         .update({
-          // Not sure if await needed
-          body: data.text,
-          title: data.title,
-          updated_at: new Date(),
+          ...newValues,
         })
         .into('proposals');
+      return data.id;
     });
-    return Proposal.gen(viewer, data.id, loaders) || null;
+    if (!proposalId) return null;
+    loaders.proposals.clear(proposalId);
+    return Proposal.gen(viewer, proposalId, loaders);
   }
 
   static async create(viewer, data, loaders) {
@@ -102,58 +190,15 @@ class Proposal {
     // validate
     if (!data.text) return null;
     if (!data.title) return null;
-    let createPollingMode = false;
-    let pollingModeData;
-    if (data.poll) {
-      // validate poll
-      let pollingMode;
-      if (data.poll.mode && data.poll.mode.id) {
-        pollingMode = await PollingMode.gen(viewer, data.poll.mode.id, loaders);
-
-        if (!pollingMode) throw Error('PollingMode not found');
-        // check if modifications
-        const { id, ...props } = data.poll.mode;
-        const keys = Object.keys(props);
-        if (keys.length > 0) {
-          // check if values are different
-          const diff = keys.reduce((acc, curr) => {
-            if (props[curr] !== pollingMode[curr]) {
-              // eslint-disable-next-line no-param-reassign
-              acc += 1;
-            }
-            return acc;
-          }, 0);
-          createPollingMode = diff > 0;
-          pollingModeData = { ...pollingMode, ...props };
-        }
-      }
-    }
-    // check Times
-    const startTime = data.poll && data.poll.startTime ? new Date(data.poll.startTime) : new Date();
-    if (!startTime.getMonth || typeof startTime.getMonth !== 'function') return null;
-
-    let endTime;
-    if (data.poll && data.poll.endTime) {
-      endTime = new Date(data.poll.endTime);
-    } else {
-      endTime = new Date();
-      endTime.setDate(startTime.getDate() + 3);
-    }
-    if (!endTime.getMonth || typeof endTime.getMonth !== 'function') return null;
-    if (startTime >= endTime) throw Error('DateTime wrong');
-
-    // check threshold;
-    const threshold = data.poll.threshold || 20;
-
-    const pollData = {
-      secret: data.poll.secret || false,
-      start_time: startTime,
-      end_time: endTime,
-      threshold,
-    };
+    const { pollData, pollingModeData, createPollingMode } = await validatePoll(
+      viewer,
+      data.poll,
+      loaders,
+    );
 
     // tags
     const { existingTags, newTags } = await validateTags(data.tags);
+
     const newProposalId = await knex.transaction(async (trx) => {
       let pId = data.poll.mode.id;
       // TODO check if they get reverted in case of rollback

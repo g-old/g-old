@@ -34,3 +34,9 @@ export const dedup = (arr) => {
     return match ? false : (hashTable[key] = true);
   });
 };
+
+export const concatDateAndTime = (date, time) => {
+  const d = date || new Date().toJSON().slice(0, 10);
+  const t = time || new Date().toJSON().slice(11, 16);
+  return new Date(`${d} ${t}`);
+};

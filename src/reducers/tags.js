@@ -4,6 +4,7 @@ import {
   LOAD_PROPOSAL_SUCCESS,
   LOAD_TAGS_SUCCESS,
   CREATE_PROPOSAL_SUCCESS,
+  UPDATE_PROPOSAL_SUCCESS,
 } from '../constants';
 
 export default function tags(state = {}, action) {
@@ -11,6 +12,7 @@ export default function tags(state = {}, action) {
     case LOAD_TAGS_SUCCESS:
     case LOAD_PROPOSAL_SUCCESS:
     case CREATE_PROPOSAL_SUCCESS:
+    case UPDATE_PROPOSAL_SUCCESS:
     case LOAD_PROPOSAL_LIST_SUCCESS: {
       return merge({}, state, action.payload.entities.tags);
     }

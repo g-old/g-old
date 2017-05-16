@@ -10,6 +10,9 @@ import {
   CREATE_PROPOSAL_START,
   CREATE_PROPOSAL_SUCCESS,
   CREATE_PROPOSAL_ERROR,
+  UPDATE_PROPOSAL_START,
+  UPDATE_PROPOSAL_SUCCESS,
+  UPDATE_PROPOSAL_ERROR,
   LOAD_TAGS_START,
   LOAD_TAGS_ERROR,
   LOAD_TAGS_SUCCESS,
@@ -143,8 +146,8 @@ query{
 `;
 
 const createProposalMutation = `
-mutation($pollingModeId:ID $title: String, $text:String, $endTime: String,  $poll:PollInput $tags:[TagInput]){
-  createProposal(proposal:{title:$title, text:$text pollingModeId:$pollingModeId endTime:$endTime poll:$poll tags:$tags}){
+mutation( $title: String, $text:String,  $poll:PollInput $tags:[TagInput]){
+  createProposal(proposal:{title:$title text:$text poll:$poll tags:$tags}){
     ${proposal}
     tags{
       id
@@ -154,6 +157,20 @@ mutation($pollingModeId:ID $title: String, $text:String, $endTime: String,  $pol
   }
 }
 `;
+
+const updateProposalMutation = `
+mutation($id:ID  $poll:PollInput $state:ProposalState ){
+  updateProposal(proposal:{ id:$id poll:$poll state:$state }){
+    ${proposal}
+    tags{
+      id
+      text
+      count
+    }
+  }
+}
+`;
+
 const getFilter = (status) => {
   switch (status) {
     case 'accepted':
@@ -262,6 +279,39 @@ export function createProposal(proposalData) {
     } catch (error) {
       dispatch({
         type: CREATE_PROPOSAL_ERROR,
+        payload: {
+          error,
+        },
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function updateProposal(proposalData) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: UPDATE_PROPOSAL_START,
+      payload: {
+        proposal: proposalData,
+      },
+    });
+    try {
+      const { data } = await graphqlRequest(updateProposalMutation, proposalData);
+      const normalizedData = normalize(data.updateProposal, proposalSchema);
+      // TODO change filter structure of reducer
+      const filter = getFilter(data.updateProposal.state);
+
+      dispatch({
+        type: UPDATE_PROPOSAL_SUCCESS,
+        payload: normalizedData,
+        filter,
+      });
+    } catch (error) {
+      dispatch({
+        type: UPDATE_PROPOSAL_ERROR,
         payload: {
           error,
         },

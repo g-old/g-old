@@ -4,6 +4,7 @@ import {
   LOAD_PROPOSAL_SUCCESS,
   LOAD_FEED_SUCCESS,
   CREATE_PROPOSAL_SUCCESS,
+  UPDATE_PROPOSAL_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -26,6 +27,9 @@ export default function byId(state = {}, action) {
     }
 
     case CREATE_PROPOSAL_SUCCESS: {
+      return merge({}, state, action.payload.entities.proposals);
+    }
+    case UPDATE_PROPOSAL_SUCCESS: {
       return merge({}, state, action.payload.entities.proposals);
     }
     default:
