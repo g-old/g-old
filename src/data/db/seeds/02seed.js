@@ -21,6 +21,16 @@ function randomNumber(max) {
 function random(array) {
   return array[Math.floor(array.length * Math.random())];
 }
+const dedup = (arr) => {
+  const hashTable = {};
+
+  return arr.filter((el) => {
+    const key = JSON.stringify(el);
+    const match = Boolean(hashTable[key]);
+
+    return match ? false : (hashTable[key] = true);
+  });
+};
 
 // https://www.frankmitchell.org/2015/01/fisher-yates/
 /* eslint-disable no-param-reassign */
@@ -179,10 +189,11 @@ exports.seed = function (knex, Promise) {
   }
 
   function createTags() {
-    const tags = [];
+    let tags = [];
     for (let i = 0; i < numTags; i += 1) {
       tags.push({ text: faker.lorem.word() });
     }
+    tags = dedup(tags);
     return Promise.resolve(knex('tags').insert(tags).returning('id').then(ids => ids));
   }
 

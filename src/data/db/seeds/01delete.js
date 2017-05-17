@@ -12,10 +12,12 @@ exports.seed = function (knex, Promise) {
     knex('flagged_statements')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE flagged_statements_id_seq RESTART WITH 1;')),
+
+    knex('tags').del().then(() => knex.raw('ALTER SEQUENCE tags_id_seq RESTART WITH 1;')),
+
     knex('proposal_tags')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE proposal_tags_id_seq RESTART WITH 1;')),
-    knex('tags').del().then(() => knex.raw('ALTER SEQUENCE tags_id_seq RESTART WITH 1;')),
     knex('password_resets')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE password_resets_id_seq RESTART WITH 1;')),
@@ -30,12 +32,18 @@ exports.seed = function (knex, Promise) {
       .then(() => knex.raw('ALTER SEQUENCE statements_id_seq RESTART WITH 1;')),
     knex('votes').del().then(() => knex.raw('ALTER SEQUENCE votes_id_seq RESTART WITH 1;')),
     knex('proposals').del().then(() => knex.raw('ALTER SEQUENCE proposals_id_seq RESTART WITH 1;')),
+
     knex('polls').del().then(() => knex.raw('ALTER SEQUENCE polls_id_seq RESTART WITH 1;')),
     knex('polling_modes')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE polling_modes_id_seq RESTART WITH 1;')),
     knex('users').del().then(() => knex.raw('ALTER SEQUENCE users_id_seq RESTART WITH 1;')),
-    knex('roles').del(),
+    knex('roles').del().then(),
   ];
+  /* const chain = deleteQueue.reduce(
+    (soFar, f) => soFar.then(f,(e)=>{console.log(e)}),
+    Promise.resolve(console.log('deleting entries in table ... '))
+  ).catch((e)=> console.log(e));
+  return chain.catch((e)=>console.log(e));*/
   return Promise.each(deleteQueue, () => console.log('deleting entries in table ... '));
 };

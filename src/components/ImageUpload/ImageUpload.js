@@ -14,9 +14,13 @@ const standardValues = {
 class ImageUpload extends React.Component {
   static propTypes = {
     uploadAvatar: PropTypes.func.isRequired,
-    uploadPending: PropTypes.bool,
+    uploadPending: PropTypes.bool.isRequired,
+    uploadError: PropTypes.shape({}),
     uploadSuccess: PropTypes.bool,
-    uploadError: PropTypes.object,
+  };
+  static defaultProps = {
+    uploadError: null,
+    uploadSuccess: false,
   };
   constructor(props) {
     super(props);
@@ -50,7 +54,9 @@ class ImageUpload extends React.Component {
     reader.onload = () => {
       this.setState({ src: reader.result, showEditor: true, ...standardValues });
     };
-    reader.readAsDataURL(files[0]);
+    if (files.length) {
+      reader.readAsDataURL(files[0]);
+    }
   }
 
   setEditorRef(editor) {
@@ -158,6 +164,7 @@ class ImageUpload extends React.Component {
       <div className={s.root}>
         <div className={s.container}>
           {uploader}
+          {this.props.uploadSuccess && 'Uploaded'}
         </div>
       </div>
     );

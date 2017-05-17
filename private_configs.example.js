@@ -42,4 +42,9 @@ module.exports = {
     url: 'https://git.heroku.com/{name}.git',
     website: 'https://{name}.herokuapp.com/',
   },
+  cloudinary: {
+    cloud_name: 'cName',
+    api_key: '123456',
+    api_secret: 'yourSecret',
+  },
 };

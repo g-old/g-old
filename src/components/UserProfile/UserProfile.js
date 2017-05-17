@@ -6,10 +6,12 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import cn from 'classnames';
 import { validateEmail as checkEmail } from '../../core/helpers';
 import { updateUser, fetchUser } from '../../actions/user';
+import { uploadAvatar } from '../../actions/file';
 import s from './UserProfile.css';
 import { getSessionUser, getAccountUpdates } from '../../reducers';
 import Avatar from '../Avatar';
 import Icon from '../Icon';
+import ImageUpload from '../ImageUpload';
 import {
   createValidator,
   passwordValidation,
@@ -46,8 +48,7 @@ const messages = defineMessages({
   },
 });
 
-const renderFollowee = (data, fn) => /* eslint-disable jsx-a11y/no-static-element-interactions */
-(
+const renderFollowee = (data, fn /* eslint-disable jsx-a11y/no-static-element-interactions */) => (
   <li
     style={{ display: 'inline' }}
     onClick={() => {
@@ -80,6 +81,7 @@ class UserProfile extends React.Component {
     // eslint-disable-next-line react/forbid-prop-types
     updates: PropTypes.object.isRequired,
     fetchUser: PropTypes.func.isRequired,
+    uploadAvatar: PropTypes.func.isRequired,
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   };
   constructor(props) {
@@ -250,6 +252,7 @@ class UserProfile extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
+          <ImageUpload uploadAvatar={this.props.uploadAvatar} />
           <img className={s.avatar} src={avatar} alt="IMG" />
           <div>
             <h3>{name}</h3>
@@ -380,6 +383,7 @@ class UserProfile extends React.Component {
 const mapDispatch = {
   updateUser,
   fetchUser,
+  uploadAvatar,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getSessionUser(state),

@@ -8,21 +8,18 @@ import { UPLOAD_AVATAR_START, UPLOAD_AVATAR_SUCCESS, UPLOAD_AVATAR_ERROR } from 
 // only clientside!
 export function uploadAvatar(avatar) {
   const initialId = '0000';
-  return async dispatch => {
+  return async (dispatch) => {
     const formData = new FormData();
     formData.append('avatar', avatar.dataUrl);
-    const properties = Object.keys({ avatar }).reduce(
-      (acc, curr) => {
-        // eslint-disable-next-line no-param-reassign
-        acc[curr] = {
-          pending: true,
-          success: false,
-          error: null,
-        };
-        return acc;
-      },
-      {},
-    );
+    const properties = Object.keys({ avatar }).reduce((acc, curr) => {
+      // eslint-disable-next-line no-param-reassign
+      acc[curr] = {
+        pending: true,
+        success: false,
+        error: null,
+      };
+      return acc;
+    }, {});
     dispatch({
       type: UPLOAD_AVATAR_START,
       id: initialId,

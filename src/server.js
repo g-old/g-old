@@ -149,7 +149,7 @@ app.post('/signup', (req, res) => {
     });
 });
 const storage = multer.memoryStorage();
-const FileStore = FileStorage(AvatarManager);
+const FileStore = FileStorage(AvatarManager({ local: !!__DEV__ }));
 
 app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
   if (!req.user) res.status(505);
