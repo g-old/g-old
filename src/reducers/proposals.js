@@ -23,6 +23,7 @@ const hydrateProposals = (state, data, entities) =>
     ...entities,
     proposals: state.byId,
     users: entities.users.byId,
+    statements: entities.statements.byId,
   });
 
 export const getVisibleProposals = (state, filter, entities) => {

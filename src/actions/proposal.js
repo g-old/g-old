@@ -34,6 +34,13 @@ const statementFields = `{
     vote{
       id
       position
+      voter{
+        id
+        name
+        surname
+        avatar
+      }
+      pollId
     }
     author{
       id
@@ -53,6 +60,12 @@ const pollFields = `{
     id
     position
     pollId
+    voter{
+      id
+      name
+      surname
+      avatar
+    }
   }
   ownStatement ${statementFields}
   upvotes

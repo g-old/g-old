@@ -78,7 +78,7 @@ class StatementsList extends React.Component {
           this.props.statements.map(
             statement =>
               // eslint-disable-next-line eqeqeq
-              (this.props.user.id != statement.author.id // to eliminate ownstatement from rendering
+              this.props.user.id != statement.author.id // to eliminate ownstatement from rendering
                 ? <Statement
                   key={statement.id}
                   data={statement}
@@ -89,10 +89,10 @@ class StatementsList extends React.Component {
                   ownStatement={false}
                   onSubmit={this.props.onSubmit}
                   isFollowee={
-                      this.props.followees.find(f => f.voter.id === statement.author.id) != null
+                      this.props.followees.find(f => f.id === statement.author.id) != null
                     }
                 />
-                : null),
+                : null,
           )}
         {/* eslint-enable no-confusing-arrow */}
       </div>

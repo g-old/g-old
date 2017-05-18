@@ -55,6 +55,7 @@ const renderFollowee = (data, fn /* eslint-disable jsx-a11y/no-static-element-in
       fn({
         id: data.userId,
         followee: data.followee.id,
+        info: { delete: true, id: data.followee.id },
       });
     }}
   >

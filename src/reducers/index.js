@@ -77,3 +77,11 @@ export const getFeedIsFetching = state => fromEntity.getFeedIsFetching(state.ent
 export const getFeedErrorMessage = state => fromEntity.getFeedErrorMessage(state.entities);
 
 export const getTags = state => fromEntity.getTags(state.entities);
+
+export const getFolloweeVotesByPoll = (state, id) =>
+  fromEntity.getFolloweeVotesByPoll(state.entities, id);
+
+export const getFollowees = state => fromEntity.getFollowees(state.entities);
+
+export const getAllStatementsByPoll = (state, id) =>
+  fromEntity.getAllStatementsByPoll(state.entities, id);

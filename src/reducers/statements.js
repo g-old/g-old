@@ -1,74 +1,24 @@
-import merge from 'lodash.merge';
-import {
-  LOAD_PROPOSAL_LIST_SUCCESS,
-  LOAD_PROPOSAL_SUCCESS,
-  DELETE_VOTE_SUCCESS,
-  CREATE_STATEMENT_SUCCESS,
-  UPDATE_STATEMENT_SUCCESS,
-  DELETE_STATEMENT_SUCCESS,
-  CREATE_LIKE_SUCCESS,
-  DELETE_LIKE_SUCCESS,
-  LOAD_FLAGGEDSTMTS_SUCCESS,
-  UPDATE_FLAGGEDSTMT_SUCCESS,
-  LOAD_FEED_SUCCESS,
-} from '../constants';
+import { denormalize } from 'normalizr';
+import { combineReducers } from 'redux';
+import byId from './statementById';
+import allIds from './statementsList';
+import byPoll, * as fromByPoll from './statementsByPoll';
 
-export default function statements(state = {}, action) {
-  switch (action.type) {
-    case LOAD_PROPOSAL_SUCCESS:
-      return merge({}, state, action.payload.entities.statements);
-    case LOAD_PROPOSAL_LIST_SUCCESS: {
-      return merge({}, state, action.payload.entities.statements);
-    }
-    case DELETE_VOTE_SUCCESS: {
-      const voteId = action.payload.result;
-      const ownStatementId = Object.keys(state).find(id => state[id].vote === voteId);
-      if (!ownStatementId) return state;
-      // eslint-disable-next-line no-unused-vars
-      const { ownStatementId: omit, ...other } = state;
-      return other;
-    }
-    case LOAD_FEED_SUCCESS: {
-      return merge({}, state, action.payload.entities.statements);
-    }
-    case CREATE_STATEMENT_SUCCESS: {
-      return merge({}, state, action.payload.entities.statements);
-    }
-    case UPDATE_STATEMENT_SUCCESS: {
-      return merge({}, state, action.payload.entities.statements);
-    }
-    case LOAD_FLAGGEDSTMTS_SUCCESS: {
-      return merge({}, state, action.payload.entities.statements);
-    }
-    case UPDATE_FLAGGEDSTMT_SUCCESS: {
-      return merge({}, state, action.payload.entities.statements);
-    }
-    case DELETE_STATEMENT_SUCCESS: {
-      // eslint-disable-next-line no-unused-vars
-      const { [action.payload.result]: omit, ...other } = state;
-      return other;
-    }
-    case CREATE_LIKE_SUCCESS: {
-      const like = action.payload.entities.statementLikes[action.payload.result];
-      return {
-        ...state,
-        [like.statementId]: {
-          ...state[like.statementId],
-          likes: state[like.statementId].likes + 1,
-        },
-      };
-    }
-    case DELETE_LIKE_SUCCESS: {
-      const like = action.payload.entities.statementLikes[action.payload.result];
-      return {
-        ...state,
-        [like.statementId]: {
-          ...state[like.statementId],
-          likes: state[like.statementId].likes - 1,
-        },
-      };
-    }
-    default:
-      return state;
-  }
-}
+import { statementArray as statementArraySchema } from './../store/schema';
+
+const statements = combineReducers({
+  byId,
+  allIds,
+  byPoll,
+});
+
+export default statements;
+
+export const getAllStatementsByPoll = (state, id, entities) => {
+  const stmts = fromByPoll.getAllByPollId(state.byPoll, id);
+  return denormalize(stmts, statementArraySchema, {
+    ...entities,
+    users: entities.users.byId,
+    statements: state.byId,
+  });
+};

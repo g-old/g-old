@@ -44,6 +44,7 @@ query ($id:ID!) {
   user (id:$id) {
     emailValidated
     lastLogin
+    email
     followees{
       ${userFields}
     }
@@ -185,7 +186,7 @@ export function createUser(newUser) {
 export function updateUser(user) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // eslint-disable-next-line no-unused-vars
-    const { id, ...rest } = user;
+    const { id, info, ...rest } = user;
     const properties = Object.keys(rest).reduce((acc, curr) => {
       // eslint-disable-next-line no-param-reassign
       acc[curr] = {
@@ -209,6 +210,7 @@ export function updateUser(user) {
         type: UPDATE_USER_SUCCESS,
         payload: normalizedData,
         properties,
+        info,
       });
     } catch (error) {
       dispatch({
@@ -268,7 +270,6 @@ export function fetchUser({ id }) {
     try {
       const { data } = await graphqlRequest(userQuery, { id });
       const normalizedData = normalize(data.user, userSchema);
-      console.log('NORMALISED USER', normalizedData);
       dispatch({
         type: FETCH_USER_SUCCESS,
         payload: normalizedData,

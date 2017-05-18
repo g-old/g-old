@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 import users, * as fromUsers from './users';
-import statements from './statements';
+import statements, * as fromStatements from './statements';
 import polls from './polls';
 import proposals, * as fromProposals from './proposals';
 import roles from './roles';
@@ -10,6 +10,7 @@ import votes from './votes';
 import statementLikes from './statementLikes';
 import flaggedStatements, * as fromFlaggedStatements from './flaggedStatements';
 import activities, * as fromActivities from './activities';
+import followees, * as fromFollowees from './followees';
 
 export default combineReducers({
   users,
@@ -23,6 +24,7 @@ export default combineReducers({
   statementLikes,
   flaggedStatements,
   activities,
+  followees,
 });
 
 export const getVisibleProposals = (state, filter) =>
@@ -56,3 +58,11 @@ export const getFeedIsFetching = state => fromActivities.getIsFetching(state.act
 export const getFeedErrorMessage = state => fromActivities.getErrorMessage(state.activities);
 
 export const getTags = state => fromTags.getTags(state.tags);
+
+export const getFolloweeVotesByPoll = (state, id) =>
+  fromFollowees.getFolloweeVotesByPoll(state, id);
+
+export const getFollowees = state => fromFollowees.getFollowees(state);
+
+export const getAllStatementsByPoll = (state, id) =>
+  fromStatements.getAllStatementsByPoll(state.statements, id, state);

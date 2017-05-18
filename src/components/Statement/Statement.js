@@ -15,6 +15,7 @@ import {
   getStatementMutationSuccess,
   getStatementMutationError,
   getSessionUser,
+  getFollowees,
 } from '../../reducers';
 
 class Statement extends React.Component {
@@ -24,6 +25,7 @@ class Statement extends React.Component {
       id: PropTypes.string,
       vote: PropTypes.shape({
         position: PropTypes.string.isRequired,
+        id: PropTypes.string.isRequired,
       }),
       pollId: PropTypes.string.isRequired,
       text: PropTypes.string.isRequired,
@@ -35,7 +37,7 @@ class Statement extends React.Component {
         id: PropTypes.string,
       }),
     }).isRequired,
-    isFollowee: PropTypes.bool.isRequired,
+    followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     createLike: PropTypes.func.isRequired,
     deleteLike: PropTypes.func.isRequired,
     updateUser: PropTypes.func.isRequired,
@@ -133,6 +135,8 @@ class Statement extends React.Component {
     const inactive = this.props.asInput && isEmpty;
     const canLike =
       this.props.user.role.type !== 'guest' && !this.props.asInput && !this.props.ownStatement;
+    const canFollow = !!(this.props.followees.length < 5 &&
+      this.props.followees.find(f => f.id === this.props.data.author.id) == null);
     return (
       <div
         className={cn(
@@ -163,13 +167,13 @@ class Statement extends React.Component {
                 </span>
               </div>
               {!this.props.ownStatement &&
-                !this.props.isFollowee &&
+                canFollow &&
                 <button
                   onClick={() => {
-                    alert('IMPLEMENT FOLLOWING');
                     this.props.updateUser({
                       id: this.props.user.id,
                       followee: this.props.data.author.id,
+                      info: { pollId: this.props.data.pollId, voteId: this.props.data.vote.id },
                     });
                   }}
                 >
@@ -250,6 +254,7 @@ const mapPropsToState = (state, { data }) => {
     mutationSuccess: getStatementMutationSuccess(state, id),
     mutationError: getStatementMutationError(state, id),
     user: getSessionUser(state),
+    followees: getFollowees(state),
   };
 };
 

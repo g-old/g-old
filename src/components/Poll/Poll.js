@@ -13,6 +13,9 @@ import {
   getVoteMutationIsPending,
   //  getVoteMutationSuccess,
   getVoteMutationError,
+  getFolloweeVotesByPoll,
+  getFollowees,
+  getAllStatementsByPoll,
 } from '../../reducers';
 
 class Poll extends React.Component {
@@ -26,7 +29,7 @@ class Poll extends React.Component {
       allVoters: PropTypes.number,
       ownStatement: PropTypes.object,
       closed_at: PropTypes.string,
-      statements: PropTypes.arrayOf(PropTypes.object),
+      // statements: PropTypes.arrayOf(PropTypes.object),
       upvotes: PropTypes.number,
       downvotes: PropTypes.number,
       votes: PropTypes.arrayOf(PropTypes.object),
@@ -67,6 +70,9 @@ class Poll extends React.Component {
     mutationIsPending: PropTypes.bool.isRequired,
     votingListIsFetching: PropTypes.bool.isRequired,
     votingListErrorMessage: PropTypes.string.isRequired,
+    followeeVotes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    statements: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   };
   constructor(props) {
     super(props);
@@ -76,10 +82,10 @@ class Poll extends React.Component {
   }
 
   getFolloweeVotes(pos) {
-    if (!this.props.poll.followees) {
+    if (!this.props.followeeVotes) {
       return null;
     }
-    return this.props.poll.followees
+    return this.props.followeeVotes
       .filter(user => user.position === pos)
       .map(user => (
         <img
@@ -136,7 +142,7 @@ class Poll extends React.Component {
     if (withStatements) {
       statements = (
         <StatementsList
-          statements={this.props.poll.statements}
+          statements={this.props.statements}
           likedStatements={this.props.poll.likedStatements}
           pollId={this.props.poll.id}
           user={this.props.user}
@@ -144,7 +150,7 @@ class Poll extends React.Component {
           ownStatement={this.props.poll.ownStatement}
           onSubmit={this.handleOnSubmit}
           ownVote={this.props.poll.ownVote}
-          followees={this.props.poll.followees}
+          followees={this.props.followees}
         />
       );
     }
@@ -251,6 +257,9 @@ const mapPropsToState = (state, { poll: { id } }) => ({
   mutationIsPending: getVoteMutationIsPending(state, id),
   // mutationSuccess: getVoteMutationSuccess(state, id),
   mutationErrorMessage: getVoteMutationError(state, id),
+  followeeVotes: getFolloweeVotesByPoll(state, id),
+  followees: getFollowees(state),
+  statements: getAllStatementsByPoll(state, id),
 });
 
 export default connect(mapPropsToState)(withStyles(s)(Poll));
