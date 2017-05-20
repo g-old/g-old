@@ -7,7 +7,7 @@ exports.up = function (knex, Promise) {
       table.integer('flagged_id').unsigned().notNullable();
       table.foreign('flagged_id').references('users.id');
       table.integer('statement_id').unsigned().notNullable().unique();
-      table.foreign('statement_id').references('statements.id');
+      // table.foreign('statement_id').references('statements.id'); // to allow retracting
       table.integer('flag_count').unsigned().defaultsTo(0);
       table.integer('solver_id').unsigned().nullable();
       table.foreign('solver_id').references('users.id');

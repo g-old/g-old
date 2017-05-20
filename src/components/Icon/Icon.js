@@ -35,7 +35,7 @@ Icon.propTypes = {
 
 Icon.defaultProps = {
   size: 32,
-  color: 'black',
+  color: 'inherit',
   vBox: 32,
 };
 

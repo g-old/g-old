@@ -10,7 +10,6 @@ import User from '../models/User';
 import Vote from '../models/Vote';
 import UserType from './UserType';
 
-
 const StatementType = new ObjectType({
   name: 'StatementDL',
   description: 'Statement on proposal',
@@ -27,7 +26,6 @@ const StatementType = new ObjectType({
     vote: {
       type: VoteType,
       resolve: (data, { id }, { viewer, loaders }) => Vote.gen(viewer, data.voteId, loaders),
-
     },
     text: {
       type: GraphQLString,
@@ -48,7 +46,9 @@ const StatementType = new ObjectType({
     updatedAt: {
       type: GraphQLString,
     },
+    deletedAt: {
+      type: GraphQLString,
+    },
   },
-
 });
 export default StatementType;

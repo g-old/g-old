@@ -76,7 +76,7 @@ class TestProposal extends React.Component {
   };
   constructor(props) {
     super(props);
-    this.state = { currentPoll: props.proposal.state };
+    this.state = { currentPoll: props.proposal.state, filter: 'ids' };
     this.handleVote = this.handleVote.bind(this);
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
     this.onDeleteStatement = this.onDeleteStatement.bind(this);
@@ -123,6 +123,7 @@ class TestProposal extends React.Component {
     }
   }
   /* eslint-disable no-nested-ternary */
+
   render() {
     // decide which poll to display
     let poll = null;
@@ -141,6 +142,7 @@ class TestProposal extends React.Component {
           fetchVotes={this.props.getVotes}
           votingListErrorMessage={this.props.votingListErrorMessage}
           votingListIsFetching={this.props.votingListIsFetching}
+          filter={this.state.filter}
         />
       );
       // eslint-disable-next-line eqeqeq
@@ -153,6 +155,7 @@ class TestProposal extends React.Component {
           onStatementSubmit={this.handleOnSubmit}
           onDeleteStatement={this.onDeleteStatement}
           fetchVotes={this.props.getVotes}
+          filter={this.state.filter}
         />
       );
       switchPoll = true;
@@ -168,6 +171,7 @@ class TestProposal extends React.Component {
           onStatementSubmit={this.handleOnSubmit}
           onDeleteStatement={this.onDeleteStatement}
           fetchVotes={this.props.getVotes}
+          filter={this.state.filter}
         />
       );
     } else if (this.state.currentPoll === 'rejected') {
@@ -180,6 +184,7 @@ class TestProposal extends React.Component {
           onStatementSubmit={this.handleOnSubmit}
           onDeleteStatement={this.onDeleteStatement}
           fetchVotes={this.props.getVotes}
+          filter={this.state.filter}
         />
       );
     } else {
@@ -215,6 +220,9 @@ class TestProposal extends React.Component {
       <div>
         <Proposal proposal={proposalData} />
         {switchPollButton}
+        <button onClick={() => this.setState({ filter: 'ids' })}>ALL</button>
+        <button onClick={() => this.setState({ filter: 'con' })}>CON</button>
+        <button onClick={() => this.setState({ filter: 'pro' })}>PRO</button>
         {poll}
       </div>
     );

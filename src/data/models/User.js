@@ -70,7 +70,6 @@ class User {
 
   static async update(viewer, data, loaders) {
     // authenticate
-    console.log('UPDATINGUSER', data);
     if (!data.id) return null;
     if (!User.canMutate(viewer, data)) return null;
     // validate - if something seems corrupted, return.
@@ -97,9 +96,6 @@ class User {
       if (!hash) return null;
       newData.password_hash = hash;
     }
-    if (data.followee) {
-      console.log('FOLLOWEES', data.followee);
-    }
 
     if (data.role) {
       const reg = new RegExp(data.role, 'i');
@@ -107,6 +103,7 @@ class User {
         const res = reg.exec(key);
         return res !== null;
       });
+
       /* eslint-disable no-bitwise */
       if (
         neededPrivilege &&
@@ -115,10 +112,8 @@ class User {
       ) {
         /* eslint-enable no-bitwise */
         // check level
-
         if (await getIsLowerLevel(viewer, data.id)) {
           // check if right level
-
           const roleId = roles.indexOf(data.role) + 1;
           if (roleId > -1) {
             newData.role_id = roleId;

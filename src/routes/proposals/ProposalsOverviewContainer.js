@@ -13,9 +13,11 @@ import FetchError from '../../components/FetchError';
 
 class ProposalContainer extends React.Component {
   static propTypes = {
-    proposals: PropTypes.arrayOf(PropTypes.shape({
-      id: PropTypes.string,
-    })).isRequired,
+    proposals: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string,
+      }),
+    ).isRequired,
     filter: PropTypes.string.isRequired,
     isFetching: PropTypes.bool.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
@@ -29,7 +31,7 @@ class ProposalContainer extends React.Component {
   render() {
     const { filter, proposals, isFetching, errorMessage } = this.props;
     if (isFetching && !proposals.length) {
-      return <p> Loading ... </p>;
+      return <div> <Navigation filter={filter} /><p> Loading ... </p></div>;
     }
 
     if (errorMessage && !proposals.length) {

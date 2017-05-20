@@ -406,5 +406,14 @@
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
+  },
+  {
+    "id": "privilege.unlockGuest",
+    "description": "Account can unlock guest rank",
+    "defaultMessage": "unlock guest",
+    "message": "",
+    "files": [
+      "src/components/PrivilegeManager/PrivilegeManager.js"
+    ]
   }
 ]

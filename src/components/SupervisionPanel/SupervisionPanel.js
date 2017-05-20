@@ -36,9 +36,11 @@ const renderFlaggedStatement = (data, flagFn) => (
     Flag count: {data.count} <br />
     State: {data.state} <br />
     Flagged content: <p>{data.content}</p>
-    Actual Statement: <Statement data={data.statement} />
+    Actual Statement:
+    {' '}
+    {data.statement ? <Statement data={data.statement} /> : <p>DELETED BY USER</p>}
     Solved by: {data.solver && renderUserInfo(data.solver)}<br />
-    {renderMenu(flagFn, data.id, data.statement.id)}
+    {renderMenu(flagFn, data.id, data.statementId)}
   </div>
 );
 
@@ -47,10 +49,15 @@ class SupervisionPanel extends React.Component {
     flaggedStatements: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string,
+        statement: PropTypes.shape({}),
       }),
     ),
     loadFlaggedStatements: PropTypes.func.isRequired,
     solveFlag: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    statement: {},
   };
   componentDidMount() {
     this.props.loadFlaggedStatements();

@@ -49,8 +49,17 @@ class Vote {
       const newPosition = data.position === 1 ? 'pro' : 'con'; // dangerous?
       if (newPosition !== oldVote.position) throw Error('Request invalid!');
       // eslint-disable-next-line newline-per-chained-call
-      await knex('votes').transacting(trx).forUpdate().where({ id: data.id }).del();
+      // check if statements exists, delete it too bc no longer cascading
 
+      let statementInDB = await knex('statements')
+        .transacting(trx)
+        .forUpdate()
+        .where({ vote_id: data.id })
+        .select();
+      statementInDB = statementInDB[0] || [];
+      if (statementInDB.id && statementInDB.deleted_at) throw Error('Cannot be modified!');
+      // eslint-disable-next-line newline-per-chained-call
+      await knex('votes').transacting(trx).forUpdate().where({ id: data.id }).del();
       // update votecount
       const columns = ['upvotes', 'downvotes'];
       const index = newPosition === 'con' ? 1 : 0;

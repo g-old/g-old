@@ -60,7 +60,7 @@ class Proposal extends React.Component {
           <div className={s.date}>
             <FormattedRelative value={this.props.proposal.publishedAt} />
           </div>
-          <Link to={`/testproposal/${this.props.proposal.id}`}>
+          <Link to={`/testproposal/${this.props.proposal.id}/ids`}>
             <div className={s.title}>
               {this.props.proposal.title}
             </div>

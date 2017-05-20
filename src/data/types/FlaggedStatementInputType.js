@@ -29,10 +29,10 @@ const FlaggedStatementInputType = new GraphQLInputObjectType({
         name: 'action',
         values: {
           delete: {
-            value: 1,
+            value: 'delete',
           },
           reject: {
-            value: 0,
+            value: 'reject',
           },
         },
       }),

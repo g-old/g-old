@@ -8,8 +8,9 @@ import cn from 'classnames';
 import s from './Statement.css';
 import { createLike, deleteLike } from '../../actions/statement_like';
 import { updateUser } from '../../actions/user';
-import { deleteStatement, flag } from '../../actions/statement';
+import { deleteStatement, flag, solveFlag } from '../../actions/statement';
 import Icon from '../Icon';
+import { ICONS } from '../../constants';
 import {
   getStatementMutationIsPending,
   getStatementMutationSuccess,
@@ -17,6 +18,24 @@ import {
   getSessionUser,
   getFollowees,
 } from '../../reducers';
+
+/* const Menu = props => (
+  <span className={s.menu}>
+    {props.children}
+  </span>
+); */
+
+const MenuDrop = props => (
+  <div className={s.menuDrop}>
+    {props.children}
+  </div>
+);
+MenuDrop.propTypes = {
+  children: PropTypes.element,
+};
+MenuDrop.defaultProps = {
+  children: null,
+};
 
 class Statement extends React.Component {
   static propTypes = {
@@ -36,6 +55,7 @@ class Statement extends React.Component {
         avatar: PropTypes.string,
         id: PropTypes.string,
       }),
+      deletedAt: PropTypes.string,
     }).isRequired,
     followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     createLike: PropTypes.func.isRequired,
@@ -45,6 +65,9 @@ class Statement extends React.Component {
     ownLike: PropTypes.shape({ id: PropTypes.string }),
     ownStatement: PropTypes.bool,
     deleteStatement: PropTypes.func.isRequired,
+    menuOpen: PropTypes.bool,
+    solveFlag: PropTypes.func.isRequired,
+    onMenuClicked: PropTypes.func,
     user: PropTypes.shape({
       id: PropTypes.string,
 
@@ -59,6 +82,8 @@ class Statement extends React.Component {
     ownLike: null,
     ownStatement: false,
     asInput: false,
+    menuOpen: false,
+    onMenuClicked: () => {},
     onSubmit() {
       alert('NO ONSUBMIT');
     },
@@ -78,10 +103,17 @@ class Statement extends React.Component {
   }
 
   onDeleteStatement() {
-    this.props.deleteStatement({
-      pollId: this.props.data.pollId,
-      id: this.props.data.id,
-    });
+    if (this.props.user.id === this.props.data.author.id) {
+      this.props.deleteStatement({
+        pollId: this.props.data.pollId,
+        id: this.props.data.id,
+      });
+    } else {
+      // TODO authorize
+      this.props.solveFlag({
+        statementId: this.props.data.id,
+      });
+    }
   }
 
   onEditStatement() {
@@ -140,7 +172,7 @@ class Statement extends React.Component {
     return (
       <div
         className={cn(
-          s.root,
+          s.rootAlt,
           this.props.data.vote.position === 'pro' ? s.pro : s.contra,
           inactive && s.inactive,
         )}
@@ -179,7 +211,7 @@ class Statement extends React.Component {
                 >
                   {' '}+Follow{' '}
                 </button>}
-              {!this.props.ownStatement &&
+              {/*! this.props.ownStatement &&
                 <button
                   className={s.iconButton}
                   onClick={() =>
@@ -190,16 +222,73 @@ class Statement extends React.Component {
                 >
                   <Icon
                     icon={
-                      'M0 0h4v32h-4v-32z M26 20.094c2.582 0 4.83-0.625 6-1.547v-16c-1.17 0.922-3.418 1.547-6 1.547s-4.83-0.625-6-1.547v16c1.17 0.922 3.418 1.547 6 1.547z M19 1.016c-1.466-0.623-3.61-1.016-6-1.016-3.012 0-5.635 0.625-7 1.547v16c1.365-0.922 3.988-1.547 7-1.547 2.39 0 4.534 0.393 6 1.016v-16z'
+                      ICONS.flag
                     }
                     size={16}
-                    color={'grey'}
                   />
-                </button>}
-              <span className={s.menu}>
-                {(this.props.asInput ||
-                  this.props.ownStatement ||
-                  ['admin', 'mod'].includes(this.props.user.role.type)) &&
+              </button> */}
+              <div>
+                {/* eslint-disable jsx-a11y/no-static-element-interactions */}
+
+                <div
+                  onClick={() => {
+                    this.props.onMenuClicked({ id: this.props.data.id || 'creating' });
+                  }}
+                >
+                  {/* eslint-enable jsx-a11y/no-static-element-interactions */}
+                  <Icon icon={ICONS.menu} size={20} color="grey" />
+                  {' '}
+                  {this.props.menuOpen &&
+                    <MenuDrop>
+                      <ul>
+                        {!this.props.ownStatement &&
+                          <li>
+                            <button
+                              className={s.iconButton}
+                              onClick={() =>
+                                this.props.flag({
+                                  statementId: this.props.data.id,
+                                  content: this.props.data.text,
+                                })}
+                            >
+                              FLAG
+                            </button>
+                          </li>}
+                        {['admin', 'mod'].includes(this.props.user.role.type) &&
+                          !this.props.asInput &&
+                          <li>
+                            <button className={s.iconButton} onClick={this.onDeleteStatement}>
+                              DELETE
+                            </button>
+                          </li>}
+                        {!this.props.data.deletedAt &&
+                          (this.props.asInput || this.props.ownStatement) &&
+                          <li>
+                            {' '}<span style={{ marginRight: '0.5em' }}>
+                              {this.state.edit
+                                ? <span>
+                                  <button onClick={this.onTextSubmit} disabled={!hasMinimumInput}>
+                                    <i className="fa fa-check" />
+                                  </button>
+                                  <button
+                                    onClick={this.onEndEditing}
+                                    disabled={this.props.asInput && !hasMinimumInput}
+                                  >
+                                    <i className="fa fa-times" />
+                                  </button>
+                                </span>
+                                : <button onClick={this.onEditStatement}>
+                                  <i className="fa fa-pencil" />
+                                </button>}
+                            </span>
+                          </li>}
+                      </ul>
+                    </MenuDrop>}
+                </div>
+              </div>
+              {/* <Menu>
+                {!this.props.data.deletedAt &&
+                  (this.props.asInput || this.props.ownStatement) &&
                   <span style={{ marginRight: '0.5em' }}>
                     {this.state.edit
                       ? <span>
@@ -216,12 +305,13 @@ class Statement extends React.Component {
                       : <button onClick={this.onEditStatement}>
                         <i className="fa fa-pencil" />
                       </button>}
-                    {!this.props.asInput &&
-                      <button onClick={this.onDeleteStatement}>
-                        <i className="fa fa-trash" />
-                      </button>}
                   </span>}
-              </span>
+                {['admin', 'mod'].includes(this.props.user.role.type) &&
+                  !this.props.asInput &&
+                  <button onClick={this.onDeleteStatement}>
+                    <i className="fa fa-trash" />
+                  </button>}
+              </Menu> */}
             </div>}
           <div className={s.text}>
             {this.state.edit
@@ -246,6 +336,7 @@ const mapDispatch = {
   deleteStatement,
   updateUser,
   flag,
+  solveFlag,
 };
 const mapPropsToState = (state, { data }) => {
   const id = data.id || '0000'; // for creations

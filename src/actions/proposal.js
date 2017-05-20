@@ -24,7 +24,7 @@ import {
 } from '../store/schema';
 import { getProposalsIsFetching, getIsProposalFetching } from '../reducers';
 
-const statementFields = `{
+const statementFields = `
     id
     likes
     text
@@ -48,7 +48,7 @@ const statementFields = `{
       surname
       avatar
     }
-}
+
 `;
 const pollFields = `{
   id
@@ -67,7 +67,7 @@ const pollFields = `{
       avatar
     }
   }
-  ownStatement ${statementFields}
+  ownStatement {${statementFields} deletedAt}
   upvotes
   downvotes
   threshold
@@ -90,7 +90,7 @@ const pollFields = `{
     unipolar
     thresholdRef
   }
-  statements ${statementFields}
+  statements {${statementFields}}
 }
 `;
 

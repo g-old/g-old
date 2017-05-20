@@ -13,6 +13,11 @@ const messages = defineMessages({
     defaultMessage: 'Set & Change Privileges',
     description: 'Header of privilegemanager',
   },
+  canUnlockGuest: {
+    id: 'privilege.unlockGuest',
+    defaultMessage: 'unlock guest',
+    description: 'Account can unlock guest rank',
+  },
   canUnlockViewer: {
     id: 'privilege.unlockViewer',
     defaultMessage: 'unlock viewer',

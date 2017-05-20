@@ -85,3 +85,6 @@ export const getFollowees = state => fromEntity.getFollowees(state.entities);
 
 export const getAllStatementsByPoll = (state, id) =>
   fromEntity.getAllStatementsByPoll(state.entities, id);
+
+export const getVisibibleStatementsByPoll = (state, id, filter) =>
+  fromEntity.getVisibibleStatementsByPoll(state.entities, id, filter);

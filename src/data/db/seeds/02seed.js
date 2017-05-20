@@ -11,7 +11,7 @@ const numTags = 10;
 const maxNumFollowees = 5;
 const numPolls = 200;
 const numProposals = numPolls / 2;
-const statementPercentage = 40; // how many of the voters have written a statement
+const statementPercentage = 50; // how many of the voters have written a statement
 
 const chunkSize = 1000;
 
@@ -86,7 +86,7 @@ exports.seed = function (knex, Promise) {
     const testAdmin = Promise.resolve(
       bcrypt
         .hash('password', 10)
-        .then(hash => createUser('admin', 'admin', hash, 'admin@example.com', 1, time, true, 255))
+        .then(hash => createUser('admin', 'admin', hash, 'admin@example.com', 1, time, true, 1023))
     );
     users.push(testAdmin);
     const testMods = [];

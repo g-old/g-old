@@ -15,6 +15,7 @@ const hydrateActivities = (state, data, entities) =>
     ...entities,
     users: entities.users.byId,
     proposals: entities.proposals.byId,
+    statements: entities.statements.byId,
   });
 
 export const getActivities = (state, entities) => {

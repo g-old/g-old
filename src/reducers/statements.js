@@ -22,3 +22,13 @@ export const getAllStatementsByPoll = (state, id, entities) => {
     statements: state.byId,
   });
 };
+
+export const getVisibibleStatementsByPoll = (state, id, entities, filter) => {
+  const byePoll = fromByPoll.getFilteredByPollId(state.byPoll, id);
+  const den = denormalize(byePoll[filter], statementArraySchema, {
+    ...entities,
+    users: entities.users.byId,
+    statements: state.byId,
+  });
+  return den;
+};

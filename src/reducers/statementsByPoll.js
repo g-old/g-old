@@ -46,7 +46,15 @@ const byPoll = (state = {}, action) => {
       return merge({}, state, allIDS);
     }
     case DELETE_STATEMENT_SUCCESS: {
-      return state.filter(id => id !== action.payload.result);
+      const statement = action.payload.entities.statements[action.payload.result];
+      return {
+        ...state,
+        [statement.pollId]: {
+          ids: state[statement.pollId].ids.filter(i => i !== statement.id),
+          pro: state[statement.pollId].pro.filter(i => i !== statement.id),
+          con: state[statement.pollId].con.filter(i => i !== statement.id),
+        },
+      };
     }
     default:
       return state;
@@ -55,3 +63,5 @@ const byPoll = (state = {}, action) => {
 export default byPoll;
 
 export const getAllByPollId = (state, id) => (state[id] ? state[id].ids : []);
+
+export const getFilteredByPollId = (state, id) => state[id] || [];

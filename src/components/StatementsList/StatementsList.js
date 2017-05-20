@@ -10,7 +10,7 @@ class StatementsList extends React.Component {
         id: PropTypes.string,
         statementId: PropTypes.string,
       }),
-    ).isRequired,
+    ),
     pollId: PropTypes.string.isRequired,
     user: PropTypes.shape({ id: PropTypes.string }).isRequired,
     voted: PropTypes.bool.isRequired,
@@ -29,7 +29,18 @@ class StatementsList extends React.Component {
   static defaultProps = {
     ownVote: null,
     ownStatement: null,
+    likedStatements: [],
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {};
+    this.handleMenu = this.handleMenu.bind(this);
+  }
+
+  handleMenu({ id }) {
+    this.setState({ menuOpen: id === this.state.menuOpen ? null : id });
+  }
 
   render() {
     // show input only if then user has voted and hasnt written a statement
@@ -47,7 +58,14 @@ class StatementsList extends React.Component {
         text: '',
       };
       ownStatement = (
-        <Statement data={data} onSubmit={this.props.onSubmit} pollId={this.props.pollId} asInput />
+        <Statement
+          data={data}
+          onSubmit={this.props.onSubmit}
+          pollId={this.props.pollId}
+          asInput
+          onMenuClicked={this.handleMenu}
+          menuOpen={this.state.menuOpen === 'creating'}
+        />
       );
     }
 
@@ -62,6 +80,8 @@ class StatementsList extends React.Component {
           )}
           pollId={this.props.pollId}
           ownStatement
+          onMenuClicked={this.handleMenu}
+          menuOpen={this.state.menuOpen === this.props.ownStatement.id}
         />
       );
 
@@ -70,6 +90,7 @@ class StatementsList extends React.Component {
     }
     return (
       <div>
+
         {input}
         {}
         {ownStatement}
@@ -91,6 +112,8 @@ class StatementsList extends React.Component {
                   isFollowee={
                       this.props.followees.find(f => f.id === statement.author.id) != null
                     }
+                  menuOpen={this.state.menuOpen === statement.id}
+                  onMenuClicked={this.handleMenu}
                 />
                 : null,
           )}

@@ -15,7 +15,7 @@ import {
   getVoteMutationError,
   getFolloweeVotesByPoll,
   getFollowees,
-  getAllStatementsByPoll,
+  getVisibibleStatementsByPoll,
 } from '../../reducers';
 
 class Poll extends React.Component {
@@ -251,15 +251,21 @@ class Poll extends React.Component {
     );
   }
 }
-const mapPropsToState = (state, { poll: { id } }) => ({
-  votingListIsFetching: getVotingListIsFetching(state, id),
-  votingListErrorMessage: getVotingListErrorMessage(state, id),
-  mutationIsPending: getVoteMutationIsPending(state, id),
-  // mutationSuccess: getVoteMutationSuccess(state, id),
-  mutationErrorMessage: getVoteMutationError(state, id),
-  followeeVotes: getFolloweeVotesByPoll(state, id),
-  followees: getFollowees(state),
-  statements: getAllStatementsByPoll(state, id),
-});
+const mapPropsToState = (state, { poll: { id }, filter }) => {
+  const statements = getVisibibleStatementsByPoll(state, id, filter);
+  if (statements) {
+    statements.sort((a, b) => b.likes - a.likes);
+  }
+  return {
+    votingListIsFetching: getVotingListIsFetching(state, id),
+    votingListErrorMessage: getVotingListErrorMessage(state, id),
+    mutationIsPending: getVoteMutationIsPending(state, id),
+    // mutationSuccess: getVoteMutationSuccess(state, id),
+    mutationErrorMessage: getVoteMutationError(state, id),
+    followeeVotes: getFolloweeVotesByPoll(state, id),
+    followees: getFollowees(state),
+    statements,
+  };
+};
 
 export default connect(mapPropsToState)(withStyles(s)(Poll));

@@ -16,21 +16,21 @@ import FetchError from '../../components/FetchError';
 
 class ProposalContainer extends React.Component {
   static propTypes = {
-    proposal: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
+    proposal: PropTypes.shape({}).isRequired,
+    user: PropTypes.shape({}).isRequired,
+    // eslint-disable-next-line react/no-unused-prop-types
     proposalId: PropTypes.number.isRequired,
-    createLike: PropTypes.func,
-    isFetching: PropTypes.bool,
+    isFetching: PropTypes.bool.isRequired,
     fetchData: PropTypes.func.isRequired,
-    errorMessage: PropTypes.string,
+    errorMessage: PropTypes.string.isRequired,
   };
+
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
     return this.props.proposal != null;
   }
   render() {
     const { proposal, isFetching, errorMessage } = this.props;
-
     if (isFetching && !proposal) {
       return <p>{'Loading...'} </p>;
     }

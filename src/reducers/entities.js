@@ -66,3 +66,6 @@ export const getFollowees = state => fromFollowees.getFollowees(state);
 
 export const getAllStatementsByPoll = (state, id) =>
   fromStatements.getAllStatementsByPoll(state.statements, id, state);
+
+export const getVisibibleStatementsByPoll = (state, id, filter) =>
+  fromStatements.getVisibibleStatementsByPoll(state.statements, id, state, filter);

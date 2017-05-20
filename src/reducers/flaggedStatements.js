@@ -37,6 +37,7 @@ const hydrateStatements = (data, entities) =>
   denormalize(data, flaggedStatementArray, {
     ...entities,
     users: entities.users.byId,
+    statements: entities.statements.byId,
     flaggedStatements: entities.flaggedStatements.byId,
   });
 

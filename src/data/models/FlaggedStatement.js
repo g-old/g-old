@@ -18,14 +18,14 @@ class FlaggedStatement {
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
   }
-  static async gen(viewer, id, { roles }) {
-    const data = await knex('flagged_statements').select();
+  static async gen(viewer, id) {
+    const data = await knex('flagged_statements').where({ id }).select();
     if (data === null) return null;
     const canSee = checkCanSee(viewer, data);
-    return canSee ? new Role(data) : null;
+    return canSee ? new FlaggedStatement(data) : null;
   }
 }
 
-export default Role;
+export default FlaggedStatement;
 
 /* eslint-enable */

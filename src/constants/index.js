@@ -89,12 +89,18 @@ export const ADD_ENTITIES = 'ADD_ENTITIES';
 // Con: Not very flexible, you cannot see the role/group/right
 export const PRIVILEGES = {
   none: 1,
-  canUnlockViewer: 2,
-  canUnlockUser: 4,
-  canUnlockMod: 8,
-  canUnlockAdmin: 16,
-  canNotifyUser: 32,
-  canModifyRights: 64,
-  canModifyRoles: 128,
-  canPostProposals: 256,
+  canUnlockGuest: 2,
+  canUnlockViewer: 4,
+  canUnlockUser: 8,
+  canUnlockMod: 16,
+  canUnlockAdmin: 32,
+  canNotifyUser: 64,
+  canModifyRights: 128,
+  canModifyRoles: 256,
+  canPostProposals: 512,
+};
+
+export const ICONS = {
+  menu: 'M2 6h28v6h-28zM2 14h28v6h-28zM2 22h28v6h-28z',
+  flag: 'M0 0h4v32h-4v-32z M26 20.094c2.582 0 4.83-0.625 6-1.547v-16c-1.17 0.922-3.418 1.547-6 1.547s-4.83-0.625-6-1.547v16c1.17 0.922 3.418 1.547 6 1.547z M19 1.016c-1.466-0.623-3.61-1.016-6-1.016-3.012 0-5.635 0.625-7 1.547v16c1.365-0.922 3.988-1.547 7-1.547 2.39 0 4.534 0.393 6 1.016v-16z',
 };

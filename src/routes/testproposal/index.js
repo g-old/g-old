@@ -7,7 +7,7 @@ import { getSessionUser } from '../../reducers';
 const title = 'Proposal';
 
 export default {
-  path: '/testproposal/:id',
+  path: '/testproposal/:id/:filter',
 
   async action({ store }, { id }) {
     const user = getSessionUser(store.getState());
