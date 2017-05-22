@@ -14,11 +14,13 @@
   width: 100%;
   height: 0.6em;
   outline: solid 1px #555;
+  cursor: pointer;
 }
 
 .compact {
   .barContainer {
     height: 0.3em;
+    cursor: default;
   }
 }
 
