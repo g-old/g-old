@@ -3,6 +3,7 @@
 .root {
   font-size: 1em;
   margin: auto;
+  cursor: pointer;
 }
 
 .header {
@@ -14,13 +15,15 @@
   width: 100%;
   height: 0.6em;
   outline: solid 1px #555;
-  cursor: pointer;
 }
 
 .compact {
+  &.root {
+    cursor: default;
+  }
+
   .barContainer {
     height: 0.3em;
-    cursor: default;
   }
 }
 

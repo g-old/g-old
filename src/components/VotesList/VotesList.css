@@ -1,21 +1,25 @@
 .votes {
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-start;
 }
 
 .bipolar {
   display: flex;
 
+  .con {
+    justify-content: flex-end;
+  }
+
   .votes {
     width: 50%;
     padding-right: 2%;
-  }
-}
 
-.con {
-  justify-content: flex-end;
-  padding-right: 0;
-  padding-left: 2%;
+    &.con {
+      padding-right: 0;
+      padding-left: 2%;
+    }
+  }
 }
 
 .avatar {
