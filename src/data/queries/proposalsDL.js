@@ -15,16 +15,26 @@ const proposals = {
   resolve: (parent, { state }, { viewer, loaders }) =>
     Promise.resolve(
       knex('proposals')
-        .modify(queryBuilder => {
+        .modify((queryBuilder) => {
           if (state === 'active') {
-            queryBuilder.where({ state: 'proposed' }).orWhere({ state: 'voting' });
+            queryBuilder
+              .where({ state: 'proposed' })
+              .orWhere({ state: 'voting' })
+              .innerJoin('polls', function () {
+                this.on('proposals.poll_one_id', '=', 'polls.id').orOn(
+                  'proposals.poll_two_id',
+                  '=',
+                  'polls.id',
+                );
+              })
+              .orderBy('polls.end_time', 'asc');
           } else if (state === 'repelled') {
             queryBuilder.where({ state: 'revoked' }).orWhere({ state: 'rejected' });
           } else if (state) {
             queryBuilder.where({ state });
           }
         })
-        .pluck('id')
+        .pluck('proposals.id')
         .then(ids => ids.map(id => Proposal.gen(viewer, id, loaders))),
     ),
 };

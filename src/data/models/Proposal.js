@@ -37,7 +37,8 @@ const validateTags = async (tags) => {
 };
 
 const validateDates = ({ poll }) => {
-  const startTime = poll && poll.startTime ? new Date(poll.startTime) : new Date();
+  const serverTime = new Date();
+  const startTime = poll && poll.startTime ? new Date(poll.startTime) : serverTime;
   if (!startTime.getMonth || typeof startTime.getMonth !== 'function') return null;
 
   let endTime;
@@ -48,7 +49,7 @@ const validateDates = ({ poll }) => {
     endTime.setDate(startTime.getDate() + 3);
   }
   if (!endTime.getMonth || typeof endTime.getMonth !== 'function') return null;
-  if (startTime < new Date() || startTime >= endTime) throw Error('DateTime wrong');
+  if (startTime < serverTime || startTime >= endTime) throw Error('DateTime wrong');
   return { startTime, endTime };
 };
 
@@ -78,7 +79,7 @@ const validatePoll = async (viewer, poll, loaders) => {
       pollingModeData = { ...pollingMode, ...props };
     }
   }
-  const { startTime, endTime } = validateDates(poll);
+  const { startTime, endTime } = validateDates({ poll });
   const pollData = {
     secret: poll.secret || false,
     start_time: startTime,
@@ -87,6 +88,37 @@ const validatePoll = async (viewer, poll, loaders) => {
   };
 
   return { pollData, pollingModeData, createPollingMode };
+};
+
+const validateStateChange = async (viewer, { id, state, proposalInDB }, loaders) => {
+  // if accepted pollOne must have passed endTime and sufficient votes
+  if (!state || ['revoked', 'accepted'].indexOf(state) === -1) return false;
+  if (state === 'accepted' && proposalInDB.state !== 'proposed') return false;
+  if (state !== 'revoked') {
+    const pollInDB = await Poll.gen(viewer, proposalInDB.pollOne_id, loaders);
+    if (!pollInDB) throw Error('Poll not found');
+    if (new Date(pollInDB.end_time) > new Date()) return false;
+    const pollingModeinDB = await PollingMode.gen(viewer, pollInDB.pollingModeId, loaders);
+    if (!pollingModeinDB) throw Error('PollingMode not found');
+
+    let ref = null;
+    switch (pollingModeinDB.thresholdRef) {
+      case 'voters':
+        ref = pollInDB.upvotes + pollInDB.downvotes;
+        break;
+      case 'all':
+        ref = pollInDB.num_voter;
+        break;
+
+      default:
+        throw Error(`Threshold reference not implemented: ${pollingModeinDB.thresholdRef}`);
+    }
+
+    ref *= pollInDB.threshold / 100;
+
+    if (pollInDB.upvotes > ref) return false;
+  }
+  return true;
 };
 
 class Proposal {
@@ -127,9 +159,9 @@ class Proposal {
     if (!Proposal.canMutate(viewer, data)) return null;
     // validate
     if (!data.id) return null;
-    const proposalInDb = await Proposal.gen(viewer, data.id, loaders);
-    if (!proposalInDb) return null;
-    if (data.state && ['revoked'].indexOf(data.state) === -1) return null;
+    const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
+    if (!proposalInDB) return null;
+    if (data.state && ['revoked', 'accepted'].indexOf(data.state) === -1) return null;
 
     const { pollData, pollingModeData, createPollingMode } = await validatePoll(
       viewer,
@@ -141,7 +173,17 @@ class Proposal {
 
     // update
     if (data.state) {
-      newValues.state = data.state;
+      const isValid = await validateStateChange(
+        viewer,
+        { id: data.id, state: data.state, proposalInDB },
+        loaders,
+      );
+
+      if (isValid) {
+        newValues.state = data.state;
+      } else {
+        throw Error('State transition not allowed');
+      }
     }
     const proposalId = await knex.transaction(async (trx) => {
       if (pollData) {
@@ -161,14 +203,23 @@ class Proposal {
         const pollTwo = await Poll.create(viewer, pollTwoData, loaders);
         if (!pollTwo) throw Error('No pollTwo provided');
         // update/close pollOne
+        // TODO check first if not already closed?
         const pollOne = await Poll.update(
           viewer,
-          { id: proposalInDb.pollOne_id, closedAt: new Date() },
+          { id: proposalInDB.pollOne_id, closedAt: new Date() },
           loaders,
         );
         if (!pollOne) throw Error('No pollOne provided');
         newValues.poll_two_id = pollTwo.id;
       }
+      if (newValues.state && newValues.state !== 'voting') {
+        await trx
+          .where({ id: proposalInDB.pollOne_id })
+          .update({ closed_at: new Date(), updated_at: new Date() })
+          .into('polls');
+        loaders.polls.clear(proposalInDB.pollOne_id);
+      }
+
       await trx
         .where({
           id: data.id,

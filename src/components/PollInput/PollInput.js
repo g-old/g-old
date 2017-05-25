@@ -2,19 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import CheckBox from '../CheckBox';
 import Icon from '../Icon';
+import { utcCorrectedDate } from '../../core/helpers';
 
-// http://stackoverflow.com/questions/6982692/html5-input-type-date-default-value-to-today
-const utcCorrectedDate = (daysAdded) => {
-  const local = new Date();
-  if (daysAdded) {
-    local.setDate(local.getDate() + daysAdded);
-  }
-  local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
-  return local.toJSON();
-};
 const DateInput = props => (
   <div>
-    <p>
+    {/*  <p>
       <label htmlFor="dateFrom">DATE FROM</label>
       <input
         type="date"
@@ -32,7 +24,7 @@ const DateInput = props => (
         onChange={props.handleChange}
         name="timeFrom"
       />
-    </p>
+    </p> */}
     <p>
       <label htmlFor="dateTo">DATE TO</label>
       <input

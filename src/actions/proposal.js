@@ -31,6 +31,7 @@ const statementFields = `
     pollId
     createdAt
     updatedAt
+    deletedAt
     vote{
       id
       position
@@ -272,11 +273,10 @@ export function loadProposalsList(state) {
 
 export function createProposal(proposalData) {
   return async (dispatch, getState, { graphqlRequest }) => {
+    const virtualId = '0000';
     dispatch({
       type: CREATE_PROPOSAL_START,
-      payload: {
-        proposal: proposalData,
-      },
+      id: virtualId,
     });
     try {
       const { data } = await graphqlRequest(createProposalMutation, proposalData);
@@ -288,6 +288,7 @@ export function createProposal(proposalData) {
         type: CREATE_PROPOSAL_SUCCESS,
         payload: normalizedData,
         filter,
+        id: virtualId,
       });
     } catch (error) {
       dispatch({
@@ -295,6 +296,8 @@ export function createProposal(proposalData) {
         payload: {
           error,
         },
+        message: error.message || 'Something went wrong',
+        id: virtualId,
       });
       return false;
     }

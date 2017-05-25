@@ -34,6 +34,7 @@ const statementResult = `{
   pollId
   createdAt
   updatedAt
+  deletedAt
   vote{
     id
     position

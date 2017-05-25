@@ -153,12 +153,23 @@ const FileStore = FileStorage(AvatarManager({ local: !!__DEV__ }));
 
 app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
   if (!req.user) res.status(505);
-  FileStore.save({ viewer: req.user, data: req.body.avatar, loaders: createLoaders() }, 'avatars/') // eslint-disable-next-line no-confusing-arrow
+  FileStore.save(
+    {
+      viewer: req.user,
+      data: { dataUrl: req.body.avatar, id: req.body.id },
+      loaders: createLoaders(),
+    },
+    'avatars/',
+  ) // eslint-disable-next-line no-confusing-arrow
     // TODO update session
     // .then(user => user ? res.status(200).json(user) : res.status(500))
     .then((user) => {
       if (!user) {
         throw Error('User update failed');
+      }
+      if (req.body.id && req.body.id !== req.user.id) {
+        // eslint-disable-next-line no-throw-literal
+        throw { id: req.body.id, user };
       }
       return new Promise((resolve, reject) => {
         // eslint-disable-next-line no-confusing-arrow
@@ -173,7 +184,14 @@ app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
         }),
     )
     .then(() => res.json(req.session.passport.user))
-    .catch(e => res.status(500).json({ message: e.message }));
+    .catch(
+      // TODO rewrite hole function
+      // eslint-disable-next-line no-confusing-arrow
+      e =>
+        e.id === req.body.id
+          ? res.json(new User(e.user))
+          : res.status(500).json({ message: e.message }),
+    );
 });
 
 app.post(

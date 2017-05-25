@@ -222,8 +222,6 @@ class UserProfile extends React.Component {
         passwordOld: this.state.passwordOld.trim(),
         password: this.state.password.trim(),
       });
-    } else {
-      console.log('Validation failed');
     }
   }
 
@@ -253,7 +251,14 @@ class UserProfile extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <ImageUpload uploadAvatar={this.props.uploadAvatar} />
+          <ImageUpload
+            uploadAvatar={(data) => {
+              this.props.uploadAvatar({ ...data, id: this.props.user.id });
+            }}
+            uploadPending={updates.dataUrl && updates.dataUrl.pending}
+            uploadError={updates.dataUrl && updates.dataUrl.error}
+            uploadSuccess={updates.dataUrl && updates.dataUrl.success}
+          />
           <img className={s.avatar} src={avatar} alt="IMG" />
           <div>
             <h3>{name}</h3>

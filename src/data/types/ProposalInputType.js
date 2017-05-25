@@ -28,6 +28,10 @@ const ProposalInputType = new GraphQLInputObjectType({
             value: 'revoked',
             description: 'Revoke the proposal',
           },
+          accepted: {
+            value: 'accepted',
+            description: 'Close the poll',
+          },
         },
       }),
     },

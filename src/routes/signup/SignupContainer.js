@@ -11,11 +11,10 @@ import { getAccountUpdates, getLocale } from '../../reducers';
 class SignupContainer extends React.Component {
   static propTypes = {
     createUser: PropTypes.func.isRequired,
-    currentStep: PropTypes.number.isRequired,
-    signupError: PropTypes.bool,
-    processing: PropTypes.bool,
+    signupError: PropTypes.bool.isRequired,
+    processing: PropTypes.bool.isRequired,
     uploadAvatar: PropTypes.func.isRequired,
-    updates: PropTypes.object,
+    updates: PropTypes.shape({}).isRequired,
   };
 
   constructor(props) {
@@ -61,9 +60,9 @@ class SignupContainer extends React.Component {
               UPLOAD AVATAR - or later
             </h1>
             <ImageUpload
-              uploadPending={updates.avatar && updates.avatar.pending}
-              uploadSuccess={updates.avatar && updates.avatar.success}
-              uploadError={updates.avatar && updates.avatar.error}
+              uploadPending={updates.dataUrl && updates.dataUrl.pending}
+              uploadSuccess={updates.dataUrl && updates.dataUrl.success}
+              uploadError={updates.dataUrl && updates.dataUrl.error}
               uploadAvatar={this.props.uploadAvatar}
             />
             <AccountSettings />

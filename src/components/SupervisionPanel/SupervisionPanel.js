@@ -66,8 +66,6 @@ class SupervisionPanel extends React.Component {
     const { flaggedStatements } = this.props;
     return (
       <div>
-        {' '}<h1>FLAGGED IMAGES</h1>
-
         <h1> FLAGGED STATEMENTS </h1>
         {flaggedStatements &&
           flaggedStatements.map(s => (

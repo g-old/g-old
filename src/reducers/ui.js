@@ -26,33 +26,33 @@ export default (state, action) => {
 };
 
 // TODO Different design
-const getMutationPending = state => {
+const getMutationPending = (state) => {
   if (state && state.mutations) {
     return state.mutations.pending;
   }
   return false;
 };
 
-const getMutationError = state => {
+const getMutationError = (state) => {
   if (state && state.mutations) {
     return state.mutations.error;
   }
   return null;
 };
 
-const getMutationSuccess = state => {
+const getMutationSuccess = (state) => {
   if (state && state.mutations) {
     return state.mutations.success;
   }
   return false;
 };
-const getVotingListFetching = state => {
+const getVotingListFetching = (state) => {
   if (state && state.pollFetching) {
     return state.pollFetching.isFetching;
   }
   return false;
 };
-const getVotingListError = state => {
+const getVotingListError = (state) => {
   if (state && state.pollFetching) {
     return state.pollFetching.errorMessage;
   }

@@ -23,6 +23,7 @@ class TestProposal extends React.Component {
             id: PropTypes.string,
           }),
         ),
+        closed_at: PropTypes.string,
         upvotes: PropTypes.number,
         downvotes: PropTypes.number,
         ownVote: PropTypes.shape({
@@ -43,6 +44,7 @@ class TestProposal extends React.Component {
             id: PropTypes.string,
           }),
         ),
+        closed_at: PropTypes.string,
         upvotes: PropTypes.number,
         downvotes: PropTypes.number,
         ownVote: PropTypes.shape({
@@ -175,10 +177,33 @@ class TestProposal extends React.Component {
         />
       );
     } else if (this.state.currentPoll === 'rejected') {
-      const passed = thresholdPassed(this.props.proposal.pollOne);
+      const lastPoll = this.props.proposal.pollOne.closed_at &&
+        this.props.proposal.pollTwo &&
+        this.props.proposal.pollTwo.closed_at
+        ? this.props.proposal.pollTwo
+        : this.props.proposal.pollTwo && this.props.proposal.pollTwo.closed_at
+            ? this.props.proposal.pollTwo
+            : this.props.proposal.pollOne;
+      //  const passed = thresholdPassed(poll);
+      //           poll={passed ? this.props.proposal.pollTwo : this.props.proposal.pollOne}
+
       poll = (
         <Poll
-          poll={passed ? this.props.proposal.pollTwo : this.props.proposal.pollOne}
+          poll={lastPoll}
+          user={this.props.user}
+          onVoteButtonClicked={this.handleVote}
+          onStatementSubmit={this.handleOnSubmit}
+          onDeleteStatement={this.onDeleteStatement}
+          fetchVotes={this.props.getVotes}
+          filter={this.state.filter}
+        />
+      );
+    } else if (this.state.currentPoll === 'revoked') {
+      const lastPoll = this.props.proposal.pollOne; // only pollOne can be revoked
+
+      poll = (
+        <Poll
+          poll={lastPoll}
           user={this.props.user}
           onVoteButtonClicked={this.handleVote}
           onStatementSubmit={this.handleOnSubmit}
@@ -220,9 +245,31 @@ class TestProposal extends React.Component {
       <div>
         <Proposal proposal={proposalData} />
         {switchPollButton}
-        <button onClick={() => this.setState({ filter: 'ids' })}>ALL</button>
-        <button onClick={() => this.setState({ filter: 'con' })}>CON</button>
-        <button onClick={() => this.setState({ filter: 'pro' })}>PRO</button>
+        {poll &&
+          poll.props &&
+          poll.props.poll &&
+          poll.props.poll.statements &&
+          poll.props.poll.statements.length > 1 &&
+          <span>
+            <button
+              style={this.state.filter === 'ids' ? { backgroundColor: 'cornflowerblue' } : null}
+              onClick={() => this.setState({ filter: 'ids' })}
+            >
+              ALL
+            </button>
+            <button
+              style={this.state.filter === 'con' ? { backgroundColor: 'cornflowerblue' } : null}
+              onClick={() => this.setState({ filter: 'con' })}
+            >
+              CON
+            </button>
+            <button
+              style={this.state.filter === 'pro' ? { backgroundColor: 'cornflowerblue' } : null}
+              onClick={() => this.setState({ filter: 'pro' })}
+            >
+              PRO
+            </button>
+          </span>}
         {poll}
       </div>
     );

@@ -15,8 +15,6 @@ import knex from '../knex';
 
 const ProposalType = new ObjectType({
   name: 'ProposalDL',
-  sqlTable: 'proposals', // the SQL table for this object type is called "accounts"
-  uniqueKey: 'id',
   args: {
     userID: {
       description: 'The proposals ID number',

@@ -6,12 +6,16 @@ import fetch from '../core/fetch';
 import { UPLOAD_AVATAR_START, UPLOAD_AVATAR_SUCCESS, UPLOAD_AVATAR_ERROR } from '../constants';
 
 // only clientside!
-export function uploadAvatar(avatar) {
-  const initialId = '0000';
+export function uploadAvatar(data) {
+  const initialId = data.id || '0000';
   return async (dispatch) => {
     const formData = new FormData();
-    formData.append('avatar', avatar.dataUrl);
-    const properties = Object.keys({ avatar }).reduce((acc, curr) => {
+    formData.append('avatar', data.dataUrl);
+    if (data.id) {
+      formData.append('id', data.id);
+    }
+    const { id, ...avatar } = data;
+    const properties = Object.keys(avatar).reduce((acc, curr) => {
       // eslint-disable-next-line no-param-reassign
       acc[curr] = {
         pending: true,

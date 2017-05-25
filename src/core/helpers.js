@@ -40,3 +40,13 @@ export const concatDateAndTime = (date, time) => {
   const t = time || new Date().toJSON().slice(11, 16);
   return new Date(`${d} ${t}`);
 };
+
+// http://stackoverflow.com/questions/6982692/html5-input-type-date-default-value-to-today
+export const utcCorrectedDate = (daysAdded) => {
+  const local = new Date();
+  if (daysAdded) {
+    local.setDate(local.getDate() + daysAdded);
+  }
+  local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
+  return local.toJSON();
+};

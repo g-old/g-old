@@ -41,11 +41,21 @@ class Proposal extends React.Component {
       this.props.proposal.state === 'rejected' ||
       this.props.proposal.state === 'revoked'
     ) {
-      poll = thresholdPassed(this.props.proposal.pollOne)
+      /* eslint-disable no-nested-ternary */
+      poll = this.props.proposal.pollOne.closed_at &&
+        this.props.proposal.pollTwo &&
+        this.props.proposal.pollTwo.closed_at
         ? this.props.proposal.pollTwo
-        : this.props.proposal.pollOne;
+        : this.props.proposal.pollTwo && this.props.proposal.pollTwo.closed_at
+            ? this.props.proposal.pollTwo
+            : this.props.proposal.pollOne;
+      /* eslint-enable no-nested-ternary */
+      /* poll = thresholdPassed(this.props.proposal.pollOne)
+        ? this.props.proposal.pollTwo
+        : this.props.proposal.pollOne; */
     }
-    const body = null; /* eslint-disable jsx-a11y/no-static-element-interactions */
+    const body = <div dangerouslySetInnerHTML={{ __html: this.props.proposal.body }} />;
+    // null; /* eslint-disable jsx-a11y/no-static-element-interactions */
     // Disabled bc Nodejs Domparser (xmldom) has dep problems
     /*  if (this.state.fullText) {
       body = this.props.proposal.body;
@@ -64,33 +74,28 @@ class Proposal extends React.Component {
             <div className={s.title}>
               {this.props.proposal.title}
             </div>
-          </Link>
-          <div
-            className={s.body}
-            onClick={() => {
-              this.setState({ fullText: !this.state.fullText });
-            }}
-          >
-            {body}
-          </div>
-          <div className={s.pollState}>
-            <PollState
-              compact
-              allVoters={poll.allVoters}
-              upvotes={poll.upvotes}
-              downvotes={poll.downvotes}
-              thresholdRef={poll.mode.thresholdRef}
-              threshold={poll.threshold}
-              unipolar={poll.mode.unipolar}
-            />
-          </div>
-          <div className={s.tags}>
-            {this.props.proposal.tags &&
-              this.props.proposal.tags.map(tag => (
-                <span key={tag.id} className={s.tag}>{`${tag.text}`}</span>
-              ))}
-          </div>
 
+            <div className={s.body}>
+              {body}
+            </div>
+            <div className={s.pollState}>
+              <PollState
+                compact
+                allVoters={poll.allVoters}
+                upvotes={poll.upvotes}
+                downvotes={poll.downvotes}
+                thresholdRef={poll.mode.thresholdRef}
+                threshold={poll.threshold}
+                unipolar={poll.mode.unipolar}
+              />
+            </div>
+            <div className={s.tags}>
+              {this.props.proposal.tags &&
+                this.props.proposal.tags.map(tag => (
+                  <span key={tag.id} className={s.tag}>{`${tag.text}`}</span>
+                ))}
+            </div>
+          </Link>
         </div>
 
       </div>

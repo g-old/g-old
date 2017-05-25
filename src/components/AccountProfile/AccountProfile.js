@@ -11,6 +11,8 @@ import AccordionPanel from '../AccordionPanel';
 import PrivilegeManager from '../PrivilegeManager';
 import RoleManager from '../RoleManager';
 import { PRIVILEGES } from '../../constants';
+import ImageUpload from '../ImageUpload';
+import { uploadAvatar } from '../../actions/file';
 
 const messages = defineMessages({
   role: {
@@ -75,6 +77,8 @@ class AccountProfile extends React.Component {
       privilege: PropTypes.string,
       role: PropTypes.shape({ type: PropTypes.string }),
     }).isRequired,
+    uploadAvatar: PropTypes.func.isRequired,
+    updates: PropTypes.shape({ dataUrl: PropTypes.string }).isRequired,
   };
 
   constructor(props) {
@@ -124,6 +128,14 @@ class AccountProfile extends React.Component {
     return (
       <div>
         <img className={s.avatar} src={avatar} alt="IMG" />
+        <ImageUpload
+          uploadAvatar={(data) => {
+            this.props.uploadAvatar({ ...data, id });
+          }}
+          uploadPending={this.props.updates.dataUrl && this.props.updates.dataUrl.pending}
+          uploadError={this.props.updates.dataUrl && this.props.updates.dataUrl.error}
+          uploadSuccess={this.props.updates.dataUrl && this.props.updates.dataUrl.success}
+        />
         <div>
           <span>{name} {surname}</span>
           {!avatarSet &&
@@ -189,5 +201,6 @@ const mapStateToProps = (state, { accountId }) => ({
 });
 const mapDispatch = {
   fetchUser,
+  uploadAvatar,
 };
 export default connect(mapStateToProps, mapDispatch)(withStyles(s)(AccountProfile));

@@ -5,6 +5,10 @@ import User from '../data/models/User';
 import knex from '../data/knex';
 import cloudinary from '../data/cloudinary';
 
+// eslint-disable-next-line no-unused-vars
+function canMutate(viewer, data) {
+  return true;
+}
 function deleteFile(filePath) {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line no-confusing-arrow
@@ -37,8 +41,10 @@ const getPublicIdFromUrl = (url) => {
 
 // TODO Integrate with Usermodel!
 
-const saveToCloudinary = async ({ viewer, data, loaders }) => {
-  const user = await User.gen(viewer, viewer.id, loaders);
+const saveToCloudinary = async ({ viewer, data: { dataUrl, id }, loaders }) => {
+  if (!canMutate(viewer, { dataUrl, id })) return null;
+  const userId = id || viewer.id;
+  const user = await User.gen(viewer, userId, loaders);
   if (user.avatar) {
     /*  if (user.avatar.indexOf('cloudinary') !== -1) {
       throw new Error('Avatar already set');
@@ -46,7 +52,7 @@ const saveToCloudinary = async ({ viewer, data, loaders }) => {
     } */
   }
   const regex = /^data:.+\/(.+);base64,(.*)$/;
-  const matches = data.match(regex);
+  const matches = dataUrl.match(regex);
   const img = matches[2];
 
   const buffer = new Buffer(img, 'base64');
@@ -70,7 +76,7 @@ const saveToCloudinary = async ({ viewer, data, loaders }) => {
     try {
       await trx
         .where({
-          id: viewer.id,
+          id: userId,
         })
         .update({ avatar_path: response.url, updated_at: new Date() })
         .into('users');
@@ -80,16 +86,18 @@ const saveToCloudinary = async ({ viewer, data, loaders }) => {
     }
   });
   // invalidate cache
-  loaders.users.clear(viewer.id);
+  loaders.users.clear(userId);
   //
   const result = await knex('users')
-    .where({ id: viewer.id })
+    .where({ id: userId })
     .select('id', 'name', 'surname', 'email', 'avatar_path', 'role_id'); // await User.gen(viewer, viewer.id, loaders);
   return result[0] || null;
 };
 
-const saveLocal = async ({ viewer, data, loaders }, folder) => {
-  const user = await User.gen(viewer, viewer.id, loaders);
+const saveLocal = async ({ viewer, data: { dataUrl, id }, loaders }, folder) => {
+  if (!canMutate(viewer, { dataUrl, id })) return null;
+  const userId = id || viewer.id;
+  const user = await User.gen(viewer, userId, loaders);
   if (user.avatar) {
     if (user.avatar.indexOf('cloudinary') !== -1) {
       throw new Error('Avatar already set');
@@ -97,7 +105,7 @@ const saveLocal = async ({ viewer, data, loaders }, folder) => {
     }
   }
   const regex = /^data:.+\/(.+);base64,(.*)$/;
-  const matches = data.match(regex);
+  const matches = dataUrl.match(regex);
   const ext = matches[1];
   const img = matches[2];
   const name = `${uuid()}.${ext}`;
@@ -110,15 +118,16 @@ const saveLocal = async ({ viewer, data, loaders }, folder) => {
     // utf8 encoding! Problem?
     // TODO delete old avatar if existing
     // TODO resizing serverside
-    if (user.avatar.indexOf('http') !== -1) {
-      await deleteFile(user.avatar);
+    if (user.avatar.indexOf('https') === -1) {
+      const pathToFile = path.resolve(__dirname, folder + user.avatar);
+      await deleteFile(pathToFile);
     }
     await writeFile(filepath, buffer);
 
     try {
       await trx
         .where({
-          id: viewer.id,
+          id: userId,
         })
         .update({ avatar_path: avatarPath, updated_at: new Date() })
         .into('users');
@@ -128,10 +137,10 @@ const saveLocal = async ({ viewer, data, loaders }, folder) => {
     }
   });
   // invalidate cache
-  loaders.users.clear(viewer.id);
+  loaders.users.clear(userId);
   //
   const result = await knex('users')
-    .where({ id: viewer.id })
+    .where({ id: userId })
     .select('id', 'name', 'surname', 'email', 'avatar_path', 'role_id'); // await User.gen(viewer, viewer.id, loaders);
   return result[0] || null;
 };

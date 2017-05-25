@@ -7,63 +7,10 @@ import cn from 'classnames';
 // import Calendar from '../Calendar';
 import { createProposal, loadTags } from '../../actions/proposal';
 import s from './ProposalInput.css';
-import { getTags } from '../../reducers';
+import { getTags, getIsProposalFetching, getProposalErrorMessage } from '../../reducers';
 import TagInput from '../TagInput';
 import PollInput from '../PollInput';
-import { concatDateAndTime } from '../../core/helpers';
-
-// http://stackoverflow.com/questions/6982692/html5-input-type-date-default-value-to-today
-const utcCorrectedDate = (daysAdded) => {
-  const local = new Date();
-  if (daysAdded) {
-    local.setDate(local.getDate() + daysAdded);
-  }
-  local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
-  return local.toJSON();
-};
-
-const DateInput = props => (
-  <div>
-    <p>
-      <label htmlFor="dateFrom">DATE FROM</label>
-      <input
-        type="date"
-        defaultValue={utcCorrectedDate().slice(0, 10)}
-        onChange={props.handleChange}
-        pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
-        name="dateFrom"
-      />
-    </p>
-    <p>
-      <label htmlFor="timeFrom">TIME FROM</label>
-      <input
-        type="time"
-        defaultValue={utcCorrectedDate().slice(11, 16)}
-        onChange={props.handleChange}
-        name="timeFrom"
-      />
-    </p>
-    <p>
-      <label htmlFor="dateTo">DATE TO</label>
-      <input
-        type="date"
-        defaultValue={utcCorrectedDate(3).slice(0, 10)}
-        onChange={props.handleChange}
-        pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
-        name="dateTo"
-      />
-    </p>
-    <p>
-      <label htmlFor="timeTo">TIME TO</label>
-      <input type="time" name="timeTo" defaultValue={'12:00'} onChange={props.handleChange} />
-    </p>
-
-  </div>
-);
-
-DateInput.propTypes = {
-  handleChange: PropTypes.func.isRequired,
-};
+import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 
 class ProposalInput extends React.Component {
   static propTypes = {
@@ -72,6 +19,8 @@ class ProposalInput extends React.Component {
     //  locale: PropTypes.string.isRequired,
     maxTags: PropTypes.number.isRequired,
     loadTags: PropTypes.func.isRequired,
+    isPending: PropTypes.bool.isRequired,
+    errorMessage: PropTypes.string,
     tags: PropTypes.arrayOf(
       PropTypes.shape({
         text: PropTypes.string,
@@ -80,6 +29,11 @@ class ProposalInput extends React.Component {
     ).isRequired,
     defaultPollValues: PropTypes.shape({}).isRequired,
   };
+
+  static defaultProps = {
+    errorMessage: null,
+  };
+
   constructor(props) {
     super(props);
 
@@ -167,12 +121,16 @@ class ProposalInput extends React.Component {
 
     let startTime = null;
     let endTime = null;
-    const { dateFrom, timeFrom, dateTo, timeTo } = this.state;
+    let { dateFrom, timeFrom, dateTo, timeTo } = this.state.settings;
     if (dateFrom || timeFrom) {
+      dateFrom = dateFrom || new Date();
+      timeFrom = timeFrom || utcCorrectedDate().slice(11, 16);
       startTime = concatDateAndTime(dateFrom, timeFrom);
     }
-
     if (dateTo || timeTo) {
+      dateTo = dateTo || new Date();
+      timeTo = timeTo || utcCorrectedDate().slice(11, 16);
+
       endTime = concatDateAndTime(dateTo, timeTo);
     }
     const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
@@ -189,7 +147,6 @@ class ProposalInput extends React.Component {
       ) || null;
     /* eslint-enable no-confusing-arrow */
     if (title && markup) {
-      alert('Implement proper sanitizing!');
       this.props.createProposal({
         title,
         text: markup,
@@ -213,19 +170,28 @@ class ProposalInput extends React.Component {
   }
 
   handleValueChanges(e) {
-    if (e.target.name === 'threshold' || e.target.checked == null) {
-      const value = e.target.value;
-      if (e.target.name === 'pollOption') {
-        this.setState({
-          [e.target.name]: value,
-          settings: { threshold: this.props.defaultPollValues[value].threshold },
-        });
-      } else {
-        this.setState({ settings: { ...this.state.settings, [e.target.name]: value } });
+    let value;
+    switch (e.target.name) {
+      case 'dateTo':
+      case 'dateFrom':
+      case 'timeFrom':
+      case 'timeTo':
+      case 'threshold':
+      case 'pollOption': {
+        value = e.target.value;
+        break;
       }
-    } else {
-      this.setState({ settings: { ...this.state.settings, [e.target.name]: e.target.checked } });
+      case 'withStatements':
+      case 'unipolar':
+      case 'secret': {
+        value = e.target.checked;
+        break;
+      }
+
+      default:
+        throw Error(`Element not recognized: ${e.target.name}`);
     }
+    this.setState({ settings: { ...this.state.settings, [e.target.name]: value } });
   }
   toggleSettings() {
     this.setState({ displaySettings: !this.state.displaySettings });
@@ -356,7 +322,11 @@ class ProposalInput extends React.Component {
           <div className={s.preview} dangerouslySetInnerHTML={this.rawMarkup()} />
 
           <div className={s.formGroup}>
-            <button className={s.button} onClick={this.onSubmit}> SUBMIT</button>
+            <button className={s.button} onClick={this.onSubmit} disabled={this.isPending}>
+              {' '}SUBMIT
+            </button>
+            {this.props.isPending && <span>{'...submitting'}</span>}
+            {this.props.errorMessage && <span>{this.props.errorMessage}</span>}
           </div>
         </div>
       </div>
@@ -365,9 +335,9 @@ class ProposalInput extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  //  intl: getMessages(state),
-  //  locale: getLocale(state),
   tags: getTags(state),
+  isPending: getIsProposalFetching(state, '0000'),
+  errorMessage: getProposalErrorMessage(state, '0000'),
 });
 
 const mapDispatch = {

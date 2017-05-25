@@ -11,7 +11,7 @@ export default {
 
   async action({ store }) {
     const user = getSessionUser(store.getState());
-    if (!user || user.role.type === 'viewer') {
+    if (!user || user.role.type === 'guest') {
       return { redirect: '/' };
     }
     if (!process.env.BROWSER) {

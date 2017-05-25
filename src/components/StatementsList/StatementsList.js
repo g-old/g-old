@@ -24,12 +24,14 @@ class StatementsList extends React.Component {
         id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
       }),
     ).isRequired,
+    hideOwnStatement: PropTypes.bool,
   };
 
   static defaultProps = {
     ownVote: null,
     ownStatement: null,
     likedStatements: [],
+    hideOwnStatement: false,
   };
 
   constructor(props) {
@@ -69,7 +71,7 @@ class StatementsList extends React.Component {
       );
     }
 
-    if (this.props.ownStatement) {
+    if (this.props.ownStatement && !this.props.hideOwnStatement) {
       ownStatement = (
         <Statement
           onSubmit={this.props.onSubmit}
@@ -86,13 +88,12 @@ class StatementsList extends React.Component {
       );
 
       // dont show input
-      input = 'EVERYTHING ALREADY SAID';
+      input = null;
     }
     return (
       <div>
 
         {input}
-        {}
         {ownStatement}
         {/* eslint-disable no-confusing-arrow */}
         {this.props.statements &&

@@ -26,6 +26,7 @@ function renderUserSuggestion(user, obj) {
         backgroundSize: '3em 3em',
         backgroundRepeat: 'no-repeat',
         marginBottom: '1em',
+        cursor: 'pointer',
       }}
       key={user.id}
       className={s.suggestionContent}
@@ -100,7 +101,7 @@ class UserPanel extends React.Component {
           </div>}
         <Accordion openMulti>
           <AccordionPanel
-            heading="Accounts with status guest"
+            heading="Guest accounts"
             onActive={() => {
               this.props.loadUserList('guest');
             }}
@@ -118,7 +119,7 @@ class UserPanel extends React.Component {
             {this.props.guestArray.map(user => renderUserSuggestion(user, this))}
           </AccordionPanel>
           <AccordionPanel
-            heading="Accounts with status viewer"
+            heading="Viewer accounts"
             onActive={() => {
               this.props.loadUserList('viewer');
             }}

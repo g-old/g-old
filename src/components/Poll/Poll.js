@@ -73,6 +73,7 @@ class Poll extends React.Component {
     followeeVotes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     statements: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    filter: PropTypes.string.isRequired,
   };
   constructor(props) {
     super(props);
@@ -151,6 +152,7 @@ class Poll extends React.Component {
           onSubmit={this.handleOnSubmit}
           ownVote={this.props.poll.ownVote}
           followees={this.props.followees}
+          hideOwnStatement={this.props.filter !== 'ids'}
         />
       );
     }
@@ -183,7 +185,11 @@ class Poll extends React.Component {
       } else if (this.props.poll.ownStatement) {
         votingButtons = (
           <div>
-            <button disabled={mutationIsPending} onClick={this.handleRetractVote}>
+            <button
+              style={{ marginBottom: '1em' }}
+              disabled={mutationIsPending}
+              onClick={this.handleRetractVote}
+            >
               RETRACT VOTE - AND DELETE STATEMENT
             </button>
             {mutationErrorMessage && <div>{mutationErrorMessage} </div>}

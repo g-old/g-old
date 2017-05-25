@@ -17,18 +17,27 @@
   border: transparent;
   border-radius: 0;
   background: transparent;
-  color: #f8f;
   text-decoration: none;
-  font-size: 18px;
+  font-size: 1.5em;
   line-height: 1.3333333em;
   cursor: pointer;
 }
 
+.box {
+  flex-direction: column;
+  flex: 0 0 auto;
+  display: flex;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
 .header {
   align-items: center;
-  min-height: 5em;
+  min-height: 4em;
   width: 100%;
   justify-content: space-between;
+  flex-direction: row;
 }
 
 .listItem {

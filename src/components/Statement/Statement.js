@@ -37,6 +37,14 @@ MenuDrop.defaultProps = {
   children: null,
 };
 
+const EditMenu = props => <div>{props.children}</div>;
+EditMenu.propTypes = {
+  children: PropTypes.element,
+};
+EditMenu.defaultProps = {
+  children: null,
+};
+
 class Statement extends React.Component {
   static propTypes = {
     onSubmit: PropTypes.func,
@@ -167,8 +175,10 @@ class Statement extends React.Component {
     const inactive = this.props.asInput && isEmpty;
     const canLike =
       this.props.user.role.type !== 'guest' && !this.props.asInput && !this.props.ownStatement;
-    const canFollow = !!(this.props.followees.length < 5 &&
-      this.props.followees.find(f => f.id === this.props.data.author.id) == null);
+    const canFollow = this.props.followees.length < 5
+      ? this.props.followees.find(f => f.id === this.props.data.author.id) == null
+      : false;
+
     return (
       <div
         className={cn(
@@ -198,120 +208,94 @@ class Statement extends React.Component {
                     />}
                 </span>
               </div>
-              {!this.props.ownStatement &&
-                canFollow &&
-                <button
-                  onClick={() => {
-                    this.props.updateUser({
-                      id: this.props.user.id,
-                      followee: this.props.data.author.id,
-                      info: { pollId: this.props.data.pollId, voteId: this.props.data.vote.id },
-                    });
-                  }}
-                >
-                  {' '}+Follow{' '}
-                </button>}
-              {/*! this.props.ownStatement &&
-                <button
-                  className={s.iconButton}
-                  onClick={() =>
-                    this.props.flag({
-                      statementId: this.props.data.id,
-                      content: this.props.data.text,
-                    })}
-                >
-                  <Icon
-                    icon={
-                      ICONS.flag
-                    }
-                    size={16}
-                  />
-              </button> */}
               <div>
                 {/* eslint-disable jsx-a11y/no-static-element-interactions */}
 
-                <div
-                  onClick={() => {
-                    this.props.onMenuClicked({ id: this.props.data.id || 'creating' });
-                  }}
-                >
-                  {/* eslint-enable jsx-a11y/no-static-element-interactions */}
-                  <Icon icon={ICONS.menu} size={20} color="grey" />
-                  {' '}
-                  {this.props.menuOpen &&
-                    <MenuDrop>
-                      <ul>
-                        {!this.props.ownStatement &&
-                          <li>
-                            <button
-                              className={s.iconButton}
-                              onClick={() =>
-                                this.props.flag({
-                                  statementId: this.props.data.id,
-                                  content: this.props.data.text,
-                                })}
-                            >
-                              FLAG
-                            </button>
-                          </li>}
-                        {['admin', 'mod'].includes(this.props.user.role.type) &&
-                          !this.props.asInput &&
-                          <li>
-                            <button className={s.iconButton} onClick={this.onDeleteStatement}>
-                              DELETE
-                            </button>
-                          </li>}
-                        {!this.props.data.deletedAt &&
-                          (this.props.asInput || this.props.ownStatement) &&
-                          <li>
-                            {' '}<span style={{ marginRight: '0.5em' }}>
-                              {this.state.edit
-                                ? <span>
-                                  <button onClick={this.onTextSubmit} disabled={!hasMinimumInput}>
-                                    <i className="fa fa-check" />
-                                  </button>
-                                  <button
-                                    onClick={this.onEndEditing}
-                                    disabled={this.props.asInput && !hasMinimumInput}
-                                  >
-                                    <i className="fa fa-times" />
-                                  </button>
-                                </span>
-                                : <button onClick={this.onEditStatement}>
-                                  <i className="fa fa-pencil" />
-                                </button>}
-                            </span>
-                          </li>}
-                      </ul>
-                    </MenuDrop>}
-                </div>
-              </div>
-              {/* <Menu>
-                {!this.props.data.deletedAt &&
-                  (this.props.asInput || this.props.ownStatement) &&
-                  <span style={{ marginRight: '0.5em' }}>
-                    {this.state.edit
-                      ? <span>
-                        <button onClick={this.onTextSubmit} disabled={!hasMinimumInput}>
-                          <i className="fa fa-check" />
-                        </button>
-                        <button
-                          onClick={this.onEndEditing}
-                          disabled={this.props.asInput && !hasMinimumInput}
-                        >
-                          <i className="fa fa-times" />
-                        </button>
-                      </span>
-                      : <button onClick={this.onEditStatement}>
-                        <i className="fa fa-pencil" />
-                      </button>}
-                  </span>}
-                {['admin', 'mod'].includes(this.props.user.role.type) &&
-                  !this.props.asInput &&
-                  <button onClick={this.onDeleteStatement}>
-                    <i className="fa fa-trash" />
+                {!(this.props.ownStatement || this.props.asInput) &&
+                  <button
+                    className={s.iconButton}
+                    onBlur={() => {
+                      // TODO attach eventhandler on document to listen for outside clicks
+                      this.props.onMenuClicked({ id: this.props.data.id || 'creating' });
+                    }}
+                    onClick={() => {
+                      this.props.onMenuClicked({ id: this.props.data.id || 'creating' });
+                    }}
+                  >
+                    {/* eslint-enable jsx-a11y/no-static-element-interactions */}
+                    <Icon icon={ICONS.menu} size={20} color="grey" />
+                    {' '}
                   </button>}
-              </Menu> */}
+                {this.props.menuOpen &&
+                  <MenuDrop>
+                    <ul>
+                      {!this.props.ownStatement &&
+                        canFollow &&
+                        <li>
+                          <button
+                            className={s.iconButton}
+                            onMouseDown={() => {
+                              this.props.updateUser({
+                                id: this.props.user.id,
+                                followee: this.props.data.author.id,
+                                info: {
+                                  pollId: this.props.data.pollId,
+                                  voteId: this.props.data.vote.id,
+                                },
+                              });
+                            }}
+                          >
+                            {'Follow user'}
+                          </button>
+                        </li>}
+                      {!this.props.ownStatement &&
+                        <li>
+                          <button
+                            className={s.iconButton}
+                            style={{ width: '100%' }}
+                            name="flagBtn"
+                            onMouseDown={() =>
+                              this.props.flag({
+                                statementId: this.props.data.id,
+                                content: this.props.data.text,
+                              })}
+                          >
+                            FLAG
+                          </button>
+                        </li>}
+                      {['admin', 'mod'].includes(this.props.user.role.type) &&
+                        !this.props.asInput &&
+                        !this.props.data.deletedAt &&
+                        <li>
+                          <button className={s.iconButton} onMouseDown={this.onDeleteStatement}>
+                            DELETE
+                          </button>
+                        </li>}
+                    </ul>
+                  </MenuDrop>}
+                <EditMenu>
+                  {!this.props.data.deletedAt &&
+                    (this.props.asInput || this.props.ownStatement) &&
+                    <span style={{ marginRight: '0.5em' }}>
+                      {this.state.edit
+                        ? <span>
+                          <button onClick={this.onTextSubmit} disabled={!hasMinimumInput}>
+                            <i className="fa fa-check" />
+                          </button>
+                          <button
+                            onClick={this.onEndEditing}
+                            disabled={this.props.asInput && !hasMinimumInput}
+                          >
+                            <i className="fa fa-times" />
+                          </button>
+                        </span>
+                        : <button onClick={this.onEditStatement}>
+                          <i className="fa fa-pencil" />
+                        </button>}
+                    </span>}
+                </EditMenu>
+
+              </div>
             </div>}
           <div className={s.text}>
             {this.state.edit

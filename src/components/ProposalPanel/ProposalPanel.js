@@ -26,10 +26,10 @@ class ProposalPanel extends React.Component {
     return (
       <div>
         <Accordion>
-          <AccordionPanel heading="CREATE">
+          <AccordionPanel heading="Post a proposal">
             <ProposalInput maxTags={8} defaultPollValues={defaultPollValues} />
           </AccordionPanel>
-          <AccordionPanel heading="MANIPULATE">
+          <AccordionPanel heading="Manage open proposals">
             <ProposalsManager defaultPollValues={defaultPollValues} />
           </AccordionPanel>
 

@@ -160,12 +160,16 @@ exports.seed = function (knex, Promise) {
       );
       if (pollTwo.upvotes >= actualThreshold) {
         // set new threshold
+        const pollTwoDates = getDates(true);
         const numVoters = pollTwo.upvotes + pollTwo.downvotes;
         if (numVoters > 0) {
           const higherThreshold = Math.floor((pollTwo.upvotes * 100)
          / numVoters)
         + Math.floor(100 / numVoters);
-          updates.push(knex('polls').where({ id: pollTwo.id }).update({ threshold: higherThreshold, num_voter: pollTwo.upvotes + pollTwo.downvotes }));
+          updates.push(knex('polls').where({ id: pollTwo.id })
+          .update({ threshold: higherThreshold, num_voter: pollTwo.upvotes + pollTwo.downvotes, closed_at:pollTwoDates.closeDate }));
+          updates.push(knex('polls').where({ id: pollOne.id })
+          .update({closed_at:pollTwoDates.closeDate }));
         }
       }
     }

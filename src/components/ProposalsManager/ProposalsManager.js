@@ -1,23 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { FormattedRelative } from 'react-intl';
 import { getVisibleProposals } from '../../reducers';
 import { loadProposalsList, updateProposal } from '../../actions/proposal';
 import PollInput from '../PollInput';
-import { concatDateAndTime } from '../../core/helpers';
+import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 import PollState from '../PollState';
 
 const ConfirmationDialog = props => (
   <div>
     <p>Are you sure?</p>
-    <button onClick={props.revoke}>{'REVOKE POPOSAL'}</button>
+    <button onClick={props.onAction}>{props.label}</button>
     <button onClick={props.cancel}>{'CANCEL'}</button>
   </div>
 );
 
 ConfirmationDialog.propTypes = {
-  revoke: PropTypes.func.isRequired,
+  onAction: PropTypes.func.isRequired,
   cancel: PropTypes.func.isRequired,
+  label: PropTypes.string.isRequired,
 };
 
 const ProposalInfo = props => (
@@ -69,44 +71,59 @@ class ProposalsManager extends React.Component {
     this.state = { pollOption: '2', settings: {} };
     this.handleValueChanges = this.handleValueChanges.bind(this);
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
-    this.handleRevoke = this.handleRevoke.bind(this);
+    this.handleStateChange = this.handleStateChange.bind(this);
     this.toggleSettings = this.toggleSettings.bind(this);
   }
   componentDidMount() {
     this.props.loadProposalsList('active');
   }
+  // TODO refactor - same in ProposalInput
   handleValueChanges(e) {
-    if (e.target.name === 'threshold' || e.target.checked == null) {
-      const value = e.target.value;
-      if (e.target.name === 'pollOption') {
-        this.setState({
-          [e.target.name]: value,
-          settings: { threshold: this.props.defaultPollValues[value].threshold },
-        });
-      } else {
-        this.setState({ settings: { ...this.state.settings, [e.target.name]: value } });
+    let value;
+    switch (e.target.name) {
+      case 'dateTo':
+      case 'dateFrom':
+      case 'timeFrom':
+      case 'timeTo':
+      case 'threshold':
+      case 'pollOption': {
+        value = e.target.value;
+        break;
       }
-    } else {
-      this.setState({ settings: { ...this.state.settings, [e.target.name]: e.target.checked } });
+      case 'withStatements':
+      case 'unipolar':
+      case 'secret': {
+        value = e.target.checked;
+        break;
+      }
+
+      default:
+        throw Error(`Element not recognized: ${e.target.name}`);
     }
+    this.setState({ settings: { ...this.state.settings, [e.target.name]: value } });
   }
 
-  handleRevoke() {
-    this.props.updateProposal({ id: this.state.currentProposal, state: 'revoked' });
+  handleStateChange() {
+    const newState = this.state.action;
+    this.props.updateProposal({ id: this.state.currentProposal, state: newState });
     this.setState({ currentProposal: null });
   }
 
   handleOnSubmit() {
     // TODO sanitize input
-
+    // TODO refactor - is the same as in ProposalsInput
     let startTime = null;
     let endTime = null;
-    const { dateFrom, timeFrom, dateTo, timeTo } = this.state.settings;
+    let { dateFrom, timeFrom, dateTo, timeTo } = this.state.settings;
     if (dateFrom || timeFrom) {
+      dateFrom = dateFrom || new Date();
+      timeFrom = timeFrom || utcCorrectedDate().slice(11, 16);
       startTime = concatDateAndTime(dateFrom, timeFrom);
     }
-
     if (dateTo || timeTo) {
+      dateTo = dateTo || new Date();
+      timeTo = timeTo || utcCorrectedDate().slice(11, 16);
+
       endTime = concatDateAndTime(dateTo, timeTo);
     }
     const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
@@ -136,37 +153,63 @@ class ProposalsManager extends React.Component {
     const toRender = proposals.filter(p => p.state === 'proposed');
     toRender.sort((a, b) => new Date(a.pollOne.end_time) - new Date(b.pollOne.end_time));
     const settings = this.state.settings;
-    const content = this.state.voting
-      ? (<div>
-        <PollInput
-          onValueChange={this.handleValueChanges}
-          handleDateChange={this.handleValueChanges}
-          selectedPMode={this.state.pollOption}
-          displaySettings={this.state.displaySettings}
-          defaultPollValues={this.props.defaultPollValues}
-          pollValues={settings}
-          toggleSettings={this.toggleSettings}
-        />
-        <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '}
-      </div>)
-      : (<ConfirmationDialog
-        revoke={this.handleRevoke}
-        cancel={() => this.setState({ currentProposal: null })}
-      />);
+    let content = null;
+    switch (this.state.action) {
+      case 'voting': {
+        content = (
+          <div>
+            <PollInput
+              onValueChange={this.handleValueChanges}
+              handleDateChange={this.handleValueChanges}
+              selectedPMode={this.state.pollOption}
+              displaySettings={this.state.displaySettings}
+              defaultPollValues={this.props.defaultPollValues}
+              pollValues={settings}
+              toggleSettings={this.toggleSettings}
+            />
+            <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '}
+          </div>
+        );
+        break;
+      }
+
+      case 'revoked': {
+        content = (
+          <ConfirmationDialog
+            onAction={this.handleStateChange}
+            cancel={() => this.setState({ currentProposal: null })}
+            label="Revoke proposal"
+          />
+        );
+        break;
+      }
+
+      case 'accepted': {
+        content = (
+          <ConfirmationDialog
+            onAction={this.handleStateChange}
+            cancel={() => this.setState({ currentProposal: null })}
+            label="Close poll"
+          />
+        );
+        break;
+      }
+      default:
+        content = 'No valid state';
+    }
+
     return (
       <div>
-        <h1> ACTIVATE PHASE TWO </h1>
-        PROPOSALS
         {toRender.map(
           p =>
             p.state === 'proposed' &&
             <ProposalInfo title={p.title} poll={p.pollOne}>
               STATE {p.state} <br />
-              ENDTIME {p.pollOne.end_time} <br />
+              ENDTIME <FormattedRelative value={p.pollOne.end_time} /> <br />
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  this.setState({ currentProposal: p.id, voting: false });
+                  this.setState({ currentProposal: p.id, action: 'revoked' });
                 }}
               >
                 {'Revoke'}
@@ -174,10 +217,18 @@ class ProposalsManager extends React.Component {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
+                  this.setState({ currentProposal: p.id, action: 'accepted' });
+                }}
+              >
+                {'Close'}
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
                   this.setState({
                     currentProposal: p.id,
                     pollOption: '2',
-                    voting: true,
+                    action: 'voting',
                     settings: {},
                   });
                 }}
@@ -186,28 +237,6 @@ class ProposalsManager extends React.Component {
               </button>
               {p.id === this.state.currentProposal && content}
             </ProposalInfo>,
-          /*<ProposalPreview proposal={p}>
-              STATE {p.state} <br />
-              ENDTIME {p.pollOne.end_time} <br />
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  this.setState({ currentProposal: p.id, voting: false });
-                }}
-              >
-                {'Revoke'}
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  this.setState({ currentProposal: p.id, pollOption: '2', voting: true });
-                }}
-              >
-                {'Open Voting'}
-              </button>
-              {p.id === this.state.currentProposal && content}
-
-            </ProposalPreview>*/
         )}
       </div>
     );

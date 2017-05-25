@@ -36,12 +36,21 @@ class AccordionPanel extends React.Component {
 
   render() {
     const { children, heading, active } = this.props;
-    const label = active ? ' <--CLOSE ME' : '-->OPEN ME';
+    const label = (
+      <svg viewPort="0 0 24 24" width="24px" height="24px">
+        <polygon fill="none" stroke="#000" strokeWidth="2" points="6 2 18 12 6 22" />
+      </svg>
+    );
     return (
       <div>
         <li className={s.listItem}>
           <button className={s.button} onClick={this.onClickTab}>
-            <span className={s.header}>{heading} <span>{label}</span> </span>
+            <div className={s.box}>
+              <header className={cn(s.header, s.box)}>
+                {heading}
+                {label}
+              </header>
+            </div>
           </button>
         </li>
         <div className={cn(active ? s.open : s.closed)}>

@@ -8,7 +8,7 @@ async function proposalPolling() {
     .innerJoin('polling_modes', 'polls.polling_mode_id', 'polling_modes.id')
     .select(
       'proposals.id as id',
-      'proposals.poll_one_id as pollOneId',
+      'proposals.poll_two_id as pollTwoId',
       'polls.threshold as threshold',
       'polls.upvotes as upvotes',
       'polls.downvotes as downvotes',
@@ -44,7 +44,7 @@ async function proposalPolling() {
       .update({ state: newState, updated_at: new Date() })
       .then(() =>
         knex('polls')
-          .where({ id: proposal.pollOneId })
+          .where({ id: proposal.pollTwoId })
           .update({ closed_at: new Date(), updated_at: new Date() }),
       );
   });
