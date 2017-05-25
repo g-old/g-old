@@ -13,7 +13,8 @@ class PollState extends React.Component {
     downvotes: PropTypes.number,
     threshold: PropTypes.number.isRequired,
     unipolar: PropTypes.bool.isRequired,
-    votes: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.string })).isRequired,
+    votes: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.string }))
+      .isRequired,
     getVotes: PropTypes.func.isRequired,
     votingListIsFetching: PropTypes.bool.isRequired,
     votingListErrorMessage: PropTypes.string.isRequired,
@@ -50,16 +51,10 @@ class PollState extends React.Component {
       ? this.props.allVoters
       : this.props.upvotes + this.props.downvotes;
 
-    const upPercent = 100 * (this.props.upvotes / sum);
-    const voteBar = <div className={cn(s.bar)} style={{ width: `${upPercent}%` }} />;
-
-    const threshMargin = this.props.unipolar
-      ? this.props.threshold
-      : Math.min(this.props.threshold, 100 - this.props.threshold);
-    const doubleMargin = 2 * threshMargin;
-    const threshWidth = this.props.unipolar ? 0 : 100 - doubleMargin;
-    const greyZone =
-      true || (!this.props.unipolar && upPercent > threshMargin && upPercent < 100 - threshMargin);
+    const upPercent = sum > 0 ? 100 * (this.props.upvotes / sum) : 0;
+    const voteBar = (
+      <div className={cn(s.bar)} style={{ width: `${upPercent}%` }} />
+    );
 
     /* eslint-disable jsx-a11y/no-static-element-interactions */
     return (
@@ -77,8 +72,10 @@ class PollState extends React.Component {
           <div className={s.barContainer}>
             {voteBar}
             <div
-              className={cn(s.threshold, greyZone && s.greyZone)}
-              style={{ marginLeft: `${threshMargin}%`, width: `${threshWidth}%` }}
+              className={cn(s.threshold)}
+              style={{
+                marginLeft: `${this.props.threshold}%`,
+              }}
             />
           </div>
           {!this.props.compact
@@ -97,7 +94,9 @@ class PollState extends React.Component {
               errorMessage={this.props.votingListErrorMessage}
             />
             {`THRESHOLD ${this.props.threshold}`}
-            {!this.props.unipolar && this.props.threshold < 50 ? ' (IMPOSSIBLE)' : ''}
+            {!this.props.unipolar && this.props.threshold < 50
+              ? ' (IMPOSSIBLE)'
+              : ''}
           </div>}
       </div>
     );
