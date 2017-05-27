@@ -2,7 +2,7 @@ import { GraphQLString, GraphQLObjectType } from 'graphql';
 
 const EdgeType = ItemType =>
   new GraphQLObjectType({
-    name: 'Edge',
+    name: `${ItemType.name}Edge`,
     fields: () => ({
       node: {
         type: ItemType,

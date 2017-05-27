@@ -1,39 +1,24 @@
-import merge from 'lodash.merge';
 import { combineReducers } from 'redux';
 import { denormalize } from 'normalizr';
 import { flaggedStatementArray } from './../store/schema';
+import createFlaggedList, * as fromList from './createFlaggedList';
+import byId, * as fromById from './flaggedStatementsById';
 
-import { LOAD_FLAGGEDSTMTS_SUCCESS, UPDATE_FLAGGEDSTMT_SUCCESS } from '../constants';
-
-const byId = (state = {}, action) => {
-  switch (action.type) {
-    case UPDATE_FLAGGEDSTMT_SUCCESS:
-    case LOAD_FLAGGEDSTMTS_SUCCESS: {
-      return merge({}, state, action.payload.entities.flaggedStatements);
-    }
-    default:
-      return state;
-  }
-};
-
-const allIds = (state = [], action) => {
-  switch (action.type) {
-    case LOAD_FLAGGEDSTMTS_SUCCESS: {
-      return [...new Set([...state, ...action.payload.result])];
-    }
-    default:
-      return state;
-  }
-};
+const listByFilter = combineReducers({
+  all: createFlaggedList('all'),
+  open: createFlaggedList('open'),
+  deleted: createFlaggedList('deleted'),
+  rejected: createFlaggedList('rejected'),
+});
 
 const flaggedStatements = combineReducers({
   byId,
-  allIds,
+  listByFilter,
 });
 
 export default flaggedStatements;
 
-const hydrateStatements = (data, entities) =>
+const hydrateFlags = (data, entities) =>
   denormalize(data, flaggedStatementArray, {
     ...entities,
     users: entities.users.byId,
@@ -41,5 +26,17 @@ const hydrateStatements = (data, entities) =>
     flaggedStatements: entities.flaggedStatements.byId,
   });
 
-export const getStatements = (state, entities) =>
-  hydrateStatements(state.allIds.map(s => state.byId[s]), entities);
+export const getVisibleFlags = (state, filter, entities) => {
+  const ids = fromList.getIds(state.listByFilter[filter]);
+  const data = ids.map(id => fromById.getFlaggedStatement(state.byId, id));
+  return hydrateFlags(data, entities);
+};
+export const getPageInfo = (state, filter) => ({
+  pageInfo: fromList.getPageInfo(state.listByFilter[filter]),
+  isFetching: fromList.getIsFetching(state.listByFilter[filter]),
+  errorMessage: fromList.getErrorMessage(state.listByFilter[filter]),
+});
+export const getIsFetching = (state, filter) => fromList.getIsFetching(state.listByFilter[filter]);
+export const getErrorMessage = (state, filter) =>
+  fromList.getErrorMessage(state.listByFilter[filter]);
+// hydrateStatements(fromList.getIds(state.listByFilter[filter]).map(s => state.byId[s]), entities);

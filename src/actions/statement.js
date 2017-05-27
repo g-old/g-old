@@ -88,16 +88,35 @@ content,
 count,
 createdAt,
 state,
+solver{
+  ${userFields}
+}
 `;
 const flaggedStatements = `
-  query{
-    flaggedStatements{
+  query($state:String){
+    flaggedStatements(state:$state){
       ${flaggedStatement}
       solver{
         ${userFields}
       }
     }
   }
+`;
+
+const flagConnection = `
+query($first:Int, $after:String $state:String){
+  flagConnection(first:$first after:$after state:$state){
+    pageInfo{
+      hasNextPage
+      endCursor
+    }
+    edges{
+      node{
+          ${flaggedStatement}
+      }
+    }
+  }
+}
 `;
 
 const flagStatement = `
@@ -111,9 +130,6 @@ const solveFlaggedStmt = `
 mutation($id:ID $statementId:ID, $content:String, $action:action){
   solveFlag(statement:{id:$id statementId:$statementId, content:$content, action:$action}){
     ${flaggedStatement}
-    solver{
-      ${userFields}
-    }
   }
 }
 `;
@@ -208,17 +224,21 @@ export function deleteStatement(statement) {
   };
 }
 
-export function loadFlaggedStatements() {
+export function loadFlaggedStatementsConnection(state, first, after) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: LOAD_FLAGGEDSTMTS_START,
+      filter: state,
     });
     try {
-      const { data } = await graphqlRequest(flaggedStatements);
-      const normalizedData = normalize(data.flaggedStatements, flaggedArraySchema);
+      const { data } = await graphqlRequest(flagConnection, { state, first, after });
+      const flags = data.flagConnection.edges.map(f => f.node);
+      const normalizedData = normalize(flags, flaggedArraySchema);
       dispatch({
         type: LOAD_FLAGGEDSTMTS_SUCCESS,
         payload: normalizedData,
+        filter: state,
+        pagination: data.flagConnection.pageInfo,
       });
     } catch (error) {
       dispatch({
@@ -226,6 +246,37 @@ export function loadFlaggedStatements() {
         payload: {
           error,
         },
+        filter: state,
+        message: error.message || 'Something went wrong',
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function loadFlaggedStatements(state) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: LOAD_FLAGGEDSTMTS_START,
+      filter: state,
+    });
+    try {
+      const { data } = await graphqlRequest(flaggedStatements, { state });
+      const normalizedData = normalize(data.flaggedStatements, flaggedArraySchema);
+      dispatch({
+        type: LOAD_FLAGGEDSTMTS_SUCCESS,
+        payload: normalizedData,
+        filter: state,
+      });
+    } catch (error) {
+      dispatch({
+        type: LOAD_FLAGGEDSTMTS_ERROR,
+        payload: {
+          error,
+        },
+        filter: state,
         message: error.message || 'Something went wrong',
       });
       return false;

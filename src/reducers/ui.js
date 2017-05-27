@@ -61,6 +61,9 @@ const getVotingListError = (state) => {
 export const getIsProposalFetching = (state, id) =>
   fromProposal.getProposal(state.proposals, id).isFetching;
 
+export const getProposalSuccess = (state, id) =>
+  fromProposal.getProposal(state.proposals, id).success;
+
 export const getProposalErrorMessage = (state, id) =>
   fromProposal.getProposal(state.proposals, id).errorMessage;
 

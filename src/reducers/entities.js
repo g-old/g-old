@@ -48,8 +48,17 @@ export const getUsersIsFetching = (state, filter) => fromUsers.getIsFetching(sta
 export const getUsersErrorMessage = (state, filter) =>
   fromUsers.getErrorMessage(state.users, filter);
 
-export const getFlaggedStatements = state =>
-  fromFlaggedStatements.getStatements(state.flaggedStatements, state);
+export const getVisibleFlags = (state, filter) =>
+  fromFlaggedStatements.getVisibleFlags(state.flaggedStatements, filter, state);
+
+export const getFlagsIsFetching = (state, filter) =>
+  fromFlaggedStatements.getIsFetching(state.flaggedStatements, filter);
+
+export const getFlagsPage = (state, filter) =>
+  fromFlaggedStatements.getPageInfo(state.flaggedStatements, filter);
+
+export const getFlagsErrorMessage = (state, filter) =>
+  fromFlaggedStatements.getErrorMessage(state.flaggedStatements, filter);
 
 export const getActivities = state => fromActivities.getActivities(state.activities, state);
 

@@ -35,7 +35,6 @@ class FeedContainer extends React.Component {
     if (errorMessage && !activities.length) {
       return <FetchError message={errorMessage} onRetry={() => this.props.loadFeed()} />;
     }
-
     return (
       <div>
         <h1>FEED</h1>

@@ -28,6 +28,8 @@ export const getProposal = (state, id) => fromEntity.getProposal(state.entities,
 
 export const getIsProposalFetching = (state, id) => fromUi.getIsProposalFetching(state.ui, id);
 
+export const getProposalSuccess = (state, id) => fromUi.getProposalSuccess(state.ui, id);
+
 export const getProposalErrorMessage = (state, id) => fromUi.getProposalErrorMessage(state.ui, id);
 
 export const getVotingListIsFetching = (state, id) => fromUi.getVotingListIsFetching(state.ui, id);
@@ -68,7 +70,16 @@ export const getMessages = state => fromIntl.getMessages(state.intl);
 
 export const getUser = (state, id) => fromEntity.getUser(state.entities, id);
 
-export const getFlaggedStatements = state => fromEntity.getFlaggedStatements(state.entities);
+export const getVisibleFlags = (state, filter) =>
+  fromEntity.getVisibleFlags(state.entities, filter);
+
+export const getFlagsIsFetching = (state, filter) =>
+  fromEntity.getFlagsIsFetching(state.entities, filter);
+
+export const getFlagsErrorMessage = (state, filter) =>
+  fromEntity.getFlagsErrorMessage(state.entities, filter);
+
+export const getFlagsPage = (state, filter) => fromEntity.getFlagsPage(state.entities, filter);
 
 export const getActivities = state => fromEntity.getActivities(state.entities);
 

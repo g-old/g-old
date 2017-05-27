@@ -18,6 +18,7 @@ const proposals = (state = {}, action) => {
           ...state[action.id],
           isFetching: true,
           errorMessage: null,
+          success: false,
         },
       };
     case CREATE_PROPOSAL_SUCCESS:
@@ -28,6 +29,7 @@ const proposals = (state = {}, action) => {
           ...state[action.id],
           isFetching: false,
           errorMessage: null,
+          success: true,
         },
       };
     case CREATE_PROPOSAL_ERROR:
@@ -38,6 +40,7 @@ const proposals = (state = {}, action) => {
           ...state[action.id],
           isFetching: false,
           errorMessage: action.message,
+          success: false,
         },
       };
     default:

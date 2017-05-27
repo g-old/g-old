@@ -1,14 +1,10 @@
-import {
-  GraphQLObjectType,
-  GraphQLInt,
-  GraphQLList,
-} from 'graphql';
+import { GraphQLObjectType, GraphQLInt, GraphQLList } from 'graphql';
 import EdgeType from './EdgeType';
 import PageInfoType from './PageInfoType';
 
 const PageType = ItemType =>
   new GraphQLObjectType({
-    name: 'Page',
+    name: `${ItemType.name}Page`,
     fields: () => ({
       totalCount: { type: GraphQLInt },
       edges: { type: new GraphQLList(EdgeType(ItemType)) },

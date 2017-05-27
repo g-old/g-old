@@ -38,6 +38,7 @@ import solveFlag from './mutations/updateFlaggedStatement';
 import feed from './queries/feed';
 import pollingModes from './queries/pollingModes';
 import proposalConnection from './queries/proposalConnection';
+import flagConnection from './queries/flagConnection';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -57,6 +58,7 @@ const schema = new Schema({
       feed,
       pollingModes,
       proposalConnection,
+      flagConnection,
     },
   }),
   mutation: new ObjectType({

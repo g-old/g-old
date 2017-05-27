@@ -7,11 +7,26 @@ import cn from 'classnames';
 // import Calendar from '../Calendar';
 import { createProposal, loadTags } from '../../actions/proposal';
 import s from './ProposalInput.css';
-import { getTags, getIsProposalFetching, getProposalErrorMessage } from '../../reducers';
+import {
+  getTags,
+  getIsProposalFetching,
+  getProposalErrorMessage,
+  getProposalSuccess,
+} from '../../reducers';
 import TagInput from '../TagInput';
 import PollInput from '../PollInput';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 
+const standardValues = {
+  textArea: { val: '', selection: [0, 0] },
+  title: { val: '' },
+  pollOption: '1',
+  settings: {},
+  tags: {},
+  showInput: false,
+  tagId: 'xt0',
+  currentTagIds: [],
+};
 class ProposalInput extends React.Component {
   static propTypes = {
     createProposal: PropTypes.func.isRequired,
@@ -21,6 +36,7 @@ class ProposalInput extends React.Component {
     loadTags: PropTypes.func.isRequired,
     isPending: PropTypes.bool.isRequired,
     errorMessage: PropTypes.string,
+    success: PropTypes.bool,
     tags: PropTypes.arrayOf(
       PropTypes.shape({
         text: PropTypes.string,
@@ -32,20 +48,14 @@ class ProposalInput extends React.Component {
 
   static defaultProps = {
     errorMessage: null,
+    success: false,
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      textArea: { val: '', selection: [0, 0] },
-      title: { val: '' },
-      pollOption: '1',
-      settings: {},
-      tags: {},
-      showInput: false,
-      tagId: 'xt0',
-      currentTagIds: [],
+      ...standardValues,
     };
     this.onTextChange = this.onTextChange.bind(this);
     this.onTextSelect = this.onTextSelect.bind(this);
@@ -70,6 +80,13 @@ class ProposalInput extends React.Component {
   componentDidMount() {
     this.props.loadTags();
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.success) {
+      this.setState({ ...standardValues });
+    }
+  }
+
   onTextChange(e) {
     const html = this.md.render(this.state.textArea.val);
 
@@ -259,6 +276,7 @@ class ProposalInput extends React.Component {
               className={s.input}
               name="titleinput"
               type="text"
+              value={this.state.title.val}
               onChange={this.onTitleChange}
             />
           </div>
@@ -327,6 +345,7 @@ class ProposalInput extends React.Component {
             </button>
             {this.props.isPending && <span>{'...submitting'}</span>}
             {this.props.errorMessage && <span>{this.props.errorMessage}</span>}
+            {this.props.success && <span>{'Proposal created'}</span>}
           </div>
         </div>
       </div>
@@ -338,6 +357,7 @@ const mapStateToProps = state => ({
   tags: getTags(state),
   isPending: getIsProposalFetching(state, '0000'),
   errorMessage: getProposalErrorMessage(state, '0000'),
+  success: getProposalSuccess(state, '0000'),
 });
 
 const mapDispatch = {

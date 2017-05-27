@@ -292,6 +292,10 @@ class Statement extends React.Component {
                         : <button onClick={this.onEditStatement}>
                           <i className="fa fa-pencil" />
                         </button>}
+                      {!this.props.asInput &&
+                        <button onClick={this.onDeleteStatement}>
+                          <i className="fa fa-trash" />
+                        </button>}
                     </span>}
                 </EditMenu>
 
