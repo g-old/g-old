@@ -107,7 +107,7 @@ class SupervisionPanel extends React.Component {
       rejectedFlagsPageInfo,
       deletedFlagsPageInfo,
     } = this.props;
-
+    console.log('PAGEINDO', openFlagsPageInfo);
     return (
       <div>
         <h1> FLAGGED STATEMENTS </h1>

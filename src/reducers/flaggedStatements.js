@@ -32,7 +32,7 @@ export const getVisibleFlags = (state, filter, entities) => {
   return hydrateFlags(data, entities);
 };
 export const getPageInfo = (state, filter) => ({
-  pageInfo: fromList.getPageInfo(state.listByFilter[filter]),
+  ...fromList.getPageInfo(state.listByFilter[filter]),
   isFetching: fromList.getIsFetching(state.listByFilter[filter]),
   errorMessage: fromList.getErrorMessage(state.listByFilter[filter]),
 });
