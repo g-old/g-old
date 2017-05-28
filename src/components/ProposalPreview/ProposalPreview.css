@@ -43,6 +43,7 @@ a:visited {
   padding-top: 1em;
   max-height: 5em;
   overflow: hidden;
+  position: relative;
 
   img {
     max-width: calc(var(--max-content-width) - 100px);
@@ -59,6 +60,14 @@ a:visited {
     text-align: left;
     border: 1px solid #ccc;
   }
+}
+
+.overlay {
+  position: absolute;
+  top: 4em;
+  height: 2em;
+  width: 100%;
+  background: linear-gradient(transparent, white);
 }
 
 .tags {

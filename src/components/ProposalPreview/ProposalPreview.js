@@ -54,7 +54,12 @@ class Proposal extends React.Component {
         ? this.props.proposal.pollTwo
         : this.props.proposal.pollOne; */
     }
-    const body = <div dangerouslySetInnerHTML={{ __html: this.props.proposal.body }} />;
+    const body = (
+      <div>
+        <div dangerouslySetInnerHTML={{ __html: this.props.proposal.body }} />
+        <div className={s.overlay} />
+      </div>
+    );
     // null; /* eslint-disable jsx-a11y/no-static-element-interactions */
     // Disabled bc Nodejs Domparser (xmldom) has dep problems
     /*  if (this.state.fullText) {
