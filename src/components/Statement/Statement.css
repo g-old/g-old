@@ -104,8 +104,14 @@
   margin-left: 50%;
 }
 
+.menuContainer {
+  position: relative;
+}
+
 .menuDrop {
   position: absolute;
+  right: 0;
+  top: 0;
 
   /* hide by default */
   display: none;

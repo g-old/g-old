@@ -205,7 +205,7 @@ class Statement extends React.Component {
                     />}
                 </span>
               </div>
-              <div>
+              <div className={s.menuContainer}>
                 {/* eslint-disable jsx-a11y/no-static-element-interactions */}
 
                 {!(this.props.ownStatement || this.props.asInput) &&
