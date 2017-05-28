@@ -106,6 +106,14 @@
 
 .menuDrop {
   position: absolute;
+
+  /* hide by default */
+  display: none;
+
+  button:focus + & {
+    /* show when button was clicked */
+    display: inline-block;
+  }
 }
 
 .menuDrop li {

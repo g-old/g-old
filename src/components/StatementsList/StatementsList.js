@@ -37,11 +37,6 @@ class StatementsList extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
-    this.handleMenu = this.handleMenu.bind(this);
-  }
-
-  handleMenu({ id }) {
-    this.setState({ menuOpen: id === this.state.menuOpen ? null : id });
   }
 
   render() {
@@ -65,8 +60,6 @@ class StatementsList extends React.Component {
           onSubmit={this.props.onSubmit}
           pollId={this.props.pollId}
           asInput
-          onMenuClicked={this.handleMenu}
-          menuOpen={this.state.menuOpen === 'creating'}
         />
       );
     }
@@ -82,8 +75,6 @@ class StatementsList extends React.Component {
           )}
           pollId={this.props.pollId}
           ownStatement
-          onMenuClicked={this.handleMenu}
-          menuOpen={this.state.menuOpen === this.props.ownStatement.id}
         />
       );
 
@@ -113,8 +104,6 @@ class StatementsList extends React.Component {
                   isFollowee={
                       this.props.followees.find(f => f.id === statement.author.id) != null
                     }
-                  menuOpen={this.state.menuOpen === statement.id}
-                  onMenuClicked={this.handleMenu}
                 />
                 : null,
           )}

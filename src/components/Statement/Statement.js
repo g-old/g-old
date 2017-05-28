@@ -73,9 +73,7 @@ class Statement extends React.Component {
     ownLike: PropTypes.shape({ id: PropTypes.string }),
     ownStatement: PropTypes.bool,
     deleteStatement: PropTypes.func.isRequired,
-    menuOpen: PropTypes.bool,
     solveFlag: PropTypes.func.isRequired,
-    onMenuClicked: PropTypes.func,
     user: PropTypes.shape({
       id: PropTypes.string,
 
@@ -91,7 +89,6 @@ class Statement extends React.Component {
     ownStatement: false,
     asInput: false,
     menuOpen: false,
-    onMenuClicked: () => {},
     onSubmit() {
       alert('NO ONSUBMIT');
     },
@@ -214,65 +211,57 @@ class Statement extends React.Component {
                 {!(this.props.ownStatement || this.props.asInput) &&
                   <button
                     className={s.iconButton}
-                    onBlur={() => {
-                      // TODO attach eventhandler on document to listen for outside clicks
-                      this.props.onMenuClicked({ id: this.props.data.id || 'creating' });
-                    }}
-                    onClick={() => {
-                      this.props.onMenuClicked({ id: this.props.data.id || 'creating' });
-                    }}
                   >
                     {/* eslint-enable jsx-a11y/no-static-element-interactions */}
                     <Icon icon={ICONS.menu} size={20} color="grey" />
                     {' '}
                   </button>}
-                {this.props.menuOpen &&
-                  <MenuDrop>
-                    <ul>
-                      {!this.props.ownStatement &&
-                        canFollow &&
-                        <li>
-                          <button
-                            className={s.iconButton}
-                            onMouseDown={() => {
-                              this.props.updateUser({
-                                id: this.props.user.id,
-                                followee: this.props.data.author.id,
-                                info: {
-                                  pollId: this.props.data.pollId,
-                                  voteId: this.props.data.vote.id,
-                                },
-                              });
-                            }}
-                          >
-                            {'Follow user'}
-                          </button>
-                        </li>}
-                      {!this.props.ownStatement &&
-                        <li>
-                          <button
-                            className={s.iconButton}
-                            style={{ width: '100%' }}
-                            name="flagBtn"
-                            onMouseDown={() =>
-                              this.props.flag({
-                                statementId: this.props.data.id,
-                                content: this.props.data.text,
-                              })}
-                          >
-                            FLAG
-                          </button>
-                        </li>}
-                      {['admin', 'mod'].includes(this.props.user.role.type) &&
-                        !this.props.asInput &&
-                        !this.props.data.deletedAt &&
-                        <li>
-                          <button className={s.iconButton} onMouseDown={this.onDeleteStatement}>
-                            DELETE
-                          </button>
-                        </li>}
-                    </ul>
-                  </MenuDrop>}
+                <MenuDrop>
+                  <ul>
+                    {!this.props.ownStatement &&
+                      canFollow &&
+                      <li>
+                        <button
+                          className={s.iconButton}
+                          onMouseDown={() => {
+                            this.props.updateUser({
+                              id: this.props.user.id,
+                              followee: this.props.data.author.id,
+                              info: {
+                                pollId: this.props.data.pollId,
+                                voteId: this.props.data.vote.id,
+                              },
+                            });
+                          }}
+                        >
+                          {'Follow user'}
+                        </button>
+                      </li>}
+                    {!this.props.ownStatement &&
+                      <li>
+                        <button
+                          className={s.iconButton}
+                          style={{ width: '100%' }}
+                          name="flagBtn"
+                          onMouseDown={() =>
+                            this.props.flag({
+                              statementId: this.props.data.id,
+                              content: this.props.data.text,
+                            })}
+                        >
+                          FLAG
+                        </button>
+                      </li>}
+                    {['admin', 'mod'].includes(this.props.user.role.type) &&
+                      !this.props.asInput &&
+                      !this.props.data.deletedAt &&
+                      <li>
+                        <button className={s.iconButton} onMouseDown={this.onDeleteStatement}>
+                          DELETE
+                        </button>
+                      </li>}
+                  </ul>
+                </MenuDrop>
                 <EditMenu>
                   {!this.props.data.deletedAt &&
                     (this.props.asInput || this.props.ownStatement) &&
