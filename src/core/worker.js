@@ -2,13 +2,24 @@ import knex from '../data/knex';
 
 async function proposalPolling() {
   const proposals = await knex('proposals')
-    .where({ state: 'voting' })
-    .where('end_time', '<=', new Date())
-    .innerJoin('polls', 'proposals.poll_two_id', 'polls.id')
+    .innerJoin('polls', function () {
+      this.on(function () {
+        this.on(
+          knex.raw(
+            "(proposals.state = 'proposed' and proposals.poll_one_id = polls.id) or proposals.state = 'voting' and proposals.poll_two_id = polls.id",
+          ),
+        );
+      });
+    })
     .innerJoin('polling_modes', 'polls.polling_mode_id', 'polling_modes.id')
+    .where({ 'polls.closed_at': null })
+    .where('polls.end_time', '<=', new Date())
     .select(
       'proposals.id as id',
+      'proposals.state as state',
       'proposals.poll_two_id as pollTwoId',
+      'proposals.poll_one_id as pollOneId',
+      'polls.closed_at as closedAt',
       'polls.threshold as threshold',
       'polls.upvotes as upvotes',
       'polls.downvotes as downvotes',
@@ -19,6 +30,7 @@ async function proposalPolling() {
   const mutations = proposals.map((proposal) => {
     let newState;
     let ref;
+
     switch (proposal.ref) {
       case 'voters':
         ref = proposal.upvotes + proposal.downvotes;
@@ -34,17 +46,18 @@ async function proposalPolling() {
     ref *= proposal.threshold / 100;
 
     if (proposal.upvotes >= ref) {
-      newState = 'accepted';
+      newState = proposal.state === 'proposed' ? 'proposed' : 'accepted';
     } else {
-      newState = 'rejected';
+      newState = proposal.state === 'proposed' ? 'accepted' : 'rejected';
     }
     // TODO in transaction!
+    const pollId = proposal.state === 'proposed' ? proposal.pollOneId : proposal.pollTwoId;
     return knex('proposals')
       .where({ id: proposal.id })
       .update({ state: newState, updated_at: new Date() })
       .then(() =>
         knex('polls')
-          .where({ id: proposal.pollTwoId })
+          .where({ id: pollId })
           .update({ closed_at: new Date(), updated_at: new Date() }),
       );
   });

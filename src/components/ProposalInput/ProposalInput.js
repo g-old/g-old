@@ -20,8 +20,8 @@ import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 const standardValues = {
   textArea: { val: '', selection: [0, 0] },
   title: { val: '' },
-  pollOption: '1',
-  settings: {},
+
+  settings: { pollOption: '1' },
   tags: {},
   showInput: false,
   tagId: 'xt0',
@@ -151,8 +151,7 @@ class ProposalInput extends React.Component {
       endTime = concatDateAndTime(dateTo, timeTo);
     }
     const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
-
-    const pollingModeId = this.state.pollOption;
+    const pollingModeId = this.state.settings.pollOption;
 
     /* eslint-disable no-confusing-arrow */
     const tags =
@@ -171,7 +170,7 @@ class ProposalInput extends React.Component {
           startTime,
           endTime,
           secret,
-          threshold: threshold || 20,
+          threshold: threshold || this.props.defaultPollValues[pollingModeId].threshold,
           mode: {
             withStatements,
             id: pollingModeId,
@@ -194,6 +193,7 @@ class ProposalInput extends React.Component {
       case 'timeFrom':
       case 'timeTo':
       case 'threshold':
+      case 'thresholdRef':
       case 'pollOption': {
         value = e.target.value;
         break;
@@ -261,7 +261,7 @@ class ProposalInput extends React.Component {
           <PollInput
             onValueChange={this.handleValueChanges}
             handleDateChange={this.handleValueChanges}
-            selectedPMode={this.state.pollOption}
+            selectedPMode={this.state.settings.pollOption}
             displaySettings={this.state.displaySettings}
             defaultPollValues={this.props.defaultPollValues}
             pollValues={this.state.settings}

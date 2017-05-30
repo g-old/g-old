@@ -68,7 +68,7 @@ class ProposalsManager extends React.Component {
   };
   constructor(props) {
     super(props);
-    this.state = { pollOption: '2', settings: {} };
+    this.state = { settings: { pollOption: '2' } };
     this.handleValueChanges = this.handleValueChanges.bind(this);
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
     this.handleStateChange = this.handleStateChange.bind(this);
@@ -86,6 +86,7 @@ class ProposalsManager extends React.Component {
       case 'timeFrom':
       case 'timeTo':
       case 'threshold':
+      case 'thresholdRef':
       case 'pollOption': {
         value = e.target.value;
         break;
@@ -127,15 +128,14 @@ class ProposalsManager extends React.Component {
       endTime = concatDateAndTime(dateTo, timeTo);
     }
     const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
-
-    const pollingModeId = this.state.pollOption;
+    const pollingModeId = this.state.settings.pollOption;
     this.props.updateProposal({
       id: this.state.currentProposal,
       poll: {
         startTime,
         endTime,
         secret,
-        threshold: threshold || 50,
+        threshold: threshold || this.props.defaultPollValues[pollingModeId].threshold,
         mode: {
           withStatements,
           id: pollingModeId,
@@ -161,7 +161,7 @@ class ProposalsManager extends React.Component {
             <PollInput
               onValueChange={this.handleValueChanges}
               handleDateChange={this.handleValueChanges}
-              selectedPMode={this.state.pollOption}
+              selectedPMode={this.state.settings.pollOption}
               displaySettings={this.state.displaySettings}
               defaultPollValues={this.props.defaultPollValues}
               pollValues={settings}
@@ -227,9 +227,7 @@ class ProposalsManager extends React.Component {
                   e.stopPropagation();
                   this.setState({
                     currentProposal: p.id,
-                    pollOption: '2',
                     action: 'voting',
-                    settings: {},
                   });
                 }}
               >

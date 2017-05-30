@@ -117,6 +117,7 @@ class Statement extends React.Component {
       // TODO authorize
       this.props.solveFlag({
         statementId: this.props.data.id,
+        action: 'delete',
       });
     }
   }
@@ -209,9 +210,7 @@ class Statement extends React.Component {
                 {/* eslint-disable jsx-a11y/no-static-element-interactions */}
 
                 {!(this.props.ownStatement || this.props.asInput) &&
-                  <button
-                    className={s.iconButton}
-                  >
+                  <button className={s.iconButton}>
                     {/* eslint-enable jsx-a11y/no-static-element-interactions */}
                     <Icon icon={ICONS.menu} size={20} color="grey" />
                     {' '}

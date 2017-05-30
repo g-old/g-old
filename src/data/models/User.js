@@ -38,6 +38,7 @@ class User {
     this.lastLogin = data.last_login_at;
   }
   static async gen(viewer, id, { users }) {
+    if (!id) return null;
     const data = await users.load(id);
 
     if (data == null) return null;
