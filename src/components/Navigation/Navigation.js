@@ -39,13 +39,13 @@ class Navigation extends React.Component {
           <FormattedMessage {...messages.about} />
         </Link>
         <Link className={s.link} to="/proposals/active">
-          Proposals
+          <FormattedMessage {...messages.proposals} />
         </Link>
         <Link className={s.link} to="/feed">
           Feed
         </Link>
         <Link className={s.link} to="/admin">
-          Admin
+          <FormattedMessage {...messages.admin} />
         </Link>
       </div>
     );

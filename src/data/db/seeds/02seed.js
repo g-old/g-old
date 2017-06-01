@@ -11,7 +11,7 @@ const numTags = 10;
 const maxNumFollowees = 5;
 const numPolls = 200;
 const numProposals = numPolls / 2;
-const statementPercentage = 50; // how many of the voters have written a statement
+const statementPercentage = 30; // how many of the voters have written a statement
 
 const chunkSize = 1000;
 

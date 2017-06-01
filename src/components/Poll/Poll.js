@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FormattedRelative } from 'react-intl';
+import { FormattedRelative, defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import StatementsList from '../StatementsList';
@@ -17,6 +17,19 @@ import {
   getFollowees,
   getVisibibleStatementsByPoll,
 } from '../../reducers';
+
+const messages = defineMessages({
+  closed: {
+    id: 'poll.closed',
+    defaultMessage: 'Closed at',
+    description: 'Poll closing time',
+  },
+  closing: {
+    id: 'poll.closing',
+    defaultMessage: 'Closing at',
+    description: 'Poll ending time',
+  },
+});
 
 class Poll extends React.Component {
   static propTypes = {
@@ -177,6 +190,7 @@ class Poll extends React.Component {
               onClick={() => this.canVote('pro')}
               style={{ background: proBtnColor }}
             >
+
               <i className="fa fa-hand-paper-o" />
             </button>
             {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
@@ -244,7 +258,10 @@ class Poll extends React.Component {
           </div>
         </div>
         <p>
-          {this.props.poll.closed_at ? ' CLOSED AT ' : ' CLOSES AT '}
+          {this.props.poll.closed_at
+            ? <FormattedMessage {...messages.closed} />
+            : <FormattedMessage {...messages.closing} />}
+          {' '}
           <FormattedRelative
             value={this.props.poll.closed_at ? this.props.poll.closed_at : this.props.poll.end_time}
           />

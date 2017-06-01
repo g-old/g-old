@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './AccordionPanel.css';
+import Button from '../Button';
 
 class AccordionPanel extends React.Component {
   static propTypes = {
@@ -36,7 +37,7 @@ class AccordionPanel extends React.Component {
 
   render() {
     const { children, heading, active } = this.props;
-    const label = (
+    const icon = (
       <svg viewPort="0 0 24 24" width="24px" height="24px">
         <polygon fill="none" stroke="#000" strokeWidth="2" points="6 2 18 12 6 22" />
       </svg>
@@ -44,14 +45,22 @@ class AccordionPanel extends React.Component {
     return (
       <div>
         <li className={s.listItem}>
-          <button className={s.button} onClick={this.onClickTab}>
+          <Button plain fill onClick={this.onClickTab}>
+            <div className={s.box}>
+              <header className={cn(s.header, s.box)}>
+                {heading}
+                {icon}
+              </header>
+            </div>
+          </Button>
+          {/*         <button className={s.button} onClick={this.onClickTab}>
             <div className={s.box}>
               <header className={cn(s.header, s.box)}>
                 {heading}
                 {label}
               </header>
             </div>
-          </button>
+          </button> */}
         </li>
         <div className={cn(active ? s.open : s.closed)}>
           {children}

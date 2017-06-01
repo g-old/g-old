@@ -22,15 +22,24 @@ a:visited {
   margin: 0 auto;
   border: solid 1px gray;
   padding: 0.4em;
+  box-shadow: #666 1px 1px 1px;
 }
 
+.header {
+  font-weight: 300;
+  font-size: 2rem;
+  padding-top: 0;
+  color: black;
+}
+
+/*
 .title {
   font-weight: bold;
   padding-top: 0;
   color: black;
   position: relative;
 }
-
+*/
 .date {
   text-align: right;
   font-size: 0.8em;

@@ -7,6 +7,7 @@ import { loadProposalsList, updateProposal } from '../../actions/proposal';
 import PollInput from '../PollInput';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 import PollState from '../PollState';
+import Button from '../Button';
 
 const ConfirmationDialog = props => (
   <div>
@@ -167,7 +168,8 @@ class ProposalsManager extends React.Component {
               pollValues={settings}
               toggleSettings={this.toggleSettings}
             />
-            <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '}
+            <Button label={'START PHASE 2'} primary onClick={this.handleOnSubmit} />
+            {/* <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '}*/}
           </div>
         );
         break;
@@ -206,23 +208,52 @@ class ProposalsManager extends React.Component {
             <ProposalInfo title={p.title} poll={p.pollOne}>
               STATE {p.state} <br />
               ENDTIME <FormattedRelative value={p.pollOne.end_time} /> <br />
-              <button
+              <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    this.setState({ currentProposal: p.id, action: 'revoked' });
+                  }}
+                  label={'Revoke'}
+                  accent
+                />
+                {/* <button
                 onClick={(e) => {
                   e.stopPropagation();
                   this.setState({ currentProposal: p.id, action: 'revoked' });
                 }}
               >
                 {'Revoke'}
-              </button>
-              <button
+              </button> */}
+
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    this.setState({ currentProposal: p.id, action: 'accepted' });
+                  }}
+                  label={'Close'}
+                  accent
+                />
+                {/*   <button
                 onClick={(e) => {
                   e.stopPropagation();
                   this.setState({ currentProposal: p.id, action: 'accepted' });
                 }}
               >
                 {'Close'}
-              </button>
-              <button
+              </button>*/}
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    this.setState({
+                      currentProposal: p.id,
+                      action: 'voting',
+                    });
+                  }}
+                  label={'Open Voting'}
+                  accent
+                />
+                {/* <button
                 onClick={(e) => {
                   e.stopPropagation();
                   this.setState({
@@ -232,7 +263,8 @@ class ProposalsManager extends React.Component {
                 }}
               >
                 {'Open Voting'}
-              </button>
+              </button> */}
+              </div>
               {p.id === this.state.currentProposal && content}
             </ProposalInfo>,
         )}

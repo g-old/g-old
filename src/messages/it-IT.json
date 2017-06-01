@@ -415,5 +415,50 @@
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
+  },
+  {
+    "id": "proposalInput",
+    "description": "Creating new proposal",
+    "defaultMessage": "Create a new proposal",
+    "message": "",
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js"
+    ]
+  },
+  {
+    "id": "proposalManager",
+    "description": "Manage proposals",
+    "defaultMessage": "Manage proposals",
+    "message": "",
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js"
+    ]
+  },
+  {
+    "id": "otherPoll",
+    "description": "Button for switching between polls",
+    "defaultMessage": "Switch poll",
+    "message": "",
+    "files": [
+      "src/components/TestProposal2/TestProposal.js"
+    ]
+  },
+  {
+    "id": "poll.closed",
+    "description": "Poll closing time",
+    "defaultMessage": "Closed at",
+    "message": "",
+    "files": [
+      "src/components/Poll/Poll.js"
+    ]
+  },
+  {
+    "id": "poll.closing",
+    "description": "Poll ending time",
+    "defaultMessage": "Closing at",
+    "message": "",
+    "files": [
+      "src/components/Poll/Poll.js"
+    ]
   }
 ]

@@ -41,7 +41,7 @@ class StatementsList extends React.Component {
 
   render() {
     // show input only if then user has voted and hasnt written a statement
-    let input = 'VOTE, THEN DEBATE ;) ';
+    let input;
     let ownStatement = null;
     if (this.props.voted) {
       input = null;
@@ -55,12 +55,7 @@ class StatementsList extends React.Component {
         text: '',
       };
       ownStatement = (
-        <Statement
-          data={data}
-          onSubmit={this.props.onSubmit}
-          pollId={this.props.pollId}
-          asInput
-        />
+        <Statement data={data} onSubmit={this.props.onSubmit} pollId={this.props.pollId} asInput />
       );
     }
 

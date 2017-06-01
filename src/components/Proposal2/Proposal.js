@@ -12,7 +12,7 @@ class Proposal extends React.Component {
       state: PropTypes.string.isRequired,
       body: PropTypes.string.isRequired,
       publishedAt: PropTypes.string,
-    }),
+    }).isRequired,
   };
   render() {
     return (
@@ -21,7 +21,7 @@ class Proposal extends React.Component {
           <div className={s.state}>
             {this.props.proposal.state}
           </div>
-          <div className={s.title}>
+          <div className={s.headline}>
             {this.props.proposal.title}
           </div>
           <div className={s.date}>

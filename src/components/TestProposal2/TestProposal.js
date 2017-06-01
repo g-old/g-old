@@ -1,12 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { createStatement, updateStatement, deleteStatement } from '../../actions/statement';
 import { createVote, updateVote, deleteVote, getVotes } from '../../actions/vote';
 import Poll from '../Poll';
 import Proposal from '../Proposal2';
-import { thresholdPassed } from '../../core/helpers';
 import Icon from '../Icon';
+import { ICONS } from '../../constants';
+import Button from '../Button';
+import { getLastActivePoll } from '../../core/helpers';
+
+const messages = defineMessages({
+  otherPoll: {
+    id: 'otherPoll',
+    defaultMessage: 'Switch poll',
+    description: 'Button for switching between polls',
+  },
+});
 
 class TestProposal extends React.Component {
   static propTypes = {
@@ -46,6 +57,7 @@ class TestProposal extends React.Component {
         ),
         closed_at: PropTypes.string,
         upvotes: PropTypes.number,
+        end_time: PropTypes.string,
         downvotes: PropTypes.number,
         ownVote: PropTypes.shape({
           id: PropTypes.string,
@@ -78,7 +90,7 @@ class TestProposal extends React.Component {
   };
   constructor(props) {
     super(props);
-    this.state = { currentPoll: props.proposal.state, filter: 'ids' };
+    this.state = { proposalState: props.proposal.state, filter: 'ids' };
     this.handleVote = this.handleVote.bind(this);
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
     this.onDeleteStatement = this.onDeleteStatement.bind(this);
@@ -96,10 +108,40 @@ class TestProposal extends React.Component {
     }
   }
 
-  handlePollSwitching() {
+  handlePollSwitching(proposalState, proposal) {
     // eslint-disable-next-line eqeqeq
-    const newPollState = this.state.currentPoll == 'voting' ? 'proposed' : 'voting';
-    this.setState({ currentPoll: newPollState });
+    let newProposalState; // = this.state.proposalState == 'voting' ? 'proposed' : 'voting';
+    switch (proposalState) {
+      case 'proposed': {
+        newProposalState = 'voting';
+        break;
+      }
+      case 'voting': {
+        newProposalState = 'proposed';
+        break;
+      }
+      case 'accepted': {
+        if (proposal.pollTwo && proposal.pollTwo.closed_at) {
+          newProposalState = 'proposed';
+        } else {
+          newProposalState = proposalState;
+        }
+
+        break;
+      }
+      case 'rejected': {
+        newProposalState = 'proposed';
+        break;
+      }
+      case 'revoked': {
+        newProposalState = proposalState;
+        break;
+      }
+
+      default:
+        throw Error(`Unknown proposal state: ${proposal.state}`);
+    }
+    this.setState({ proposalState: newProposalState });
   }
 
   handleFetchVotes(pollId) {
@@ -127,109 +169,37 @@ class TestProposal extends React.Component {
   /* eslint-disable no-nested-ternary */
 
   render() {
-    // decide which poll to display
-    let poll = null;
+    const pollData = {
+      user: this.props.user,
+      onVoteButtonClicked: this.handleVote,
+      onStatementSubmit: this.handleOnSubmit,
+      onDeleteStatement: this.onDeleteStatement,
+      fetchVotes: this.props.getVotes,
+      votingListErrorMessage: this.props.votingListErrorMessage,
+      votingListIsFetching: this.props.votingListIsFetching,
+      filter: this.state.filter,
+    };
+    pollData.poll = getLastActivePoll(this.state.proposalState, this.props.proposal);
+    const poll = <Poll {...pollData} />;
+
     let switchPoll = false;
-    // eslint-disable-next-line eqeqeq
-    if (this.state.currentPoll === 'proposed') {
-      // eslint-disable-next-line eqeqeq
-      switchPoll = this.props.proposal.state !== 'proposed';
-      poll = (
-        <Poll
-          poll={this.props.proposal.pollOne}
-          user={this.props.user}
-          onVoteButtonClicked={this.handleVote}
-          onStatementSubmit={this.handleOnSubmit}
-          onDeleteStatement={this.onDeleteStatement}
-          fetchVotes={this.props.getVotes}
-          votingListErrorMessage={this.props.votingListErrorMessage}
-          votingListIsFetching={this.props.votingListIsFetching}
-          filter={this.state.filter}
-        />
-      );
-      // eslint-disable-next-line eqeqeq
-    } else if (this.state.currentPoll === 'voting') {
-      poll = (
-        <Poll
-          poll={this.props.proposal.pollTwo}
-          user={this.props.user}
-          onVoteButtonClicked={this.handleVote}
-          onStatementSubmit={this.handleOnSubmit}
-          onDeleteStatement={this.onDeleteStatement}
-          fetchVotes={this.props.getVotes}
-          filter={this.state.filter}
-        />
-      );
-      switchPoll = true;
-    } else if (this.state.currentPoll === 'accepted') {
-      // how was it accepted? a) time, b) votes
-
-      const passed = thresholdPassed(this.props.proposal.pollOne);
-      poll = (
-        <Poll
-          poll={passed ? this.props.proposal.pollTwo : this.props.proposal.pollOne}
-          user={this.props.user}
-          onVoteButtonClicked={this.handleVote}
-          onStatementSubmit={this.handleOnSubmit}
-          onDeleteStatement={this.onDeleteStatement}
-          fetchVotes={this.props.getVotes}
-          filter={this.state.filter}
-        />
-      );
-    } else if (this.state.currentPoll === 'rejected') {
-      const lastPoll = this.props.proposal.pollOne.closed_at &&
-        this.props.proposal.pollTwo &&
-        this.props.proposal.pollTwo.closed_at
-        ? this.props.proposal.pollTwo
-        : this.props.proposal.pollTwo && this.props.proposal.pollTwo.closed_at
-            ? this.props.proposal.pollTwo
-            : this.props.proposal.pollOne;
-      //  const passed = thresholdPassed(poll);
-      //           poll={passed ? this.props.proposal.pollTwo : this.props.proposal.pollOne}
-
-      poll = (
-        <Poll
-          poll={lastPoll}
-          user={this.props.user}
-          onVoteButtonClicked={this.handleVote}
-          onStatementSubmit={this.handleOnSubmit}
-          onDeleteStatement={this.onDeleteStatement}
-          fetchVotes={this.props.getVotes}
-          filter={this.state.filter}
-        />
-      );
-    } else if (this.state.currentPoll === 'revoked') {
-      const lastPoll = this.props.proposal.pollOne; // only pollOne can be revoked
-
-      poll = (
-        <Poll
-          poll={lastPoll}
-          user={this.props.user}
-          onVoteButtonClicked={this.handleVote}
-          onStatementSubmit={this.handleOnSubmit}
-          onDeleteStatement={this.onDeleteStatement}
-          fetchVotes={this.props.getVotes}
-          filter={this.state.filter}
-        />
-      );
-    } else {
-      poll = 'TO IMPLEMENT';
+    if (this.props.proposal.state !== 'proposed') {
+      if (this.props.proposal.pollTwo && this.props.proposal.pollTwo.end_time) {
+        switchPoll = true;
+      } else {
+        switchPoll = false;
+      }
     }
-
-    // decide if switchBtn should be shown
     let switchPollButton = null;
 
     if (switchPoll) {
       switchPollButton = (
-        <button onClick={() => this.handlePollSwitching()}>
-          OTHER POLL
-          {' '}
-          <Icon
-            icon={
-              'M12.586 27.414l-10-10c-0.781-0.781-0.781-2.047 0-2.828l10-10c0.781-0.781 2.047-0.781 2.828 0s0.781 2.047 0 2.828l-6.586 6.586h19.172c1.105 0 2 0.895 2 2s-0.895 2-2 2h-19.172l6.586 6.586c0.39 0.39 0.586 0.902 0.586 1.414s-0.195 1.024-0.586 1.414c-0.781 0.781-2.047 0.781-2.828 0z'
-            }
-          />
-        </button>
+        <Button
+          onClick={() => this.handlePollSwitching(this.state.proposalState, this.props.proposal)}
+        >
+          <FormattedMessage {...messages.otherPoll} />
+          <Icon icon={ICONS.leftArrow} />
+        </Button>
       );
     }
 

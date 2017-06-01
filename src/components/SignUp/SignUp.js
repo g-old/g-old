@@ -5,6 +5,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import cn from 'classnames';
 import s from './SignUp.css';
 import { validateEmail as checkEmail } from '../../core/helpers';
+import Button from '../Button';
 
 const messages = defineMessages({
   email: {
@@ -80,6 +81,12 @@ class SignUp extends React.Component {
     error: PropTypes.bool,
     notUniqueEmail: PropTypes.bool,
     processing: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    processing: false,
+    notUniqueEmail: false,
+    error: false,
   };
   constructor(props) {
     super(props);
@@ -476,9 +483,9 @@ class SignUp extends React.Component {
 
           </form>
           <div className={s.formGroup}>
-            <button className={s.button} onClick={this.onSubmit} disabled={this.props.processing}>
+            <Button primary fill onClick={this.onSubmit} disabled={this.props.processing}>
               <FormattedMessage {...messages.nextStep} />
-            </button>
+            </Button>
             {this.props.processing && 'PROCESSING...'}
           </div>
         </div>

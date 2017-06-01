@@ -1,9 +1,22 @@
 import React from 'react';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import ProposalInput from '../ProposalInput';
 import ProposalsManager from '../ProposalsManager';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
 
+const messages = defineMessages({
+  proposalInput: {
+    id: 'proposalInput',
+    defaultMessage: 'Create a new proposal',
+    description: 'Creating new proposal',
+  },
+  proposalManager: {
+    id: 'proposalManager',
+    defaultMessage: 'Manage proposals',
+    description: 'Manage proposals',
+  },
+});
 const defaultPollValues = {
   1: {
     withStatements: false,
@@ -26,10 +39,10 @@ class ProposalPanel extends React.Component {
     return (
       <div>
         <Accordion>
-          <AccordionPanel heading="Post a proposal">
+          <AccordionPanel heading={<FormattedMessage {...messages.proposalInput} />}>
             <ProposalInput maxTags={8} defaultPollValues={defaultPollValues} />
           </AccordionPanel>
-          <AccordionPanel heading="Manage open proposals">
+          <AccordionPanel heading={<FormattedMessage {...messages.proposalManager} />}>
             <ProposalsManager defaultPollValues={defaultPollValues} />
           </AccordionPanel>
 

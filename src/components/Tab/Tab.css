@@ -1,6 +1,5 @@
 .tab {
-  padding-left: 12px;
-  padding-right: 12px;
+  padding: 0 12px;
 }
 
 .tab_label {
@@ -9,14 +8,10 @@
   padding-bottom: 10px;
   cursor: pointer;
   display: inline-block;
+  color: #666;
 }
 
 .active {
   border-bottom: 4px solid;
-}
-
-.tab_button {
-  border: none;
-  background: transparent;
-  outline: none;
+  color: black;
 }

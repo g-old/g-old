@@ -5,7 +5,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './ProposalPreview.css';
 import PollState from '../PollState';
 import Link from '../Link';
-import { thresholdPassed } from '../../core/helpers';
+import { getLastActivePoll } from '../../core/helpers';
 // import { DOMParser } from 'xmldom';
 
 class Proposal extends React.Component {
@@ -27,33 +27,7 @@ class Proposal extends React.Component {
   }
 
   render() {
-    let poll = null;
-    if (this.props.proposal.state === 'proposed') {
-      poll = this.props.proposal.pollOne;
-    } else if (this.props.proposal.state === 'voting') {
-      poll = this.props.proposal.pollTwo;
-    } else if (this.props.proposal.state === 'accepted') {
-      // TODO how should we decide which poll has to be displayed
-      poll = thresholdPassed(this.props.proposal.pollOne)
-        ? this.props.proposal.pollTwo
-        : this.props.proposal.pollOne;
-    } else if (
-      this.props.proposal.state === 'rejected' ||
-      this.props.proposal.state === 'revoked'
-    ) {
-      /* eslint-disable no-nested-ternary */
-      poll = this.props.proposal.pollOne.closed_at &&
-        this.props.proposal.pollTwo &&
-        this.props.proposal.pollTwo.closed_at
-        ? this.props.proposal.pollTwo
-        : this.props.proposal.pollTwo && this.props.proposal.pollTwo.closed_at
-            ? this.props.proposal.pollTwo
-            : this.props.proposal.pollOne;
-      /* eslint-enable no-nested-ternary */
-      /* poll = thresholdPassed(this.props.proposal.pollOne)
-        ? this.props.proposal.pollTwo
-        : this.props.proposal.pollOne; */
-    }
+    const poll = getLastActivePoll(this.props.proposal.state, this.props.proposal);
     const body = (
       <div>
         <div dangerouslySetInnerHTML={{ __html: this.props.proposal.body }} />
@@ -76,9 +50,9 @@ class Proposal extends React.Component {
             <FormattedRelative value={this.props.proposal.publishedAt} />
           </div>
           <Link to={`/testproposal/${this.props.proposal.id}/ids`}>
-            <div className={s.title}>
+            <h2 className={s.header}>
               {this.props.proposal.title}
-            </div>
+            </h2>
 
             <div className={s.body}>
               {body}

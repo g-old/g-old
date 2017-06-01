@@ -50,3 +50,60 @@ export const utcCorrectedDate = (daysAdded) => {
   local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
   return local.toJSON();
 };
+
+const thresholdPassedUniversal = (poll, thresholdRef) => {
+  let ref;
+  switch (thresholdRef) {
+    case 'voters':
+      ref = poll.upvotes + poll.downvotes;
+      break;
+    case 'all':
+      ref = poll.allVoters;
+      break;
+
+    default:
+      throw Error(`Threshold reference not implemented: ${thresholdRef}`);
+  }
+
+  ref *= poll.threshold / 100;
+  return ref <= poll.upvotes;
+};
+export const getLastActivePoll = (state, proposal) => {
+  let poll;
+  switch (state) {
+    case 'proposed': {
+      poll = proposal.pollOne;
+      break;
+    }
+    case 'voting': {
+      poll = proposal.pollTwo;
+      break;
+    }
+    case 'accepted': {
+      // TODO check only dates
+      if (thresholdPassedUniversal(proposal.pollOne, proposal.pollOne.mode.thresholdRef)) {
+        if (thresholdPassedUniversal(proposal.pollTwo, proposal.pollTwo.mode.thresholdRef)) {
+          poll = proposal.pollTwo;
+        } else {
+          throw Error('A proposal cannot fail at pollTwo and be accepted');
+        }
+      } else {
+        poll = proposal.pollOne;
+      }
+      break;
+    }
+    case 'revoked': {
+      poll = proposal.pollOne;
+      break;
+    }
+    case 'rejected': {
+      poll = proposal.pollTwo;
+
+      break;
+    }
+
+    default:
+      throw Error(`Unknown proposal state: ${proposal.state}`);
+  }
+  return poll;
+};

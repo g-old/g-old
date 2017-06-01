@@ -249,7 +249,7 @@
     "id": "account.role",
     "description": "Role of the user",
     "defaultMessage": "Role",
-    "message": "",
+    "message": "Benutzerrolle",
     "files": [
       "src/components/AccountProfile/AccountProfile.js"
     ]
@@ -267,7 +267,7 @@
     "id": "navigation.proposals",
     "description": "Proposals link in header",
     "defaultMessage": "Proposals",
-    "message": "",
+    "message": "Beschlüsse",
     "files": [
       "src/components/Navigation/Navigation.js"
     ]
@@ -276,7 +276,7 @@
     "id": "account.changeRights",
     "description": "Changing the rights of the user",
     "defaultMessage": "Change users rights",
-    "message": "",
+    "message": "Benutzerrechte verändern",
     "files": [
       "src/components/AccountProfile/AccountProfile.js"
     ]
@@ -294,7 +294,7 @@
     "id": "account.notify",
     "description": "Contact user",
     "defaultMessage": "Notify user",
-    "message": "",
+    "message": "Benutzer kontaktieren",
     "files": [
       "src/components/AccountProfile/AccountProfile.js"
     ]
@@ -303,7 +303,7 @@
     "id": "privilege.changeRights",
     "description": "Account can change rights",
     "defaultMessage": "change rights",
-    "message": "",
+    "message": "Rechte verändern",
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
@@ -312,7 +312,7 @@
     "id": "privilege.changeRoles",
     "description": "Account can change roles",
     "defaultMessage": "change roles",
-    "message": "",
+    "message": "Rollen verändern",
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
@@ -330,7 +330,7 @@
     "id": "privilege.unlockAdmin",
     "description": "Account can unlock admin rank",
     "defaultMessage": "unlock admin",
-    "message": "",
+    "message": "Administrator freischalten",
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
@@ -339,7 +339,7 @@
     "id": "privilege.unlockMod",
     "description": "Account can unlock mod rank",
     "defaultMessage": "unlock mod",
-    "message": "",
+    "message": "Moderator freisschalten",
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
@@ -348,7 +348,7 @@
     "id": "privilege.unlockUser",
     "description": "Account can unlock user rank",
     "defaultMessage": "unlock user",
-    "message": "",
+    "message": "User freischalten",
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
@@ -357,7 +357,7 @@
     "id": "privilege.unlockViewer",
     "description": "Account can unlock viewer rank",
     "defaultMessage": "unlock viewer",
-    "message": "",
+    "message": "Viewer freischalten",
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
@@ -366,7 +366,7 @@
     "id": "privilege.header",
     "description": "Header of privilegemanager",
     "defaultMessage": "Set & Change Privileges",
-    "message": "",
+    "message": "Rechte vergeben",
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
@@ -402,7 +402,7 @@
     "id": "privilege.postProposals",
     "description": "Account can post proposals",
     "defaultMessage": "post proposals",
-    "message": "",
+    "message": "Beschlüsse erstellen",
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
@@ -411,9 +411,54 @@
     "id": "privilege.unlockGuest",
     "description": "Account can unlock guest rank",
     "defaultMessage": "unlock guest",
-    "message": "",
+    "message": "Gast freischalten",
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js"
+    ]
+  },
+  {
+    "id": "proposalInput",
+    "description": "Creating new proposal",
+    "defaultMessage": "Create a new proposal",
+    "message": "Neuen Beschluss eingeben",
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js"
+    ]
+  },
+  {
+    "id": "proposalManager",
+    "description": "Manage proposals",
+    "defaultMessage": "Manage proposals",
+    "message": "Beschlüsse verwalten",
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js"
+    ]
+  },
+  {
+    "id": "otherPoll",
+    "description": "Button for switching between polls",
+    "defaultMessage": "Switch poll",
+    "message": "Abstimmung wechseln",
+    "files": [
+      "src/components/TestProposal2/TestProposal.js"
+    ]
+  },
+  {
+    "id": "poll.closed",
+    "description": "Poll closing time",
+    "defaultMessage": "Closed at",
+    "message": "",
+    "files": [
+      "src/components/Poll/Poll.js"
+    ]
+  },
+  {
+    "id": "poll.closing",
+    "description": "Poll ending time",
+    "defaultMessage": "Closing at",
+    "message": "",
+    "files": [
+      "src/components/Poll/Poll.js"
     ]
   }
 ]

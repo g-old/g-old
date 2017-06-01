@@ -4,13 +4,19 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import s from './Tab.css';
+import Button from '../Button';
 
 class Tab extends React.Component {
   static propTypes = {
     title: PropTypes.node.isRequired,
     active: PropTypes.bool,
-    id: PropTypes.string,
+    id: PropTypes.string.isRequired,
     onRequestForActive: PropTypes.func, // from Tabs
+  };
+
+  static defaultProps = {
+    active: false,
+    onRequestForActive: () => {},
   };
   constructor() {
     super();
@@ -30,11 +36,11 @@ class Tab extends React.Component {
 
     return (
       <li {...props} id={id} className={s.tab}>
-        <button onClick={this.onTabClick} className={s.tab_button} name="tabButton">
+        <Button plain onClick={this.onTabClick}>
           <label className={cn(s.tab_label, active && s.active)} htmlFor="tabButton">
             {title}
           </label>
-        </button>
+        </Button>
       </li>
     );
   }

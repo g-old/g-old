@@ -16,6 +16,7 @@ import {
 import TagInput from '../TagInput';
 import PollInput from '../PollInput';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
+import Button from '../Button';
 
 const standardValues = {
   textArea: { val: '', selection: [0, 0] },
@@ -340,9 +341,10 @@ class ProposalInput extends React.Component {
           <div className={s.preview} dangerouslySetInnerHTML={this.rawMarkup()} />
 
           <div className={s.formGroup}>
-            <button className={s.button} onClick={this.onSubmit} disabled={this.isPending}>
+            <Button primary label={'Submit'} onClick={this.onSubmit} disabled={this.isPending} />
+            {/* <button className={s.button} onClick={this.onSubmit} disabled={this.isPending}>
               {' '}SUBMIT
-            </button>
+            </button> */}
             {this.props.isPending && <span>{'...submitting'}</span>}
             {this.props.errorMessage && <span>{this.props.errorMessage}</span>}
             {this.props.success && <span>{'Proposal created'}</span>}

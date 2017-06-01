@@ -1,0 +1,38 @@
+
+.mainButton {
+  background-color: transparent;
+  border: 2px solid #e0b000;
+  border-radius: 4px;
+  color: #333;
+  font-size: 19px;
+  font-size: 1.1875rem;
+  line-height: 24px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  outline: none;
+  min-width: 120px;
+  max-width: 384px;
+  padding: 6px 22px;
+}
+
+.primary {
+  color: #fff;
+  background-color: #e0b000;
+}
+
+.plain {
+  text-align: inherit;
+  font-weight: inherit;
+  border: 2px solid transparent;
+  padding: 0;
+}
+
+.fill {
+  max-width: none;
+  width: 100%;
+}
+
+.accent {
+  border: 2px solid #ad11ac;
+}

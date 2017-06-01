@@ -8,21 +8,6 @@
   display: block;
 }
 
-.button {
-  display: block;
-  box-sizing: border-box;
-  margin: 0;
-  width: 100%;
-  outline: none;
-  border: transparent;
-  border-radius: 0;
-  background: transparent;
-  text-decoration: none;
-  font-size: 1.5em;
-  line-height: 1.3333333em;
-  cursor: pointer;
-}
-
 .box {
   flex-direction: column;
   flex: 0 0 auto;
