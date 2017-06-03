@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { normalize } from 'normalizr';
+import { getFlagsIsFetching } from '../reducers';
 
 import {
   CREATE_STATEMENT_START,
@@ -226,6 +227,10 @@ export function deleteStatement(statement) {
 
 export function loadFlaggedStatementsConnection(state, first, after) {
   return async (dispatch, getState, { graphqlRequest }) => {
+    // Dont fetch if pending
+    if (getFlagsIsFetching(getState(), state)) {
+      return false;
+    }
     dispatch({
       type: LOAD_FLAGGEDSTMTS_START,
       filter: state,

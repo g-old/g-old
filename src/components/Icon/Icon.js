@@ -21,7 +21,7 @@ const Icon = (props) => {
       height={`${props.size}px`}
       viewBox={`0 0 ${props.vBox} ${props.vBox}`}
     >
-      <path style={styles.path} d={props.icon} />
+      <path style={styles.path} d={props.icon} transform={props.transform} />
     </svg>
   );
 };
@@ -31,12 +31,14 @@ Icon.propTypes = {
   size: PropTypes.number,
   color: PropTypes.string,
   vBox: PropTypes.number,
+  transform: PropTypes.string,
 };
 
 Icon.defaultProps = {
   size: 32,
   color: 'inherit',
   vBox: 32,
+  transform: '',
 };
 
 export default Icon;

@@ -1,9 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import ProposalInput from '../ProposalInput';
 import ProposalsManager from '../ProposalsManager';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
+import { loadTags, loadProposalsList } from '../../actions/proposal';
 
 const messages = defineMessages({
   proposalInput: {
@@ -35,14 +38,29 @@ const defaultPollValues = {
 };
 
 class ProposalPanel extends React.Component {
+  static propTypes = {
+    loadProposalsList: PropTypes.func.isRequired,
+    loadTags: PropTypes.func.isRequired,
+  };
+
   render() {
     return (
       <div>
         <Accordion>
-          <AccordionPanel heading={<FormattedMessage {...messages.proposalInput} />}>
+          <AccordionPanel
+            heading={<FormattedMessage {...messages.proposalInput} />}
+            onActive={() => {
+              this.props.loadTags();
+            }}
+          >
             <ProposalInput maxTags={8} defaultPollValues={defaultPollValues} />
           </AccordionPanel>
-          <AccordionPanel heading={<FormattedMessage {...messages.proposalManager} />}>
+          <AccordionPanel
+            heading={<FormattedMessage {...messages.proposalManager} />}
+            onActive={() => {
+              this.props.loadProposalsList('active');
+            }}
+          >
             <ProposalsManager defaultPollValues={defaultPollValues} />
           </AccordionPanel>
 
@@ -53,4 +71,9 @@ class ProposalPanel extends React.Component {
   }
 }
 
-export default ProposalPanel;
+const mapDispatch = {
+  loadTags,
+  loadProposalsList,
+};
+
+export default connect(null, mapDispatch)(ProposalPanel);

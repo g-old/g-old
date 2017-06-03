@@ -195,11 +195,12 @@ class TestProposal extends React.Component {
     if (switchPoll) {
       switchPollButton = (
         <Button
+          label={<FormattedMessage {...messages.otherPoll} />}
+          icon={
+            <Icon icon={ICONS.leftArrow} size={24} vBox={24} transform={'matrix(-1 0 0 1 24 0)'} />
+          }
           onClick={() => this.handlePollSwitching(this.state.proposalState, this.props.proposal)}
-        >
-          <FormattedMessage {...messages.otherPoll} />
-          <Icon icon={ICONS.leftArrow} />
-        </Button>
+        />
       );
     }
 

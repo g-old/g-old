@@ -1,30 +1,71 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FormattedRelative } from 'react-intl';
-import { getVisibleProposals } from '../../reducers';
-import { loadProposalsList, updateProposal } from '../../actions/proposal';
+import { FormattedRelative, defineMessages, FormattedMessage } from 'react-intl';
+import {
+  getVisibleProposals,
+  getProposalsIsFetching,
+  getProposalsErrorMessage,
+} from '../../reducers';
+import { updateProposal, loadProposalsList } from '../../actions/proposal';
 import PollInput from '../PollInput';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 import PollState from '../PollState';
 import Button from '../Button';
+import FetchError from '../FetchError';
+import Box from '../Box';
 
-const ConfirmationDialog = props => (
-  <div>
-    <p>Are you sure?</p>
-    <button onClick={props.onAction}>{props.label}</button>
-    <button onClick={props.cancel}>{'CANCEL'}</button>
-  </div>
-);
+const messages = defineMessages({
+  cancel: {
+    id: 'cancel',
+    defaultMessage: 'cancel',
+    description: 'Cancel the action',
+  },
+  confirmation: {
+    id: 'confirmation',
+    defaultMessage: 'Are you sure?',
+    description: 'Ask for confirmation',
+  },
+
+  open: {
+    id: 'manager.open',
+    defaultMessage: 'Open voting',
+    description: 'Starts the voting process',
+  },
+  revokeShort: {
+    id: 'manager.revokeShort',
+    defaultMessage: 'Revoke',
+    description: 'Revoke proposal, short',
+  },
+  revoke: {
+    id: 'manager.revoke',
+    defaultMessage: 'Revoke proposal',
+    description: 'Revoke proposal',
+  },
+  close: {
+    id: 'manager.clsoe',
+    defaultMessage: 'Close proposal',
+    description: 'Close the proposal',
+  },
+});
+
+const ConfirmationDialog = props =>
+  (<div>
+    <p><FormattedMessage {...messages.confirmation} /></p>
+    <Box>
+      <Button primary onClick={props.onAction} label={props.label} />
+      <Button onClick={props.onCancel} label={<FormattedMessage {...messages.cancel} />} />
+    </Box>
+  </div>);
 
 ConfirmationDialog.propTypes = {
   onAction: PropTypes.func.isRequired,
-  cancel: PropTypes.func.isRequired,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.element.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
-const ProposalInfo = props => (
-  <div>
+const ProposalInfo = props =>
+  (<div>
     <h3>{props.title}</h3>
     <PollState
       compact
@@ -38,8 +79,7 @@ const ProposalInfo = props => (
 
     {props.children}
 
-  </div>
-);
+  </div>);
 
 ProposalInfo.propTypes = {
   title: PropTypes.string.isRequired,
@@ -64,8 +104,13 @@ class ProposalsManager extends React.Component {
       }),
     ).isRequired,
     updateProposal: PropTypes.func.isRequired,
-    loadProposalsList: PropTypes.func.isRequired,
     defaultPollValues: PropTypes.shape({}).isRequired,
+    isFetching: PropTypes.bool.isRequired,
+    loadProposalsList: PropTypes.func.isRequired,
+    errorMessage: PropTypes.string,
+  };
+  static defaultProps = {
+    errorMessage: null,
   };
   constructor(props) {
     super(props);
@@ -74,9 +119,6 @@ class ProposalsManager extends React.Component {
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
     this.handleStateChange = this.handleStateChange.bind(this);
     this.toggleSettings = this.toggleSettings.bind(this);
-  }
-  componentDidMount() {
-    this.props.loadProposalsList('active');
   }
   // TODO refactor - same in ProposalInput
   handleValueChanges(e) {
@@ -150,7 +192,15 @@ class ProposalsManager extends React.Component {
     this.setState({ displaySettings: !this.state.displaySettings });
   }
   render() {
-    const { proposals } = this.props;
+    const { proposals, isFetching, errorMessage } = this.props;
+    if (isFetching && !proposals.length) {
+      return <p>{'Loading...'} </p>;
+    }
+    if (errorMessage && !proposals.length) {
+      return (
+        <FetchError message={errorMessage} onRetry={() => this.props.loadProposalsList('active')} />
+      );
+    }
     const toRender = proposals.filter(p => p.state === 'proposed');
     toRender.sort((a, b) => new Date(a.pollOne.end_time) - new Date(b.pollOne.end_time));
     const settings = this.state.settings;
@@ -168,7 +218,11 @@ class ProposalsManager extends React.Component {
               pollValues={settings}
               toggleSettings={this.toggleSettings}
             />
-            <Button label={'START PHASE 2'} primary onClick={this.handleOnSubmit} />
+            <Button
+              label={<FormattedMessage {...messages.open} />}
+              primary
+              onClick={this.handleOnSubmit}
+            />
             {/* <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '}*/}
           </div>
         );
@@ -179,8 +233,8 @@ class ProposalsManager extends React.Component {
         content = (
           <ConfirmationDialog
             onAction={this.handleStateChange}
-            cancel={() => this.setState({ currentProposal: null })}
-            label="Revoke proposal"
+            onCancel={() => this.setState({ currentProposal: null })}
+            label={<FormattedMessage {...messages.revoke} />}
           />
         );
         break;
@@ -190,8 +244,8 @@ class ProposalsManager extends React.Component {
         content = (
           <ConfirmationDialog
             onAction={this.handleStateChange}
-            cancel={() => this.setState({ currentProposal: null })}
-            label="Close poll"
+            onCancel={() => this.setState({ currentProposal: null })}
+            label={<FormattedMessage {...messages.close} />}
           />
         );
         break;
@@ -208,40 +262,28 @@ class ProposalsManager extends React.Component {
             <ProposalInfo title={p.title} poll={p.pollOne}>
               STATE {p.state} <br />
               ENDTIME <FormattedRelative value={p.pollOne.end_time} /> <br />
-              <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+
+              <Box>
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
                     this.setState({ currentProposal: p.id, action: 'revoked' });
                   }}
-                  label={'Revoke'}
+                  label={<FormattedMessage {...messages.revokeShort} />}
                   accent
                 />
-                {/* <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  this.setState({ currentProposal: p.id, action: 'revoked' });
-                }}
-              >
-                {'Revoke'}
-              </button> */}
 
-                <Button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    this.setState({ currentProposal: p.id, action: 'accepted' });
-                  }}
-                  label={'Close'}
-                  accent
-                />
-                {/*   <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  this.setState({ currentProposal: p.id, action: 'accepted' });
-                }}
-              >
-                {'Close'}
-              </button>*/}
+                {
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      this.setState({ currentProposal: p.id, action: 'accepted' });
+                    }}
+                    label={<FormattedMessage {...messages.close} />}
+                    accent
+                  />
+                }
+
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -250,21 +292,10 @@ class ProposalsManager extends React.Component {
                       action: 'voting',
                     });
                   }}
-                  label={'Open Voting'}
+                  label={<FormattedMessage {...messages.open} />}
                   accent
                 />
-                {/* <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  this.setState({
-                    currentProposal: p.id,
-                    action: 'voting',
-                  });
-                }}
-              >
-                {'Open Voting'}
-              </button> */}
-              </div>
+              </Box>
               {p.id === this.state.currentProposal && content}
             </ProposalInfo>,
         )}
@@ -273,15 +304,13 @@ class ProposalsManager extends React.Component {
   }
 }
 
-const mapPropsToState = (state) => {
-  const proposals = getVisibleProposals(state, 'active');
-
-  return {
-    proposals,
-  };
-};
+const mapPropsToState = state => ({
+  proposals: getVisibleProposals(state, 'active'),
+  isFetching: getProposalsIsFetching(state, 'active'),
+  errorMessage: getProposalsErrorMessage(state, 'active'),
+});
 const mapDispatch = {
-  loadProposalsList,
   updateProposal,
+  loadProposalsList,
 };
 export default connect(mapPropsToState, mapDispatch)(ProposalsManager);

@@ -460,5 +460,59 @@
     "files": [
       "src/components/Poll/Poll.js"
     ]
+  },
+  {
+    "id": "cancel",
+    "description": "Cancel the action",
+    "defaultMessage": "cancel",
+    "message": "",
+    "files": [
+      "src/components/ProposalsManager/ProposalsManager.js"
+    ]
+  },
+  {
+    "id": "confirmation",
+    "description": "Ask for confirmation",
+    "defaultMessage": "Are you sure?",
+    "message": "",
+    "files": [
+      "src/components/ProposalsManager/ProposalsManager.js"
+    ]
+  },
+  {
+    "id": "manager.clsoe",
+    "description": "Close the proposal",
+    "defaultMessage": "Close proposal",
+    "message": "",
+    "files": [
+      "src/components/ProposalsManager/ProposalsManager.js"
+    ]
+  },
+  {
+    "id": "manager.open",
+    "description": "Starts the voting process",
+    "defaultMessage": "Open voting",
+    "message": "",
+    "files": [
+      "src/components/ProposalsManager/ProposalsManager.js"
+    ]
+  },
+  {
+    "id": "manager.revoke",
+    "description": "Revoke proposal",
+    "defaultMessage": "Revoke proposal",
+    "message": "",
+    "files": [
+      "src/components/ProposalsManager/ProposalsManager.js"
+    ]
+  },
+  {
+    "id": "manager.revokeShort",
+    "description": "Revoke proposal, short",
+    "defaultMessage": "Revoke",
+    "message": "",
+    "files": [
+      "src/components/ProposalsManager/ProposalsManager.js"
+    ]
   }
 ]

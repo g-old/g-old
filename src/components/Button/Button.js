@@ -6,7 +6,7 @@ import s from './Button.css';
 
 class Button extends React.Component {
   static propTypes = {
-    label: PropTypes.string,
+    label: PropTypes.element,
     onClick: PropTypes.func.isRequired,
     disabled: PropTypes.bool,
     primary: PropTypes.bool,
@@ -14,7 +14,10 @@ class Button extends React.Component {
     plain: PropTypes.bool,
     children: PropTypes.element,
     fill: PropTypes.bool,
+    reverse: PropTypes.bool,
+    icon: PropTypes.element,
   };
+
   static defaultProps = {
     label: null,
     disabled: false,
@@ -23,23 +26,48 @@ class Button extends React.Component {
     plain: false,
     children: null,
     fill: false,
+    reverse: false,
+    icon: null,
   };
-  render() {
-    const { label, onClick, disabled, primary, accent, plain, children, fill } = this.props;
 
+  render() {
+    const {
+      label,
+      icon,
+      onClick,
+      disabled,
+      primary,
+      accent,
+      plain,
+      reverse,
+      children,
+      fill,
+    } = this.props;
+    let buttonIcon;
+    if (icon) {
+      buttonIcon = <span className={s.icon}> {icon}</span>;
+    }
+    let buttonLabel;
+    if (label) {
+      buttonLabel = <span className={s.label}>{label}</span>;
+    }
+    const first = reverse ? buttonLabel : buttonIcon;
+    const second = reverse ? buttonIcon : buttonLabel;
     return (
       <button
         className={cn(
-          s.mainButton,
+          s.button,
           primary ? s.primary : null,
           accent ? s.accent : null,
           plain ? s.plain : null,
           fill ? s.fill : null,
+          disabled ? s.disabled : null,
         )}
         disabled={disabled}
         onClick={onClick}
       >
-        <span>{label}</span>
+        {first}
+        {second}
         {children}
       </button>
     );

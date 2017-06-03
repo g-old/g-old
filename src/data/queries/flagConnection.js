@@ -18,9 +18,12 @@ const flags = {
       type: GraphQLString,
     },
   },
-  resolve: async (parent, { first = 10, state, after = '' }) => {
-    let cursor = parseInt(Buffer.from(after, 'base64').toString('ascii'), 10);
-    // cursor = cursor ? new Date(cursor) : new Date();
+  resolve: async (parent, { first = 10, state, after }) => {
+    let cursor;
+    if (after) {
+      cursor = parseInt(Buffer.from(after, 'base64').toString('ascii'), 10);
+      // cursor = cursor ? new Date(cursor) : new Date();
+    }
     cursor = cursor || 0;
     const data = await knex('flagged_statements')
       .where({ state })

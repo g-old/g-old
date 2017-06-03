@@ -5,7 +5,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import MarkdownIt from 'markdown-it';
 import cn from 'classnames';
 // import Calendar from '../Calendar';
-import { createProposal, loadTags } from '../../actions/proposal';
+import { createProposal } from '../../actions/proposal';
 import s from './ProposalInput.css';
 import {
   getTags,
@@ -34,7 +34,6 @@ class ProposalInput extends React.Component {
     //  intl: PropTypes.shape({}).isRequired,
     //  locale: PropTypes.string.isRequired,
     maxTags: PropTypes.number.isRequired,
-    loadTags: PropTypes.func.isRequired,
     isPending: PropTypes.bool.isRequired,
     errorMessage: PropTypes.string,
     success: PropTypes.bool,
@@ -79,7 +78,7 @@ class ProposalInput extends React.Component {
     });
   }
   componentDidMount() {
-    this.props.loadTags();
+    //    this.props.loadTags();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -364,6 +363,5 @@ const mapStateToProps = state => ({
 
 const mapDispatch = {
   createProposal,
-  loadTags,
 };
 export default connect(mapStateToProps, mapDispatch)(withStyles(s)(ProposalInput));

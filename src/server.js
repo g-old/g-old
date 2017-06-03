@@ -43,7 +43,6 @@ import PasswordReset from './data/models/PasswordReset';
 import { sendMail, resetLinkMail, resetSuccessMail } from './core/mailer';
 import { user as userSchema } from './store/schema';
 import config from './config';
-
 import worker from './core/worker';
 
 worker();
@@ -297,13 +296,10 @@ app.get('*', async (req, res, next) => {
       baseUrl: config.api.serverUrl,
       cookie: req.headers.cookie,
     });
-    const store = configureStore(
-      initialState, {
-        fetch,
-        history: null,
-      },
-    );
-
+    const store = configureStore(initialState, {
+      fetch,
+      history: null,
+    });
 
     store.dispatch(
       setRuntimeVariable({
@@ -312,10 +308,12 @@ app.get('*', async (req, res, next) => {
       }),
     );
 
-    store.dispatch(setRuntimeVariable({
-      name: 'availableLocales',
-      value: config.locales,
-    }));
+    store.dispatch(
+      setRuntimeVariable({
+        name: 'availableLocales',
+        value: config.locales,
+      }),
+    );
 
     const locale = req.language;
     await store.dispatch(

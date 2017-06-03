@@ -1,0 +1,12 @@
+
+.root {
+  display: flex;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  flex-wrap: wrap;
+}
+
+.root > *:not(:last-child) {
+  margin-right: 24px;
+}
