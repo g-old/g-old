@@ -41,9 +41,7 @@ export function setLocale({ locale }) {
       if (process.env.BROWSER) {
         const maxAge = 3650 * 24 * 3600; // 10 years in seconds
         document.cookie = `lang=${locale};path=/;max-age=${maxAge}`;
-
-        // re-run router on client
-        window.RSK_ENTRY();
+        history.push(`?lang=${locale}`);
       }
     } catch (error) {
       dispatch({

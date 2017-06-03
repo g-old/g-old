@@ -2,13 +2,13 @@
 import { normalize } from 'normalizr';
 
 import { user as userSchema } from '../store/schema';
-import fetch from '../core/fetch';
+// import fetch from '../core/fetch';
 import { UPLOAD_AVATAR_START, UPLOAD_AVATAR_SUCCESS, UPLOAD_AVATAR_ERROR } from '../constants';
 
 // only clientside!
 export function uploadAvatar(data) {
   const initialId = data.id || '0000';
-  return async (dispatch) => {
+  return async (dispatch, getState, { fetch }) => {
     const formData = new FormData();
     formData.append('avatar', data.dataUrl);
     if (data.id) {

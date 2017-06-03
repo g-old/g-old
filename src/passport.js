@@ -16,7 +16,7 @@
 import passport from 'passport';
 import bcrypt from 'bcrypt';
 import { Strategy as LocalStrategy } from 'passport-local';
-import knex from '../data/knex';
+import knex from '../src/data/knex';
 
 function verifyUser(user, password) {
   return bcrypt.compare(password, user.password_hash);

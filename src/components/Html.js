@@ -11,6 +11,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import serialize from 'serialize-javascript';
 
+/* eslint-disable react/no-danger */
 class Html extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
@@ -23,22 +24,19 @@ class Html extends React.Component {
     ),
     scripts: PropTypes.arrayOf(PropTypes.string.isRequired),
     // eslint-disable-next-line react/forbid-prop-types
-    state: PropTypes.object,
-    lang: PropTypes.string,
+    app: PropTypes.object.isRequired,
     children: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
     styles: [],
     scripts: [],
-    state: null,
-    lang: 'en',
   };
 
   render() {
-    const { title, description, styles, scripts, state, lang, children } = this.props;
+    const { title, description, styles, scripts, app, children } = this.props;
     return (
-      <html className="no-js" lang={lang}>
+      <html className="no-js" lang={app.lang}>
         <head>
           <meta charSet="utf-8" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />
@@ -55,25 +53,16 @@ class Html extends React.Component {
             <style
               key={style.id}
               id={style.id}
-              // eslint-disable-next-line react/no-danger
               dangerouslySetInnerHTML={{ __html: style.cssText }}
             />
           ))}
         </head>
         <body>
-          <div
-            id="app"
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: children }}
-          />
-          {state &&
-            <script
-              // eslint-disable-next-line react/no-danger
-              dangerouslySetInnerHTML={{
-                __html: `window.APP_STATE=${serialize(state, { isJSON: true })}`,
-              }}
-            />}
-          {scripts && scripts.map(script => <script key={script} src={script} />)}
+
+          <div id="app" dangerouslySetInnerHTML={{ __html: children }} />
+          <script dangerouslySetInnerHTML={{ __html: `window.App=${serialize(app)}` }} />
+          {scripts.map(script => <script key={script} src={script} />)}
+
         </body>
       </html>
     );

@@ -11,7 +11,7 @@ import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import Login from '../../components/Login';
 import s from './Home.css';
-import history from '../../core/history';
+import history from '../../history';
 
 class Home extends React.Component {
   render() {

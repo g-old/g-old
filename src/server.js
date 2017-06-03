@@ -28,20 +28,21 @@ import App from './components/App';
 import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import errorPageStyle from './routes/error/ErrorPage.css';
-import router from './core/router';
+import createFetch from './createFetch';
+import passport from './passport';
+import router from './router';
 import schema from './data/schema';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
 import { setRuntimeVariable } from './actions/runtime';
 import { setLocale } from './actions/intl';
-import { port, locales } from './config';
 import createLoaders from './data/dataLoader';
-import passport from './core/passport';
 import User from './data/models/User';
 import FileStorage, { AvatarManager } from './core/FileStorage';
 import PasswordReset from './data/models/PasswordReset';
 import { sendMail, resetLinkMail, resetSuccessMail } from './core/mailer';
 import { user as userSchema } from './store/schema';
+import config from './config';
 
 import worker from './core/worker';
 
@@ -63,7 +64,7 @@ app.use(express.static(path.join(__dirname, '/avatars')));
 app.use(cookieParser());
 app.use(
   requestLanguage({
-    languages: locales,
+    languages: config.locales,
     queryName: 'lang',
     cookie: {
       name: 'lang',
@@ -87,7 +88,7 @@ const sessionConfig = {
   resave: false,
   saveUninitialized: true,
   cookie: { maxAge: 4 * 60 * 60 * 1000 },
-  //cookie: { secure: true } // Use with SSL : https://github.com/expressjs/session
+  // cookie: { secure: true } // Use with SSL : https://github.com/expressjs/session
 };
 
 const SessionStore = knexSession(session);
@@ -97,10 +98,6 @@ const sessionDB = new SessionStore({
 sessionConfig.store = sessionDB;
 
 app.use(session(sessionConfig));
-
-//
-// Authentication
-// -----------------------------------------------------------------------------
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -204,13 +201,13 @@ app.post(
       })
       .then((info) => {
         // TODO ONLY for TESTING!
-        console.log(info.envelope);
-        console.log(info.messageId);
-        console.log(info.message);
+        console.info(info.envelope);
+        console.info(info.messageId);
+        console.info(info.message);
         res.status(200).json({ ok: true });
       })
       .catch((error) => {
-        console.log('ERROR: ', error);
+        console.error('ERROR: ', error);
         res.status(200).json({ ok: true });
       }), // give no feedback!
 );
@@ -232,11 +229,11 @@ app.post('/reset/:token', (req, res) => {
         sendMail(resetSuccessMail(user.email)).then(
           (info) => {
             // TODO ONLY for TESTING!
-            console.log(info.envelope);
-            console.log(info.messageId);
-            console.log(info.message);
+            console.info(info.envelope);
+            console.info(info.messageId);
+            console.info(info.message);
           },
-          err => console.log('MAILING failed', err),
+          err => console.error('MAILING failed', err),
         ),
         new Promise((resolve, reject) => {
           // eslint-disable-next-line no-confusing-arrow
@@ -287,20 +284,26 @@ app.get('*', async (req, res, next) => {
     if (req.user) {
       normalizedData = normalize(req.user, userSchema);
     }
-    const store = configureStore(
-      {
-        user: normalizedData.result || null,
-        entities: {
-          users: {
-            byId: normalizedData.entities.users || {},
-          },
-          roles: normalizedData.entities.roles || {},
+    const initialState = {
+      user: normalizedData.result || null,
+      entities: {
+        users: {
+          byId: normalizedData.entities.users || {},
         },
+        roles: normalizedData.entities.roles || {},
       },
-      {
-        cookie: req.headers.cookie,
+    };
+    const fetch = createFetch({
+      baseUrl: config.api.serverUrl,
+      cookie: req.headers.cookie,
+    });
+    const store = configureStore(
+      initialState, {
+        fetch,
+        history: null,
       },
     );
+
 
     store.dispatch(
       setRuntimeVariable({
@@ -309,12 +312,10 @@ app.get('*', async (req, res, next) => {
       }),
     );
 
-    store.dispatch(
-      setRuntimeVariable({
-        name: 'availableLocales',
-        value: locales,
-      }),
-    );
+    store.dispatch(setRuntimeVariable({
+      name: 'availableLocales',
+      value: config.locales,
+    }));
 
     const locale = req.language;
     await store.dispatch(
@@ -334,8 +335,8 @@ app.get('*', async (req, res, next) => {
         // eslint-disable-next-line no-underscore-dangle
         styles.forEach(style => css.add(style._getCss()));
       },
-      // Initialize a new Redux store
-      // http://redux.js.org/docs/basics/UsageWithReact.html
+      fetch,
+      // You can access redux through react-redux connect
       store,
     };
 
@@ -351,23 +352,31 @@ app.get('*', async (req, res, next) => {
     }
 
     const data = { ...route };
-    const rootComponent = <App context={context}>{route.component}</App>;
+
+    const rootComponent = (
+      <App context={context} store={store}>
+        {route.component}
+      </App>
+    );
 
     data.children = await ReactDOM.renderToString(rootComponent);
     data.styles = [{ id: 'css', cssText: [...css].join('') }];
     data.scripts = [assets.vendor.js, assets.client.js];
 
-    // Furthermore invoked actions will be ignored, client will not receive them!
-    if (__DEV__) {
-      // eslint-disable-next-line no-console
-      console.log('Serializing store...');
-    }
-    data.state = context.store.getState();
-
     if (assets[route.chunk]) {
       data.scripts.push(assets[route.chunk].js);
     }
-    data.lang = locale;
+
+    // Furthermore invoked actions will be ignored, client will not receive them!
+    if (__DEV__) {
+      // eslint-disable-next-line no-console
+      console.info('Serializing store...');
+    }
+    data.app = {
+      apiUrl: config.api.clientUrl,
+      state: context.store.getState(),
+      lang: locale,
+    };
 
     const html = ReactDOM.renderToStaticMarkup(<Html {...data} />);
     res.status(route.status || 200);
@@ -388,12 +397,13 @@ pe.skipPackage('express');
 app.use((err, req, res, next) => {
   console.log(pe.render(err)); // eslint-disable-line no-console
   const locale = req.language;
+  console.error(pe.render(err));
   const html = ReactDOM.renderToStaticMarkup(
     <Html
       title="Internal Server Error"
       description={err.message}
       styles={[{ id: 'css', cssText: errorPageStyle._getCss() }]} // eslint-disable-line no-underscore-dangle
-      lang={locale}
+      app={{ lang: locale }}
     >
       {ReactDOM.renderToString(
         <IntlProvider locale={locale}>
@@ -411,8 +421,6 @@ app.use((err, req, res, next) => {
 // -----------------------------------------------------------------------------
 /* eslint-disable no-console */
 
-app.listen(port, () => {
-  console.log(`The server is running at http://localhost:${port}/`);
+app.listen(config.port, () => {
+  console.log(`The server is running at http://localhost:${config.port}/`);
 });
-
-/* eslint-enable no-console */

@@ -1,10 +1,10 @@
 /* eslint-disable import/prefer-default-export */
 import { SESSION_LOGOUT_START, SESSION_LOGOUT_SUCCESS, SESSION_LOGOUT_ERROR } from '../constants';
-import fetch from '../core/fetch';
-import history from '../core/history';
+// import fetch from '../core/fetch';
+import history from '../history';
 
 export function logout() {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { fetch }) => {
     const user = getState().user;
     dispatch({
       type: SESSION_LOGOUT_START,

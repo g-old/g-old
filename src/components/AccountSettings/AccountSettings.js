@@ -1,5 +1,5 @@
 import React from 'react';
-import history from '../../core/history';
+import history from '../../history';
 
 class AccountSettings extends React.Component {
   render() {

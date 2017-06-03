@@ -13,9 +13,13 @@ class UserStatus extends React.Component {
       id: PropTypes.int,
       avatar: PropTypes.string,
       name: PropTypes.string,
-    }).isRequired,
+    }),
     logout: PropTypes.func.isRequired,
   };
+
+  static defaultProps = {
+    user: null,
+  }
   render() {
     return (
       <div>

@@ -1,4 +1,3 @@
-import fetch from '../core/fetch';
 
 function createGraphqlRequest(fetchKnowingCookie) {
   return async function graphqlRequest(query, variables) {
@@ -17,6 +16,7 @@ function createGraphqlRequest(fetchKnowingCookie) {
   };
 }
 
+/*
 function createFetchKnowingCookie({ cookie }) {
   if (!process.env.BROWSER) {
     return (url, options = {}) => {
@@ -37,15 +37,14 @@ function createFetchKnowingCookie({ cookie }) {
   }
 
   return fetch;
-}
+} */
 
-export default function createHelpers(config) {
-  const fetchKnowingCookie = createFetchKnowingCookie(config);
-  const graphqlRequest = createGraphqlRequest(fetchKnowingCookie);
 
+export default function createHelpers({ fetch, history }) {
   return {
-    fetch: fetchKnowingCookie,
-    graphqlRequest,
-    history: config.history,
+    history,
+    fetch,
+    // @deprecated('Use `client.query()` or `client.mutate()` instead')
+    graphqlRequest: createGraphqlRequest(fetch),
   };
 }
