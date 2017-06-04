@@ -160,8 +160,8 @@ query{
 `;
 
 const createProposalMutation = `
-mutation( $title: String, $text:String,  $poll:PollInput $tags:[TagInput]){
-  createProposal(proposal:{title:$title text:$text poll:$poll tags:$tags}){
+mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput]){
+  createProposal(proposal:{title:$title text:$text state:$state poll:$poll tags:$tags}){
     ${proposal}
     tags{
       id

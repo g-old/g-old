@@ -427,8 +427,9 @@ exports.seed = function (knex, Promise) {
 
   function createPollingmodes() {
     const data = [
-      { name: 'propose', unipolar: true, with_statements: false, threshold_ref: 'all' },
-      { name: 'vote', unipolar: false, with_statements: true, threshold_ref: 'voters' },
+      { id: 1, name: 'propose', unipolar: true, with_statements: false, threshold_ref: 'all' },
+      { id: 2, name: 'vote', unipolar: false, with_statements: true, threshold_ref: 'voters' },
+      { id: 3, name: 'survey', unipolar: false, with_statements: false, threshold_ref: 'voters' },
     ];
     return Promise.resolve(
       knex('polling_modes')

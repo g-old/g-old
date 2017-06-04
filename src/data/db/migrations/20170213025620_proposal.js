@@ -7,7 +7,15 @@ exports.up = function (knex, Promise) {
       table.string('title').notNullable();
       table.text('body').notNullable();
       table
-        .enu('state', ['proposed', 'voting', 'accepted', 'rejected', 'revoked', 'deleted'])
+        .enu('state', [
+          'proposed',
+          'voting',
+          'accepted',
+          'rejected',
+          'revoked',
+          'deleted',
+          'survey',
+        ])
         .notNullable()
         .defaultsTo('proposed');
       table.integer('votes').defaultsTo(0);

@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import CheckBox from '../CheckBox';
 import Icon from '../Icon';
 import { utcCorrectedDate } from '../../core/helpers';
+import Select from '../Select';
 
-const DateInput = props => (
-  <div>
+const DateInput = props =>
+  (<div>
     {/*  <p>
       <label htmlFor="dateFrom">DATE FROM</label>
       <input
@@ -45,15 +46,14 @@ const DateInput = props => (
       />
     </p>
 
-  </div>
-);
+  </div>);
 
 DateInput.propTypes = {
   handleChange: PropTypes.func.isRequired,
 };
 
-const PollSettings = props => (
-  <div>
+const PollSettings = props =>
+  (<div>
     <h4> Settings </h4>
     <CheckBox
       label={'with statements'}
@@ -90,17 +90,25 @@ const PollSettings = props => (
       </label>
     </p>
     <p>
-      Threshold Reference: <select
-        value={props.thresholdRef}
-        name="thresholdRef"
-        onChange={props.onValueChange}
-      >
-        <option value={'all'}>ALL </option>
-        <option value={'voters'}>VOTERS</option>
-      </select>
+      Threshold Reference:
+      {' '}
+      <Select
+        options={[
+          { value: 'all', label: <span>ALL</span> },
+          { value: 'voters', label: <span>VOTERS</span> },
+        ]}
+        onSearch={false}
+        value={{
+          value: props.thresholdRef,
+          label: props.thresholdRef === 'all' ? 'ALL' : 'VOTERS',
+        }}
+        onChange={(e) => {
+          props.onValueChange({ target: { name: 'thresholdRef', value: e.value } });
+        }}
+      />
+
     </p>
-  </div>
-);
+  </div>);
 
 PollSettings.propTypes = {
   withStatements: PropTypes.bool.isRequired,
@@ -125,14 +133,25 @@ const PollInput = (props) => {
       thresholdRef: thresholdRef == null ? defaultVal.thresholdRef : thresholdRef,
     };
   }
+  const msg = props.pollOptions.find(o => o.value === selected);
+
+  const value = {
+    label: props.intl.messages[msg.mId] || props.intl.messages,
+    value: msg.value,
+  };
+
   return (
     <div>
       <DateInput handleChange={props.handleDateChange} />
       <div>
-        <select value={selected} name="pollOption" onChange={props.onValueChange}>
-          <option value={'1'}>TR: 20 - PHASE ONE - NO STATEMENTS </option>
-          <option value={'2'}>TR: 50 - PHASE TWO - WITH STATEMENTS </option>
-        </select>
+        <Select
+          options={props.pollOptions}
+          onSearch={false}
+          value={value}
+          onChange={(e) => {
+            props.onValueChange({ target: { name: 'pollOption', value: e.value } });
+          }}
+        />
       </div>
       {
         <button onClick={props.toggleSettings}>
@@ -173,6 +192,8 @@ PollInput.propTypes = {
   displaySettings: PropTypes.bool,
   selectedPMode: PropTypes.string.isRequired,
   toggleSettings: PropTypes.func.isRequired,
+  pollOptions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  intl: PropTypes.shape({ messages: PropTypes.shape({}) }).isRequired,
 };
 
 PollInput.defaultProps = {

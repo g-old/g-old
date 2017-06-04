@@ -44,6 +44,7 @@ class ProposalInput extends React.Component {
       }),
     ).isRequired,
     defaultPollValues: PropTypes.shape({}).isRequired,
+    pollOptions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   };
 
   static defaultProps = {
@@ -162,10 +163,13 @@ class ProposalInput extends React.Component {
             : { id: this.state.tags[id].id },
       ) || null;
     /* eslint-enable no-confusing-arrow */
+
+    const state = pollingModeId === '3' ? 'survey' : null;
     if (title && markup) {
       this.props.createProposal({
         title,
         text: markup,
+        state,
         poll: {
           startTime,
           endTime,
@@ -220,7 +224,9 @@ class ProposalInput extends React.Component {
   insertAtSelection(pre, post) {
     let val = this.state.textArea.val;
     let sel = this.state.textArea.selection;
-    val = `${val.substring(0, sel[0])}${pre}${val.substring(sel[0], sel[1])}${post}${val.substring(sel[1])}`;
+    val = `${val.substring(0, sel[0])}${pre}${val.substring(sel[0], sel[1])}${post}${val.substring(
+      sel[1],
+    )}`;
     sel = [val.length, val.length];
 
     this.setState({
@@ -266,6 +272,8 @@ class ProposalInput extends React.Component {
             defaultPollValues={this.props.defaultPollValues}
             pollValues={this.state.settings}
             toggleSettings={this.toggleSettings}
+            pollOptions={this.props.pollOptions}
+            intl={this.context.intl}
           />
 
           <div className={s.formGroup}>
@@ -363,5 +371,8 @@ const mapStateToProps = state => ({
 
 const mapDispatch = {
   createProposal,
+};
+ProposalInput.contextTypes = {
+  intl: PropTypes.object,
 };
 export default connect(mapStateToProps, mapDispatch)(withStyles(s)(ProposalInput));

@@ -108,6 +108,7 @@ class ProposalsManager extends React.Component {
     isFetching: PropTypes.bool.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
     errorMessage: PropTypes.string,
+    pollOptions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   };
   static defaultProps = {
     errorMessage: null,
@@ -217,6 +218,8 @@ class ProposalsManager extends React.Component {
               defaultPollValues={this.props.defaultPollValues}
               pollValues={settings}
               toggleSettings={this.toggleSettings}
+              pollOptions={this.props.pollOptions}
+              intl={this.context.intl}
             />
             <Button
               label={<FormattedMessage {...messages.open} />}
@@ -312,5 +315,8 @@ const mapPropsToState = state => ({
 const mapDispatch = {
   updateProposal,
   loadProposalsList,
+};
+ProposalsManager.contextTypes = {
+  intl: PropTypes.object,
 };
 export default connect(mapPropsToState, mapDispatch)(ProposalsManager);

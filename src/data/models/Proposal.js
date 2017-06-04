@@ -59,6 +59,7 @@ const validatePoll = async (viewer, poll, loaders) => {
   let pollingMode;
   let createPollingMode = false;
   let pollingModeData;
+  let isSurvey = false;
   if (poll.mode && poll.mode.id) {
     pollingMode = await PollingMode.gen(viewer, poll.mode.id, loaders);
 
@@ -77,14 +78,22 @@ const validatePoll = async (viewer, poll, loaders) => {
       }, 0);
       createPollingMode = diff > 0;
       pollingModeData = { ...pollingMode, ...props };
+      if (pollingMode.name === 'survey') {
+        isSurvey = true;
+        pollingModeData.thresholdRef = 'voters';
+      }
     }
   }
   const { startTime, endTime } = validateDates({ poll });
+  let threshold = poll.threshold;
+  if (isSurvey) {
+    threshold = 100;
+  }
   const pollData = {
     secret: poll.secret || false,
     start_time: startTime,
     end_time: endTime,
-    threshold: poll.threshold || 50,
+    threshold: threshold || 50,
   };
 
   return { pollData, pollingModeData, createPollingMode };
@@ -273,7 +282,7 @@ class Proposal {
           title: data.title,
           body: data.text,
           poll_one_id: pollOne.id,
-          state: 'proposed',
+          state: data.state === 'survey' ? 'survey' : 'proposed',
           created_at: new Date(),
         },
           'id',

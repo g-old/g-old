@@ -21,6 +21,7 @@ export default {
     require('./proposals').default,
     require('./about').default,
     require('./testproposal').default,
+    require('./surveys').default,
     require('./account').default,
     require('./admin').default,
     require('./signup').default,

@@ -1,0 +1,6 @@
+{
+  "name": "Drop",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Drop.js"
+}

@@ -29,6 +29,11 @@ const messages = defineMessages({
     defaultMessage: 'Admin',
     description: 'Admin link in header',
   },
+  surveys: {
+    id: 'navigation.surveys',
+    defaultMessage: 'Surveys',
+    description: 'Surveys link in header',
+  },
 });
 
 class Navigation extends React.Component {
@@ -43,6 +48,9 @@ class Navigation extends React.Component {
         </Link>
         <Link className={s.link} to="/feed">
           Feed
+        </Link>
+        <Link className={s.link} to="/surveys">
+          <FormattedMessage {...messages.surveys} />
         </Link>
         <Link className={s.link} to="/admin">
           <FormattedMessage {...messages.admin} />

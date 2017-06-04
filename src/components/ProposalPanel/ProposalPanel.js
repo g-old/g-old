@@ -19,6 +19,21 @@ const messages = defineMessages({
     defaultMessage: 'Manage proposals',
     description: 'Manage proposals',
   },
+  phaseOnePoll: {
+    id: 'proposalManager.phaseOnePoll',
+    defaultMessage: 'TR: 20 - PHASE ONE - NO STATEMENTS',
+    description: 'PhaseOnePoll presets',
+  },
+  phaseTwoPoll: {
+    id: 'proposalManager.phaseTwoPoll',
+    defaultMessage: 'TR: 50 - PHASE TWO - WITH STATEMENTS',
+    description: 'PhaseTwoPoll presets',
+  },
+  survey: {
+    id: 'proposalManager.survey',
+    defaultMessage: 'Survey',
+    description: 'Survey presets',
+  },
 });
 const defaultPollValues = {
   1: {
@@ -35,7 +50,32 @@ const defaultPollValues = {
     secret: false,
     thresholdRef: 'voters',
   },
+  3: {
+    withStatements: false,
+    unipolar: false,
+    threshold: 100,
+    secret: false,
+    thresholdRef: 'voters',
+  },
 };
+
+const pollOptions = [
+  {
+    value: '1',
+    label: <FormattedMessage {...messages.phaseOnePoll} />,
+    mId: messages.phaseOnePoll.id,
+  },
+  {
+    value: '2',
+    label: <FormattedMessage {...messages.phaseTwoPoll} />,
+    mId: messages.phaseTwoPoll.id,
+  },
+  {
+    value: '3',
+    label: <FormattedMessage {...messages.survey} />,
+    mId: messages.survey.id,
+  },
+];
 
 class ProposalPanel extends React.Component {
   static propTypes = {
@@ -53,7 +93,11 @@ class ProposalPanel extends React.Component {
               this.props.loadTags();
             }}
           >
-            <ProposalInput maxTags={8} defaultPollValues={defaultPollValues} />
+            <ProposalInput
+              maxTags={8}
+              pollOptions={pollOptions}
+              defaultPollValues={defaultPollValues}
+            />
           </AccordionPanel>
           <AccordionPanel
             heading={<FormattedMessage {...messages.proposalManager} />}
@@ -61,7 +105,7 @@ class ProposalPanel extends React.Component {
               this.props.loadProposalsList('active');
             }}
           >
-            <ProposalsManager defaultPollValues={defaultPollValues} />
+            <ProposalsManager pollOptions={pollOptions} defaultPollValues={defaultPollValues} />
           </AccordionPanel>
 
         </Accordion>

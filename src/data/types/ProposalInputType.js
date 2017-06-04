@@ -32,6 +32,10 @@ const ProposalInputType = new GraphQLInputObjectType({
             value: 'accepted',
             description: 'Close the poll',
           },
+          survey: {
+            value: 'survey',
+            description: 'Open survey',
+          },
         },
       }),
     },

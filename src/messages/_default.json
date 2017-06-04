@@ -514,5 +514,32 @@
     "files": [
       "src/components/ProposalsManager/ProposalsManager.js"
     ]
+  },
+  {
+    "id": "proposalManager.phaseOnePoll",
+    "description": "PhaseOnePoll presets",
+    "defaultMessage": "TR: 20 - PHASE ONE - NO STATEMENTS",
+    "message": "",
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js"
+    ]
+  },
+  {
+    "id": "proposalManager.phaseTwoPoll",
+    "description": "PhaseTwoPoll presets",
+    "defaultMessage": "TR: 50 - PHASE TWO - WITH STATEMENTS",
+    "message": "",
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js"
+    ]
+  },
+  {
+    "id": "proposalManager.survey",
+    "description": "Survey presets",
+    "defaultMessage": "Survey",
+    "message": "",
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js"
+    ]
   }
 ]

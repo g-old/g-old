@@ -36,7 +36,11 @@ class Activity extends React.Component {
     } else if (this.props.content && this.props.content.__typename === 'ProposalDL') {
       content = <ProposalPreview proposal={this.props.content} />;
       if (this.props.verb === 'create') {
-        header = 'NEW Proposal!';
+        if (this.props.content.state === 'survey') {
+          header = 'New Survey';
+        } else {
+          header = 'NEW Proposal!';
+        }
       } else if (this.props.verb === 'close') {
         header = 'Soon closing!';
       } else if (this.props.verb === 'accept') {

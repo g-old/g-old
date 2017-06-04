@@ -16,6 +16,7 @@ class Button extends React.Component {
     fill: PropTypes.bool,
     reverse: PropTypes.bool,
     icon: PropTypes.element,
+    className: PropTypes.string,
   };
 
   static defaultProps = {
@@ -28,6 +29,7 @@ class Button extends React.Component {
     fill: false,
     reverse: false,
     icon: null,
+    className: null,
   };
 
   render() {
@@ -42,6 +44,7 @@ class Button extends React.Component {
       reverse,
       children,
       fill,
+      className,
     } = this.props;
     let buttonIcon;
     if (icon) {
@@ -62,6 +65,7 @@ class Button extends React.Component {
           plain ? s.plain : null,
           fill ? s.fill : null,
           disabled ? s.disabled : null,
+          className || null,
         )}
         disabled={disabled}
         onClick={onClick}
