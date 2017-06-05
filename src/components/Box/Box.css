@@ -7,6 +7,15 @@
   flex-wrap: wrap;
 }
 
-.root > *:not(:last-child) {
+.root:not(.column) > *:not(:last-child) {
   margin-right: 24px;
+}
+
+.column {
+  flex-direction: column;
+}
+
+.clickable {
+  cursor: pointer;
+  outline: none;
 }

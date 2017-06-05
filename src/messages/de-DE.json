@@ -541,5 +541,14 @@
     "files": [
       "src/components/ProposalPanel/ProposalPanel.js"
     ]
+  },
+  {
+    "id": "navigation.surveys",
+    "description": "Surveys link in header",
+    "defaultMessage": "Surveys",
+    "message": "",
+    "files": [
+      "src/components/Navigation/Navigation.js"
+    ]
   }
 ]

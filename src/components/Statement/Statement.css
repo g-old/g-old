@@ -19,20 +19,6 @@
   transition: margin 0.5s;
 }
 
-.iconButton {
-  background-color: transparent;
-  border-color: transparent;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  fill: grey;
-  padding: 0;
-}
-
-.iconButton:active svg {
-  fill: cornflowerblue;
-}
-
 .header {
   display: flex;
   justify-content: space-between;
@@ -102,42 +88,4 @@
 
 .contra.inactive {
   margin-left: 50%;
-}
-
-.menuContainer {
-  position: relative;
-}
-
-.menuDrop {
-  position: absolute;
-  right: 0;
-  top: 0;
-
-  /* hide by default */
-  display: none;
-
-  button:focus + & {
-    /* show when button was clicked */
-    display: inline-block;
-  }
-}
-
-.menuDrop li {
-  border-bottom: 1px solid #ddd;
-  padding: 5px 10px;
-  margin: 0;
-}
-
-.menuDrop li :hover {
-  color: lightblue;
-}
-
-.menuDrop ul {
-  list-style-type: none;
-  box-shadow: 0.05em 0.01em 0.5em rgba(0, 0, 0, 0.2);
-  background: white;
-  padding: 0;
-  -webkit-margin-before: 0;
-  -webkit-margin-after: 0;
-  margin-top: 0;
 }

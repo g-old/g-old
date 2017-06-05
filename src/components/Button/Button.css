@@ -34,8 +34,10 @@
   height: 24px;
 }
 
-.icon + .label {
-  margin-left: 12px;
+.button:not(.plain) {
+  .icon + .label {
+    margin-left: 12px;
+  }
 }
 
 .plain {
@@ -47,6 +49,18 @@
   max-width: none;
   text-align: inherit;
   font-weight: inherit;
+
+  .label {
+    margin: 0 12px;
+  }
+
+  .icon {
+    padding: 0;
+  }
+
+  .icon + .label {
+    margin-left: 0;
+  }
 }
 
 .fill {
@@ -58,7 +72,7 @@
   border: 2px solid #930793;
 }
 
-.accent:not(.disabled):hover {
+.accent:not(.disabled):not(.plain):hover {
   box-shadow: 0 0 0 2px #930793;
 }
 

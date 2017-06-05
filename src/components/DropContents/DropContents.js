@@ -12,6 +12,7 @@ class DropContents extends React.Component {
     onDropChange: PropTypes.func,
     router: PropTypes.any,
     store: PropTypes.object,
+    insertCss: PropTypes.func,
   };
 
   getChildContext() {
