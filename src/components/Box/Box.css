@@ -11,6 +11,10 @@
   margin-right: 24px;
 }
 
+.root.column.pad > *:not(:last-child) {
+  margin-bottom: 24px;
+}
+
 .column {
   flex-direction: column;
 }

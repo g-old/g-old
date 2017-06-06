@@ -1,11 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { logout } from '../../actions/session';
-import s from './UserStatus.css';
 import { getSessionUser } from '../../reducers';
-import Link from '../Link';
+import Menu from '../Menu';
+import Button from '../Button';
+import history from '../../history';
+
+const onVisitProfile = (e) => {
+  if (e.button !== 0) {
+    // leftclick
+    return;
+  }
+
+  if (e.defaultPrevented === true) {
+    return;
+  }
+
+  e.preventDefault();
+  history.push('/account');
+};
 
 class UserStatus extends React.Component {
   static propTypes = {
@@ -19,33 +33,39 @@ class UserStatus extends React.Component {
 
   static defaultProps = {
     user: null,
+  };
+  constructor(props) {
+    super(props);
+    this.onLogout = this.onLogout.bind(this);
   }
+
+  onLogout() {
+    this.props.logout();
+  }
+
   render() {
-    return (
-      <div>
-        {this.props.user &&
-          this.props.user.id &&
-          <div style={{ display: 'flex' }}>
-            <span>
-              <Link to={'/account'}>
-                <img className={s.avatar} src={this.props.user.avatar} alt="IMG" />
-              </Link>
-            </span>
-            <span>
-              <div>
-                {this.props.user.name}
-              </div>
-              <button
-                onClick={() => {
-                  this.props.logout();
-                }}
-              >
-                LOGOUT
-              </button>
-            </span>
-          </div>}
-      </div>
-    );
+    let userAvatar = null;
+    if (this.props.user) {
+      userAvatar = (
+        <div style={{ maxWidth: '100px' }}>
+          <Menu
+            withControl
+            dropAlign={{ top: 'top', left: 'left' }}
+            icon={
+              <img
+                style={{ height: '2em', width: '2em', marginBottom: '12px' }}
+                src={this.props.user.avatar}
+                alt="IMG"
+              />
+            }
+          >
+            <Button plain onClick={onVisitProfile} label="Profile" />
+            <Button plain onClick={this.onLogout} label="Logout" />
+          </Menu>
+        </div>
+      );
+    }
+    return userAvatar;
   }
 }
 const mapStateToProps = state => ({
@@ -55,4 +75,4 @@ const mapDispatch = {
   logout,
 };
 
-export default connect(mapStateToProps, mapDispatch)(withStyles(s)(UserStatus));
+export default connect(mapStateToProps, mapDispatch)(UserStatus);

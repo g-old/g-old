@@ -111,6 +111,9 @@ app.post(
   }),
 );
 
+app.post('/login', passport.authenticate('local'), (req, res) => {
+  res.status(200).json({ user: req.session.passport.user, redirect: '/feed' });
+});
 app.post('/logout', (req, res) => {
   if (req.isAuthenticated()) {
     req.logout();

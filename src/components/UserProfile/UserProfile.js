@@ -48,8 +48,10 @@ const messages = defineMessages({
   },
 });
 
-const renderFollowee = (data, fn /* eslint-disable jsx-a11y/no-static-element-interactions */) => (
-  <li
+const renderFollowee = (data, fn) =>
+  /* eslint-disable jsx-a11y/no-static-element-interactions */
+  /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+  (<li
     style={{ display: 'inline' }}
     onClick={() => {
       fn({
@@ -60,8 +62,7 @@ const renderFollowee = (data, fn /* eslint-disable jsx-a11y/no-static-element-in
     }}
   >
     <Avatar user={data.followee} isFollowee />
-  </li>
-);
+  </li>);
 /* eslint-enable jsx-a11y/no-static-element-interactions */
 
 class UserProfile extends React.Component {
@@ -123,10 +124,10 @@ class UserProfile extends React.Component {
         passwordAgain: passwordAgainValidation,
         email: emailValidation,
       },
+      this,
       {
         minPasswordLength: 6,
       },
-      this,
     );
   }
 

@@ -12,6 +12,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import Login from '../../components/Login';
 import s from './Home.css';
 import history from '../../history';
+import Button from '../../components/Button';
 
 class Home extends React.Component {
   render() {
@@ -19,14 +20,15 @@ class Home extends React.Component {
       <div className={s.root}>
         <div className={s.box}>
           <div className={s.formGroup}>
-            <button
-              className={s.button}
+            <Button
+              fill
+              primary
+              label="Sign Up"
               onClick={() => {
                 history.push('/signup');
               }}
-            >
-              Sign up
-            </button>
+            />
+
           </div>
           <strong className={s.lineThrough}>OR</strong>
           <Login />

@@ -174,8 +174,9 @@ class Statement extends React.Component {
 
   render() {
     //  const { mutationIsPending, mutationSuccess, mutationError } = this.props;
-
+    // TODO create authorization decorator
     const { ownStatement, data, asInput, user, followees } = this.props;
+    if (!user) return null;
 
     const isEmpty = this.state.textArea.val.length === 0;
     const hasMinimumInput = this.state.textArea.val.length >= 5;

@@ -11,6 +11,7 @@ class Box extends React.Component {
     clickable: PropTypes.bool,
     column: PropTypes.bool,
     className: PropTypes.string,
+    pad: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -18,10 +19,11 @@ class Box extends React.Component {
     clickable: false,
     column: false,
     className: null,
+    pad: false,
   };
 
   render() {
-    const { column, clickable, onClick } = this.props;
+    const { column, clickable, onClick, pad } = this.props;
     /* eslint-disable jsx-a11y/no-static-element-interactions*/
     return (
       <div
@@ -30,6 +32,7 @@ class Box extends React.Component {
           this.props.className || null,
           column ? s.column : null,
           clickable ? s.clickable : null,
+          pad ? s.pad : null,
         )}
         onClick={onClick}
       >

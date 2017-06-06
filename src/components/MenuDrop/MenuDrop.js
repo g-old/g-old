@@ -12,7 +12,7 @@ class MenuDrop extends React.Component {
     store: PropTypes.shape({}),
     insertCss: PropTypes.shape({}).isRequired,
     control: PropTypes.node.isRequired,
-    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), React.node]).isRequired,
+    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
     onClick: PropTypes.func.isRequired,
   };
 

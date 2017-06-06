@@ -13,6 +13,7 @@ import {
   FETCH_USER_SUCCESS,
   LOAD_FLAGGEDSTMTS_SUCCESS,
   LOAD_FEED_SUCCESS,
+  SESSION_LOGIN_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -54,6 +55,9 @@ export default function byId(state = {}, action) {
       return merge({}, state, action.payload.entities.users);
     }
     case FIND_USER_SUCCESS: {
+      return merge({}, state, action.payload.entities.users);
+    }
+    case SESSION_LOGIN_SUCCESS: {
       return merge({}, state, action.payload.entities.users);
     }
     case FETCH_USER_SUCCESS: {

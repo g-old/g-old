@@ -1,6 +1,6 @@
 import { validateEmail } from './helpers';
 
-export function passwordValidation(password, values, { minPasswordLength }) {
+export function passwordValidation(password, values, { minPasswordLength = 0 }) {
   const pw = password.trim();
   let result = {
     touched: false,
@@ -40,7 +40,7 @@ export function passwordAgainValidation(passwordAgain, { password }) {
   return result;
 }
 
-export function emailValidation(email, { invalidEmails }) {
+export function emailValidation(email, { invalidEmails = [] }) {
   const mailAddress = email.trim().toLowerCase();
   let result = {
     touched: false,
@@ -73,7 +73,7 @@ export function emailValidation(email, { invalidEmails }) {
   return result;
 }
 
-export function createValidator(allValues, validators, options, obj) {
+export function createValidator(allValues, validators, obj, options = {}) {
   return (properties) => {
     const result = properties.reduce(
       (acc, curr) => {

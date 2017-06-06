@@ -143,16 +143,14 @@ const PollInput = (props) => {
   return (
     <div>
       <DateInput handleChange={props.handleDateChange} />
-      <div>
-        <Select
-          options={props.pollOptions}
-          onSearch={false}
-          value={value}
-          onChange={(e) => {
-            props.onValueChange({ target: { name: 'pollOption', value: e.value } });
-          }}
-        />
-      </div>
+      <Select
+        options={props.pollOptions}
+        onSearch={false}
+        value={value}
+        onChange={(e) => {
+          props.onValueChange({ target: { name: 'pollOption', value: e.value } });
+        }}
+      />
       {
         <button onClick={props.toggleSettings}>
 
