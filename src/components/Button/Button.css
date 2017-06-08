@@ -15,6 +15,10 @@
   padding: 6px 22px;
 }
 
+.button:not(.fill) {
+  flex: 0 0 auto;
+}
+
 .button:not(.disabled):not(.accent):not(.plain):hover {
   box-shadow: 0 0 0 2px #e0b000;
 }

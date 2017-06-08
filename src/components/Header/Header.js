@@ -25,11 +25,6 @@ const messages = defineMessages({
     defaultMessage: 'G O L D',
     description: 'Title in page header',
   },
-  bannerDesc: {
-    id: 'header.banner.desc',
-    defaultMessage: 'Online democracy',
-    description: 'Description in header',
-  },
 });
 
 class Header extends React.Component {
@@ -43,7 +38,7 @@ class Header extends React.Component {
             <h1 className={s.bannerTitle}>
               <FormattedMessage {...messages.bannerTitle} />
             </h1>
-            <FormattedMessage tagName="p" {...messages.bannerDesc} />
+            {'Government by OnLine Democracy'}
           </div>
         </div>
       </div>

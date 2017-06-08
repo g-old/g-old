@@ -11,8 +11,6 @@ import { getAccountUpdates, getLocale } from '../../reducers';
 class SignupContainer extends React.Component {
   static propTypes = {
     createUser: PropTypes.func.isRequired,
-    signupError: PropTypes.bool.isRequired,
-    processing: PropTypes.bool.isRequired,
     uploadAvatar: PropTypes.func.isRequired,
     updates: PropTypes.shape({}).isRequired,
   };
@@ -29,6 +27,14 @@ class SignupContainer extends React.Component {
   componentWillReceiveProps({ updates }) {
     if (updates) {
       const success = Object.keys(updates).find(key => !updates[key].success) == null;
+      const error = Object.keys(updates).some(key => updates[key].error);
+      const pending = Object.keys(updates).some(key => updates[key].pending === true);
+      if (error !== this.state.error) {
+        this.setState({ error });
+      }
+      if (pending !== this.state.pending) {
+        this.setState({ pending });
+      }
       if (success && this.state.serverCalled) {
         this.setState({ step: 1 });
       }
@@ -42,14 +48,17 @@ class SignupContainer extends React.Component {
 
   render() {
     const { updates } = this.props;
-
+    let emailError = false;
+    if (updates.email && updates.email.error) {
+      emailError = updates.email.error.unique === false;
+    }
     switch (this.state.step) {
       case 0:
         return (
           <SignUp
-            processing={this.props.processing}
-            notUniqueEmail={(updates.email && updates.email.error) != null}
-            error={this.props.signupError}
+            pending={this.state.pending}
+            notUniqueEmail={emailError}
+            error={this.state.error}
             onCreateUser={this.onCreateUser}
           />
         );
@@ -73,10 +82,8 @@ class SignupContainer extends React.Component {
     }
   }
 }
-const mapStateToProps = (state, { updates = {} }) => ({
+const mapStateToProps = state => ({
   updates: getAccountUpdates(state, '0000'),
-  signupError: Object.keys(updates).find(key => updates[key].error) != null,
-  processing: Object.keys(updates).find(key => updates[key].pending) != null,
   intl: getLocale(state), // fix for forceUpdate
 });
 const mapDispatch = {

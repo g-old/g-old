@@ -40,6 +40,20 @@ export function passwordAgainValidation(passwordAgain, { password }) {
   return result;
 }
 
+export function nameValidation(name) {
+  const n = name.trim();
+  let result = {
+    touched: false,
+  };
+  if (!n) {
+    result = {
+      touched: true,
+      errorName: 'empty',
+    };
+  }
+  return result;
+}
+
 export function emailValidation(email, { invalidEmails = [] }) {
   const mailAddress = email.trim().toLowerCase();
   let result = {

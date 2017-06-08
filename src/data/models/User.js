@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import knex from '../knex.js';
+import knex from '../knex';
 import { validateEmail } from '../../core/helpers';
 import { PRIVILEGES } from '../../constants';
 // eslint-disable-next-line no-unused-vars
@@ -71,6 +71,7 @@ class User {
 
   static async update(viewer, data, loaders) {
     // authenticate
+    //  throw Error('TESTERROR');
     if (!data.id) return null;
     if (!User.canMutate(viewer, data)) return null;
     // validate - if something seems corrupted, return.
@@ -80,6 +81,7 @@ class User {
     if (data.privilege && data.privilege < 1) return null;
     // TODO write fn which gets all the props with the right name
     // TODO Allow only specific updates, take car of role
+    const errors = [];
     const newData = { updated_at: new Date() };
     if (data.email) {
       newData.email = data.email.trim();
@@ -90,7 +92,10 @@ class User {
         let passwordHash = await knex('users').where({ id: data.id }).pluck('password_hash');
         passwordHash = passwordHash[0];
         const same = await bcrypt.compare(data.passwordOld, passwordHash);
-        if (!same) return null;
+        if (!same) {
+          errors.push('passwordOld');
+          return { user: null, errors };
+        }
       } else if (viewer.role.type !== 'system') return null; // password resets
 
       const hash = await bcrypt.hash(data.password, 10);
@@ -134,50 +139,61 @@ class User {
     }
 
     // update
-    const updatedId = await knex.transaction(async (trx) => {
-      // TODO log certain actions in a separate table (role changes, rights, deletions)
+    let updatedId = null;
+    try {
+      updatedId = await knex.transaction(async (trx) => {
+        // TODO log certain actions in a separate table (role changes, rights, deletions)
 
-      if (data.followee) {
-        // check if they are already following each others
-        const followee = await trx
-          .where({ follower_id: data.id, followee_id: data.followee })
-          .pluck('id')
-          .into('user_follows');
-        if (followee[0]) {
-          // delete
-          await trx
+        if (data.followee) {
+          // check if they are already following each others
+          const followee = await trx
             .where({ follower_id: data.id, followee_id: data.followee })
-            .del()
+            .pluck('id')
             .into('user_follows');
-        } else {
-          // check if they are less than 5;
-          const numFollowees = await trx
-            .where({ follower_id: data.id })
-            .count('id')
-            .into('user_follows');
-
-          if (numFollowees[0].count < 5) {
+          if (followee[0]) {
+            // delete
             await trx
-              .insert({ follower_id: data.id, followee_id: data.followee })
+              .where({ follower_id: data.id, followee_id: data.followee })
+              .del()
               .into('user_follows');
           } else {
-            throw Error('To many followees');
+            // check if they are less than 5;
+            const numFollowees = await trx
+              .where({ follower_id: data.id })
+              .count('id')
+              .into('user_follows');
+
+            if (numFollowees[0].count < 5) {
+              await trx
+                .insert({ follower_id: data.id, followee_id: data.followee })
+                .into('user_follows');
+            } else {
+              throw Error('To many followees');
+            }
           }
         }
-      }
 
-      await trx
-        .where({
-          id: data.id,
-        })
-        .update(newData)
-        .into('users');
-      return data.id;
-    });
+        await trx
+          .where({
+            id: data.id,
+          })
+          .update(newData)
+          .into('users');
+        return data.id;
+      });
+    } catch (e) {
+      if (e.code === '23505') {
+        errors.push('email');
+      } else {
+        throw Error(e.message);
+      }
+      return { user: null, errors };
+    }
     if (!updatedId) return null;
     // invalidate cache
     loaders.users.clear(updatedId);
-    return User.gen(viewer, data.id, loaders) || null;
+
+    return { user: (await User.gen(viewer, data.id, loaders)) || null, errors };
   }
 
   static async create(data) {

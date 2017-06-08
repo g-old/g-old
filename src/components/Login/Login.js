@@ -13,12 +13,12 @@ import { createValidator, passwordValidation, emailValidation } from '../../core
 
 const messages = defineMessages({
   email: {
-    id: 'login.email',
+    id: 'form.email',
     defaultMessage: 'Email',
     description: 'Email-address',
   },
   password: {
-    id: 'login.password',
+    id: 'form.password',
     defaultMessage: 'Password',
     description: 'Password',
   },
@@ -28,12 +28,12 @@ const messages = defineMessages({
     description: 'Help for password',
   },
   empty: {
-    id: 'signup.error-empty',
+    id: 'form.error-empty',
     defaultMessage: "You can't leave this empty",
     description: 'Help for empty fields',
   },
   invalidEmail: {
-    id: 'signup.error-invalidEmail',
+    id: 'form.error-invalidEmail',
     defaultMessage: 'Your email address seems to be invalid',
     description: 'Help for email',
   },

@@ -1,14 +1,5 @@
 [
   {
-    "id": "header.banner.desc",
-    "description": "Description in header",
-    "defaultMessage": "Online democracy",
-    "message": "",
-    "files": [
-      "src/components/Header/Header.js"
-    ]
-  },
-  {
     "id": "header.banner.title",
     "description": "Title in page header",
     "defaultMessage": "G O L D",
@@ -41,26 +32,7 @@
     "defaultMessage": "Email",
     "message": "",
     "files": [
-      "src/components/Login/Login.js",
       "src/routes/passwordRecovery/PasswordRecovery.js"
-    ]
-  },
-  {
-    "id": "login.password",
-    "description": "Password",
-    "defaultMessage": "Password",
-    "message": "",
-    "files": [
-      "src/components/Login/Login.js"
-    ]
-  },
-  {
-    "id": "signup.name",
-    "description": "Name",
-    "defaultMessage": "Name",
-    "message": "",
-    "files": [
-      "src/components/SignUp/SignUp.js"
     ]
   },
   {
@@ -70,16 +42,8 @@
     "message": "",
     "files": [
       "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/UserSettings.js",
       "src/routes/passwordReset/PasswordReset.js"
-    ]
-  },
-  {
-    "id": "signup.surname",
-    "description": "Surname",
-    "defaultMessage": "Surname",
-    "message": "",
-    "files": [
-      "src/components/SignUp/SignUp.js"
     ]
   },
   {
@@ -92,33 +56,12 @@
     ]
   },
   {
-    "id": "signup.forename",
-    "description": "Forename",
-    "defaultMessage": "First",
-    "message": "",
-    "files": [
-      "src/components/SignUp/SignUp.js"
-    ]
-  },
-  {
     "id": "signup.error-empty",
     "description": "Help for empty fields",
     "defaultMessage": "You can't leave this empty",
     "message": "",
     "files": [
-      "src/components/SignUp/SignUp.js",
-      "src/components/UserProfile/UserProfile.js",
       "src/routes/passwordReset/PasswordReset.js"
-    ]
-  },
-  {
-    "id": "signup.error-invalidEmail",
-    "description": "Help for email",
-    "defaultMessage": "Your email address seems to be invalid",
-    "message": "",
-    "files": [
-      "src/components/SignUp/SignUp.js",
-      "src/components/UserProfile/UserProfile.js"
     ]
   },
   {
@@ -127,8 +70,6 @@
     "defaultMessage": "These passwords don't match. Try again?",
     "message": "",
     "files": [
-      "src/components/SignUp/SignUp.js",
-      "src/components/UserProfile/UserProfile.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
   },
@@ -138,8 +79,6 @@
     "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
     "message": "",
     "files": [
-      "src/components/SignUp/SignUp.js",
-      "src/components/UserProfile/UserProfile.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
   },
@@ -168,17 +107,8 @@
     "message": "",
     "files": [
       "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/UserSettings.js",
       "src/routes/passwordReset/PasswordReset.js"
-    ]
-  },
-  {
-    "id": "signup.error-emailTaken",
-    "description": "Help for not unique email",
-    "defaultMessage": "Email address already in use",
-    "message": "",
-    "files": [
-      "src/components/SignUp/SignUp.js",
-      "src/components/UserProfile/UserProfile.js"
     ]
   },
   {
@@ -549,6 +479,202 @@
     "message": "",
     "files": [
       "src/components/Navigation/Navigation.js"
+    ]
+  },
+  {
+    "id": "login.error",
+    "description": "Failed login",
+    "defaultMessage": "Login attempt failed",
+    "message": "",
+    "files": [
+      "src/components/Login/Login.js"
+    ]
+  },
+  {
+    "id": "signup.error",
+    "description": "Default signup error message",
+    "defaultMessage": "Could not create your account",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "form.email",
+    "description": "Email-address",
+    "defaultMessage": "Email",
+    "message": "",
+    "files": [
+      "src/components/Login/Login.js"
+    ]
+  },
+  {
+    "id": "form.error-empty",
+    "description": "Help for empty fields",
+    "defaultMessage": "You can't leave this empty",
+    "message": "",
+    "files": [
+      "src/components/Login/Login.js",
+      "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "form.error-invalidEmail",
+    "description": "Help for email",
+    "defaultMessage": "Your email address seems to be invalid",
+    "message": "",
+    "files": [
+      "src/components/Login/Login.js",
+      "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "form.password",
+    "description": "Password",
+    "defaultMessage": "Password",
+    "message": "",
+    "files": [
+      "src/components/Login/Login.js"
+    ]
+  },
+  {
+    "id": "form.error-emailTaken",
+    "description": "Help for not unique email",
+    "defaultMessage": "Email address already in use",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "form.error-passwordMismatch",
+    "description": "Help for mismatching passwords",
+    "defaultMessage": "These passwords don't match. Try again?",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "form.error-shortPassword",
+    "description": "Help for short passwords",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "form.forename",
+    "description": "Forename",
+    "defaultMessage": "First",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "form.name",
+    "description": "Name",
+    "defaultMessage": "Name",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "form.surname",
+    "description": "Surname",
+    "defaultMessage": "Surname",
+    "message": "",
+    "files": [
+      "src/components/SignUp/SignUp.js"
+    ]
+  },
+  {
+    "id": "commands.cancel",
+    "description": "Short command to cancel a operation",
+    "defaultMessage": "Cancel",
+    "message": "",
+    "files": [
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "commands.change",
+    "description": "Short command to change a setting",
+    "defaultMessage": "Change",
+    "message": "",
+    "files": [
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "settings.email",
+    "description": "Email label in settings",
+    "defaultMessage": "Your current email address",
+    "message": "",
+    "files": [
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "userSettings.oldPW",
+    "description": "Current account password for form label",
+    "defaultMessage": "Enter your current password",
+    "message": "",
+    "files": [
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "settings.title",
+    "description": "Header for settings",
+    "defaultMessage": "Settings",
+    "message": "",
+    "files": [
+      "src/components/UserProfile/UserProfile.js"
+    ]
+  },
+  {
+    "id": "action.error",
+    "description": "Short failure notification",
+    "defaultMessage": "Action failed. Please retry!",
+    "message": "",
+    "files": [
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "action.success",
+    "description": "Short success notification",
+    "defaultMessage": "Success!",
+    "message": "",
+    "files": [
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "settings.emailNew",
+    "description": "Email label in settings for new address",
+    "defaultMessage": "New email address",
+    "message": "",
+    "files": [
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "settings.error.passwordOld",
+    "description": "Wrong password entered",
+    "defaultMessage": "Wrong password",
+    "message": "",
+    "files": [
+      "src/components/UserSettings/UserSettings.js"
     ]
   }
 ]

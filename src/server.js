@@ -124,6 +124,9 @@ app.post('/logout', (req, res) => {
 
 app.post('/signup', (req, res) => {
   // OR post to graphql
+  /* res.status(500).json();
+  return; */
+
   User.create(req.body.user)
     .then((user) => {
       if (!user) throw Error('User creation failed');
@@ -142,9 +145,9 @@ app.post('/signup', (req, res) => {
     .then(() => res.status(200).json({ user: req.session.passport.user }))
     .catch((error) => {
       if (error.code === '23505') {
-        res.status(500).json({ error: { fields: { email: 'Email not unique' } } });
+        res.status(200).json({ error: { fields: { email: { unique: false } } } });
       }
-      res.status(500).json({ error: {} });
+      res.status(500).json({ error: error.message });
     });
 });
 const storage = multer.memoryStorage();

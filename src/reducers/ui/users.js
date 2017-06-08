@@ -63,10 +63,10 @@ const users = (state = {}, action) => {
       const current = state[action.id];
       const newState = Object.keys(current).reduce((acc, curr) => {
         if (curr in action.properties && current[curr].pending) {
-          let error = action.message;
+          let error = true;
           if (action.message.fields) {
             // means only valid for specific property
-            error = null;
+            error = false;
             if (action.message.fields[curr]) {
               error = action.message.fields[curr];
             }

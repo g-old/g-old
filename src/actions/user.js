@@ -56,8 +56,8 @@ query ($id:ID!) {
 
 const updateUserMutation = `
 mutation($id:ID $name:String, $surname:String, $role:String, $email:String, $password:String, $passwordOld:String, $followee:ID, $privilege:Int){
-  updateUser(user:{id:$id name:$name, surname:$surname, role:$role, email:$email, password:$password passwordOld:$passwordOld followee:$followee privilege:$privilege}){
-    ${userFields}
+  updateUser( user:{id:$id name:$name, surname:$surname, role:$role, email:$email, password:$password passwordOld:$passwordOld followee:$followee privilege:$privilege}){
+    user{${userFields}
     email,
     privilege
     followees{
@@ -66,6 +66,8 @@ mutation($id:ID $name:String, $surname:String, $role:String, $email:String, $pas
       surname,
       avatar
     }
+  }
+  errors
   }
 }
 `;
@@ -172,7 +174,7 @@ export function createUser(newUser) {
         payload: {
           error,
         },
-        message: error || 'Something went wrong',
+        message: error.message || 'Something went wrong',
         id: initialId,
         properties,
       });
@@ -205,7 +207,24 @@ export function updateUser(user) {
 
     try {
       const { data } = await graphqlRequest(updateUserMutation, user);
-      const normalizedData = normalize(data.updateUser, userSchema);
+      const errors = data.updateUser.errors;
+      if (errors.length) {
+        const standardError = errors.reduce(
+          (acc, curr) => (acc[curr] = { [curr]: { [curr]: true } }),
+          {},
+        );
+        dispatch({
+          type: UPDATE_USER_ERROR,
+          payload: {
+            errors,
+          },
+          message: { fields: standardError },
+          properties,
+          id: user.id,
+        });
+        return false;
+      }
+      const normalizedData = normalize(data.updateUser.user, userSchema);
       dispatch({
         type: UPDATE_USER_SUCCESS,
         payload: normalizedData,

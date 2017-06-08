@@ -2,11 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import cn from 'classnames';
 import s from './SignUp.css';
-import { validateEmail as checkEmail } from '../../core/helpers';
 import Button from '../Button';
+import FormField from '../FormField';
+import Box from '../Box';
+import {
+  createValidator,
+  passwordValidation,
+  passwordAgainValidation,
+  emailValidation,
+  nameValidation,
+} from '../../core/validation';
 
+const fieldNames = ['name', 'surname', 'email', 'password', 'passwordAgain'];
 const messages = defineMessages({
   email: {
     id: 'signup.email',
@@ -24,17 +32,17 @@ const messages = defineMessages({
     description: 'PasswordAgain',
   },
   name: {
-    id: 'signup.name',
+    id: 'form.name',
     defaultMessage: 'Name',
     description: 'Name',
   },
   forename: {
-    id: 'signup.forename',
+    id: 'form.forename',
     defaultMessage: 'First',
     description: 'Forename',
   },
   surname: {
-    id: 'signup.surname',
+    id: 'form.surname',
     defaultMessage: 'Surname',
     description: 'Surname',
   },
@@ -49,29 +57,34 @@ const messages = defineMessages({
     description: 'Next',
   },
   empty: {
-    id: 'signup.error-empty',
+    id: 'form.error-empty',
     defaultMessage: "You can't leave this empty",
     description: 'Help for empty fields',
   },
   shortPassword: {
-    id: 'signup.error-shortPassword',
+    id: 'form.error-shortPassword',
     defaultMessage: 'Short passwords are easy to guess. Try one with at least 6 characters ',
     description: 'Help for short passwords',
   },
   passwordMismatch: {
-    id: 'signup.error-passwordMismatch',
+    id: 'form.error-passwordMismatch',
     defaultMessage: "These passwords don't match. Try again?",
     description: 'Help for mismatching passwords',
   },
   invalidEmail: {
-    id: 'signup.error-invalidEmail',
+    id: 'form.error-invalidEmail',
     defaultMessage: 'Your email address seems to be invalid',
     description: 'Help for email',
   },
   emailTaken: {
-    id: 'signup.error-emailTaken',
+    id: 'form.error-emailTaken',
     defaultMessage: 'Email address already in use',
     description: 'Help for not unique email',
+  },
+  error: {
+    id: 'signup.error',
+    defaultMessage: 'Could not create your account',
+    description: 'Default signup error message',
   },
 });
 
@@ -79,14 +92,14 @@ class SignUp extends React.Component {
   static propTypes = {
     onCreateUser: PropTypes.func.isRequired,
     error: PropTypes.bool,
+    pending: PropTypes.bool,
     notUniqueEmail: PropTypes.bool,
-    processing: PropTypes.bool,
   };
 
   static defaultProps = {
-    processing: false,
-    notUniqueEmail: false,
+    pending: false,
     error: false,
+    notUniqueEmail: false,
   };
   constructor(props) {
     super(props);
@@ -96,7 +109,7 @@ class SignUp extends React.Component {
       name: '',
       surname: '',
       email: '',
-      notUniqueEmail: null,
+      invalidEmails: [],
       errors: {
         password: {
           touched: false,
@@ -116,115 +129,45 @@ class SignUp extends React.Component {
       },
     };
 
-    this.onEmailChange = this.onEmailChange.bind(this);
-    this.onNameChange = this.onNameChange.bind(this);
-    this.onPasswordAgainChange = this.onPasswordAgainChange.bind(this);
-    this.onPasswordChange = this.onPasswordChange.bind(this);
-    this.onSurnameChange = this.onSurnameChange.bind(this);
-    this.validateForm = this.validateForm.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-    this.validateEmail = this.validateEmail.bind(this);
-    this.onNameBlur = this.onNameBlur.bind(this);
-    this.onSurnameBlur = this.onSurnameBlur.bind(this);
-    this.onPasswordBlur = this.onPasswordBlur.bind(this);
-    this.onPasswordAgainBlur = this.onPasswordAgainBlur.bind(this);
-    this.onEmailBlur = this.onEmailBlur.bind(this);
+    this.handleValidation = this.handleValidation.bind(this);
+    this.visibleErrors = this.visibleErrors.bind(this);
+    this.handleBlur = this.handleBlur.bind(this);
+    this.handleValueChange = this.handleValueChange.bind(this);
+    const testValues = {
+      password: { fn: 'password' },
+      passwordAgain: { fn: 'passwordAgain' },
+      name: { fn: 'name' },
+      surname: { fn: 'name' },
+      email: { fn: 'email' },
+    };
+    this.Validator = createValidator(
+      testValues,
+      {
+        password: passwordValidation,
+        passwordAgain: passwordAgainValidation,
+        email: emailValidation,
+        name: nameValidation,
+      },
+      this,
+      {
+        minPasswordLength: 6,
+      },
+    );
   }
 
   componentWillReceiveProps({ notUniqueEmail }) {
     if (notUniqueEmail) {
       this.setState({
         ...this.state,
-        notUniqueEmail: this.state.email.trim().toLowerCase(),
+        invalidEmails: [...this.state.invalidEmails, this.state.email.trim().toLowerCase()],
         errors: { ...this.state.errors, email: { touched: true, errorName: 'emailTaken' } },
       });
     }
   }
 
-  onPasswordChange(e) {
-    const password = e.target.value;
-    if (this.state.errors.password.touched) {
-      this.setState({
-        errors: {
-          ...this.state.errors,
-          password: { ...this.state.errors.password, touched: false },
-        },
-      });
-    }
-    this.setState({ password });
-  }
-  onPasswordAgainChange(e) {
-    const passwordAgain = e.target.value;
-    if (this.state.errors.passwordAgain.touched) {
-      this.setState({
-        errors: {
-          ...this.state.errors,
-          passwordAgain: { ...this.state.errors.passwordAgain, touched: false },
-        },
-      });
-    }
-    this.setState({ passwordAgain });
-  }
-  onNameChange(e) {
-    const name = e.target.value;
-    if (this.state.errors.name.touched) {
-      this.setState({
-        errors: { ...this.state.errors, name: { ...this.state.errors.name, touched: false } },
-      });
-    }
-    this.setState({
-      name,
-    });
-  }
-  onSurnameChange(e) {
-    const surname = e.target.value;
-    if (this.state.errors.surname.touched) {
-      this.setState({
-        errors: { ...this.state.errors, surname: { ...this.state.errors.surname, touched: false } },
-      });
-    }
-    this.setState({ surname });
-  }
-  onEmailChange(e) {
-    const email = e.target.value;
-    if (this.state.errors.email.touched) {
-      this.setState({
-        errors: { ...this.state.errors, email: { ...this.state.errors.email, touched: false } },
-      });
-    }
-    this.setState({ email });
-  }
-  // TODO validate on blur or in own function?
-  onNameBlur() {
-    const name = this.validateName();
-    this.setState({ errors: { ...this.state.errors, name } });
-  }
-
-  onEmailBlur() {
-    const email = this.validateEmail();
-    this.setState({ errors: { ...this.state.errors, email } });
-  }
-  onSurnameBlur() {
-    const surname = this.validateSurname();
-    this.setState({ errors: { ...this.state.errors, surname } });
-  }
-  onPasswordBlur() {
-    const password = this.validatePassword(6);
-    let passwordAgain = { touched: false };
-    if (this.state.passwordAgain.length > 0) {
-      passwordAgain = this.validatePasswordAgain();
-    }
-
-    this.setState({ errors: { ...this.state.errors, password, passwordAgain } });
-  }
-  onPasswordAgainBlur() {
-    const passwordAgain = this.validatePasswordAgain();
-    this.setState({ errors: { ...this.state.errors, passwordAgain } });
-  }
-
   onSubmit() {
-    const valid = this.validateForm();
-    if (valid) {
+    if (this.handleValidation(fieldNames)) {
       let { name, surname, email, password } = this.state;
       name = name.trim();
       surname = surname.trim();
@@ -238,256 +181,126 @@ class SignUp extends React.Component {
       };
       //  alert(JSON.stringify(data));
       this.props.onCreateUser(data);
-    } else {
-      // alert('FORM not valid');
     }
   }
 
-  validateName() {
-    let name = this.state.name;
-    name = name.trim();
-    let result = {
-      touched: false,
-    };
-    if (!name) {
-      result = {
-        touched: true,
-        errorName: 'empty',
-      };
+  handleValueChange(e) {
+    const field = e.target.name;
+    const value = e.target.value;
+    if (this.state.errors[field].touched) {
+      this.setState({
+        errors: { ...this.state.errors, [field]: { ...this.state.errors[field], touched: false } },
+      });
     }
-    return result;
-  }
-  validateSurname() {
-    let surname = this.state.surname;
-    surname = surname.trim();
-    let result = {
-      touched: false,
-    };
-    if (!surname) {
-      result = {
-        touched: true,
-        errorName: 'empty',
-      };
-    }
-    return result;
-  }
-  validatePassword(minPasswordLength) {
-    let password = this.state.password;
-    password = password.trim();
-    let result = {
-      touched: false,
-    };
-    if (!password) {
-      result = {
-        touched: true,
-        errorName: 'empty',
-      };
-    } else if (password.length < minPasswordLength) {
-      result = {
-        touched: true,
-        errorName: 'shortPassword',
-      };
-    }
-    return result;
-  }
-  validatePasswordAgain() {
-    let passwordAgain = this.state.passwordAgain;
-    passwordAgain = passwordAgain.trim();
-    let result = {
-      touched: false,
-    };
-    if (!passwordAgain) {
-      result = {
-        touched: true,
-        errorName: 'empty',
-      };
-    } else if (this.state.password.trim() !== passwordAgain) {
-      result = {
-        touched: true,
-        errorName: 'passwordMismatch',
-      };
-    }
-    return result;
+    this.setState({ [field]: value });
   }
 
-  validateEmail() {
-    let email = this.state.email;
-    email = email.trim();
-    let result = {
-      touched: false,
-    };
-    if (!email) {
-      result = {
-        touched: true,
-        errorName: 'empty',
-      };
-    } else if (!checkEmail(email)) {
-      result = {
-        touched: true,
-        errorName: 'invalidEmail',
-      };
-    } else if (this.state.email.trim().toLowerCase() === this.state.notUniqueEmail) {
-      result = {
-        touched: true,
-        errorName: 'emailTaken',
-      };
-    }
-    return result;
+  handleValidation(fields) {
+    const validated = this.Validator(fields);
+    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
+    return validated.failed === 0;
   }
-  validateForm() {
-    // validate each field
-    let errors = {};
-    let error = false;
-    const name = this.validateName();
-    if (name.touched) {
-      error = true;
-    }
 
-    const surname = this.validateSurname();
-    if (name.touched) {
-      error = true;
+  handleBlur(e) {
+    const fields = [];
+    const currentField = e.target.name;
+    fields.push(e.target.name);
+    if (currentField) {
+      if (currentField === 'password' && this.state.passwordAgain.length > 0) {
+        fields.push('passwordAgain');
+      }
+      this.handleValidation(fields);
     }
-
-    const password = this.validatePassword(6);
-    if (password.touched) {
-      error = true;
-    }
-
-    const passwordAgain = this.validatePasswordAgain();
-    if (passwordAgain.touched) {
-      error = true;
-    }
-
-    const email = this.validateEmail();
-    if (email.touched) {
-      error = true;
-    }
-    // if errors, set state, else submit
-    if (error) {
-      errors = {
-        name,
-        surname,
-        password,
-        passwordAgain,
-        email,
-      };
-      this.setState({ errors });
-    }
-    return error === false;
+  }
+  visibleErrors(errorNames) {
+    return errorNames.reduce((acc, curr) => {
+      const err = `${curr}Error`;
+      if (this.state.errors[curr].touched) {
+        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+      }
+      return acc;
+    }, {});
   }
 
   render() {
+    const {
+      nameError,
+      surnameError,
+      passwordError,
+      passwordAgainError,
+      emailError,
+    } = this.visibleErrors(fieldNames);
+
+    const loginError = this.props.error
+      ? (<div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
+        <FormattedMessage {...messages.error} />
+      </div>)
+      : null;
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <h1> <FormattedMessage {...messages.title} /></h1>
-          {this.props.error && 'SOMETHING WENT WRONG'}
-          <form>
+          <h1>
+            Please fill out the form below
+          </h1>
+          <Box pad column>
             <fieldset>
-              <div className={s.formGroup}>
-                <label className={s.label} htmlFor="name">
-                  <FormattedMessage {...messages.forename} />
-                </label>
+              <FormField label={<FormattedMessage {...messages.forename} />} error={nameError}>
                 <input
-                  className={cn(s.input, this.state.errors.name.touched && s.error)}
-                  id="name"
                   type="text"
                   name="name"
                   value={this.state.name}
-                  onChange={this.onNameChange}
-                  onBlur={this.onNameBlur}
+                  onChange={this.handleValueChange}
+                  onBlur={this.handleBlur}
                 />
-                <div>
-                  {this.state.errors.name.touched
-                    ? <FormattedMessage {...messages[this.state.errors.name.errorName]} />
-                    : ''}
-                </div>
-              </div>
-              <div className={s.formGroup}>
-                <label className={s.label} htmlFor="surname">
-                  <FormattedMessage {...messages.surname} />
-                </label>
+              </FormField>
+              <FormField label={<FormattedMessage {...messages.surname} />} error={surnameError}>
                 <input
-                  className={cn(s.input, this.state.errors.surname.touched && s.error)}
-                  id="surname"
                   type="text"
                   name="surname"
                   value={this.state.surname}
-                  onChange={this.onSurnameChange}
-                  onBlur={this.onSurnameBlur}
+                  onChange={this.handleValueChange}
+                  onBlur={this.handleBlur}
                 />
-                <div>
-                  {this.state.errors.surname.touched
-                    ? <FormattedMessage {...messages[this.state.errors.surname.errorName]} />
-                    : ''}
-                </div>
-              </div>
+              </FormField>
+              <FormField label={<FormattedMessage {...messages.password} />} error={passwordError}>
+                <input
+                  id="password"
+                  type="password"
+                  name="password"
+                  value={this.state.password}
+                  onChange={this.handleValueChange}
+                  onBlur={this.handleBlur}
+                />
+              </FormField>
+              <FormField
+                label={<FormattedMessage {...messages.passwordAgain} />}
+                error={passwordAgainError}
+              >
+                <input
+                  id="passwordAgain"
+                  type="password"
+                  name="passwordAgain"
+                  value={this.state.passwordAgain}
+                  onChange={this.handleValueChange}
+                  onBlur={this.handleBlur}
+                />
+              </FormField>
+              <FormField label={<FormattedMessage {...messages.email} />} error={emailError}>
+                <input
+                  id="email"
+                  type="text"
+                  name="email"
+                  value={this.state.email}
+                  onChange={this.handleValueChange}
+                  onBlur={this.handleBlur}
+                />
+              </FormField>
+              {!this.props.notUniqueEmail && loginError}
             </fieldset>
-            <div className={s.formGroup}>
-              <label className={s.label} htmlFor="password">
-                <FormattedMessage {...messages.password} />
-              </label>
-              <input
-                className={cn(s.input, this.state.errors.password.touched && s.error)}
-                id="password"
-                type="password"
-                name="password"
-                value={this.state.password}
-                onChange={this.onPasswordChange}
-                onBlur={this.onPasswordBlur}
-              />
-              <div>
-                {this.state.errors.password.touched
-                  ? <FormattedMessage {...messages[this.state.errors.password.errorName]} />
-                  : ''}
-              </div>
-            </div>
-            <div className={s.formGroup}>
-              <label className={s.label} htmlFor="passwordAgain">
-                <FormattedMessage {...messages.passwordAgain} />
-              </label>
-              <input
-                className={cn(s.input, this.state.errors.passwordAgain.touched && s.error)}
-                id="passwordAgain"
-                type="password"
-                name="passwordAgain"
-                value={this.state.passwordAgain}
-                onChange={this.onPasswordAgainChange}
-                onBlur={this.onPasswordAgainBlur}
-              />
-              <div>
-                {this.state.errors.passwordAgain.touched
-                  ? <FormattedMessage {...messages[this.state.errors.passwordAgain.errorName]} />
-                  : ''}
-              </div>
-            </div>
-            <div className={s.formGroup}>
-              <label className={s.label} htmlFor="email">
-                <FormattedMessage {...messages.email} />
-              </label>
-              <input
-                className={cn(s.input, this.state.errors.email.touched && s.error)}
-                id="email"
-                type="text"
-                name="email"
-                value={this.state.email}
-                onChange={this.onEmailChange}
-                onBlur={this.onEmailBlur}
-              />
-              <div>
-                {this.state.errors.email.touched
-                  ? <FormattedMessage {...messages[this.state.errors.email.errorName]} />
-                  : ''}
-              </div>
-            </div>
-
-          </form>
-          <div className={s.formGroup}>
-            <Button primary fill onClick={this.onSubmit} disabled={this.props.processing}>
+            <Button primary fill onClick={this.onSubmit} disabled={this.props.pending}>
               <FormattedMessage {...messages.nextStep} />
             </Button>
-            {this.props.processing && 'PROCESSING...'}
-          </div>
+          </Box>
         </div>
       </div>
     );
