@@ -747,5 +747,14 @@
     "files": [
       "src/components/ImageUpload/ImageUpload.js"
     ]
+  },
+  {
+    "id": "commands.rotate",
+    "description": "Short command for rotation",
+    "defaultMessage": "Rotate",
+    "message": "",
+    "files": [
+      "src/components/ImageUpload/ImageUpload.js"
+    ]
   }
 ]
