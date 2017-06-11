@@ -1,11 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './RoleManager.css';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import CheckBox from '../CheckBox';
+import Box from '../Box';
+import Button from '../Button';
 
 const roles = ['admin', 'mod', 'user', 'viewer', 'guest'];
 
+const messages = defineMessages({
+  header: {
+    id: 'roles.header',
+    defaultMessage: 'Set & Change Roles',
+    description: 'Header of rolesemanager',
+  },
+  change: {
+    id: 'commands.change',
+    defaultMessage: 'Change',
+    description: 'Short command to change a setting',
+  },
+  unlock: {
+    id: 'roles.unlock',
+    defaultMessage: 'Unlock viewer',
+    description: 'Button label for those who can only unlock viewers',
+  },
+});
 const calcState = (roleNames, role) =>
   roleNames.reduce((acc, curr) => {
     if (curr === role) {
@@ -54,34 +72,33 @@ class RoleManager extends React.Component {
     const { userRole } = this.props;
     if (!['admin', 'mod'].includes(userRole)) {
       promoteButton = (
-        <button onClick={() => this.props.updateFn({ id: this.props.accountId, role: 'viewer' })}>
-          {'Unlock status viewer'}
-        </button>
+        <Button
+          label={<FormattedMessage {...messages.unlockViewer} />}
+          onClick={() => this.props.updateFn({ id: this.props.accountId, role: 'viewer' })}
+        />
+      );
+    }
+
+    let checkBoxes = null;
+    let changeBtn = null;
+    if (!promoteButton) {
+      checkBoxes = this.availableRoles.map(r =>
+        <CheckBox label={r} checked={this.state[r]} onChange={this.onChange} name={r} />,
+      );
+      changeBtn = (
+        <Button primary onClick={this.onSubmit} label={<FormattedMessage {...messages.change} />} />
       );
     }
     return (
-      <div>
-        <h3> {'Set Roles'}</h3>
+      <Box column pad>
+        <h3> <FormattedMessage {...messages.header} /></h3>
         {promoteButton}
+        {checkBoxes}
+        {changeBtn}
 
-        {!promoteButton &&
-          <div>
-            {this.availableRoles.map(r => (
-              <div className={s.box}>
-                <CheckBox
-                  label={<label htmlFor={r}> {r}</label>}
-                  checked={this.state[r]}
-                  onChange={this.onChange}
-                  name={r}
-                />
-              </div>
-            ))}
-            <button onClick={this.onSubmit}>{'CHANGE ROLE'}</button>
-          </div>}
-
-      </div>
+      </Box>
     );
   }
 }
 
-export default withStyles(s)(RoleManager);
+export default RoleManager;

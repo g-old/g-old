@@ -1,0 +1,11 @@
+.label {
+  font-weight: 300;
+  cursor: inherit;
+  font-size: 1.1875rem;
+  line-height: 1.26316;
+}
+
+.margin {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}

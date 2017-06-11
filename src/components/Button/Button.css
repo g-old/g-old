@@ -1,3 +1,5 @@
+@import '../variables.css';
+
 .button {
   background-color: transparent;
   border: 2px solid #e0b000;
@@ -13,6 +15,7 @@
   min-width: 120px;
   max-width: 384px;
   padding: 6px 22px;
+  transition: 0.1s ease-in-out;
 }
 
 .button:not(.fill) {
@@ -60,11 +63,11 @@
   }
 
   .icon {
-    padding: 0;
-  }
+    padding: 12px;
 
-  .icon + .label {
-    margin-left: 0;
+    + .label {
+      margin-left: 0;
+    }
   }
 }
 
@@ -74,11 +77,19 @@
 }
 
 .accent {
-  border: 2px solid #930793;
+  border: 2px solid  var(--color-accent-1);
 }
 
 .accent:not(.disabled):not(.plain):hover {
-  box-shadow: 0 0 0 2px #930793;
+  box-shadow: 0 0 0 2px var(--color-accent-1);
+}
+
+.button:not(.plain) {
+  .icon {
+    + .label {
+      margin-left: 12px;
+    }
+  }
 }
 
 .disabled {

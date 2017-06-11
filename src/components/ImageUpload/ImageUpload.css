@@ -1,16 +1,5 @@
 @import '../../components/variables.css';
 
-.root {
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.container {
-  margin: 0 auto;
-  padding: 0 0 40px;
-  max-width: 380px;
-}
-
 .inputfile {
   width: 0.1px;
   height: 0.1px;
@@ -47,8 +36,7 @@
 
 /* https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/ */
 .slider {
-  margin-top: 1em;
-  width: 10em;
+  width: 100%;
   border-radius: 5px;
   background: #2c3e50;
   cursor: pointer;
@@ -56,31 +44,4 @@
 
 .slider::-webkit-slider-runnable-track {
   background: #d7dcdf;
-}
-
-.button {
-  display: block;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 10px 16px;
-  width: 100%;
-  outline: 0;
-  border: 1px solid #2a2a2a;
-  border-radius: 0;
-  background: var(--color-gold);
-  color: #fff;
-  text-align: center;
-  text-decoration: none;
-  font-size: 18px;
-  line-height: 1.3333333;
-  cursor: pointer;
-}
-
-.button:hover {
-  background: var(--color-gold);
-}
-
-.button:focus {
-  border-color: #0074c2;
-  box-shadow: 0 0 8px rgba(0, 116, 194, 0.6);
 }

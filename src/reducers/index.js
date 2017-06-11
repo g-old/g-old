@@ -22,6 +22,9 @@ export const getProposalsIsFetching = (state, filter) =>
 export const getProposalsErrorMessage = (state, filter) =>
   fromEntity.getProposalsErrorMessage(state.entities, filter);
 
+export const getProposalsPage = (state, filter) =>
+  fromEntity.getProposalsPage(state.entities, filter);
+
 export const getSessionUser = state => fromEntity.getUser(state.entities, state.user);
 
 export const getProposal = (state, id) => fromEntity.getProposal(state.entities, id);

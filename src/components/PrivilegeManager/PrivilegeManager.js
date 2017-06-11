@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import s from './PrivilegeManager.css';
 import { PRIVILEGES } from '../../constants';
+import Box from '../Box';
+import Button from '../Button';
 
 import CheckBox from '../CheckBox';
 
@@ -57,6 +57,11 @@ const messages = defineMessages({
     id: 'privilege.postProposals',
     defaultMessage: 'post proposals',
     description: 'Account can post proposals',
+  },
+  change: {
+    id: 'commands.change',
+    defaultMessage: 'Change',
+    description: 'Short command to change a setting',
   },
 });
 const readPrivileges = (privilege) => {
@@ -114,28 +119,26 @@ class PrivilegeManager extends React.Component {
   }
   render() {
     return (
-      <div>
+      <Box column pad>
         <h3><FormattedMessage {...messages.header} /></h3>
         {Object.keys(PRIVILEGES).map((p) => {
           if (p === 'none') {
             return null;
           }
           return (
-            <div className={s.box}>
-              <CheckBox
-                label={<FormattedMessage {...messages[p]} />}
-                checked={this.state[p]}
-                onChange={this.onChange}
-                name={p}
-              />
-            </div>
+            <CheckBox
+              label={<FormattedMessage {...messages[p]} />}
+              checked={this.state[p]}
+              onChange={this.onChange}
+              name={p}
+            />
           );
         })}
-        <button onClick={this.onSubmit}>CHANGE RIGHTS</button>
+        <Button onClick={this.onSubmit} primary label={<FormattedMessage {...messages.change} />} />
 
-      </div>
+      </Box>
     );
   }
 }
 
-export default withStyles(s)(PrivilegeManager);
+export default PrivilegeManager;

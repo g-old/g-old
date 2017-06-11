@@ -13,6 +13,7 @@ import RoleManager from '../RoleManager';
 import { PRIVILEGES } from '../../constants';
 import ImageUpload from '../ImageUpload';
 import { uploadAvatar } from '../../actions/file';
+import Button from '../Button';
 
 const messages = defineMessages({
   role: {
@@ -170,25 +171,16 @@ class AccountProfile extends React.Component {
                 WRITE
                 <textarea />
                 <p>
-                  <button
+                  <Button
                     onClick={() => {
                       alert('TO IMPLEMENT! \n mail, sms, accountmsg, messenger ?');
                     }}
-                  >
-                    <FormattedMessage {...messages.notify} />
-                  </button>
+                    label={<FormattedMessage {...messages.notify} />}
+                  />
+
                 </p>
               </AccordionPanel>
             </Accordion>
-          </p>
-          <p>
-            <button
-              onClick={() => {
-                alert('TO IMPLEMENT! \n soft, hard ?');
-              }}
-            >
-              <FormattedMessage {...messages.delete} />
-            </button>
           </p>
         </div>
       </div>

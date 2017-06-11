@@ -41,3 +41,9 @@ export const getProposal = (state, id, entities) => {
   const proposal = fromById.getProposal(state.byId, id);
   return hydrateProposals(state, [proposal], entities)[0];
 };
+
+export const getPageInfo = (state, filter) => ({
+  ...fromList.getPageInfo(state.listByFilter[filter]),
+  //  isFetching: fromList.getIsFetching(state.listByFilter[filter]),
+  //  errorMessage: fromList.getErrorMessage(state.listByFilter[filter]),
+});

@@ -611,6 +611,8 @@
     "defaultMessage": "Change",
     "message": "",
     "files": [
+      "src/components/PrivilegeManager/PrivilegeManager.js",
+      "src/components/RoleManager/RoleManager.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -675,6 +677,33 @@
     "message": "",
     "files": [
       "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "roles.header",
+    "description": "Header of rolesemanager",
+    "defaultMessage": "Set & Change Roles",
+    "message": "",
+    "files": [
+      "src/components/RoleManager/RoleManager.js"
+    ]
+  },
+  {
+    "id": "roles.unlock",
+    "description": "Button label for those who can only unlock viewers",
+    "defaultMessage": "Unlock viewer",
+    "message": "",
+    "files": [
+      "src/components/RoleManager/RoleManager.js"
+    ]
+  },
+  {
+    "id": "commands.upload",
+    "description": "Short command for uploading",
+    "defaultMessage": "Upload",
+    "message": "",
+    "files": [
+      "src/components/ImageUpload/ImageUpload.js"
     ]
   }
 ]

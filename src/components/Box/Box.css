@@ -5,6 +5,7 @@
   background-size: cover;
   background-repeat: no-repeat;
   flex-wrap: wrap;
+  flex-direction: row;
 }
 
 .root:not(.column) > *:not(:last-child) {
@@ -22,4 +23,12 @@
 .clickable {
   cursor: pointer;
   outline: none;
+}
+
+.align {
+  align-items: center;
+}
+
+.justify {
+  justify-content: center;
 }

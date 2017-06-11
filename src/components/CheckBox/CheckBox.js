@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './CheckBox.css';
 
@@ -24,11 +25,11 @@ class CheckBox extends React.Component {
   render() {
     const { checked, disabled, name, label, onChange } = this.props;
 
-    const labelNode = label; /* (
-      <label key="label" htmlFor={name} className={s.label}>
+    const labelNode = (
+      <span key="label" htmlFor={name} className={s.label}>
         {label}
-      </label>
-    ); */
+      </span>
+    );
     let hidden;
     if (disabled && checked) {
       hidden = <input name={name} type="hidden" value="true" />;
@@ -56,13 +57,11 @@ class CheckBox extends React.Component {
 
     return (
       /* eslint-disable jsx-a11y/label-has-for */
-      (
-        <label className={s.checkBox}>
+      <label className={cn(s.checkbox, disabled ? s.disabled : null)}>
 
-          {children}
-          {hidden}
-        </label>
-      )
+        {children}
+        {hidden}
+      </label>
       /* eslint-enable jsx-a11y/label-has-for */
     );
   }

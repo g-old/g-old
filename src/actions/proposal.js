@@ -131,31 +131,40 @@ const pollFieldsForList = `{
 }
 `;
 
-const listQuery = `
-query ($state:String) {
-  proposalsDL (state:$state) {
-    id
-    title
-    publishedAt
-    state
-    body
-    tags{
-      id
-      text
-      count
-    }
-    pollOne ${pollFieldsForList}
-    pollTwo ${pollFieldsForList}
-  }
-}
-`;
-
 const tagsQuery = `
 query{
   tags{
     id
     text
   }
+}
+`;
+
+const proposalConnection = `
+query ($state:String $first:Int, $after:String) {
+  proposalConnection (state:$state first:$first after:$after) {
+    pageInfo{
+      endCursor
+      hasNextPage
+    }
+    edges{
+      node{
+        id
+        title
+        publishedAt
+        state
+        body
+        tags{
+          id
+          text
+          count
+        }
+        pollOne ${pollFieldsForList}
+        pollTwo ${pollFieldsForList}
+      }
+
+      }
+    }
 }
 `;
 
@@ -233,7 +242,7 @@ export function loadProposal({ id }) {
   };
 }
 
-export function loadProposalsList(state) {
+export function loadProposalsList({ state, first, after }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
     // Dont fetch if pending
@@ -247,13 +256,15 @@ export function loadProposalsList(state) {
     });
 
     try {
-      const { data } = await graphqlRequest(listQuery, { state });
-      const normalizedData = normalize(data.proposalsDL, proposalListSchema);
+      const { data } = await graphqlRequest(proposalConnection, { state, first, after });
+      const proposals = data.proposalConnection.edges.map(p => p.node);
+      const normalizedData = normalize(proposals, proposalListSchema);
       // dispatch(addEntities(normalizedData.entities, state));
       dispatch({
         type: LOAD_PROPOSAL_LIST_SUCCESS,
         payload: normalizedData,
         filter: state,
+        pagination: data.proposalConnection.pageInfo,
       });
     } catch (error) {
       dispatch({
@@ -261,6 +272,7 @@ export function loadProposalsList(state) {
         payload: {
           error,
         },
+
         filter: state,
         message: error.message || 'Something went wrong',
       });

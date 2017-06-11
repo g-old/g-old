@@ -52,6 +52,7 @@ class Button extends React.Component {
     }
     let buttonLabel;
     if (label) {
+      // eslint-disable-next-line css-modules/no-undef-class
       buttonLabel = <span className={s.label}>{label}</span>;
     }
     const first = reverse ? buttonLabel : buttonIcon;

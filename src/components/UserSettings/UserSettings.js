@@ -91,6 +91,21 @@ const messages = defineMessages({
   },
 });
 
+const initState = {
+  passwordSuccess: false,
+  password: '',
+  passwordOld: '',
+  passwordAgain: '',
+  email: '',
+  errors: {
+    password: { touched: false },
+    passwordAgain: { touched: false },
+    passwordOld: { touched: false },
+    email: { touched: false },
+  },
+  showEmailInput: false,
+};
+
 class UserSettings extends React.Component {
   static propTypes = {
     user: PropTypes.shape({ email: PropTypes.string.isRequired, id: PropTypes.string.isRequired })
@@ -102,19 +117,8 @@ class UserSettings extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      passwordSuccess: false,
-      password: '',
-      passwordOld: '',
-      passwordAgain: '',
-      email: '',
-      errors: {
-        password: { touched: false },
-        passwordAgain: { touched: false },
-        passwordOld: { touched: false },
-        email: { touched: false },
-      },
-      showEmailInput: false,
-      invalidEmails: [props.user.email],
+      ...initState,
+      invalidEmails: [this.props.user.email],
     };
     this.onEditEmail = this.onEditEmail.bind(this);
     this.handleValidation = this.handleValidation.bind(this);
@@ -158,6 +162,7 @@ class UserSettings extends React.Component {
       if (updates.passwordOld && updates.passwordOld.error) {
         if (updates.passwordOld.error.passwordOld) {
           this.setState({
+            passwordOld: '',
             errors: {
               ...this.state.errors,
               passwordOld: { touched: true, errorName: 'wrongPassword' },
@@ -181,7 +186,7 @@ class UserSettings extends React.Component {
   onEditEmail() {
     this.setState({
       showEmailInput: !this.state.showEmailInput,
-      email: this.props.user.email,
+      email: '', // this.props.user.email,
       errors: { ...this.state.errors, email: { touched: false } },
     });
   }
@@ -275,7 +280,7 @@ class UserSettings extends React.Component {
               onChange={this.handleValueChange}
               value={showEmailInput ? this.state.email : this.props.user.email}
               name="email"
-              readOnly={showEmailInput == null}
+              readOnly={showEmailInput === false}
             />
 
           </FormField>

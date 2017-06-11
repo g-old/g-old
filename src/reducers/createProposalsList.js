@@ -55,10 +55,23 @@ const createList = (filter) => {
         return state;
     }
   };
+  const pageInfo = (state = { endCursor: '' }, action) => {
+    if (action.filter !== filter) {
+      return state;
+    }
+    switch (action.type) {
+      case LOAD_PROPOSAL_LIST_SUCCESS:
+        return { ...state, ...action.pagination };
+
+      default:
+        return state;
+    }
+  };
   return combineReducers({
     ids,
     isFetching,
     errorMessage,
+    pageInfo,
   });
 };
 
@@ -66,3 +79,4 @@ export default createList;
 export const getIds = state => state.ids;
 export const getIsFetching = state => state.isFetching;
 export const getErrorMessage = state => state.errorMessage;
+export const getPageInfo = state => state.pageInfo;

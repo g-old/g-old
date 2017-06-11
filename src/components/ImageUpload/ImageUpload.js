@@ -1,8 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import AvatarEditor from 'react-avatar-editor';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './ImageUpload.css';
+import Box from '../Box';
+import Button from '../Button';
+import Label from '../Label';
 
 const standardValues = {
   scale: 1,
@@ -11,6 +15,20 @@ const standardValues = {
   rotate: 0,
   loaded: false,
 };
+
+const messages = defineMessages({
+  upload: {
+    id: 'commands.upload',
+    defaultMessage: 'Upload',
+    description: 'Short command for uploading',
+  },
+  rotate: {
+    id: 'commands.rotate',
+    defaultMessage: 'Rotate',
+    description: 'Short command for rotation',
+  },
+});
+
 class ImageUpload extends React.Component {
   static propTypes = {
     uploadAvatar: PropTypes.func.isRequired,
@@ -35,6 +53,7 @@ class ImageUpload extends React.Component {
     this.onChange = this.onChange.bind(this);
     this.handleScale = this.handleScale.bind(this);
     this.handleRightRotation = this.handleRightRotation.bind(this);
+    this.handleLeftRotation = this.handleLeftRotation.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -82,6 +101,10 @@ class ImageUpload extends React.Component {
     const rotate = (this.state.rotate + 90) % 360;
     this.setState({ rotate });
   }
+  handleLeftRotation() {
+    const rotate = (this.state.rotate - 90) % 360;
+    this.setState({ rotate });
+  }
 
   render() {
     let uploader = null;
@@ -90,7 +113,7 @@ class ImageUpload extends React.Component {
 
     if (this.state.src) {
       editor = (
-        <div>
+        <Box justify>
           <AvatarEditor
             ref={this.setEditorRef}
             image={this.state.src}
@@ -105,14 +128,8 @@ class ImageUpload extends React.Component {
             onLoadFailure={() => alert('Image could not been loaded -> load another one')}
             onLoadSuccess={() => this.setState({ loaded: true })}
           />
-          <br />
-          <div>
-            {this.state.loaded && 'Drag, rotate or zoom, then upload!'}
-          </div>
-          <div>
-
-            {'Zoom:'}
-            <br />
+          <Box pad column>
+            <Label>{'Zoom:'}</Label>
             <input
               className={s.slider}
               name="scale"
@@ -123,29 +140,35 @@ class ImageUpload extends React.Component {
               step="0.01"
               defaultValue="1"
             />
-            <br />
-            <span>
-              {'Rotate :'}
-              <button
-                style={{ marginLeft: '1em', marginTop: '2em' }}
-                onClick={this.handleRightRotation}
-              >
-                RIGHT
-              </button>
-            </span>
-          </div>
-          <div style={{ marginTop: '2em' }}>
-            <button className={s.button} onClick={this.handleSave} disabled={uploadPending}>
-              UPLOAD
-            </button>
-          </div>
+            <Button
+              label={<FormattedMessage {...messages.rotate} />}
+              icon={
+                <svg viewBox={'0 0 24 24'} width={24} height={24}>
+                  <path
+                    fill="none"
+                    stroke="#000"
+                    strokeWidth="2"
+                    d="M8,3 L3,8 L8,13 M12,20 L15,20 C18.3137085,20 21,17.3137085 21,14 C21,10.6862915 18.3137085,8 15,8 L4,8"
+                  />
+                </svg>
+              }
+              onClick={this.handleLeftRotation}
+            />
+            <Button
+              fill
+              primary
+              label={<FormattedMessage {...messages.upload} />}
+              onClick={this.handleSave}
+              disabled={uploadPending}
+            />
+          </Box>
           {uploadPending && 'Uploading...'}
           {uploadError && uploadError}
-        </div>
+        </Box>
       );
     }
     uploader = (
-      <div style={{ width: '100%' }}>
+      <Box column>
         <input
           className={s.inputfile}
           name="file"
@@ -157,16 +180,14 @@ class ImageUpload extends React.Component {
         <label htmlFor="file">Click to choose your image</label>
         <br style={{ clear: 'both' }} />
         {this.state.showEditor && editor}
-      </div>
+      </Box>
     );
 
     return (
-      <div className={s.root}>
-        <div className={s.container}>
-          {uploader}
-          {this.props.uploadSuccess && 'Uploaded'}
-        </div>
-      </div>
+      <Box>
+        {uploader}
+        {this.props.uploadSuccess && 'Uploaded'}
+      </Box>
     );
   }
 }

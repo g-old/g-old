@@ -50,5 +50,5 @@
 
 .focus {
   z-index: 1;
-  border-color: var(--color-focus);
+  border-color: var(--color-accent-1);
 }

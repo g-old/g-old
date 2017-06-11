@@ -36,6 +36,9 @@ export const getProposalsIsFetching = (state, filter) =>
 export const getProposalsErrorMessage = (state, filter) =>
   fromProposals.getErrorMessage(state.proposals, filter);
 
+export const getProposalsPage = (state, filter) =>
+  fromProposals.getPageInfo(state.proposals, filter);
+
 export const getUser = (state, id) => fromUsers.getUser(state.users, id, state);
 
 export const getProposal = (state, id) => fromProposals.getProposal(state.proposals, id, state);

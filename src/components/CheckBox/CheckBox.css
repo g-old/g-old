@@ -1,9 +1,18 @@
 .check {
   width: 24px;
   height: 24px;
-  stroke: cornflowerblue;
+  stroke: #930793;
   stroke-width: 4px;
   display: none;
+}
+
+.checkbox {
+  margin-right: 12px;
+  white-space: nowrap;
+}
+
+.checkbox:not(.disabled) {
+  cursor: pointer;
 }
 
 .control {
@@ -17,22 +26,43 @@
   background-color: inherit;
   border: 2px solid #666;
   border-radius: 4px;
-  border-color: cornflowerblue;
+  border-color: #930793;
+}
+
+.label {
+  display: inline-block;
+  vertical-align: middle;
+  color: #666;
+  white-space: normal;
+  margin-right: 24px;
+  word-break: break-word;
 }
 
 .input {
   opacity: 0;
   position: absolute;
+
+  &:checked + .control {
+    .check {
+      display: block;
+    }
+
+    + .label {
+      color: #000;
+    }
+  }
 }
 
-.input:checked + .control .check {
-  display: block;
+.input:checked + .control {
+  .label {
+    color: #000;
+  }
 }
 
-.checkBox {
-  margin-right: 12px;
-  white-space: nowrap;
-  cursor: pointer;
+.disabled {
+  .control {
+    opacity: 0.5;
+  }
 }
 
 /*

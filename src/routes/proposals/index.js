@@ -15,13 +15,18 @@ export default {
       return { redirect: '/' };
     }
     if (!process.env.BROWSER) {
-      await store.dispatch(loadProposalsList(state));
+      await store.dispatch(loadProposalsList({ state }));
     } else {
-      store.dispatch(loadProposalsList(state));
+      store.dispatch(loadProposalsList({ state }));
     }
     return {
       title,
-      component: <Layout><ProposalOverviewContainer state={state} /> </Layout>,
+      component: (
+        <Layout>
+          <ProposalOverviewContainer state={state} />
+          {' '}
+        </Layout>
+      ),
     };
   },
 };

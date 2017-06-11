@@ -12,6 +12,10 @@ class Box extends React.Component {
     column: PropTypes.bool,
     className: PropTypes.string,
     pad: PropTypes.bool,
+    tag: PropTypes.string,
+    align: PropTypes.bool,
+    containerClassName: PropTypes.string,
+    justify: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -20,24 +24,44 @@ class Box extends React.Component {
     column: false,
     className: null,
     pad: false,
+    tag: 'div',
+    align: false,
+    containerClassName: null,
+    justify: false,
   };
 
   render() {
-    const { column, clickable, onClick, pad } = this.props;
+    const {
+      tag,
+      column,
+      children,
+      clickable,
+      onClick,
+      pad,
+      className,
+      containerClassName,
+      align,
+      justify,
+    } = this.props;
     /* eslint-disable jsx-a11y/no-static-element-interactions*/
+    const Component = tag;
+
     return (
-      <div
+      <Component
         className={cn(
           s.root,
-          this.props.className || null,
+          className || null,
+          containerClassName || null,
           column ? s.column : null,
           clickable ? s.clickable : null,
           pad ? s.pad : null,
+          align ? s.align : null,
+          justify ? s.justify : null,
         )}
         onClick={onClick}
       >
-        {this.props.children}
-      </div>
+        {children}
+      </Component>
     );
   }
 }

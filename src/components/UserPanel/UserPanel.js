@@ -9,6 +9,8 @@ import AccountProfile from '../AccountProfile';
 import Accordion from '../../components/Accordion';
 import AccordionPanel from '../../components/AccordionPanel';
 import SearchField from '../../components/SearchField';
+import Box from '../Box';
+import Button from '../Button';
 
 import {
   getVisibleUsers,
@@ -76,7 +78,7 @@ class UserPanel extends React.Component {
     } = this.props;
 
     return (
-      <div className={s.container}>
+      <Box>
         <SearchField
           data={this.props.userArray}
           fetch={this.props.findUser}
@@ -85,59 +87,62 @@ class UserPanel extends React.Component {
           }}
         />
         {this.state.showAccount &&
-          <div>
+          <Box column pad>
             <AccountProfile
               user={this.props.user}
               accountId={this.state.accountId}
               update={this.props.updateUser}
             />
-            <button
+            <Button
+              accent
+              label={'Close'}
               onClick={() => {
                 this.setState({ showAccount: false });
               }}
+            />
+          </Box>}
+        <div style={{ width: '100%' }}>
+          <Accordion openMulti>
+            <AccordionPanel
+              heading="Guest accounts"
+              onActive={() => {
+                this.props.loadUserList('guest');
+              }}
             >
-              CLOSE{' '}
-            </button>
-          </div>}
-        <Accordion openMulti>
-          <AccordionPanel
-            heading="Guest accounts"
-            onActive={() => {
-              this.props.loadUserList('guest');
-            }}
-          >
-            {guestArrayIsFetching && !guestArray.length && <p>Loading...</p>}
-            {!guestArrayIsFetching &&
-              !guestArray.length &&
-              !guestArrayErrorMessage &&
-              <p> No data</p>}
-            {guestArrayErrorMessage &&
-              <FetchError
-                message={guestArrayErrorMessage}
-                onRetry={() => this.props.loadUserList('guest')}
-              />}
-            {this.props.guestArray.map(user => renderUserSuggestion(user, this))}
-          </AccordionPanel>
-          <AccordionPanel
-            heading="Viewer accounts"
-            onActive={() => {
-              this.props.loadUserList('viewer');
-            }}
-          >
-            {viewerArrayIsFetching && !viewerArray.length && <p>Loading...</p>}
-            {!viewerArrayIsFetching &&
-              !viewerArray.length &&
-              !viewerArrayErrorMessage &&
-              <p> No data</p>}
-            {viewerArrayErrorMessage &&
-              <FetchError
-                message={viewerArrayErrorMessage}
-                onRetry={() => this.props.loadUserList('viewer')}
-              />}
-            {this.props.viewerArray.map(user => renderUserSuggestion(user, this))}
-          </AccordionPanel>
-        </Accordion>
-      </div>
+              {guestArrayIsFetching && !guestArray.length && <p>Loading...</p>}
+              {!guestArrayIsFetching &&
+                !guestArray.length &&
+                !guestArrayErrorMessage &&
+                <p> No data</p>}
+              {guestArrayErrorMessage &&
+                <FetchError
+                  message={guestArrayErrorMessage}
+                  onRetry={() => this.props.loadUserList('guest')}
+                />}
+              {this.props.guestArray.map(user => renderUserSuggestion(user, this))}
+            </AccordionPanel>
+            <AccordionPanel
+              heading="Viewer accounts"
+              onActive={() => {
+                this.props.loadUserList('viewer');
+              }}
+            >
+              {viewerArrayIsFetching && !viewerArray.length && <p>Loading...</p>}
+              {!viewerArrayIsFetching &&
+                !viewerArray.length &&
+                !viewerArrayErrorMessage &&
+                <p> No data</p>}
+              {viewerArrayErrorMessage &&
+                <FetchError
+                  message={viewerArrayErrorMessage}
+                  onRetry={() => this.props.loadUserList('viewer')}
+                />}
+              {this.props.viewerArray.map(user => renderUserSuggestion(user, this))}
+            </AccordionPanel>
+          </Accordion>
+          {' '}
+        </div>
+      </Box>
     );
   }
 }

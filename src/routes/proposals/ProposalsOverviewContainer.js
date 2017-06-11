@@ -8,7 +8,9 @@ import {
   getVisibleProposals,
   getProposalsIsFetching,
   getProposalsErrorMessage,
+  getProposalsPage,
 } from '../../reducers/index';
+import Button from '../../components/Button';
 import FetchError from '../../components/FetchError';
 
 class ProposalContainer extends React.Component {
@@ -22,6 +24,11 @@ class ProposalContainer extends React.Component {
     isFetching: PropTypes.bool.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
     errorMessage: PropTypes.string.isRequired,
+    pageInfo: PropTypes.shape({
+      endCursor: PropTypes.string,
+      hasNextPage: PropTypes.bool,
+    }).isRequired,
+    state: PropTypes.string.isRequired,
   };
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
@@ -44,6 +51,16 @@ class ProposalContainer extends React.Component {
       <div>
         <Navigation filter={filter} />
         {proposals.map(proposal => <ProposalPreview key={proposal.id} proposal={proposal} />)}
+        {this.props.pageInfo.hasNextPage &&
+          <Button
+            onClick={() => {
+              this.props.loadProposalsList({
+                state: this.props.state,
+                after: this.props.pageInfo.endCursor,
+              });
+            }}
+            label={'LOAD MORE'}
+          />}
       </div>
     );
   }
@@ -54,6 +71,7 @@ const mapStateToProps = (state, ownProps) => ({
   filter: ownProps.state,
   isFetching: getProposalsIsFetching(state, ownProps.state),
   errorMessage: getProposalsErrorMessage(state, ownProps.state),
+  pageInfo: getProposalsPage(state, ownProps.state),
 });
 
 const mapDispatch = {
