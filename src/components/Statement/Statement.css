@@ -13,6 +13,7 @@
 .rootAlt {
   display: flex;
   border-left: solid 4px gray;
+  border-right: solid 4px gray;
   padding: 0.4em;
   margin: 0.1em 0.1em 2em;
   font-size: 0.9em;
@@ -49,13 +50,15 @@
 .pro {
   margin-right: 10%;
   background-color: #fafffa;
-  border-color: #3a3;
+  border-right: 0;
+  border-color: var(--color-green);
 }
 
 .contra {
   margin-left: 10%;
   background-color: #fffafa;
-  border-color: #d33;
+  border-left: 0;
+  border-color: var(--color-red);
 }
 
 .text {

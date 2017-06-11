@@ -215,7 +215,6 @@ class TestProposal extends React.Component {
     return (
       <div>
         <Proposal proposal={proposalData} />
-        {switchPollButton}
         {poll &&
           poll.props &&
           poll.props.poll &&
@@ -242,6 +241,7 @@ class TestProposal extends React.Component {
             </button>
           </span>}
         {poll}
+        {switchPollButton}
       </div>
     );
   }
