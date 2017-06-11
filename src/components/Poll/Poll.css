@@ -20,6 +20,14 @@
   text-align: right;
 }
 
+.proBtnColor {
+  background: var(--color-green);
+}
+
+.conBtnColor {
+  background: var(--color-red);
+}
+
 .followee {
   width: 2em;
   margin: 0.2em;

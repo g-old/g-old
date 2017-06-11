@@ -175,20 +175,16 @@ class Poll extends React.Component {
     if (!this.props.poll.closed_at && !['viewer', 'guest'].includes(this.props.user.role.type)) {
       // TODO Find better check
       // eslint-disable-next-line no-nested-ternary
-      const proBtnColor = this.props.poll.ownVote
-        ? this.props.poll.ownVote.position === 'pro' ? 'green' : ''
-        : '';
+      const proBtnColor = this.props.poll.ownVote && this.props.poll.ownVote.position === 'pro' ? s.proBtnColor : '';
       // eslint-disable-next-line no-nested-ternary
-      const conBtnColor = this.props.poll.ownVote
-        ? this.props.poll.ownVote.position === 'con' ? 'red' : ''
-        : '';
+      const conBtnColor = this.props.poll.ownVote && this.props.poll.ownVote.position === 'con' ? s.conBtnColor : '';
       if (this.props.poll.mode.unipolar) {
         votingButtons = (
           <div>
             <button
+              className={cn(proBtnColor)}
               disabled={mutationIsPending}
               onClick={() => this.canVote('pro')}
-              style={{ background: proBtnColor }}
             >
 
               <i className="fa fa-hand-paper-o" />
@@ -214,6 +210,7 @@ class Poll extends React.Component {
           <div>
             <span>
               <button
+                className={cn(proBtnColor)}
                 disabled={mutationIsPending}
                 onClick={() => this.canVote('pro')}
                 style={{ background: proBtnColor }}
@@ -221,9 +218,9 @@ class Poll extends React.Component {
                 <i className="fa fa-thumbs-up" />
               </button>
               <button
+                className={cn(conBtnColor)}
                 disabled={mutationIsPending}
                 onClick={() => this.canVote('con')}
-                style={{ background: conBtnColor }}
               >
                 <i className="fa fa-thumbs-down" />
               </button>
