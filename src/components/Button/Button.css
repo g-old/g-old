@@ -63,7 +63,7 @@
   }
 
   .icon {
-    padding: 12px;
+    /*  padding: 12px; */
 
     + .label {
       margin-left: 0;

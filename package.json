@@ -186,6 +186,7 @@
       "git add"
     ],
     "*.{css,less,scss,sss}": [
+      "stylefmt",
       "stylelint",
       "git add"
     ]

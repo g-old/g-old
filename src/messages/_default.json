@@ -602,6 +602,7 @@
     "defaultMessage": "Cancel",
     "message": "",
     "files": [
+      "src/components/ImageUpload/ImageUpload.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -649,6 +650,7 @@
     "defaultMessage": "Action failed. Please retry!",
     "message": "",
     "files": [
+      "src/components/ImageUpload/ImageUpload.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -713,6 +715,15 @@
     "message": "",
     "files": [
       "src/components/ImageUpload/ImageUpload.js"
+    ]
+  },
+  {
+    "id": "signup.upload",
+    "description": "No description",
+    "defaultMessage": "Upload your profile image",
+    "message": "",
+    "files": [
+      "src/routes/signup/SignupContainer.js"
     ]
   }
 ]

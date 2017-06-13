@@ -10,7 +10,6 @@ import Accordion from '../../components/Accordion';
 import AccordionPanel from '../../components/AccordionPanel';
 import SearchField from '../../components/SearchField';
 import Box from '../Box';
-import Button from '../Button';
 
 import {
   getVisibleUsers,
@@ -87,20 +86,14 @@ class UserPanel extends React.Component {
           }}
         />
         {this.state.showAccount &&
-          <Box column pad>
-            <AccountProfile
-              user={this.props.user}
-              accountId={this.state.accountId}
-              update={this.props.updateUser}
-            />
-            <Button
-              accent
-              label={'Close'}
-              onClick={() => {
-                this.setState({ showAccount: false });
-              }}
-            />
-          </Box>}
+          <AccountProfile
+            user={this.props.user}
+            accountId={this.state.accountId}
+            update={this.props.updateUser}
+            onClose={() => {
+              this.setState({ showAccount: false });
+            }}
+          />}
         <div style={{ width: '100%' }}>
           <Accordion openMulti>
             <AccordionPanel

@@ -7,6 +7,13 @@ import {
   CREATE_PROPOSAL_SUCCESS,
 } from '../constants';
 
+const handlePageInfo = (state, action) => {
+  if (state.endCursor && !action.savePageInfo) {
+    return state;
+  }
+  return { ...state, ...action.pagination };
+};
+
 const createList = (filter) => {
   const ids = (state = [], action) => {
     if (action.filter !== filter) {
@@ -61,7 +68,7 @@ const createList = (filter) => {
     }
     switch (action.type) {
       case LOAD_PROPOSAL_LIST_SUCCESS:
-        return { ...state, ...action.pagination };
+        return handlePageInfo(state, action);
 
       default:
         return state;

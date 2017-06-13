@@ -53,6 +53,7 @@ class ProposalContainer extends React.Component {
         {proposals.map(proposal => <ProposalPreview key={proposal.id} proposal={proposal} />)}
         {this.props.pageInfo.hasNextPage &&
           <Button
+            disabled={isFetching}
             onClick={() => {
               this.props.loadProposalsList({
                 state: this.props.state,

@@ -265,6 +265,7 @@ export function loadProposalsList({ state, first, after }) {
         payload: normalizedData,
         filter: state,
         pagination: data.proposalConnection.pageInfo,
+        savePageInfo: after != null,
       });
     } catch (error) {
       dispatch({

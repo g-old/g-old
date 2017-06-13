@@ -1,17 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+// import { defineMessages, FormattedMessage } from 'react-intl';
 import SignUp from '../../components/SignUp';
-import ImageUpload from '../../components/ImageUpload';
-import AccountSettings from '../../components/AccountSettings';
+// import ImageUpload from '../../components/ImageUpload';
+// import AccountSettings from '../../components/AccountSettings';
 import { createUser } from '../../actions/user';
 import { uploadAvatar } from '../../actions/file';
 import { getAccountUpdates, getLocale } from '../../reducers';
+import Button from '../../components/Button';
+import history from '../../history';
 
 class SignupContainer extends React.Component {
   static propTypes = {
     createUser: PropTypes.func.isRequired,
-    uploadAvatar: PropTypes.func.isRequired,
+    // uploadAvatar: PropTypes.func.isRequired,
     updates: PropTypes.shape({}).isRequired,
   };
 
@@ -20,6 +23,7 @@ class SignupContainer extends React.Component {
     this.state = {
       step: 0,
       serverCalled: false,
+      showUpload: false,
     };
     this.onCreateUser = this.onCreateUser.bind(this);
   }
@@ -63,20 +67,35 @@ class SignupContainer extends React.Component {
           />
         );
       case 1:
+        return <Button onClick={() => history.push('/account')} label={'Next'} />;
+      /*
         return (
-          <div>
-            <h1>
+          <Box pad column>
+            <Headline>
               UPLOAD AVATAR - or later
-            </h1>
+            </Headline>
+
+            <Button
+              onClick={() => {
+                this.setState({ showUpload: true });
+              }}
+              label={<FormattedMessage {...messages.upload} />}
+              disabled={this.state.showUpload}
+            />
             <ImageUpload
               uploadPending={updates.dataUrl && updates.dataUrl.pending}
               uploadSuccess={updates.dataUrl && updates.dataUrl.success}
               uploadError={updates.dataUrl && updates.dataUrl.error}
               uploadAvatar={this.props.uploadAvatar}
+              open={this.state.showUpload}
+              onClose={() => {
+                this.setState({ showUpload: false });
+              }}
             />
             <AccountSettings />
-          </div>
+          </Box>
         );
+        */
       default:
         return <div />;
     }

@@ -14,6 +14,7 @@ import { PRIVILEGES } from '../../constants';
 import ImageUpload from '../ImageUpload';
 import { uploadAvatar } from '../../actions/file';
 import Button from '../Button';
+import Layer from '../Layer';
 
 const messages = defineMessages({
   role: {
@@ -80,12 +81,16 @@ class AccountProfile extends React.Component {
     }).isRequired,
     uploadAvatar: PropTypes.func.isRequired,
     updates: PropTypes.shape({ dataUrl: PropTypes.string }).isRequired,
+    onClose: PropTypes.func.isRequired,
   };
 
   constructor(props) {
     super(props);
     this.props.fetchUser({ id: props.accountId });
     this.onPromoteToViewer = this.onPromoteToViewer.bind(this);
+    this.state = {
+      showUpload: false,
+    };
   }
 
   componentDidMount(props) {
@@ -127,63 +132,76 @@ class AccountProfile extends React.Component {
     }
     const avatarSet = checkAvatar(avatar);
     return (
-      <div>
-        <img className={s.avatar} src={avatar} alt="IMG" />
-        <ImageUpload
-          uploadAvatar={(data) => {
-            this.props.uploadAvatar({ ...data, id });
-          }}
-          uploadPending={this.props.updates.dataUrl && this.props.updates.dataUrl.pending}
-          uploadError={this.props.updates.dataUrl && this.props.updates.dataUrl.error}
-          uploadSuccess={this.props.updates.dataUrl && this.props.updates.dataUrl.success}
-        />
+      <Layer onClose={this.props.onClose}>
         <div>
-          <span>{name} {surname}</span>
-          {!avatarSet &&
-            <div>
-              <FormattedMessage {...messages.avatarMissing} />
-            </div>}
-          {!emailValidated &&
-            <div>
-              <FormattedMessage {...messages.emailValidationMissing} />
-            </div>}
+          <img className={s.avatar} src={avatar} alt="IMG" />
+          <Button
+            label={'Change image'}
+            onClick={() => {
+              this.setState({ showUpload: true });
+            }}
+            disabled={this.state.showUpload}
+          />
+          {this.state.showUpload &&
+            <ImageUpload
+              uploadAvatar={(data) => {
+                this.props.uploadAvatar({ ...data, id });
+              }}
+              uploadPending={this.props.updates.dataUrl && this.props.updates.dataUrl.pending}
+              uploadError={this.props.updates.dataUrl && this.props.updates.dataUrl.error}
+              uploadSuccess={this.props.updates.dataUrl && this.props.updates.dataUrl.success}
+              onClose={() => {
+                this.setState({ showUpload: false });
+              }}
+            />}
           <div>
-            <FormattedMessage {...messages.role} /> : {role.type}
+            <span>{name} {surname}</span>
+            {!avatarSet &&
+              <div>
+                <FormattedMessage {...messages.avatarMissing} />
+              </div>}
+            {!emailValidated &&
+              <div>
+                <FormattedMessage {...messages.emailValidationMissing} />
+              </div>}
+            <div>
+              <FormattedMessage {...messages.role} /> : {role.type}
+            </div>
+
+            <div>
+              <FormattedMessage {...messages.lastLogin} /> : {lastLogin || 'No Data'}
+            </div>
+
+            <p>
+              <RoleManager
+                accountId={id}
+                updateFn={this.props.update}
+                userRole={this.props.user.role.type}
+                accountRole={role.type}
+              />
+              {PrivilegePanel}
+              <Accordion>
+
+                <AccordionPanel heading={'Notify user'}>
+                  {'If you see this, you can notify users'} <br />
+
+                  WRITE
+                  <textarea />
+                  <p>
+                    <Button
+                      onClick={() => {
+                        alert('TO IMPLEMENT! \n mail, sms, accountmsg, messenger ?');
+                      }}
+                      label={<FormattedMessage {...messages.notify} />}
+                    />
+
+                  </p>
+                </AccordionPanel>
+              </Accordion>
+            </p>
           </div>
-
-          <div>
-            <FormattedMessage {...messages.lastLogin} /> : {lastLogin || 'No Data'}
-          </div>
-
-          <p>
-            <RoleManager
-              accountId={id}
-              updateFn={this.props.update}
-              userRole={this.props.user.role.type}
-              accountRole={role.type}
-            />
-            {PrivilegePanel}
-            <Accordion>
-
-              <AccordionPanel heading={'Notify user'}>
-                {'If you see this, you can notify users'} <br />
-
-                WRITE
-                <textarea />
-                <p>
-                  <Button
-                    onClick={() => {
-                      alert('TO IMPLEMENT! \n mail, sms, accountmsg, messenger ?');
-                    }}
-                    label={<FormattedMessage {...messages.notify} />}
-                  />
-
-                </p>
-              </AccordionPanel>
-            </Accordion>
-          </p>
         </div>
-      </div>
+      </Layer>
     );
   }
 }

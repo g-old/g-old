@@ -64,12 +64,12 @@ const saveToCloudinary = async ({ viewer, data: { dataUrl, id }, loaders }) => {
     if (user.avatar.indexOf('http') !== -1) {
       const publicId = getPublicIdFromUrl(user.avatar);
       await deleteFileOnCloudinary(publicId).catch((e) => {
-        console.log(`Cloudinary delete error: ${JSON.stringify(e)}`);
+        console.error(`Cloudinary delete error: ${JSON.stringify(e)}`);
       });
     }
 
     const response = await uploadToCloudinaryStream(buffer).catch((e) => {
-      console.log(`Cloudinary upload error: ${JSON.stringify(e)}`);
+      console.error(`Cloudinary upload error: ${JSON.stringify(e)}`);
     });
 
     if (!response || !response.url) throw Error('Cloudinary failed');
@@ -95,6 +95,7 @@ const saveToCloudinary = async ({ viewer, data: { dataUrl, id }, loaders }) => {
 };
 
 const saveLocal = async ({ viewer, data: { dataUrl, id }, loaders }, folder) => {
+  // throw Error('TEST');
   if (!canMutate(viewer, { dataUrl, id })) return null;
   const userId = id || viewer.id;
   const user = await User.gen(viewer, userId, loaders);

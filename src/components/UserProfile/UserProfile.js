@@ -14,6 +14,7 @@ import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
 import ImageUpload from '../ImageUpload';
 import Box from '../Box';
+import Button from '../Button';
 
 const messages = defineMessages({
   settings: {
@@ -63,7 +64,7 @@ class UserProfile extends React.Component {
   };
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { showUpload: false };
   }
 
   componentDidMount() {
@@ -71,25 +72,49 @@ class UserProfile extends React.Component {
     this.props.fetchUser({ id });
   }
 
+  componentWillReceiveProps({ updates }) {
+    if (updates.dataUrl && updates.dataUrl.success) {
+      this.setState({ showUpload: false });
+    }
+  }
   render() {
     if (!this.props.user) return null;
     const updates = this.props.updates;
 
     const { avatar, name, surname, followees } = this.props.user;
+    let uploadButton = (
+      <Button
+        label={'Change image'}
+        onClick={() => {
+          this.setState({ showUpload: true });
+        }}
+        disabled={this.state.showUpload}
+      />
+    );
+    if (updates.dataUrl && updates.dataUrl.success) {
+      uploadButton = null;
+    }
 
     return (
       <Box>
         <Box>
           <div>
-            <ImageUpload
-              uploadAvatar={(data) => {
-                this.props.uploadAvatar({ ...data, id: this.props.user.id });
-              }}
-              uploadPending={updates.dataUrl && updates.dataUrl.pending}
-              uploadError={updates.dataUrl && updates.dataUrl.error}
-              uploadSuccess={updates.dataUrl && updates.dataUrl.success}
-            />
-            <img className={s.avatar} src={avatar} alt="IMG" />
+            <Box pad column>
+              <img className={s.avatar} src={avatar} alt="IMG" />
+              {uploadButton}
+              {this.state.showUpload &&
+                <ImageUpload
+                  uploadAvatar={(data) => {
+                    this.props.uploadAvatar({ ...data, id: this.props.user.id });
+                  }}
+                  uploadPending={updates.dataUrl && updates.dataUrl.pending}
+                  uploadError={updates.dataUrl && updates.dataUrl.error}
+                  uploadSuccess={updates.dataUrl && updates.dataUrl.success}
+                  onClose={() => {
+                    this.setState({ showUpload: false });
+                  }}
+                />}
+            </Box>
             <h3>{name}</h3>
             <h3>{surname}</h3>
             <h3>{'Some Data'}</h3>
