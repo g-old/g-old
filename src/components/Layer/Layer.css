@@ -1,5 +1,32 @@
-.avatar {
-  width: 256px;
-  height: 256px;
-  border-radius: 10%;
+.layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.5);
+  height: 100vh;
+  overflow: auto;
+}
+
+.container {
+  bottom: 50%;
+  right: 50%;
+  max-height: calc(100vh - 48px);
+  max-width: calc(100vw - 48px);
+  transform: translate(50%, 50%);
+}
+
+.layer .container {
+  position: absolute;
+  max-height: 100%;
+  max-width: 100%;
+  overflow: auto;
+  padding: 0 48px;
+  border-radius: 4px;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
 }

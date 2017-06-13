@@ -758,14 +758,5 @@
     "files": [
       "src/components/ImageUpload/ImageUpload.js"
     ]
-  },
-  {
-    "id": "signup.upload",
-    "description": "No description",
-    "defaultMessage": "Upload your profile image",
-    "message": "",
-    "files": [
-      "src/routes/signup/SignupContainer.js"
-    ]
   }
 ]
