@@ -4,25 +4,7 @@
 import React from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
 import DropContents from '../DropContents';
-
-function findScrollParents(element, horizontal) {
-  const result = [];
-  let parent = element.parentNode;
-  while (parent && parent.getBoundingClientRect) {
-    const rect = parent.getBoundingClientRect();
-    // 10px is to account for borders and scrollbars in a lazy way
-    if (horizontal) {
-      if (rect.width && parent.scrollWidth > rect.width + 10) {
-        result.push(parent);
-      }
-    } else if (rect.height && parent.scrollHeight > rect.height + 10) {
-      result.push(parent);
-    }
-    parent = parent.parentNode;
-  }
-  result.push(document);
-  return result;
-}
+import { findScrollParents } from '../../core/helpers';
 
 class Drop {
   constructor(control, content, options) {

@@ -1,47 +1,10 @@
-@import '../../components/variables.css';
 
-.inputfile {
-  width: 0.1px;
-  height: 0.1px;
-  opacity: 0;
-  overflow: hidden;
-  position: absolute;
-  z-index: -1;
+.footer {
+  padding-top: 1em;
+  padding-bottom: 1em;
 }
 
-/* https://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-way/ */
-.inputfile + label {
-  font-size: 2em;
-  font-weight: 700;
-  color: white;
-  background-color: black;
-  display: inline-block;
-  cursor: pointer;
-}
-
-.inputfile:focus + label,
-.inputfile + label:hover {
-  background-color: red;
-}
-
-/*
-.inputfile:focus + label {
-  outline: 1px dotted #000;
-  outline: -webkit-focus-ring-color auto 5px;
-}
-*/
-.inputfile + label * {
-  pointer-events: none; /* to work with fastclick */
-}
-
-/* https://css-tricks.com/styling-cross-browser-compatible-range-inputs-css/ */
-.slider {
-  width: 100%;
-  border-radius: 5px;
-  background: #2c3e50;
-  cursor: pointer;
-}
-
-.slider::-webkit-slider-runnable-track {
-  background: #d7dcdf;
+.article {
+  padding-top: 2.5em;
+  padding-bottom: 2.5em;
 }

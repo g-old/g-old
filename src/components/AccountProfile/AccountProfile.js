@@ -98,9 +98,12 @@ class AccountProfile extends React.Component {
       this.props.fetchUser({ id: this.props.accountId });
     }
   }
-  componentWillReceiveProps({ accountId }) {
+  componentWillReceiveProps({ accountId, updates }) {
     if (accountId && accountId !== this.props.accountId) {
       this.props.fetchUser({ id: this.props.accountId });
+    }
+    if (updates.dataUrl && updates.dataUrl.success) {
+      this.setState({ showUpload: false });
     }
   }
   onPromoteToViewer() {

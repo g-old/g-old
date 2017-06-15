@@ -29,22 +29,24 @@ class LayerContents extends React.Component {
     const { onClose, children, className } = this.props;
     return (
       <div className={className}>
-        <Button
-          onClick={onClose}
-          plain
-          icon={
-            <svg
-              version="1.1"
-              viewBox="0 0 24 24"
-              width="24px"
-              height="24px"
-              role="img"
-              aria-label="close"
-            >
-              <path fill="none" stroke="#000" strokeWidth="2" d="M3,3 L21,21 M3,21 L21,3" />
-            </svg>
-          }
-        />
+        <div style={{ position: 'absolute', top: 0, right: 0, zIndex: 1, margin: '12px' }}>
+          <Button
+            onClick={onClose}
+            plain
+            icon={
+              <svg
+                version="1.1"
+                viewBox="0 0 24 24"
+                width="24px"
+                height="24px"
+                role="img"
+                aria-label="close"
+              >
+                <path fill="none" stroke="#000" strokeWidth="2" d="M3,3 L21,21 M3,21 L21,3" />
+              </svg>
+            }
+          />
+        </div>
         {children}
       </div>
     );

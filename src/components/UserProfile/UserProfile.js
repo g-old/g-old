@@ -15,6 +15,7 @@ import AccordionPanel from '../AccordionPanel';
 import ImageUpload from '../ImageUpload';
 import Box from '../Box';
 import Button from '../Button';
+import Value from '../Value';
 
 const messages = defineMessages({
   settings: {
@@ -118,6 +119,31 @@ class UserProfile extends React.Component {
             <h3>{name}</h3>
             <h3>{surname}</h3>
             <h3>{'Some Data'}</h3>
+            <Box pad>
+              <Value label="Followers" value={101} />
+              <Value
+                icon={
+                  <svg
+                    version="1.1"
+                    viewBox="0 0 24 24"
+                    width="24px"
+                    height="24px"
+                    role="img"
+                    aria-label="star"
+                  >
+                    <polygon
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      points="5 21 8 14 3 9 9 9 12 3 15 9 21 9 16 14 19 21 12 17"
+                    />
+                  </svg>
+                }
+                label="Likes"
+                value={999}
+              />
+              <Value label="Statements" value={1337} />
+            </Box>
             <div>
               <Icon
                 icon={

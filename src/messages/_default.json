@@ -716,5 +716,14 @@
     "files": [
       "src/components/ImageUpload/ImageUpload.js"
     ]
+  },
+  {
+    "id": "poll.changeVote",
+    "description": "Changeing vote",
+    "defaultMessage": "Change your vote",
+    "message": "",
+    "files": [
+      "src/components/Poll/Poll.js"
+    ]
   }
 ]

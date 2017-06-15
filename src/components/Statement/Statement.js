@@ -220,7 +220,7 @@ class Statement extends React.Component {
     } else {
       menu = (
         <Menu
-          dropAlign={{ top: 'top', left: 'left' }}
+          dropAlign={{ top: 'top', right: 'right' }}
           icon={<Icon icon={ICONS.menu} size={20} color="grey" />}
         >
           {canFollow && <Button onClick={this.handleFollowing} plain label="Followme" />}
@@ -248,13 +248,21 @@ class Statement extends React.Component {
                 </span>
                 <span>
                   {this.props.data.likes ? ` (+${this.props.data.likes})` : ''}
+
                   {canLike &&
-                    <button
+                    <Button
                       onClick={e => this.handleLikeClick(e, this.props.ownLike)}
-                      className={cn(
-                        s.like,
-                        this.props.ownLike ? 'fa fa-thumbs-up' : 'fa fa-thumbs-o-up',
-                      )}
+                      plain
+                      icon={
+                        <svg viewBox="0 0 24 24" width="16px" height="16px">
+                          <path
+                            fill="none"
+                            stroke={this.props.ownLike ? '#8cc800' : '#666'}
+                            strokeWidth="1"
+                            d={ICONS.thumbUpAlt}
+                          />
+                        </svg>
+                      }
                     />}
                 </span>
               </div>

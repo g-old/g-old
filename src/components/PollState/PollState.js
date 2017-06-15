@@ -4,6 +4,8 @@ import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './PollState.css';
 import VotesList from '../VotesList';
+import Value from '../Value';
+import { ICONS } from '../../constants';
 
 class PollState extends React.Component {
   static propTypes = {
@@ -44,6 +46,7 @@ class PollState extends React.Component {
   }
 
   render() {
+    const { compact, unipolar } = this.props;
     const voteClass = this.props.unipolar ? s.unipolar : s.bipolar;
 
     const sum = this.props.unipolar
@@ -53,6 +56,38 @@ class PollState extends React.Component {
     const upPercent = sum > 0 ? 100 * (this.props.upvotes / sum) : 0;
     const voteBar = <div className={cn(s.bar)} style={{ width: `${upPercent}%` }} />;
 
+    let numUpVotes = null;
+    let numDownVotes = null;
+    if (!compact) {
+      if (!unipolar) {
+        numDownVotes = (
+          <Value
+            value={this.props.downvotes}
+            trendIcon={
+              <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                <path
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth="2"
+                  d={ICONS.up}
+                  transform="matrix(1 0 0 -1 0 24)"
+                />
+              </svg>
+            }
+          />
+        );
+      }
+      numUpVotes = (
+        <Value
+          trendIcon={
+            <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+              <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.up} />
+            </svg>
+          }
+          value={this.props.upvotes}
+        />
+      );
+    }
     /* eslint-disable jsx-a11y/no-static-element-interactions */
     /* eslint-disable jsx-a11y/interactive-supports-focus */
     return (
@@ -62,11 +97,7 @@ class PollState extends React.Component {
         role="button"
       >
         <div className={s.header}>
-          {!this.props.compact
-            ? <div className={s.voteCount}>
-              {this.props.upvotes}
-            </div>
-            : ''}
+          {numUpVotes}
           <div className={s.barContainer}>
             {voteBar}
             <div
@@ -76,11 +107,7 @@ class PollState extends React.Component {
               }}
             />
           </div>
-          {!this.props.compact
-            ? <div className={s.voteCount} style={{ textAlign: 'right' }}>
-              {!this.props.unipolar ? `${this.props.downvotes}` : ''}
-            </div>
-            : ''}
+          {numDownVotes}
         </div>
         {this.state.expand &&
           <div className={s.votesList}>

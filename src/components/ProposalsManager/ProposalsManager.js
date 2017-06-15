@@ -6,6 +6,7 @@ import {
   getVisibleProposals,
   getProposalsIsFetching,
   getProposalsErrorMessage,
+  getProposalsPage,
 } from '../../reducers';
 import { updateProposal, loadProposalsList } from '../../actions/proposal';
 import PollInput from '../PollInput';
@@ -78,7 +79,6 @@ const ProposalInfo = props =>
     />
 
     {props.children}
-
   </div>);
 
 ProposalInfo.propTypes = {
@@ -199,7 +199,10 @@ class ProposalsManager extends React.Component {
     }
     if (errorMessage && !proposals.length) {
       return (
-        <FetchError message={errorMessage} onRetry={() => this.props.loadProposalsList('active')} />
+        <FetchError
+          message={errorMessage}
+          onRetry={() => this.props.loadProposalsList({ state: 'active' })}
+        />
       );
     }
     const toRender = proposals.filter(p => p.state === 'proposed');
@@ -311,6 +314,7 @@ const mapPropsToState = state => ({
   proposals: getVisibleProposals(state, 'active'),
   isFetching: getProposalsIsFetching(state, 'active'),
   errorMessage: getProposalsErrorMessage(state, 'active'),
+  pageInfo: getProposalsPage(state, 'active'),
 });
 const mapDispatch = {
   updateProposal,

@@ -56,6 +56,7 @@
     "rc-time-picker": "^2.4.0",
     "react": "^15.5.4",
     "react-addons-css-transition-group": "^15.5.2",
+    "react-addons-transition-group": "^15.6.0",
     "react-autosuggest": "^9.0.1",
     "react-avatar-editor": "^9.1.1",
     "react-deep-force-update": "^2.0.1",
@@ -63,6 +64,7 @@
     "react-infinite-calendar": "^2.2.0",
     "react-intl": "^2.2.3",
     "react-redux": "^5.0.4",
+    "react-transition-group": "^1.2.0",
     "redux": "^3.6.0",
     "redux-logger": "^3.0.1",
     "redux-thunk": "^2.2.0",
@@ -186,7 +188,6 @@
       "git add"
     ],
     "*.{css,less,scss,sss}": [
-      "stylefmt",
       "stylelint",
       "git add"
     ]

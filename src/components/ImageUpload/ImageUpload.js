@@ -8,6 +8,7 @@ import Box from '../Box';
 import Button from '../Button';
 import Label from '../Label';
 import Layer from '../Layer';
+import FormField from '../FormField';
 
 const standardValues = {
   scale: 1,
@@ -45,13 +46,11 @@ class ImageUpload extends React.Component {
     uploadAvatar: PropTypes.func.isRequired,
     uploadPending: PropTypes.bool.isRequired,
     uploadError: PropTypes.shape({}),
-    open: PropTypes.bool,
     onClose: PropTypes.func,
   };
   static defaultProps = {
     uploadError: null,
     uploadSuccess: false,
-    open: false,
     onClose: null,
   };
   constructor(props) {
@@ -69,17 +68,6 @@ class ImageUpload extends React.Component {
     this.handleLeftRotation = this.handleLeftRotation.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.open === true) {
-      if (!this.props.open) {
-        this.setState({ src: '' });
-        this.input.click();
-      }
-    } else if (nextProps.open === false) {
-      this.input.value = '';
-      this.setState({ src: '' });
-    }
-  }
   onChange(e) {
     e.preventDefault();
     let files;
@@ -128,9 +116,10 @@ class ImageUpload extends React.Component {
   render() {
     let editor = null;
     const { uploadPending, uploadError, onClose } = this.props;
+    const disableControls = !this.state.src;
 
     editor = (
-      <Box justify>
+      <Box pad justify column>
         <AvatarEditor
           ref={this.setEditorRef}
           image={this.state.src}
@@ -145,21 +134,50 @@ class ImageUpload extends React.Component {
           onLoadFailure={() => alert('Image could not been loaded -> load another one')}
           onLoadSuccess={() => this.setState({ loaded: true })}
         />
-        <Box pad column>
-          <Label>{'Zoom:'}</Label>
-          <input
-            className={s.slider}
-            name="scale"
-            type="range"
-            onChange={this.handleScale}
-            min="1"
-            max="2"
-            step="0.01"
-            defaultValue="1"
-          />
-          <Button
-            label={<FormattedMessage {...messages.rotate} />}
-            icon={
+        <Box pad column justify>
+
+          <Box pad justify>
+            <Label>{'Zoom:'}</Label>
+
+            <Button
+              plain
+              disable={disableControls}
+              onClick={() => {
+                this.setState({ scale: this.state.scale + 0.1 });
+              }}
+              icon={
+                <svg viewBox="0 0 24 24" width="24px" height="24px" role="img" aria-label="add">
+                  <path fill="none" stroke="#000" strokeWidth="2" d="M12,22 L12,2 M2,12 L22,12" />
+                </svg>
+              }
+            />
+
+            <Button
+              plain
+              disable={disableControls}
+              onClick={() => {
+                this.setState({ scale: Math.max(this.state.scale - 0.1, 1) });
+              }}
+              icon={
+                <svg
+                  viewBox="0 0 24 24"
+                  width="24px"
+                  height="24px"
+                  role="img"
+                  aria-label="subtract"
+                >
+                  <path fill="none" stroke="#000" strokeWidth="2" d="M2,12 L22,12" />
+                </svg>
+              }
+            />
+          </Box>
+          <Box justify>
+            <Button
+              disable={disableControls}
+              plain
+              label={<FormattedMessage {...messages.rotate} />}
+              onClick={this.handleLeftRotation}
+            >
               <svg viewBox={'0 0 24 24'} width={24} height={24}>
                 <path
                   fill="none"
@@ -168,16 +186,8 @@ class ImageUpload extends React.Component {
                   d="M8,3 L3,8 L8,13 M12,20 L15,20 C18.3137085,20 21,17.3137085 21,14 C21,10.6862915 18.3137085,8 15,8 L4,8"
                 />
               </svg>
-            }
-            onClick={this.handleLeftRotation}
-          />
-          <Button
-            fill
-            primary
-            label={<FormattedMessage {...messages.upload} />}
-            onClick={this.handleSave}
-            disabled={uploadPending}
-          />
+            </Button>
+          </Box>
         </Box>
 
       </Box>
@@ -185,26 +195,33 @@ class ImageUpload extends React.Component {
 
     return (
       <Layer onClose={onClose}>
-        <Box column>
-          <input
-            ref={input => (this.input = input)}
-            className={s.inputfile}
-            name="file"
-            type="file"
-            id="file"
-            accept="image/*"
-            onChange={this.onChange}
-          />
-          <Label htmlFor="file">
-            Browse
-          </Label>
-          {editor}
+        <div className={s.article}>
+          <FormField label="File">
+            <input
+              ref={input => (this.input = input)}
+              onChange={this.onChange}
+              accept="image/*"
+              type="file"
+            />
+          </FormField>
+          <FormField label="Image">
+            {editor}
+
+          </FormField>
+          <div className={s.footer}>
+            <Button
+              primary
+              label={<FormattedMessage {...messages.upload} />}
+              onClick={this.handleSave}
+              disabled={uploadPending || disableControls}
+            />
+          </div>
           {uploadPending && 'Uploading...'}
           {uploadError &&
             <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
               <FormattedMessage {...messages.error} />
             </div>}
-        </Box>
+        </div>
       </Layer>
     );
   }

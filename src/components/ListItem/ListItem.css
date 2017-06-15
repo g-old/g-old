@@ -1,0 +1,7 @@
+.item {
+  max-width: none;
+}
+
+.item:hover {
+  background-color: red;
+}

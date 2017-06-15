@@ -7,6 +7,9 @@ import cn from 'classnames';
 import StatementsList from '../StatementsList';
 import PollState from '../PollState';
 import s from './Poll.css';
+import { ICONS } from '../../constants';
+import Button from '../Button';
+import Box from '../Box';
 import {
   getVotingListIsFetching,
   getVotingListErrorMessage,
@@ -28,6 +31,11 @@ const messages = defineMessages({
     id: 'poll.closing',
     defaultMessage: 'Closing at',
     description: 'Poll ending time',
+  },
+  change: {
+    id: 'poll.changeVote',
+    defaultMessage: 'Change your vote',
+    description: 'Changeing vote',
   },
 });
 
@@ -101,15 +109,15 @@ class Poll extends React.Component {
     }
     return this.props.followeeVotes
       .filter(user => user.position === pos)
-      .map(user => (
-        <img
+      .map(user =>
+        (<img
           key={user.id}
           className={s.followee}
           src={user.voter.avatar}
           title={`${user.voter.name} ${user.voter.surname}`}
           alt="IMG"
-        />
-      ));
+        />),
+      );
   }
 
   canVote(position) {
@@ -175,41 +183,80 @@ class Poll extends React.Component {
     if (!this.props.poll.closed_at && !['viewer', 'guest'].includes(this.props.user.role.type)) {
       // TODO Find better check
       // eslint-disable-next-line no-nested-ternary
-      const proBtnColor = this.props.poll.ownVote && this.props.poll.ownVote.position === 'pro' ? s.proBtnColor : '';
+      const proBtnColor = this.props.poll.ownVote && this.props.poll.ownVote.position === 'pro'
+        ? s.proBtnColor
+        : '';
       // eslint-disable-next-line no-nested-ternary
-      const conBtnColor = this.props.poll.ownVote && this.props.poll.ownVote.position === 'con' ? s.conBtnColor : '';
+      const conBtnColor = this.props.poll.ownVote && this.props.poll.ownVote.position === 'con'
+        ? s.conBtnColor
+        : '';
       if (this.props.poll.mode.unipolar) {
         votingButtons = (
           <div>
-            <button
+            <Button disabled={mutationIsPending} onClick={() => this.canVote('pro')} plain>
+              Stop this!
+              <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
+                <path
+                  fill="none"
+                  stroke={proBtnColor ? '#ff324d' : '#666'}
+                  strokeWidth="1"
+                  d={ICONS.halt}
+                />
+              </svg>
+            </Button>
+            {/* <button
               className={cn(proBtnColor)}
               disabled={mutationIsPending}
               onClick={() => this.canVote('pro')}
             >
 
               <i className="fa fa-hand-paper-o" />
-            </button>
+            </button>*/}
             {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
           </div>
         );
       } else if (this.props.poll.ownStatement) {
         votingButtons = (
           <div>
-            <button
+            <Button disabled={mutationIsPending} onClick={this.handleRetractVote}>
+              <FormattedMessage {...messages.change} />
+            </Button>
+            {/*  <button
               style={{ marginBottom: '1em' }}
               disabled={mutationIsPending}
               onClick={this.handleRetractVote}
             >
               RETRACT VOTE - AND DELETE STATEMENT
-            </button>
+            </button> */}
             {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
           </div>
         );
       } else {
         votingButtons = (
-          <div>
-            <span>
-              <button
+          <div style={{ paddingBottom: '2em' }}>
+            <Box pad>
+              <Button plain onClick={() => this.canVote('pro')} disabled={mutationIsPending}>
+                <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
+                  <path
+                    fill="none"
+                    stroke={proBtnColor ? '#8cc800' : '#666'}
+                    strokeWidth="1"
+                    d={ICONS.thumbUpAlt}
+                  />
+                </svg>
+              </Button>
+              <Button plain onClick={() => this.canVote('con')} disabled={mutationIsPending}>
+                <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
+                  <path
+                    fill="none"
+                    stroke={conBtnColor ? '#ff324d' : '#666'}
+                    strokeWidth="1"
+                    d={ICONS.thumbUpAlt}
+                    transform="rotate(180 12 12)"
+                  />
+                </svg>
+              </Button>
+              {/* <button
                 className={cn(proBtnColor)}
                 disabled={mutationIsPending}
                 onClick={() => this.canVote('pro')}
@@ -223,8 +270,8 @@ class Poll extends React.Component {
                 onClick={() => this.canVote('con')}
               >
                 <i className="fa fa-thumbs-down" />
-              </button>
-            </span>
+              </button> */}
+            </Box>
             {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
           </div>
         );
@@ -232,6 +279,16 @@ class Poll extends React.Component {
     }
     return (
       <div>
+        <p>
+          {this.props.poll.closed_at
+            ? <FormattedMessage {...messages.closed} />
+            : <FormattedMessage {...messages.closing} />}
+          {' '}
+          <FormattedRelative
+            value={this.props.poll.closed_at ? this.props.poll.closed_at : this.props.poll.end_time}
+          />
+
+        </p>
         <div className={s.pollState}>
           <PollState
             allVoters={this.props.poll.allVoters}
@@ -254,19 +311,12 @@ class Poll extends React.Component {
             {this.getFolloweeVotes('con')}
           </div>
         </div>
-        <p>
-          {this.props.poll.closed_at
-            ? <FormattedMessage {...messages.closed} />
-            : <FormattedMessage {...messages.closing} />}
-          {' '}
-          <FormattedRelative
-            value={this.props.poll.closed_at ? this.props.poll.closed_at : this.props.poll.end_time}
-          />
 
-        </p>
-        {mutationErrorMessage && <div> {'ERROR:'} </div>}
-        {votingButtons}
-        {statements}
+        <Box justify>
+          {mutationErrorMessage && <div> {'ERROR:'} </div>}
+          {votingButtons}
+          {statements}
+        </Box>
       </div>
     );
   }

@@ -1,0 +1,6 @@
+{
+  "name": "Value",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Value.js"
+}
