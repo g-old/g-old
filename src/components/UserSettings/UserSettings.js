@@ -141,6 +141,7 @@ class UserSettings extends React.Component {
         email: emailValidation,
       },
       this,
+      obj => obj.state,
       {
         minPasswordLength: 6,
       },

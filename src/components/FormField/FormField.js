@@ -10,10 +10,13 @@ class FormField extends React.Component {
   static propTypes = {
     children: PropTypes.element.isRequired,
     error: PropTypes.node,
-    label: PropTypes.node.isRequired,
+    label: PropTypes.node,
+    help: PropTypes.node,
   };
   static defaultProps = {
     error: null,
+    label: null,
+    help: null,
   };
 
   constructor(props) {
@@ -58,9 +61,9 @@ class FormField extends React.Component {
   }
 
   render() {
-    const { error, children, label } = this.props;
+    const { error, children, label, help } = this.props;
     const fieldError = error ? <span className={s.field_error}>{error}</span> : undefined;
-
+    const fieldHelp = help ? <span className={s.help}>{help}</span> : undefined;
     /* eslint-disable jsx-a11y/no-static-element-interactions */
     return (
       <div
@@ -69,6 +72,7 @@ class FormField extends React.Component {
       >
         {fieldError}
         {label}
+        {fieldHelp}
         <span ref={ref => (this.contentsRef = ref)} className={s.contents}>{children}</span>
       </div>
     );

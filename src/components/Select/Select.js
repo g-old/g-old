@@ -215,7 +215,15 @@ class Select extends React.Component {
           readOnly
           value={renderValue(value)}
         />
-        <Button className={s.select_control} plain label={'V'} />
+        <Button
+          className={s.select_control}
+          plain
+          icon={
+            <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+              <polygon fill="none" stroke="#000" strokeWidth="2" points="22 8 12 20 2 8" />
+            </svg>
+          }
+        />
       </div>
     );
   }

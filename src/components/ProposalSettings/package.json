@@ -1,0 +1,6 @@
+{
+  "name": "ProposalSettings",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ProposalSettings.js"
+}

@@ -150,6 +150,7 @@ class SignUp extends React.Component {
         name: nameValidation,
       },
       this,
+      obj => obj.state,
       {
         minPasswordLength: 6,
       },

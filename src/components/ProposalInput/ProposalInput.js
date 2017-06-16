@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import MarkdownIt from 'markdown-it';
-import cn from 'classnames';
+import { defineMessages, FormattedMessage } from 'react-intl';
+
 // import Calendar from '../Calendar';
 import { createProposal } from '../../actions/proposal';
 import s from './ProposalInput.css';
@@ -17,17 +18,56 @@ import TagInput from '../TagInput';
 import PollInput from '../PollInput';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 import Button from '../Button';
+import FormField from '../FormField';
+import Box from '../Box';
+import Layer from '../Layer';
+import Proposal from '../Proposal2';
+import { ICONS } from '../../constants';
+import {
+  nameValidation,
+  createValidator,
+  dateToValidation,
+  timeToValidation,
+} from '../../core/validation';
+
+const messages = defineMessages({
+  empty: {
+    id: 'form.error-empty',
+    defaultMessage: "You can't leave this empty",
+    description: 'Help for empty fields',
+  },
+  past: {
+    id: 'form.error-past',
+    defaultMessage: 'Time already passed',
+    description: 'Help for wrong time settings',
+  },
+});
 
 const standardValues = {
   textArea: { val: '', selection: [0, 0] },
-  title: { val: '' },
 
-  settings: { pollOption: '1' },
+  settings: { pollOption: '1', title: '', body: '' },
   tags: {},
   showInput: false,
   tagId: 'xt0',
   currentTagIds: [],
+  errors: {
+    title: {
+      touched: false,
+    },
+    body: {
+      touched: false,
+    },
+    dateTo: {
+      touched: false,
+    },
+    timeTo: {
+      touched: false,
+    },
+  },
 };
+
+const formFields = ['title', 'body', 'dateTo', 'timeTo'];
 class ProposalInput extends React.Component {
   static propTypes = {
     createProposal: PropTypes.func.isRequired,
@@ -64,22 +104,38 @@ class ProposalInput extends React.Component {
     this.onModeChange = this.onModeChange.bind(this);
     this.onTRefChange = this.onTRefChange.bind(this);
     this.onTitleChange = this.onTitleChange.bind(this);
-    this.handleDateTimeChange = this.handleDateTimeChange.bind(this);
     this.handleTagInputChange = this.handleTagInputChange.bind(this);
     this.handleKeys = this.handleKeys.bind(this);
-    this.rawMarkup = this.rawMarkup.bind(this);
     this.onStrong = this.onStrong.bind(this);
     this.onItalic = this.onItalic.bind(this);
     this.onAddLink = this.onAddLink.bind(this);
     this.handleValueChanges = this.handleValueChanges.bind(this);
     this.toggleSettings = this.toggleSettings.bind(this);
+    this.handleValidation = this.handleValidation.bind(this);
+    this.visibleErrors = this.visibleErrors.bind(this);
+    this.handleBlur = this.handleBlur.bind(this);
+
     this.md = new MarkdownIt({
       // html: true,
       linkify: true,
     });
-  }
-  componentDidMount() {
-    //    this.props.loadTags();
+
+    const testValues = {
+      title: { fn: 'name' },
+      body: { fn: 'name' },
+      dateTo: { fn: 'date' },
+      timeTo: { fn: 'time' },
+    };
+    this.Validator = createValidator(
+      testValues,
+      {
+        name: nameValidation,
+        date: dateToValidation,
+        time: timeToValidation,
+      },
+      this,
+      obj => obj.state.settings,
+    );
   }
 
   componentWillReceiveProps(nextProps) {
@@ -103,10 +159,7 @@ class ProposalInput extends React.Component {
   onTextSelect(e) {
     this.setState({
       ...this.state,
-      textArea: {
-        ...this.state.textArea,
-        selection: [e.target.selectionStart, e.target.selectionEnd],
-      },
+      textSelection: [e.target.selectionStart, e.target.selectionEnd],
     });
   }
   onTitleChange(e) {
@@ -133,62 +186,76 @@ class ProposalInput extends React.Component {
 
   onSubmit() {
     // TODO validate
-    const title = this.state.title.val.trim();
-    const markup = this.md.render(this.state.textArea.val); // trim?
-    // TODO sanitize input
+    if (this.handleValidation(formFields)) {
+      const startTime = null;
+      let endTime = null;
+      const { dateTo, timeTo, body, title, pollOption } = this.state.settings;
+      // currently not in use
+      /*  if (dateFrom || timeFrom) {
+        dateFrom = dateFrom || new Date();
+        timeFrom = timeFrom || utcCorrectedDate().slice(11, 16);
+        startTime = concatDateAndTime(dateFrom, timeFrom);
+      }
+      */
+      if (dateTo || timeTo) {
+        const date = dateTo || utcCorrectedDate(3).slice(0, 10);
+        const time = timeTo || utcCorrectedDate().slice(11, 16);
 
-    let startTime = null;
-    let endTime = null;
-    let { dateFrom, timeFrom, dateTo, timeTo } = this.state.settings;
-    if (dateFrom || timeFrom) {
-      dateFrom = dateFrom || new Date();
-      timeFrom = timeFrom || utcCorrectedDate().slice(11, 16);
-      startTime = concatDateAndTime(dateFrom, timeFrom);
-    }
-    if (dateTo || timeTo) {
-      dateTo = dateTo || new Date();
-      timeTo = timeTo || utcCorrectedDate().slice(11, 16);
+        endTime = concatDateAndTime(date, time);
+      }
+      const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
 
-      endTime = concatDateAndTime(dateTo, timeTo);
-    }
-    const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
-    const pollingModeId = this.state.settings.pollOption;
+      /* eslint-disable no-confusing-arrow */
+      const tags =
+        this.state.currentTagIds.map(
+          id =>
+            this.state.tags[id].id.indexOf('xt') === 0
+              ? { text: this.state.tags[id].text }
+              : { id: this.state.tags[id].id },
+        ) || null;
+      /* eslint-enable no-confusing-arrow */
 
-    /* eslint-disable no-confusing-arrow */
-    const tags =
-      this.state.currentTagIds.map(
-        id =>
-          this.state.tags[id].id.indexOf('xt') === 0
-            ? { text: this.state.tags[id].text }
-            : { id: this.state.tags[id].id },
-      ) || null;
-    /* eslint-enable no-confusing-arrow */
-
-    const state = pollingModeId === '3' ? 'survey' : null;
-    if (title && markup) {
       this.props.createProposal({
-        title,
-        text: markup,
-        state,
+        title: title.trim(),
+        text: this.md.render(body),
+        state: pollOption === '3' ? 'survey' : null,
         poll: {
           startTime,
           endTime,
           secret,
-          threshold: threshold || this.props.defaultPollValues[pollingModeId].threshold,
+          threshold: threshold || this.props.defaultPollValues[pollOption].threshold,
           mode: {
             withStatements,
-            id: pollingModeId,
+            id: pollOption,
             unipolar,
             thresholdRef,
           },
         },
         tags,
       });
-    } else if (!title) {
-      alert('TITLE MISSING');
     }
   }
+  visibleErrors(errorNames) {
+    return errorNames.reduce((acc, curr) => {
+      const err = `${curr}Error`;
+      if (this.state.errors[curr].touched) {
+        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+      }
+      return acc;
+    }, {});
+  }
 
+  handleValidation(fields) {
+    const validated = this.Validator(fields);
+    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
+    return validated.failed === 0;
+  }
+  handleBlur(e) {
+    const field = e.target.name;
+    if (this.state.settings[field]) {
+      this.handleValidation([field]);
+    }
+  }
   handleValueChanges(e) {
     let value;
     switch (e.target.name) {
@@ -198,6 +265,9 @@ class ProposalInput extends React.Component {
       case 'timeTo':
       case 'threshold':
       case 'thresholdRef':
+      case 'tagInput':
+      case 'title':
+      case 'body':
       case 'pollOption': {
         value = e.target.value;
         break;
@@ -219,11 +289,11 @@ class ProposalInput extends React.Component {
   }
 
   isSomethingSelected() {
-    return this.state.textArea.selection[0] !== this.state.textArea.selection[1];
+    return this.state.textSelection[0] !== this.state.textSelection[1];
   }
   insertAtSelection(pre, post) {
-    let val = this.state.textArea.val;
-    let sel = this.state.textArea.selection;
+    let val = this.state.settings.body;
+    let sel = this.state.textSelection;
     val = `${val.substring(0, sel[0])}${pre}${val.substring(sel[0], sel[1])}${post}${val.substring(
       sel[1],
     )}`;
@@ -231,12 +301,12 @@ class ProposalInput extends React.Component {
 
     this.setState({
       ...this.state,
-      textArea: { val, selection: sel },
+      settings: {
+        ...this.state.settings,
+        body: val,
+      },
+      textSelection: sel,
     });
-  }
-
-  handleDateTimeChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
   }
 
   handleTagInputChange(e) {
@@ -253,12 +323,9 @@ class ProposalInput extends React.Component {
     }
   }
 
-  rawMarkup() {
-    const rawMarkup = this.md.render(this.state.textArea.val);
-    return { __html: rawMarkup };
-  }
-
   render() {
+    const { title, body } = this.state.settings;
+    const { titleError, bodyError, ...pollErrors } = this.visibleErrors(formFields);
     return (
       <div className={s.root}>
         <div className={s.container}>
@@ -274,50 +341,58 @@ class ProposalInput extends React.Component {
             toggleSettings={this.toggleSettings}
             pollOptions={this.props.pollOptions}
             intl={this.context.intl}
+            formErrors={pollErrors}
+            handleBlur={this.handleBlur}
           />
-
-          <div className={s.formGroup}>
-            <label className={s.label} htmlFor="titleinput">
-              Titel
-            </label>
+          <FormField label={'Title'} error={titleError}>
             <input
-              className={s.input}
-              name="titleinput"
+              name="title"
+              onBlur={this.handleBlur}
               type="text"
-              value={this.state.title.val}
-              onChange={this.onTitleChange}
+              value={title}
+              onChange={this.handleValueChanges}
             />
-          </div>
-          <div className={s.formGroup}>
-            <label className={s.label} htmlFor="textarea">
-              Text - you can use Markdown!
-            </label>
-            <div className={s.editorButtons}>
-              <button onClick={this.onStrong}>
-                <strong>A</strong>
-              </button>
-              <button onClick={this.onItalic}>
-                <i>A</i>
-              </button>
-              <button onClick={this.onAddLink}>
-                <i className={'fa fa-link'} />
-              </button>
-            </div>
+          </FormField>
+          <FormField
+            error={bodyError}
+            label={'Body'}
+            help={
+              <Box pad>
+
+                <Button onClick={this.onStrong} plain icon={<strong>A</strong>} />
+                <Button onClick={this.onItalic} plain icon={<i>A</i>} />
+                <Button
+                  plain
+                  onClick={this.onAddLink}
+                  icon={
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="24px"
+                      height="24px"
+                      role="img"
+                      aria-label="link"
+                    >
+                      <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.link} />
+                    </svg>
+                  }
+                />
+
+              </Box>
+            }
+          >
             <textarea
-              className={cn(s.input, s.textInput)}
-              name="textarea"
-              placeholder="Enter text"
-              value={this.state.textArea.val}
-              onChange={this.onTextChange}
+              className={s.textInput}
+              name="body"
+              value={body}
+              onChange={this.handleValueChanges}
               onSelect={this.onTextSelect}
+              onBlur={this.handleBlur}
             />
-          </div>
-          <div className={s.formGroup}>
-            <label className={s.label} htmlFor="taginput">
-              Tags
-            </label>
+          </FormField>
+
+          <FormField label="Tags">
             <TagInput
-              name={'taginput'}
+              name={'tagInput'}
               tags={this.state.currentTagIds.map(t => this.state.tags[t])}
               availableTags={Object.keys(this.props.tags).map(t => this.props.tags[t])}
               handleAddition={(t) => {
@@ -342,16 +417,35 @@ class ProposalInput extends React.Component {
                 });
               }}
             />
-          </div>
+          </FormField>
 
-          <h2> PREVIEW</h2>
-          <div className={s.preview} dangerouslySetInnerHTML={this.rawMarkup()} />
+          {this.state.showPreview &&
+            <Layer
+              onClose={() => {
+                this.setState({ showPreview: false });
+              }}
+            >
+              <Proposal
+                proposal={{
+                  id: '0000',
+                  state: this.state.settings.pollOption === '3' ? 'survey' : 'proposed',
+                  title: title.trim().length < 3 ? 'Title is missing!' : title.trim(),
+                  body: this.md.render(body).length < 3 ? 'Body is missing' : this.md.render(body),
+                  publishedAt: new Date(),
+                }}
+              />
+            </Layer>}
 
-          <div className={s.formGroup}>
-            <Button primary label={'Submit'} onClick={this.onSubmit} disabled={this.isPending} />
-            {/* <button className={s.button} onClick={this.onSubmit} disabled={this.isPending}>
-              {' '}SUBMIT
-            </button> */}
+          <div>
+            <Box pad>
+              <Button primary label={'Submit'} onClick={this.onSubmit} disabled={this.isPending} />
+              <Button
+                label="Preview"
+                onClick={() => {
+                  this.setState({ showPreview: true });
+                }}
+              />
+            </Box>
             {this.props.isPending && <span>{'...submitting'}</span>}
             {this.props.errorMessage && <span>{this.props.errorMessage}</span>}
             {this.props.success && <span>{'Proposal created'}</span>}

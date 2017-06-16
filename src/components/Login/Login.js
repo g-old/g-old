@@ -73,6 +73,7 @@ class Login extends React.Component {
         email: emailValidation,
       },
       this,
+      obj => obj.state,
     );
   }
 

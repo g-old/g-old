@@ -36,6 +36,29 @@
   margin: 0;
 }
 
+.contents > textarea {
+  vertical-align: top;
+  resize: vertical;
+  padding: 0 24px;
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  font-size: 16px;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding-left: 22px;
+  box-sizing: border-box;
+  outline: none;
+  background-color: transparent;
+  color: inherit;
+  margin: 0;
+}
+
+.contents input {
+  border: 0;
+}
+
 .field_error {
   display: block;
   float: right;
@@ -46,6 +69,10 @@
 .error {
   z-index: 1;
   border-color: var(--color-red);
+}
+
+.help {
+  display: block;
 }
 
 .focus {

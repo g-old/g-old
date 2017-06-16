@@ -2,17 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './TagInput.css';
+import Box from '../Box';
 
 function filteredSuggestions(query, suggestions) {
   return suggestions.filter(item => item.text.toLowerCase().indexOf(query.toLowerCase()) === 0);
 }
 // heavily inspired by : https://github.com/prakhar1989/react-tags/
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-const RemoveMe = props => (
-  <a onClick={props.onClick}>
+const RemoveMe = props =>
+  (<a onClick={props.onClick}>
     {String.fromCharCode(215)}
-  </a>
-);
+  </a>);
 /* eslint-enable jsx-a11y/no-static-element-interactions */
 
 RemoveMe.propTypes = {
@@ -38,12 +38,11 @@ RemoveMe.propTypes = {
   }
 } */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-const Tag = props => (
-  <span className={props.readOnly ? s.availableTag : s.tag} onClick={props.onClick}>
+const Tag = props =>
+  (<span className={props.readOnly ? s.availableTag : s.tag} onClick={props.onClick}>
     {props.label}
     {!props.readOnly && <RemoveMe onClick={props.onDelete} />}
-  </span>
-);
+  </span>);
 /* eslint-enable jsx-a11y/no-static-element-interactions */
 Tag.propTypes = {
   label: PropTypes.string.isRequired,
@@ -159,13 +158,13 @@ class TagInput extends React.Component {
   }
 
   render() {
-    const tags = this.props.tags.map(i => (
-      <Tag key={i.id} label={i.text} onDelete={() => this.handleDelete(i.id)} />
-    ));
+    const tags = this.props.tags.map(i =>
+      <Tag key={i.id} label={i.text} onDelete={() => this.handleDelete(i.id)} />,
+    );
 
-    const availableTags = this.props.availableTags.map(t => (
-      <Tag key={t.id} label={t.text} onClick={() => this.props.handleAddition(t)} readOnly />
-    ));
+    const availableTags = this.props.availableTags.map(t =>
+      <Tag key={t.id} label={t.text} onClick={() => this.props.handleAddition(t)} readOnly />,
+    );
     const placeholder = 'Add a new tag';
     const maxLength = 20;
     const tagInput = (
@@ -195,15 +194,15 @@ class TagInput extends React.Component {
       </div>
     );
     return (
-      <div>
-        <div className={s.tags}>
+      <Box className={s.container} pad column>
+        <Box pad className={s.tags}>
           {tags}
           {tagInput}
-        </div>
-        <div>
+        </Box>
+        <Box pad>
           {availableTags}
-        </div>
-      </div>
+        </Box>
+      </Box>
     );
   }
 }

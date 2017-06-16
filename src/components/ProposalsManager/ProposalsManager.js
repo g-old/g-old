@@ -15,6 +15,7 @@ import PollState from '../PollState';
 import Button from '../Button';
 import FetchError from '../FetchError';
 import Box from '../Box';
+import ProposalSettings from '../ProposalSettings';
 
 const messages = defineMessages({
   cancel: {
@@ -44,7 +45,7 @@ const messages = defineMessages({
     description: 'Revoke proposal',
   },
   close: {
-    id: 'manager.clsoe',
+    id: 'manager.close',
     defaultMessage: 'Close proposal',
     description: 'Close the proposal',
   },
@@ -262,6 +263,16 @@ class ProposalsManager extends React.Component {
 
     return (
       <div>
+        {this.state.showSettings &&
+          <ProposalSettings
+            onClose={() => {
+              this.setState({ showSettings: false });
+            }}
+            pollOptions={this.props.pollOptions}
+            defaultPollValues={this.props.defaultPollValues}
+            intl={this.context.intl}
+            updateProposal={this.props.updateProposal}
+          />}
         {toRender.map(
           p =>
             p.state === 'proposed' &&

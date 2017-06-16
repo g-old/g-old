@@ -1,4 +1,4 @@
-import { validateEmail } from './helpers';
+import { validateEmail, concatDateAndTime, utcCorrectedDate } from './helpers';
 
 export function passwordValidation(password, values, { minPasswordLength = 0 }) {
   const pw = password.trim();
@@ -36,6 +36,48 @@ export function passwordAgainValidation(passwordAgain, { password }) {
       touched: true,
       errorName: 'passwordMismatch',
     };
+  }
+  return result;
+}
+
+export function dateToValidation(date) {
+  // TODO finish
+  let result = {
+    touched: false,
+  };
+  if (date) {
+    const testDate = new Date(date);
+    testDate.setHours(0, 0, 0, 0);
+    const referenceDate = new Date();
+    referenceDate.setHours(0, 0, 0, 0);
+    if (testDate < referenceDate) {
+      result = {
+        touched: true,
+        errorName: 'past',
+      };
+    }
+  }
+  return result;
+}
+
+export function timeToValidation(time, { dateTo }) {
+  let result = {
+    touched: false,
+  };
+  if (time) {
+    let date;
+    if (dateTo) {
+      date = dateTo;
+    } else {
+      date = utcCorrectedDate(3).slice(0, 10);
+    }
+    const endTime = concatDateAndTime(date, time);
+    if (endTime < new Date()) {
+      result = {
+        touched: true,
+        errorName: 'past',
+      };
+    }
   }
   return result;
 }
@@ -87,12 +129,13 @@ export function emailValidation(email, { invalidEmails = [] }) {
   return result;
 }
 
-export function createValidator(allValues, validators, obj, options = {}) {
+export function createValidator(allValues, validators, obj, resolverFn, options = {}) {
   return (properties) => {
     const result = properties.reduce(
       (acc, curr) => {
-        const value = obj.state[curr];
-        const errors = validators[allValues[curr].fn](value, obj.state, options);
+        const state = resolverFn(obj);
+        const value = state[curr]; // obj[curr];
+        const errors = validators[allValues[curr].fn](value, state, options);
         // eslint-disable-next-line no-param-reassign
         acc.errors[curr] = {
           ...errors,

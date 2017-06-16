@@ -439,6 +439,7 @@
     "defaultMessage": "cancel",
     "message": "",
     "files": [
+      "src/components/ProposalSettings/ProposalSettings.js",
       "src/components/ProposalsManager/ProposalsManager.js"
     ]
   },
@@ -448,15 +449,7 @@
     "defaultMessage": "Are you sure?",
     "message": "",
     "files": [
-      "src/components/ProposalsManager/ProposalsManager.js"
-    ]
-  },
-  {
-    "id": "manager.clsoe",
-    "description": "Close the proposal",
-    "defaultMessage": "Close proposal",
-    "message": "",
-    "files": [
+      "src/components/ProposalSettings/ProposalSettings.js",
       "src/components/ProposalsManager/ProposalsManager.js"
     ]
   },
@@ -466,6 +459,7 @@
     "defaultMessage": "Open voting",
     "message": "",
     "files": [
+      "src/components/ProposalSettings/ProposalSettings.js",
       "src/components/ProposalsManager/ProposalsManager.js"
     ]
   },
@@ -475,6 +469,7 @@
     "defaultMessage": "Revoke proposal",
     "message": "",
     "files": [
+      "src/components/ProposalSettings/ProposalSettings.js",
       "src/components/ProposalsManager/ProposalsManager.js"
     ]
   },
@@ -484,6 +479,7 @@
     "defaultMessage": "Revoke",
     "message": "",
     "files": [
+      "src/components/ProposalSettings/ProposalSettings.js",
       "src/components/ProposalsManager/ProposalsManager.js"
     ]
   },
@@ -557,6 +553,7 @@
     "message": "",
     "files": [
       "src/components/Login/Login.js",
+      "src/components/ProposalInput/ProposalInput.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -766,6 +763,70 @@
     "message": "",
     "files": [
       "src/components/Poll/Poll.js"
+    ]
+  },
+  {
+    "id": "manager.close",
+    "description": "Close the proposal",
+    "defaultMessage": "Close proposal",
+    "message": "",
+    "files": [
+      "src/components/ProposalSettings/ProposalSettings.js",
+      "src/components/ProposalsManager/ProposalsManager.js"
+    ]
+  },
+  {
+    "id": "date.to",
+    "description": "Date until",
+    "defaultMessage": "End date",
+    "message": "",
+    "files": [
+      "src/components/PollInput/PollInput.js"
+    ]
+  },
+  {
+    "id": "poll.reference",
+    "description": "Threshold reference of poll",
+    "defaultMessage": "Threshold reference",
+    "message": "",
+    "files": [
+      "src/components/PollInput/PollInput.js"
+    ]
+  },
+  {
+    "id": "poll.threshold",
+    "description": "Poll threshold",
+    "defaultMessage": "Threshold",
+    "message": "",
+    "files": [
+      "src/components/PollInput/PollInput.js"
+    ]
+  },
+  {
+    "id": "poll.type",
+    "description": "Poll type",
+    "defaultMessage": "Poll type",
+    "message": "",
+    "files": [
+      "src/components/PollInput/PollInput.js"
+    ]
+  },
+  {
+    "id": "time.to",
+    "description": "Time until",
+    "defaultMessage": "End time",
+    "message": "",
+    "files": [
+      "src/components/PollInput/PollInput.js"
+    ]
+  },
+  {
+    "id": "form.error-past",
+    "description": "Help for wrong time settings",
+    "defaultMessage": "Time already passed",
+    "message": "",
+    "files": [
+      "src/components/ProposalInput/ProposalInput.js"
     ]
   }
 ]
