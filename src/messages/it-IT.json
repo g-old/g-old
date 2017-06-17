@@ -554,6 +554,7 @@
     "files": [
       "src/components/Login/Login.js",
       "src/components/ProposalInput/ProposalInput.js",
+      "src/components/ProposalSettings/ProposalSettings.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -757,15 +758,6 @@
     ]
   },
   {
-    "id": "poll.changeVote",
-    "description": "Changeing vote",
-    "defaultMessage": "Change your vote",
-    "message": "",
-    "files": [
-      "src/components/Poll/Poll.js"
-    ]
-  },
-  {
     "id": "manager.close",
     "description": "Close the proposal",
     "defaultMessage": "Close proposal",
@@ -826,7 +818,17 @@
     "defaultMessage": "Time already passed",
     "message": "",
     "files": [
-      "src/components/ProposalInput/ProposalInput.js"
+      "src/components/ProposalInput/ProposalInput.js",
+      "src/components/ProposalSettings/ProposalSettings.js"
+    ]
+  },
+  {
+    "id": "poll.retractVote",
+    "description": "Drawing back the vote",
+    "defaultMessage": "Retract your vote",
+    "message": "",
+    "files": [
+      "src/components/Poll/Poll.js"
     ]
   }
 ]

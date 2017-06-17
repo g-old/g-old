@@ -101,8 +101,8 @@ const DateInput = props =>
 DateInput.propTypes = {
   handleChange: PropTypes.func.isRequired,
   handleBlur: PropTypes.func.isRequired,
-  dateToError: PropTypes.string,
-  timeToError: PropTypes.string,
+  dateToError: PropTypes.shape({}),
+  timeToError: PropTypes.shape({}),
 };
 DateInput.defaultProps = {
   dateToError: null,

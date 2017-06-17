@@ -1,16 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import { connect } from 'react-redux';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
+import s from './ProposalSettings.css';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
-
+import { getIsProposalFetching, getProposalErrorMessage, getProposalSuccess } from '../../reducers';
 import Layer from '../Layer';
 import Box from '../Box';
 import Button from '../Button';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
-import Label from '../Label';
 import PollInput from '../PollInput';
+import { createValidator, dateToValidation, timeToValidation } from '../../core/validation';
+import Notification from '../Notification';
 
 const messages = defineMessages({
   cancel: {
@@ -44,13 +47,34 @@ const messages = defineMessages({
     defaultMessage: 'Close proposal',
     description: 'Close the proposal',
   },
+  empty: {
+    id: 'form.error-empty',
+    defaultMessage: "You can't leave this empty",
+    description: 'Help for empty fields',
+  },
+  past: {
+    id: 'form.error-past',
+    defaultMessage: 'Time already passed',
+    description: 'Help for wrong time settings',
+  },
 });
+
+const formFields = ['dateTo', 'timeTo'];
+
 class ProposalSettings extends React.Component {
   static propTypes = {
     updateProposal: PropTypes.func.isRequired,
     defaultPollValues: PropTypes.shape({}).isRequired,
     pollOptions: PropTypes.shape({}).isRequired,
     intl: PropTypes.shape({}).isRequired,
+    onClose: PropTypes.func.isRequired,
+    error: PropTypes.shape({}),
+    proposal: PropTypes.shape({ id: PropTypes.string }).isRequired,
+    pending: PropTypes.bool,
+  };
+  static defaultProps = {
+    error: null,
+    pending: false,
   };
   constructor(props) {
     super(props);
@@ -58,9 +82,62 @@ class ProposalSettings extends React.Component {
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
     this.handleStateChange = this.handleStateChange.bind(this);
     this.toggleSettings = this.toggleSettings.bind(this);
+    this.handleValidation = this.handleValidation.bind(this);
+    this.handleBlur = this.handleBlur.bind(this);
+    this.visibleErrors = this.visibleErrors.bind(this);
     this.state = {
       settings: { pollOption: '2' },
+      error: false,
+      errors: {
+        dateTo: {
+          touched: false,
+        },
+        timeTo: {
+          touched: false,
+        },
+      },
     };
+    const testValues = {
+      dateTo: { fn: 'date' },
+      timeTo: { fn: 'time' },
+    };
+    this.Validator = createValidator(
+      testValues,
+      {
+        date: dateToValidation,
+        time: timeToValidation,
+      },
+      this,
+      obj => obj.state.settings,
+    );
+  }
+  componentWillReceiveProps({ success, error }) {
+    if (success === true) {
+      this.props.onClose();
+    }
+    if (error) {
+      this.setState({ error: !this.props.error });
+    }
+  }
+  handleValidation(fields) {
+    const validated = this.Validator(fields);
+    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
+    return validated.failed === 0;
+  }
+  handleBlur(e) {
+    const field = e.target.name;
+    if (this.state.settings[field]) {
+      this.handleValidation([field]);
+    }
+  }
+  visibleErrors(errorNames) {
+    return errorNames.reduce((acc, curr) => {
+      const err = `${curr}Error`;
+      if (this.state.errors[curr].touched) {
+        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+      }
+      return acc;
+    }, {});
   }
   handleValueChanges(e) {
     let value;
@@ -89,66 +166,71 @@ class ProposalSettings extends React.Component {
   }
 
   handleStateChange() {
-    const newState = this.state.action;
-    this.props.updateProposal({ id: this.state.currentProposal, state: newState });
-    this.setState({ currentProposal: null });
+    this.props.updateProposal({ id: this.props.proposal.id, state: 'revoked' });
   }
 
   handleOnSubmit() {
     // TODO sanitize input
     // TODO refactor - is the same as in ProposalsInput
-    let startTime = null;
-    let endTime = null;
-    let { dateFrom, timeFrom, dateTo, timeTo } = this.state.settings;
-    if (dateFrom || timeFrom) {
-      dateFrom = dateFrom || new Date();
-      timeFrom = timeFrom || utcCorrectedDate().slice(11, 16);
-      startTime = concatDateAndTime(dateFrom, timeFrom);
-    }
-    if (dateTo || timeTo) {
-      dateTo = dateTo || new Date();
-      timeTo = timeTo || utcCorrectedDate().slice(11, 16);
 
-      endTime = concatDateAndTime(dateTo, timeTo);
-    }
-    const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
-    const pollingModeId = this.state.settings.pollOption;
-    this.props.updateProposal({
-      id: this.state.currentProposal,
-      poll: {
-        startTime,
-        endTime,
-        secret,
-        threshold: threshold || this.props.defaultPollValues[pollingModeId].threshold,
-        mode: {
-          withStatements,
-          id: pollingModeId,
-          unipolar,
-          thresholdRef,
+    if (this.handleValidation(formFields)) {
+      const startTime = null;
+      let endTime = null;
+      const { dateTo, timeTo, pollOption } = this.state.settings;
+      // currently not in use
+      /*  if (dateFrom || timeFrom) {
+        dateFrom = dateFrom || new Date();
+        timeFrom = timeFrom || utcCorrectedDate().slice(11, 16);
+        startTime = concatDateAndTime(dateFrom, timeFrom);
+      }
+      */
+      if (dateTo || timeTo) {
+        const date = dateTo || utcCorrectedDate(3).slice(0, 10);
+        const time = timeTo || utcCorrectedDate().slice(11, 16);
+
+        endTime = concatDateAndTime(date, time);
+      }
+      const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
+      this.props.updateProposal({
+        id: this.props.proposal.id,
+        poll: {
+          startTime,
+          endTime,
+          secret,
+          threshold: threshold || this.props.defaultPollValues[pollOption].threshold,
+          mode: {
+            withStatements,
+            id: pollOption,
+            unipolar,
+            thresholdRef,
+          },
         },
-      },
-    });
+      });
+    }
   }
   toggleSettings() {
     this.setState({ displaySettings: !this.state.displaySettings });
   }
   render() {
     const settings = this.state.settings;
-
+    const { onClose, error, pending } = this.props;
     return (
-      <Layer>
-        <Box pad column>
-
+      <Layer onClose={onClose}>
+        <Box className={s.container} pad column>
+          {this.state.error && <Notification message={error} />}
           <Accordion>
             <AccordionPanel heading={<FormattedMessage {...messages.revoke} />}>
-              <Label>{'Are your sure ?'}</Label>
-              <Box>
-                <Button primary label={<FormattedMessage {...messages.revokeShort} />} />
-                <Button label={<FormattedMessage {...messages.cancel} />} />
+              <Box pad column justify>
+                <Button
+                  disabled={pending}
+                  onClick={this.handleStateChange}
+                  primary
+                  label={<FormattedMessage {...messages.revokeShort} />}
+                />
               </Box>
             </AccordionPanel>
             <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
-              <Box column pad>
+              <Box className={s.innerContainer} column pad>
 
                 <PollInput
                   onValueChange={this.handleValueChanges}
@@ -160,8 +242,11 @@ class ProposalSettings extends React.Component {
                   toggleSettings={this.toggleSettings}
                   pollOptions={this.props.pollOptions}
                   intl={this.props.intl}
+                  formErrors={this.visibleErrors(formFields)}
+                  handleBlur={this.handleBlur}
                 />
                 <Button
+                  disabled={pending}
                   label={<FormattedMessage {...messages.open} />}
                   primary
                   onClick={this.handleOnSubmit}
@@ -176,4 +261,10 @@ class ProposalSettings extends React.Component {
   }
 }
 
-export default ProposalSettings;
+const mapStateToProps = (state, { proposal: { id } }) => ({
+  success: getProposalSuccess(state, id),
+  pending: getIsProposalFetching(state, id),
+  error: getProposalErrorMessage(state, id),
+});
+
+export default connect(mapStateToProps)(withStyles(s)(ProposalSettings));

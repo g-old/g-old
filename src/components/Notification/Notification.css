@@ -1,0 +1,14 @@
+@import '../../components/variables.css';
+
+.message {
+  stroke: #fff;
+  fill: #fff;
+  color: #fff;
+}
+
+.notification {
+  font-size: 1.1875rem;
+  line-height: 24px;
+  background-color: var(--color-red);
+  padding: 12px;
+}

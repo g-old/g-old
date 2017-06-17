@@ -32,10 +32,10 @@ const messages = defineMessages({
     defaultMessage: 'Closing at',
     description: 'Poll ending time',
   },
-  change: {
-    id: 'poll.changeVote',
-    defaultMessage: 'Change your vote',
-    description: 'Changeing vote',
+  retract: {
+    id: 'poll.retractVote',
+    defaultMessage: 'Retract your vote',
+    description: 'Drawing back the vote',
   },
 });
 
@@ -219,15 +219,8 @@ class Poll extends React.Component {
         votingButtons = (
           <div>
             <Button disabled={mutationIsPending} onClick={this.handleRetractVote}>
-              <FormattedMessage {...messages.change} />
+              <FormattedMessage {...messages.retract} />
             </Button>
-            {/*  <button
-              style={{ marginBottom: '1em' }}
-              disabled={mutationIsPending}
-              onClick={this.handleRetractVote}
-            >
-              RETRACT VOTE - AND DELETE STATEMENT
-            </button> */}
             {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
           </div>
         );
@@ -256,21 +249,6 @@ class Poll extends React.Component {
                   />
                 </svg>
               </Button>
-              {/* <button
-                className={cn(proBtnColor)}
-                disabled={mutationIsPending}
-                onClick={() => this.canVote('pro')}
-                style={{ background: proBtnColor }}
-              >
-                <i className="fa fa-thumbs-up" />
-              </button>
-              <button
-                className={cn(conBtnColor)}
-                disabled={mutationIsPending}
-                onClick={() => this.canVote('con')}
-              >
-                <i className="fa fa-thumbs-down" />
-              </button> */}
             </Box>
             {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
           </div>
@@ -283,7 +261,6 @@ class Poll extends React.Component {
           {this.props.poll.closed_at
             ? <FormattedMessage {...messages.closed} />
             : <FormattedMessage {...messages.closing} />}
-          {' '}
           <FormattedRelative
             value={this.props.poll.closed_at ? this.props.poll.closed_at : this.props.poll.end_time}
           />
@@ -315,8 +292,8 @@ class Poll extends React.Component {
         <Box justify>
           {mutationErrorMessage && <div> {'ERROR:'} </div>}
           {votingButtons}
-          {statements}
         </Box>
+        {statements}
       </div>
     );
   }

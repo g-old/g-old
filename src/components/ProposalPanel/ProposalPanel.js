@@ -102,7 +102,7 @@ class ProposalPanel extends React.Component {
           <AccordionPanel
             heading={<FormattedMessage {...messages.proposalManager} />}
             onActive={() => {
-              this.props.loadProposalsList({ state: 'active' });
+              this.props.loadProposalsList({ state: 'active', first: 50 });
             }}
           >
             <ProposalsManager pollOptions={pollOptions} defaultPollValues={defaultPollValues} />

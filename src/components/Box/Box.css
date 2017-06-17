@@ -4,7 +4,6 @@
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
-  flex-wrap: wrap;
   flex-direction: row;
 }
 
@@ -31,4 +30,8 @@
 
 .justify {
   justify-content: center;
+}
+
+.wrap {
+  flex-wrap: wrap;
 }

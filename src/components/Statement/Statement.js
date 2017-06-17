@@ -195,25 +195,56 @@ class Statement extends React.Component {
         <EditMenu>
           {!data.deletedAt &&
             <span style={{ marginRight: '0.5em' }}>
+
               {this.state.edit
                 ? <span>
-                  <button onClick={this.onTextSubmit} disabled={!hasMinimumInput}>
-                    <i className="fa fa-check" />
-                  </button>
-                  <button
+                  <Button
+                    plain
+                    onClick={this.onTextSubmit}
+                    disabled={!hasMinimumInput}
+                    icon={
+                      <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                        <polyline
+                          fill="none"
+                          stroke="#000"
+                          strokeWidth="2"
+                          points={ICONS.check}
+                        />
+                      </svg>
+                      }
+                  />
+
+                  <Button
+                    plain
                     onClick={this.onEndEditing}
                     disabled={this.props.asInput && !hasMinimumInput}
-                  >
-                    <i className="fa fa-times" />
-                  </button>
+                    icon={
+                      <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                        <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.delete} />
+                      </svg>
+                      }
+                  />
+
                 </span>
-                : <button onClick={this.onEditStatement}>
-                  <i className="fa fa-pencil" />
-                </button>}
+                : <Button
+                  plain
+                  onClick={this.onEditStatement}
+                  icon={
+                    <svg version="1.1" viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                      <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.edit} />
+                    </svg>
+                    }
+                />}
               {!asInput &&
-                <button onClick={this.onDeleteStatement}>
-                  <i className="fa fa-trash" />
-                </button>}
+                <Button
+                  plain
+                  onClick={this.onDeleteStatement}
+                  icon={
+                    <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                      <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.trash} />
+                    </svg>
+                  }
+                />}
             </span>}
         </EditMenu>
       );

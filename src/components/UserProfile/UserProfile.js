@@ -97,7 +97,7 @@ class UserProfile extends React.Component {
     }
 
     return (
-      <Box>
+      <Box wrap>
         <Box>
           <div>
             <Box pad column>

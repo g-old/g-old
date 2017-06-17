@@ -77,7 +77,7 @@ class UserPanel extends React.Component {
     } = this.props;
 
     return (
-      <Box>
+      <Box wrap>
         <SearchField
           data={this.props.userArray}
           fetch={this.props.findUser}

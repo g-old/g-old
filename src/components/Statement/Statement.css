@@ -76,6 +76,16 @@
   width: 99%;
 }
 
+/*
+.textEditAlt {
+  font-family: var(--font-family-base);
+  height: 2.8em;
+  width: 99%;
+  border: none;
+  outline: none;
+  background-color: var(--color-accent-1);
+} */
+
 .inactive {
   .avatar {
     opacity: 0.5;

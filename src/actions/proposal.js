@@ -323,9 +323,7 @@ export function updateProposal(proposalData) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: UPDATE_PROPOSAL_START,
-      payload: {
-        proposal: proposalData,
-      },
+      id: proposalData.id,
     });
     try {
       const { data } = await graphqlRequest(updateProposalMutation, proposalData);
@@ -337,6 +335,7 @@ export function updateProposal(proposalData) {
         type: UPDATE_PROPOSAL_SUCCESS,
         payload: normalizedData,
         filter,
+        id: proposalData.id,
       });
     } catch (error) {
       dispatch({
@@ -344,6 +343,8 @@ export function updateProposal(proposalData) {
         payload: {
           error,
         },
+        id: proposalData.id,
+        message: error.message || 'Something went wrong',
       });
       return false;
     }
