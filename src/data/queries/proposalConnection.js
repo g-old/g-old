@@ -21,8 +21,8 @@ const proposal = {
   resolve: async (parent, { first = 10, after = '', state }, { viewer, loaders }) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
     // cursor = cursor ? new Date(cursor) : new Date();
-    let [cursor = null, offset = 0] = pagination ? pagination.split('$') : [];
-    offset = Number(offset);
+    let [cursor = null, id = 0] = pagination ? pagination.split('$') : [];
+    id = Number(id);
     let proposals = [];
 
     switch (state) {
@@ -39,11 +39,12 @@ const proposal = {
             });
           })
           .where({ 'polls.closed_at': null })
-          .where('polls.end_time', '>=', cursor)
+          .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
           .limit(first)
-          .offset(offset)
           .orderBy('polls.end_time', 'asc')
+          .orderBy('polls.id', 'asc')
           .select('proposals.id as id', 'polls.end_time as time');
+
         break;
       }
 
@@ -58,9 +59,8 @@ const proposal = {
             });
           })
           .where('proposals.state', '=', 'accepted')
-          .where('polls.end_time', '<=', cursor)
+          .whereRaw('(polls.end_time, polls.id) < (?,?)', [cursor, id])
           .limit(first)
-          .offset(offset)
           .orderBy('polls.end_time', 'desc')
           .select('proposals.id as id', 'polls.closed_at as time');
         break;
@@ -79,17 +79,26 @@ const proposal = {
               );
             });
           })
-          .where('polls.closed_at', '<=', new Date(cursor))
+          .whereRaw('(polls.closed_at, polls.id) < (?,?)', [cursor, id])
           .limit(first)
-          .offset(offset)
           .orderBy('polls.closed_at', 'desc')
           .select('proposals.id as id', 'polls.closed_at as time');
+        break;
+      }
+      case 'survey': {
+        cursor = cursor ? new Date(cursor) : new Date(null);
+        proposals = await knex('proposals')
+          .innerJoin('polls', 'proposals.poll_one_id', 'polls.id')
+          .where('proposals.state', '=', 'survey')
+          .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
+          .limit(first)
+          .orderBy('polls.end_time', 'asc')
+          .select('proposals.id as id', 'polls.end_time as time');
         break;
       }
       default:
         throw Error(`State not recognized: ${state}`);
     }
-
     const queries = proposals.map(p => Proposal.gen(viewer, p.id, loaders));
     const proposalsSet = proposals.reduce((acc, curr) => {
       acc[curr.id] = curr;
@@ -99,9 +108,9 @@ const proposal = {
     const edges = data.map(p => ({ node: p }));
     const endCursor = edges.length > 0
       ? Buffer.from(
-          `${new Date(
-            proposalsSet[edges[edges.length - 1].node.id].time,
-          ).toJSON()}$${edges.length}`,
+          `${new Date(proposalsSet[edges[edges.length - 1].node.id].time).toJSON()}$${edges[
+            edges.length - 1
+          ].node.id}`,
         ).toString('base64')
       : null;
 

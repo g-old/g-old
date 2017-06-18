@@ -246,6 +246,7 @@ class Proposal {
   }
 
   static async create(viewer, data, loaders) {
+    // throw Error('TestError');
     // authorize
     if (!Proposal.canMutate(viewer, data)) return null;
     // validate

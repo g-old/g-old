@@ -169,6 +169,8 @@ class TestProposal extends React.Component {
   /* eslint-disable no-nested-ternary */
 
   render() {
+    const { filter, proposalState } = this.state;
+
     const pollData = {
       user: this.props.user,
       onVoteButtonClicked: this.handleVote,
@@ -177,9 +179,9 @@ class TestProposal extends React.Component {
       fetchVotes: this.props.getVotes,
       votingListErrorMessage: this.props.votingListErrorMessage,
       votingListIsFetching: this.props.votingListIsFetching,
-      filter: this.state.filter,
+      filter,
     };
-    pollData.poll = getLastActivePoll(this.state.proposalState, this.props.proposal);
+    pollData.poll = getLastActivePoll(proposalState, this.props.proposal);
     const poll = <Poll {...pollData} />;
 
     let switchPoll = false;
@@ -211,7 +213,7 @@ class TestProposal extends React.Component {
       publishedAt: this.props.proposal.publishedAt,
       state: this.props.proposal.state,
     };
-
+    const filterActive = filter !== 'ids';
     return (
       <div>
         <Proposal proposal={proposalData} />
@@ -221,24 +223,51 @@ class TestProposal extends React.Component {
           poll.props.poll.statements &&
           poll.props.poll.statements.length > 1 &&
           <span>
-            <button
-              style={this.state.filter === 'ids' ? { backgroundColor: 'cornflowerblue' } : null}
+            <Button
               onClick={() => this.setState({ filter: 'ids' })}
-            >
-              ALL
-            </button>
-            <button
-              style={this.state.filter === 'con' ? { backgroundColor: 'cornflowerblue' } : null}
-              onClick={() => this.setState({ filter: 'con' })}
-            >
-              CON
-            </button>
-            <button
-              style={this.state.filter === 'pro' ? { backgroundColor: 'cornflowerblue' } : null}
+              plain
+              icon={
+                <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                  <polygon
+                    fill={filterActive ? '#eee7f5' : 'none'}
+                    opacity={filterActive ? 1 : 0.2}
+                    stroke="#000"
+                    strokeWidth="2"
+                    points="3 6 10 13 10 21 14 21 14 13 21 6 21 3 3 3"
+                  />
+                </svg>
+              }
+            />
+            <Button
               onClick={() => this.setState({ filter: 'pro' })}
-            >
-              PRO
-            </button>
+              plain
+              icon={
+                <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                  <path
+                    fill="none"
+                    stroke={filter === 'pro' ? 'green' : '#000'}
+                    strokeWidth="2"
+                    d={ICONS.up}
+                  />
+                </svg>
+              }
+            />
+            <Button
+              onClick={() => this.setState({ filter: 'con' })}
+              plain
+              icon={
+                <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                  <path
+                    fill="none"
+                    stroke={filter === 'con' ? 'red' : '#000'}
+                    strokeWidth="2"
+                    d={ICONS.up}
+                    transform="matrix(1 0 0 -1 0 24)"
+                  />
+                </svg>
+              }
+            />
+
           </span>}
         {poll}
         {switchPollButton}

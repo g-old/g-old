@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import ProposalPreview from '../../components/ProposalPreview';
-import Navigation from '../../components/ProposalsNavigation';
 import { loadProposalsList } from '../../actions/proposal';
 import {
   getVisibleProposals,
@@ -18,7 +17,6 @@ class SurveyListContainer extends React.Component {
         id: PropTypes.string,
       }),
     ).isRequired,
-    filter: PropTypes.string.isRequired,
     isFetching: PropTypes.bool.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
     errorMessage: PropTypes.string.isRequired,
@@ -29,14 +27,17 @@ class SurveyListContainer extends React.Component {
   }
 
   render() {
-    const { filter, proposals, isFetching, errorMessage } = this.props;
+    const { proposals, isFetching, errorMessage } = this.props;
     if (isFetching && !proposals.length) {
-      return <div> <Navigation filter={filter} /><p> Loading ... </p></div>;
+      return <p> Loading ... </p>;
     }
 
     if (errorMessage && !proposals.length) {
       return (
-        <FetchError message={errorMessage} onRetry={() => this.props.loadProposalsList(filter)} />
+        <FetchError
+          message={errorMessage}
+          onRetry={() => this.props.loadProposalsList({ state: 'survey' })}
+        />
       );
     }
 

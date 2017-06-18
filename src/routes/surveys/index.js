@@ -15,9 +15,9 @@ export default {
       return { redirect: '/' };
     }
     if (!process.env.BROWSER) {
-      await store.dispatch(loadProposalsList('survey'));
+      await store.dispatch(loadProposalsList({ state: 'survey' }));
     } else {
-      store.dispatch(loadProposalsList('survey'));
+      store.dispatch(loadProposalsList({ state: 'survey' }));
     }
     return {
       title,

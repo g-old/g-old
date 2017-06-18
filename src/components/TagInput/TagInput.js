@@ -184,22 +184,15 @@ class TagInput extends React.Component {
           name={this.props.name}
           maxLength={maxLength}
         />
-        {/*        <Suggestions
-          query={this.state.query.trim()}
-          suggestions={this.state.suggestions}
-          selectedIndex={this.state.selectedIndex}
-          handleClick={this.handleSuggestionClick}
-          minQueryLength={2}
-        /> */}
       </div>
     );
     return (
       <Box className={s.container} pad column>
-        <Box pad className={s.tags}>
+        <Box wrap pad className={s.tags}>
           {tags}
           {tagInput}
         </Box>
-        <Box pad>
+        <Box pad wrap>
           {availableTags}
         </Box>
       </Box>

@@ -213,11 +213,12 @@ class ProposalSettings extends React.Component {
   }
   render() {
     const settings = this.state.settings;
-    const { onClose, error, pending } = this.props;
+    const { onClose, error, pending, proposal } = this.props;
     return (
       <Layer onClose={onClose}>
-        <Box className={s.container} pad column>
+        <Box className={s.container} pad column justify>
           {this.state.error && <Notification message={error} />}
+          <h4>{proposal.title}</h4>
           <Accordion>
             <AccordionPanel heading={<FormattedMessage {...messages.revoke} />}>
               <Box pad column justify>

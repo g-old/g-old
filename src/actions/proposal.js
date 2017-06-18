@@ -201,6 +201,8 @@ const getFilter = (status) => {
     case 'proposed':
     case 'voting':
       return 'active';
+    case 'survey':
+      return 'survey';
     default:
       return 'repelled';
   }
@@ -302,6 +304,7 @@ export function createProposal(proposalData) {
         payload: normalizedData,
         filter,
         id: virtualId,
+        info: normalizedData.result,
       });
     } catch (error) {
       dispatch({

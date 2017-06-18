@@ -29,6 +29,8 @@ import {
   dateToValidation,
   timeToValidation,
 } from '../../core/validation';
+import Notification from '../Notification';
+import history from '../../history';
 
 const messages = defineMessages({
   empty: {
@@ -41,11 +43,15 @@ const messages = defineMessages({
     defaultMessage: 'Time already passed',
     description: 'Help for wrong time settings',
   },
+  success: {
+    id: 'notification.success',
+    defaultMessage: 'Success!',
+    description: 'Should notify a successful action',
+  },
 });
 
 const standardValues = {
   textArea: { val: '', selection: [0, 0] },
-
   settings: { pollOption: '1', title: '', body: '' },
   tags: {},
   showInput: false,
@@ -76,7 +82,7 @@ class ProposalInput extends React.Component {
     maxTags: PropTypes.number.isRequired,
     isPending: PropTypes.bool.isRequired,
     errorMessage: PropTypes.string,
-    success: PropTypes.bool,
+    success: PropTypes.string,
     tags: PropTypes.arrayOf(
       PropTypes.shape({
         text: PropTypes.string,
@@ -89,7 +95,7 @@ class ProposalInput extends React.Component {
 
   static defaultProps = {
     errorMessage: null,
-    success: false,
+    success: null,
   };
 
   constructor(props) {
@@ -138,9 +144,12 @@ class ProposalInput extends React.Component {
     );
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.success) {
-      this.setState({ ...standardValues });
+  componentWillReceiveProps({ success, errorMessage }) {
+    if (success) {
+      this.setState({ ...standardValues, success: !this.props.success });
+    }
+    if (errorMessage) {
+      this.setState({ error: !this.props.errorMessage });
     }
   }
 
@@ -328,97 +337,98 @@ class ProposalInput extends React.Component {
     const { titleError, bodyError, ...pollErrors } = this.visibleErrors(formFields);
     return (
       <div className={s.root}>
-        <div className={s.container}>
+        <Box column pad>
           {/* <Calendar lang={this.props.locale} /> */}
 
-          <PollInput
-            onValueChange={this.handleValueChanges}
-            handleDateChange={this.handleValueChanges}
-            selectedPMode={this.state.settings.pollOption}
-            displaySettings={this.state.displaySettings}
-            defaultPollValues={this.props.defaultPollValues}
-            pollValues={this.state.settings}
-            toggleSettings={this.toggleSettings}
-            pollOptions={this.props.pollOptions}
-            intl={this.context.intl}
-            formErrors={pollErrors}
-            handleBlur={this.handleBlur}
-          />
-          <FormField label={'Title'} error={titleError}>
-            <input
-              name="title"
-              onBlur={this.handleBlur}
-              type="text"
-              value={title}
-              onChange={this.handleValueChanges}
+          <div>
+            <PollInput
+              onValueChange={this.handleValueChanges}
+              handleDateChange={this.handleValueChanges}
+              selectedPMode={this.state.settings.pollOption}
+              displaySettings={this.state.displaySettings}
+              defaultPollValues={this.props.defaultPollValues}
+              pollValues={this.state.settings}
+              toggleSettings={this.toggleSettings}
+              pollOptions={this.props.pollOptions}
+              intl={this.context.intl}
+              formErrors={pollErrors}
+              handleBlur={this.handleBlur}
             />
-          </FormField>
-          <FormField
-            error={bodyError}
-            label={'Body'}
-            help={
-              <Box pad>
+            <FormField label={'Title'} error={titleError}>
+              <input
+                name="title"
+                onBlur={this.handleBlur}
+                type="text"
+                value={title}
+                onChange={this.handleValueChanges}
+              />
+            </FormField>
+            <FormField
+              error={bodyError}
+              label={'Body'}
+              help={
+                <Box pad>
 
-                <Button onClick={this.onStrong} plain icon={<strong>A</strong>} />
-                <Button onClick={this.onItalic} plain icon={<i>A</i>} />
-                <Button
-                  plain
-                  onClick={this.onAddLink}
-                  icon={
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="24px"
-                      height="24px"
-                      role="img"
-                      aria-label="link"
-                    >
-                      <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.link} />
-                    </svg>
+                  <Button onClick={this.onStrong} plain icon={<strong>A</strong>} />
+                  <Button onClick={this.onItalic} plain icon={<i>A</i>} />
+                  <Button
+                    plain
+                    onClick={this.onAddLink}
+                    icon={
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="24px"
+                        height="24px"
+                        role="img"
+                        aria-label="link"
+                      >
+                        <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.link} />
+                      </svg>
+                    }
+                  />
+
+                </Box>
+              }
+            >
+              <textarea
+                className={s.textInput}
+                name="body"
+                value={body}
+                onChange={this.handleValueChanges}
+                onSelect={this.onTextSelect}
+                onBlur={this.handleBlur}
+              />
+            </FormField>
+
+            <FormField label="Tags">
+              <TagInput
+                name={'tagInput'}
+                tags={this.state.currentTagIds.map(t => this.state.tags[t])}
+                availableTags={Object.keys(this.props.tags).map(t => this.props.tags[t])}
+                handleAddition={(t) => {
+                  if (this.state.currentTagIds.length < this.props.maxTags) {
+                    let tag = t;
+                    const duplicate = Object.keys(this.props.tags).find(
+                      id => this.props.tags[id].text.toLowerCase() === t.text.toLowerCase(),
+                    );
+                    if (duplicate) {
+                      tag = this.props.tags[duplicate];
+                    }
+
+                    this.setState({
+                      tags: { ...this.state.tags, [tag.id]: tag },
+                      currentTagIds: [...new Set([...this.state.currentTagIds, tag.id])],
+                    });
                   }
-                />
-
-              </Box>
-            }
-          >
-            <textarea
-              className={s.textInput}
-              name="body"
-              value={body}
-              onChange={this.handleValueChanges}
-              onSelect={this.onTextSelect}
-              onBlur={this.handleBlur}
-            />
-          </FormField>
-
-          <FormField label="Tags">
-            <TagInput
-              name={'tagInput'}
-              tags={this.state.currentTagIds.map(t => this.state.tags[t])}
-              availableTags={Object.keys(this.props.tags).map(t => this.props.tags[t])}
-              handleAddition={(t) => {
-                if (this.state.currentTagIds.length < this.props.maxTags) {
-                  let tag = t;
-                  const duplicate = Object.keys(this.props.tags).find(
-                    id => this.props.tags[id].text.toLowerCase() === t.text.toLowerCase(),
-                  );
-                  if (duplicate) {
-                    tag = this.props.tags[duplicate];
-                  }
-
+                }}
+                handleDelete={(id) => {
                   this.setState({
-                    tags: { ...this.state.tags, [tag.id]: tag },
-                    currentTagIds: [...new Set([...this.state.currentTagIds, tag.id])],
+                    currentTagIds: this.state.currentTagIds.filter(tId => tId !== id),
                   });
-                }
-              }}
-              handleDelete={(id) => {
-                this.setState({
-                  currentTagIds: this.state.currentTagIds.filter(tId => tId !== id),
-                });
-              }}
-            />
-          </FormField>
-
+                }}
+              />
+            </FormField>
+          </div>
           {this.state.showPreview &&
             <Layer
               onClose={() => {
@@ -434,23 +444,46 @@ class ProposalInput extends React.Component {
                   publishedAt: new Date(),
                 }}
               />
+
             </Layer>}
 
-          <div>
-            <Box pad>
-              <Button primary label={'Submit'} onClick={this.onSubmit} disabled={this.isPending} />
-              <Button
-                label="Preview"
-                onClick={() => {
-                  this.setState({ showPreview: true });
-                }}
-              />
-            </Box>
-            {this.props.isPending && <span>{'...submitting'}</span>}
-            {this.props.errorMessage && <span>{this.props.errorMessage}</span>}
-            {this.props.success && <span>{'Proposal created'}</span>}
-          </div>
-        </div>
+          <Box pad>
+            <Button primary label={'Submit'} onClick={this.onSubmit} disabled={this.isPending} />
+            <Button
+              label="Preview"
+              onClick={() => {
+                this.setState({ showPreview: true });
+              }}
+            />
+          </Box>
+          {this.props.isPending && <span>{'...submitting'}</span>}
+          {this.state.error && <Notification message={this.props.errorMessage} />}
+          {this.state.success &&
+            <Notification
+              success
+              message={<FormattedMessage {...messages.success} />}
+              action={
+                <Button
+                  plain
+                  reverse
+                  icon={
+                    <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                      <path
+                        fill="none"
+                        stroke="#000"
+                        strokeWidth="2"
+                        d="M2,12 L22,12 M13,3 L22,12 L13,21"
+                      />
+                    </svg>
+                  }
+                  onClick={() => {
+                    history.push(`/testproposal/${this.props.success}/ids`);
+                  }}
+                  label="Visit"
+                />
+              }
+            />}
+        </Box>
       </div>
     );
   }

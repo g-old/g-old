@@ -1,6 +1,14 @@
 @import '../../components/variables.css';
 
-.message {
+.success {
+  stroke: #000;
+  fill: #000;
+  color: #000;
+  background-color: var(--color-green);
+}
+
+.error {
+  background-color: var(--color-red);
   stroke: #fff;
   fill: #fff;
   color: #fff;
@@ -9,6 +17,6 @@
 .notification {
   font-size: 1.1875rem;
   line-height: 24px;
-  background-color: var(--color-red);
-  padding: 12px;
+  padding: 1.5rem;
+  justify-content: space-between;
 }

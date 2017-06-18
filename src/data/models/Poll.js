@@ -66,6 +66,7 @@ class Poll {
       let numVoter = 0;
 
       if (pollingMode.thresholdRef === 'all') {
+        // TODO check vote privilege for count of numVoter
         numVoter = await trx.whereIn('role_id', [1, 2, 3, 4]).count('id').into('users');
         numVoter = Number(numVoter[0].count);
         if (numVoter < 1) throw Error('Not enough user');
@@ -76,6 +77,7 @@ class Poll {
         {
           ...data,
           num_voter: numVoter,
+          created_at: new Date(),
         },
           'id',
         )

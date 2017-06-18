@@ -34,7 +34,7 @@ const proposals = (state = {}, action) => {
           ...state[action.id],
           isFetching: false,
           errorMessage: null,
-          success: true,
+          success: action.info || true, // to get id of created proposal
         },
       };
     case CREATE_PROPOSAL_ERROR:

@@ -439,8 +439,7 @@
     "defaultMessage": "cancel",
     "message": "Abbrechen",
     "files": [
-      "src/components/ProposalSettings/ProposalSettings.js",
-      "src/components/ProposalsManager/ProposalsManager.js"
+      "src/components/ProposalSettings/ProposalSettings.js"
     ]
   },
   {
@@ -449,8 +448,7 @@
     "defaultMessage": "Are you sure?",
     "message": "Aktion ausführen?",
     "files": [
-      "src/components/ProposalSettings/ProposalSettings.js",
-      "src/components/ProposalsManager/ProposalsManager.js"
+      "src/components/ProposalSettings/ProposalSettings.js"
     ]
   },
   {
@@ -465,8 +463,7 @@
     "defaultMessage": "Open voting",
     "message": "Abstimmung starten",
     "files": [
-      "src/components/ProposalSettings/ProposalSettings.js",
-      "src/components/ProposalsManager/ProposalsManager.js"
+      "src/components/ProposalSettings/ProposalSettings.js"
     ]
   },
   {
@@ -475,8 +472,7 @@
     "defaultMessage": "Revoke proposal",
     "message": "Beschluss zurückziehen",
     "files": [
-      "src/components/ProposalSettings/ProposalSettings.js",
-      "src/components/ProposalsManager/ProposalsManager.js"
+      "src/components/ProposalSettings/ProposalSettings.js"
     ]
   },
   {
@@ -485,8 +481,7 @@
     "defaultMessage": "Revoke",
     "message": "Zurückziehen",
     "files": [
-      "src/components/ProposalSettings/ProposalSettings.js",
-      "src/components/ProposalsManager/ProposalsManager.js"
+      "src/components/ProposalSettings/ProposalSettings.js"
     ]
   },
   {
@@ -769,8 +764,7 @@
     "defaultMessage": "Close proposal",
     "message": "",
     "files": [
-      "src/components/ProposalSettings/ProposalSettings.js",
-      "src/components/ProposalsManager/ProposalsManager.js"
+      "src/components/ProposalSettings/ProposalSettings.js"
     ]
   },
   {
@@ -835,6 +829,15 @@
     "message": "",
     "files": [
       "src/components/Poll/Poll.js"
+    ]
+  },
+  {
+    "id": "notification.success",
+    "description": "Should notify a successful action",
+    "defaultMessage": "Success!",
+    "message": "",
+    "files": [
+      "src/components/ProposalInput/ProposalInput.js"
     ]
   }
 ]

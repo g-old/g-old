@@ -157,8 +157,14 @@ class Poll extends React.Component {
   }
 
   render() {
+    const { poll: { ownVote }, filter } = this.props;
     const withStatements = this.props.poll.mode.withStatements;
     let statements = null;
+
+    let hideOwnStatement = true;
+    if (filter === 'ids' || (ownVote && filter === ownVote.position)) {
+      hideOwnStatement = false;
+    }
 
     // render StatementsList or not?
     if (withStatements) {
@@ -173,7 +179,7 @@ class Poll extends React.Component {
           onSubmit={this.handleOnSubmit}
           ownVote={this.props.poll.ownVote}
           followees={this.props.followees}
-          hideOwnStatement={this.props.filter !== 'ids'}
+          hideOwnStatement={hideOwnStatement}
         />
       );
     }

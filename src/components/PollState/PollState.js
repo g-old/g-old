@@ -119,6 +119,7 @@ class PollState extends React.Component {
               errorMessage={this.props.votingListErrorMessage}
             />
             {`THRESHOLD ${this.props.threshold}`}
+            {`Allvoters ${this.props.allVoters}`}
             {!this.props.unipolar && this.props.threshold < 50 ? ' (IMPOSSIBLE)' : ''}
           </div>}
       </div>

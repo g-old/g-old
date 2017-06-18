@@ -68,11 +68,11 @@ class Vote {
         .forUpdate()
         .where({ id: data.pollId })
         .decrement(columns[index], 1);
-      await knex('polls')
+      /*  await knex('polls')
         .transacting(trx)
         .forUpdate()
         .where({ id: data.pollId })
-        .decrement('num_voter', 1);
+        .decrement('num_voter', 1); */
       return oldVote;
     });
     return new Vote(deletedVote) || null;
@@ -154,11 +154,11 @@ class Vote {
         .forUpdate()
         .where({ id: data.pollId })
         .increment(columns[index], 1);
-      await knex('polls')
+      /*  await knex('polls')
         .transacting(trx)
         .forUpdate()
         .where({ id: data.pollId })
-        .increment('num_voter', 1);
+        .increment('num_voter', 1);*/
       return id[0];
     });
     if (!newVoteId) return null;
