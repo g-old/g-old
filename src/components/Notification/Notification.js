@@ -8,17 +8,36 @@ import Box from '../Box';
 class Notification extends React.Component {
   static propTypes = {
     message: PropTypes.node.isRequired,
-    success: PropTypes.bool,
     action: PropTypes.node,
+    type: PropTypes.oneOf(['success', 'error', 'alert']).isRequired,
   };
   static defaultProps = {
-    success: false,
     action: null,
   };
   render() {
-    const { message, success, action } = this.props;
+    const { message, type, action } = this.props;
+    let className;
+    switch (type) {
+      case 'success': {
+        className = s.success;
+        break;
+      }
+      case 'error': {
+        className = s.error;
+        break;
+      }
+      case 'alert': {
+        className = s.alert;
+
+        break;
+      }
+
+      default:
+        className = s.error;
+    }
     return (
-      <Box pad className={cn(success ? s.success : s.error, s.notification)}>
+      <Box pad className={cn(className, s.notification)}>
+
         <span>
           {message}
         </span>

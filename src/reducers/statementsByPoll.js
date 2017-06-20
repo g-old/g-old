@@ -4,6 +4,8 @@ import {
   DELETE_STATEMENT_SUCCESS,
   LOAD_FLAGGEDSTMTS_SUCCESS,
   LOAD_FEED_SUCCESS,
+  DELETE_VOTE_SUCCESS,
+  UPDATE_VOTE_SUCCESS,
 } from '../constants';
 
 const sortStatementsByPoll = (stmts, votes) =>
@@ -50,14 +52,14 @@ const byPoll = (state = {}, action) => {
       if (!stmts) return state;
       const sorted = sortStatementsByPoll(stmts, action.payload.entities.votes);
       const pollId = stmts[action.payload.result].pollId;
-
+      const currentState = state[pollId] || [];
       return {
         ...state,
         [pollId]: {
           ...state[pollId],
-          ids: [...state[pollId].ids, ...sorted[pollId].ids],
-          pro: [...state[pollId].pro, ...sorted[pollId].pro],
-          con: [...state[pollId].con, ...sorted[pollId].con],
+          ids: [...(currentState.ids || []), ...sorted[pollId].ids],
+          pro: [...(currentState.pro || []), ...sorted[pollId].pro],
+          con: [...(currentState.con || []), ...sorted[pollId].con],
         },
       };
     }
@@ -70,6 +72,24 @@ const byPoll = (state = {}, action) => {
           ids: state[statement.pollId].ids.filter(i => i !== statement.id),
           pro: state[statement.pollId].pro.filter(i => i !== statement.id),
           con: state[statement.pollId].con.filter(i => i !== statement.id),
+        },
+      };
+    }
+
+    case UPDATE_VOTE_SUCCESS:
+    case DELETE_VOTE_SUCCESS: {
+      if (!action.info) {
+        // if info is not null, a statement was deleted cascading from vote.
+        return state;
+      }
+      const vote = action.payload.entities.votes[action.payload.result];
+      return {
+        ...state,
+        [vote.pollId]: {
+          ...state[vote.pollId],
+          ids: state[vote.pollId].ids.filter(i => i !== action.info),
+          pro: state[vote.pollId].ids.filter(i => i !== action.info),
+          con: state[vote.pollId].ids.filter(i => i !== action.info),
         },
       };
     }

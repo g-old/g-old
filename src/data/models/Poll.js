@@ -31,9 +31,16 @@ class Poll {
     return true;
   }
   // eslint-disable-next-line class-methods-use-this
-  isVotable() {
+  isVotable(viewer) {
+    if (this.closed_at || new Date(this.end_time) < new Date()) {
+      return false;
+    }
+    if (!viewer || !['admin', 'mod', 'user'].includes(viewer.role.type)) {
+      return false;
+    }
+
+    // TODO regional voting here
     return true;
-    //  TODO return this.endTime >= new Date();
   }
 
   async isUnipolar(viewer, loaders) {

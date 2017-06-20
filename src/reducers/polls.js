@@ -61,12 +61,14 @@ export default function polls(state = {}, action) {
       const poll = state[pollId];
       const voteColumns = ['upvotes', 'downvotes'];
       const index = position === 'pro' ? 0 : 1;
+      const statementId = action.info;
       return {
         ...state,
         [pollId]: {
           ...poll,
           [voteColumns[index]]: poll[voteColumns[index]] + 1,
           [voteColumns[1 - index]]: poll[voteColumns[1 - index]] - 1,
+          ownStatement: statementId ? null : state[pollId].ownStatement,
         },
       };
     }

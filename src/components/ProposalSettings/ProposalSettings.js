@@ -16,11 +16,6 @@ import { createValidator, dateToValidation, timeToValidation } from '../../core/
 import Notification from '../Notification';
 
 const messages = defineMessages({
-  cancel: {
-    id: 'cancel',
-    defaultMessage: 'cancel',
-    description: 'Cancel the action',
-  },
   confirmation: {
     id: 'confirmation',
     defaultMessage: 'Are you sure?',
@@ -217,7 +212,7 @@ class ProposalSettings extends React.Component {
     return (
       <Layer onClose={onClose}>
         <Box className={s.container} pad column justify>
-          {this.state.error && <Notification message={error} />}
+          {this.state.error && <Notification type="error" message={error} />}
           <h4>{proposal.title}</h4>
           <Accordion>
             <AccordionPanel heading={<FormattedMessage {...messages.revoke} />}>

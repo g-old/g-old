@@ -457,10 +457,10 @@ class ProposalInput extends React.Component {
             />
           </Box>
           {this.props.isPending && <span>{'...submitting'}</span>}
-          {this.state.error && <Notification message={this.props.errorMessage} />}
+          {this.state.error && <Notification type="error" message={this.props.errorMessage} />}
           {this.state.success &&
             <Notification
-              success
+              type="success"
               message={<FormattedMessage {...messages.success} />}
               action={
                 <Button

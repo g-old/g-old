@@ -43,13 +43,21 @@ class ProposalContainer extends React.Component {
 
     if (errorMessage && !proposals.length) {
       return (
-        <FetchError message={errorMessage} onRetry={() => this.props.loadProposalsList(filter)} />
+        <div>
+          <Navigation filter={filter} />
+          <FetchError
+            isFetching={isFetching}
+            message={errorMessage}
+            onRetry={() => this.props.loadProposalsList({ state: filter })}
+          />
+        </div>
       );
     }
 
     return (
       <div>
         <Navigation filter={filter} />
+
         {proposals.map(proposal => <ProposalPreview key={proposal.id} proposal={proposal} />)}
         {this.props.pageInfo.hasNextPage &&
           <Button

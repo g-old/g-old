@@ -25,7 +25,7 @@ class Vote {
   }
 
   static async validate(viewer, data, loaders, poll, trx, mutation = false) {
-    if (!poll || !poll.isVotable()) return null;
+    if (!poll || !poll.isVotable(viewer)) return null;
     const voteInDB = await knex('votes')
       .transacting(trx)
       .forUpdate()
@@ -49,7 +49,7 @@ class Vote {
       const newPosition = data.position === 1 ? 'pro' : 'con'; // dangerous?
       if (newPosition !== oldVote.position) throw Error('Request invalid!');
       // eslint-disable-next-line newline-per-chained-call
-      // check if statements exists, delete it too bc no longer cascading
+      // check if statements exists, check if it can be deleted (cascading)
 
       let statementInDB = await knex('statements')
         .transacting(trx)
@@ -68,11 +68,6 @@ class Vote {
         .forUpdate()
         .where({ id: data.pollId })
         .decrement(columns[index], 1);
-      /*  await knex('polls')
-        .transacting(trx)
-        .forUpdate()
-        .where({ id: data.pollId })
-        .decrement('num_voter', 1); */
       return oldVote;
     });
     return new Vote(deletedVote) || null;
@@ -82,6 +77,7 @@ class Vote {
     if (!data.id) return null;
     if (!data.pollId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
+
     if (await poll.isUnipolar(viewer, loaders)) {
       return null; // delete is the right method
     }
@@ -90,6 +86,18 @@ class Vote {
       if (!oldVote || !oldVote.position) throw Error('Position mismatch');
       // eslint-disable-next-line eqeqeq
       if (data.id != oldVote.id) throw Error('Id mismatch');
+
+      let statementInDB = await knex('statements')
+        .transacting(trx)
+        .forUpdate()
+        .where({ vote_id: data.id })
+        .select('id', 'deleted_at');
+      statementInDB = statementInDB[0] || [];
+      if (statementInDB && statementInDB.deleted_at) throw Error('Cannot be modified!');
+      if (statementInDB.id) {
+        // eslint-disable-next-line newline-per-chained-call
+        await knex('statements').transacting(trx).forUpdate().where({ vote_id: data.id }).del();
+      }
 
       const newPosition = data.position === 1 ? 'pro' : 'con'; // dangerous?
       if (newPosition === oldVote.position) throw Error('Request invalid');
@@ -101,6 +109,7 @@ class Vote {
       // update votecount
       const columns = ['upvotes', 'downvotes'];
       let index = newPosition === 'con' ? 1 : 0;
+
       await knex('polls')
         .transacting(trx)
         .forUpdate()
@@ -121,7 +130,7 @@ class Vote {
     // validate
     if (!data.pollId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
-    if (!poll || !poll.isVotable()) return null;
+    if (!poll || !poll.isVotable(viewer)) return null;
 
     let position = data.position === 1 ? 'pro' : 'con';
 
@@ -154,11 +163,6 @@ class Vote {
         .forUpdate()
         .where({ id: data.pollId })
         .increment(columns[index], 1);
-      /*  await knex('polls')
-        .transacting(trx)
-        .forUpdate()
-        .where({ id: data.pollId })
-        .increment('num_voter', 1);*/
       return id[0];
     });
     if (!newVoteId) return null;

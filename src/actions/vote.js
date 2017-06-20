@@ -92,7 +92,7 @@ export function createVote(vote) {
   };
 }
 
-export function updateVote(vote) {
+export function updateVote(vote, stmtId = null) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: UPDATE_VOTE_START,
@@ -104,6 +104,7 @@ export function updateVote(vote) {
       dispatch({
         type: UPDATE_VOTE_SUCCESS,
         payload: normalized,
+        info: stmtId,
       });
     } catch (error) {
       dispatch({
@@ -119,7 +120,7 @@ export function updateVote(vote) {
   };
 }
 
-export function deleteVote(vote) {
+export function deleteVote(vote, stmtId = null) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: DELETE_VOTE_START,
@@ -131,6 +132,7 @@ export function deleteVote(vote) {
       dispatch({
         type: DELETE_VOTE_SUCCESS,
         payload: normalized,
+        info: stmtId,
       });
     } catch (error) {
       dispatch({

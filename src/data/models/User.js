@@ -71,7 +71,7 @@ class User {
 
   static async update(viewer, data, loaders) {
     // authenticate
-    //  throw Error('TESTERROR');
+    // throw Error('TESTERROR');
     if (!data.id) return null;
     if (!User.canMutate(viewer, data)) return null;
     // validate - if something seems corrupted, return.

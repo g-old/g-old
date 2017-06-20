@@ -113,24 +113,22 @@ class AccountProfile extends React.Component {
   }
 
   render() {
-    if (!this.props.accountData) {
+    const { updates, accountData, user } = this.props;
+    if (!accountData) {
       return null;
     }
-    const {
-      id,
-      avatar,
-      name,
-      surname,
-      role,
-      emailValidated,
-      lastLogin,
-      privilege,
-    } = this.props.accountData;
+    const { id, avatar, name, surname, role, emailValidated, lastLogin, privilege } = accountData;
     let PrivilegePanel = null;
     // eslint-disable-next-line no-bitwise
-    if (privilege && this.props.user.privilege & PRIVILEGES.canModifyRights) {
+    if (privilege && user.privilege & PRIVILEGES.canModifyRights) {
       PrivilegePanel = (
-        <PrivilegeManager updateFn={this.props.update} privilege={privilege} id={id} />
+        <PrivilegeManager
+          updates={updates.privilege}
+          className={s.checks}
+          updateFn={this.props.update}
+          privilege={privilege}
+          id={id}
+        />
       );
     }
     const avatarSet = checkAvatar(avatar);
@@ -177,6 +175,8 @@ class AccountProfile extends React.Component {
 
             <p>
               <RoleManager
+                className={s.checks}
+                updates={updates.role}
                 accountId={id}
                 updateFn={this.props.update}
                 userRole={this.props.user.role.type}

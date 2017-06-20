@@ -27,9 +27,10 @@ class LayerContents extends React.Component {
   }
   render() {
     const { onClose, children, className } = this.props;
-    return (
-      <div className={className}>
-        <div style={{ position: 'absolute', top: 0, right: 0, zIndex: 1, margin: '12px' }}>
+    let closeNode = null;
+    if (onClose) {
+      closeNode = (
+        <div style={{ position: 'absolute', top: 0, right: 0, zIndex: 1, margin: '0.75em' }}>
           <Button
             onClick={onClose}
             plain
@@ -47,6 +48,11 @@ class LayerContents extends React.Component {
             }
           />
         </div>
+      );
+    }
+    return (
+      <div className={className}>
+        {closeNode}
         {children}
       </div>
     );

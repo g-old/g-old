@@ -437,10 +437,7 @@
     "id": "cancel",
     "description": "Cancel the action",
     "defaultMessage": "cancel",
-    "message": "Abbrechen",
-    "files": [
-      "src/components/ProposalSettings/ProposalSettings.js"
-    ]
+    "message": "Abbrechen"
   },
   {
     "id": "confirmation",
@@ -644,6 +641,7 @@
     "message": "",
     "files": [
       "src/components/ImageUpload/ImageUpload.js",
+      "src/components/Poll/Poll.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -838,6 +836,52 @@
     "message": "",
     "files": [
       "src/components/ProposalInput/ProposalInput.js"
+    ]
+  },
+  {
+    "id": "poll.notify",
+    "description": "Notice that vote change will lead to statement deletion",
+    "defaultMessage": "Your statement will be deleted!",
+    "message": "",
+    "files": [
+      "src/components/Poll/Poll.js"
+    ]
+  },
+  {
+    "id": "notifications.error.undefined",
+    "description": "Server or network error",
+    "defaultMessage": "Something went wrong",
+    "message": "",
+    "files": [
+      "src/components/PrivilegeManager/PrivilegeManager.js",
+      "src/components/RoleManager/RoleManager.js"
+    ]
+  },
+  {
+    "id": "commands.delete",
+    "description": "Short command to invoke deletion",
+    "defaultMessage": "Delete",
+    "message": "",
+    "files": [
+      "src/components/SupervisionPanel/SupervisionPanel.js"
+    ]
+  },
+  {
+    "id": "commands.more",
+    "description": "Load more resources",
+    "defaultMessage": "Show more",
+    "message": "",
+    "files": [
+      "src/components/SupervisionPanel/SupervisionPanel.js"
+    ]
+  },
+  {
+    "id": "commands.reject",
+    "description": "Short command to invoke rejection",
+    "defaultMessage": "Reject",
+    "message": "",
+    "files": [
+      "src/components/SupervisionPanel/SupervisionPanel.js"
     ]
   }
 ]

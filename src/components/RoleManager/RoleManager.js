@@ -4,6 +4,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import CheckBox from '../CheckBox';
 import Box from '../Box';
 import Button from '../Button';
+import FormField from '../FormField';
 
 const roles = ['admin', 'mod', 'user', 'viewer', 'guest'];
 
@@ -23,6 +24,11 @@ const messages = defineMessages({
     defaultMessage: 'Unlock viewer',
     description: 'Button label for those who can only unlock viewers',
   },
+  error: {
+    id: 'notifications.error.undefined',
+    defaultMessage: 'Something went wrong',
+    description: 'Server or network error ',
+  },
 });
 const calcState = (roleNames, role) =>
   roleNames.reduce((acc, curr) => {
@@ -40,36 +46,42 @@ class RoleManager extends React.Component {
     accountRole: PropTypes.string.isRequired,
     accountId: PropTypes.string.isRequired,
     updateFn: PropTypes.func.isRequired,
+    className: PropTypes.string.isRequired,
+    updates: PropTypes.shape({ error: PropTypes.bool, pending: PropTypes.bool }),
+  };
+  static defaultProps = {
+    updates: {},
   };
 
   constructor(props) {
     super(props);
     this.onChange = this.onChange.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
     this.availableRoles = roles.slice(roles.indexOf(props.userRole) + 1);
     this.state = calcState(this.availableRoles, props.accountRole);
   }
 
   componentWillReceiveProps(nextProps) {
+    if (nextProps.updates && nextProps.updates.error) {
+      const old = this.props.updates || {};
+      this.setState({ error: !old.error });
+    }
     if (nextProps !== this.props) {
       this.availableRoles = roles.slice(roles.indexOf(nextProps.userRole) + 1);
       const newState = calcState(this.availableRoles, nextProps.accountRole);
       this.setState(newState);
     }
   }
+
   onChange(e) {
-    const newState = calcState(this.availableRoles, e.target.name);
-    this.setState(newState);
+    if (e.target.name !== this.props.accountRole) {
+      this.props.updateFn({ id: this.props.accountId, role: e.target.name });
+    }
   }
 
-  onSubmit() {
-    const role = Object.keys(this.state).find(key => this.state[key]);
-    this.props.updateFn({ id: this.props.accountId, role });
-  }
   availableRoles = [];
   render() {
     let promoteButton = null;
-    const { userRole } = this.props;
+    const { userRole, className, updates } = this.props;
     if (!['admin', 'mod'].includes(userRole)) {
       promoteButton = (
         <Button
@@ -80,21 +92,28 @@ class RoleManager extends React.Component {
     }
 
     let checkBoxes = null;
-    let changeBtn = null;
     if (!promoteButton) {
-      checkBoxes = this.availableRoles.map(r =>
-        <CheckBox label={r} checked={this.state[r]} onChange={this.onChange} name={r} />,
-      );
-      changeBtn = (
-        <Button primary onClick={this.onSubmit} label={<FormattedMessage {...messages.change} />} />
+      checkBoxes = (
+        <Box className={className} column>
+          {this.availableRoles.map(r =>
+            (<CheckBox
+              label={r}
+              disabled={updates && updates.pending}
+              checked={this.state[r]}
+              onChange={this.onChange}
+              name={r}
+            />),
+          )}
+        </Box>
       );
     }
+    const error = this.state.error && <FormattedMessage {...messages.error} />;
     return (
       <Box column pad>
-        <h3> <FormattedMessage {...messages.header} /></h3>
         {promoteButton}
-        {checkBoxes}
-        {changeBtn}
+        <FormField label={<FormattedMessage {...messages.header} />} error={error}>
+          {checkBoxes}
+        </FormField>
 
       </Box>
     );

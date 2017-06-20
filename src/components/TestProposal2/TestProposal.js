@@ -148,18 +148,18 @@ class TestProposal extends React.Component {
     this.props.getVotes(pollId);
   }
 
-  handleVote(data, method) {
+  handleVote(data, method, info) {
     switch (method) {
       case 'create': {
         this.props.createVote(data);
         break;
       }
       case 'update': {
-        this.props.updateVote(data);
+        this.props.updateVote(data, info);
         break;
       }
       case 'del': {
-        this.props.deleteVote(data);
+        this.props.deleteVote(data, info);
         break;
       }
       default:
@@ -245,7 +245,7 @@ class TestProposal extends React.Component {
                 <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
                   <path
                     fill="none"
-                    stroke={filter === 'pro' ? 'green' : '#000'}
+                    stroke={filter === 'pro' ? '#8cc800' : '#000'}
                     strokeWidth="2"
                     d={ICONS.up}
                   />
@@ -259,7 +259,7 @@ class TestProposal extends React.Component {
                 <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
                   <path
                     fill="none"
-                    stroke={filter === 'con' ? 'red' : '#000'}
+                    stroke={filter === 'con' ? '#ff324d' : '#000'}
                     strokeWidth="2"
                     d={ICONS.up}
                     transform="matrix(1 0 0 -1 0 24)"

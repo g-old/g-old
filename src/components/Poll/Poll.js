@@ -10,6 +10,8 @@ import s from './Poll.css';
 import { ICONS } from '../../constants';
 import Button from '../Button';
 import Box from '../Box';
+import Layer from '../Layer';
+import Notification from '../Notification';
 import {
   getVotingListIsFetching,
   getVotingListErrorMessage,
@@ -36,6 +38,17 @@ const messages = defineMessages({
     id: 'poll.retractVote',
     defaultMessage: 'Retract your vote',
     description: 'Drawing back the vote',
+  },
+  cancel: {
+    id: 'commands.cancel',
+    defaultMessage: 'Cancel',
+    description: 'Short command to cancel a operation',
+  },
+
+  notify: {
+    id: 'poll.notify',
+    defaultMessage: 'Your statement will be deleted!',
+    description: 'Notice that vote change will lead to statement deletion',
   },
 });
 
@@ -122,6 +135,7 @@ class Poll extends React.Component {
 
   canVote(position) {
     let method; // or take methods better directly in and connect to redux
+    let info = null;
 
     if (!this.props.poll.ownVote) {
       method = 'create';
@@ -131,13 +145,27 @@ class Poll extends React.Component {
       method = 'del';
     }
     const id = this.props.poll.ownVote ? this.props.poll.ownVote.id : null;
-    this.props.onVoteButtonClicked({ position, pollId: this.props.poll.id, id }, method);
+    if (this.props.poll.ownStatement) {
+      info = this.props.poll.ownStatement.id;
+      this.setState({
+        confirmationFunc: () => {
+          this.props.onVoteButtonClicked(
+            { position, pollId: this.props.poll.id, id },
+            method,
+            info,
+          );
+          this.setState({ confirmationFunc: null });
+        },
+      });
+      return;
+    }
+    this.props.onVoteButtonClicked({ position, pollId: this.props.poll.id, id }, method, info);
   }
 
   handleRetractVote() {
     // TODO Add some sort of validation
     // will delete vote and the statement too bc of cascade on delete
-    this.canVote(this.props.poll.ownVote.position);
+    this.canVote(this.props.poll.ownVote.position, this.props.poll.ownStatement.id);
   }
 
   handleOnSubmit(input, update) {
@@ -210,23 +238,6 @@ class Poll extends React.Component {
                 />
               </svg>
             </Button>
-            {/* <button
-              className={cn(proBtnColor)}
-              disabled={mutationIsPending}
-              onClick={() => this.canVote('pro')}
-            >
-
-              <i className="fa fa-hand-paper-o" />
-            </button>*/}
-            {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
-          </div>
-        );
-      } else if (this.props.poll.ownStatement) {
-        votingButtons = (
-          <div>
-            <Button disabled={mutationIsPending} onClick={this.handleRetractVote}>
-              <FormattedMessage {...messages.retract} />
-            </Button>
             {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
           </div>
         );
@@ -263,6 +274,22 @@ class Poll extends React.Component {
     }
     return (
       <div>
+        {this.state.confirmationFunc &&
+          <Layer>
+            <Box column pad className={s.confirmationBox}>
+              <Notification type="alert" message={<FormattedMessage {...messages.notify} />} />
+              <Box justify>
+                <Button onClick={() => this.state.confirmationFunc()} label={'Ok'} />
+                <Button
+                  primary
+                  label={<FormattedMessage {...messages.cancel} />}
+                  onClick={() => {
+                    this.setState({ confirmationFunc: null });
+                  }}
+                />
+              </Box>
+            </Box>
+          </Layer>}
         <p>
           {this.props.poll.closed_at
             ? <FormattedMessage {...messages.closed} />

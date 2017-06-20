@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FormattedDate } from 'react-intl';
+import { FormattedDate, defineMessages, FormattedMessage } from 'react-intl';
+
 import Statement from '../Statement';
 import {
   loadFlaggedStatements,
@@ -13,17 +14,41 @@ import Avatar from '../Avatar';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
 import FetchError from '../FetchError';
+import Button from '../Button';
 
 const PAGESIZE = 5;
+const messages = defineMessages({
+  more: {
+    id: 'commands.more',
+    defaultMessage: 'Show more',
+    description: 'Load more resources',
+  },
+  delete: {
+    id: 'commands.delete',
+    defaultMessage: 'Delete',
+    description: 'Short command to invoke deletion',
+  },
+  reject: {
+    id: 'commands.reject',
+    defaultMessage: 'Reject',
+    description: 'Short command to invoke rejection',
+  },
+});
 const renderUserInfo = user => <div><Avatar user={user} /> {`${user.name} ${user.surname}`} </div>;
-const renderMenu = (solveFn, id, statementId) => (
-  <div style={{ border: '1px solid', textAlign: 'center' }}>
+const renderMenu = (solveFn, id, statementId) =>
+  (<div style={{ border: '1px solid', textAlign: 'center' }}>
     <span>
-      <button onClick={() => solveFn({ id, statementId, action: 'delete' })}>DELETE</button>
-      <button onClick={() => solveFn({ id, statementId, action: 'reject' })}>REJECT</button>
+
+      <Button
+        onClick={() => solveFn({ id, statementId, action: 'delete' })}
+        label={<FormattedMessage {...messages.delete} />}
+      />
+      <Button
+        onClick={() => solveFn({ id, statementId, action: 'reject' })}
+        label={<FormattedMessage {...messages.reject} />}
+      />
     </span>
-  </div>
-);
+  </div>);
 
 const showStatus = (data, fetching, error, filter, retryFn) => {
   let status = null;
@@ -128,11 +153,11 @@ class SupervisionPanel extends React.Component {
               'open',
               this.props.loadFlaggedStatementsConnection,
             )}
-            {openFlagsArray.map(s => (
-              <div>
+            {openFlagsArray.map(s =>
+              (<div>
                 {renderFlaggedStatement(s, this.props.solveFlag)}
-              </div>
-            ))}
+              </div>),
+            )}
             {openFlagsPageInfo.hasNextPage &&
               <button
                 disabled={openFlagsPageInfo.isFetching}
@@ -164,11 +189,11 @@ class SupervisionPanel extends React.Component {
               this.props.loadFlaggedStatementsConnection,
             )}
 
-            {rejectedFlagsArray.map(s => (
-              <div>
+            {rejectedFlagsArray.map(s =>
+              (<div>
                 {renderFlaggedStatement(s, this.props.solveFlag)}
-              </div>
-            ))}
+              </div>),
+            )}
             {rejectedFlagsPageInfo.hasNextPage &&
               <button
                 disabled={rejectedFlagsPageInfo.isFetching}
@@ -200,13 +225,14 @@ class SupervisionPanel extends React.Component {
               this.props.loadFlaggedStatementsConnection,
             )}
 
-            {deletedStatementsArray.map(s => (
-              <div>
+            {deletedStatementsArray.map(s =>
+              (<div>
                 {renderFlaggedStatement(s, this.props.solveFlag)}
-              </div>
-            ))}
+              </div>),
+            )}
             {deletedFlagsPageInfo.hasNextPage &&
-              <button
+              <Button
+                label={<FormattedMessage {...messages.more} />}
                 disabled={deletedFlagsPageInfo.isFetching}
                 onClick={() =>
                   this.props.loadFlaggedStatementsConnection(
@@ -214,9 +240,7 @@ class SupervisionPanel extends React.Component {
                     PAGESIZE,
                     deletedFlagsPageInfo.endCursor,
                   )}
-              >
-                LOAD MORE
-              </button>}
+              />}
           </AccordionPanel>
 
         </Accordion>

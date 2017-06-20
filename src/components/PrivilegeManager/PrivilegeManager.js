@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { PRIVILEGES } from '../../constants';
 import Box from '../Box';
-import Button from '../Button';
+import FormField from '../FormField';
 
 import CheckBox from '../CheckBox';
 
@@ -63,6 +63,11 @@ const messages = defineMessages({
     defaultMessage: 'Change',
     description: 'Short command to change a setting',
   },
+  error: {
+    id: 'notifications.error.undefined',
+    defaultMessage: 'Something went wrong',
+    description: 'Server or network error ',
+  },
 });
 const readPrivileges = (privilege) => {
   const rights = Object.keys(PRIVILEGES).reduce((acc, curr) => {
@@ -85,6 +90,12 @@ class PrivilegeManager extends React.Component {
     privilege: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
+    className: PropTypes.string.isRequired,
+    updates: PropTypes.shape({ error: PropTypes.bool, pending: PropTypes.bool }),
+  };
+
+  static defaultProps = {
+    updates: {},
   };
   constructor(props) {
     super(props);
@@ -96,13 +107,29 @@ class PrivilegeManager extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
   }
 
-  componentWillReceiveProps({ privilege }) {
+  componentWillReceiveProps({ privilege, updates }) {
+    if (updates && updates.error) {
+      const old = this.props.updates || {};
+      this.setState({ error: !old.error });
+    }
     const state = readPrivileges(privilege);
     this.setState(state);
   }
   onChange(e) {
     const value = !this.state[e.target.name];
-    this.setState({ [e.target.name]: value });
+    this.setState({ [e.target.name]: value }, () => {
+      const privilege = this.state;
+      const newPrivilege = Object.keys(privilege).reduce((acc, curr) => {
+        const hasRight = privilege[curr];
+        if (hasRight) {
+          // eslint-disable-next-line no-bitwise
+          acc |= PRIVILEGES[curr]; // eslint-disable-line no-param-reassign
+        }
+        return acc;
+      }, 1);
+      this.props.updateFn({ id: this.props.id, privilege: newPrivilege });
+    });
+    // this.props.updateFn({ id: this.props.id, privilege: newPrivilege });
   }
 
   onSubmit() {
@@ -118,15 +145,16 @@ class PrivilegeManager extends React.Component {
     this.props.updateFn({ id: this.props.id, privilege: newPrivilege });
   }
   render() {
-    return (
-      <Box column pad>
-        <h3><FormattedMessage {...messages.header} /></h3>
+    const { updates } = this.props;
+    const privileges = (
+      <Box column className={this.props.className}>
         {Object.keys(PRIVILEGES).map((p) => {
           if (p === 'none') {
             return null;
           }
           return (
             <CheckBox
+              disabled={updates && updates.pending}
               label={<FormattedMessage {...messages[p]} />}
               checked={this.state[p]}
               onChange={this.onChange}
@@ -134,7 +162,14 @@ class PrivilegeManager extends React.Component {
             />
           );
         })}
-        <Button onClick={this.onSubmit} primary label={<FormattedMessage {...messages.change} />} />
+      </Box>
+    );
+    const error = this.state.error && <FormattedMessage {...messages.error} />;
+    return (
+      <Box column pad>
+        <FormField error={error} label={<FormattedMessage {...messages.header} />}>
+          {privileges}
+        </FormField>
 
       </Box>
     );

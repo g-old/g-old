@@ -6,7 +6,7 @@ async function proposalPolling() {
       this.on(function () {
         this.on(
           knex.raw(
-            "(proposals.state = 'proposed' and proposals.poll_one_id = polls.id) or proposals.state = 'voting' and proposals.poll_two_id = polls.id",
+            "(proposals.state = 'proposed' and proposals.poll_one_id = polls.id) or (proposals.state = 'voting' and proposals.poll_two_id = polls.id) or(proposals.state = 'survey' and proposals.poll_one_id = polls.id)",
           ),
         );
       });
@@ -46,12 +46,46 @@ async function proposalPolling() {
     ref *= proposal.threshold / 100;
 
     if (proposal.upvotes >= ref) {
-      newState = proposal.state === 'proposed' ? 'proposed' : 'accepted';
+      switch (proposal.state) {
+        case 'proposed': {
+          newState = 'proposed';
+          break;
+        }
+        case 'voting': {
+          newState = 'accepted';
+          break;
+        }
+        case 'survey': {
+          newState = 'survey';
+          break;
+        }
+
+        default:
+          throw Error(`State not recognized: ${proposal.state}`);
+      }
     } else {
-      newState = proposal.state === 'proposed' ? 'accepted' : 'rejected';
+      switch (proposal.state) {
+        case 'proposed': {
+          newState = 'accepted';
+          break;
+        }
+        case 'voting': {
+          newState = 'rejected';
+          break;
+        }
+        case 'survey': {
+          newState = 'survey';
+          break;
+        }
+
+        default:
+          throw Error(`State not recognized: ${proposal.state}`);
+      }
     }
     // TODO in transaction!
-    const pollId = proposal.state === 'proposed' ? proposal.pollOneId : proposal.pollTwoId;
+    const pollId = proposal.state === 'proposed' || proposal.state === 'survey'
+      ? proposal.pollOneId
+      : proposal.pollTwoId;
     return knex('proposals')
       .where({ id: proposal.id })
       .update({ state: newState, updated_at: new Date() })
@@ -68,11 +102,11 @@ async function proposalPolling() {
 }
 
 const worker = async () => {
-  console.log('working...');
+  console.info('working...');
   try {
     proposalPolling(worker);
   } catch (e) {
-    console.log(e);
+    console.error(e);
   }
   setTimeout(() => {
     worker();
