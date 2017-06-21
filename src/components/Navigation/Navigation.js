@@ -12,6 +12,9 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Navigation.css';
 import Link from '../Link';
+import Menu from '../Menu';
+import Icon from '../Icon';
+import { ICONS } from '../../constants';
 
 const messages = defineMessages({
   about: {
@@ -36,25 +39,39 @@ const messages = defineMessages({
   },
 });
 
+const getMenu = className => (
+  <div className={className}>
+    <Link className={s.link} to="/feed">
+        Feed
+      </Link>
+    <Link className={s.link} to="/proposals/active">
+      <FormattedMessage {...messages.proposals} />
+    </Link>
+    <Link className={s.link} to="/surveys">
+      <FormattedMessage {...messages.surveys} />
+    </Link>
+    <Link className={s.link} to="/admin">
+      <FormattedMessage {...messages.admin} />
+    </Link>
+    <Link className={s.link} to="/about">
+      <FormattedMessage {...messages.about} />
+    </Link>
+  </div>
+  );
+
 class Navigation extends React.Component {
   render() {
     return (
       <div className={s.root} role="navigation">
-        <Link className={s.link} to="/about">
-          <FormattedMessage {...messages.about} />
-        </Link>
-        <Link className={s.link} to="/proposals/active">
-          <FormattedMessage {...messages.proposals} />
-        </Link>
-        <Link className={s.link} to="/feed">
-          Feed
-        </Link>
-        <Link className={s.link} to="/surveys">
-          <FormattedMessage {...messages.surveys} />
-        </Link>
-        <Link className={s.link} to="/admin">
-          <FormattedMessage {...messages.admin} />
-        </Link>
+        {getMenu(s.navBar)}
+        <div className={s.menu}>
+          <Menu
+            withControl
+            icon={<Icon icon={ICONS.menu} size={20} color="grey" />}
+          >
+            {getMenu(s.menuContent)}
+          </Menu>
+        </div>
       </div>
     );
   }
