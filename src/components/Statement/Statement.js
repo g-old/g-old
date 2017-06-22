@@ -3,21 +3,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { connect } from 'react-redux';
 import cn from 'classnames';
 import s from './Statement.css';
-import { createLike, deleteLike } from '../../actions/statement_like';
-import { updateUser } from '../../actions/user';
-import { deleteStatement, flag, solveFlag } from '../../actions/statement';
-import Icon from '../Icon';
 import { ICONS } from '../../constants';
-import {
-  getStatementMutationIsPending,
-  getStatementMutationSuccess,
-  getStatementMutationError,
-  getSessionUser,
-  getFollowees,
-} from '../../reducers';
 
 import Menu from '../Menu';
 import Button from '../Button';
@@ -32,33 +20,25 @@ EditMenu.defaultProps = {
 
 class Statement extends React.Component {
   static propTypes = {
-    onSubmit: PropTypes.func,
-    data: PropTypes.shape({
-      id: PropTypes.string,
-      vote: PropTypes.shape({
-        position: PropTypes.string.isRequired,
-        id: PropTypes.string.isRequired,
-      }),
-      pollId: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired,
-      likes: PropTypes.number.isRequired,
-      author: PropTypes.shape({
-        name: PropTypes.string,
-        surname: PropTypes.string,
-        avatar: PropTypes.string,
-        id: PropTypes.string,
-      }),
-      deletedAt: PropTypes.string,
+    id: PropTypes.string.isRequired,
+    vote: PropTypes.shape({
+      position: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
     }).isRequired,
+    pollId: PropTypes.string.isRequired,
+    text: PropTypes.string.isRequired,
+    likes: PropTypes.number.isRequired,
+    author: PropTypes.shape({
+      name: PropTypes.string,
+      surname: PropTypes.string,
+      avatar: PropTypes.string,
+      id: PropTypes.string,
+    }).isRequired,
+    deletedAt: PropTypes.string,
+
     followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    createLike: PropTypes.func.isRequired,
-    deleteLike: PropTypes.func.isRequired,
-    updateUser: PropTypes.func.isRequired,
-    flag: PropTypes.func.isRequired,
     ownLike: PropTypes.shape({ id: PropTypes.string }),
     ownStatement: PropTypes.bool,
-    deleteStatement: PropTypes.func.isRequired,
-    solveFlag: PropTypes.func.isRequired,
     user: PropTypes.shape({
       id: PropTypes.string,
 
@@ -66,7 +46,16 @@ class Statement extends React.Component {
         type: PropTypes.string,
       }),
     }).isRequired,
+    isFollowee: PropTypes.bool,
     asInput: PropTypes.bool,
+    onFlagging: PropTypes.func,
+    onModeration: PropTypes.func,
+    onDelete: PropTypes.func,
+    onUpdate: PropTypes.func,
+    onCreate: PropTypes.func,
+    onFollow: PropTypes.func,
+    onLike: PropTypes.func,
+    onDeleteLike: PropTypes.func,
   };
 
   static defaultProps = {
@@ -74,15 +63,22 @@ class Statement extends React.Component {
     ownStatement: false,
     asInput: false,
     menuOpen: false,
-    onSubmit() {
-      alert('NO ONSUBMIT');
-    },
+    deletedAt: null,
+    onFlagging: null,
+    onDelete: null,
+    onUpdate: null,
+    onCreate: null,
+    onFollow: null,
+    onModeration: null,
+    onLike: null,
+    onDeleteLike: null,
+    isFollowee: false,
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      textArea: { val: this.props.data.text || '' },
+      textArea: { val: this.props.text || '' },
       edit: props.asInput === true,
     };
     this.onDeleteStatement = this.onDeleteStatement.bind(this);
@@ -92,18 +88,21 @@ class Statement extends React.Component {
     this.onEndEditing = this.onEndEditing.bind(this);
     this.handleFlag = this.handleFlag.bind(this);
     this.handleFollowing = this.handleFollowing.bind(this);
+    this.handleLiking = this.handleLiking.bind(this);
   }
 
   onDeleteStatement() {
-    if (this.props.user.id === this.props.data.author.id) {
-      this.props.deleteStatement({
-        pollId: this.props.data.pollId,
-        id: this.props.data.id,
+    const { id, author, pollId, user, onDelete, onModeration } = this.props;
+    // eslint-disable-next-line eqeqeq
+    if (user.id == author.id) {
+      onDelete({
+        pollId,
+        id,
       });
     } else {
       // TODO authorize
-      this.props.solveFlag({
-        statementId: this.props.data.id,
+      onModeration({
+        statementId: id,
         action: 'delete',
       });
     }
@@ -118,10 +117,16 @@ class Statement extends React.Component {
   }
 
   onTextSubmit(e) {
+    const { pollId, vote } = this.props;
     const text = this.state.textArea.val.trim();
     if (text) {
       // TODO validation
-      this.props.onSubmit({ id: this.props.data.id, text }, this.props.data.text != null);
+      if (this.props.text) {
+        // update;
+        this.props.onUpdate({ id: this.props.id, text });
+      } else {
+        this.props.onCreate({ pollId, text, voteId: vote.id });
+      }
     }
 
     this.onEndEditing();
@@ -129,44 +134,45 @@ class Statement extends React.Component {
   }
 
   onEndEditing() {
-    //
+    const { asInput, text } = this.props;
     this.setState({
       ...this.state,
-      textArea: { ...this.state.textArea, val: this.props.asInput ? '' : this.props.data.text },
+      textArea: { ...this.state.textArea, val: asInput ? '' : text },
       edit: this.props.asInput === true,
     });
   }
   handleFlag() {
-    const { id, text } = this.props.data;
-    this.props.flag({
+    const { id, text, onFlagging } = this.props;
+    onFlagging({
       statementId: id,
       content: text,
     });
   }
 
   handleFollowing() {
-    const { user, data } = this.props;
-    this.props.updateUser({
+    const { user, author, pollId, vote, onFollow } = this.props;
+    onFollow({
       id: user.id,
-      followee: data.author.id,
+      followee: author.id,
       info: {
-        pollId: data.pollId,
-        voteId: data.vote.id,
+        pollId,
+        voteId: vote.id,
       },
     });
   }
 
-  handleLikeClick(e, like) {
-    if (!like) {
-      this.props.createLike({
-        statementId: this.props.data.id,
-        pollId: this.props.data.pollId,
+  handleLiking(e) {
+    const { onLike, onDeleteLike, id, pollId, ownLike } = this.props;
+    if (ownLike) {
+      onDeleteLike({
+        statementId: id,
+        likeId: ownLike.id,
+        pollId,
       });
     } else {
-      this.props.deleteLike({
-        statementId: this.props.data.id,
-        likeId: like.id,
-        pollId: this.props.data.pollId,
+      onLike({
+        statementId: id,
+        pollId,
       });
     }
     e.preventDefault();
@@ -175,25 +181,34 @@ class Statement extends React.Component {
   render() {
     //  const { mutationIsPending, mutationSuccess, mutationError } = this.props;
     // TODO create authorization decorator
-    const { ownStatement, data, asInput, user, followees } = this.props;
+    const {
+      ownStatement,
+      vote,
+      text,
+      likes,
+      author,
+      asInput,
+      user,
+      followees,
+      isFollowee,
+      deletedAt,
+    } = this.props;
     if (!user) return null;
 
     const isEmpty = this.state.textArea.val.length === 0;
     const hasMinimumInput = this.state.textArea.val.length >= 5;
     const inactive = asInput && isEmpty;
     const canLike = user.role.type !== 'guest' && !asInput && !ownStatement;
-    const canFollow = followees.length < 5
-      ? followees.find(f => f.id === data.author.id) == null
-      : false;
+    const canFollow = !isFollowee && followees.length <= 5;
 
-    const canFlag = !ownStatement && !data.deletedAt;
-    const canDelete = !data.deletedAt && ['admin', 'mod'].includes(user.role.type);
+    const canFlag = !ownStatement && !deletedAt;
+    const canDelete = !deletedAt && ['admin', 'mod'].includes(user.role.type);
 
     let menu = null;
     if (ownStatement || asInput) {
       menu = (
         <EditMenu>
-          {!data.deletedAt &&
+          {!deletedAt &&
             <span style={{ marginRight: '0.5em' }}>
 
               {this.state.edit
@@ -252,7 +267,16 @@ class Statement extends React.Component {
       menu = (
         <Menu
           dropAlign={{ top: 'top', right: 'right' }}
-          icon={<Icon icon={ICONS.menu} size={20} color="grey" />}
+          icon={
+            <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+              <path
+                fill="none"
+                stroke="#666"
+                strokeWidth="2"
+                d="M3,13 L3,11 L5,11 L5,13 L3,13 Z M11,12.9995001 L11,11 L12.9995001,11 L12.9995001,12.9995001 L11,12.9995001 Z M19,12.9995001 L19,11 L20.9995001,11 L20.9995001,12.9995001 L19,12.9995001 Z"
+              />
+            </svg>
+          }
         >
           {canFollow && <Button onClick={this.handleFollowing} plain label="Followme" />}
           {canFlag && <Button onClick={this.handleFlag} plain label="Flag" />}
@@ -264,25 +288,24 @@ class Statement extends React.Component {
       <div
         className={cn(
           s.rootAlt,
-          this.props.data.vote.position === 'pro' ? s.pro : s.contra,
+          vote.position === 'pro' ? s.pro : s.contra,
           inactive && s.inactive,
         )}
       >
-        {!inactive &&
-          <img className={cn(s.avatar)} src={this.props.data.author.avatar} alt="IMG" />}
+        {!inactive && <img className={cn(s.avatar)} src={author.avatar} alt="IMG" />}
         <div style={{ width: '100%' }}>
           {!inactive &&
             <div className={s.header}>
               <div>
                 <span className={s.author}>
-                  {this.props.data.author.name} {this.props.data.author.surname}
+                  {author.name} {author.surname}
                 </span>
                 <span>
-                  {this.props.data.likes ? ` (+${this.props.data.likes})` : ''}
+                  {likes ? ` (+${likes})` : ''}
 
                   {canLike &&
                     <Button
-                      onClick={e => this.handleLikeClick(e, this.props.ownLike)}
+                      onClick={this.handleLiking}
                       plain
                       icon={
                         <svg viewBox="0 0 24 24" width="16px" height="16px">
@@ -309,30 +332,12 @@ class Statement extends React.Component {
                   onChange={this.onTextChange}
                 />
               </div>
-              : this.props.data.text}
+              : text}
           </div>
         </div>
       </div>
     );
   }
 }
-const mapDispatch = {
-  createLike,
-  deleteLike,
-  deleteStatement,
-  updateUser,
-  flag,
-  solveFlag,
-};
-const mapPropsToState = (state, { data }) => {
-  const id = data.id || '0000'; // for creations
-  return {
-    mutationIsPending: getStatementMutationIsPending(state, id),
-    mutationSuccess: getStatementMutationSuccess(state, id),
-    mutationError: getStatementMutationError(state, id),
-    user: getSessionUser(state),
-    followees: getFollowees(state),
-  };
-};
 
-export default connect(mapPropsToState, mapDispatch)(withStyles(s)(Statement));
+export default withStyles(s)(Statement);

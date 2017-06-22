@@ -92,6 +92,14 @@
   }
 }
 
+.button:not(.plain) {
+  .label {
+    + .icon {
+      margin-left: 12px;
+    }
+  }
+}
+
 .disabled {
   opacity: 0.3;
   cursor: default;

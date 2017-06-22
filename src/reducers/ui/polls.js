@@ -13,99 +13,52 @@ import {
   DELETE_VOTE_ERROR,
 } from '../../constants';
 
+import { getErrors, getSuccessState } from '../../core/helpers';
+
 const polls = (state = {}, action) => {
   switch (action.type) {
+    case LOAD_VOTES_SUCCESS:
     case UPDATE_VOTE_SUCCESS:
     case DELETE_VOTE_SUCCESS:
     case CREATE_VOTE_SUCCESS: {
-      const pollId = action.payload.entities.votes[action.payload.result].pollId;
+      const id = action.id; // Is initial id!
+      const current = state[id];
+      const newState = getSuccessState(current, action);
       return {
         ...state,
-        [pollId]: {
-          ...state[pollId],
-          mutations: {
-            pending: false,
-            success: true,
-            error: null,
-          },
+        [id]: {
+          ...state[id],
+          ...newState,
         },
       };
     }
+    case LOAD_VOTES_START:
     case UPDATE_VOTE_START:
     case DELETE_VOTE_START:
     case CREATE_VOTE_START: {
-      const pollId = action.pollId;
       return {
         ...state,
-        [pollId]: {
-          ...state[pollId],
-          mutations: {
-            pending: true,
-            success: false,
-            error: null,
-          },
+        [action.id]: {
+          ...state[action.id],
+          ...action.properties,
         },
       };
     }
+    case LOAD_VOTES_ERROR:
     case UPDATE_VOTE_ERROR:
     case DELETE_VOTE_ERROR:
     case CREATE_VOTE_ERROR: {
-      const pollId = action.pollId;
+      const current = state[action.id];
+      const newState = getErrors(current, action);
       return {
         ...state,
-        [pollId]: {
-          ...state[pollId],
-          mutations: {
-            pending: false,
-            success: false,
-            error: action.message,
-          },
+        [action.id]: {
+          ...state[action.id],
+          ...newState,
         },
       };
     }
 
-    case LOAD_VOTES_START: {
-      const pollId = action.id;
-
-      return {
-        ...state,
-        [pollId]: {
-          ...state[pollId],
-          pollFetching: {
-            isFetching: true,
-            errorMessage: null,
-          },
-        },
-      };
-    }
-    case LOAD_VOTES_ERROR: {
-      const pollId = action.id;
-
-      return {
-        ...state,
-        [pollId]: {
-          ...state[pollId],
-          pollFetching: {
-            isFetching: false,
-            errorMessage: action.message,
-          },
-        },
-      };
-    }
-    case LOAD_VOTES_SUCCESS: {
-      const pollId = action.id;
-
-      return {
-        ...state,
-        [pollId]: {
-          ...state[pollId],
-          pollFetching: {
-            isFetching: false,
-            errorMessage: null,
-          },
-        },
-      };
-    }
     default:
       return state;
   }
@@ -113,3 +66,4 @@ const polls = (state = {}, action) => {
 
 export default polls;
 export const getPoll = (state, id) => state[id] || {};
+export const getUpdates = (state, id) => state[id] || {};

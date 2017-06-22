@@ -5,7 +5,7 @@ import VoteType from '../types/VoteDLType';
 import Vote from '../models/Vote';
 
 const votes = {
-  type: new GraphQLList(VoteType),
+  type: new GraphQLNonNull(new GraphQLList(VoteType)),
   args: {
     pollId: {
       description: 'ID of the poll',
@@ -14,6 +14,7 @@ const votes = {
   },
   // TODO make a list loading method in votes or poll model to abstract
   resolve: (parent, { pollId }, { viewer, loaders }) =>
+    //  throw Error('TESTERROR');
     knex('votes')
       .where({ poll_id: pollId })
       .pluck('votes.id')

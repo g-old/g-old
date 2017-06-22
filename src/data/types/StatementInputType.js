@@ -1,33 +1,22 @@
-import {
-  GraphQLString as String,
-  GraphQLNonNull as NonNull,
-  GraphQLInputObjectType,
-  GraphQLID as ID,
-} from 'graphql';
-import VoteInputType from './VoteInputType';
-
+import { GraphQLString as String, GraphQLInputObjectType, GraphQLID as ID } from 'graphql';
 
 const StatementInputType = new GraphQLInputObjectType({
   name: 'StatementInput',
   fields: {
-
-    vote: {
-      type: VoteInputType,
-    },
     text: {
       type: String,
     },
+    voteId: {
+      type: ID,
+    },
     pollId: {
-      type: new NonNull(ID),
+      type: ID,
     },
 
     id: {
       type: ID,
       description: 'Must be provided for mutations',
     },
-
-
   },
-
 });
 export default StatementInputType;

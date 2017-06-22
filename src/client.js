@@ -23,7 +23,6 @@ import configureStore from './store/configureStore';
 import { updateMeta } from './DOMUtils';
 import history from './history';
 
-
 [de, it].forEach(addLocaleData);
 // Initialize a new Redux store
 // http://redux.js.org/docs/basics/UsageWithReact.html
@@ -33,7 +32,6 @@ const fetch = createFetch({
 const store = configureStore(window.App.state, { history, fetch });
 
 /* eslint-disable global-require */
-
 
 // Global (context) variables that can be easily accessed from any React component
 // https://facebook.github.io/react/docs/context.html
@@ -146,7 +144,8 @@ async function onLocationChange(location, action) {
     }
 
     appInstance = ReactDOM.render(<App context={context}>{route.component}</App>, container, () =>
-      onRenderComplete(route, location));
+      onRenderComplete(route, location),
+    );
   } catch (error) {
     // Display the error in full-screen for development mode
     if (__DEV__) {

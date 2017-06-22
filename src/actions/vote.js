@@ -14,9 +14,10 @@ import {
   LOAD_VOTES_SUCCESS,
   LOAD_VOTES_ERROR,
 } from '../constants';
+import { genStatusIndicators } from '../core/helpers';
 
 import { voteList as voteListSchema, vote as voteSchema } from '../store/schema';
-import { getVotingListIsFetching } from '../reducers';
+import { getVoteUpdates } from '../reducers';
 
 const voteInfo = `{
   id
@@ -64,12 +65,14 @@ const votesList = `
 
 export function createVote(vote) {
   return async (dispatch, getState, { graphqlRequest }) => {
+    const properties = genStatusIndicators(['vote']);
     dispatch({
       type: CREATE_VOTE_START,
       payload: {
         vote,
       },
-      pollId: vote.pollId,
+      id: vote.pollId,
+      properties,
     });
     try {
       const { data } = await graphqlRequest(createVoteMutation, vote);
@@ -77,13 +80,16 @@ export function createVote(vote) {
       dispatch({
         type: CREATE_VOTE_SUCCESS,
         payload: normalized,
+        properties,
+        id: vote.pollId,
       });
     } catch (error) {
       dispatch({
         type: CREATE_VOTE_ERROR,
         message: error.message || 'Something went wrong',
-        pollId: vote.pollId,
+        id: vote.pollId,
         payload: error,
+        properties,
       });
       return false;
     }
@@ -94,9 +100,12 @@ export function createVote(vote) {
 
 export function updateVote(vote, stmtId = null) {
   return async (dispatch, getState, { graphqlRequest }) => {
+    const properties = genStatusIndicators(['vote']);
+
     dispatch({
       type: UPDATE_VOTE_START,
-      pollId: vote.pollId,
+      id: vote.pollId,
+      properties,
     });
     try {
       const { data } = await graphqlRequest(updateVoteMutation, vote);
@@ -105,13 +114,16 @@ export function updateVote(vote, stmtId = null) {
         type: UPDATE_VOTE_SUCCESS,
         payload: normalized,
         info: stmtId,
+        id: vote.pollId,
+        properties,
       });
     } catch (error) {
       dispatch({
         type: UPDATE_VOTE_ERROR,
         message: error.message || 'Something went wrong',
-        pollId: vote.pollId,
+        id: vote.pollId,
         payload: error,
+        properties,
       });
       return false;
     }
@@ -122,9 +134,12 @@ export function updateVote(vote, stmtId = null) {
 
 export function deleteVote(vote, stmtId = null) {
   return async (dispatch, getState, { graphqlRequest }) => {
+    const properties = genStatusIndicators(['vote']);
+
     dispatch({
       type: DELETE_VOTE_START,
-      pollId: vote.pollId,
+      id: vote.pollId,
+      properties,
     });
     try {
       const { data } = await graphqlRequest(deleteVoteMutation, vote);
@@ -133,13 +148,16 @@ export function deleteVote(vote, stmtId = null) {
         type: DELETE_VOTE_SUCCESS,
         payload: normalized,
         info: stmtId,
+        properties,
+        id: vote.pollId,
       });
     } catch (error) {
       dispatch({
         type: DELETE_VOTE_ERROR,
         message: error.message || 'Something went wrong',
         payload: error,
-        pollId: vote.pollId,
+        properties,
+        id: vote.pollId,
       });
       return false;
     }
@@ -151,16 +169,19 @@ export function deleteVote(vote, stmtId = null) {
 export function getVotes(pollId) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO check cache
-
-    if (getVotingListIsFetching(getState(), pollId)) {
+    const status = getVoteUpdates(getState(), pollId).fetchVoters || {};
+    if (status.pending) {
       return false;
     }
+
+    const properties = genStatusIndicators(['fetchVoters']);
     dispatch({
       type: LOAD_VOTES_START,
       payload: {
         pollId,
       },
       id: pollId,
+      properties,
     });
 
     try {
@@ -170,6 +191,7 @@ export function getVotes(pollId) {
         type: LOAD_VOTES_SUCCESS,
         payload: normalized,
         id: pollId,
+        properties,
       });
     } catch (error) {
       dispatch({
@@ -177,6 +199,7 @@ export function getVotes(pollId) {
         message: error.message || 'Something went wrong',
         payload: error,
         id: pollId,
+        properties,
       });
       return false;
     }

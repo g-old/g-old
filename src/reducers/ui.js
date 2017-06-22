@@ -82,13 +82,8 @@ export const getVoteMutationSuccess = (state, id) =>
 export const getVoteMutationError = (state, id) =>
   getMutationError(fromPoll.getPoll(state.polls, id));
 
-export const getStatementMutationIsPending = (state, id) =>
-  fromStatement.getStatementIsPending(state.statements, id);
+export const getVoteUpdates = (state, id) => fromPoll.getUpdates(state.polls, id);
 
-export const getStatementMutationSuccess = (state, id) =>
-  fromStatement.getStatementSuccess(state.statements, id);
-
-export const getStatementMutationError = (state, id) =>
-  fromStatement.getStatementError(state.statements, id);
+export const getStatementUpdates = state => fromStatement.getUpdates(state.statements);
 
 export const getAccountUpdates = (state, id) => fromUser.getStatus(state.users, id) || {};

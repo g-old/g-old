@@ -412,7 +412,7 @@
     "defaultMessage": "Switch poll",
     "message": "",
     "files": [
-      "src/components/TestProposal2/TestProposal.js"
+      "src/routes/proposal/ProposalContainer.js"
     ]
   },
   {
@@ -870,6 +870,15 @@
     "message": "",
     "files": [
       "src/components/SupervisionPanel/SupervisionPanel.js"
+    ]
+  },
+  {
+    "id": "poll.voteError",
+    "description": "Notice that voting was not successful",
+    "defaultMessage": "Voting failed!",
+    "message": "",
+    "files": [
+      "src/components/Poll/Poll.js"
     ]
   }
 ]

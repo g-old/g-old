@@ -39,15 +39,10 @@ class Statement {
     return true;
   }
   /* eslint-enable no-unused-vars */
-  static async validateVote(viewer, vote, loaders) {
-    if (!vote) return null;
-    let voteInDb;
-    if (vote.id) {
-      voteInDb = await Vote.gen(viewer, vote.id, loaders);
-    } else {
-      voteInDb = await Vote.create(viewer, vote, loaders);
-    }
-    return voteInDb || null;
+  static async validateVote(viewer, id, loaders) {
+    const voteInDb = await Vote.gen(viewer, id, loaders);
+    if (!voteInDb || voteInDb.userId !== viewer.id) return null;
+    return voteInDb;
   }
 
   static async delete(viewer, data, loaders) {
@@ -71,7 +66,6 @@ class Statement {
     if (!Statement.canMutate(viewer, data)) return null;
 
     // validate
-    if (!data.pollId) return null;
     if (!data.id) return null;
     if (data.text && data.text.length < 1 && data.text !== 'string') return null;
     // update
@@ -99,7 +93,7 @@ class Statement {
     if (!Statement.canMutate(viewer, data)) return null;
     // validate
 
-    if (!data.pollId) return null;
+    if (!data.pollId || !data.voteId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders);
     if (!poll) return null;
     const statementsAllowed = await poll.isCommentable(viewer, loaders);
@@ -110,8 +104,8 @@ class Statement {
     // create
     // eslint-disable-next-line prefer-arrow-callback
     const newStatementId = await knex.transaction(async function (trx) {
-      const vote = await Statement.validateVote(viewer, data.vote, loaders);
-      if (!vote) throw Error('Vote not valid');
+      const vote = await Statement.validateVote(viewer, data.voteId, loaders);
+      if (!vote.id) throw Error('Vote not valid');
       const statementInDB = await knex('statements')
         .where({ poll_id: data.pollId, author_id: viewer.id })
         .pluck('id');

@@ -17,8 +17,7 @@ class PollState extends React.Component {
     unipolar: PropTypes.bool.isRequired,
     votes: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.string })).isRequired,
     getVotes: PropTypes.func.isRequired,
-    votingListIsFetching: PropTypes.bool.isRequired,
-    votingListErrorMessage: PropTypes.string.isRequired,
+    updates: PropTypes.shape({ isPending: PropTypes.bool, error: PropTypes.node }).isRequired,
   };
 
   static defaultProps = {
@@ -27,8 +26,6 @@ class PollState extends React.Component {
     threshold: 50,
     /* threshold_ref: 'all', */
     votes: [],
-    votingListIsFetching: false,
-    votingListErrorMessage: 'error',
   };
 
   constructor(props) {
@@ -46,7 +43,7 @@ class PollState extends React.Component {
   }
 
   render() {
-    const { compact, unipolar } = this.props;
+    const { compact, unipolar, updates } = this.props;
     const voteClass = this.props.unipolar ? s.unipolar : s.bipolar;
 
     const sum = this.props.unipolar
@@ -115,11 +112,10 @@ class PollState extends React.Component {
               autoLoadVotes
               unipolar={this.props.unipolar}
               votes={this.props.votes}
-              isFetching={this.props.votingListIsFetching}
-              errorMessage={this.props.votingListErrorMessage}
+              isFetching={updates && updates.isPending}
+              errorMessage={updates && updates.error}
+              getVotes={this.props.getVotes}
             />
-            {`THRESHOLD ${this.props.threshold}`}
-            {`Allvoters ${this.props.allVoters}`}
             {!this.props.unipolar && this.props.threshold < 50 ? ' (IMPOSSIBLE)' : ''}
           </div>}
       </div>

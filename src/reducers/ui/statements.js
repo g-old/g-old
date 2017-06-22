@@ -9,52 +9,32 @@ import {
   DELETE_STATEMENT_SUCCESS,
   DELETE_STATEMENT_ERROR,
 } from '../../constants';
+import { getErrors, getSuccessState } from '../../core/helpers';
 
 const statements = (state = {}, action) => {
   switch (action.type) {
     case UPDATE_STATEMENT_START:
     case DELETE_STATEMENT_START:
     case CREATE_STATEMENT_START: {
-      const id = action.id;
       return {
         ...state,
-        [id]: {
-          ...state[id],
-          mutations: {
-            pending: true,
-            success: false,
-            error: null,
-          },
+        [action.id]: {
+          ...state[action.id],
+          ...action.properties,
         },
       };
     }
+    case CREATE_STATEMENT_SUCCESS:
     case UPDATE_STATEMENT_SUCCESS:
     case DELETE_STATEMENT_SUCCESS: {
-      const id = action.payload.result;
+      const id = action.id; // Is initial id!
+      const current = state[id];
+      const newState = getSuccessState(current, action);
       return {
         ...state,
         [id]: {
           ...state[id],
-          mutations: {
-            pending: false,
-            success: true,
-            error: null,
-          },
-        },
-      };
-    }
-
-    case CREATE_STATEMENT_SUCCESS: {
-      const id = action.id;
-      return {
-        ...state,
-        [id]: {
-          ...state[id],
-          mutations: {
-            pending: false,
-            success: true,
-            error: null,
-          },
+          ...newState,
         },
       };
     }
@@ -62,16 +42,13 @@ const statements = (state = {}, action) => {
     case UPDATE_STATEMENT_ERROR:
     case DELETE_STATEMENT_ERROR:
     case CREATE_STATEMENT_ERROR: {
-      const id = action.id;
+      const current = state[action.id];
+      const newState = getErrors(current, action);
       return {
         ...state,
-        [id]: {
-          ...state[id],
-          mutations: {
-            pending: false,
-            success: false,
-            error: action.message,
-          },
+        [action.id]: {
+          ...state[action.id],
+          ...newState,
         },
       };
     }
@@ -81,22 +58,5 @@ const statements = (state = {}, action) => {
   }
 };
 
-export const getStatementIsPending = (state, id) => {
-  if (state[id] && state[id].mutations) {
-    return state[id].mutations.pending;
-  }
-  return false;
-};
-export const getStatementSuccess = (state, id) => {
-  if (state[id] && state[id].mutations) {
-    return state[id].mutations.success;
-  }
-  return false;
-};
-export const getStatementError = (state, id) => {
-  if (state[id] && state[id].mutations) {
-    return state[id].mutations.error;
-  }
-  return null;
-};
+export const getUpdates = state => state;
 export default statements;

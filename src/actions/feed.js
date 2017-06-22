@@ -32,7 +32,7 @@ query{
         downvotes
         threshold
         start_time
-        end_time
+        endTime
         allVoters
         mode{
           id
@@ -45,7 +45,7 @@ query{
         downvotes
         threshold
         start_time
-        end_time
+        endTime
         allVoters
         mode{
           id

@@ -162,7 +162,7 @@ class ProposalsManager extends React.Component {
       );
     }
     const toRender = proposals.filter(p => p.state === 'proposed');
-    toRender.sort((a, b) => new Date(a.pollOne.end_time) - new Date(b.pollOne.end_time));
+    toRender.sort((a, b) => new Date(a.pollOne.endTime) - new Date(b.pollOne.endTime));
 
     return (
       <Box column pad>
@@ -199,7 +199,7 @@ class ProposalsManager extends React.Component {
                       d="M12,18 C15.3137085,18 18,15.3137085 18,12 C18,8.6862915 15.3137085,6 12,6 C8.6862915,6 6,8.6862915 6,12 C6,15.3137085 8.6862915,18 12,18 Z M12,8 L12,12 L15,13"
                     />
                   </svg>
-                  <FormattedRelative value={p.pollOne.end_time} />
+                  <FormattedRelative value={p.pollOne.endTime} />
                 </span>
               </span>
 

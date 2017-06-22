@@ -40,21 +40,9 @@ export const getVotingListIsFetching = (state, id) => fromUi.getVotingListIsFetc
 export const getVotingListErrorMessage = (state, id) =>
   fromUi.getVotingListErrorMessage(state.ui, id);
 
-export const getVoteMutationIsPending = (state, id) =>
-  fromUi.getVoteMutationIsPending(state.ui, id);
+export const getVoteUpdates = (state, id) => fromUi.getVoteUpdates(state.ui, id);
 
-export const getVoteMutationSuccess = (state, id) => fromUi.getVoteMutationSuccess(state.ui, id);
-
-export const getVoteMutationError = (state, id) => fromUi.getVoteMutationError(state.ui, id);
-
-export const getStatementMutationIsPending = (state, id) =>
-  fromUi.getStatementMutationIsPending(state.ui, id);
-
-export const getStatementMutationSuccess = (state, id) =>
-  fromUi.getStatementMutationSuccess(state.ui, id);
-
-export const getStatementMutationError = (state, id) =>
-  fromUi.getStatementMutationError(state.ui, id);
+export const getStatementUpdates = state => fromUi.getStatementUpdates(state.ui);
 
 export const getVisibleUsers = (state, filter) =>
   fromEntity.getVisibleUsers(state.entities, filter);

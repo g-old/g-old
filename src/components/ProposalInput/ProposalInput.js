@@ -21,7 +21,7 @@ import Button from '../Button';
 import FormField from '../FormField';
 import Box from '../Box';
 import Layer from '../Layer';
-import Proposal from '../Proposal2';
+import Proposal from '../Proposal';
 import { ICONS } from '../../constants';
 import {
   nameValidation,

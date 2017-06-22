@@ -18,7 +18,7 @@ class VotesList extends React.Component {
   static defaultProps = {
     autoLoadVotes: false,
     errorMessage: 'Error.',
-  }
+  };
 
   static renderVote(vote) {
     return (
@@ -61,8 +61,17 @@ class VotesList extends React.Component {
       return <p>{'Loading...'} </p>;
     }
     if (errorMessage && !(pro.length || con.length)) {
-      return <FetchError message={errorMessage} onRetry={this.props.getVotes} />;
+      return (
+        <FetchError
+          message={errorMessage}
+          onRetry={(e) => {
+            e.stopPropagation();
+            this.props.getVotes();
+          }}
+        />
+      );
     }
+    /* eslint-disable css-modules/no-undef-class */
     return (
       <div>
         {this.state.showVotes
@@ -78,6 +87,7 @@ class VotesList extends React.Component {
           : <button onClick={this.onGetVotes}> GETVOTES</button>}
       </div>
     );
+    /* eslint-enable css-modules/no-undef-class */
   }
 }
 

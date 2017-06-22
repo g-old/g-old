@@ -17,7 +17,7 @@ const sortStatementsByPoll = (stmts, votes) =>
     return {
       ...acc,
       [statement.pollId]: {
-        ids: [...new Set([...(acc[statement.pollId] ? acc[statement.pollId].ids : []), curr])],
+        all: [...new Set([...(acc[statement.pollId] ? acc[statement.pollId].all : []), curr])],
         pro: [
           ...new Set([
             ...(acc[statement.pollId] ? acc[statement.pollId].pro : []),
@@ -57,7 +57,7 @@ const byPoll = (state = {}, action) => {
         ...state,
         [pollId]: {
           ...state[pollId],
-          ids: [...(currentState.ids || []), ...sorted[pollId].ids],
+          all: [...(currentState.all || []), ...sorted[pollId].all],
           pro: [...(currentState.pro || []), ...sorted[pollId].pro],
           con: [...(currentState.con || []), ...sorted[pollId].con],
         },
@@ -69,7 +69,7 @@ const byPoll = (state = {}, action) => {
       return {
         ...state,
         [statement.pollId]: {
-          ids: state[statement.pollId].ids.filter(i => i !== statement.id),
+          all: state[statement.pollId].all.filter(i => i !== statement.id),
           pro: state[statement.pollId].pro.filter(i => i !== statement.id),
           con: state[statement.pollId].con.filter(i => i !== statement.id),
         },
@@ -87,9 +87,9 @@ const byPoll = (state = {}, action) => {
         ...state,
         [vote.pollId]: {
           ...state[vote.pollId],
-          ids: state[vote.pollId].ids.filter(i => i !== action.info),
-          pro: state[vote.pollId].ids.filter(i => i !== action.info),
-          con: state[vote.pollId].ids.filter(i => i !== action.info),
+          all: state[vote.pollId].all.filter(i => i !== action.info),
+          pro: state[vote.pollId].pro.filter(i => i !== action.info),
+          con: state[vote.pollId].con.filter(i => i !== action.info),
         },
       };
     }
@@ -99,6 +99,6 @@ const byPoll = (state = {}, action) => {
 };
 export default byPoll;
 
-export const getAllByPollId = (state, id) => (state[id] ? state[id].ids : []);
+export const getAllByPollId = (state, id) => (state[id] ? state[id].all : []);
 
 export const getFilteredByPollId = (state, id) => state[id] || [];

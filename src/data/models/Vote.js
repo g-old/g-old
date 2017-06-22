@@ -74,6 +74,8 @@ class Vote {
   }
 
   static async update(viewer, data, loaders) {
+    // throw Error('TESTERROR');
+
     if (!data.id) return null;
     if (!data.pollId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
@@ -126,7 +128,7 @@ class Vote {
 
   static async create(viewer, data, loaders) {
     // authenticate later?
-
+    // throw Error('TESTERROR');
     // validate
     if (!data.pollId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...

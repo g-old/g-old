@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { FormattedRelative, defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
-import StatementsList from '../StatementsList';
 import PollState from '../PollState';
 import s from './Poll.css';
 import { ICONS } from '../../constants';
@@ -12,16 +10,6 @@ import Button from '../Button';
 import Box from '../Box';
 import Layer from '../Layer';
 import Notification from '../Notification';
-import {
-  getVotingListIsFetching,
-  getVotingListErrorMessage,
-  getVoteMutationIsPending,
-  //  getVoteMutationSuccess,
-  getVoteMutationError,
-  getFolloweeVotesByPoll,
-  getFollowees,
-  getVisibibleStatementsByPoll,
-} from '../../reducers';
 
 const messages = defineMessages({
   closed: {
@@ -50,45 +38,34 @@ const messages = defineMessages({
     defaultMessage: 'Your statement will be deleted!',
     description: 'Notice that vote change will lead to statement deletion',
   },
+  error: {
+    id: 'poll.voteError',
+    defaultMessage: 'Voting failed!',
+    description: 'Notice that voting was not successful',
+  },
 });
 
 class Poll extends React.Component {
   static propTypes = {
-    poll: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    threshold: PropTypes.number.isRequired,
+    endTime: PropTypes.string.isRequired,
+    allVoters: PropTypes.number.isRequired,
+    ownStatement: PropTypes.shape({}).isRequired,
+    closedAt: PropTypes.string.isRequired,
+    // statements: PropTypes.arrayOf(PropTypes.object),
+    upvotes: PropTypes.number.isRequired,
+    downvotes: PropTypes.number.isRequired,
+    votes: PropTypes.arrayOf(PropTypes.shape({})),
+    ownVote: PropTypes.shape({
       id: PropTypes.string,
-      secret: PropTypes.bool,
-      threshold: PropTypes.number,
-      start_time: PropTypes.string,
-      end_time: PropTypes.string,
-      allVoters: PropTypes.number,
-      ownStatement: PropTypes.object,
-      closed_at: PropTypes.string,
-      // statements: PropTypes.arrayOf(PropTypes.object),
-      upvotes: PropTypes.number,
-      downvotes: PropTypes.number,
-      votes: PropTypes.arrayOf(PropTypes.object),
-      ownVote: PropTypes.shape({
-        id: PropTypes.string,
-        position: PropTypes.string,
-        pollId: PropTypes.string,
-      }),
-      mode: PropTypes.shape({
-        withStatements: PropTypes.bool,
-        unipolar: PropTypes.bool,
-        thresholdRef: PropTypes.string,
-      }),
-      likedStatements: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string,
-          statementId: PropTypes.string,
-        }),
-      ),
-      followees: PropTypes.arrayOf(
-        PropTypes.shape({
-          position: PropTypes.string,
-          voter: PropTypes.object,
-        }),
-      ),
+      position: PropTypes.string,
+      pollId: PropTypes.string,
+    }),
+    mode: PropTypes.shape({
+      withStatements: PropTypes.bool,
+      unipolar: PropTypes.bool,
+      thresholdRef: PropTypes.string,
     }).isRequired,
     user: PropTypes.shape({
       id: PropTypes.string,
@@ -96,24 +73,36 @@ class Poll extends React.Component {
         type: PropTypes.string,
       }),
     }).isRequired,
-    fetchVotes: PropTypes.func.isRequired,
-    onVoteButtonClicked: PropTypes.func.isRequired,
-    onStatementSubmit: PropTypes.func.isRequired,
-    // mutationSuccess: PropTypes.bool.isRequired,
-    mutationErrorMessage: PropTypes.string.isRequired,
-    mutationIsPending: PropTypes.bool.isRequired,
-    votingListIsFetching: PropTypes.bool.isRequired,
-    votingListErrorMessage: PropTypes.string.isRequired,
+    onVote: PropTypes.func.isRequired,
+    onFetchVoters: PropTypes.func.isRequired,
     followeeVotes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    statements: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     filter: PropTypes.string.isRequired,
+    updates: PropTypes.shape({ vote: PropTypes.shape({}) }).isRequired,
+  };
+
+  static defaultProps = {
+    updates: {},
+    votes: null,
+    ownVote: null,
   };
   constructor(props) {
     super(props);
     this.state = {};
-    this.handleOnSubmit = this.handleOnSubmit.bind(this);
     this.handleRetractVote = this.handleRetractVote.bind(this);
+  }
+
+  componentWillReceiveProps({ updates }) {
+    if (updates.vote) {
+      let voteError;
+      if (updates.vote.error) {
+        const oldStatus = this.props.updates.vote || {};
+        voteError = !oldStatus.error;
+      }
+      if (updates.vote.success) {
+        voteError = false;
+      }
+      this.setState({ voteError });
+    }
   }
 
   getFolloweeVotes(pos) {
@@ -134,100 +123,66 @@ class Poll extends React.Component {
   }
 
   canVote(position) {
+    const { ownVote, ownStatement, id } = this.props;
     let method; // or take methods better directly in and connect to redux
     let info = null;
 
-    if (!this.props.poll.ownVote) {
+    if (!ownVote) {
       method = 'create';
-    } else if (this.props.poll.ownVote.position !== position) {
+    } else if (ownVote.position !== position) {
       method = 'update';
     } else {
       method = 'del';
     }
-    const id = this.props.poll.ownVote ? this.props.poll.ownVote.id : null;
-    if (this.props.poll.ownStatement) {
-      info = this.props.poll.ownStatement.id;
+    const voteId = ownVote ? ownVote.id : null;
+    if (ownStatement) {
+      info = ownStatement.id;
       this.setState({
         confirmationFunc: () => {
-          this.props.onVoteButtonClicked(
-            { position, pollId: this.props.poll.id, id },
-            method,
-            info,
-          );
+          this.props.onVote({ position, pollId: id, id: voteId }, method, info);
           this.setState({ confirmationFunc: null });
         },
       });
       return;
     }
-    this.props.onVoteButtonClicked({ position, pollId: this.props.poll.id, id }, method, info);
+    this.props.onVote({ position, pollId: id, id: voteId }, method, info);
   }
 
   handleRetractVote() {
+    const { ownVote, ownStatement } = this.props;
     // TODO Add some sort of validation
     // will delete vote and the statement too bc of cascade on delete
-    this.canVote(this.props.poll.ownVote.position, this.props.poll.ownStatement.id);
-  }
-
-  handleOnSubmit(input, update) {
-    if (!this.props.poll.ownVote) {
-      alert('CHANGE: ADMIN/MODS CANNOT EDIT ANYMORE!');
-    } else {
-      const { id, pollId, position } = this.props.poll.ownVote;
-      this.props.onStatementSubmit(
-        {
-          ...input,
-          pollId: this.props.poll.id,
-          vote: { id, pollId, position },
-        },
-        update,
-      );
-    }
+    this.canVote(ownVote.position, ownStatement.id);
   }
 
   render() {
-    const { poll: { ownVote }, filter } = this.props;
-    const withStatements = this.props.poll.mode.withStatements;
-    let statements = null;
+    const {
+      id,
+      ownVote,
+      allVoters,
+      upvotes,
+      downvotes,
+      threshold,
+      mode,
+      user,
+      closedAt,
+      endTime,
+      votes,
+      updates,
+      onFetchVoters,
+    } = this.props;
 
-    let hideOwnStatement = true;
-    if (filter === 'ids' || (ownVote && filter === ownVote.position)) {
-      hideOwnStatement = false;
-    }
-
-    // render StatementsList or not?
-    if (withStatements) {
-      statements = (
-        <StatementsList
-          statements={this.props.statements}
-          likedStatements={this.props.poll.likedStatements}
-          pollId={this.props.poll.id}
-          user={this.props.user}
-          voted={this.props.poll.ownVote != null}
-          ownStatement={this.props.poll.ownStatement}
-          onSubmit={this.handleOnSubmit}
-          ownVote={this.props.poll.ownVote}
-          followees={this.props.followees}
-          hideOwnStatement={hideOwnStatement}
-        />
-      );
-    }
     let votingButtons = null;
-    const { mutationIsPending, mutationErrorMessage } = this.props;
 
-    if (!this.props.poll.closed_at && !['viewer', 'guest'].includes(this.props.user.role.type)) {
+    const votePending = updates.vote ? updates.vote.pending : false;
+    if (!closedAt && !['viewer', 'guest'].includes(user.role.type)) {
       // TODO Find better check
       // eslint-disable-next-line no-nested-ternary
-      const proBtnColor = this.props.poll.ownVote && this.props.poll.ownVote.position === 'pro'
-        ? s.proBtnColor
-        : '';
-      // eslint-disable-next-line no-nested-ternary
-      const conBtnColor = this.props.poll.ownVote && this.props.poll.ownVote.position === 'con'
-        ? s.conBtnColor
-        : '';
-      if (this.props.poll.mode.unipolar) {
+      const proBtnColor = ownVote && ownVote.position === 'pro' ? s.proBtnColor : '';
+      if (mode.unipolar) {
         votingButtons = (
           <div>
-            <Button disabled={mutationIsPending} onClick={() => this.canVote('pro')} plain>
+            <Button disabled={votePending} onClick={() => this.canVote('pro')} plain>
               Stop this!
               <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
                 <path
@@ -238,14 +193,15 @@ class Poll extends React.Component {
                 />
               </svg>
             </Button>
-            {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
           </div>
         );
       } else {
+        // eslint-disable-next-line no-nested-ternary
+        const conBtnColor = ownVote && ownVote.position === 'con' ? s.conBtnColor : '';
         votingButtons = (
           <div style={{ paddingBottom: '2em' }}>
             <Box pad>
-              <Button plain onClick={() => this.canVote('pro')} disabled={mutationIsPending}>
+              <Button plain onClick={() => this.canVote('pro')} disabled={votePending}>
                 <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
                   <path
                     fill="none"
@@ -255,7 +211,7 @@ class Poll extends React.Component {
                   />
                 </svg>
               </Button>
-              <Button plain onClick={() => this.canVote('con')} disabled={mutationIsPending}>
+              <Button plain onClick={() => this.canVote('con')} disabled={votePending}>
                 <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
                   <path
                     fill="none"
@@ -267,11 +223,11 @@ class Poll extends React.Component {
                 </svg>
               </Button>
             </Box>
-            {mutationErrorMessage && <div>{mutationErrorMessage} </div>}
           </div>
         );
       }
     }
+
     return (
       <div>
         {this.state.confirmationFunc &&
@@ -291,26 +247,23 @@ class Poll extends React.Component {
             </Box>
           </Layer>}
         <p>
-          {this.props.poll.closed_at
+          {closedAt
             ? <FormattedMessage {...messages.closed} />
             : <FormattedMessage {...messages.closing} />}
-          <FormattedRelative
-            value={this.props.poll.closed_at ? this.props.poll.closed_at : this.props.poll.end_time}
-          />
+          <FormattedRelative value={closedAt || endTime} />
 
         </p>
         <div className={s.pollState}>
           <PollState
-            allVoters={this.props.poll.allVoters}
-            upvotes={this.props.poll.upvotes}
-            downvotes={this.props.poll.downvotes}
-            unipolar={this.props.poll.mode.unipolar}
-            threshold={this.props.poll.threshold}
-            thresholdRef={this.props.poll.mode.thresholdRef}
-            votes={this.props.poll.votes || []}
-            getVotes={() => this.props.fetchVotes(this.props.poll.id)}
-            votingListIsFetching={this.props.votingListIsFetching}
-            votingListErrorMessage={this.props.votingListErrorMessage}
+            allVoters={allVoters}
+            upvotes={upvotes}
+            downvotes={downvotes}
+            unipolar={mode.unipolar}
+            threshold={threshold}
+            thresholdRef={mode.thresholdRef}
+            votes={votes}
+            getVotes={() => onFetchVoters(id)}
+            updates={updates.fetchVoters || {}}
           />
         </div>
         <div className={s.followeeContainer}>
@@ -323,29 +276,14 @@ class Poll extends React.Component {
         </div>
 
         <Box justify>
-          {mutationErrorMessage && <div> {'ERROR:'} </div>}
           {votingButtons}
+
         </Box>
-        {statements}
+        {this.state.voteError &&
+          <Notification type="error" message={<FormattedMessage {...messages.error} />} />}
       </div>
     );
   }
 }
-const mapPropsToState = (state, { poll: { id }, filter }) => {
-  const statements = getVisibibleStatementsByPoll(state, id, filter);
-  if (statements) {
-    statements.sort((a, b) => b.likes - a.likes);
-  }
-  return {
-    votingListIsFetching: getVotingListIsFetching(state, id),
-    votingListErrorMessage: getVotingListErrorMessage(state, id),
-    mutationIsPending: getVoteMutationIsPending(state, id),
-    // mutationSuccess: getVoteMutationSuccess(state, id),
-    mutationErrorMessage: getVoteMutationError(state, id),
-    followeeVotes: getFolloweeVotesByPoll(state, id),
-    followees: getFollowees(state),
-    statements,
-  };
-};
 
-export default connect(mapPropsToState)(withStyles(s)(Poll));
+export default withStyles(s)(Poll);

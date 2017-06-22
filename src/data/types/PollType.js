@@ -24,13 +24,13 @@ const PollType = new ObjectType({
     threshold: {
       type: GraphQLInt,
     },
-    end_time: {
+    endTime: {
       type: GraphQLString,
     },
     start_time: {
       type: GraphQLString,
     },
-    closed_at: {
+    closedAt: {
       type: GraphQLString,
     },
     mode: {
@@ -60,7 +60,8 @@ const PollType = new ObjectType({
       description: 'Votings of followees',
       sqlJoin(pollsTable, votesTable, args, context) {
         if (context.args && context.args.userID) {
-          return `${pollsTable}.id = ${votesTable}.poll_id and ${votesTable}.user_id = any(select followee_id from user_follows where user_follows.follower_id = ${context.args.userID} union all select ${context.args.userID})`;
+          return `${pollsTable}.id = ${votesTable}.poll_id and ${votesTable}.user_id = any(select followee_id from user_follows where user_follows.follower_id = ${context
+            .args.userID} union all select ${context.args.userID})`;
         }
         return `${pollsTable}.id = ${votesTable}.poll_id`;
       },
@@ -70,15 +71,11 @@ const PollType = new ObjectType({
       sqlJoin(pollsTable, statementsTable) {
         return `${pollsTable}.id = ${statementsTable}.poll_id`;
       },
-
     },
     createdAt: {
       type: GraphQLString,
       sqlColumn: 'created_at',
     },
-
-
   },
-
 });
 export default PollType;

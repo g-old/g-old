@@ -135,3 +135,55 @@ export function findScrollParents(element, horizontal) {
   }
   return result;
 }
+
+export const getErrors = (state, action) =>
+  Object.keys(state).reduce((acc, curr) => {
+    if (curr in action.properties && state[curr].pending) {
+      let error = action.message || true;
+      if (action.message.fields) {
+        // means only valid for specific property
+        error = false;
+        if (action.message.fields[curr]) {
+          error = action.message.fields[curr];
+        }
+      }
+      // eslint-disable-next-line no-param-reassign
+      acc[curr] = {
+        pending: false,
+        success: false,
+        error,
+      };
+    }
+    return acc;
+  }, {});
+
+export const getSuccessState = (state, action) =>
+  Object.keys(state).reduce((acc, curr) => {
+    if (curr in action.properties && state[curr].pending) {
+      // eslint-disable-next-line no-param-reassign
+      acc[curr] = {
+        pending: false,
+        success: true,
+        error: null,
+      };
+    }
+    return acc;
+  }, {});
+
+export const genStatusIndicators = (data) => {
+  let component = null;
+  if (Array.isArray(data)) {
+    component = data;
+  } else if (typeof data === 'object') {
+    component = Object.keys(data);
+  }
+  return component.reduce((acc, curr) => {
+    // eslint-disable-next-line no-param-reassign
+    acc[curr] = {
+      pending: true,
+      success: false,
+      error: null,
+    };
+    return acc;
+  }, {});
+};

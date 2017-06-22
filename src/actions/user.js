@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { normalize } from 'normalizr';
-
+import { genStatusIndicators } from '../core/helpers';
 import { user as userSchema, userList as userArray } from '../store/schema';
 import {
   LOAD_USERS_START,
@@ -122,15 +122,7 @@ export function loadUserList(role) {
 const initialId = '0000';
 export function createUser(newUser) {
   return async (dispatch) => {
-    const properties = Object.keys(newUser).reduce((acc, curr) => {
-      // eslint-disable-next-line no-param-reassign
-      acc[curr] = {
-        pending: true,
-        success: false,
-        error: null,
-      };
-      return acc;
-    }, {});
+    const properties = genStatusIndicators(newUser);
     dispatch({
       type: CREATE_USER_START,
       properties,
@@ -189,15 +181,7 @@ export function updateUser(user) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // eslint-disable-next-line no-unused-vars
     const { id, info, ...rest } = user;
-    const properties = Object.keys(rest).reduce((acc, curr) => {
-      // eslint-disable-next-line no-param-reassign
-      acc[curr] = {
-        pending: true,
-        success: false,
-        error: null,
-      };
-      return acc;
-    }, {});
+    const properties = genStatusIndicators(rest);
 
     dispatch({
       type: UPDATE_USER_START,
@@ -230,6 +214,7 @@ export function updateUser(user) {
         payload: normalizedData,
         properties,
         info,
+        id: user.id,
       });
     } catch (error) {
       dispatch({

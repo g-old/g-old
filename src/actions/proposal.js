@@ -72,9 +72,9 @@ const pollFields = `{
   upvotes
   downvotes
   threshold
-  closed_at
+  closedAt
   start_time
-  end_time
+  endTime
   allVoters
   followees{
     id
@@ -120,7 +120,7 @@ const pollFieldsForList = `{
   downvotes
   threshold
   start_time
-  end_time
+  endTime
   allVoters
   mode{
     id

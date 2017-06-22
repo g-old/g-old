@@ -16,6 +16,8 @@ import {
   SESSION_LOGIN_ERROR,
 } from '../../constants';
 
+import { getErrors, getSuccessState } from '../../core/helpers';
+
 const users = (state = {}, action) => {
   switch (action.type) {
     case CREATE_USER_START:
@@ -32,54 +34,13 @@ const users = (state = {}, action) => {
       };
     }
 
-    case UPDATE_USER_SUCCESS: {
-      const id = action.payload.result;
-      const current = state[id];
-      const newState = Object.keys(current).reduce((acc, curr) => {
-        if (curr in action.properties && current[curr].pending) {
-          // eslint-disable-next-line no-param-reassign
-          acc[curr] = {
-            pending: false,
-            success: true,
-            error: null,
-          };
-        }
-        return acc;
-      }, {});
-
-      return {
-        ...state,
-        [id]: {
-          ...state[id],
-          ...newState,
-        },
-      };
-    }
     case RESET_PASSWORD_ERROR:
     case CREATE_USER_ERROR:
     case SESSION_LOGIN_ERROR:
     case UPLOAD_AVATAR_ERROR:
     case UPDATE_USER_ERROR: {
       const current = state[action.id];
-      const newState = Object.keys(current).reduce((acc, curr) => {
-        if (curr in action.properties && current[curr].pending) {
-          let error = true;
-          if (action.message.fields) {
-            // means only valid for specific property
-            error = false;
-            if (action.message.fields[curr]) {
-              error = action.message.fields[curr];
-            }
-          }
-          // eslint-disable-next-line no-param-reassign
-          acc[curr] = {
-            pending: false,
-            success: false,
-            error,
-          };
-        }
-        return acc;
-      }, {});
+      const newState = getErrors(current, action);
       return {
         ...state,
         [action.id]: {
@@ -89,22 +50,13 @@ const users = (state = {}, action) => {
       };
     }
     case RESET_PASSWORD_SUCCESS:
+    case UPDATE_USER_SUCCESS:
     case CREATE_USER_SUCCESS:
     case SESSION_LOGIN_SUCCESS:
     case UPLOAD_AVATAR_SUCCESS: {
       const id = action.id; // Is initial id!
       const current = state[id];
-      const newState = Object.keys(current).reduce((acc, curr) => {
-        if (curr in action.properties && current[curr].pending) {
-          // eslint-disable-next-line no-param-reassign
-          acc[curr] = {
-            pending: false,
-            success: true,
-            error: null,
-          };
-        }
-        return acc;
-      }, {});
+      const newState = getSuccessState(current, action);
       return {
         ...state,
         [id]: {
@@ -120,4 +72,4 @@ const users = (state = {}, action) => {
 };
 export default users;
 
-export const getStatus = (state, id) => state[id];
+export const getStatus = (state, id) => state[id] || {};

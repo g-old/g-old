@@ -49,7 +49,7 @@ class Proposal extends React.Component {
           <div className={s.date}>
             <FormattedRelative value={this.props.proposal.publishedAt} />
           </div>
-          <Link to={`/testproposal/${this.props.proposal.id}/ids`}>
+          <Link to={`/proposal/${this.props.proposal.id}/${poll.id}`}>
             <h2 className={s.header}>
               {this.props.proposal.title}
             </h2>
@@ -70,9 +70,9 @@ class Proposal extends React.Component {
             </div>
             <div className={s.tags}>
               {this.props.proposal.tags &&
-                this.props.proposal.tags.map(tag => (
-                  <span key={tag.id} className={s.tag}>{`${tag.text}`}</span>
-                ))}
+                this.props.proposal.tags.map(tag =>
+                  <span key={tag.id} className={s.tag}>{`${tag.text}`}</span>,
+                )}
             </div>
           </Link>
         </div>

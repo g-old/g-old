@@ -1,6 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import { normalize } from 'normalizr';
 import { getFlagsIsFetching } from '../reducers';
+import { genStatusIndicators } from '../core/helpers';
 
 import {
   CREATE_STATEMENT_START,
@@ -50,14 +51,14 @@ const statementResult = `{
 `;
 
 const createStatementMutation = `
-  mutation ($vote:VoteInput $text:String $pollId:ID! $id: ID) {
-    createStatement (statement:{vote:$vote text:$text pollId:$pollId id:$id })${statementResult}
+  mutation ($text:String! $pollId:ID! $voteId:ID!) {
+    createStatement (statement:{ text:$text pollId:$pollId  voteId:$voteId})${statementResult}
   }
 `;
 
 const updateStatementMutation = `
-  mutation ($vote:VoteInput $text:String $pollId:ID! $id: ID) {
-    updateStatement (statement:{vote:$vote text:$text pollId:$pollId id:$id })${statementResult}
+  mutation ( $text:String!  $id: ID!) {
+    updateStatement (statement:{ text:$text id:$id })${statementResult}
   }
 `;
 
@@ -137,9 +138,11 @@ mutation($id:ID $statementId:ID, $content:String, $action:action){
 export function createStatement(statement) {
   return async (dispatch, getState, { graphqlRequest }) => {
     const virtualId = '0000';
+    const properties = genStatusIndicators(['createStmt']);
     dispatch({
       type: CREATE_STATEMENT_START,
       id: virtualId,
+      properties,
     });
     try {
       const { data } = await graphqlRequest(createStatementMutation, statement);
@@ -148,6 +151,7 @@ export function createStatement(statement) {
         type: CREATE_STATEMENT_SUCCESS,
         payload: normalizedData,
         id: virtualId,
+        properties,
       });
     } catch (error) {
       dispatch({
@@ -156,8 +160,8 @@ export function createStatement(statement) {
           error,
         },
         message: error.message || 'Something went wrong',
-
         id: virtualId,
+        properties,
       });
       return false;
     }
@@ -168,9 +172,11 @@ export function createStatement(statement) {
 
 export function updateStatement(statement) {
   return async (dispatch, getState, { graphqlRequest }) => {
+    const properties = genStatusIndicators(['updateStmt']);
     dispatch({
       type: UPDATE_STATEMENT_START,
       id: statement.id,
+      properties,
     });
     try {
       const { data } = await graphqlRequest(updateStatementMutation, statement);
@@ -178,6 +184,8 @@ export function updateStatement(statement) {
       dispatch({
         type: UPDATE_STATEMENT_SUCCESS,
         payload: normalizedData,
+        properties,
+        id: statement.id,
       });
     } catch (error) {
       dispatch({
@@ -185,6 +193,7 @@ export function updateStatement(statement) {
         payload: {
           error,
         },
+        properties,
         message: error.message || 'Something went wrong',
 
         id: statement.id,
@@ -198,9 +207,11 @@ export function updateStatement(statement) {
 
 export function deleteStatement(statement) {
   return async (dispatch, getState, { graphqlRequest }) => {
+    const properties = genStatusIndicators(['deleteStmt']);
     dispatch({
       type: DELETE_STATEMENT_START,
       id: statement.id,
+      properties,
     });
     try {
       const { data } = await graphqlRequest(deleteStatementMutation, statement);
@@ -208,6 +219,8 @@ export function deleteStatement(statement) {
       dispatch({
         type: DELETE_STATEMENT_SUCCESS,
         payload: normalizedData,
+        properties,
+        id: statement.id,
       });
     } catch (error) {
       dispatch({
@@ -217,6 +230,7 @@ export function deleteStatement(statement) {
         },
         message: error.message || 'Something went wrong',
         id: statement.id,
+        properties,
       });
       return false;
     }

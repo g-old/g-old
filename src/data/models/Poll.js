@@ -16,8 +16,8 @@ class Poll {
     this.downvotes = data.downvotes;
     this.numVoter = data.num_voter;
     this.start_time = data.start_time;
-    this.end_time = data.end_time;
-    this.closed_at = data.closed_at;
+    this.endTime = data.end_time;
+    this.closedAt = data.closed_at;
   }
   static async gen(viewer, id, { polls }) {
     if (!id) return null;
@@ -32,7 +32,7 @@ class Poll {
   }
   // eslint-disable-next-line class-methods-use-this
   isVotable(viewer) {
-    if (this.closed_at || new Date(this.end_time) < new Date()) {
+    if (this.closedAt || new Date(this.endTime) < new Date()) {
       return false;
     }
     if (!viewer || !['admin', 'mod', 'user'].includes(viewer.role.type)) {
@@ -48,7 +48,7 @@ class Poll {
     return mode.unipolar === true;
   }
   async isCommentable(viewer, loaders) {
-    if (this.closed_at) return false;
+    if (this.closedAt) return false;
     const mode = await PollingMode.gen(viewer, this.pollingModeId, loaders);
     return mode.withStatements === true;
   }
@@ -65,7 +65,7 @@ class Poll {
     // validate
     if (!data.polling_mode_id) return null;
     if (!data.threshold) return null;
-    if (!data.end_time) return null;
+    if (!data.endTime) return null;
     // create
     const newPollId = await knex.transaction(async (trx) => {
       const pollingMode = await PollingMode.gen(viewer, data.polling_mode_id, loaders);
@@ -102,7 +102,7 @@ class Poll {
     if (!data.id) return null;
     const newData = {};
     if (data.closedAt) {
-      newData.closed_at = data.closedAt;
+      newData.closedAt = data.closedAt;
     }
 
     const pollId = await knex.transaction(async (trx) => {
