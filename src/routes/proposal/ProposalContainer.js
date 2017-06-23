@@ -34,7 +34,7 @@ class ProposalContainer extends React.Component {
     user: PropTypes.shape({}).isRequired,
     proposalId: PropTypes.number.isRequired,
     isFetching: PropTypes.bool.isRequired,
-    errorMessage: PropTypes.string.isRequired,
+    errorMessage: PropTypes.string,
     pollId: PropTypes.string.isRequired,
     createVote: PropTypes.func.isRequired,
     updateVote: PropTypes.func.isRequired,
@@ -44,6 +44,9 @@ class ProposalContainer extends React.Component {
     voteUpdates: PropTypes.shape({}).isRequired,
     followeeVotes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  };
+  static defaultProps = {
+    errorMessage: null,
   };
   constructor(props) {
     super(props);

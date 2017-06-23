@@ -17,7 +17,7 @@ class VotesList extends React.Component {
 
   static defaultProps = {
     autoLoadVotes: false,
-    errorMessage: 'Error.',
+    errorMessage: null,
   };
 
   static renderVote(vote) {
@@ -48,19 +48,19 @@ class VotesList extends React.Component {
   render() {
     const pro = [];
     const con = [];
-    if (this.state.showVotes && this.props.votes) {
-      this.props.votes.forEach((vote) => {
-        // TODO check why votes are undefined when ownvote is deleted
+    const { votes, unipolar } = this.props;
+    if (this.state.showVotes && votes) {
+      votes.forEach((vote) => {
         if (vote && vote.position === 'pro') pro.push(vote);
         else con.push(vote);
       });
     }
 
     const { isFetching, errorMessage } = this.props;
-    if (isFetching && !(pro.length || con.length)) {
+    if (isFetching && !votes.length) {
       return <p>{'Loading...'} </p>;
     }
-    if (errorMessage && !(pro.length || con.length)) {
+    if (errorMessage && !votes.length) {
       return (
         <FetchError
           message={errorMessage}
@@ -75,11 +75,11 @@ class VotesList extends React.Component {
     return (
       <div>
         {this.state.showVotes
-          ? <div className={cn(!this.props.unipolar && s.bipolar)}>
+          ? <div className={cn(!unipolar && s.bipolar)}>
             <div className={cn(s.votes)}>
               {pro.map(vote => VotesList.renderVote(vote))}
             </div>
-            {!this.props.unipolar &&
+            {!unipolar &&
             <div className={cn(s.votes, s.con)}>
               {con.map(vote => VotesList.renderVote(vote))}
             </div>}

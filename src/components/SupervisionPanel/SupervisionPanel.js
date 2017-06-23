@@ -85,7 +85,7 @@ const renderFlaggedStatement = (data, flagFn) => {
       Flagged content: <p>{data.content}</p>
       Actual Statement:
       {' '}
-      {data.statement ? <Statement data={data.statement} /> : <p>DELETED BY USER</p>}
+      {data.statement ? <Statement {...data.statement} /> : <p>DELETED BY USER</p>}
       Solved by: {data.solver && renderUserInfo(data.solver)}<br />
       {data.state === 'open' && renderMenu(flagFn, data.id, data.statementId)}
     </div>

@@ -122,6 +122,7 @@ const pollFieldsForList = `{
   start_time
   endTime
   allVoters
+  closedAt
   mode{
     id
     withStatements
@@ -304,7 +305,8 @@ export function createProposal(proposalData) {
         payload: normalizedData,
         filter,
         id: virtualId,
-        info: normalizedData.result,
+        info: `${normalizedData.result}/${normalizedData.entities.proposals[normalizedData.result]
+          .pollOne}`,
       });
     } catch (error) {
       dispatch({

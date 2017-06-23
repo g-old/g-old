@@ -65,7 +65,8 @@ class Poll {
     // validate
     if (!data.polling_mode_id) return null;
     if (!data.threshold) return null;
-    if (!data.endTime) return null;
+    if (!data.end_time) return null;
+
     // create
     const newPollId = await knex.transaction(async (trx) => {
       const pollingMode = await PollingMode.gen(viewer, data.polling_mode_id, loaders);

@@ -39,11 +39,11 @@ const messages = defineMessages({
   },
 });
 
-const getMenu = className => (
-  <div className={className}>
+const getMenu = className =>
+  (<div className={className}>
     <Link className={s.link} to="/feed">
-        Feed
-      </Link>
+      Feed
+    </Link>
     <Link className={s.link} to="/proposals/active">
       <FormattedMessage {...messages.proposals} />
     </Link>
@@ -56,8 +56,7 @@ const getMenu = className => (
     <Link className={s.link} to="/about">
       <FormattedMessage {...messages.about} />
     </Link>
-  </div>
-  );
+  </div>);
 
 class Navigation extends React.Component {
   render() {
@@ -65,10 +64,7 @@ class Navigation extends React.Component {
       <div className={s.root} role="navigation">
         {getMenu(s.navBar)}
         <div className={s.menu}>
-          <Menu
-            withControl
-            icon={<Icon icon={ICONS.menu} size={20} color="grey" />}
-          >
+          <Menu withControl icon={<Icon icon={ICONS.menu} size={20} color="grey" />}>
             {getMenu(s.menuContent)}
           </Menu>
         </div>

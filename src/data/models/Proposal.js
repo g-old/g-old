@@ -3,6 +3,7 @@ import Poll from './Poll';
 import PollingMode from './PollingMode';
 import Activity from './Activity';
 import { dedup } from '../../core/helpers';
+import { webPush } from '../../webPush';
 
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
@@ -336,6 +337,27 @@ class Proposal {
     await knex('system_feeds')
       .where({ user_id: userId })
       .update({ activity_ids: JSON.stringify(aIds), updated_at: new Date() });
+  }
+
+  static async pushToUsers(viewer, proposal) {
+    const subscriptions = await knex('webpush_subscriptions').select();
+    const allSubs = subscriptions.map(s => ({
+      endpoint: s.endpoint,
+      keys: { auth: s.auth, p256dh: s.p256dh },
+    }));
+
+    const promises = allSubs.map(sub =>
+      webPush.sendNotification(sub, `Greetings from GOLD: ${proposal.title}`).catch(async (err) => {
+        if (err.statusCode === 410) {
+          console.error('Subscription should be deleted from DB: ', err);
+          await knex('webpush_subscriptions').where({ endpoint: sub.endpoint }).del();
+        }
+        console.error('Subscription is no longer valid: ', err);
+      }),
+    );
+
+    await Promise.all(promises);
+    return proposal;
   }
 }
 

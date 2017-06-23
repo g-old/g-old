@@ -24,6 +24,7 @@ class Menu extends React.Component {
     closeOnClick: PropTypes.bool,
     children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), React.node]),
     withControl: PropTypes.bool,
+    primary: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -33,6 +34,7 @@ class Menu extends React.Component {
     closeOnClick: true,
     children: null,
     withControl: false,
+    primary: false,
   };
   constructor(props) {
     super(props);
@@ -125,9 +127,9 @@ class Menu extends React.Component {
   }
 
   render() {
-    const { icon } = this.props;
+    const { icon, primary } = this.props;
     return (
-      <Box ref={ref => (this.controlRef = ref)} column>
+      <Box className={primary ? s.primary : null} ref={ref => (this.controlRef = ref)} column>
         <Button plain reverse icon={icon} label={this.props.label} onClick={this.onOpen} />
       </Box>
     );

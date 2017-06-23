@@ -12,3 +12,7 @@
   overflow: auto;
   box-sizing: border-box;
 }
+
+.primary {
+  width: 100%;
+}

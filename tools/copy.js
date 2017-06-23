@@ -42,6 +42,7 @@ async function copy() {
     // TODO If node env is production
     copyDir('src/data/db', 'build/db'),
     copyFile('private_configs.js', 'build/private_configs.js'),
+    copyFile('src/core/serviceworker.js', 'build/public/serviceworker.js'),
   ]);
 
   await copyFile('src/knexfile.js', 'build/db/knexfile.js');
@@ -54,10 +55,7 @@ async function copy() {
     watcher.on('all', async (event, filePath) => {
       const start = new Date();
       const src = path.relative('./', filePath);
-      const dist = path.join(
-        'build/',
-        src.startsWith('src') ? path.relative('src', src) : src,
-      );
+      const dist = path.join('build/', src.startsWith('src') ? path.relative('src', src) : src);
       switch (event) {
         case 'add':
         case 'change':

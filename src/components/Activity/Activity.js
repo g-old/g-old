@@ -31,7 +31,7 @@ class Activity extends React.Component {
     let header = null;
     /* eslint-disable no-underscore-dangle */
     if (this.props.content && this.props.content.__typename === 'StatementDL') {
-      content = <Statement data={this.props.content} />;
+      content = <Statement {...this.props.content} />;
       header = 'Look at that statement!';
     } else if (this.props.content && this.props.content.__typename === 'ProposalDL') {
       content = <ProposalPreview proposal={this.props.content} />;

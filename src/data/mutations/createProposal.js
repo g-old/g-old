@@ -12,10 +12,12 @@ const createProposal = {
     },
   },
   resolve: (data, { proposal }, { viewer, loaders }) =>
-    Proposal.create(viewer, proposal, loaders).then((res) => {
-      Proposal.insertInFeed(viewer, res, 'create');
-      return res;
-    }),
+    Proposal.create(viewer, proposal, loaders)
+      .then((res) => {
+        Proposal.insertInFeed(viewer, res, 'create');
+        return res;
+      })
+      .then(p => Proposal.pushToUsers(viewer, p)),
 };
 
 export default createProposal;

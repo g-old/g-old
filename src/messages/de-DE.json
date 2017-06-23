@@ -892,5 +892,14 @@
     "files": [
       "src/components/Poll/Poll.js"
     ]
+  },
+  {
+    "id": "command.submit",
+    "description": "Short command for sending data to the server",
+    "defaultMessage": "Submit",
+    "message": "",
+    "files": [
+      "src/components/ProposalInput/ProposalInput.js"
+    ]
   }
 ]

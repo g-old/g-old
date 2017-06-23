@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { updateUser, fetchUser } from '../../actions/user';
+import { saveWebPushSub } from '../../actions/subscriptions';
 import { uploadAvatar } from '../../actions/file';
 import s from './UserProfile.css';
 import { getSessionUser, getAccountUpdates } from '../../reducers';
@@ -16,6 +17,8 @@ import ImageUpload from '../ImageUpload';
 import Box from '../Box';
 import Button from '../Button';
 import Value from '../Value';
+import { urlBase64ToUint8Array } from '../../core/helpers';
+import { publicKey } from '../../webPush';
 
 const messages = defineMessages({
   settings: {
@@ -60,12 +63,14 @@ class UserProfile extends React.Component {
     // eslint-disable-next-line react/forbid-prop-types
     updates: PropTypes.object.isRequired,
     fetchUser: PropTypes.func.isRequired,
+    saveWebPushSub: PropTypes.func.isRequired,
     uploadAvatar: PropTypes.func.isRequired,
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   };
   constructor(props) {
     super(props);
     this.state = { showUpload: false };
+    this.askForPush = this.askForPush.bind(this);
   }
 
   componentDidMount() {
@@ -78,6 +83,43 @@ class UserProfile extends React.Component {
       this.setState({ showUpload: false });
     }
   }
+
+  askForPush() {
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      console.info('Service Worker and Push is supported');
+      navigator.serviceWorker
+        .register('serviceworker.js')
+        .then((swReg) => {
+          console.info('Service Worker is registered', swReg);
+
+          const subscribeOptions = {
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(publicKey),
+          };
+          return swReg.pushManager.subscribe(subscribeOptions);
+        })
+        .then((pushSubscription) => {
+          console.info('Received PushSubscription: ', JSON.stringify(pushSubscription));
+          return JSON.parse(JSON.stringify(pushSubscription));
+        })
+        .then((pushSubscription) => {
+          // send to server
+          this.props.saveWebPushSub({
+            endpoint: pushSubscription.endpoint,
+            auth: pushSubscription.keys.auth,
+            p256dh: pushSubscription.keys.p256dh,
+          });
+        })
+        .catch((error) => {
+          console.error('Service Worker Error', error);
+        });
+    } else {
+      alert('Your browser does not support push!');
+    }
+    // console.warn('Push messaging is not supported');
+    // alert('Push Not Supported');
+  }
+
   render() {
     if (!this.props.user) return null;
     const updates = this.props.updates;
@@ -167,6 +209,7 @@ class UserProfile extends React.Component {
 
               </p>
             </div>
+            <Button label={'SUBSCRIBEFORPUSH'} onClick={this.askForPush} />
           </div>
         </Box>
         <div style={{ width: '100%' }}>
@@ -190,6 +233,7 @@ const mapDispatch = {
   updateUser,
   fetchUser,
   uploadAvatar,
+  saveWebPushSub,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getSessionUser(state),

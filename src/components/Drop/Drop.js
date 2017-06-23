@@ -191,9 +191,9 @@ class Drop {
   }
 
   render(content) {
-    const { container } = this.state;
+    const { container, options: { context } } = this.state;
     const originalScrollPosition = container.scrollTop;
-    render(<DropContents content={content} />, container, () => {
+    render(<DropContents content={content} context={context} />, container, () => {
       this.place();
       // reset container to its original scroll position
       container.scrollTop = originalScrollPosition;

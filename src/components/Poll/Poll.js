@@ -51,7 +51,7 @@ class Poll extends React.Component {
     threshold: PropTypes.number.isRequired,
     endTime: PropTypes.string.isRequired,
     allVoters: PropTypes.number.isRequired,
-    ownStatement: PropTypes.shape({}).isRequired,
+    ownStatement: PropTypes.shape({}),
     closedAt: PropTypes.string.isRequired,
     // statements: PropTypes.arrayOf(PropTypes.object),
     upvotes: PropTypes.number.isRequired,
@@ -84,6 +84,7 @@ class Poll extends React.Component {
     updates: {},
     votes: null,
     ownVote: null,
+    ownStatement: null,
   };
   constructor(props) {
     super(props);
@@ -91,8 +92,8 @@ class Poll extends React.Component {
     this.handleRetractVote = this.handleRetractVote.bind(this);
   }
 
-  componentWillReceiveProps({ updates }) {
-    if (updates.vote) {
+  componentWillReceiveProps({ updates, id }) {
+    if (id === this.props.id && updates.vote) {
       let voteError;
       if (updates.vote.error) {
         const oldStatus = this.props.updates.vote || {};
@@ -255,6 +256,7 @@ class Poll extends React.Component {
         </p>
         <div className={s.pollState}>
           <PollState
+            pollId={id}
             allVoters={allVoters}
             upvotes={upvotes}
             downvotes={downvotes}

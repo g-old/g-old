@@ -47,4 +47,10 @@ module.exports = {
     api_key: '123456',
     api_secret: 'yourSecret',
   },
+  // in gold folder open node REPL, type: var wp = require('web-push');wp.generateVAPIDKeys()
+  webpush: {
+    mail: 'your@emailAdress.com',
+    publicKey: '',
+    privateKey: '',
+  },
 };

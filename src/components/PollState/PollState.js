@@ -9,6 +9,7 @@ import { ICONS } from '../../constants';
 
 class PollState extends React.Component {
   static propTypes = {
+    pollId: PropTypes.string.isRequired,
     compact: PropTypes.bool,
     allVoters: PropTypes.number.isRequired,
     upvotes: PropTypes.number.isRequired,
@@ -36,6 +37,11 @@ class PollState extends React.Component {
     this.onToggleExpand = this.onToggleExpand.bind(this);
   }
 
+  componentWillReceiveProps({ pollId }) {
+    if (pollId !== this.props.pollId) {
+      this.setState({ expand: false });
+    }
+  }
   onToggleExpand() {
     const newExpand = !this.state.expand;
     this.setState({ ...this.state, expand: newExpand });

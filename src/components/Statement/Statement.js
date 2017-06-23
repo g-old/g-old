@@ -45,7 +45,7 @@ class Statement extends React.Component {
       role: PropTypes.shape({
         type: PropTypes.string,
       }),
-    }).isRequired,
+    }),
     isFollowee: PropTypes.bool,
     asInput: PropTypes.bool,
     onFlagging: PropTypes.func,
@@ -73,6 +73,7 @@ class Statement extends React.Component {
     onLike: null,
     onDeleteLike: null,
     isFollowee: false,
+    user: null,
   };
 
   constructor(props) {
@@ -193,16 +194,23 @@ class Statement extends React.Component {
       isFollowee,
       deletedAt,
     } = this.props;
-    if (!user) return null;
+
+    let canLike;
+    let canDelete;
+    let canFollow;
+    let canFlag;
+    if (user) {
+      canLike = user.role.type !== 'guest' && !asInput && !ownStatement;
+      canDelete = !deletedAt && ['admin', 'mod'].includes(user.role.type);
+      canFlag = !ownStatement && !deletedAt;
+      if (followees) {
+        canFollow = !isFollowee && followees.length <= 5;
+      }
+    }
 
     const isEmpty = this.state.textArea.val.length === 0;
     const hasMinimumInput = this.state.textArea.val.length >= 5;
     const inactive = asInput && isEmpty;
-    const canLike = user.role.type !== 'guest' && !asInput && !ownStatement;
-    const canFollow = !isFollowee && followees.length <= 5;
-
-    const canFlag = !ownStatement && !deletedAt;
-    const canDelete = !deletedAt && ['admin', 'mod'].includes(user.role.type);
 
     let menu = null;
     if (ownStatement || asInput) {
@@ -263,7 +271,7 @@ class Statement extends React.Component {
             </span>}
         </EditMenu>
       );
-    } else {
+    } else if (canFlag || canFollow || canDelete) {
       menu = (
         <Menu
           dropAlign={{ top: 'top', right: 'right' }}

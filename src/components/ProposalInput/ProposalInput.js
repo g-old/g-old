@@ -48,6 +48,11 @@ const messages = defineMessages({
     defaultMessage: 'Success!',
     description: 'Should notify a successful action',
   },
+  submit: {
+    id: 'command.submit',
+    defaultMessage: 'Submit',
+    description: 'Short command for sending data to the server',
+  },
 });
 
 const standardValues = {
@@ -436,7 +441,7 @@ class ProposalInput extends React.Component {
               }}
             >
               <Proposal
-                proposal={{
+                {...{
                   id: '0000',
                   state: this.state.settings.pollOption === '3' ? 'survey' : 'proposed',
                   title: title.trim().length < 3 ? 'Title is missing!' : title.trim(),
@@ -448,7 +453,12 @@ class ProposalInput extends React.Component {
             </Layer>}
 
           <Box pad>
-            <Button primary label={'Submit'} onClick={this.onSubmit} disabled={this.isPending} />
+            <Button
+              primary
+              label={<FormattedMessage {...messages.submit} />}
+              onClick={this.onSubmit}
+              disabled={this.isPending}
+            />
             <Button
               label="Preview"
               onClick={() => {
@@ -477,7 +487,7 @@ class ProposalInput extends React.Component {
                     </svg>
                   }
                   onClick={() => {
-                    history.push(`/testproposal/${this.props.success}/ids`);
+                    history.push(`/proposal/${this.props.success}`);
                   }}
                   label="Visit"
                 />

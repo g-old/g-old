@@ -132,7 +132,7 @@ class StatementsContainer extends React.Component {
             {...s}
             user={user}
             key={s.id}
-            ownLike={likedStatements.find(data => data.statementId === s.id)}
+            ownLike={likedStatements && likedStatements.find(data => data.statementId === s.id)}
             onLike={this.props.createLike}
             onDeleteLike={this.props.deleteLike}
             onFollow={this.props.updateUser}

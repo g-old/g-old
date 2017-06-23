@@ -39,6 +39,7 @@ import feed from './queries/feed';
 import pollingModes from './queries/pollingModes';
 import proposalConnection from './queries/proposalConnection';
 import flagConnection from './queries/flagConnection';
+import createPushSub from './mutations/createPushSub';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -79,6 +80,7 @@ const schema = new Schema({
       uploadAvatar,
       flag,
       solveFlag,
+      createPushSub,
     },
   }),
 });
