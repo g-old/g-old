@@ -3,6 +3,8 @@ import proposals, * as fromProposal from './ui/proposals';
 import statements, * as fromStatement from './ui/statements';
 import users, * as fromUser from './ui/users';
 import polls, * as fromPoll from './ui/polls';
+import subscription, * as fromSubscription from './ui/subscription';
+
 import { SESSION_LOGOUT_SUCCESS } from '../constants';
 
 /* export default combineReducers({
@@ -16,6 +18,7 @@ const uiReducer = combineReducers({
   polls,
   statements,
   users,
+  subscription,
 });
 export default (state, action) => {
   if (action.type === SESSION_LOGOUT_SUCCESS) {
@@ -87,3 +90,5 @@ export const getVoteUpdates = (state, id) => fromPoll.getUpdates(state.polls, id
 export const getStatementUpdates = state => fromStatement.getUpdates(state.statements);
 
 export const getAccountUpdates = (state, id) => fromUser.getStatus(state.users, id) || {};
+
+export const getSubscription = state => fromSubscription.getStatus(state.subscription);

@@ -89,7 +89,10 @@ export const SESSION_LOGIN_ERROR = 'SESSION_LOGIN_ERROR';
 export const CREATE_PSUB_START = 'CREATE_PSUB_START';
 export const CREATE_PSUB_SUCCESS = 'CREATE_PSUB_SUCCESS';
 export const CREATE_PSUB_ERROR = 'CREATE_PSUB_ERROR';
-
+export const DELETE_PSUB_START = 'DELETE_PSUB_START';
+export const DELETE_PSUB_SUCCESS = 'DELETE_PSUB_SUCCESS';
+export const DELETE_PSUB_ERROR = 'DELETE_PSUB_ERROR';
+export const CHECK_PSUB_STATUS = 'CHECK_PSUB_STATUS';
 export const ADD_ENTITIES = 'ADD_ENTITIES';
 
 // Con: Not very flexible, you cannot see the role/group/right

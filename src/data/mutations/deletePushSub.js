@@ -2,7 +2,7 @@ import { GraphQLNonNull, GraphQLBoolean } from 'graphql';
 import PushSubInputType from '../types/PushSubInputType';
 import knex from '../knex';
 
-const createPushSub = {
+const deletePushSub = {
   type: new GraphQLNonNull(GraphQLBoolean),
   args: {
     subscription: {
@@ -13,10 +13,9 @@ const createPushSub = {
   resolve: async (data, { subscription }, { viewer }) => {
     try {
       if (!viewer.id) return false;
-      await knex('webpush_subscriptions').insert({
-        ...subscription,
-        user_id: viewer.id,
-      });
+      await knex('webpush_subscriptions')
+        .where({ endpoint: subscription.endpoint, user_id: viewer.id })
+        .del();
       return true;
     } catch (e) {
       return false;
@@ -24,4 +23,4 @@ const createPushSub = {
   },
 };
 
-export default createPushSub;
+export default deletePushSub;

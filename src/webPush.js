@@ -9,15 +9,6 @@ webPush.setVapidDetails(
 
 // https://developers.google.com/web/fundamentals/engage-and-retain/push-notifications/subscribing-a-user
 
-const registerSW = filepath =>
-  navigator.serviceWorker
-    .register(filepath)
-    .then((registration) => {
-      console.info('Service worker registered ');
-      return registration;
-    })
-    .catch(err => console.error(`Unable to register Service worker: ${err}`));
-
 const askPermission = () =>
   new Promise((resolve, reject) => {
     const permissionResult = Notification.requestPermission((result) => {
@@ -39,5 +30,4 @@ module.exports = {
   webPush,
   publicKey: config.webpush.publicKey,
   askPermission,
-  registerSW,
 };

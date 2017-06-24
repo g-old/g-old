@@ -40,6 +40,7 @@ import pollingModes from './queries/pollingModes';
 import proposalConnection from './queries/proposalConnection';
 import flagConnection from './queries/flagConnection';
 import createPushSub from './mutations/createPushSub';
+import deletePushSub from './mutations/deletePushSub';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -81,6 +82,7 @@ const schema = new Schema({
       flag,
       solveFlag,
       createPushSub,
+      deletePushSub,
     },
   }),
 });

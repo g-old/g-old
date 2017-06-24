@@ -197,3 +197,5 @@ export const urlBase64ToUint8Array = (base64String) => {
   return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
 };
 /* eslint-enable no-mixed-operators */
+
+export const isPushAvailable = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;

@@ -90,3 +90,5 @@ export const getAllStatementsByPoll = (state, id) =>
 
 export const getVisibibleStatementsByPoll = (state, id, filter) =>
   fromEntity.getVisibibleStatementsByPoll(state.entities, id, filter);
+
+export const getSubscription = state => fromUi.getSubscription(state.ui);
