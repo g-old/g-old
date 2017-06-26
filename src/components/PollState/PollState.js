@@ -18,7 +18,7 @@ class PollState extends React.Component {
     unipolar: PropTypes.bool.isRequired,
     votes: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.string })).isRequired,
     getVotes: PropTypes.func.isRequired,
-    updates: PropTypes.shape({ isPending: PropTypes.bool, error: PropTypes.node }).isRequired,
+    updates: PropTypes.shape({ isPending: PropTypes.bool, error: PropTypes.node }),
   };
 
   static defaultProps = {
@@ -27,6 +27,7 @@ class PollState extends React.Component {
     threshold: 50,
     /* threshold_ref: 'all', */
     votes: [],
+    updates: null,
   };
 
   constructor(props) {

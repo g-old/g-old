@@ -30,7 +30,8 @@ const messages = defineMessages({
 });
 class ProposalContainer extends React.Component {
   static propTypes = {
-    proposal: PropTypes.shape({}).isRequired,
+    proposal: PropTypes.shape({ pollOne: PropTypes.shape({}), pollTwo: PropTypes.shape({}) })
+      .isRequired,
     user: PropTypes.shape({}).isRequired,
     proposalId: PropTypes.number.isRequired,
     isFetching: PropTypes.bool.isRequired,
@@ -58,7 +59,7 @@ class ProposalContainer extends React.Component {
 
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
-    return this.props.proposal != null;
+    return (this.props.proposal && this.props.proposal.pollOne) || this.props.proposal.pollTwo;
   }
 
   filterStatements(e, { filter }) {

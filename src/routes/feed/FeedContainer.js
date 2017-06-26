@@ -37,15 +37,15 @@ class FeedContainer extends React.Component {
     }
     return (
       <div>
-        <h1>FEED</h1>
-        {activities.map(activity => (
-          <Activity
+        <h1>feed</h1>
+        {activities.map(activity =>
+          (<Activity
             actor={activity.actor}
             date={activity.createdAt}
             verb={activity.verb}
             content={activity.object}
-          />
-        ))}
+          />),
+        )}
       </div>
     );
   }

@@ -1,5 +1,5 @@
-const webPush = require('web-push');
-const config = require('../private_configs');
+import webPush from 'web-push';
+import config from '../private_configs';
 
 webPush.setVapidDetails(
   `mailto:${config.webpush.mail}`,
@@ -9,7 +9,7 @@ webPush.setVapidDetails(
 
 // https://developers.google.com/web/fundamentals/engage-and-retain/push-notifications/subscribing-a-user
 
-const askPermission = () =>
+/* const askPermission = () =>
   new Promise((resolve, reject) => {
     const permissionResult = Notification.requestPermission((result) => {
       resolve(result);
@@ -23,11 +23,8 @@ const askPermission = () =>
       throw new Error('Permission not granted');
     }
   });
-
+*/
 // const subscribeUser = () => {};
 
-module.exports = {
-  webPush,
-  publicKey: config.webpush.publicKey,
-  askPermission,
-};
+export default webPush;
+export const publicKey = config.webpush.publicKey;

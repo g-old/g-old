@@ -8,7 +8,6 @@ import Link from '../Link';
 import Button from '../Button';
 import Box from '../Box';
 import FormField from '../FormField';
-import history from '../../history';
 import { createValidator, passwordValidation, emailValidation } from '../../core/validation';
 
 const messages = defineMessages({
@@ -98,9 +97,9 @@ class Login extends React.Component {
   }
   render() {
     const { status } = this.props;
-    if (status.login && status.login.success) {
-      history.push('/feed');
-    }
+    /*  if (status.login && status.login.success) {
+      // /  history.push('/feed');
+    }*/
     const emailError = this.state.errors.email.errorName
       ? <FormattedMessage {...messages[this.state.errors.email.errorName]} />
       : null;

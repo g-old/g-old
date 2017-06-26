@@ -16,9 +16,13 @@ const title = 'Admin Page';
 export default {
   path: '/admin/',
 
-  async action({ store }) {
+  async action({ store, path }) {
     const user = getSessionUser(store.getState());
-    if (!user || !['admin', 'mod'].includes(user.role.type)) { return { component: <div> You have to login as admin or mod!</div> }; }
+    if (!user) {
+      return { redirect: `/?redirect=${path}` };
+    } else if (!['admin', 'mod'].includes(user.role.type)) {
+      return { component: <div> You have to login as admin or mod!</div> };
+    }
 
     const Admin = await require.ensure([], require => require('./Admin').default, 'admin');
 

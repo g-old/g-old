@@ -11,7 +11,6 @@ import {
   SESSION_LOGIN_ERROR,
 } from '../constants';
 // import fetch from '../core/fetch';
-import history from '../history';
 
 export function logout() {
   return async (dispatch, getState, { fetch }) => {
@@ -54,7 +53,7 @@ export function logout() {
 }
 
 export function login(data) {
-  return async (dispatch, getState, { fetch }) => {
+  return async (dispatch, getState, { fetch, history }) => {
     const initialId = '0000';
     const properties = ['login'].reduce((acc, curr) => {
       // eslint-disable-next-line no-param-reassign
@@ -65,6 +64,10 @@ export function login(data) {
       };
       return acc;
     }, {});
+    let redirect = null;
+    if (history.location.search && history.location.search.indexOf('=') !== -1) {
+      redirect = history.location.search.split('=')[1];
+    }
     dispatch({
       type: SESSION_LOGIN_START,
       properties,
@@ -91,6 +94,8 @@ export function login(data) {
           id: initialId,
         });
       }
+
+      history.push(redirect || '/feed');
     } catch (error) {
       dispatch({
         type: SESSION_LOGIN_ERROR,

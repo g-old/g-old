@@ -9,9 +9,11 @@ const title = 'Feed';
 export default {
   path: '/feed',
 
-  async action({ store }) {
+  async action({ store, path }) {
     const user = getSessionUser(store.getState());
-    if (!user || user.role.type === 'guest') {
+    if (!user) {
+      return { redirect: `/?redirect=${path}` };
+    } else if (user.role.type === 'guest') {
       return { redirect: '/' };
     }
     if (!process.env.BROWSER) {

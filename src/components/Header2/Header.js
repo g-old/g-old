@@ -7,7 +7,7 @@ import Box from '../Box';
 
 class Header extends React.Component {
   static propTypes = {
-    children: PropTypes.element.isRequired,
+    children: PropTypes.node.isRequired,
     className: PropTypes.string,
   };
 

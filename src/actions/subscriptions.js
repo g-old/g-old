@@ -10,7 +10,7 @@ import {
   CHECK_PSUB_STATUS,
 } from '../constants';
 import { getSessionUser } from '../reducers';
-import { publicKey } from '../webPush';
+import config from '../../private_configs';
 
 const createPushSub = `mutation($endpoint:String! $p256dh:String! $auth:String!){
 createPushSub(subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})
@@ -20,12 +20,34 @@ const deletePushSub = `mutation($endpoint:String! $p256dh:String! $auth:String!)
 deletePushSub(subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})
 }`;
 
-const registerSW = async () => {
-  let registration = null;
+const registerSW = async (file) => {
   if ('serviceWorker' in navigator && 'PushManager' in window) {
-    registration = await navigator.serviceWorker.register('serviceworker.js');
+    const registration = await navigator.serviceWorker.register(file);
+    const serviceWorker = registration.installing || registration.waiting || registration.active;
+
+    return new Promise((resolve, reject) => {
+      if (!serviceWorker) {
+        reject('No serviceWorker in registration');
+        return;
+      }
+      if (serviceWorker.state === 'activated') {
+        resolve(registration);
+      }
+      if (serviceWorker.state === 'redundant') {
+        reject('SW registration is redundant!');
+      }
+      const changeListener = () => {
+        if (serviceWorker.state === 'activated') {
+          resolve(registration);
+        } else if (serviceWorker.state === 'redundant') {
+          reject('SW registration is redundant!');
+        }
+        serviceWorker.removeEventListener('statechange', changeListener);
+      };
+      serviceWorker.addEventListener('statechange', changeListener);
+    });
   }
-  return registration;
+  return null;
 };
 
 const subscriptionToObject = (subscription) => {
@@ -39,16 +61,16 @@ const subscriptionToObject = (subscription) => {
 };
 
 const getPushSubscription = async () => {
-  let registration = await registerSW();
+  const registration = await registerSW('serviceworker.js');
   if (!registration) {
-    registration = await registerSW();
-    if (!registration) throw Error('Could not register SW');
+    throw Error('Could not register SW');
   }
   // TODO older versions have cb!
   const permission = await Notification.requestPermission();
-  if (permission === 'denied') {
+  if (permission !== 'granted') {
     throw Error('Permission denied');
   }
+  const publicKey = config.webpush.publicKey;
   const subscribeOptions = {
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(publicKey),
@@ -181,10 +203,13 @@ export function checkSubscription() {
         error = 'User has blocked subscription';
       } else {
         disabled = false;
-        const registration = await navigator.serviceWorker.ready;
 
-        if (registration) {
+        const controller = await navigator.serviceWorker.controller;
+
+        if (controller) {
           try {
+            const registration = await navigator.serviceWorker.ready;
+
             const subscription = await registration.pushManager.getSubscription();
             if (!subscription) {
               isPushEnabled = false;

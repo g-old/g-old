@@ -3,7 +3,7 @@ import Poll from './Poll';
 import PollingMode from './PollingMode';
 import Activity from './Activity';
 import { dedup } from '../../core/helpers';
-import { webPush } from '../../webPush';
+import webPush from '../../webPush';
 
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
@@ -347,13 +347,21 @@ class Proposal {
     }));
 
     const promises = allSubs.map(sub =>
-      webPush.sendNotification(sub, `Greetings from GOLD: ${proposal.title}`).catch(async (err) => {
-        if (err.statusCode === 410) {
-          console.error('Subscription should be deleted from DB: ', err);
-          await knex('webpush_subscriptions').where({ endpoint: sub.endpoint }).del();
-        }
-        console.error('Subscription is no longer valid: ', err);
-      }),
+      webPush
+        .sendNotification(
+          sub,
+          JSON.stringify({
+            body: proposal.title,
+            link: `/proposal/${proposal.id}/${proposal.pollOne_id}`,
+          }),
+        )
+        .catch(async (err) => {
+          if (err.statusCode === 410) {
+            console.error('Subscription should be deleted from DB: ', err);
+            await knex('webpush_subscriptions').where({ endpoint: sub.endpoint }).del();
+          }
+          console.error('Subscription is no longer valid: ', err);
+        }),
     );
 
     await Promise.all(promises);

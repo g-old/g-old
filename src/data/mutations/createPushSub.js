@@ -16,6 +16,7 @@ const createPushSub = {
       await knex('webpush_subscriptions').insert({
         ...subscription,
         user_id: viewer.id,
+        created_at: new Date(),
       });
       return true;
     } catch (e) {

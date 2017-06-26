@@ -6,7 +6,7 @@ import s from './Box.css';
 
 class Box extends React.Component {
   static propTypes = {
-    children: PropTypes.element.isRequired,
+    children: PropTypes.node.isRequired,
     onClick: PropTypes.func,
     clickable: PropTypes.bool,
     column: PropTypes.bool,

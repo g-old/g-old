@@ -9,9 +9,11 @@ const title = 'Proposal';
 export default {
   path: '/proposal/:id/:pollId',
 
-  async action({ store }, { id, pollId }) {
+  async action({ store, path }, { id, pollId }) {
     const user = getSessionUser(store.getState());
-    if (!user || user.role.type === 'guest') {
+    if (!user) {
+      return { redirect: `/?redirect=${path}` };
+    } else if (user.role.type === 'guest') {
       return { redirect: '/' };
     }
     if (!process.env.BROWSER) {

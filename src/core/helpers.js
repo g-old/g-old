@@ -198,4 +198,12 @@ export const urlBase64ToUint8Array = (base64String) => {
 };
 /* eslint-enable no-mixed-operators */
 
-export const isPushAvailable = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+// from https://github.com/firebase/firebase-js-sdk/blob/master/src/messaging/controllers/window-controller.ts
+/* eslint-disable no-prototype-builtins */
+export const isPushAvailable = () =>
+  'serviceWorker' in navigator &&
+  'PushManager' in window &&
+  'Notification' in window &&
+  ServiceWorkerRegistration.prototype.hasOwnProperty('showNotification') &&
+  PushSubscription.prototype.hasOwnProperty('getKey');
+/* eslint-enable no-prototype-builtins */

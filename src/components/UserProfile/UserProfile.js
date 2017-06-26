@@ -32,6 +32,7 @@ const renderFollowee = (data, fn) =>
   /* eslint-disable jsx-a11y/no-static-element-interactions */
   /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
   (<li
+    key={data.followee.id}
     style={{ display: 'inline' }}
     onClick={() => {
       fn({
@@ -95,7 +96,7 @@ class UserProfile extends React.Component {
     if (updates.dataUrl && updates.dataUrl.success) {
       this.setState({ showUpload: false });
     }
-    if (subscription.disabled !== this.props.subscription.disabled) {
+    if (subscription) {
       this.setState({ disableSubscription: subscription.disabled });
     }
   }
@@ -182,20 +183,18 @@ class UserProfile extends React.Component {
               />
               <h3>Followees </h3>
 
-              <p>
-                {/* eslint-disable jsx-a11y/no-static-element-interactions */}
-                {followees &&
-                  <ul style={{ listStyle: 'none' }}>
-                    {followees.map(f =>
-                      renderFollowee(
-                        { userId: this.props.user.id, followee: f },
-                        this.props.updateUser,
-                      ),
-                    )}
-                  </ul>}
-                {/* eslint-enable jsx-a11y/no-static-element-interactions */}
+              {/* eslint-disable jsx-a11y/no-static-element-interactions */}
+              {followees &&
+                <ul style={{ listStyle: 'none' }}>
+                  {followees.map(f =>
+                    renderFollowee(
+                      { userId: this.props.user.id, followee: f },
+                      this.props.updateUser,
+                    ),
+                  )}
+                </ul>}
+              {/* eslint-enable jsx-a11y/no-static-element-interactions */}
 
-              </p>
             </div>
             <FormField label={'WebPush'} error={subscription.error}>
               <Button
