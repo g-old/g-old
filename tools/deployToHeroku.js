@@ -24,11 +24,18 @@ import config from '../private_configs';
 // };
 
 // Heroku
-const remote = {
+const heroku = {
   name: 'heroku',
   url: config.deploy.url,
   branch: 'master',
   website: config.deploy.website,
+};
+
+const erebor = {
+  name: 'erebor',
+  url: 'erebor:/home/git/gold.git',
+  branch: 'master',
+  website: 'https://erebor.hopto.org:3001/',
 };
 
 const options = {
@@ -40,6 +47,12 @@ const options = {
  * Deploy the contents of the `/build` folder to a remote server via Git.
  */
 async function deploy() {
+  const repo = process.argv[3];
+  let remote = heroku;
+  if (repo === '--erebor') {
+    remote = erebor;
+  }
+
   // Initialize a new repository
   await makeDir('build');
   await spawn('git', ['init', '--quiet'], options);
