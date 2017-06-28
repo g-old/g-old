@@ -45,6 +45,7 @@ import { user as userSchema } from './store/schema';
 import config from './config';
 import worker from './core/worker';
 import BWorker from './core/childProcess';
+import privateConfig from '../private_configs';
 
 worker();
 BWorker.start(path.resolve(__dirname, 'workers/backgroundWorker.js'));
@@ -302,6 +303,7 @@ app.get('*', async (req, res, next) => {
         },
         roles: normalizedData.entities.roles || {},
       },
+      webPushKey: privateConfig.webpush.publicKey,
     };
     const fetch = createFetch({
       baseUrl: config.api.serverUrl,

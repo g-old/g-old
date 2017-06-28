@@ -10,7 +10,7 @@ import {
   CHECK_PSUB_STATUS,
 } from '../constants';
 import { getSessionUser } from '../reducers';
-import config from '../../private_configs';
+// import { webPush as publicKey } from '../../private_configs';
 
 const createPushSub = `mutation($endpoint:String! $p256dh:String! $auth:String!){
 createPushSub(subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})
@@ -60,7 +60,7 @@ const subscriptionToObject = (subscription) => {
   };
 };
 
-const getPushSubscription = async () => {
+const getPushSubscription = async (publicKey) => {
   const registration = await registerSW('serviceworker.js');
   if (!registration) {
     throw Error('Could not register SW');
@@ -70,7 +70,6 @@ const getPushSubscription = async () => {
   if (permission !== 'granted') {
     throw Error('Permission denied');
   }
-  const publicKey = config.webpush.publicKey;
   const subscribeOptions = {
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(publicKey),
@@ -113,7 +112,8 @@ export function createWebPushSub() {
     });
 
     try {
-      const subscription = await getPushSubscription();
+      const publicKey = getState().webPushKey;
+      const subscription = await getPushSubscription(publicKey);
       const { data } = await graphqlRequest(createPushSub, subscription);
       const result = data.createPushSub;
       if (result) {

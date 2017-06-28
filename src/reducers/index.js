@@ -11,6 +11,7 @@ export default combineReducers({
   intl,
   entities,
   ui,
+  webPushKey: (state = '') => state,
 });
 
 export const getVisibleProposals = (state, filter) =>

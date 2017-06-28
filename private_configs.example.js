@@ -1,3 +1,7 @@
+if (process.env.BROWSER) {
+  throw new Error('Do not import `private_configs.js` from inside the client-side code.');
+}
+
 module.exports = {
   development: {
     dbConfig: {
