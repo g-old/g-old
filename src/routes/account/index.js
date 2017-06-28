@@ -10,7 +10,9 @@ export default {
 
   async action({ store, path }) {
     // TODO check if token is valid and not expirated
-    const user = getSessionUser(store.getState());
+    const state = await store.getState();
+    const user = getSessionUser(state);
+
     if (!user) {
       return { redirect: `/?redirect=${path}` };
     }

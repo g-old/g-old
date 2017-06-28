@@ -10,7 +10,9 @@ export default {
   path: '/proposal/:id/:pollId',
 
   async action({ store, path }, { id, pollId }) {
-    const user = getSessionUser(store.getState());
+    const state = await store.getState();
+    const user = getSessionUser(state);
+
     if (!user) {
       return { redirect: `/?redirect=${path}` };
     } else if (user.role.type === 'guest') {

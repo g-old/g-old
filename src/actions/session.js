@@ -13,7 +13,7 @@ import {
 // import fetch from '../core/fetch';
 
 export function logout() {
-  return async (dispatch, getState, { fetch }) => {
+  return async (dispatch, getState, { fetch, history }) => {
     const user = getState().user;
     dispatch({
       type: SESSION_LOGOUT_START,

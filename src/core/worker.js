@@ -102,7 +102,6 @@ async function proposalPolling() {
 }
 
 const worker = async () => {
-  console.info('working...');
   try {
     proposalPolling(worker);
   } catch (e) {

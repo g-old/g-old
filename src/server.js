@@ -44,8 +44,10 @@ import { sendMail, resetLinkMail, resetSuccessMail } from './core/mailer';
 import { user as userSchema } from './store/schema';
 import config from './config';
 import worker from './core/worker';
+import BWorker from './core/childProcess';
 
 worker();
+BWorker.start(path.resolve(__dirname, 'workers/backgroundWorker.js'));
 const app = express();
 
 //

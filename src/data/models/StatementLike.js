@@ -1,4 +1,5 @@
 import knex from '../knex';
+
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
@@ -83,6 +84,7 @@ class StatementLike {
       return id[0];
     });
     if (!newLikeId) return null;
+
     return StatementLike.gen(viewer, newLikeId, loaders);
   }
 }

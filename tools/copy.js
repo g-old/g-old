@@ -20,6 +20,7 @@ import { format } from './run';
 async function copy() {
   await makeDir('build');
   await makeDir('build/avatars');
+  await makeDir('build/workers');
   await Promise.all([
     writeFile(
       'build/package.json',
@@ -43,6 +44,9 @@ async function copy() {
     copyDir('src/data/db', 'build/db'),
     copyFile('private_configs.js', 'build/private_configs.js'),
     copyFile('src/core/serviceworker.js', 'build/public/serviceworker.js'),
+    copyFile('src/core/backgroundWorker.js', 'build/workers/backgroundWorker.js'),
+    copyFile('src/webPush.js', 'build/workers/webPush.js'),
+    copyFile('src/logger.js', 'build/logger.js'),
   ]);
 
   await copyFile('src/knexfile.js', 'build/db/knexfile.js');

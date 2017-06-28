@@ -1,10 +1,13 @@
-import webPush from 'web-push';
-import config from '../private_configs';
+/* eslint-disable comma-dangle */
+
+const webPush = require('web-push');
+const config = require('../private_configs');
+
 
 webPush.setVapidDetails(
   `mailto:${config.webpush.mail}`,
   config.webpush.publicKey,
-  config.webpush.privateKey,
+  config.webpush.privateKey
 );
 
 // https://developers.google.com/web/fundamentals/engage-and-retain/push-notifications/subscribing-a-user
@@ -26,5 +29,4 @@ webPush.setVapidDetails(
 */
 // const subscribeUser = () => {};
 
-export default webPush;
-export const publicKey = config.webpush.publicKey;
+module.exports = webPush;

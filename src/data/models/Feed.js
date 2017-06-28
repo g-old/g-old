@@ -36,7 +36,7 @@ function rankInPlace(activity) {
   // time-based decay
   const decay = timeDecay(activity.createdAt);
   // eslint-disable-next-line no-param-reassign
-  activity.rank = (affinity + content) - decay;
+  activity.rank = affinity + content - decay; //  eslint-disable-line no-mixed-operators
 }
 const loadActivities = (viewer, ids, loaders) =>
   Promise.all(ids.map(id => Activity.gen(viewer, id, loaders)));
@@ -54,7 +54,6 @@ class Feed {
   static async gen(viewer, id, loaders) {
     // authorize
     // get proposalsfeed;
-
     let aIds = await knex('system_feeds').where({ user_id: 1 }).select('activity_ids');
     let sIds = await knex('system_feeds').where({ user_id: 2 }).select('activity_ids');
     let fIds = await User.followees(viewer.id, loaders)
