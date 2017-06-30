@@ -542,7 +542,8 @@
       "src/components/ProposalInput/ProposalInput.js",
       "src/components/ProposalSettings/ProposalSettings.js",
       "src/components/SignUp/SignUp.js",
-      "src/components/UserSettings/UserSettings.js"
+      "src/components/UserSettings/UserSettings.js",
+      "src/routes/passwordRecovery/PasswordRecovery.js"
     ]
   },
   {
@@ -553,7 +554,8 @@
     "files": [
       "src/components/Login/Login.js",
       "src/components/SignUp/SignUp.js",
-      "src/components/UserSettings/UserSettings.js"
+      "src/components/UserSettings/UserSettings.js",
+      "src/routes/passwordRecovery/PasswordRecovery.js"
     ]
   },
   {

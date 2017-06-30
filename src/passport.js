@@ -17,6 +17,7 @@ import passport from 'passport';
 import bcrypt from 'bcrypt';
 import { Strategy as LocalStrategy } from 'passport-local';
 import knex from '../src/data/knex';
+import log from './logger';
 
 function verifyUser(user, password) {
   return bcrypt.compare(password, user.password_hash);
@@ -31,19 +32,35 @@ passport.use(
     (email, password, done) =>
       knex('users')
         .where({ email })
-        .first()
-        .then((user) => {
+        .returning([
+          'id',
+          'name',
+          'password_hash',
+          'surname',
+          'email',
+          'avatar_path',
+          'privilege',
+          'role_id',
+        ])
+        .update({ last_login_at: new Date() })
+        .then((userData) => {
+          const user = userData[0];
           if (!user) {
             return done(null, false);
           }
           return verifyUser(user, password).then((verified) => {
             if (verified) {
+              log.info({ user }, 'User logged in');
               return done(null, user);
             }
+            log.warn({ user }, 'User verification failed');
             return done(null, false);
           });
         })
-        .catch(error => done(error)),
+        .catch((error) => {
+          log.error({ err: error }, 'User log in failed');
+          return done(error);
+        }),
   ),
 );
 
@@ -52,8 +69,8 @@ passport.serializeUser((user, done) =>
     .where({ id: user.role_id })
     .select('id', 'type')
     .then((data) => {
-      if (data) {
-        const role = data[0]; // .type;
+      const role = data[0];
+      if (role) {
         const sessionUser = {
           id: user.id,
           name: user.name,
@@ -67,10 +84,17 @@ passport.serializeUser((user, done) =>
           },
         };
         done(null, sessionUser);
+        return null;
       }
-      return Error('Role not found');
+      log.error({ user }, 'Serializing failed');
+      done({ message: 'Serializing failed', name: 'SerializeError' });
+      return null;
     })
-    .catch(error => done(error)),
+    .catch((error) => {
+      log.error({ err: error, user }, 'Serializing failed');
+      done(error);
+      return null;
+    }),
 );
 
 passport.deserializeUser((sessionUser, done) => {

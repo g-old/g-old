@@ -24,7 +24,12 @@ const createPushSub = {
 
       return true;
     } catch (e) {
-      log.error({ subInfo: { sub: subscription, viewer } }, 'Creating subscription failed');
+      if (e.code === '23505') {
+        log.info({ subInfo: { err: e, sub: subscription, viewer } }, 'Subscription already stored');
+
+        return true;
+      }
+      log.error({ subInfo: { err: e, sub: subscription, viewer } }, 'Creating subscription failed');
 
       return false;
     }

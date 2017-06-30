@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { updateUser, fetchUser } from '../../actions/user';
+import { verifyEmail } from '../../actions/verifyEmail';
 import { createWebPushSub, deleteWebPushSub, checkSubscription } from '../../actions/subscriptions';
 import { uploadAvatar } from '../../actions/file';
 import s from './UserProfile.css';
@@ -75,6 +76,7 @@ class UserProfile extends React.Component {
     }).isRequired,
     deleteWebPushSub: PropTypes.func.isRequired,
     createWebPushSub: PropTypes.func.isRequired,
+    verifyEmail: PropTypes.func.isRequired,
   };
   constructor(props) {
     super(props);
@@ -127,6 +129,7 @@ class UserProfile extends React.Component {
     if (updates.dataUrl && updates.dataUrl.success) {
       uploadButton = null;
     }
+
     return (
       <Box wrap>
         <Box>
@@ -198,12 +201,14 @@ class UserProfile extends React.Component {
             </div>
             <FormField label={'WebPush'} error={subscription.error}>
               <Button
+                fill
                 primary={!subscription.isPushEnabled}
                 label={subscription.isPushEnabled ? 'UNSUBSCRIBEFROMPUSH' : 'SUBSCRIBEFORPUSH'}
                 disabled={this.state.disableSubscription || subscription.pending}
                 onClick={this.handleWPSubscription}
               />
             </FormField>
+
           </div>
         </Box>
         <div style={{ width: '100%' }}>
@@ -211,6 +216,7 @@ class UserProfile extends React.Component {
             <AccordionPanel heading={<FormattedMessage {...messages.settings} />}>
               <div style={{ marginTop: '1em' }}>
                 <UserSettings
+                  resendEmail={this.props.verifyEmail}
                   updates={updates}
                   user={this.props.user}
                   updateUser={this.props.updateUser}
@@ -230,6 +236,7 @@ const mapDispatch = {
   createWebPushSub,
   deleteWebPushSub,
   checkSubscription,
+  verifyEmail,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getSessionUser(state),

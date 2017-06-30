@@ -7,35 +7,37 @@ const genToken = () =>
     // eslint-disable-next-line no-confusing-arrow
     crypto.randomBytes(20, (err, buffer) => (err ? reject(err) : resolve(buffer.toString('hex'))));
   });
-const hoursValid = 1;
+const hoursValid = 48;
 
-class PasswordReset {
+class VerifyEmail {
   constructor(data) {
-    this.resetToken = data.reset_password_token;
-    this.expires = data.reset_password_expires;
+    this.verificationToken = data.verify_email_token;
+    this.expires = data.verify_email_expires;
     this.userId = data.user_id;
+    this.email = data.email;
   }
 
   static async checkToken({ token }) {
     if (!token || typeof token !== 'string') return null;
-    const resetData = await knex.transaction(async (trx) => {
-      let data = await trx.where({ reset_password_token: token }).into('password_resets').select();
+    const verificationData = await knex.transaction(async (trx) => {
+      let data = await trx.where({ verify_email_token: token }).into('verify_emails').select();
       data = data[0];
       if (data) {
         // eslint-disable-next-line newline-per-chained-call
-        await knex('password_resets').transacting(trx).forUpdate().where({ id: data.id }).del('id');
+        await knex('verify_emails').transacting(trx).forUpdate().where({ id: data.id }).del('id');
       }
       return data;
     });
-    if (!resetData || new Date(resetData.reset_password_expires) < new Date()) return null;
-    return new PasswordReset(resetData);
+    if (!verificationData || new Date(verificationData.verify_email_expires) < new Date()) {
+      return null;
+    }
+    return new VerifyEmail(verificationData);
   }
 
   static async createToken({ email }) {
     if (!email || typeof email !== 'string') return null;
     if (!validateEmail(email)) return null;
-
-    const resetToken = await knex.transaction(async (trx) => {
+    const verificationToken = await knex.transaction(async (trx) => {
       let userId = await trx.where({ email }).into('users').pluck('id');
       userId = userId[0];
       if (!userId) throw Error('User not found');
@@ -44,35 +46,34 @@ class PasswordReset {
       const expiration = new Date();
       expiration.setHours(expiration.getHours() + hoursValid);
       // If user exists in table, update
-      const exists = await knex('password_resets')
+      const exists = await knex('verify_emails')
         .transacting(trx)
         .forUpdate()
         .where({ user_id: userId })
         .pluck('id');
 
       if (exists[0]) {
-        await knex('password_resets')
-          .transacting(trx)
-          .forUpdate()
-          .where({ user_id: userId })
-          .update({
-            reset_password_token: token,
-            reset_password_expires: expiration,
-            updated_at: new Date(),
-          });
+        // eslint-disable-next-line newline-per-chained-call
+        await knex('verify_emails').transacting(trx).forUpdate().where({ user_id: userId }).update({
+          verify_email_token: token,
+          verify_email_expires: expiration,
+          email,
+          updated_at: new Date(),
+        });
       } else {
-        await knex('password_resets').transacting(trx).forUpdate().insert({
-          reset_password_token: token,
-          reset_password_expires: expiration,
+        await knex('verify_emails').transacting(trx).forUpdate().insert({
+          verify_email_token: token,
+          verify_email_expires: expiration,
           user_id: userId,
+          email,
           created_at: new Date(),
         });
       }
 
       return token || null;
     });
-    return resetToken;
+    return verificationToken;
   }
 }
 
-export default PasswordReset;
+export default VerifyEmail;

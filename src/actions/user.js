@@ -25,7 +25,7 @@ const userFields = `
   privilege,
     name,
     surname,
-    avatar
+    avatar,
     role{
       id,
       type
@@ -42,8 +42,8 @@ query ($role:String) {
 const userQuery = `
 query ($id:ID!) {
   user (id:$id) {
-    emailValidated
     lastLogin
+    emailVerified
     email
     followees{
       ${userFields}

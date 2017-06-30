@@ -3,10 +3,18 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import cn from 'classnames';
 import s from './PasswordReset.css';
 import { resetPassword } from '../../actions/password_reset';
 import { getAccountUpdates } from '../../reducers';
+import Button from '../../components/Button';
+import FormField from '../../components/FormField';
+import Box from '../../components/Box';
+import Notification from '../../components/Notification';
+import {
+  createValidator,
+  passwordValidation,
+  passwordAgainValidation,
+} from '../../core/validation';
 
 const messages = defineMessages({
   password: {
@@ -41,15 +49,21 @@ const messages = defineMessages({
   },
 });
 
+const formFields = ['password', 'passwordAgain'];
 class PasswordReset extends React.Component {
   static propTypes = {
     resetPassword: PropTypes.func.isRequired,
     token: PropTypes.string.isRequired,
-    updates: PropTypes.object,
+    updates: PropTypes.shape({ password: PropTypes.string }),
+  };
+
+  static defaultProps = {
+    updates: null,
   };
   constructor(props) {
     super(props);
     this.state = {
+      error: false,
       password: '',
       passwordAgain: '',
       errors: {
@@ -61,54 +75,41 @@ class PasswordReset extends React.Component {
         },
       },
     };
-    this.onPasswordChange = this.onPasswordChange.bind(this);
-    this.onPasswordAgainChange = this.onPasswordAgainChange.bind(this);
-    this.validatePassword = this.validatePassword.bind(this);
-    this.validatePasswordAgain = this.validatePasswordAgain.bind(this);
-    this.onPasswordBlur = this.onPasswordBlur.bind(this);
-    this.onPasswordAgainBlur = this.onPasswordAgainBlur.bind(this);
+    const testValues = {
+      password: { fn: 'password' },
+      passwordAgain: { fn: 'passwordAgain' },
+    };
+    this.Validator = createValidator(
+      testValues,
+      {
+        password: passwordValidation,
+        passwordAgain: passwordAgainValidation,
+      },
+      this,
+      obj => obj.state,
+      {
+        minPasswordLength: 6,
+      },
+    );
+
+    this.handleValueChange = this.handleValueChange.bind(this);
+    this.handleValidation = this.handleValidation.bind(this);
+    this.handleBlur = this.handleBlur.bind(this);
+    this.visibleErrors = this.visibleErrors.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
-  onPasswordChange(e) {
-    const password = e.target.value;
-    if (this.state.errors.password.touched) {
-      this.setState({
-        errors: {
-          ...this.state.errors,
-          password: { ...this.state.errors.password, touched: false },
-        },
-      });
-    }
-    this.setState({ password });
-  }
-  onPasswordAgainChange(e) {
-    const passwordAgain = e.target.value;
-    if (this.state.errors.passwordAgain.touched) {
-      this.setState({
-        errors: {
-          ...this.state.errors,
-          passwordAgain: { ...this.state.errors.passwordAgain, touched: false },
-        },
-      });
-    }
-    this.setState({ passwordAgain });
-  }
-  onPasswordBlur() {
-    const password = this.validatePassword(6);
-    let passwordAgain = { touched: false };
-    if (this.state.passwordAgain.length > 0) {
-      passwordAgain = this.validatePasswordAgain();
-    }
 
-    this.setState({ errors: { ...this.state.errors, password, passwordAgain } });
-  }
-  onPasswordAgainBlur() {
-    const passwordAgain = this.validatePasswordAgain();
-    this.setState({ errors: { ...this.state.errors, passwordAgain } });
+  componentWillReceiveProps({ updates }) {
+    if (updates && updates.password && updates.password.error) {
+      this.setState({
+        password: '',
+        passwordAgain: '',
+        error: !this.props.updates.password.error,
+      });
+    }
   }
   onSubmit() {
-    const valid = this.validateForm();
-    if (valid) {
+    if (this.handleValidation(formFields)) {
       let { password } = this.state;
 
       password = password.trim();
@@ -118,135 +119,96 @@ class PasswordReset extends React.Component {
       };
       //  alert(JSON.stringify(data));
       this.props.resetPassword(data);
-    } else {
-      // alert('FORM not valid');
     }
   }
-  validatePassword(minPasswordLength) {
-    let password = this.state.password;
-    password = password.trim();
-    let result = {
-      touched: false,
-    };
-    if (!password) {
-      result = {
-        touched: true,
-        errorName: 'empty',
-      };
-    } else if (password.length < minPasswordLength) {
-      result = {
-        touched: true,
-        errorName: 'shortPassword',
-      };
+  handleValueChange(e) {
+    const field = e.target.name;
+    const value = e.target.value;
+    if (this.state.errors[field].touched) {
+      this.setState({
+        errors: { ...this.state.errors, [field]: { ...this.state.errors[field], touched: false } },
+      });
     }
-    return result;
+    this.setState({ [field]: value });
   }
-  validatePasswordAgain() {
-    let passwordAgain = this.state.passwordAgain;
-    passwordAgain = passwordAgain.trim();
-    let result = {
-      touched: false,
-    };
-    if (!passwordAgain) {
-      result = {
-        touched: true,
-        errorName: 'empty',
-      };
-    } else if (this.state.password.trim() !== passwordAgain) {
-      result = {
-        touched: true,
-        errorName: 'passwordMismatch',
-      };
-    }
-    return result;
+
+  handleValidation(fields) {
+    const validated = this.Validator(fields);
+    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
+    return validated.failed === 0;
   }
-  validateForm() {
-    // validate each field
-    let errors = {};
-    let error = false;
 
-    const password = this.validatePassword(6);
-    if (password.touched) {
-      error = true;
+  handleBlur(e) {
+    const fields = [];
+    const currentField = e.target.name;
+    fields.push(e.target.name);
+    if (currentField) {
+      if (currentField === 'password' && this.state.passwordAgain.length > 0) {
+        fields.push('passwordAgain');
+      }
+      this.handleValidation(fields);
     }
-
-    const passwordAgain = this.validatePasswordAgain();
-    if (passwordAgain.touched) {
-      error = true;
-    }
-
-    // if errors, set state, else submit
-    if (error) {
-      errors = {
-        password,
-        passwordAgain,
-      };
-      this.setState({ errors });
-    }
-    return error === false;
+  }
+  visibleErrors(errorNames) {
+    return errorNames.reduce((acc, curr) => {
+      const err = `${curr}Error`;
+      if (this.state.errors[curr].touched) {
+        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+      }
+      return acc;
+    }, {});
   }
 
   render() {
     let content;
-    const { password } = this.props.updates;
-    if (password && password.success) {
+    const { updates } = this.props;
+    if (updates && updates.password && updates.password.success) {
       content = <div> YOU ARE LOGGED IN!</div>;
     } else {
+      const { passwordError, passwordAgainError } = this.visibleErrors(formFields);
       content = (
-        <div>
+        <Box column pad>
           <h1> Reset Password</h1>
-          <div className={s.formGroup}>
-            <label className={s.label} htmlFor="password">
-              <FormattedMessage {...messages.password} />
-            </label>
-            <input
-              className={cn(s.input, this.state.errors.password.touched && s.error)}
-              id="password"
-              type="password"
-              name="password"
-              value={this.state.password}
-              onChange={this.onPasswordChange}
-              onBlur={this.onPasswordBlur}
-            />
-            <div>
-              {this.state.errors.password.touched
-                ? <FormattedMessage {...messages[this.state.errors.password.errorName]} />
-                : ''}
-            </div>
+          <div>
+            <FormField label={<FormattedMessage {...messages.password} />} error={passwordError}>
+              <input
+                id="password"
+                type="password"
+                name="password"
+                value={this.state.password}
+                onChange={this.handleValueChange}
+                onBlur={this.handleBlur}
+              />
+            </FormField>
+
+            <FormField
+              label={<FormattedMessage {...messages.passwordAgain} />}
+              error={passwordAgainError}
+            >
+              <input
+                id="passwordAgain"
+                type="password"
+                name="passwordAgain"
+                value={this.state.passwordAgain}
+                onChange={this.handleValueChange}
+                onBlur={this.handleBlur}
+              />
+            </FormField>
           </div>
-          <div className={s.formGroup}>
-            <label className={s.label} htmlFor="passwordAgain">
-              <FormattedMessage {...messages.passwordAgain} />
-            </label>
-            <input
-              className={cn(s.input, this.state.errors.passwordAgain.touched && s.error)}
-              id="passwordAgain"
-              type="password"
-              name="passwordAgain"
-              value={this.state.passwordAgain}
-              onChange={this.onPasswordAgainChange}
-              onBlur={this.onPasswordAgainBlur}
-            />
-            <div>
-              {this.state.errors.passwordAgain.touched
-                ? <FormattedMessage {...messages[this.state.errors.passwordAgain.errorName]} />
-                : ''}
-            </div>
-          </div>
-          <div className={s.formGroup}>
-            <button className={s.button} onClick={this.onSubmit}>
-              <FormattedMessage {...messages.reset} />
-            </button>
-          </div>
-        </div>
+
+          <Button
+            primary
+            label={<FormattedMessage {...messages.reset} />}
+            onClick={this.onSubmit}
+          />
+
+        </Box>
       );
     }
     return (
       <div className={s.root}>
         <div className={s.container}>
-          {password &&
-            password.error &&
-            <div className={s.error}> <h3>SOMETHING WENT WRONG</h3> </div>}
+          {this.state.error && <Notification type={'error'} message={updates.password.error} />}
           {content}
         </div>
       </div>

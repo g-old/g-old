@@ -64,7 +64,7 @@ exports.seed = function (knex, Promise) {
     );
   }
 
-  function createUser(name, surname, passwordHash, email, roleId, time, emailValidated, privilege) {
+  function createUser(name, surname, passwordHash, email, roleId, time, emailVerified, privilege) {
     return knex('users').insert({
       name,
       surname,
@@ -73,7 +73,7 @@ exports.seed = function (knex, Promise) {
       role_id: roleId,
       created_at: time,
       updated_at: time,
-      email_validated: emailValidated,
+      email_verified: emailVerified,
       privilege: privilege || 1,
       avatar_path: `https://api.adorable.io/avatars/32/${name}${surname}.io.png`,
     });

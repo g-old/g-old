@@ -93,6 +93,10 @@ export const DELETE_PSUB_START = 'DELETE_PSUB_START';
 export const DELETE_PSUB_SUCCESS = 'DELETE_PSUB_SUCCESS';
 export const DELETE_PSUB_ERROR = 'DELETE_PSUB_ERROR';
 export const CHECK_PSUB_STATUS = 'CHECK_PSUB_STATUS';
+export const CREATE_VEMAIL_START = 'CREATE_VEMAIL_START';
+export const CREATE_VEMAIL_SUCCESS = 'CREATE_VEMAIL_SUCCESS';
+export const CREATE_VEMAIL_ERROR = 'CREATE_VEMAIL_ERROR';
+
 export const ADD_ENTITIES = 'ADD_ENTITIES';
 
 // Con: Not very flexible, you cannot see the role/group/right

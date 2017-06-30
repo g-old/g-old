@@ -65,7 +65,7 @@ class AccountProfile extends React.Component {
       surname: PropTypes.string,
       avatar: PropTypes.string,
       privilege: PropTypes.string,
-      emailValidated: PropTypes.bool,
+      emailVerified: PropTypes.bool,
       lastLogin: PropTypes.string,
       role: PropTypes.shape({
         type: PropTypes.string,
@@ -117,7 +117,7 @@ class AccountProfile extends React.Component {
     if (!accountData) {
       return null;
     }
-    const { id, avatar, name, surname, role, emailValidated, lastLogin, privilege } = accountData;
+    const { id, avatar, name, surname, role, emailVerified, lastLogin, privilege } = accountData;
     let PrivilegePanel = null;
     // eslint-disable-next-line no-bitwise
     if (privilege && user.privilege & PRIVILEGES.canModifyRights) {
@@ -161,7 +161,7 @@ class AccountProfile extends React.Component {
               <div>
                 <FormattedMessage {...messages.avatarMissing} />
               </div>}
-            {!emailValidated &&
+            {!emailVerified &&
               <div>
                 <FormattedMessage {...messages.emailValidationMissing} />
               </div>}

@@ -28,18 +28,15 @@ export function recoverPassword(email) {
 const initialId = 'pw';
 export function resetPassword({ token, password }) {
   return async (dispatch) => {
-    const properties = ['password'].reduce(
-      (acc, curr) => {
-        // eslint-disable-next-line no-param-reassign
-        acc[curr] = {
-          pending: true,
-          success: false,
-          error: null,
-        };
-        return acc;
-      },
-      {},
-    );
+    const properties = ['password'].reduce((acc, curr) => {
+      // eslint-disable-next-line no-param-reassign
+      acc[curr] = {
+        pending: true,
+        success: false,
+        error: null,
+      };
+      return acc;
+    }, {});
     dispatch({
       type: RESET_PASSWORD_START,
       properties,
@@ -58,7 +55,8 @@ export function resetPassword({ token, password }) {
         credentials: 'include',
       });
       if (resp.status !== 200) throw new Error(resp.statusText);
-      const { user } = await resp.json();
+      const { user, error } = await resp.json();
+      if (error) throw Error(error);
       if (!user) throw Error('Resetting failed');
       const normalizedData = normalize(user, userSchema);
       dispatch({

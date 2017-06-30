@@ -40,15 +40,19 @@ import createLoaders from './data/dataLoader';
 import User from './data/models/User';
 import FileStorage, { AvatarManager } from './core/FileStorage';
 import PasswordReset from './data/models/PasswordReset';
+import VerifyEmail from './data/models/VerifyEmail';
 import { sendMail, resetLinkMail, resetSuccessMail } from './core/mailer';
 import { user as userSchema } from './store/schema';
 import config from './config';
 import worker from './core/worker';
-import BWorker from './core/childProcess';
+import BWorker, { sendJob } from './core/childProcess';
+import { getProtocol } from './core/helpers';
 import privateConfig from '../private_configs';
+import log from './logger';
 
 worker();
-BWorker.start(path.resolve(__dirname, 'workers/backgroundWorker.js'));
+BWorker.start(path.resolve(__dirname, 'backgroundWorker.js'));
+
 const app = express();
 
 //
@@ -136,6 +140,18 @@ app.post('/signup', (req, res) => {
   User.create(req.body.user)
     .then((user) => {
       if (!user) throw Error('User creation failed');
+      const job = {
+        type: 'mail',
+        data: {
+          mailType: 'verifyEmail',
+          address: user.email,
+          viewer: user,
+          connection: { host: req.headers.host, protocol: getProtocol(req) },
+        },
+      };
+      if (!sendJob(job)) {
+        log.error('Verification email not sent');
+      }
       return new Promise((resolve, reject) => {
         // eslint-disable-next-line no-confusing-arrow
         req.login(user, err => (err ? reject(err) : resolve()));
@@ -215,15 +231,16 @@ app.post(
         console.info(info.envelope);
         console.info(info.messageId);
         console.info(info.message);
+        log.info({ req }, 'Password reset token generated');
         res.status(200).json({ ok: true });
       })
       .catch((error) => {
-        console.error('ERROR: ', error);
+        log.error({ err: error, req }, 'Password reset req failed');
         res.status(200).json({ ok: true });
       }), // give no feedback!
 );
 // TODO change to /reset only ?
-app.post('/reset/:token', (req, res) => {
+app.post('/reset/:token', (req, res) =>
   PasswordReset.checkToken({ token: req.params.token }) // TODO checkToken and delete it
     .then((data) => {
       if (!data) throw Error('Token invalid');
@@ -244,7 +261,7 @@ app.post('/reset/:token', (req, res) => {
             console.info(info.messageId);
             console.info(info.message);
           },
-          err => console.error('MAILING failed', err),
+          err => log.error({ err }, 'Mail not delivered'),
         ),
         new Promise((resolve, reject) => {
           // eslint-disable-next-line no-confusing-arrow
@@ -253,8 +270,69 @@ app.post('/reset/:token', (req, res) => {
       ]);
     })
     .then(() => res.status(200).json({ user: req.user }))
-    .catch(error => res.status(500).json({ error }));
+    .catch((error) => {
+      log.error({ err: error }, 'Password reset failed');
+      return res.status(200).json({ user: null, error: error.message });
+    }),
+);
+
+app.get('/verify/:token', (req, res) => {
+  // ! No check if user is logged in !
+  VerifyEmail.checkToken({ token: req.params.token })
+    .then((data) => {
+      if (data) {
+        return knex('users')
+          .forUpdate()
+          .where({ email: data.email })
+          .update({ email_verified: true, updated_at: new Date() })
+          .returning('id');
+      }
+      throw Error('Token not valid');
+    })
+    .then((id) => {
+      if (id[0]) {
+        // TODO insert into feed
+        return res.redirect('/account');
+      }
+      throw Error('User not found');
+    })
+    .catch((err) => {
+      log.error({ err }, 'Email verification failed');
+      return res.redirect('/verify');
+    });
 });
+
+app.post('/verify', (req, res) =>
+  // ! No check if user is logged in !
+  User.gen(req.user, req.user.id, createLoaders())
+    .then((user) => {
+      if (user) {
+        const job = {
+          type: 'mail',
+          data: {
+            mailType: 'verifyEmail',
+            lang: req.cookies.lang,
+            verify: true,
+            address: user.email,
+            viewer: user,
+            connection: { host: req.headers.host, protocol: getProtocol(req) },
+          },
+        };
+        if (!sendJob(job)) {
+          throw Error('Verification email not sent');
+        }
+      } else {
+        throw Error('Could not get user');
+      }
+    })
+    .then(() => {
+      res.status(200).send();
+    })
+    .catch((err) => {
+      log.error({ err }, 'Verification process failed');
+      res.status(500).send();
+    }),
+);
 
 app.get('/test', (req, res, next) => {
   knex('users')

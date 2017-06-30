@@ -34,7 +34,7 @@ class User {
     this.role_id = data.role_id;
     this.privilege = data.privilege;
     this.avatar = data.avatar_path;
-    this.emailValidated = data.email_validated;
+    this.emailVerified = data.email_verified;
     this.lastLogin = data.last_login_at;
   }
   static async gen(viewer, id, { users }) {
@@ -85,7 +85,7 @@ class User {
     const newData = { updated_at: new Date() };
     if (data.email) {
       newData.email = data.email.trim();
-      newData.email_validated = false;
+      newData.email_verified = false;
     }
     if (data.password) {
       if (data.passwordOld) {
@@ -225,7 +225,7 @@ class User {
           surname,
           email,
           avatar_path,
-          email_validated: false,
+          email_verified: false,
           password_hash: hash,
           role_id: 5, // TODO make better
           created_at: new Date(),

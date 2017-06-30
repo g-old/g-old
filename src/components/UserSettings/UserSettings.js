@@ -4,6 +4,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
+import Notification from '../Notification';
 import {
   createValidator,
   passwordValidation,
@@ -89,6 +90,21 @@ const messages = defineMessages({
     defaultMessage: 'Action failed. Please retry!',
     description: 'Short failure notification ',
   },
+  verified: {
+    id: 'settings.email.verified',
+    defaultMessage: 'Email verified!',
+    description: 'Email got verified ',
+  },
+  notVerified: {
+    id: 'settings.email.notVerified',
+    defaultMessage: 'Email not verified',
+    description: 'Email not yet verified ',
+  },
+  resend: {
+    id: 'settings.email.resend',
+    defaultMessage: 'Resend verification email',
+    description: 'Resend verification email ',
+  },
 });
 
 const initState = {
@@ -111,6 +127,7 @@ class UserSettings extends React.Component {
     user: PropTypes.shape({ email: PropTypes.string.isRequired, id: PropTypes.string.isRequired })
       .isRequired,
     updateUser: PropTypes.func.isRequired,
+    resendEmail: PropTypes.func.isRequired,
     updates: PropTypes.shape({}).isRequired,
   };
 
@@ -249,11 +266,14 @@ class UserSettings extends React.Component {
 
   render() {
     const { showEmailInput } = this.state;
-    const { updates } = this.props;
+    const { updates, user, resendEmail } = this.props;
     const emailPending = updates && updates.email && updates.email.pending;
     const emailSuccess = updates && updates.email && updates.email.success;
     const passwordPending = updates && updates.password && updates.password.pending;
     const passwordSuccess = updates && updates.password && updates.password.success;
+    // const verifyError = updates && updates.verifyEmail && updates.verifyEmail.error;
+    const verifyPending = updates && updates.verifyEmail && updates.verifyEmail.pending;
+    const verifySuccess = updates && updates.verifyEmail && updates.verifyEmail.success;
     const updateEmailBtn = this.state.showEmailInput
       ? (<Button
         disabled={emailPending}
@@ -268,6 +288,17 @@ class UserSettings extends React.Component {
       'email',
     ]);
 
+    let emailStatus = null;
+    if (!showEmailInput) {
+      if (user.emailVerified === true) {
+        emailStatus = <FormattedMessage {...messages.verified} />;
+      } else {
+        emailStatus = <FormattedMessage {...messages.notVerified} />;
+      }
+    }
+
+    const showResendBtn = !user.emailVerified && !emailSuccess && !emailPending && !showEmailInput;
+
     return (
       <Box column pad>
         <fieldset>
@@ -275,7 +306,11 @@ class UserSettings extends React.Component {
             <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
               <FormattedMessage {...messages.error} />
             </div>}
-          <FormField label={<FormattedMessage {...messages.email} />} error={emailError}>
+          <FormField
+            label={<FormattedMessage {...messages.email} />}
+            error={emailError}
+            help={emailStatus}
+          >
             <input
               type="text"
               onChange={this.handleValueChange}
@@ -287,7 +322,7 @@ class UserSettings extends React.Component {
           </FormField>
 
         </fieldset>
-        <Box>
+        <Box wrap>
           {!emailSuccess && !emailPending && updateEmailBtn}
           {!emailSuccess &&
             <Button
@@ -295,7 +330,18 @@ class UserSettings extends React.Component {
               onClick={this.onEditEmail}
               label={<FormattedMessage {...messages[buttonLabel]} />}
             />}
+          {showResendBtn &&
+            <Button
+              disabled={verifyPending}
+              onClick={resendEmail}
+              label={<FormattedMessage {...messages.resend} />}
+            />}
         </Box>
+        {verifySuccess &&
+          <Notification
+            type="alert"
+            message={'Look in your mail account. Soon something should be there'}
+          />}
         <fieldset>
           {this.state.passwordError &&
             <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>

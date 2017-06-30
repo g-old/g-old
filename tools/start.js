@@ -22,7 +22,7 @@ import copy from './copy';
 const isDebug = !process.argv.includes('--release');
 process.argv.push('--watch');
 
-const [clientConfig, serverConfig] = webpackConfig;
+const [clientConfig, serverConfig, workerConfig] = webpackConfig;
 
 /**
  * Launches a development web server with "live reload" functionality -
@@ -36,6 +36,7 @@ async function start() {
     // Save the server-side bundle files to the file system after compilation
     // https://github.com/webpack/webpack-dev-server/issues/62
     serverConfig.plugins.push(new WriteFilePlugin({ log: false }));
+    workerConfig.plugins.push(new WriteFilePlugin({ log: false }));
 
     // Hot Module Replacement (HMR) + React Hot Reload
     if (isDebug) {

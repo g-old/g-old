@@ -23,8 +23,12 @@ deletePushSub(subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})
 const registerSW = async (file) => {
   if ('serviceWorker' in navigator && 'PushManager' in window) {
     const registration = await navigator.serviceWorker.register(file);
+    console.info('Getting sw registration', registration);
     const serviceWorker = registration.installing || registration.waiting || registration.active;
+    console.info('Sw status', serviceWorker);
 
+    const isReady = await navigator.serviceWorker.ready;
+    console.info('SW is now ready', isReady);
     return new Promise((resolve, reject) => {
       if (!serviceWorker) {
         reject('No serviceWorker in registration');
@@ -36,7 +40,9 @@ const registerSW = async (file) => {
       if (serviceWorker.state === 'redundant') {
         reject('SW registration is redundant!');
       }
+
       const changeListener = () => {
+        console.info('Listening for changes');
         if (serviceWorker.state === 'activated') {
           resolve(registration);
         } else if (serviceWorker.state === 'redundant') {
@@ -65,17 +71,21 @@ const getPushSubscription = async (publicKey) => {
   if (!registration) {
     throw Error('Could not register SW');
   }
+  console.info('Serviceworker registered!');
   // TODO older versions have cb!
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') {
     throw Error('Permission denied');
   }
+  console.info('Permission granted!');
+
   const subscribeOptions = {
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(publicKey),
   };
   const subscription = await registration.pushManager.subscribe(subscribeOptions);
   if (!subscription) throw Error('Could not subscribe to push service');
+  console.info('Subscription received!');
 
   return subscriptionToObject(subscription);
 };

@@ -14,6 +14,13 @@ const fork = async (file) => {
     worker = await cp.fork(file);
     if (worker) {
       worker.on('message', handleResults);
+      // Listen for an exit event:
+      worker.on('exit', (exitCode) => {
+        log.error({ exitCode }, 'Worker terminated!');
+        initialized = false;
+        // Restart
+        fork(file);
+      });
       initialized = true;
     } else {
       log.fatal('Worker could not been forked');

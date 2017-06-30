@@ -27,6 +27,8 @@ export default {
     require('./loggedOut').default,
     require('./passwordRecovery').default,
     require('./passwordReset').default,
+    require('./emailVerification').default,
+
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     require('./notFound').default,
   ],

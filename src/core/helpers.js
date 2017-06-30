@@ -207,3 +207,11 @@ export const isPushAvailable = () =>
   ServiceWorkerRegistration.prototype.hasOwnProperty('showNotification') &&
   PushSubscription.prototype.hasOwnProperty('getKey');
 /* eslint-enable no-prototype-builtins */
+
+// from https://stackoverflow.com/questions/10348906/how-to-know-if-a-request-is-http-or-https-in-node-js
+export const getProtocol = (req) => {
+  let proto = req.connection.encrypted ? 'https' : 'http';
+  // only do this if you trust the proxy
+  proto = req.headers['x-forwarded-proto'] || proto;
+  return proto.split(/\s*,\s*/)[0];
+};
