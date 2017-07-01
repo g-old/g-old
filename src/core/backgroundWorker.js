@@ -1,37 +1,75 @@
 import knex from '../data/knex';
 import webPush from '../webPush';
 import log from '../logger';
-import VerifyEmail from '../data/models/VerifyEmail';
-import { sendMail, emailVerificationMail, emailChangedMail } from './mailer';
+import { createToken } from './tokens';
+import {
+  sendMail,
+  emailVerificationMail,
+  emailChangedMail,
+  resetLinkMail,
+  resetSuccessMail,
+} from './mailer';
 
-const mailWithToken = async ({ address, viewer, connection, template }) => {
+const mailWithToken = async ({ address, viewer, connection, template, type }) => {
   const result = false;
   try {
-    const token = await VerifyEmail.createToken({ email: address });
+    let token = null;
+    switch (type) {
+      case 'reset': {
+        token = await createToken({ email: address, table: 'reset_tokens', hoursValid: 2 });
+        break;
+      }
+      case 'verify': {
+        token = await createToken({
+          email: address,
+          table: 'verify_tokens',
+          hoursValid: 48,
+          withEmail: true,
+        });
+        break;
+      }
 
+      default: {
+        throw Error(`Token type not recognized: ${type}`);
+      }
+    }
     const mail = template(address, connection, token, viewer.name);
 
-    return sendMail(mail).then((info) => {
-      // TODO ONLY for TESTING!
-      console.info(info.envelope);
-      console.info(info.messageId);
-      console.info(info.message);
-    });
+    return sendMail(mail);
   } catch (err) {
-    log.error({ err }, 'Sending verification email failed');
+    log.error({ err }, 'Sending token email failed');
   }
   return result;
+};
+
+const mailNotification = async ({ address, viewer, template }) => {
+  try {
+    const mail = template(address, viewer.name);
+    return sendMail(mail);
+  } catch (err) {
+    log.error({ err }, 'Sending email failed');
+  }
+  return null;
 };
 
 const handleMails = (mailData) => {
   let result = null;
   switch (mailData.mailType) {
     case 'verifyEmail': {
-      result = mailWithToken({ ...mailData, template: emailVerificationMail });
+      result = mailWithToken({ ...mailData, template: emailVerificationMail, type: 'verify' });
       break;
     }
     case 'mailChanged': {
-      result = mailWithToken({ ...mailData, template: emailChangedMail });
+      result = mailWithToken({ ...mailData, template: emailChangedMail, type: 'verify' });
+      break;
+    }
+    case 'resetPassword': {
+      result = mailWithToken({ ...mailData, template: resetLinkMail, type: 'reset' });
+      break;
+    }
+
+    case 'resetSuccess': {
+      result = mailNotification({ ...mailData, template: resetSuccessMail });
       break;
     }
     default: {

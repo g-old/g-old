@@ -83,6 +83,7 @@ const getPushSubscription = async (publicKey) => {
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(publicKey),
   };
+  // throw Error('TESTERROR');
   const subscription = await registration.pushManager.subscribe(subscribeOptions);
   if (!subscription) throw Error('Could not subscribe to push service');
   console.info('Subscription received!');

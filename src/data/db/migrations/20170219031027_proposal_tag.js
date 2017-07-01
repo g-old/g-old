@@ -1,4 +1,3 @@
-
 exports.up = function (knex, Promise) {
   return Promise.all([
     knex.schema.createTable('proposal_tags', (table) => {
@@ -14,7 +13,5 @@ exports.up = function (knex, Promise) {
 };
 
 exports.down = function (knex, Promise) {
-  return Promise.all([
-    knex.schema.dropTable('proposal_tags'),
-  ]);
+  return Promise.all([knex.schema.dropTable('proposal_tags')]);
 };

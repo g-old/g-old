@@ -1,4 +1,3 @@
-
 .root {
   display: flex;
   background-position: center center;
@@ -34,4 +33,8 @@
 
 .wrap {
   flex-wrap: wrap;
+}
+
+.flex {
+  flex: 1 1;
 }

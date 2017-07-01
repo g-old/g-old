@@ -42,11 +42,16 @@ export default function byId(state = {}, action) {
     }
     case UPDATE_USER_SUCCESS: {
       // bc of deleted followees
+      const users = action.payload.entities.users;
+      const newState = Object.keys(users).reduce(
+        (acc, curr) => ({ ...acc, [curr]: { ...state[curr], ...users[curr] } }),
+        {},
+      );
       return {
         ...state,
-        ...action.payload.entities.users,
+        ...newState,
+        //...action.payload.entities.users,
       };
-      // return merge({}, state, action.payload.entities.users);
     }
     case UPLOAD_AVATAR_SUCCESS: {
       return merge({}, state, action.payload.entities.users);

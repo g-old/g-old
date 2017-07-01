@@ -74,10 +74,11 @@
 .fill {
   max-width: none;
   width: 100%;
+  flex-grow: 1;
 }
 
 .accent {
-  border: 2px solid  var(--color-accent-1);
+  border: 2px solid var(--color-accent-1);
 }
 
 .accent:not(.disabled):not(.plain):hover {

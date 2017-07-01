@@ -12,9 +12,7 @@ export function recoverPassword(email) {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email,
-        }),
+        body: JSON.stringify(email),
         credentials: 'include',
       });
     } catch (error) {

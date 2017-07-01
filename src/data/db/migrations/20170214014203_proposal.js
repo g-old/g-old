@@ -19,6 +19,11 @@ exports.up = function (knex, Promise) {
         .notNullable()
         .defaultsTo('proposed');
       table.integer('votes').defaultsTo(0);
+      table.integer('poll_one_id').unsigned().notNullable().unique();
+      table.foreign('poll_one_id').references('polls.id');
+      table.integer('poll_two_id').unsigned().unique();
+      table.foreign('poll_two_id').references('polls.id');
+      table.string('spokesman');
       table.timestamp('deleted_at');
       table.timestamps();
     }),

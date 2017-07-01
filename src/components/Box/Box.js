@@ -17,6 +17,7 @@ class Box extends React.Component {
     containerClassName: PropTypes.string,
     justify: PropTypes.bool,
     wrap: PropTypes.bool,
+    flex: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -30,6 +31,7 @@ class Box extends React.Component {
     containerClassName: null,
     justify: false,
     wrap: false,
+    flex: false,
   };
 
   render() {
@@ -45,6 +47,7 @@ class Box extends React.Component {
       align,
       justify,
       wrap,
+      flex,
     } = this.props;
     /* eslint-disable jsx-a11y/no-static-element-interactions*/
     const Component = tag;
@@ -61,6 +64,7 @@ class Box extends React.Component {
           align ? s.align : null,
           justify ? s.justify : null,
           wrap ? s.wrap : null,
+          flex ? s.flex : null,
         )}
         onClick={onClick}
       >

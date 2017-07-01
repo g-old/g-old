@@ -903,5 +903,41 @@
     "files": [
       "src/components/ProposalInput/ProposalInput.js"
     ]
+  },
+  {
+    "id": "settings.email.notVerified",
+    "description": "Email not yet verified",
+    "defaultMessage": "Email not verified",
+    "message": "",
+    "files": [
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "settings.email.resend",
+    "description": "Resend verification email",
+    "defaultMessage": "Resend verification email",
+    "message": "",
+    "files": [
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "settings.email.verified",
+    "description": "Email got verified",
+    "defaultMessage": "Email verified!",
+    "message": "",
+    "files": [
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "profile.followees",
+    "description": "Followees",
+    "defaultMessage": "Followees",
+    "message": "",
+    "files": [
+      "src/components/UserProfile/UserProfile.js"
+    ]
   }
 ]

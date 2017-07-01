@@ -1,11 +1,12 @@
 exports.up = function (knex, Promise) {
   return Promise.all([
-    knex.schema.createTable('password_resets', (table) => {
+    knex.schema.createTable('verify_tokens', (table) => {
       table.increments();
       table.integer('user_id').unsigned().notNullable().unique();
       table.foreign('user_id').references('users.id');
-      table.string('reset_password_token');
-      table.timestamp('reset_password_expires').notNullable();
+      table.string('token');
+      table.string('email').notNullable();
+      table.timestamp('token_expires').notNullable();
 
       table.timestamps();
     }),
@@ -13,5 +14,5 @@ exports.up = function (knex, Promise) {
 };
 
 exports.down = function (knex, Promise) {
-  return Promise.all([knex.schema.dropTable('password_resets')]);
+  return Promise.all([knex.schema.dropTable('verify_tokens')]);
 };

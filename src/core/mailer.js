@@ -6,17 +6,21 @@ const env = process.env.NODE_ENV || 'development';
 const mailOptions = config[env].mailer;
 const Transporter = nodemailer.createTransport(mailOptions.config);
 
-export const resetLinkMail = (email, host, token) => {
-  if (!email || !host || !token) throw Error('Mail details not provided');
+export const resetLinkMail = (email, connection, token, name) => {
+  if (!email || !connection || !connection.host || !token || !name) {
+    throw Error('Mail details not provided');
+  }
   // TODO further checks
   // TODO Lang option
   return {
     from: mailOptions.sender || 'passwordreset@g-old.com',
     to: email,
     subject: 'G-old Password Reset',
-    text:
-      `${'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n Please click on the following link, or paste this into your browser to complete the process:\n\nhttp://'}${host}/reset/${token}\n\n` +
-        'If you did not request this, please ignore this email and your password will remain unchanged.\n',
+    text: `Hi ${name}! \n\n
+      You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+      Please click on the following link, or paste this into your browser to complete the process:\n\n
+      ${connection.protocol}://${connection.host}/reset/${token}\n\n
+      If you did not request this, please ignore this email and your password will remain unchanged.\n`,
   };
 };
 export const sendMail = mail =>
@@ -26,14 +30,20 @@ export const sendMail = mail =>
       if (err) reject(err);
       resolve(data);
     });
+  }).then((info) => {
+    // TODO ONLY for TESTING!
+    console.info(info.envelope);
+    console.info(info.messageId);
+    console.info(info.message);
   });
-export const resetSuccessMail = (email) => {
-  if (!email) throw Error('Mail details not provided');
+
+export const resetSuccessMail = (email, name) => {
+  if (!email || !name) throw Error('Mail details not provided');
   return {
     from: mailOptions.sender || 'passwordreset@g-old.com',
     to: email,
     subject: 'Your password has been changed',
-    text: `${'Hello,\n\n This is a confirmation that the password for your account '}${email} has just been changed.\n`,
+    text: `Hello ${name},\n\n This is a confirmation that the password for your account ${email} has just been changed.\n`,
   };
 };
 

@@ -10,7 +10,6 @@ import { uploadAvatar } from '../../actions/file';
 import s from './UserProfile.css';
 import { getSessionUser, getAccountUpdates, getSubscription } from '../../reducers';
 import Avatar from '../Avatar';
-import Icon from '../Icon';
 import UserSettings from '../UserSettings';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
@@ -19,6 +18,7 @@ import Box from '../Box';
 import FormField from '../FormField';
 import Button from '../Button';
 import Value from '../Value';
+import Label from '../Label';
 import { isPushAvailable } from '../../core/helpers';
 
 const messages = defineMessages({
@@ -27,25 +27,29 @@ const messages = defineMessages({
     defaultMessage: 'Settings',
     description: 'Header for settings',
   },
+  followees: {
+    id: 'profile.followees',
+    defaultMessage: 'Followees',
+    description: 'Followees',
+  },
 });
 
 const renderFollowee = (data, fn) =>
-  /* eslint-disable jsx-a11y/no-static-element-interactions */
-  /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-  (<li
-    key={data.followee.id}
-    style={{ display: 'inline' }}
-    onClick={() => {
-      fn({
-        id: data.userId,
-        followee: data.followee.id,
-        info: { delete: true, id: data.followee.id },
-      });
-    }}
-  >
-    <Avatar user={data.followee} isFollowee />
+  (<li key={data.followee.id}>
+    <Button
+      onClick={() => {
+        fn({
+          id: data.userId,
+          followee: data.followee.id,
+          info: { delete: true, id: data.followee.id },
+        });
+      }}
+      plain
+    >
+      <Avatar user={data.followee} isFollowee />
+    </Button>
+
   </li>);
-/* eslint-enable jsx-a11y/no-static-element-interactions */
 
 class UserProfile extends React.Component {
   static propTypes = {
@@ -119,6 +123,7 @@ class UserProfile extends React.Component {
     const { avatar, name, surname, followees } = this.props.user;
     let uploadButton = (
       <Button
+        fill
         label={'Change image'}
         onClick={() => {
           this.setState({ showUpload: true });
@@ -132,70 +137,110 @@ class UserProfile extends React.Component {
 
     return (
       <Box wrap>
-        <Box>
-          <div>
-            <Box pad column>
-              <img className={s.avatar} src={avatar} alt="IMG" />
-              {uploadButton}
-              {this.state.showUpload &&
-                <ImageUpload
-                  uploadAvatar={(data) => {
-                    this.props.uploadAvatar({ ...data, id: this.props.user.id });
-                  }}
-                  uploadPending={updates.dataUrl && updates.dataUrl.pending}
-                  uploadError={updates.dataUrl && updates.dataUrl.error}
-                  uploadSuccess={updates.dataUrl && updates.dataUrl.success}
-                  onClose={() => {
-                    this.setState({ showUpload: false });
-                  }}
-                />}
-            </Box>
-            <h3>{name}</h3>
-            <h3>{surname}</h3>
-            <h3>{'Some Data'}</h3>
+        <Box flex>
+          <Box pad column>
+            <div style={{ display: 'inline' }}>
+              <img className={s.avatar} src={avatar} alt="IMG" style={{ display: 'block' }} />
+
+            </div>
+
+            {uploadButton}
+            {this.state.showUpload &&
+              <ImageUpload
+                uploadAvatar={(data) => {
+                  this.props.uploadAvatar({ ...data, id: this.props.user.id });
+                }}
+                uploadPending={updates.dataUrl && updates.dataUrl.pending}
+                uploadError={updates.dataUrl && updates.dataUrl.error}
+                uploadSuccess={updates.dataUrl && updates.dataUrl.success}
+                onClose={() => {
+                  this.setState({ showUpload: false });
+                }}
+              />}
+
+            <Label>{name} {surname}</Label>
             <Box pad>
-              <Value label="Followers" value={101} />
+              <Value
+                icon={
+                  <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                    <path
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      d="M12,13 C14.209139,13 16,11.209139 16,9 C16,6.790861 14.209139,5 12,5 C9.790861,5 8,6.790861 8,9 C8,11.209139 9.790861,13 12,13 Z M6,22 L6,19 C6,15.6862915 8.6862915,13 12,13 C15.3137085,13 18,15.6862915 18,19 L18,22 M13,5 C13.4037285,3.33566165 15.0151447,2 17,2 C19.172216,2 20.98052,3.790861 21,6 C20.98052,8.209139 19.172216,10 17,10 L16,10 L17,10 C20.287544,10 23,12.6862915 23,16 L23,18 M11,5 C10.5962715,3.33566165 8.98485529,2 7,2 C4.82778404,2 3.01948003,3.790861 3,6 C3.01948003,8.209139 4.82778404,10 7,10 L8,10 L7,10 C3.71245602,10 1,12.6862915 1,16 L1,18"
+                    />
+                  </svg>
+                }
+                label="Followers"
+                value={101}
+              />
               <Value
                 icon={
                   <svg
-                    version="1.1"
                     viewBox="0 0 24 24"
                     width="24px"
                     height="24px"
                     role="img"
-                    aria-label="star"
+                    aria-label="favorite"
                   >
-                    <polygon
+                    <path
                       fill="none"
                       stroke="#000"
                       strokeWidth="2"
-                      points="5 21 8 14 3 9 9 9 12 3 15 9 21 9 16 14 19 21 12 17"
+                      d="M2,8.4 C2,4 5,3 7,3 C9,3 11,5 12,6.5 C13,5 15,3 17,3 C19,3 22,4 22,8.4 C22,15 12,21 12,21 C12,21 2,15 2,8.4 Z"
                     />
                   </svg>
                 }
                 label="Likes"
                 value={999}
               />
-              <Value label="Statements" value={1337} />
+              <Value
+                icon={
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24px"
+                    height="24px"
+                    role="img"
+                    aria-label="contact"
+                  >
+                    <path
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      d="M1,2 L22,2 L22,18 L14,18 L6,22 L6,18 L1,18 L1,2 Z M6,10 L7,10 L7,11 L6,11 L6,10 Z M11,10 L12,10 L12,11 L11,11 L11,10 Z M16,10 L17,10 L17,11 L16,11 L16,10 Z"
+                    />
+                  </svg>
+                }
+                label="Statements"
+                value={1337}
+              />
             </Box>
             <div>
-              <Icon
+
+              <Label><FormattedMessage {...messages.followees} /></Label>
+              <Button
+                plain
                 icon={
-                  'M24 24.082v-1.649c2.203-1.241 4-4.337 4-7.432 0-4.971 0-9-6-9s-6 4.029-6 9c0 3.096 1.797 6.191 4 7.432v1.649c-6.784 0.555-12 3.888-12 7.918h28c0-4.030-5.216-7.364-12-7.918z M10.225 24.854c1.728-1.13 3.877-1.989 6.243-2.513-0.47-0.556-0.897-1.176-1.265-1.844-0.95-1.726-1.453-3.627-1.453-5.497 0-2.689 0-5.228 0.956-7.305 0.928-2.016 2.598-3.265 4.976-3.734-0.529-2.39-1.936-3.961-5.682-3.961-6 0-6 4.029-6 9 0 3.096 1.797 6.191 4 7.432v1.649c-6.784 0.555-12 3.888-12 7.918h8.719c0.454-0.403 0.956-0.787 1.506-1.146z'
+                  <svg viewBox="0 0 24 24" width="24px" height="24px">
+                    <path
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      d="M14,4 L20,10 L14,4 Z M22.2942268,5.29422684 C22.6840146,5.68401459 22.6812861,6.3187139 22.2864907,6.71350932 L9,20 L2,22 L4,15 L17.2864907,1.71350932 C17.680551,1.319449 18.3127724,1.31277239 18.7057732,1.70577316 L22.2942268,5.29422684 Z M3,19 L5,21 M7,17 L15,9"
+                    />
+                  </svg>
                 }
               />
-              <h3>Followees </h3>
-
               {/* eslint-disable jsx-a11y/no-static-element-interactions */}
               {followees &&
-                <ul style={{ listStyle: 'none' }}>
+                <Box wrap tag="ul" className={s.followeeContainer}>
                   {followees.map(f =>
                     renderFollowee(
                       { userId: this.props.user.id, followee: f },
                       this.props.updateUser,
                     ),
                   )}
-                </ul>}
+                </Box>}
               {/* eslint-enable jsx-a11y/no-static-element-interactions */}
 
             </div>
@@ -208,10 +253,10 @@ class UserProfile extends React.Component {
                 onClick={this.handleWPSubscription}
               />
             </FormField>
-
-          </div>
+          </Box>
         </Box>
-        <div style={{ width: '100%' }}>
+
+        <Box flex>
           <Accordion>
             <AccordionPanel heading={<FormattedMessage {...messages.settings} />}>
               <div style={{ marginTop: '1em' }}>
@@ -224,7 +269,7 @@ class UserProfile extends React.Component {
               </div>
             </AccordionPanel>
           </Accordion>
-        </div>
+        </Box>
       </Box>
     );
   }

@@ -282,6 +282,7 @@ class ProposalInput extends React.Component {
       case 'tagInput':
       case 'title':
       case 'body':
+      case 'spokesman':
       case 'pollOption': {
         value = e.target.value;
         break;
@@ -338,7 +339,7 @@ class ProposalInput extends React.Component {
   }
 
   render() {
-    const { title, body } = this.state.settings;
+    const { title, body, spokesman } = this.state.settings;
     const { titleError, bodyError, ...pollErrors } = this.visibleErrors(formFields);
     return (
       <div className={s.root}>
@@ -431,6 +432,14 @@ class ProposalInput extends React.Component {
                     currentTagIds: this.state.currentTagIds.filter(tId => tId !== id),
                   });
                 }}
+              />
+            </FormField>
+            <FormField label="Spokesman">
+              <input
+                name="spokesman"
+                type="text"
+                value={spokesman}
+                onChange={this.handleValueChanges}
               />
             </FormField>
           </div>

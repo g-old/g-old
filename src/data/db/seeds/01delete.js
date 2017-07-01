@@ -12,9 +12,7 @@ exports.seed = function (knex, Promise) {
     knex('flagged_statements')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE flagged_statements_id_seq RESTART WITH 1;')),
-
     knex('tags').del().then(() => knex.raw('ALTER SEQUENCE tags_id_seq RESTART WITH 1;')),
-
     knex('proposal_tags')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE proposal_tags_id_seq RESTART WITH 1;')),
@@ -45,5 +43,5 @@ exports.seed = function (knex, Promise) {
     Promise.resolve(console.log('deleting entries in table ... '))
   ).catch((e)=> console.log(e));
   return chain.catch((e)=>console.log(e));*/
-  return Promise.each(deleteQueue, () => console.log('deleting entries in table ... '));
+  return Promise.each(deleteQueue, () => console.info('deleting entries in table ... '));
 };

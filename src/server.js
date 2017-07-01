@@ -39,15 +39,13 @@ import { setLocale } from './actions/intl';
 import createLoaders from './data/dataLoader';
 import User from './data/models/User';
 import FileStorage, { AvatarManager } from './core/FileStorage';
-import PasswordReset from './data/models/PasswordReset';
-import VerifyEmail from './data/models/VerifyEmail';
-import { sendMail, resetLinkMail, resetSuccessMail } from './core/mailer';
 import { user as userSchema } from './store/schema';
 import config from './config';
 import worker from './core/worker';
 import BWorker, { sendJob } from './core/childProcess';
 import { getProtocol } from './core/helpers';
 import privateConfig from '../private_configs';
+import { checkToken } from './core/tokens';
 import log from './logger';
 
 worker();
@@ -143,6 +141,7 @@ app.post('/signup', (req, res) => {
       const job = {
         type: 'mail',
         data: {
+          lang: req.cookies.lang,
           mailType: 'verifyEmail',
           address: user.email,
           viewer: user,
@@ -218,30 +217,40 @@ app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
     );
 });
 
-app.post(
-  '/forgot',
-  (req, res) =>
-    PasswordReset.createToken(req.body.email)
-      .then((token) => {
-        if (!token) throw Error('Token not generated');
-        return sendMail(resetLinkMail(req.body.email.email, req.headers.host, token));
-      })
-      .then((info) => {
-        // TODO ONLY for TESTING!
-        console.info(info.envelope);
-        console.info(info.messageId);
-        console.info(info.message);
-        log.info({ req }, 'Password reset token generated');
-        res.status(200).json({ ok: true });
-      })
-      .catch((error) => {
-        log.error({ err: error, req }, 'Password reset req failed');
-        res.status(200).json({ ok: true });
-      }), // give no feedback!
-);
+app.post('/forgot', (req, res) => {
+  if (req.user) throw Error('User logged in');
+
+  return knex('users')
+    .where({ email: req.body.email })
+    .select()
+    .then((usr) => {
+      const user = usr[0];
+      if (user) {
+        const job = {
+          type: 'mail',
+          data: {
+            mailType: 'resetPassword',
+            lang: req.cookies.lang,
+            address: user.email,
+            viewer: user,
+            connection: { host: req.headers.host, protocol: getProtocol(req) },
+          },
+        };
+
+        if (!sendJob(job)) {
+          throw Error('Resetlink mail not sent!');
+        }
+      }
+    })
+    .then(() => res.status(200).json({ ok: true }))
+    .catch((err) => {
+      log.error({ err, req }, 'Password reset  failed');
+      res.status(200).json({ ok: true });
+    });
+});
 // TODO change to /reset only ?
 app.post('/reset/:token', (req, res) =>
-  PasswordReset.checkToken({ token: req.params.token }) // TODO checkToken and delete it
+  checkToken({ token: req.params.token, table: 'reset_tokens' }) // TODO checkToken and delete it
     .then((data) => {
       if (!data) throw Error('Token invalid');
       return User.update(
@@ -250,24 +259,32 @@ app.post('/reset/:token', (req, res) =>
         createLoaders(),
       );
     })
-    .then((user) => {
-      if (!user) throw Error('Update failed');
-      // TODO separate errorhandling for mail and login
-      return Promise.all([
-        sendMail(resetSuccessMail(user.email)).then(
-          (info) => {
-            // TODO ONLY for TESTING!
-            console.info(info.envelope);
-            console.info(info.messageId);
-            console.info(info.message);
+    .then((userData) => {
+      const user = userData.user;
+      if (user) {
+        if (!user) throw Error('Update failed');
+        // TODO separate errorhandling for mail and login
+
+        const job = {
+          type: 'mail',
+          data: {
+            mailType: 'resetSuccess',
+            lang: req.cookies.lang,
+            address: user.email,
+            viewer: user,
+            connection: { host: req.headers.host, protocol: getProtocol(req) },
           },
-          err => log.error({ err }, 'Mail not delivered'),
-        ),
-        new Promise((resolve, reject) => {
+        };
+        if (!sendJob(job)) {
+          log.error({ req }, 'Reset success mail not sent!');
+        }
+
+        return new Promise((resolve, reject) => {
           // eslint-disable-next-line no-confusing-arrow
           req.login(user, err => (err ? reject(err) : resolve()));
-        }),
-      ]);
+        });
+      }
+      throw Error('Could not store data');
     })
     .then(() => res.status(200).json({ user: req.user }))
     .catch((error) => {
@@ -278,7 +295,7 @@ app.post('/reset/:token', (req, res) =>
 
 app.get('/verify/:token', (req, res) => {
   // ! No check if user is logged in !
-  VerifyEmail.checkToken({ token: req.params.token })
+  checkToken({ token: req.params.token, table: 'verify_tokens' })
     .then((data) => {
       if (data) {
         return knex('users')
@@ -310,7 +327,7 @@ app.post('/verify', (req, res) =>
         const job = {
           type: 'mail',
           data: {
-            mailType: 'verifyEmail',
+            mailType: req.user.role.type === 'viewer' ? 'verifyEmail' : 'mailChanged',
             lang: req.cookies.lang,
             verify: true,
             address: user.email,

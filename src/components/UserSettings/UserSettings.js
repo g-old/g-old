@@ -297,7 +297,7 @@ class UserSettings extends React.Component {
       }
     }
 
-    const showResendBtn = !user.emailVerified && !emailSuccess && !emailPending && !showEmailInput;
+    const showResendBtn = !user.emailVerified && !emailPending && !showEmailInput;
 
     return (
       <Box column pad>
@@ -337,7 +337,8 @@ class UserSettings extends React.Component {
               label={<FormattedMessage {...messages.resend} />}
             />}
         </Box>
-        {verifySuccess &&
+        {(verifySuccess || emailSuccess) &&
+          !user.emailVerified &&
           <Notification
             type="alert"
             message={'Look in your mail account. Soon something should be there'}
