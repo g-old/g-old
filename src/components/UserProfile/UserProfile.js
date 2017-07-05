@@ -20,6 +20,7 @@ import Button from '../Button';
 import Value from '../Value';
 import Label from '../Label';
 import { isPushAvailable } from '../../core/helpers';
+import CheckBox from '../CheckBox';
 
 const messages = defineMessages({
   settings: {
@@ -59,6 +60,9 @@ class UserProfile extends React.Component {
       name: PropTypes.string,
       surname: PropTypes.string,
       avatar: PropTypes.string,
+      numStatements: PropTypes.number,
+      numFollowers: PropTypes.number,
+      numLikes: PropTypes.number,
       followees: PropTypes.arrayOf(
         PropTypes.shape({
           avatar: PropTypes.isRequired,
@@ -120,7 +124,15 @@ class UserProfile extends React.Component {
     if (!this.props.user) return null;
     const { subscription, updates } = this.props;
 
-    const { avatar, name, surname, followees } = this.props.user;
+    const {
+      avatar,
+      name,
+      surname,
+      followees,
+      numStatements,
+      numFollowers,
+      numLikes,
+    } = this.props.user;
     let uploadButton = (
       <Button
         fill
@@ -172,7 +184,7 @@ class UserProfile extends React.Component {
                   </svg>
                 }
                 label="Followers"
-                value={101}
+                value={numFollowers || 0}
               />
               <Value
                 icon={
@@ -192,7 +204,7 @@ class UserProfile extends React.Component {
                   </svg>
                 }
                 label="Likes"
-                value={999}
+                value={numLikes || 0}
               />
               <Value
                 icon={
@@ -212,7 +224,7 @@ class UserProfile extends React.Component {
                   </svg>
                 }
                 label="Statements"
-                value={1337}
+                value={numStatements || 0}
               />
             </Box>
             <div>
@@ -245,12 +257,19 @@ class UserProfile extends React.Component {
 
             </div>
             <FormField label={'WebPush'} error={subscription.error}>
-              <Button
+              {/* <Button
                 fill
                 primary={!subscription.isPushEnabled}
                 label={subscription.isPushEnabled ? 'UNSUBSCRIBEFROMPUSH' : 'SUBSCRIBEFORPUSH'}
                 disabled={this.state.disableSubscription || subscription.pending}
                 onClick={this.handleWPSubscription}
+              /> */}
+              <CheckBox
+                toggle
+                checked={subscription.isPushEnabled}
+                label={subscription.isPushEnabled ? 'ON' : 'OFF'}
+                onChange={this.handleWPSubscription}
+                disabled={this.state.disableSubscription || subscription.pending}
               />
             </FormField>
           </Box>

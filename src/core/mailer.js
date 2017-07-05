@@ -19,7 +19,9 @@ export const resetLinkMail = (email, connection, token, name) => {
     text: `Hi ${name}! \n\n
       You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
       Please click on the following link, or paste this into your browser to complete the process:\n\n
-      ${connection.protocol}://${connection.host}/reset/${token}\n\n
+      ${connection.protocol}://${connection.host}${process.env.EPORT
+      ? `:${process.env.EPORT}`
+      : ''}/reset/${token}\n\n
       If you did not request this, please ignore this email and your password will remain unchanged.\n`,
   };
 };
@@ -37,13 +39,13 @@ export const sendMail = mail =>
     console.info(info.message);
   });
 
-export const resetSuccessMail = (email, name) => {
-  if (!email || !name) throw Error('Mail details not provided');
+export const resetSuccessMail = ({ address, name }) => {
+  if (!address || !name) throw Error('Mail details not provided');
   return {
     from: mailOptions.sender || 'passwordreset@g-old.com',
-    to: email,
+    to: address,
     subject: 'Your password has been changed',
-    text: `Hello ${name},\n\n This is a confirmation that the password for your account ${email} has just been changed.\n`,
+    text: `Hello ${name},\n\n This is a confirmation that the password for your account ${address} has just been changed.\n`,
   };
 };
 
@@ -58,7 +60,10 @@ export const emailVerificationMail = (email, connection, token, name) => {
     to: email,
     subject: 'G-old Verification Link',
     text: `Hi ${name}! \n\n Thanks so much for joining GOLD. To finish signing up, you just \n need to confirm that we got your email right. \n \n
-    Please click on the following link, or paste this into your browser :\n\n ${connection.protocol}://${connection.host}/verify/${token} \n\n
+    Please click on the following link, or paste this into your browser :\n\n ${connection.protocol}://${connection.host}${process
+      .env.EPORT
+      ? `:${process.env.EPORT}`
+      : ''}/verify/${token} \n\n
     `,
   };
 };
@@ -74,7 +79,20 @@ export const emailChangedMail = (email, connection, token, name) => {
     to: email,
     subject: 'G-old Email changed',
     text: `Hi ${name}! \n\n You have changed your email address for your account on GOLD. You just \n need to confirm that we got your email right. \n \n
-    Please click on the following link, or paste this into your browser :\n\n ${connection.protocol}://${connection.host}/verify/${token} \n\n
+    Please click on the following link, or paste this into your browser :\n\n ${connection.protocol}://${connection.host}${process
+      .env.EPORT
+      ? `:${process.env.EPORT}`
+      : ''}/verify/${token} \n\n
     `,
+  };
+};
+
+export const notificationMail = ({ address, message, subject }) => {
+  if (!address || !message) throw Error('Mail details not provided');
+  return {
+    from: mailOptions.sender || 'info@g-old.com',
+    to: address,
+    subject,
+    text: message,
   };
 };

@@ -8,6 +8,7 @@ import {
   emailChangedMail,
   resetLinkMail,
   resetSuccessMail,
+  notificationMail,
 } from './mailer';
 
 const mailWithToken = async ({ address, viewer, connection, template, type }) => {
@@ -42,9 +43,10 @@ const mailWithToken = async ({ address, viewer, connection, template, type }) =>
   return result;
 };
 
-const mailNotification = async ({ address, viewer, template }) => {
+const mailNotification = async (mailData) => {
   try {
-    const mail = template(address, viewer.name);
+    const { viewer, template, ...data } = mailData;
+    const mail = template({ ...data, name: viewer.name });
     return sendMail(mail);
   } catch (err) {
     log.error({ err }, 'Sending email failed');
@@ -70,6 +72,11 @@ const handleMails = (mailData) => {
 
     case 'resetSuccess': {
       result = mailNotification({ ...mailData, template: resetSuccessMail });
+      break;
+    }
+
+    case 'notification': {
+      result = mailNotification({ ...mailData, template: notificationMail });
       break;
     }
     default: {

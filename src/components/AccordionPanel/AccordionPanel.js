@@ -7,6 +7,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './AccordionPanel.css';
 import Button from '../Button';
 import Header from '../Header2';
+import Box from '../Box';
 
 class AccordionPanel extends React.Component {
   static propTypes = {
@@ -55,9 +56,9 @@ class AccordionPanel extends React.Component {
             </div>
           </Button>
         </li>
-        <div className={cn(active ? s.open : s.closed)}>
+        <Box {...this.props} className={cn(active ? s.open : s.closed)}>
           {children}
-        </div>
+        </Box>
       </div>
     );
   }

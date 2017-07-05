@@ -157,7 +157,7 @@
     "id": "login.resetPassword",
     "description": "Help for password",
     "defaultMessage": "Forgot your password?",
-    "message": "Password vergessen?",
+    "message": "Passwort vergessen?",
     "files": [
       "src/components/Login/Login.js"
     ]
@@ -340,6 +340,7 @@
     "defaultMessage": "Set & Change Privileges",
     "message": "Rechte vergeben",
     "files": [
+      "src/components/AccountProfile/AccountProfile.js",
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
   },
@@ -550,6 +551,7 @@
     "defaultMessage": "You can't leave this empty",
     "message": "",
     "files": [
+      "src/components/AccountProfile/AccountProfile.js",
       "src/components/Login/Login.js",
       "src/components/ProposalInput/ProposalInput.js",
       "src/components/ProposalSettings/ProposalSettings.js",
@@ -728,6 +730,7 @@
     "defaultMessage": "Set & Change Roles",
     "message": "",
     "files": [
+      "src/components/AccountProfile/AccountProfile.js",
       "src/components/RoleManager/RoleManager.js"
     ]
   },

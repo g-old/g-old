@@ -3,27 +3,19 @@ import PropTypes from 'prop-types';
 import Button from '../Button';
 
 class LayerContents extends React.Component {
-  static childContextTypes = {
-    history: PropTypes.object,
-    intl: PropTypes.object,
-    onDropChange: PropTypes.func,
-    router: PropTypes.any,
-    store: PropTypes.object,
-    insertCss: PropTypes.func,
-  };
   static propTypes = {
-    context: PropTypes.shape({}).isRequired,
     children: PropTypes.element.isRequired,
     onClose: PropTypes.func.isRequired,
     className: PropTypes.string.isRequired,
+    intl: PropTypes.shape({}).isRequired,
+    insertCss: PropTypes.func.isRequired,
   };
   constructor(props, context) {
     super(props, context);
     this.state = {};
   }
   getChildContext() {
-    const { context } = this.props;
-    return { ...context };
+    return { intl: this.props.intl, insertCss: this.props.insertCss };
   }
   render() {
     const { onClose, children, className } = this.props;
@@ -59,7 +51,7 @@ class LayerContents extends React.Component {
   }
 }
 
-LayerContents.contextTypes = {
+LayerContents.childContextTypes = {
   history: PropTypes.any,
   intl: PropTypes.any,
   router: PropTypes.any,

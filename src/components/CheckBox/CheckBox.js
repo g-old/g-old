@@ -12,18 +12,18 @@ class CheckBox extends React.Component {
     label: PropTypes.node,
     name: PropTypes.string,
     onChange: PropTypes.func,
+    toggle: PropTypes.bool,
   };
   static defaultProps = {
     checked: false,
     disabled: false,
     label: 'No label',
-    onChange: () => {
-      alert('Changed');
-    },
+    onChange: null,
     name: 'name',
+    toggle: false,
   };
   render() {
-    const { checked, disabled, name, label, onChange } = this.props;
+    const { checked, disabled, name, label, onChange, toggle } = this.props;
 
     const labelNode = (
       <span key="label" htmlFor={name} className={s.label}>
@@ -57,7 +57,7 @@ class CheckBox extends React.Component {
 
     return (
       /* eslint-disable jsx-a11y/label-has-for */
-      <label className={cn(s.checkbox, disabled ? s.disabled : null)}>
+      <label className={cn(s.checkBox, disabled ? s.disabled : null, toggle ? s.toggle : null)}>
 
         {children}
         {hidden}

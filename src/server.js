@@ -105,9 +105,9 @@ app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
 
-if (__DEV__) {
-  app.enable('trust proxy');
-}
+// if (__DEV__) {
+app.enable('trust proxy');
+// }
 
 app.post(
   '/',

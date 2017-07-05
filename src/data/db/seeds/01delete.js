@@ -16,9 +16,6 @@ exports.seed = function (knex, Promise) {
     knex('proposal_tags')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE proposal_tags_id_seq RESTART WITH 1;')),
-    knex('password_resets')
-      .del()
-      .then(() => knex.raw('ALTER SEQUENCE password_resets_id_seq RESTART WITH 1;')),
     knex('user_follows')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE user_follows_id_seq RESTART WITH 1;')),

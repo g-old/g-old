@@ -340,6 +340,7 @@
     "defaultMessage": "Set & Change Privileges",
     "message": "",
     "files": [
+      "src/components/AccountProfile/AccountProfile.js",
       "src/components/PrivilegeManager/PrivilegeManager.js"
     ]
   },
@@ -538,6 +539,7 @@
     "defaultMessage": "You can't leave this empty",
     "message": "",
     "files": [
+      "src/components/AccountProfile/AccountProfile.js",
       "src/components/Login/Login.js",
       "src/components/ProposalInput/ProposalInput.js",
       "src/components/ProposalSettings/ProposalSettings.js",
@@ -716,6 +718,7 @@
     "defaultMessage": "Set & Change Roles",
     "message": "",
     "files": [
+      "src/components/AccountProfile/AccountProfile.js",
       "src/components/RoleManager/RoleManager.js"
     ]
   },

@@ -90,7 +90,6 @@ class PrivilegeManager extends React.Component {
     privilege: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
-    className: PropTypes.string.isRequired,
     updates: PropTypes.shape({ error: PropTypes.bool, pending: PropTypes.bool }),
   };
 
@@ -146,29 +145,25 @@ class PrivilegeManager extends React.Component {
   }
   render() {
     const { updates } = this.props;
-    const privileges = (
-      <Box column className={this.props.className}>
-        {Object.keys(PRIVILEGES).map((p) => {
-          if (p === 'none') {
-            return null;
-          }
-          return (
-            <CheckBox
-              disabled={updates && updates.pending}
-              label={<FormattedMessage {...messages[p]} />}
-              checked={this.state[p]}
-              onChange={this.onChange}
-              name={p}
-            />
-          );
-        })}
-      </Box>
-    );
+
     const error = this.state.error && <FormattedMessage {...messages.error} />;
     return (
       <Box column pad>
         <FormField error={error} label={<FormattedMessage {...messages.header} />}>
-          {privileges}
+          {Object.keys(PRIVILEGES).map((p) => {
+            if (p === 'none') {
+              return null;
+            }
+            return (
+              <CheckBox
+                disabled={updates && updates.pending}
+                label={<FormattedMessage {...messages[p]} />}
+                checked={this.state[p]}
+                onChange={this.onChange}
+                name={p}
+              />
+            );
+          })}
         </FormField>
 
       </Box>

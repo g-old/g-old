@@ -46,7 +46,6 @@ class RoleManager extends React.Component {
     accountRole: PropTypes.string.isRequired,
     accountId: PropTypes.string.isRequired,
     updateFn: PropTypes.func.isRequired,
-    className: PropTypes.string.isRequired,
     updates: PropTypes.shape({ error: PropTypes.bool, pending: PropTypes.bool }),
   };
   static defaultProps = {
@@ -81,7 +80,7 @@ class RoleManager extends React.Component {
   availableRoles = [];
   render() {
     let promoteButton = null;
-    const { userRole, className, updates } = this.props;
+    const { userRole, updates } = this.props;
     if (!['admin', 'mod'].includes(userRole)) {
       promoteButton = (
         <Button
@@ -91,28 +90,21 @@ class RoleManager extends React.Component {
       );
     }
 
-    let checkBoxes = null;
-    if (!promoteButton) {
-      checkBoxes = (
-        <Box className={className} column>
-          {this.availableRoles.map(r =>
-            (<CheckBox
-              label={r}
-              disabled={updates && updates.pending}
-              checked={this.state[r]}
-              onChange={this.onChange}
-              name={r}
-            />),
-          )}
-        </Box>
-      );
-    }
     const error = this.state.error && <FormattedMessage {...messages.error} />;
     return (
       <Box column pad>
         {promoteButton}
         <FormField label={<FormattedMessage {...messages.header} />} error={error}>
-          {checkBoxes}
+          {!promoteButton &&
+            this.availableRoles.map(r =>
+              (<CheckBox
+                label={r}
+                disabled={updates && updates.pending}
+                checked={this.state[r]}
+                onChange={this.onChange}
+                name={r}
+              />),
+            )}
         </FormField>
 
       </Box>

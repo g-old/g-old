@@ -18,6 +18,11 @@
   transform: translate(50%, 50%);
 }
 
+.hidden {
+  width: 100%;
+  position: fixed;
+}
+
 .layer .container {
   position: absolute;
   max-height: 100%;

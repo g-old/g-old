@@ -7,6 +7,8 @@ import {
   GraphQLInt,
 } from 'graphql';
 
+import knex from '../knex';
+
 import RoleType from './RoleType';
 import Role from '../models/Role';
 import User from '../models/User';
@@ -51,6 +53,46 @@ const UserType = new ObjectType({
             ids.map(id => User.gen(viewer, id, loaders)),
           ),
         ),
+    },
+
+    numFollowers: {
+      type: GraphQLInt,
+      resolve: (data, args, { viewer }) => {
+        if (viewer) {
+          return knex('user_follows')
+            .where({ followee_id: data.id })
+            .count('id')
+            .then(countData => Number(countData[0].count));
+        }
+        return 0;
+      },
+    },
+
+    numStatements: {
+      type: GraphQLInt,
+      resolve: (data, args, { viewer }) => {
+        if (viewer) {
+          return knex('statements')
+            .where({ author_id: data.id })
+            .count('id')
+            .then(countData => Number(countData[0].count));
+        }
+        return 0;
+      },
+    },
+
+    numLikes: {
+      type: GraphQLInt,
+      resolve: (data, args, { viewer }) => {
+        if (viewer) {
+          return knex('statements')
+            .where({ author_id: data.id })
+            .innerJoin('statement_likes', 'statement_id', 'statements.id')
+            .count('statement_likes.id')
+            .then(countData => Number(countData[0].count));
+        }
+        return 0;
+      },
     },
   }),
 });

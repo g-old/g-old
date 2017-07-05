@@ -45,6 +45,9 @@ query ($id:ID!) {
     lastLogin
     emailVerified
     email
+    numStatements
+    numFollowers
+    numLikes
     followees{
       ${userFields}
     }

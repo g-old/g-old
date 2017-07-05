@@ -13,10 +13,26 @@ import RoleManager from '../RoleManager';
 import { PRIVILEGES } from '../../constants';
 import ImageUpload from '../ImageUpload';
 import { uploadAvatar } from '../../actions/file';
+import { notifyUser } from '../../actions/notifications';
 import Button from '../Button';
 import Layer from '../Layer';
+import FormField from '../FormField';
+import CheckBox from '../CheckBox';
+import { nameValidation, createValidator } from '../../core/validation';
+import Box from '../Box';
 
+const formFields = ['subject', 'notificationText'];
 const messages = defineMessages({
+  headerPrivilege: {
+    id: 'privilege.header',
+    defaultMessage: 'Set & Change Privileges',
+    description: 'Header of privilegemanager',
+  },
+  headerRole: {
+    id: 'roles.header',
+    defaultMessage: 'Set & Change Roles',
+    description: 'Header of rolesemanager',
+  },
   role: {
     id: 'account.role',
     defaultMessage: 'Role',
@@ -53,6 +69,11 @@ const messages = defineMessages({
     defaultMessage: 'Delete account',
     description: 'Deleting the account',
   },
+  empty: {
+    id: 'form.error-empty',
+    defaultMessage: "You can't leave this empty",
+    description: 'Help for empty fields',
+  },
 });
 const checkAvatar = url => url && url.indexOf('http') === -1;
 
@@ -82,15 +103,46 @@ class AccountProfile extends React.Component {
     uploadAvatar: PropTypes.func.isRequired,
     updates: PropTypes.shape({ dataUrl: PropTypes.string }).isRequired,
     onClose: PropTypes.func.isRequired,
+    notifyUser: PropTypes.func.isRequired,
   };
 
   constructor(props) {
     super(props);
     this.props.fetchUser({ id: props.accountId });
     this.onPromoteToViewer = this.onPromoteToViewer.bind(this);
+    this.handleValueChange = this.handleValueChange.bind(this);
+    this.handleNotification = this.handleNotification.bind(this);
+    this.handleBlur = this.handleBlur.bind(this);
+    this.visibleErrors = this.visibleErrors.bind(this);
+    this.handleNotification = this.handleNotification.bind(this);
     this.state = {
+      subject: '',
+      notificationText: '',
       showUpload: false,
+      errors: {
+        subject: {
+          touched: false,
+        },
+        notificationText: {
+          touched: false,
+        },
+      },
     };
+    const testValues = {
+      subject: { fn: 'text' },
+      notificationText: { fn: 'text' },
+      name: { fn: 'name' },
+      surname: { fn: 'name' },
+      email: { fn: 'email' },
+    };
+    this.Validator = createValidator(
+      testValues,
+      {
+        text: nameValidation,
+      },
+      this,
+      obj => obj.state,
+    );
   }
 
   componentDidMount(props) {
@@ -111,7 +163,38 @@ class AccountProfile extends React.Component {
       this.props.update({ id: this.props.accountData.id, role: 'viewer' });
     }
   }
+  handleValidation(fields) {
+    const validated = this.Validator(fields);
+    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
+    return validated.failed === 0;
+  }
+  handleValueChange(e) {
+    this.setState({ [e.target.name]: e.target.value });
+  }
+  handleBlur(e) {
+    const field = e.target.name;
+    if (this.state[field]) {
+      this.handleValidation([field]);
+    }
+  }
+  handleNotification() {
+    if (this.handleValidation(formFields)) {
+      const message = this.state.notificationText.trim();
+      const subject = this.state.subject ? this.state.subject.trim() : null;
+      const receiverId = this.props.accountData.id;
+      this.props.notifyUser({ message, subject, type: 'email', receiverId });
+    }
+  }
 
+  visibleErrors(errorNames) {
+    return errorNames.reduce((acc, curr) => {
+      const err = `${curr}Error`;
+      if (this.state.errors[curr].touched) {
+        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+      }
+      return acc;
+    }, {});
+  }
   render() {
     const { updates, accountData, user } = this.props;
     if (!accountData) {
@@ -124,7 +207,6 @@ class AccountProfile extends React.Component {
       PrivilegePanel = (
         <PrivilegeManager
           updates={updates.privilege}
-          className={s.checks}
           updateFn={this.props.update}
           privilege={privilege}
           id={id}
@@ -132,9 +214,11 @@ class AccountProfile extends React.Component {
       );
     }
     const avatarSet = checkAvatar(avatar);
+
+    const { subjectError, notificationTextError } = this.visibleErrors(formFields);
     return (
       <Layer onClose={this.props.onClose}>
-        <div>
+        <Box flex column>
           <img className={s.avatar} src={avatar} alt="IMG" />
           <Button
             label={'Change image'}
@@ -172,38 +256,51 @@ class AccountProfile extends React.Component {
             <div>
               <FormattedMessage {...messages.lastLogin} /> : {lastLogin || 'No Data'}
             </div>
-
-            <p>
-              <RoleManager
-                className={s.checks}
-                updates={updates.role}
-                accountId={id}
-                updateFn={this.props.update}
-                userRole={this.props.user.role.type}
-                accountRole={role.type}
-              />
-              {PrivilegePanel}
-              <Accordion>
-
-                <AccordionPanel heading={'Notify user'}>
-                  {'If you see this, you can notify users'} <br />
-
-                  WRITE
-                  <textarea />
-                  <p>
-                    <Button
-                      onClick={() => {
-                        alert('TO IMPLEMENT! \n mail, sms, accountmsg, messenger ?');
-                      }}
-                      label={<FormattedMessage {...messages.notify} />}
-                    />
-
-                  </p>
-                </AccordionPanel>
-              </Accordion>
-            </p>
           </div>
-        </div>
+        </Box>
+        <Box flex column>
+
+          <Accordion>
+            <RoleManager
+              updates={updates.role}
+              accountId={id}
+              updateFn={this.props.update}
+              userRole={this.props.user.role.type}
+              accountRole={role.type}
+            />
+
+            {PrivilegePanel}
+
+            <AccordionPanel column pad heading={'Notify user'}>
+              <CheckBox checked label="Email" disabled />
+              <fieldset>
+                <FormField label="Subject" error={subjectError}>
+                  <input
+                    name="subject"
+                    type="text"
+                    onBlur={this.handleBlur}
+                    value={this.state.subject}
+                    onChange={this.handleValueChange}
+                  />
+                </FormField>
+                <FormField label="Text" error={notificationTextError}>
+                  <textarea
+                    name="notificationText"
+                    onBlur={this.handleBlur}
+                    value={this.state.notificationText}
+                    onChange={this.handleValueChange}
+                  />
+                </FormField>
+              </fieldset>
+              <Button
+                fill
+                onClick={this.handleNotification}
+                label={<FormattedMessage {...messages.notify} />}
+              />
+            </AccordionPanel>
+          </Accordion>
+        </Box>
+
       </Layer>
     );
   }
@@ -215,5 +312,6 @@ const mapStateToProps = (state, { accountId }) => ({
 const mapDispatch = {
   fetchUser,
   uploadAvatar,
+  notifyUser,
 };
 export default connect(mapStateToProps, mapDispatch)(withStyles(s)(AccountProfile));

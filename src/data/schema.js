@@ -41,6 +41,7 @@ import proposalConnection from './queries/proposalConnection';
 import flagConnection from './queries/flagConnection';
 import createPushSub from './mutations/createPushSub';
 import deletePushSub from './mutations/deletePushSub';
+import notify from './mutations/sendNotification';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -83,6 +84,7 @@ const schema = new Schema({
       solveFlag,
       createPushSub,
       deletePushSub,
+      notify,
     },
   }),
 });
