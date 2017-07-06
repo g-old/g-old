@@ -17,6 +17,9 @@ import {
   CREATE_VEMAIL_START,
   CREATE_VEMAIL_SUCCESS,
   CREATE_VEMAIL_ERROR,
+  SEND_NOTIFICATION_START,
+  SEND_NOTIFICATION_SUCCESS,
+  SEND_NOTIFICATION_ERROR,
 } from '../../constants';
 
 import { getErrors, getSuccessState } from '../../core/helpers';
@@ -28,6 +31,7 @@ const users = (state = {}, action) => {
     case UPLOAD_AVATAR_START:
     case RESET_PASSWORD_START:
     case UPDATE_USER_START:
+    case SEND_NOTIFICATION_START:
     case CREATE_VEMAIL_START: {
       return {
         ...state,
@@ -43,6 +47,7 @@ const users = (state = {}, action) => {
     case SESSION_LOGIN_ERROR:
     case UPLOAD_AVATAR_ERROR:
     case UPDATE_USER_ERROR:
+    case SEND_NOTIFICATION_ERROR:
     case CREATE_VEMAIL_ERROR: {
       const current = state[action.id];
       const newState = getErrors(current, action);
@@ -59,6 +64,7 @@ const users = (state = {}, action) => {
     case CREATE_USER_SUCCESS:
     case SESSION_LOGIN_SUCCESS:
     case UPLOAD_AVATAR_SUCCESS:
+    case SEND_NOTIFICATION_SUCCESS:
     case CREATE_VEMAIL_SUCCESS: {
       const id = action.id; // Is initial id!
       const current = state[id];

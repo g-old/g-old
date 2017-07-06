@@ -21,6 +21,8 @@ import Value from '../Value';
 import Label from '../Label';
 import { isPushAvailable } from '../../core/helpers';
 import CheckBox from '../CheckBox';
+import ProfilePicture from '../ProfilePicture';
+import { ICONS } from '../../constants';
 
 const messages = defineMessages({
   settings: {
@@ -35,19 +37,26 @@ const messages = defineMessages({
   },
 });
 
-const renderFollowee = (data, fn) =>
+const renderFollowee = (data, fn, del) =>
   (<li key={data.followee.id}>
     <Button
+      disabled={!del}
       onClick={() => {
-        fn({
-          id: data.userId,
-          followee: data.followee.id,
-          info: { delete: true, id: data.followee.id },
-        });
+        if (del) {
+          fn({
+            id: data.userId,
+            followee: data.followee.id,
+            info: { delete: true, id: data.followee.id },
+          });
+        }
       }}
       plain
     >
       <Avatar user={data.followee} isFollowee />
+      {del &&
+        <svg viewBox="0 0 24 24" width="24px" height="24px">
+          <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.delete} />
+        </svg>}
     </Button>
 
   </li>);
@@ -89,7 +98,7 @@ class UserProfile extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { showUpload: false, disableSubscription: true };
+    this.state = { showUpload: false, disableSubscription: true, editFollowees: false };
     this.handleWPSubscription = this.handleWPSubscription.bind(this);
   }
 
@@ -133,30 +142,20 @@ class UserProfile extends React.Component {
       numFollowers,
       numLikes,
     } = this.props.user;
-    let uploadButton = (
-      <Button
-        fill
-        label={'Change image'}
-        onClick={() => {
-          this.setState({ showUpload: true });
-        }}
-        disabled={this.state.showUpload}
-      />
-    );
-    if (updates.dataUrl && updates.dataUrl.success) {
-      uploadButton = null;
-    }
 
     return (
       <Box wrap>
         <Box flex>
           <Box pad column>
-            <div style={{ display: 'inline' }}>
-              <img className={s.avatar} src={avatar} alt="IMG" style={{ display: 'block' }} />
+            <ProfilePicture
+              img={avatar}
+              canChange
+              onChange={() => {
+                this.setState({ showUpload: true });
+              }}
+              updates={updates.dataUrl}
+            />
 
-            </div>
-
-            {uploadButton}
             {this.state.showUpload &&
               <ImageUpload
                 uploadAvatar={(data) => {
@@ -228,7 +227,6 @@ class UserProfile extends React.Component {
               />
             </Box>
             <div>
-
               <Label><FormattedMessage {...messages.followees} /></Label>
               <Button
                 plain
@@ -242,6 +240,9 @@ class UserProfile extends React.Component {
                     />
                   </svg>
                 }
+                onClick={() => {
+                  this.setState({ editFollowees: !this.state.editFollowees });
+                }}
               />
               {/* eslint-disable jsx-a11y/no-static-element-interactions */}
               {followees &&
@@ -250,6 +251,7 @@ class UserProfile extends React.Component {
                     renderFollowee(
                       { userId: this.props.user.id, followee: f },
                       this.props.updateUser,
+                      this.state.editFollowees,
                     ),
                   )}
                 </Box>}

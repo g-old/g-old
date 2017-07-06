@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import s from './AccountProfile.css';
 import { fetchUser } from '../../actions/user';
 import { getUser, getAccountUpdates } from '../../reducers';
 import Accordion from '../Accordion';
@@ -19,6 +17,7 @@ import Layer from '../Layer';
 import FormField from '../FormField';
 import CheckBox from '../CheckBox';
 import { nameValidation, createValidator } from '../../core/validation';
+import ProfilePicture from '../ProfilePicture';
 import Box from '../Box';
 
 const formFields = ['subject', 'notificationText'];
@@ -101,7 +100,10 @@ class AccountProfile extends React.Component {
       role: PropTypes.shape({ type: PropTypes.string }),
     }).isRequired,
     uploadAvatar: PropTypes.func.isRequired,
-    updates: PropTypes.shape({ dataUrl: PropTypes.string }).isRequired,
+    updates: PropTypes.shape({
+      dataUrl: PropTypes.string,
+      notification: PropTypes.shape({ success: PropTypes.bool, pending: PropTypes.bool }),
+    }).isRequired,
     onClose: PropTypes.func.isRequired,
     notifyUser: PropTypes.func.isRequired,
   };
@@ -156,6 +158,9 @@ class AccountProfile extends React.Component {
     }
     if (updates.dataUrl && updates.dataUrl.success) {
       this.setState({ showUpload: false });
+    }
+    if (updates.notification && updates.notification.success) {
+      this.setState({ notificationText: '', subject: '' });
     }
   }
   onPromoteToViewer() {
@@ -219,14 +224,15 @@ class AccountProfile extends React.Component {
     return (
       <Layer onClose={this.props.onClose}>
         <Box flex column>
-          <img className={s.avatar} src={avatar} alt="IMG" />
-          <Button
-            label={'Change image'}
-            onClick={() => {
+          <ProfilePicture
+            img={avatar}
+            canChange
+            onChange={() => {
               this.setState({ showUpload: true });
             }}
-            disabled={this.state.showUpload}
+            updates={updates.dataUrl}
           />
+
           {this.state.showUpload &&
             <ImageUpload
               uploadAvatar={(data) => {
@@ -294,7 +300,9 @@ class AccountProfile extends React.Component {
               </fieldset>
               <Button
                 fill
+                primary
                 onClick={this.handleNotification}
+                pending={this.props.updates.notification && this.props.updates.notification.pending}
                 label={<FormattedMessage {...messages.notify} />}
               />
             </AccordionPanel>
@@ -314,4 +322,4 @@ const mapDispatch = {
   uploadAvatar,
   notifyUser,
 };
-export default connect(mapStateToProps, mapDispatch)(withStyles(s)(AccountProfile));
+export default connect(mapStateToProps, mapDispatch)(AccountProfile);

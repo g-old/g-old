@@ -22,7 +22,7 @@ export const databaseUrl = process.env.DATABASE_URL || 'sqlite:database.sqlite';
 */
 module.exports = {
   // default locale is the first one
-  locales: ['de-DE', 'it-IT'],
+  locales: ['de-DE', 'it-IT', 'lld-IT'],
 
   // Node.js app
   port: process.env.PORT || 3000,
@@ -56,14 +56,17 @@ module.exports = {
 
     // https://cloud.google.com/console/project
     google: {
-      id: process.env.GOOGLE_CLIENT_ID || '251410730550-ahcg0ou5mgfhl8hlui1urru7jn5s12km.apps.googleusercontent.com',
+      id:
+        process.env.GOOGLE_CLIENT_ID ||
+          '251410730550-ahcg0ou5mgfhl8hlui1urru7jn5s12km.apps.googleusercontent.com',
       secret: process.env.GOOGLE_CLIENT_SECRET || 'Y8yR9yZAhm9jQ8FKAL8QIEcd',
     },
 
     // https://apps.twitter.com/
     twitter: {
       key: process.env.TWITTER_CONSUMER_KEY || 'Ie20AZvLJI2lQD5Dsgxgjauns',
-      secret: process.env.TWITTER_CONSUMER_SECRET || 'KTZ6cxoKnEakQCeSpZlaUCJWGAlTEBJj0y2EMkUBujA7zWSvaQ',
+      secret:
+        process.env.TWITTER_CONSUMER_SECRET || 'KTZ6cxoKnEakQCeSpZlaUCJWGAlTEBJj0y2EMkUBujA7zWSvaQ',
     },
   },
 };

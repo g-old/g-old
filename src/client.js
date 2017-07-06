@@ -17,13 +17,14 @@ import { createPath } from 'history/PathUtils';
 import { addLocaleData } from 'react-intl';
 import de from 'react-intl/locale-data/de';
 import it from 'react-intl/locale-data/it';
+import lld from './locales/lld';
 import App from './components/App';
 import createFetch from './createFetch';
 import configureStore from './store/configureStore';
 import { updateMeta } from './DOMUtils';
 import history from './history';
 
-[de, it].forEach(addLocaleData);
+[de, it, lld].forEach(addLocaleData);
 // Initialize a new Redux store
 // http://redux.js.org/docs/basics/UsageWithReact.html
 const fetch = createFetch({

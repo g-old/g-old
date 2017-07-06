@@ -10,12 +10,13 @@ function LanguageSwitcher({ currentLocale, availableLocales, setLocale }) {
   const localeDict = {
     'de-DE': 'Deutsch',
     'it-IT': 'Italiano',
+    'lld-IT': 'Ladin',
   };
   const localeName = locale => localeDict[locale] || locale;
   return (
     <div>
-      {availableLocales.map(locale => (
-        <span key={locale}>
+      {availableLocales.map(locale =>
+        (<span key={locale}>
           {isSelected(locale)
             ? <span>{localeName(locale)}</span>
             : // github.com/yannickcr/eslint-plugin-react/issues/945
@@ -30,8 +31,8 @@ function LanguageSwitcher({ currentLocale, availableLocales, setLocale }) {
                 {localeName(locale)}
               </a>}
           {' '}
-        </span>
-      ))}
+        </span>),
+      )}
     </div>
   );
 }

@@ -145,7 +145,7 @@ app.post('/signup', (req, res) => {
           mailType: 'verifyEmail',
           address: user.email,
           viewer: user,
-          connection: { host: req.headers.host, protocol: getProtocol(req) },
+          connection: { host: req.hostname, protocol: getProtocol(req) },
         },
       };
       if (!sendJob(job)) {
@@ -233,7 +233,7 @@ app.post('/forgot', (req, res) => {
             lang: req.cookies.lang,
             address: user.email,
             viewer: user,
-            connection: { host: req.headers.host, protocol: getProtocol(req) },
+            connection: { host: req.hostname, protocol: getProtocol(req) },
           },
         };
 
@@ -272,7 +272,7 @@ app.post('/reset/:token', (req, res) =>
             lang: req.cookies.lang,
             address: user.email,
             viewer: user,
-            connection: { host: req.headers.host, protocol: getProtocol(req) },
+            connection: { host: req.hostname, protocol: getProtocol(req) },
           },
         };
         if (!sendJob(job)) {
@@ -332,7 +332,7 @@ app.post('/verify', (req, res) =>
             verify: true,
             address: user.email,
             viewer: user,
-            connection: { host: req.headers.host, protocol: getProtocol(req) },
+            connection: { host: req.hostname, protocol: getProtocol(req) },
           },
         };
         if (!sendJob(job)) {
