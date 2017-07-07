@@ -1,6 +1,12 @@
 /* eslint-disable import/prefer-default-export */
 
-import { SET_LOCALE_START, SET_LOCALE_SUCCESS, SET_LOCALE_ERROR } from '../constants';
+import { IntlProvider } from "react-intl";
+
+import {
+  SET_LOCALE_START,
+  SET_LOCALE_SUCCESS,
+  SET_LOCALE_ERROR
+} from "../constants";
 
 const query = `
   query ($locale:String!) {
@@ -11,30 +17,44 @@ const query = `
   }
 `;
 
+function getIntlFromState(state) {
+  const intl = (state && state.intl) || {};
+  const { initialNow, locale, messages } = intl;
+  const localeMessages = (messages && messages[locale]) || {};
+  const provider = new IntlProvider({
+    initialNow,
+    locale,
+    messages: localeMessages,
+    defaultLocale: "de-DE"
+  });
+  return provider.getChildContext().intl;
+}
+
+export function getIntl() {
+  return (dispatch, getState) => getIntlFromState(getState());
+}
+
 export function setLocale({ locale }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: SET_LOCALE_START,
       payload: {
-        locale,
-      },
+        locale
+      }
     });
 
     try {
       const { data } = await graphqlRequest(query, { locale });
-      const messages = data.intl.reduce(
-        (msgs, msg) => {
-          msgs[msg.id] = msg.message; // eslint-disable-line no-param-reassign
-          return msgs;
-        },
-        {},
-      );
+      const messages = data.intl.reduce((msgs, msg) => {
+        msgs[msg.id] = msg.message; // eslint-disable-line no-param-reassign
+        return msgs;
+      }, {});
       dispatch({
         type: SET_LOCALE_SUCCESS,
         payload: {
           locale,
-          messages,
-        },
+          messages
+        }
       });
 
       // remember locale for every new request
@@ -43,17 +63,18 @@ export function setLocale({ locale }) {
         document.cookie = `lang=${locale};path=/;max-age=${maxAge}`;
         history.push(`?lang=${locale}`);
       }
+
+      // return bound intl instance at the end
+      return getIntlFromState(getState());
     } catch (error) {
       dispatch({
         type: SET_LOCALE_ERROR,
         payload: {
           locale,
-          error,
-        },
+          error
+        }
       });
-      return false;
+      return null;
     }
-
-    return true;
   };
 }

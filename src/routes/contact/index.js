@@ -8,12 +8,16 @@
  */
 
 import React from 'react';
-import ErrorPage from './ErrorPage';
+import Layout from '../../components/Layout';
+import Contact from './Contact';
+
+const title = 'Contact Us';
 
 function action() {
   return {
-    title: 'Demo Error',
-    component: <ErrorPage />,
+    chunks: ['contact'],
+    title,
+    component: <Layout><Contact title={title} /></Layout>,
   };
 }
 

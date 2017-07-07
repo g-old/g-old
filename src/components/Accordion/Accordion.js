@@ -43,7 +43,6 @@ class Accordion extends React.Component {
   onPanelChange(index) {
     let active = [...this.state.active];
     const { onActive, openMulti } = this.props;
-
     const activeIndex = active.indexOf(index);
     if (activeIndex > -1) {
       active.splice(activeIndex, 1);
@@ -69,7 +68,8 @@ class Accordion extends React.Component {
       React.cloneElement(child, {
         active: this.state.active.indexOf(index) > -1,
         onChange: () => this.onPanelChange(index),
-      }));
+      }),
+    );
 
     return (
       <ul className={s.list}>

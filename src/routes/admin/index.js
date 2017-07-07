@@ -7,29 +7,26 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React from 'react';
-import Layout from '../../components/Layout';
-import { getSessionUser } from '../../reducers';
+import React from "react";
+import Layout from "../../components/Layout";
+import { getSessionUser } from "../../reducers";
+import Admin from "./Admin";
 
-const title = 'Admin Page';
+const title = "Admin Page";
 
-export default {
-  path: '/admin/',
+async function action({ store, path }) {
+  const user = getSessionUser(store.getState());
+  if (!user) {
+    return { redirect: `/?redirect=${path}` };
+  } else if (!["admin", "mod"].includes(user.role.type)) {
+    return { component: <div> You have to login as admin or mod!</div> };
+  }
 
-  async action({ store, path }) {
-    const user = getSessionUser(store.getState());
-    if (!user) {
-      return { redirect: `/?redirect=${path}` };
-    } else if (!['admin', 'mod'].includes(user.role.type)) {
-      return { component: <div> You have to login as admin or mod!</div> };
-    }
+  return {
+    title,
+    chunks: ["admin"],
+    component: <Layout><Admin title={title} /></Layout>
+  };
+}
 
-    const Admin = await require.ensure([], require => require('./Admin').default, 'admin');
-
-    return {
-      title,
-      chunk: 'admin',
-      component: <Layout><Admin title={title} /></Layout>,
-    };
-  },
-};
+export default action;

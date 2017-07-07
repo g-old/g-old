@@ -7,28 +7,36 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import ErrorReporter from 'redbox-react';
-import deepForceUpdate from 'react-deep-force-update';
-import FastClick from 'fastclick';
-import queryString from 'query-string';
-import { createPath } from 'history/PathUtils';
-import { addLocaleData } from 'react-intl';
-import de from 'react-intl/locale-data/de';
-import it from 'react-intl/locale-data/it';
-import lld from './locales/lld';
-import App from './components/App';
-import createFetch from './createFetch';
-import configureStore from './store/configureStore';
-import { updateMeta } from './DOMUtils';
-import history from './history';
+import "whatwg-fetch";
+import React from "react";
+import ReactDOM from "react-dom";
+import deepForceUpdate from "react-deep-force-update";
+import queryString from "query-string";
+import { createPath } from "history/PathUtils";
+import { addLocaleData } from "react-intl";
+import de from "react-intl/locale-data/de";
+import it from "react-intl/locale-data/it";
+import lld from "./locales/lld";
+import App from "./components/App";
+import createFetch from "./createFetch";
+import configureStore from "./store/configureStore";
+import { updateMeta } from "./DOMUtils";
+import history from "./history";
+import router from "./router";
+import { getIntl } from "./actions/intl";
 
-[de, it, lld].forEach(addLocaleData);
-// Initialize a new Redux store
-// http://redux.js.org/docs/basics/UsageWithReact.html
-const fetch = createFetch({
-  baseUrl: window.App.apiUrl,
+/* @intl-code-template addLocaleData(${lang}); */
+addLocaleData(de);
+addLocaleData(it);
+addLocaleData(lld);
+
+/* @intl-code-template-end */
+
+/* eslint-disable global-require */
+
+// Universal HTTP client
+const fetch = createFetch(self.fetch, {
+  baseUrl: window.App.apiUrl
 });
 const store = configureStore(window.App.state, { history, fetch });
 
@@ -50,22 +58,24 @@ const context = {
   storeSubscription: null,
   // Universal HTTP client
   fetch,
+  // intl instance as it can be get with injectIntl
+  intl: store.dispatch(getIntl())
 };
 
 // Switch off the native scroll restoration behavior and handle it manually
 // https://developers.google.com/web/updates/2015/09/history-api-scroll-restoration
 const scrollPositionsHistory = {};
-if (window.history && 'scrollRestoration' in window.history) {
-  window.history.scrollRestoration = 'manual';
+if (window.history && "scrollRestoration" in window.history) {
+  window.history.scrollRestoration = "manual";
 }
 
 let onRenderComplete = function initialRenderComplete() {
-  const elem = document.getElementById('css');
+  const elem = document.getElementById("css");
   if (elem) elem.parentNode.removeChild(elem);
   onRenderComplete = function renderComplete(route, location) {
     document.title = route.title;
 
-    updateMeta('description', route.description);
+    updateMeta("description", route.description);
     // Update necessary tags in <head> at runtime here, ie:
     // updateMeta('keywords', route.keywords);
     // updateCustomMeta('og:url', route.canonicalUrl);
@@ -97,31 +107,29 @@ let onRenderComplete = function initialRenderComplete() {
     // Google Analytics tracking. Don't send 'pageview' event after
     // the initial rendering, as it was already sent
     if (window.ga) {
-      window.ga('send', 'pageview', createPath(location));
+      window.ga("send", "pageview", createPath(location));
     }
   };
 };
 
-// Make taps on links and buttons work fast on mobiles
-FastClick.attach(document.body);
-
-const container = document.getElementById('app');
+const container = document.getElementById("app");
 let appInstance;
 let currentLocation = history.location;
-let router = require('./router').default;
 
 // Re-render the app when window.location changes
 async function onLocationChange(location, action) {
   // Remember the latest scroll position for the previous location
   scrollPositionsHistory[currentLocation.key] = {
     scrollX: window.pageXOffset,
-    scrollY: window.pageYOffset,
+    scrollY: window.pageYOffset
   };
   // Delete stored scroll position for next page if any
-  if (action === 'PUSH') {
+  if (action === "PUSH") {
     delete scrollPositionsHistory[location.key];
   }
   currentLocation = location;
+
+  context.intl = store.dispatch(getIntl());
 
   try {
     // Traverses the list of routes in the order they are defined until
@@ -131,7 +139,7 @@ async function onLocationChange(location, action) {
       ...context,
       path: location.pathname,
       query: queryString.parse(location.search),
-      locale: store.getState().intl.locale,
+      locale: store.getState().intl.locale
     });
 
     // Prevent multiple page renders during the routing process
@@ -144,15 +152,13 @@ async function onLocationChange(location, action) {
       return;
     }
 
-    appInstance = ReactDOM.render(<App context={context}>{route.component}</App>, container, () =>
-      onRenderComplete(route, location),
+    appInstance = ReactDOM.render(
+      <App context={context}>{route.component}</App>,
+      container,
+      () => onRenderComplete(route, location)
     );
   } catch (error) {
-    // Display the error in full-screen for development mode
     if (__DEV__) {
-      appInstance = null;
-      document.title = `Error: ${error.message}`;
-      ReactDOM.render(<ErrorReporter error={error} />, container);
       throw error;
     }
 
@@ -180,32 +186,12 @@ export default function main() {
 // globally accesible entry point
 window.RSK_ENTRY = main;
 
-// Handle errors that might happen after rendering
-// Display the error in full-screen for development mode
-if (__DEV__) {
-  window.addEventListener('error', (event) => {
-    appInstance = null;
-    document.title = `Runtime Error: ${event.error.message}`;
-    ReactDOM.render(<ErrorReporter error={event.error} />, container);
-  });
-}
-
 // Enable Hot Module Replacement (HMR)
 if (module.hot) {
-  module.hot.accept('./router', async () => {
-    router = require('./router').default;
-
-    currentLocation = history.location;
-    await onLocationChange(currentLocation);
+  module.hot.accept("./router", () => {
     if (appInstance) {
-      try {
-        // Force-update the whole tree, including components that refuse to update
-        deepForceUpdate(appInstance);
-      } catch (error) {
-        appInstance = null;
-        document.title = `Hot Update Error: ${error.message}`;
-        ReactDOM.render(<ErrorReporter error={error} />, container);
-      }
+      // Force-update the whole tree, including components that refuse to update
+      deepForceUpdate(appInstance);
     }
   });
 }

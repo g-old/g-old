@@ -1,16 +1,15 @@
-import React from 'react';
-import Layout from '../../components/Layout';
-import PasswordRecovery from './PasswordRecovery';
+import React from "react";
+import Layout from "../../components/Layout";
+import PasswordRecovery from "./PasswordRecovery";
 
-const title = 'Recover your Password';
+const title = "Recover your Password";
 
-export default {
-  path: '/account/password/reset',
+async function action() {
+  return {
+    chunks: ["passwordRecovery"],
+    title,
+    component: <Layout><PasswordRecovery /> </Layout>
+  };
+}
 
-  async action() {
-    return {
-      title,
-      component: <Layout><PasswordRecovery /> </Layout>,
-    };
-  },
-};
+export default action;

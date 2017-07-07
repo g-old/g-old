@@ -12,14 +12,7 @@
 if (process.env.BROWSER) {
   throw new Error('Do not import `config.js` from inside the client-side code.');
 }
-/* export const port = process.env.PORT || 3000;
-export const host = process.env.WEBSITE_HOSTNAME || `localhost:${port}`;
 
-// default locale is the first one
-export const locales = ['de-DE', 'it-IT'];
-
-export const databaseUrl = process.env.DATABASE_URL || 'sqlite:database.sqlite';
-*/
 module.exports = {
   // default locale is the first one
   locales: ['de-DE', 'it-IT', 'lld-IT'],

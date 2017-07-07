@@ -14,6 +14,7 @@ import cookieParser from 'cookie-parser';
 import requestLanguage from 'express-request-language';
 import bodyParser from 'body-parser';
 import expressGraphQL from 'express-graphql';
+import nodeFetch from 'node-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import PrettyError from 'pretty-error';
@@ -400,10 +401,12 @@ app.get('*', async (req, res, next) => {
       },
       webPushKey: privateConfig.webpush.publicKey,
     };
-    const fetch = createFetch({
+    // Universal HTTP client
+    const fetch = createFetch(nodeFetch, {
       baseUrl: config.api.serverUrl,
       cookie: req.headers.cookie,
     });
+
     const store = configureStore(initialState, {
       fetch,
       history: null,
@@ -424,7 +427,7 @@ app.get('*', async (req, res, next) => {
     );
 
     const locale = req.language;
-    await store.dispatch(
+    const intl = await store.dispatch(
       setLocale({
         locale,
       }),
@@ -444,6 +447,7 @@ app.get('*', async (req, res, next) => {
       fetch,
       // You can access redux through react-redux connect
       store,
+      intl,
     };
 
     const route = await router.resolve({
@@ -467,11 +471,12 @@ app.get('*', async (req, res, next) => {
 
     data.children = await ReactDOM.renderToString(rootComponent);
     data.styles = [{ id: 'css', cssText: [...css].join('') }];
-    data.scripts = [assets.vendor.js, assets.client.js];
 
-    if (assets[route.chunk]) {
-      data.scripts.push(assets[route.chunk].js);
+    data.scripts = [assets.vendor.js];
+    if (route.chunks) {
+      data.scripts.push(...route.chunks.map(chunk => assets[chunk].js));
     }
+    data.scripts.push(assets.client.js);
 
     // Furthermore invoked actions will be ignored, client will not receive them!
     if (__DEV__) {
@@ -525,8 +530,18 @@ app.use((err, req, res, next) => {
 //
 // Launch the server
 // -----------------------------------------------------------------------------
-/* eslint-disable no-console */
+if (!module.hot) {
+  app.listen(config.port, () => {
+    console.info(`The server is running at http://localhost:${config.port}/`);
+  });
+}
 
-app.listen(config.port, () => {
-  console.log(`The server is running at http://localhost:${config.port}/`);
-});
+//
+// Hot Module Replacement
+// -----------------------------------------------------------------------------
+if (module.hot) {
+  app.hot = module.hot;
+  module.hot.accept('./router');
+}
+
+export default app;

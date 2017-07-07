@@ -10,27 +10,74 @@
 /* eslint-disable global-require */
 
 // The top-level (parent) route
-export default {
-  path: '/',
+const routes = {
+  path: "/",
 
   // Keep in mind, routes are evaluated in order
   children: [
-    require('./home').default,
-    require('./feed').default,
-    require('./proposal').default,
-    require('./proposals').default,
-    require('./about').default,
-    require('./surveys').default,
-    require('./account').default,
-    require('./admin').default,
-    require('./signup').default,
-    require('./loggedOut').default,
-    require('./passwordRecovery').default,
-    require('./passwordReset').default,
-    require('./emailVerification').default,
+    {
+      path: "/",
+      load: () => import(/* webpackChunkName: 'home' */ "./home")
+    },
+    {
+      path: "/feed",
+      load: () => import(/* webpackChunkName: 'feed' */ "./feed")
+    },
+    {
+      path: "/proposal/:id/:pollId",
+      load: () => import(/* webpackChunkName: 'proposal' */ "./proposal")
+    },
+    {
+      path: "/proposals/:state",
+      load: () => import(/* webpackChunkName: 'proposals' */ "./proposals")
+    },
+    {
+      path: "/about",
+      load: () => import(/* webpackChunkName: 'about' */ "./about")
+    },
+    {
+      path: "/surveys",
+      load: () => import(/* webpackChunkName: 'surveys' */ "./surveys")
+    },
+    {
+      path: "/account",
+      load: () => import(/* webpackChunkName: 'account' */ "./account")
+    },
+    {
+      path: "/admin",
+      load: () => import(/* webpackChunkName: 'admin' */ "./admin")
+    },
+    {
+      path: "/signup",
+      load: () => import(/* webpackChunkName: 'signup' */ "./signup")
+    },
+    {
+      path: "/logged-out",
+      load: () => import(/* webpackChunkName: 'loggedOut' */ "./loggedOut")
+    },
+    {
+      path: "/account/password/reset",
+      load: () =>
+        import(/* webpackChunkName: 'passwordRecovery' */ "./passwordRecovery")
+    },
+    {
+      path: "/reset/:token",
+      load: () =>
+        import(/* webpackChunkName: 'passwordReset' */ "./passwordReset")
+    },
+    {
+      path: "/verify",
+      load: () =>
+        import(
+          /* webpackChunkName: 'emailVerification' */ "./emailVerification"
+        )
+    },
 
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
-    require('./notFound').default,
+    {
+      path: "*",
+      load: () => import(/* webpackChunkName: 'not-found' */ "./not-found")
+    }
   ],
 
   async action({ next }) {
@@ -38,9 +85,19 @@ export default {
     const route = await next();
 
     // Provide default values for title, description etc.
-    route.title = `${route.title || 'Untitled Page'} - www.gold.com`;
-    route.description = route.description || '';
+    route.title = `${route.title || "Untitled Page"} - www.gold.com`;
+    route.description = route.description || "";
 
     return route;
-  },
+  }
 };
+
+// The error page is available by permanent url for development mode
+if (__DEV__) {
+  routes.children.unshift({
+    path: "/error",
+    action: require("./error").default
+  });
+}
+
+export default routes;

@@ -6,29 +6,28 @@ import { getSessionUser } from '../../reducers';
 
 const title = 'Proposals';
 
-export default {
-  path: '/proposals/:state',
+async function action({ store, path }, { state }) {
+  const user = getSessionUser(store.getState());
+  if (!user) {
+    return { redirect: `/?redirect=${path}` };
+  } else if (user.role.type === 'guest') {
+    return { redirect: '/' };
+  }
+  if (!process.env.BROWSER) {
+    await store.dispatch(loadProposalsList({ state }));
+  } else {
+    store.dispatch(loadProposalsList({ state }));
+  }
+  return {
+    chunks: ['proposals'],
+    title,
+    component: (
+      <Layout>
+        <ProposalOverviewContainer state={state} />
+        {' '}
+      </Layout>
+    ),
+  };
+}
 
-  async action({ store, path }, { state }) {
-    const user = getSessionUser(store.getState());
-    if (!user) {
-      return { redirect: `/?redirect=${path}` };
-    } else if (user.role.type === 'guest') {
-      return { redirect: '/' };
-    }
-    if (!process.env.BROWSER) {
-      await store.dispatch(loadProposalsList({ state }));
-    } else {
-      store.dispatch(loadProposalsList({ state }));
-    }
-    return {
-      title,
-      component: (
-        <Layout>
-          <ProposalOverviewContainer state={state} />
-          {' '}
-        </Layout>
-      ),
-    };
-  },
-};
+export default action;

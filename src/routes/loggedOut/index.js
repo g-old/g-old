@@ -1,41 +1,40 @@
-import React from 'react';
-import Layout from '../../components/Layout';
-import Login from '../../components/Login';
+import React from "react";
+import Layout from "../../components/Layout";
+import Login from "../../components/Login";
 
-export default {
-  path: '/logged-out',
-
-  async action() {
-    return {
-      title: 'Logged out',
-      component: (
-        <Layout>
+async function action() {
+  return {
+    chunks: ["loggedOut"],
+    title: "Logged out",
+    component: (
+      <Layout>
+        <div
+          style={{
+            paddingLeft: "20px",
+            paddingRight: "20px",
+            paddingTop: "20px"
+          }}
+        >
           <div
             style={{
-              paddingLeft: '20px',
-              paddingRight: '20px',
-              paddingTop: '20px',
+              padding: "0 0 40px",
+              maxWidth: "380px"
             }}
           >
-            <div
-              style={{
-                padding: '0 0 40px',
-                maxWidth: '380px',
-              }}
-            >
-              <div style={{ marginBottom: '3em' }}>
-                <span style={{ fontSize: '1.5em' }}>LOGGED OUT </span>
-                <br />
-                <span style={{ fontSize: '1em' }}>Thank you for the visit </span>
+            <div style={{ marginBottom: "3em" }}>
+              <span style={{ fontSize: "1.5em" }}>LOGGED OUT </span>
+              <br />
+              <span style={{ fontSize: "1em" }}>Thank you for the visit </span>
 
-                <br />
-                <span style={{ fontSize: '1em' }}>Come back? </span>
-              </div>
-              <Login />
+              <br />
+              <span style={{ fontSize: "1em" }}>Come back? </span>
             </div>
+            <Login />
           </div>
-        </Layout>
-      ),
-    };
-  },
-};
+        </div>
+      </Layout>
+    )
+  };
+}
+
+export default action;
