@@ -188,7 +188,7 @@ class Poll extends React.Component {
               <img
                 style={{ maxWidth: '5em', maxHeight: '5em' }}
                 alt="Vote"
-                src="/abstimmung-01.png"
+                src={proBtnColor ? '/abstimmung-01.png' : '/abstimmung-02.png'}
               />
               {/* <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
                 <path
