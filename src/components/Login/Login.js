@@ -56,6 +56,7 @@ class Login extends React.Component {
   };
   constructor(props) {
     super(props);
+    this.onSubmit = this.onSubmit.bind(this);
     this.handleLogin = this.handleLogin.bind(this);
     this.onEmailChange = this.onEmailChange.bind(this);
     this.onPasswordChange = this.onPasswordChange.bind(this);
@@ -88,6 +89,15 @@ class Login extends React.Component {
     this.setState({ password: e.target.value });
   }
 
+  onSubmit(e) {
+    /* prevent the default form-submit action */
+    e.preventDefault();
+    this.handleLogin();
+
+    /* apparently this is needed with some browsers to prevent the submit action */
+    return false;
+  }
+
   handleLogin() {
     const validated = this.Validator(['password', 'email']);
     this.setState({ errors: { ...this.state.errors, ...validated.errors } });
@@ -95,6 +105,7 @@ class Login extends React.Component {
       this.props.login({ email: this.state.email.trim(), password: this.state.password.trim() });
     }
   }
+
   render() {
     const { status } = this.props;
     /*  if (status.login && status.login.success) {
@@ -115,25 +126,29 @@ class Login extends React.Component {
       : null;
     return (
       <Box column pad>
-        <fieldset>
-          <FormField label={<FormattedMessage {...messages.email} />} error={emailError}>
-            <input
-              name="email"
-              type="text"
-              value={this.state.email}
-              onChange={this.onEmailChange}
-            />
-          </FormField>
-          <FormField label={<FormattedMessage {...messages.password} />} error={passwordError}>
-            <input
-              name="password"
-              type="password"
-              value={this.state.password}
-              onChange={this.onPasswordChange}
-            />
-          </FormField>
-          {loginError}
-        </fieldset>
+        <form onSubmit={this.onSubmit}>
+          {/* invisible submit button */}
+          <input type="submit" style={{ display: 'none' }} />
+          <fieldset>
+            <FormField label={<FormattedMessage {...messages.email} />} error={emailError}>
+              <input
+                name="email"
+                type="text"
+                value={this.state.email}
+                onChange={this.onEmailChange}
+              />
+            </FormField>
+            <FormField label={<FormattedMessage {...messages.password} />} error={passwordError}>
+              <input
+                name="password"
+                type="password"
+                value={this.state.password}
+                onChange={this.onPasswordChange}
+              />
+            </FormField>
+            {loginError}
+          </fieldset>
+        </form>
         <Button
           fill
           primary
