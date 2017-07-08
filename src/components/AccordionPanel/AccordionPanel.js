@@ -56,6 +56,7 @@ class AccordionPanel extends React.Component {
             </div>
           </Button>
         </li>
+
         <Box {...this.props} className={cn(active ? s.open : s.closed)}>
           {children}
         </Box>

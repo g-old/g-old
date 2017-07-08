@@ -5,7 +5,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import PollState from '../PollState';
 import s from './Poll.css';
-import { ICONS } from '../../constants';
+// import { ICONS } from '../../constants';
 import Button from '../Button';
 import Box from '../Box';
 import Layer from '../Layer';
@@ -174,7 +174,7 @@ class Poll extends React.Component {
     } = this.props;
 
     let votingButtons = null;
-
+    /* eslint-disable max-len*/
     const votePending = updates.vote ? updates.vote.pending : false;
     if (!closedAt && !['viewer', 'guest'].includes(user.role.type)) {
       // TODO Find better check
@@ -185,14 +185,19 @@ class Poll extends React.Component {
           <div>
             <Button disabled={votePending} onClick={() => this.canVote('pro')} plain>
               Stop this!
-              <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
+              <img
+                style={{ maxWidth: '5em', maxHeight: '5em' }}
+                alt="Vote"
+                src="/abstimmung-01.png"
+              />
+              {/* <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
                 <path
                   fill="none"
                   stroke={proBtnColor ? '#ff324d' : '#666'}
                   strokeWidth="1"
                   d={ICONS.halt}
                 />
-              </svg>
+              </svg> */}
             </Button>
           </div>
         );
@@ -203,17 +208,27 @@ class Poll extends React.Component {
           <div style={{ paddingBottom: '2em' }}>
             <Box pad>
               <Button plain onClick={() => this.canVote('pro')} disabled={votePending}>
-                <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
+                <img
+                  style={{ maxWidth: '5em', maxHeight: '5em' }}
+                  alt="Vote"
+                  src={proBtnColor ? '/abstimmung-03.png' : '/abstimmung-04.png'}
+                />
+                {/* <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
                   <path
                     fill="none"
                     stroke={proBtnColor ? '#8cc800' : '#666'}
                     strokeWidth="1"
                     d={ICONS.thumbUpAlt}
                   />
-                </svg>
+              </svg> */}
               </Button>
               <Button plain onClick={() => this.canVote('con')} disabled={votePending}>
-                <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
+                <img
+                  style={{ maxWidth: '5em', maxHeight: '5em' }}
+                  alt="Vote"
+                  src={conBtnColor ? '/abstimmung-05.png' : '/abstimmung-06.png'}
+                />
+                {/* <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
                   <path
                     fill="none"
                     stroke={conBtnColor ? '#ff324d' : '#666'}
@@ -221,7 +236,7 @@ class Poll extends React.Component {
                     d={ICONS.thumbUpAlt}
                     transform="rotate(180 12 12)"
                   />
-                </svg>
+                </svg> */}
               </Button>
             </Box>
           </div>
@@ -252,7 +267,6 @@ class Poll extends React.Component {
             ? <FormattedMessage {...messages.closed} />
             : <FormattedMessage {...messages.closing} />}
           <FormattedRelative value={closedAt || endTime} />
-
         </p>
         <div className={s.pollState}>
           <PollState
@@ -279,7 +293,6 @@ class Poll extends React.Component {
 
         <Box justify>
           {votingButtons}
-
         </Box>
         {this.state.voteError &&
           <Notification type="error" message={<FormattedMessage {...messages.error} />} />}

@@ -13,7 +13,9 @@ const createStatement = {
   },
   resolve: (data, { statement }, { viewer, loaders }) =>
     Statement.create(viewer, statement, loaders).then((res) => {
-      Statement.insertInFeed(viewer, res, 'create');
+      if (res) {
+        Statement.insertInFeed(viewer, res, 'create');
+      }
       return res;
     }),
 };

@@ -1,12 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 
-import { IntlProvider } from "react-intl";
+import { IntlProvider } from 'react-intl';
 
-import {
-  SET_LOCALE_START,
-  SET_LOCALE_SUCCESS,
-  SET_LOCALE_ERROR
-} from "../constants";
+import { SET_LOCALE_START, SET_LOCALE_SUCCESS, SET_LOCALE_ERROR } from '../constants';
 
 const query = `
   query ($locale:String!) {
@@ -25,7 +21,7 @@ function getIntlFromState(state) {
     initialNow,
     locale,
     messages: localeMessages,
-    defaultLocale: "de-DE"
+    defaultLocale: 'de-DE',
   });
   return provider.getChildContext().intl;
 }
@@ -39,8 +35,8 @@ export function setLocale({ locale }) {
     dispatch({
       type: SET_LOCALE_START,
       payload: {
-        locale
-      }
+        locale,
+      },
     });
 
     try {
@@ -53,8 +49,8 @@ export function setLocale({ locale }) {
         type: SET_LOCALE_SUCCESS,
         payload: {
           locale,
-          messages
-        }
+          messages,
+        },
       });
 
       // remember locale for every new request
@@ -71,8 +67,8 @@ export function setLocale({ locale }) {
         type: SET_LOCALE_ERROR,
         payload: {
           locale,
-          error
-        }
+          error,
+        },
       });
       return null;
     }

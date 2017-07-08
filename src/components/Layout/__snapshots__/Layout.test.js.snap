@@ -1,0 +1,159 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layout renders children correctly 1`] = `
+<div>
+  <div
+    className="root"
+  >
+    <div
+      className="container"
+    >
+      <div
+        className="root"
+        role="navigation"
+      >
+        <div
+          className="navBar"
+        >
+          <a
+            className="link"
+            href="/feed"
+            onClick={[Function]}
+          >
+            Feed
+          </a>
+          <a
+            className="link"
+            href="/proposals/active"
+            onClick={[Function]}
+          >
+            <span>
+              Proposals
+            </span>
+          </a>
+          <a
+            className="link"
+            href="/surveys"
+            onClick={[Function]}
+          >
+            <span>
+              Surveys
+            </span>
+          </a>
+          <a
+            className="link"
+            href="/admin"
+            onClick={[Function]}
+          >
+            <span>
+              Admin
+            </span>
+          </a>
+          <a
+            className="link"
+            href="/about"
+            onClick={[Function]}
+          >
+            <span>
+              About
+            </span>
+          </a>
+        </div>
+        <div
+          className="menu"
+        >
+          <div
+            className="root column"
+            onClick={null}
+          >
+            <button
+              className="button plain"
+              disabled={false}
+              onClick={[Function]}
+            >
+              <span
+                className="icon"
+              >
+                 
+                <svg
+                  height="20px"
+                  style={
+                    Object {
+                      "display": "inline-block",
+                      "verticalAlign": "middle",
+                    }
+                  }
+                  viewBox="0 0 32 32"
+                  width="20px"
+                >
+                  <path
+                    d="M2 6h28v6h-28zM2 14h28v6h-28zM2 22h28v6h-28z"
+                    style={
+                      Object {
+                        "fill": "grey",
+                      }
+                    }
+                    transform=""
+                  />
+                </svg>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        className="banner"
+      >
+        <h1
+          className="bannerTitle"
+        >
+          <span>
+            G O L D
+          </span>
+        </h1>
+        Government by OnLine Democracy
+      </div>
+    </div>
+  </div>
+  <div
+    className="content"
+  >
+    <div
+      className="child"
+    />
+  </div>
+  <div
+    className="root"
+  >
+    <div
+      className="container"
+    >
+      <span
+        className="text"
+      >
+        © G O L D
+      </span>
+      <span
+        className="spacer"
+      >
+        ·
+      </span>
+      <a
+        className="link"
+        href="/"
+        onClick={[Function]}
+      >
+        Home
+      </a>
+      <div>
+        <span>
+          <span>
+            Deutsch
+          </span>
+           
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+`;

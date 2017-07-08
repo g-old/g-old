@@ -18,56 +18,56 @@ export default [
     },
     fields: {
       year: {
-        displayName: 'an',
+        displayName: 'ann',
         relative: {
-          0: 'ongan',
-          1: "l'an que ven",
-          '-1': "l'an passat",
+          0: 'chest ann',
+          1: "l'ann che vegn",
+          '-1': "l'ann passé",
         },
         relativeTime: {
           future: {
-            one: 'dins {0} an',
-            other: 'dins {0} ans',
+            one: 'te {0} ann',
+            other: 'te {0} agn',
           },
           past: {
-            one: 'fa {0} an',
-            other: 'fa {0} ans',
+            one: 'dant {0} an',
+            other: 'dant {0} agn',
           },
         },
       },
       month: {
-        displayName: 'mes',
+        displayName: 'meis',
         relative: {
-          0: 'aqueste mes',
-          1: 'lo mes que ven',
-          '-1': 'lo mes passat',
+          0: 'chest meis',
+          1: 'l mies che vegn',
+          '-1': 'l meis passé',
         },
         relativeTime: {
           future: {
-            one: 'dins {0} mes',
-            other: 'dins {0} meses',
+            one: 'te {0} meis',
+            other: 'te {0} meisc',
           },
           past: {
-            one: 'fa {0} mes',
-            other: 'fa {0} meses',
+            one: 'dant {0} meis',
+            other: 'dant {0} meisc',
           },
         },
       },
       day: {
-        displayName: 'jorn',
+        displayName: 'di',
         relative: {
-          0: 'uèi',
-          1: 'deman',
-          '-1': 'ièr',
+          0: 'encuei',
+          1: 'doman',
+          '-1': 'enier',
         },
         relativeTime: {
           future: {
-            one: 'dins {0} jorn',
-            other: 'dins {0} jorns',
+            one: 'te {0} di',
+            other: 'te {0} dis',
           },
           past: {
-            one: 'fa {0} jorn',
-            other: 'fa {0} jorns',
+            one: 'dant {0} di',
+            other: 'dant {0} dis',
           },
         },
       },
@@ -75,41 +75,41 @@ export default [
         displayName: 'ora',
         relativeTime: {
           future: {
-            one: 'dins {0} ora',
-            other: 'dins {0} oras',
+            one: 'te {0} ora',
+            other: 'te {0} ores',
           },
           past: {
-            one: 'fa {0} ora',
-            other: 'fa {0} oras',
+            one: 'dant {0} ora',
+            other: 'dant {0} ores',
           },
         },
       },
       minute: {
-        displayName: 'minuta',
+        displayName: 'menut',
         relativeTime: {
           future: {
-            one: 'dins {0} minuta',
-            other: 'dins {0} minutas',
+            one: 'te {0} menut',
+            other: 'te {0} menuc',
           },
           past: {
-            one: 'fa {0} minuta',
-            other: 'fa {0} minutas',
+            one: 'dant {0} menut',
+            other: 'dant {0} menuc',
           },
         },
       },
       second: {
-        displayName: 'segonda',
+        displayName: 'secont',
         relative: {
-          0: 'ara',
+          0: 'segn',
         },
         relativeTime: {
           future: {
-            one: 'dins {0} segonda',
-            other: 'dins {0} segondas',
+            one: 'te {0} secont',
+            other: 'te {0} seconc',
           },
           past: {
-            one: 'fa {0} segonda',
-            other: 'fa {0} segondas',
+            one: 'dant {0} secont',
+            other: 'dant {0} seconc',
           },
         },
       },
