@@ -4,6 +4,7 @@ import ProposalType from '../types/ProposalDLType';
 import Proposal from '../models/Proposal';
 import { sendJob } from '../../core/childProcess';
 import log from '../../logger';
+import { insertIntoFeed } from '../../core/feed';
 
 const createProposal = {
   type: new GraphQLNonNull(ProposalType),
@@ -13,25 +14,28 @@ const createProposal = {
       description: 'Create a new Proposal',
     },
   },
-  resolve: (data, { proposal }, { viewer, loaders }) =>
-    Proposal.create(viewer, proposal, loaders)
-      .then((p) => {
-        if (p) {
-          Proposal.insertInFeed(viewer, p, 'create');
-        }
-        return p;
-      })
-      .then((p) => {
-        if (p) {
-          if (!sendJob({ type: 'webpush', data: p })) {
-            log.error(
-              { viewer, job: { type: 'webpush', data: p } },
-              'Could not send job to worker',
-            );
-          }
-        }
-        return p;
-      }), // Proposal.pushToUsers(viewer, p)),
+  resolve: async (data, { proposal }, { viewer, loaders }) => {
+    const newProposal = await Proposal.create(viewer, proposal, loaders);
+
+    if (newProposal) {
+      await insertIntoFeed(
+        {
+          viewer,
+          data: { type: 'proposal', content: newProposal, objectId: newProposal.id },
+          verb: 'create',
+        },
+        true,
+      );
+      if (!sendJob({ type: 'webpush', data: newProposal })) {
+        log.error(
+          { viewer, job: { type: 'webpush', data: newProposal } },
+          'Could not send job to worker',
+        );
+      }
+    }
+
+    return newProposal;
+  },
 };
 
 export default createProposal;

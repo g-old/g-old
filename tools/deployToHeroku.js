@@ -35,7 +35,7 @@ const erebor = {
   name: 'erebor',
   url: 'erebor:/home/git/gold.git',
   branch: 'master',
-  website: 'https://erebor.hopto.org:3001/',
+  website: 'https://g-old.org',
 };
 
 const options = {

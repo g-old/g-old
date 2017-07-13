@@ -1,9 +1,7 @@
 import knex from '../knex';
 import Poll from './Poll';
 import PollingMode from './PollingMode';
-import Activity from './Activity';
 import { dedup } from '../../core/helpers';
-import webPush from '../../webPush';
 
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
@@ -319,53 +317,6 @@ class Proposal {
     });
     if (!newProposalId) return null;
     return Proposal.gen(viewer, newProposalId, loaders);
-  }
-
-  static async insertInFeed(viewer, proposal, verb) {
-    // create activity;
-    const userId = 1;
-    const activityId = await Activity.create(
-      { id: viewer.id },
-      { action: 'create', verb, type: 'proposal', objectId: proposal.id },
-    );
-    // add activity to feed
-    // create activity;
-
-    let aIds = await knex('system_feeds').where({ user_id: userId }).select('activity_ids');
-    aIds = aIds[0].activity_ids;
-    aIds.push(activityId[0]);
-    await knex('system_feeds')
-      .where({ user_id: userId })
-      .update({ activity_ids: JSON.stringify(aIds), updated_at: new Date() });
-  }
-
-  static async pushToUsers(viewer, proposal) {
-    const subscriptions = await knex('webpush_subscriptions').select();
-    const allSubs = subscriptions.map(s => ({
-      endpoint: s.endpoint,
-      keys: { auth: s.auth, p256dh: s.p256dh },
-    }));
-
-    const promises = allSubs.map(sub =>
-      webPush
-        .sendNotification(
-          sub,
-          JSON.stringify({
-            body: proposal.title,
-            link: `/proposal/${proposal.id}/${proposal.pollOne_id}`,
-          }),
-        )
-        .catch(async (err) => {
-          if (err.statusCode === 410) {
-            console.error('Subscription should be deleted from DB: ', err);
-            await knex('webpush_subscriptions').where({ endpoint: sub.endpoint }).del();
-          }
-          console.error('Subscription is no longer valid: ', err);
-        }),
-    );
-
-    await Promise.all(promises);
-    return proposal;
   }
 }
 

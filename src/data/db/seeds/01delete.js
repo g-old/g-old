@@ -2,6 +2,9 @@ exports.seed = function (knex, Promise) {
   // Deletes ALL existing entries
   // TODO maybe put in a transaction
   const deleteQueue = [
+    knex('webpush_subscriptions')
+      .del()
+      .then(() => knex.raw('ALTER SEQUENCE webpush_subscriptions_id_seq RESTART WITH 1;')),
     knex('activities')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE activities_id_seq RESTART WITH 1;')),

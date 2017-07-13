@@ -7,23 +7,23 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import "whatwg-fetch";
-import React from "react";
-import ReactDOM from "react-dom";
-import deepForceUpdate from "react-deep-force-update";
-import queryString from "query-string";
-import { createPath } from "history/PathUtils";
-import { addLocaleData } from "react-intl";
-import de from "react-intl/locale-data/de";
-import it from "react-intl/locale-data/it";
-import lld from "./locales/lld";
-import App from "./components/App";
-import createFetch from "./createFetch";
-import configureStore from "./store/configureStore";
-import { updateMeta } from "./DOMUtils";
-import history from "./history";
-import router from "./router";
-import { getIntl } from "./actions/intl";
+import 'whatwg-fetch';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import deepForceUpdate from 'react-deep-force-update';
+import queryString from 'query-string';
+import { createPath } from 'history/PathUtils';
+import { addLocaleData } from 'react-intl';
+import de from 'react-intl/locale-data/de';
+import it from 'react-intl/locale-data/it';
+import lld from './locales/lld';
+import App from './components/App';
+import createFetch from './createFetch';
+import configureStore from './store/configureStore';
+import { updateMeta } from './DOMUtils';
+import history from './history';
+import router from './router';
+import { getIntl } from './actions/intl';
 
 /* @intl-code-template addLocaleData(${lang}); */
 addLocaleData(de);
@@ -36,7 +36,7 @@ addLocaleData(lld);
 
 // Universal HTTP client
 const fetch = createFetch(self.fetch, {
-  baseUrl: window.App.apiUrl
+  baseUrl: window.App.apiUrl,
 });
 const store = configureStore(window.App.state, { history, fetch });
 
@@ -59,23 +59,23 @@ const context = {
   // Universal HTTP client
   fetch,
   // intl instance as it can be get with injectIntl
-  intl: store.dispatch(getIntl())
+  intl: store.dispatch(getIntl()),
 };
 
 // Switch off the native scroll restoration behavior and handle it manually
 // https://developers.google.com/web/updates/2015/09/history-api-scroll-restoration
 const scrollPositionsHistory = {};
-if (window.history && "scrollRestoration" in window.history) {
-  window.history.scrollRestoration = "manual";
+if (window.history && 'scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual';
 }
 
 let onRenderComplete = function initialRenderComplete() {
-  const elem = document.getElementById("css");
+  const elem = document.getElementById('css');
   if (elem) elem.parentNode.removeChild(elem);
   onRenderComplete = function renderComplete(route, location) {
     document.title = route.title;
 
-    updateMeta("description", route.description);
+    updateMeta('description', route.description);
     // Update necessary tags in <head> at runtime here, ie:
     // updateMeta('keywords', route.keywords);
     // updateCustomMeta('og:url', route.canonicalUrl);
@@ -107,12 +107,12 @@ let onRenderComplete = function initialRenderComplete() {
     // Google Analytics tracking. Don't send 'pageview' event after
     // the initial rendering, as it was already sent
     if (window.ga) {
-      window.ga("send", "pageview", createPath(location));
+      window.ga('send', 'pageview', createPath(location));
     }
   };
 };
 
-const container = document.getElementById("app");
+const container = document.getElementById('app');
 let appInstance;
 let currentLocation = history.location;
 
@@ -121,10 +121,10 @@ async function onLocationChange(location, action) {
   // Remember the latest scroll position for the previous location
   scrollPositionsHistory[currentLocation.key] = {
     scrollX: window.pageXOffset,
-    scrollY: window.pageYOffset
+    scrollY: window.pageYOffset,
   };
   // Delete stored scroll position for next page if any
-  if (action === "PUSH") {
+  if (action === 'PUSH') {
     delete scrollPositionsHistory[location.key];
   }
   currentLocation = location;
@@ -139,7 +139,7 @@ async function onLocationChange(location, action) {
       ...context,
       path: location.pathname,
       query: queryString.parse(location.search),
-      locale: store.getState().intl.locale
+      locale: store.getState().intl.locale,
     });
 
     // Prevent multiple page renders during the routing process
@@ -153,9 +153,11 @@ async function onLocationChange(location, action) {
     }
 
     appInstance = ReactDOM.render(
-      <App context={context}>{route.component}</App>,
+      <App context={context}>
+        {route.component}
+      </App>,
       container,
-      () => onRenderComplete(route, location)
+      () => onRenderComplete(route, location),
     );
   } catch (error) {
     if (__DEV__) {
@@ -188,7 +190,7 @@ window.RSK_ENTRY = main;
 
 // Enable Hot Module Replacement (HMR)
 if (module.hot) {
-  module.hot.accept("./router", () => {
+  module.hot.accept('./router', () => {
     if (appInstance) {
       // Force-update the whole tree, including components that refuse to update
       deepForceUpdate(appInstance);

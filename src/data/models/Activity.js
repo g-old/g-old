@@ -23,16 +23,20 @@ class Activity {
   }
 
   static async create(viewer, data) {
-    return knex('activities')
-      .insert({
-        actor_id: viewer.id,
-        verb: data.verb,
-        type: data.type,
-        object_id: data.objectId,
-        content: JSON.stringify(data.content),
-        created_at: new Date(),
-      })
-      .returning('id');
+    if (!viewer) return null;
+    if (!data.verb || !data.type || !data.objectId || !data.content) return null;
+    const activity = {
+      actor_id: viewer.id,
+      verb: data.verb,
+      type: data.type,
+      object_id: data.objectId,
+      content: JSON.stringify(data.content),
+      created_at: new Date(),
+    };
+    let id = await knex('activities').insert(activity).returning('id');
+    id = id[0];
+    if (id == null) return null;
+    return new Activity({ ...activity, id });
   }
 }
 

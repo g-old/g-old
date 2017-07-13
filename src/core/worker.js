@@ -1,4 +1,6 @@
 import knex from '../data/knex';
+import { insertIntoFeed } from './feed';
+import log from '../logger';
 
 async function proposalPolling() {
   const proposals = await knex('proposals')
@@ -83,17 +85,31 @@ async function proposalPolling() {
       }
     }
     // TODO in transaction!
-    const pollId = proposal.state === 'proposed' || proposal.state === 'survey'
-      ? proposal.pollOneId
-      : proposal.pollTwoId;
+    const pollId =
+      proposal.state === 'proposed' || proposal.state === 'survey'
+        ? proposal.pollOneId
+        : proposal.pollTwoId;
     return knex('proposals')
       .where({ id: proposal.id })
       .update({ state: newState, updated_at: new Date() })
-      .then(() =>
-        knex('polls')
-          .where({ id: pollId })
-          .update({ closed_at: new Date(), updated_at: new Date() }),
-      );
+      .returning(['id', 'body', 'title', 'state', 'author_id', 'poll_two_id', 'poll_two_id'])
+      .then((proposalData) => {
+        const data = proposalData[0];
+
+        return Promise.all([
+          insertIntoFeed(
+            {
+              viewer: { id: 0, role: { type: 'system' } },
+              data: { type: 'proposal', content: data, objectId: data.id },
+              verb: 'update',
+            },
+            true,
+          ).catch(err => log.error({ err }, 'Feed insertion failed - worker- ')),
+          knex('polls')
+            .where({ id: pollId })
+            .update({ closed_at: new Date(), updated_at: new Date() }),
+        ]);
+      });
   });
 
   await Promise.all(mutations);
