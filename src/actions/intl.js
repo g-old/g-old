@@ -31,7 +31,7 @@ export function getIntl() {
 }
 
 export function setLocale({ locale }) {
-  return async (dispatch, getState, { graphqlRequest }) => {
+  return async (dispatch, getState, { graphqlRequest, history }) => {
     dispatch({
       type: SET_LOCALE_START,
       payload: {

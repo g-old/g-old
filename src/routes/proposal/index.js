@@ -1,10 +1,10 @@
-import React from "react";
-import Layout from "../../components/Layout";
-import { loadProposal } from "../../actions/proposal";
-import ProposalContainer from "./ProposalContainer";
-import { getSessionUser } from "../../reducers";
+import React from 'react';
+import Layout from '../../components/Layout';
+import { loadProposal } from '../../actions/proposal';
+import ProposalContainer from './ProposalContainer';
+import { getSessionUser } from '../../reducers';
 
-const title = "Proposal";
+const title = 'Proposal';
 
 async function action({ store, path }, { id, pollId }) {
   const state = await store.getState();
@@ -12,8 +12,8 @@ async function action({ store, path }, { id, pollId }) {
 
   if (!user) {
     return { redirect: `/?redirect=${path}` };
-  } else if (user.role.type === "guest") {
-    return { redirect: "/" };
+  } else if (user.role.type === 'guest') {
+    return { redirect: '/' };
   }
   if (!process.env.BROWSER) {
     await store.dispatch(loadProposal({ id }));
@@ -23,12 +23,12 @@ async function action({ store, path }, { id, pollId }) {
 
   return {
     title,
-    chunks: ["proposal"],
+    chunks: ['proposal'],
     component: (
       <Layout>
         <ProposalContainer proposalId={id} pollId={pollId} user={user} />
       </Layout>
-    )
+    ),
   };
 }
 export default action;

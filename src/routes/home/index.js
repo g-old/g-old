@@ -7,17 +7,30 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React from "react";
-import Layout from "../../components/Layout";
-import Home from "./Home";
+import React from 'react';
+import Layout from '../../components/Layout';
+import Home from './Home';
+import { getSessionUser } from '../../reducers';
 
-const title = "Home";
+const title = 'Home';
 
-function action() {
+async function action({ store }) {
+  const state = await store.getState();
+  const user = getSessionUser(state);
+  if (user) {
+    if (user.role.type === 'guest') {
+      return { redirect: '/account' };
+    }
+    return { redirect: '/feed' };
+  }
   return {
-    chunks: ["home"],
+    chunks: ['home'],
     title,
-    component: <Layout><Home title={title} /></Layout>
+    component: (
+      <Layout>
+        <Home title={title} />
+      </Layout>
+    ),
   };
 }
 

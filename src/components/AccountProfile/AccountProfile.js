@@ -246,7 +246,9 @@ class AccountProfile extends React.Component {
               }}
             />}
           <div>
-            <span>{name} {surname}</span>
+            <span>
+              {name} {surname}
+            </span>
             {!avatarSet &&
               <div>
                 <FormattedMessage {...messages.avatarMissing} />
@@ -264,51 +266,53 @@ class AccountProfile extends React.Component {
             </div>
           </div>
         </Box>
-        <Box flex column>
-
-          <Accordion>
-            <RoleManager
-              updates={updates.role}
-              accountId={id}
-              updateFn={this.props.update}
-              userRole={this.props.user.role.type}
-              accountRole={role.type}
-            />
-
-            {PrivilegePanel}
-
-            <AccordionPanel column pad heading={'Notify user'}>
-              <CheckBox checked label="Email" disabled />
-              <fieldset>
-                <FormField label="Subject" error={subjectError}>
-                  <input
-                    name="subject"
-                    type="text"
-                    onBlur={this.handleBlur}
-                    value={this.state.subject}
-                    onChange={this.handleValueChange}
-                  />
-                </FormField>
-                <FormField label="Text" error={notificationTextError}>
-                  <textarea
-                    name="notificationText"
-                    onBlur={this.handleBlur}
-                    value={this.state.notificationText}
-                    onChange={this.handleValueChange}
-                  />
-                </FormField>
-              </fieldset>
-              <Button
-                fill
-                primary
-                onClick={this.handleNotification}
-                pending={this.props.updates.notification && this.props.updates.notification.pending}
-                label={<FormattedMessage {...messages.notify} />}
+        {/* eslint-disable eqeqeq */}
+        {user.id != id &&
+          <Box flex column>
+            <Accordion>
+              <RoleManager
+                updates={updates.role}
+                accountId={id}
+                updateFn={this.props.update}
+                userRole={this.props.user.role.type}
+                accountRole={role.type}
               />
-            </AccordionPanel>
-          </Accordion>
-        </Box>
 
+              {PrivilegePanel}
+
+              <AccordionPanel column pad heading={'Notify user'}>
+                <CheckBox checked label="Email" disabled />
+                <fieldset>
+                  <FormField label="Subject" error={subjectError}>
+                    <input
+                      name="subject"
+                      type="text"
+                      onBlur={this.handleBlur}
+                      value={this.state.subject}
+                      onChange={this.handleValueChange}
+                    />
+                  </FormField>
+                  <FormField label="Text" error={notificationTextError}>
+                    <textarea
+                      name="notificationText"
+                      onBlur={this.handleBlur}
+                      value={this.state.notificationText}
+                      onChange={this.handleValueChange}
+                    />
+                  </FormField>
+                </fieldset>
+                <Button
+                  fill
+                  primary
+                  onClick={this.handleNotification}
+                  pending={
+                    this.props.updates.notification && this.props.updates.notification.pending
+                  }
+                  label={<FormattedMessage {...messages.notify} />}
+                />
+              </AccordionPanel>
+            </Accordion>
+          </Box>}
       </Layer>
     );
   }
