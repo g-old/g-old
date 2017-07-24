@@ -14,6 +14,7 @@ import {
   LOAD_FLAGGEDSTMTS_SUCCESS,
   LOAD_FEED_SUCCESS,
   SESSION_LOGIN_SUCCESS,
+  SSE_UPDATE_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -39,6 +40,11 @@ export default function byId(state = {}, action) {
     }
     case CREATE_USER_SUCCESS: {
       return merge({}, state, action.payload.entities.users);
+    }
+    case SSE_UPDATE_SUCCESS: {
+      return action.payload.entities.users
+        ? merge({}, state, action.payload.entities.users)
+        : state;
     }
     case UPDATE_USER_SUCCESS: {
       // bc of deleted followees

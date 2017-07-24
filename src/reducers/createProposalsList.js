@@ -5,6 +5,7 @@ import {
   LOAD_PROPOSAL_LIST_SUCCESS,
   LOAD_PROPOSAL_SUCCESS,
   CREATE_PROPOSAL_SUCCESS,
+  SSE_UPDATE_SUCCESS,
 } from '../constants';
 
 const handlePageInfo = (state, action) => {
@@ -23,6 +24,13 @@ const createList = (filter) => {
       case CREATE_PROPOSAL_SUCCESS:
       case LOAD_PROPOSAL_SUCCESS: {
         return [...new Set([...state, action.payload.result])];
+      }
+      case SSE_UPDATE_SUCCESS: {
+        const activity = action.payload.entities.activities[action.payload.result];
+        if (!activity.type === 'proposal') {
+          return state;
+        }
+        return [...new Set([...state, activity.objectId])];
       }
       case LOAD_PROPOSAL_LIST_SUCCESS: {
         const newEntries = action.payload.result || [];

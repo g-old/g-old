@@ -215,7 +215,7 @@ class Proposal {
         // TODO check first if not already closed?
         const pollOne = await Poll.update(
           viewer,
-          { id: proposalInDB.pollOne_id, closed_at: new Date() },
+          { id: proposalInDB.pollOne_id, closedAt: new Date() },
           loaders,
         );
         if (!pollOne) throw Error('No pollOne provided');

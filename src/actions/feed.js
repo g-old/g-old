@@ -10,6 +10,7 @@ query{
   feed {
   id
   type
+  objectId
   verb
   createdAt
   actor {
@@ -27,32 +28,38 @@ query{
       state
       body
       votes
-      pollOne {  id
+      pollOne {
+        id
         upvotes
         downvotes
         threshold
         start_time
         endTime
         allVoters
+        closedAt
         mode{
           id
           withStatements
           unipolar
           thresholdRef
-        }}
-      pollTwo {  id
+        }
+      }
+      pollTwo {
+        id
         upvotes
         downvotes
         threshold
         start_time
         endTime
         allVoters
+        closedAt
         mode{
           id
           withStatements
           unipolar
           thresholdRef
-        }}
+        }
+      }
     }
     ... on StatementDL {
       id
@@ -88,7 +95,6 @@ query{
 }
 }
 `;
-
 export function loadFeed() {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!

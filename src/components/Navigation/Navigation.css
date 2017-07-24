@@ -42,6 +42,10 @@
   display: flex;
 }
 
+.news {
+  color: red;
+}
+
 @media only screen and (max-width: 440px) {
   .navBar {
     display: none;

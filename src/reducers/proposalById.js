@@ -5,6 +5,7 @@ import {
   LOAD_FEED_SUCCESS,
   CREATE_PROPOSAL_SUCCESS,
   UPDATE_PROPOSAL_SUCCESS,
+  SSE_UPDATE_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -23,6 +24,12 @@ export default function byId(state = {}, action) {
     }
     case LOAD_PROPOSAL_LIST_SUCCESS: {
       // change
+      return merge({}, state, action.payload.entities.proposals);
+    }
+
+    case SSE_UPDATE_SUCCESS: {
+      const proposals = action.payload.entities.proposals;
+      if (!proposals) return state;
       return merge({}, state, action.payload.entities.proposals);
     }
 

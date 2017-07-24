@@ -11,10 +11,10 @@ const updateProposal = {
       type: ProposalInputType,
     },
   },
-  resolve: async (data, { proposal }, { viewer, loaders }) => {
-    const updatedProposal = Proposal.update(viewer, proposal, loaders);
+  resolve: async (data, { proposal }, { viewer, loaders, pubsub }) => {
+    const updatedProposal = await Proposal.update(viewer, proposal, loaders);
     if (updatedProposal) {
-      await insertIntoFeed(
+      const activityId = await insertIntoFeed(
         {
           viewer,
           data: { type: 'proposal', objectId: updatedProposal.id, content: updatedProposal },
@@ -22,6 +22,9 @@ const updateProposal = {
         },
         true,
       );
+      if (activityId) {
+        pubsub.publish('activities', { id: activityId });
+      }
     }
     return updatedProposal;
   },

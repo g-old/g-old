@@ -23,6 +23,7 @@ import {
   tagArray as tagArraySchema,
 } from '../store/schema';
 import { getProposalsIsFetching, getIsProposalFetching } from '../reducers';
+import { getFilter } from '../core/helpers';
 
 const statementFields = `
     id
@@ -195,19 +196,6 @@ mutation($id:ID  $poll:PollInput $state:ProposalState ){
 }
 `;
 
-const getFilter = (status) => {
-  switch (status) {
-    case 'accepted':
-      return 'accepted';
-    case 'proposed':
-    case 'voting':
-      return 'active';
-    case 'survey':
-      return 'survey';
-    default:
-      return 'repelled';
-  }
-};
 export function loadProposal({ id }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // Dont fetch if pending

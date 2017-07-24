@@ -25,13 +25,13 @@ function rankInPlace(activity) {
   // how important is this for the user
   const affinity = 1;
   // what action/content happened
-  let content = 1;
-  if (activity.type === 'proposal') {
+  const content = 1;
+  /*  if (activity.type === 'proposal') {
     content = 5;
     if (activity.verb === 'close') {
       content = 10;
     }
-  }
+  } */
 
   // time-based decay
   const decay = timeDecay(activity.createdAt);
@@ -75,15 +75,57 @@ class Feed {
     // process them
     // deduplicate
 
-    // rank
-    allActivities.forEach((el) => {
+    // aggregate
+
+    // filter deleted statements
+    const sorted = allActivities.reduce(
+      (agg, curr) => {
+        if (curr.type === 'statement') {
+          if (curr.verb === 'delete') {
+            // eslint-disable-next-line no-param-reassign
+            agg.del[curr.objectId] = curr.objectId;
+            return agg;
+          }
+          if (curr.verb === 'update') {
+            return agg;
+          }
+        }
+        if (curr.type === 'proposal') {
+          if (curr.verb === 'update') {
+            // eslint-disable-next-line no-param-reassign
+            agg.updatedProposals[curr.objectId] = curr.objectId;
+          }
+        }
+        agg.all.push(curr);
+        return agg;
+      },
+      { del: {}, all: [], updatedProposals: {} },
+    );
+
+    const aggregated = sorted.all.filter((e) => {
+      if (e.objectId in sorted.del) {
+        return false;
+      }
+      if (e.type === 'proposal') {
+        if (e.objectId in sorted.updatedProposals) {
+          if (e.verb === 'update') {
+            return true; // get only updated ones
+          }
+          return false;
+        }
+      }
+      return true;
+    });
+
+    aggregated.forEach((el) => {
       rankInPlace(el);
     });
 
-    // sort
-    //  allActivities.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    allActivities.sort((a, b) => b.rank - a.rank);
-    return allActivities;
+    aggregated.sort((a, b) => b.rank - a.rank);
+
+    // TODO store activity ids in userfeed - then recompose only if updates in other feeds
+    // TODO paginate feed. How?
+    return aggregated;
   }
 }
 

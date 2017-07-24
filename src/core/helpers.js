@@ -215,3 +215,17 @@ export const getProtocol = (req) => {
   proto = req.headers['x-forwarded-proto'] || proto;
   return proto.split(/\s*,\s*/)[0];
 };
+
+export const getFilter = (status) => {
+  switch (status) {
+    case 'accepted':
+      return 'accepted';
+    case 'proposed':
+    case 'voting':
+      return 'active';
+    case 'survey':
+      return 'survey';
+    default:
+      return 'repelled';
+  }
+};

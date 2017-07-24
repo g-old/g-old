@@ -10,6 +10,7 @@ import {
   LOAD_FLAGGEDSTMTS_SUCCESS,
   LOAD_FEED_SUCCESS,
   SESSION_LOGIN_SUCCESS,
+  SSE_UPDATE_SUCCESS,
 } from '../constants';
 
 export default function roles(state = {}, action) {
@@ -17,6 +18,11 @@ export default function roles(state = {}, action) {
     case LOAD_PROPOSAL_SUCCESS:
     case LOAD_PROPOSAL_LIST_SUCCESS: {
       return merge({}, state, action.payload.entities.roles);
+    }
+    case SSE_UPDATE_SUCCESS: {
+      return action.payload.entities.roles
+        ? merge({}, state, action.payload.entities.roles)
+        : state;
     }
     case LOAD_FEED_SUCCESS:
     case SESSION_LOGIN_SUCCESS:

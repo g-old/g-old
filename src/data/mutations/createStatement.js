@@ -12,10 +12,10 @@ const createStatement = {
       description: 'Create a new Statement',
     },
   },
-  resolve: async (data, { statement }, { viewer, loaders }) => {
+  resolve: async (data, { statement }, { viewer, loaders, pubsub }) => {
     const newStatement = await Statement.create(viewer, statement, loaders);
     if (newStatement) {
-      await insertIntoFeed(
+      const activityId = await insertIntoFeed(
         {
           viewer,
           data: { type: 'statement', objectId: newStatement.id, content: newStatement },
@@ -23,6 +23,7 @@ const createStatement = {
         },
         true,
       );
+      pubsub.publish('activities', { id: activityId });
     }
     return newStatement;
   },

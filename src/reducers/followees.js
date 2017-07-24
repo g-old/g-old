@@ -10,7 +10,7 @@ const allIds = (state = [], action) => {
       const { polls } = action.payload.entities;
 
       const ids = Object.keys(polls).reduce((acc, curr) => {
-        const voteIds = polls[curr].followees;
+        const voteIds = polls[curr].followees || [];
         return acc.concat(
           voteIds.map((vId) => {
             const vote = action.payload.entities.votes[vId];
@@ -52,7 +52,7 @@ const votesByPoll = (state = {}, action) => {
     case LOAD_PROPOSAL_SUCCESS: {
       const { polls } = action.payload.entities;
       const pollVotes = Object.keys(polls).reduce((acc, curr) => {
-        const voteIds = polls[curr].followees;
+        const voteIds = polls[curr].followees || [];
 
         return { ...acc, [curr]: [...voteIds] };
       }, {});
@@ -76,7 +76,7 @@ const votesByFollowee = (state = {}, action) => {
     case LOAD_PROPOSAL_SUCCESS: {
       const { polls, votes } = action.payload.entities;
       const followeeVotes = Object.keys(polls).reduce((acc, curr) => {
-        const voteIds = polls[curr].followees;
+        const voteIds = polls[curr].followees || [];
 
         const followeesWithVote = voteIds.reduce(
           (a, c) => ({

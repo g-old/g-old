@@ -42,6 +42,7 @@ import flagConnection from './queries/flagConnection';
 import createPushSub from './mutations/createPushSub';
 import deletePushSub from './mutations/deletePushSub';
 import notify from './mutations/sendNotification';
+import activities from './subscriptions/activities';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -85,6 +86,12 @@ const schema = new Schema({
       createPushSub,
       deletePushSub,
       notify,
+    },
+  }),
+  subscription: new ObjectType({
+    name: 'Subscriptions',
+    fields: {
+      activities,
     },
   }),
 });

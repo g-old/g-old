@@ -55,6 +55,7 @@ exports.seed = function (knex, Promise) {
           verb,
           type: 'statement',
           object_id: object.id,
+          content: JSON.stringify(object),
           created_at: createdAt,
         };
       } else if ('state' in object) {
@@ -90,6 +91,7 @@ exports.seed = function (knex, Promise) {
           verb,
           type: 'proposal',
           object_id: object.id,
+          content: JSON.stringify(object),
           created_at: createdAt,
         };
       } else if ('position' in object) {
@@ -105,7 +107,8 @@ exports.seed = function (knex, Promise) {
           createdAt.setDate(time.getDate() - randomNumber(70));
         }
 
-        data = { actor_id: object.user_id, verb, type: 'vote', object_id: object.id, created_at: createdAt };
+        data = { actor_id: object.user_id, verb, type: 'vote', object_id: object.id, content: JSON.stringify(object),
+ created_at: createdAt };
       }
       knex('activities').insert(data).returning('id').then(id => resolve(id));
     });

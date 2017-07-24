@@ -2,7 +2,7 @@ import knex from '../data/knex';
 import { insertIntoFeed } from './feed';
 import log from '../logger';
 
-async function proposalPolling() {
+async function proposalPolling(pubsub) {
   const proposals = await knex('proposals')
     .innerJoin('polls', function () {
       this.on(function () {
@@ -85,10 +85,7 @@ async function proposalPolling() {
       }
     }
     // TODO in transaction!
-    const pollId =
-      proposal.state === 'proposed' || proposal.state === 'survey'
-        ? proposal.pollOneId
-        : proposal.pollTwoId;
+
     return knex('proposals')
       .where({ id: proposal.id })
       .update({ state: newState, updated_at: new Date() })
@@ -96,35 +93,36 @@ async function proposalPolling() {
       .then((proposalData) => {
         const data = proposalData[0];
 
-        return Promise.all([
-          insertIntoFeed(
-            {
-              viewer: { id: 0, role: { type: 'system' } },
-              data: { type: 'proposal', content: data, objectId: data.id },
-              verb: 'update',
-            },
-            true,
-          ).catch(err => log.error({ err }, 'Feed insertion failed - worker- ')),
-          knex('polls')
-            .where({ id: pollId })
-            .update({ closed_at: new Date(), updated_at: new Date() }),
-        ]);
+        return insertIntoFeed(
+          {
+            viewer: { id: 0, role: { type: 'system' } },
+            data: { type: 'proposal', content: data, objectId: data.id },
+            verb: 'update',
+          },
+          true,
+        )
+          .then((activityId) => {
+            if (activityId) {
+              pubsub.publish('activities', { id: activityId });
+            }
+          })
+          .catch(err => log.error({ err }, 'Feed insertion failed -worker- '));
       });
   });
 
-  await Promise.all(mutations);
+  return Promise.all(mutations);
 
   // workerFn();
 }
 
-const worker = async () => {
+const worker = async (pubsub) => {
   try {
-    proposalPolling(worker);
+    proposalPolling(pubsub);
   } catch (e) {
     console.error(e);
   }
   setTimeout(() => {
-    worker();
+    worker(pubsub);
   }, 10000);
 };
 

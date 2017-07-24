@@ -14,11 +14,11 @@ const createProposal = {
       description: 'Create a new Proposal',
     },
   },
-  resolve: async (data, { proposal }, { viewer, loaders }) => {
+  resolve: async (data, { proposal }, { viewer, loaders, pubsub }) => {
     const newProposal = await Proposal.create(viewer, proposal, loaders);
 
     if (newProposal) {
-      await insertIntoFeed(
+      const activityId = await insertIntoFeed(
         {
           viewer,
           data: { type: 'proposal', content: newProposal, objectId: newProposal.id },
@@ -26,6 +26,9 @@ const createProposal = {
         },
         true,
       );
+      if (activityId) {
+        pubsub.publish('activities', { id: activityId });
+      }
       if (!sendJob({ type: 'webpush', data: newProposal })) {
         log.error(
           { viewer, job: { type: 'webpush', data: newProposal } },

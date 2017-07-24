@@ -48,13 +48,16 @@ import { getProtocol } from './core/helpers';
 import privateConfig from '../private_configs';
 import { checkToken } from './core/tokens';
 import log from './logger';
+import { SubscriptionManager, SubscriptionServer } from './core/sse';
+import PubSub from './core/pubsub';
 
-worker();
+const pubsub = new PubSub();
+
+worker(pubsub);
 BWorker.start(path.resolve(__dirname, 'backgroundWorker.js'));
 
 const app = express();
 
-//
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the
 // user agent is not known.
 // -----------------------------------------------------------------------------
@@ -352,6 +355,20 @@ app.post('/verify', (req, res) =>
     }),
 );
 
+const subscriptionManager = new SubscriptionManager({ schema, pubsub });
+SubscriptionServer({
+  onSubscribe: (msg, params) =>
+    Object.assign({}, params, {
+      context: {
+        loaders: createLoaders(),
+        pubsub,
+      },
+    }),
+  subscriptionManager,
+  express: app,
+  path: '/updates',
+});
+
 app.get('/test', (req, res, next) => {
   knex('users')
     .where({ name: 'admin' })
@@ -377,6 +394,7 @@ const graphqlMiddleware = expressGraphQL(req => ({
   context: {
     viewer: req.user,
     loaders: createLoaders(),
+    pubsub,
   },
 }));
 

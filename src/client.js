@@ -193,6 +193,7 @@ if (module.hot) {
   module.hot.accept('./router', () => {
     if (appInstance) {
       // Force-update the whole tree, including components that refuse to update
+      //  onLocationChange(currentLocation);
       deepForceUpdate(appInstance);
     }
   });

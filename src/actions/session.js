@@ -10,6 +10,8 @@ import {
   SESSION_LOGIN_SUCCESS,
   SESSION_LOGIN_ERROR,
 } from '../constants';
+
+import { createSSESub, closeSSE } from './sseSubs';
 // import fetch from '../core/fetch';
 
 export function logout() {
@@ -21,6 +23,7 @@ export function logout() {
         user,
       },
     });
+    dispatch(closeSSE());
     try {
       const resp = await fetch('/logout', {
         method: 'post',
@@ -45,6 +48,7 @@ export function logout() {
           error,
         },
       });
+
       return false;
     }
 
@@ -94,6 +98,8 @@ export function login(data) {
           id: initialId,
         });
       }
+
+      dispatch(createSSESub());
 
       history.push(redirect || '/feed');
     } catch (error) {

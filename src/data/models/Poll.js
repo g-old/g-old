@@ -103,7 +103,7 @@ class Poll {
     if (!data.id) return null;
     const newData = {};
     if (data.closedAt) {
-      newData.closedAt = data.closedAt;
+      newData.closed_at = data.closedAt;
     }
 
     const pollId = await knex.transaction(async (trx) => {

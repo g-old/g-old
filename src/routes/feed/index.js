@@ -3,6 +3,7 @@ import Layout from '../../components/Layout';
 import { loadFeed } from '../../actions/feed';
 import FeedContainer from './FeedContainer';
 import { getSessionUser } from '../../reducers';
+import { RESET_ACTIVITY_COUNTER } from '../../constants';
 
 const title = 'Feed';
 
@@ -18,10 +19,15 @@ async function action({ store, path }) {
   } else {
     store.dispatch(loadFeed());
   }
+  store.dispatch({ type: RESET_ACTIVITY_COUNTER, payload: { feed: true } });
   return {
     chunks: ['feed'],
     title,
-    component: <Layout><FeedContainer /> </Layout>,
+    component: (
+      <Layout>
+        <FeedContainer />{' '}
+      </Layout>
+    ),
   };
 }
 

@@ -1,0 +1,191 @@
+/* eslint-disable import/prefer-default-export */
+import { normalize } from 'normalizr';
+import {
+  CREATE_SSESUB_START,
+  CREATE_SSESUB_SUCCESS,
+  CREATE_SSESUB_ERROR,
+  SSE_UPDATE_SUCCESS,
+} from '../constants';
+import { activity as activitySchema } from '../store/schema';
+import { getFilter } from '../core/helpers';
+import { getSessionUser } from '../reducers';
+
+const activitiesSubscription = `
+subscription{
+  activities {
+  id
+  type
+  objectId
+  verb
+  createdAt
+  actor {
+    id
+    name
+    surname
+    avatar
+  }
+  object {
+    __typename
+    ... on ProposalDL {
+      id
+      title
+      publishedAt
+      state
+      body
+      votes
+      pollOne {
+        id
+        upvotes
+        downvotes
+        threshold
+        start_time
+        endTime
+        allVoters
+        closedAt
+        mode{
+          id
+          withStatements
+          unipolar
+          thresholdRef
+        }
+      }
+      pollTwo {
+        id
+        upvotes
+        downvotes
+        threshold
+        start_time
+        endTime
+        allVoters
+        closedAt
+        mode{
+          id
+          withStatements
+          unipolar
+          thresholdRef
+        }
+      }
+    }
+    ... on StatementDL {
+      id
+      likes
+      text
+      pollId
+      createdAt
+      updatedAt
+      vote{
+        id
+        position
+      }
+      author{
+        id
+        name
+        surname
+        avatar
+      }
+
+    }
+    ... on VoteDL {
+      id
+      position
+      pollId
+      voter{
+        id
+        name
+        surname
+        avatar
+      }
+    }
+  }
+}
+}
+`;
+let eventSource = null;
+export function createSSESub() {
+  return async (dispatch, getState, { fetch }) => {
+    const user = getSessionUser(getState());
+    if (!user || user.role.type === 'guest') {
+      return false;
+    }
+    if (eventSource && eventSource.readyState !== 2) {
+      // closed
+      console.info('Already connected or connecting');
+      return false;
+    }
+
+    if (!EventSource) {
+      console.error('Browser does not support SSE');
+      return false;
+    }
+
+    dispatch({
+      type: CREATE_SSESUB_START,
+    });
+    try {
+      const response = await fetch('/updates', {
+        body: JSON.stringify({ query: activitiesSubscription }),
+        method: 'post',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      // returns subId,
+      const resp = await response.json();
+      eventSource = new EventSource(`/updates/${resp.subId}`, {
+        withCredentials: true,
+      });
+      eventSource.onmessage = (e) => {
+        const message = JSON.parse(e.data);
+
+        switch (message.type) {
+          case 'DATA': {
+            const normalizedData = normalize(message.data.activities, activitySchema);
+            let filter = null;
+            if (message.data.activities.type === 'proposal') {
+              filter = getFilter(message.data.activities.object.state);
+            }
+            dispatch({
+              type: SSE_UPDATE_SUCCESS,
+              payload: normalizedData,
+              filter,
+            });
+            break;
+          }
+          case 'KEEPALIVE':
+            break;
+          default:
+            break;
+        }
+      };
+
+      eventSource.onerror = () => {
+        eventSource.close();
+        if (getState().user) {
+          setTimeout(() => {
+            dispatch(createSSESub());
+          }, 5000);
+        }
+      };
+
+      dispatch({
+        type: CREATE_SSESUB_SUCCESS,
+      });
+    } catch (e) {
+      dispatch({
+        type: CREATE_SSESUB_ERROR,
+        payload: e,
+      });
+    }
+    return true;
+  };
+}
+
+export function closeSSE() {
+  return async () => {
+    if (eventSource) {
+      eventSource.close();
+    }
+  };
+}

@@ -8,8 +8,11 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { connect } from 'react-redux';
+import { getActivityCounter } from '../../reducers';
 import s from './Navigation.css';
 import Link from '../Link';
 import Menu from '../Menu';
@@ -39,12 +42,20 @@ const messages = defineMessages({
   },
 });
 
-const getMenu = className =>
+const getMenu = (className, counter) =>
   (<div className={className}>
     <Link className={s.link} to="/feed">
-      Feed
+      {counter.feed > 0 &&
+        <span className={s.news}>
+          {`(${counter.feed}) `}
+        </span>}
+      {'Feed'}
     </Link>
     <Link className={s.link} to="/proposals/active">
+      {counter.proposals > 0 &&
+        <span className={s.news}>
+          {'NEW '}
+        </span>}
       <FormattedMessage {...messages.proposals} />
     </Link>
     <Link className={s.link} to="/surveys">
@@ -59,13 +70,16 @@ const getMenu = className =>
   </div>);
 
 class Navigation extends React.Component {
+  static propTypes = {
+    activityCounter: PropTypes.number.isRequired,
+  };
   render() {
     return (
       <div className={s.root} role="navigation">
-        {getMenu(s.navBar)}
+        {getMenu(s.navBar, this.props.activityCounter)}
         <div className={s.menu}>
           <Menu withControl icon={<Icon icon={ICONS.menu} size={20} color="grey" />}>
-            {getMenu(s.menuContent)}
+            {getMenu(s.menuContent, this.props.activityCounter)}
           </Menu>
         </div>
       </div>
@@ -73,4 +87,8 @@ class Navigation extends React.Component {
   }
 }
 
-export default withStyles(s)(Navigation);
+const mapToProps = state => ({
+  activityCounter: getActivityCounter(state),
+});
+
+export default connect(mapToProps, null)(withStyles(s)(Navigation));

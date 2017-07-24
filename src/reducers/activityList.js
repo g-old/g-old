@@ -1,10 +1,18 @@
 import { combineReducers } from 'redux';
-import { LOAD_FEED_SUCCESS, LOAD_FEED_START, LOAD_FEED_ERROR } from '../constants';
+import {
+  LOAD_FEED_SUCCESS,
+  LOAD_FEED_START,
+  LOAD_FEED_ERROR,
+  SSE_UPDATE_SUCCESS,
+} from '../constants';
 
 const ids = (state = [], action) => {
   switch (action.type) {
     case LOAD_FEED_SUCCESS: {
       return [...action.payload.result]; // [...new Set([...state, ...action.payload.result])];
+    }
+    case SSE_UPDATE_SUCCESS: {
+      return [action.payload.result, ...state];
     }
     default:
       return state;

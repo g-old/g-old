@@ -6,6 +6,7 @@ import {
   LOAD_FEED_SUCCESS,
   DELETE_VOTE_SUCCESS,
   UPDATE_VOTE_SUCCESS,
+  SSE_UPDATE_SUCCESS,
 } from '../constants';
 
 const sortStatementsByPoll = (stmts, votes) =>
@@ -45,6 +46,40 @@ const byPoll = (state = {}, action) => {
       return {
         ...state,
         ...sorted,
+      };
+    }
+    case SSE_UPDATE_SUCCESS: {
+      const stmts = action.payload.entities.statements;
+      if (!stmts) return state;
+      const activity = action.payload.entities.activities[action.payload.result];
+      const pollId = stmts[activity.objectId].pollId;
+
+      if (activity.type === 'statement' && activity.verb === 'delete') {
+        // check first if polls are in store
+        if (state[pollId]) {
+          // eslint-disable-next-line no-unused-vars
+          return {
+            ...state,
+            [pollId]: {
+              all: state[pollId].all.filter(i => i !== activity.objectId),
+              pro: state[pollId].pro.filter(i => i !== activity.objectId),
+              con: state[pollId].con.filter(i => i !== activity.objectId),
+            },
+          };
+        }
+        return state;
+      }
+
+      const sorted = sortStatementsByPoll(stmts, action.payload.entities.votes);
+      const currentState = state[pollId] || [];
+      return {
+        ...state,
+        [pollId]: {
+          ...state[pollId],
+          all: [...(currentState.all || []), ...sorted[pollId].all],
+          pro: [...(currentState.pro || []), ...sorted[pollId].pro],
+          con: [...(currentState.con || []), ...sorted[pollId].con],
+        },
       };
     }
     case CREATE_STATEMENT_SUCCESS: {

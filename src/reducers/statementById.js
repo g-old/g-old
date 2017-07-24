@@ -12,6 +12,7 @@ import {
   LOAD_FLAGGEDSTMTS_SUCCESS,
   UPDATE_FLAGGEDSTMT_SUCCESS,
   LOAD_FEED_SUCCESS,
+  SSE_UPDATE_SUCCESS,
 } from '../constants';
 
 export default function statements(state = {}, action) {
@@ -28,6 +29,22 @@ export default function statements(state = {}, action) {
       // eslint-disable-next-line no-unused-vars
       const { ownStatementId: omit, ...other } = state;
       return other;
+    }
+    case SSE_UPDATE_SUCCESS: {
+      const stmts = action.payload.entities.statements;
+      if (!stmts) return state;
+      const activity = action.payload.entities.activities[action.payload.result];
+      if (activity.type === 'statement' && activity.verb === 'delete') {
+        // check first if in store
+        /*  if (state[activity.objectId]) {
+          // eslint-disable-next-line no-unused-vars
+
+          const { [activity.objectId]: omit, ...other } = state;
+          return other;
+        } */
+        return state;
+      }
+      return merge({}, state, action.payload.entities.statements);
     }
     case LOAD_FEED_SUCCESS: {
       return merge({}, state, action.payload.entities.statements);

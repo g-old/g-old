@@ -1,9 +1,8 @@
-import {
-  GraphQLNonNull,
-} from 'graphql';
+import { GraphQLNonNull } from 'graphql';
 import StatementInputType from '../types/StatementInputType';
 import StatementType from '../types/StatementDLType';
 import Statement from '../models/Statement';
+import { insertIntoFeed } from '../../core/feed';
 
 const updateStatement = {
   type: new GraphQLNonNull(StatementType),
@@ -12,9 +11,23 @@ const updateStatement = {
       type: StatementInputType,
     },
   },
-  resolve: (data, { statement }, { viewer, loaders }) =>
-      Statement.update(viewer, statement, loaders),
-
+  resolve: async (data, { statement }, { viewer, loaders, pubsub }) => {
+    const updatedStatement = await Statement.update(viewer, statement, loaders);
+    if (updatedStatement) {
+      const activityId = await insertIntoFeed(
+        {
+          viewer,
+          data: { type: 'statement', objectId: updatedStatement.id, content: updatedStatement },
+          verb: 'update',
+        },
+        true,
+      );
+      if (activityId) {
+        pubsub.publish('activities', { id: activityId });
+      }
+    }
+    return updatedStatement;
+  },
 };
 
 export default updateStatement;

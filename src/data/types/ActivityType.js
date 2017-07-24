@@ -25,13 +25,29 @@ const ActivityType = new GraphQLObjectType({
     verb: {
       type: GraphQLString, // or enum?
     },
+    objectId: {
+      type: GraphQLID,
+    },
     object: {
       type: ObjectType,
       resolve: (parent, args, { viewer, loaders }) => {
         if (parent.type === 'proposal') {
+          if (parent.verb === 'update') {
+            loaders.proposals.clear(parent.objectId);
+            loaders.polls.clearAll(); // or specify
+          }
           return Proposal.gen(viewer, parent.objectId, loaders);
         }
         if (parent.type === 'statement') {
+          if (parent.verb === 'delete') {
+            return new Statement({
+              id: parent.content.id,
+              poll_id: parent.content.pollId,
+            });
+          }
+          if (parent.verb === 'update') {
+            loaders.statements.clear(parent.objectId);
+          }
           return Statement.gen(viewer, parent.objectId, loaders);
         }
         if (parent.type === 'vote') {

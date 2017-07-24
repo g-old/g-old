@@ -7,25 +7,29 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React from "react";
-import Layout from "../../components/Layout";
-import { getSessionUser } from "../../reducers";
-import Admin from "./Admin";
+import React from 'react';
+import Layout from '../../components/Layout';
+import { getSessionUser } from '../../reducers';
+import Admin from './Admin';
 
-const title = "Admin Page";
+const title = 'Admin Page';
 
 async function action({ store, path }) {
   const user = getSessionUser(store.getState());
   if (!user) {
     return { redirect: `/?redirect=${path}` };
-  } else if (!["admin", "mod"].includes(user.role.type)) {
+  } else if (!['admin', 'mod'].includes(user.role.type)) {
     return { component: <div> You have to login as admin or mod!</div> };
   }
 
   return {
     title,
-    chunks: ["admin"],
-    component: <Layout><Admin title={title} /></Layout>
+    chunks: ['admin'],
+    component: (
+      <Layout>
+        <Admin title={title} />
+      </Layout>
+    ),
   };
 }
 

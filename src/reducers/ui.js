@@ -4,7 +4,7 @@ import statements, * as fromStatement from './ui/statements';
 import users, * as fromUser from './ui/users';
 import polls, * as fromPoll from './ui/polls';
 import subscription, * as fromSubscription from './ui/subscription';
-
+import activityCounter, * as fromActivityCounter from './ui/activities';
 import { SESSION_LOGOUT_SUCCESS } from '../constants';
 
 /* export default combineReducers({
@@ -19,6 +19,7 @@ const uiReducer = combineReducers({
   statements,
   users,
   subscription,
+  activityCounter,
 });
 export default (state, action) => {
   if (action.type === SESSION_LOGOUT_SUCCESS) {
@@ -92,3 +93,5 @@ export const getStatementUpdates = state => fromStatement.getUpdates(state.state
 export const getAccountUpdates = (state, id) => fromUser.getStatus(state.users, id) || {};
 
 export const getSubscription = state => fromSubscription.getStatus(state.subscription);
+
+export const getActivityCounter = state => fromActivityCounter.getCounter(state.activityCounter);
