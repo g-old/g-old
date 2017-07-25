@@ -124,25 +124,34 @@ class StatementsContainer extends React.Component {
       // eslint-disable-next-line eqeqeq
       statementsList = statements.filter(s => s.author.id != user.id);
     }
+    const outDated = {};
+
     return (
       <div>
         {ownStatementsNode}
-        {statementsList.map(s =>
-          (<Statement
-            {...s}
-            user={user}
-            key={s.id}
-            ownLike={likedStatements && likedStatements.find(data => data.statementId === s.id)}
-            onLike={this.props.createLike}
-            onDeleteLike={this.props.deleteLike}
-            onFollow={this.props.updateUser}
-            onDelete={this.props.deleteStatement}
-            onModeration={this.props.solveFlag}
-            onFlagging={this.props.flag}
-            followees={followees}
-            isFollowee={followees.some(f => f.id === s.author.id)}
-          />),
-        )}
+        {statementsList.map((s) => {
+          if (s.author.id in outDated) {
+            return null; // older one passes, newer one not. TODO find solution
+          }
+          outDated[s.author.id] = s.id;
+
+          return (
+            <Statement
+              {...s}
+              user={user}
+              key={s.id}
+              ownLike={likedStatements && likedStatements.find(data => data.statementId === s.id)}
+              onLike={this.props.createLike}
+              onDeleteLike={this.props.deleteLike}
+              onFollow={this.props.updateUser}
+              onDelete={this.props.deleteStatement}
+              onModeration={this.props.solveFlag}
+              onFlagging={this.props.flag}
+              followees={followees}
+              isFollowee={followees.some(f => f.id === s.author.id)}
+            />
+          );
+        })}
       </div>
     );
   }

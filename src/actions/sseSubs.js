@@ -76,6 +76,13 @@ subscription{
       vote{
         id
         position
+        pollId
+        voter{
+          id
+          name
+          surname
+          avatar
+        }
       }
       author{
         id

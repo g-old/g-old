@@ -35,17 +35,44 @@ class FeedContainer extends React.Component {
     if (errorMessage && !activities.length) {
       return <FetchError message={errorMessage} onRetry={() => this.props.loadFeed()} />;
     }
+
+    const outDated = {};
     return (
       <div>
         <h1>feed</h1>
-        {activities.map(activity =>
-          (<Activity
-            actor={activity.actor}
-            date={activity.createdAt}
-            verb={activity.verb}
-            content={activity.object}
-          />),
-        )}
+        {activities.map((activity) => {
+          if (activity.type === 'statement') {
+            if (activity.verb === 'update') {
+              outDated[activity.objectId] = activity.objectId;
+            } else if (activity.verb === 'delete') {
+              outDated[activity.objectId] = activity.objectId;
+              return null;
+            } else if (activity.objectId in outDated) {
+              return null;
+            } else if (activity.verb === 'create') {
+              if (activity.object) {
+                if (
+                  activity.object.pollId in outDated &&
+                  activity.object.author.id === outDated[activity.object.pollId]
+                ) {
+                  return null;
+                }
+                outDated[activity.object.pollId] = activity.object.author.id;
+              } else {
+                return null;
+              }
+            }
+          }
+
+          return (
+            <Activity
+              actor={activity.actor}
+              date={activity.createdAt}
+              verb={activity.verb}
+              content={activity.object}
+            />
+          );
+        })}
       </div>
     );
   }

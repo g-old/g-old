@@ -73,6 +73,21 @@ class Navigation extends React.Component {
   static propTypes = {
     activityCounter: PropTypes.number.isRequired,
   };
+
+  componentWillReceiveProps({ activityCounter }) {
+    if (process.env.BROWSER && (activityCounter.feed !== 0 || activityCounter.proposals !== 0)) {
+      let oldTitle = document.title;
+      const news = oldTitle.indexOf(')');
+      if (news > -1) {
+        oldTitle = oldTitle.substr(news + 2);
+      }
+      const notice =
+        activityCounter.feed > activityCounter.proposals
+          ? activityCounter.feed
+          : activityCounter.proposals;
+      document.title = `(${notice}) ${oldTitle}`;
+    }
+  }
   render() {
     return (
       <div className={s.root} role="navigation">

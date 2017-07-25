@@ -10,7 +10,10 @@ import { ICONS } from '../../constants';
 import Menu from '../Menu';
 import Button from '../Button';
 
-const EditMenu = props => <div>{props.children}</div>;
+const EditMenu = props =>
+  (<div>
+    {props.children}
+  </div>);
 EditMenu.propTypes = {
   children: PropTypes.element,
 };
@@ -110,7 +113,7 @@ class Statement extends React.Component {
   }
 
   onEditStatement() {
-    this.setState({ ...this.state, edit: true });
+    this.setState({ textArea: { val: this.props.text }, edit: true });
   }
 
   onTextChange(e) {
@@ -218,7 +221,6 @@ class Statement extends React.Component {
         <EditMenu>
           {!deletedAt &&
             <span style={{ marginRight: '0.5em' }}>
-
               {this.state.edit
                 ? <span>
                   <Button
@@ -247,7 +249,6 @@ class Statement extends React.Component {
                       </svg>
                       }
                   />
-
                 </span>
                 : <Button
                   plain

@@ -11,73 +11,68 @@
 
 // The top-level (parent) route
 const routes = {
-  path: "/",
+  path: '/',
 
   // Keep in mind, routes are evaluated in order
   children: [
     {
-      path: "/",
-      load: () => import(/* webpackChunkName: 'home' */ "./home")
+      path: '/',
+      load: () => import(/* webpackChunkName: 'home' */ './home'),
     },
     {
-      path: "/feed",
-      load: () => import(/* webpackChunkName: 'feed' */ "./feed")
+      path: '/feed',
+      load: () => import(/* webpackChunkName: 'feed' */ './feed'),
     },
     {
-      path: "/proposal/:id/:pollId",
-      load: () => import(/* webpackChunkName: 'proposal' */ "./proposal")
+      path: '/proposal/:id/:pollId',
+      load: () => import(/* webpackChunkName: 'proposal' */ './proposal'),
     },
     {
-      path: "/proposals/:state",
-      load: () => import(/* webpackChunkName: 'proposals' */ "./proposals")
+      path: '/proposals/:state',
+      load: () => import(/* webpackChunkName: 'proposals' */ './proposals'),
     },
     {
-      path: "/about",
-      load: () => import(/* webpackChunkName: 'about' */ "./about")
+      path: '/about',
+      load: () => import(/* webpackChunkName: 'about' */ './about'),
     },
     {
-      path: "/surveys",
-      load: () => import(/* webpackChunkName: 'surveys' */ "./surveys")
+      path: '/surveys',
+      load: () => import(/* webpackChunkName: 'surveys' */ './surveys'),
     },
     {
-      path: "/account",
-      load: () => import(/* webpackChunkName: 'account' */ "./account")
+      path: '/account',
+      load: () => import(/* webpackChunkName: 'account' */ './account'),
     },
     {
-      path: "/admin",
-      load: () => import(/* webpackChunkName: 'admin' */ "./admin")
+      path: '/admin',
+      load: () => import(/* webpackChunkName: 'admin' */ './admin'),
     },
     {
-      path: "/signup",
-      load: () => import(/* webpackChunkName: 'signup' */ "./signup")
+      path: '/signup',
+      load: () => import(/* webpackChunkName: 'signup' */ './signup'),
     },
     {
-      path: "/logged-out",
-      load: () => import(/* webpackChunkName: 'loggedOut' */ "./loggedOut")
+      path: '/logged-out',
+      load: () => import(/* webpackChunkName: 'loggedOut' */ './loggedOut'),
     },
     {
-      path: "/account/password/reset",
-      load: () =>
-        import(/* webpackChunkName: 'passwordRecovery' */ "./passwordRecovery")
+      path: '/account/password/reset',
+      load: () => import(/* webpackChunkName: 'passwordRecovery' */ './passwordRecovery'),
     },
     {
-      path: "/reset/:token",
-      load: () =>
-        import(/* webpackChunkName: 'passwordReset' */ "./passwordReset")
+      path: '/reset/:token',
+      load: () => import(/* webpackChunkName: 'passwordReset' */ './passwordReset'),
     },
     {
-      path: "/verify",
-      load: () =>
-        import(
-          /* webpackChunkName: 'emailVerification' */ "./emailVerification"
-        )
+      path: '/verify',
+      load: () => import(/* webpackChunkName: 'emailVerification' */ './emailVerification'),
     },
 
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     {
-      path: "*",
-      load: () => import(/* webpackChunkName: 'not-found' */ "./not-found")
-    }
+      path: '*',
+      load: () => import(/* webpackChunkName: 'not-found' */ './not-found'),
+    },
   ],
 
   async action({ next }) {
@@ -85,18 +80,18 @@ const routes = {
     const route = await next();
 
     // Provide default values for title, description etc.
-    route.title = `${route.title || "Untitled Page"} - www.gold.com`;
-    route.description = route.description || "";
+    route.title = `${route.title || 'Untitled Page'} - g-old.org`;
+    route.description = route.description || '';
 
     return route;
-  }
+  },
 };
 
 // The error page is available by permanent url for development mode
 if (__DEV__) {
   routes.children.unshift({
-    path: "/error",
-    action: require("./error").default
+    path: '/error',
+    action: require('./error').default,
   });
 }
 

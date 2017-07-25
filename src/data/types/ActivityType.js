@@ -48,6 +48,8 @@ const ActivityType = new GraphQLObjectType({
           if (parent.verb === 'update') {
             loaders.statements.clear(parent.objectId);
           }
+          // clear votes loader, bc if user changed vote, it will return wrong values
+          loaders.votes.clear(parent.content.voteId);
           return Statement.gen(viewer, parent.objectId, loaders);
         }
         if (parent.type === 'vote') {
