@@ -149,6 +149,17 @@ class Proposal {
     // return canSee ? new Proposal(data) : new Proposal(data.email = null);
   }
 
+  static async genByPoll(viewer, pollId) {
+    const data = await knex('proposals')
+      .where({ poll_one_id: pollId })
+      .orWhere({ poll_two_id: pollId })
+      .select();
+
+    if (!data[0]) return null;
+    if (viewer == null) return null;
+    return new Proposal(data[0]);
+  }
+
   // eslint-disable-next-line no-unused-vars
   static canMutate(viewer, data) {
     return ['admin', 'mod'].includes(viewer.role.type);

@@ -7,6 +7,7 @@ import Avatar from '../Avatar';
 import Statement from '../Statement';
 import ProposalPreview from '../ProposalPreview';
 import Icon from '../Icon';
+import Link from '../Link';
 
 class Activity extends React.Component {
   static propTypes = {
@@ -18,6 +19,7 @@ class Activity extends React.Component {
         surname: PropTypes.string,
       }),
       state: PropTypes.string,
+      pollId: PropTypes.string,
     }),
     verb: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
@@ -31,7 +33,11 @@ class Activity extends React.Component {
     let header = null;
     /* eslint-disable no-underscore-dangle */
     if (this.props.content && this.props.content.__typename === 'StatementDL') {
-      content = <Statement {...this.props.content} />;
+      content = (
+        <Link to={`/proposal/xxx/${this.props.content.pollId}`}>
+          <Statement {...this.props.content} />
+        </Link>
+      );
       header = 'Look at that statement!';
     } else if (this.props.content && this.props.content.__typename === 'ProposalDL') {
       content = <ProposalPreview proposal={this.props.content} />;
@@ -58,12 +64,14 @@ class Activity extends React.Component {
       }
     } else if (this.props.content && this.props.content.__typename === 'VoteDL') {
       content = (
-        <div>
-          <Avatar user={this.props.content.voter} isFollowee />
-          {`${this.props.content.voter.name} ${this.props.content.voter.surname}`}
-          <br />
-          <Icon icon={'M27 4l-15 15-7-7-5 5 12 12 20-20z'} color={'green'} size={'64'} />
-        </div>
+        <Link to={`/proposal/xxx/${this.props.content.pollId}`}>
+          <div>
+            <Avatar user={this.props.content.voter} isFollowee />
+            {`${this.props.content.voter.name} ${this.props.content.voter.surname}`}
+            <br />
+            <Icon icon={'M27 4l-15 15-7-7-5 5 12 12 20-20z'} color={'green'} size={'64'} />
+          </div>
+        </Link>
       );
       header = 'Just voted!';
     } else {
@@ -75,11 +83,12 @@ class Activity extends React.Component {
     return (
       <div className={s.container}>
         <FormattedRelative value={this.props.date} />
-        <h1>{header}</h1>
+        <h1>
+          {header}
+        </h1>
 
         <div>
           {content}
-
         </div>
       </div>
     );

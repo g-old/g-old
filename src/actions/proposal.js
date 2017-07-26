@@ -108,8 +108,8 @@ pollTwo ${pollFields}
 `;
 
 const query = `
-  query ($id:ID!) {
-    proposalDL (id:$id) {
+  query ($id:ID $pollId: ID) {
+    proposalDL (id:$id pollId:$pollId) {
       ${proposal}
     }
   }
@@ -196,7 +196,7 @@ mutation($id:ID  $poll:PollInput $state:ProposalState ){
 }
 `;
 
-export function loadProposal({ id }) {
+export function loadProposal({ id, pollId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // Dont fetch if pending
     if (getIsProposalFetching(getState(), id)) {
@@ -208,7 +208,7 @@ export function loadProposal({ id }) {
     });
 
     try {
-      const { data } = await graphqlRequest(query, { id });
+      const { data } = await graphqlRequest(query, { id, pollId });
       const normalizedData = normalize(data.proposalDL, proposalSchema);
       // dispatch(addEntities(normalizedData.entities, 'all'));
       const filter = getFilter(data.proposalDL.state);
@@ -218,6 +218,7 @@ export function loadProposal({ id }) {
         filter,
         id,
       });
+      return data.proposalDL.id;
     } catch (error) {
       dispatch({
         type: LOAD_PROPOSAL_ERROR,
@@ -228,8 +229,6 @@ export function loadProposal({ id }) {
       });
       return false;
     }
-
-    return true;
   };
 }
 

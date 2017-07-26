@@ -18,6 +18,7 @@
   margin: 0.1em 0.1em 2em;
   font-size: 0.9em;
   transition: margin 0.5s;
+  color: #000;
 }
 
 .header {
