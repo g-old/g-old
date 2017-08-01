@@ -66,7 +66,6 @@ class Poll {
     if (!data.polling_mode_id) return null;
     if (!data.threshold) return null;
     if (!data.end_time) return null;
-
     // create
     const newPollId = await knex.transaction(async (trx) => {
       const pollingMode = await PollingMode.gen(viewer, data.polling_mode_id, loaders);
@@ -79,7 +78,6 @@ class Poll {
         numVoter = Number(numVoter[0].count);
         if (numVoter < 1) throw Error('Not enough user');
       }
-
       const id = await trx
         .insert(
         {

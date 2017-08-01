@@ -59,7 +59,9 @@ class Activity extends React.Component {
         } else if (this.props.content.state === 'revoked') {
           header = 'Proposal has been revoked';
         } else if (this.props.content.state === 'accepted') {
-          header = 'This voting has been accepted!';
+          header = 'This proposal has been accepted!';
+        } else if (this.props.content.state === 'rejected') {
+          header = 'This proposal has been rejected!';
         }
       }
     } else if (this.props.content && this.props.content.__typename === 'VoteDL') {

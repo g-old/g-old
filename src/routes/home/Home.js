@@ -28,7 +28,6 @@ class Home extends React.Component {
                 history.push('/signup');
               }}
             />
-
           </div>
           <strong className={s.lineThrough}>OR</strong>
           <Login />

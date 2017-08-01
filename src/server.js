@@ -74,14 +74,14 @@ app.use(
   requestLanguage({
     languages: config.locales,
     queryName: 'lang',
-    cookie: {
+    /* cookie: {
       name: 'lang',
       options: {
         path: '/',
         maxAge: 3650 * 24 * 3600 * 1000, // 10 years in miliseconds
       },
       url: '/lang/{language}',
-    },
+    },*/
   }),
 );
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -409,6 +409,10 @@ app.get('*', async (req, res, next) => {
     if (req.user) {
       normalizedData = normalize(req.user, userSchema);
     }
+    let cookieConsent;
+    if (req.cookies) {
+      cookieConsent = req.cookies.consent || null;
+    }
     const initialState = {
       user: normalizedData.result || null,
       entities: {
@@ -418,6 +422,7 @@ app.get('*', async (req, res, next) => {
         roles: normalizedData.entities.roles || {},
       },
       webPushKey: privateConfig.webpush.publicKey,
+      consent: cookieConsent,
     };
     // Universal HTTP client
     const fetch = createFetch(nodeFetch, {

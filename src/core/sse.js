@@ -1,5 +1,6 @@
 import { validate, execute, parse } from 'graphql';
 import { EventEmitter } from 'events';
+import log from '../logger';
 // import { getArgumentValues } from 'graphql/execution/values';
 // import { createAsyncIterator, forAwaitEach, isAsyncIterable } from 'iterall';
 
@@ -152,13 +153,15 @@ export function SubscriptionServer(options) {
       if (options.subscriptionManager.subscriptions[connectionSubId]) {
         options.subscriptionManager.unsubscribe(connectionSubId);
       }
+
       // remove listener;
       ee.removeListener(`e-${connectionSubId}`, listenerCallback);
     });
 
-    req.connection.on('error', (e) => {
-      if (e) {
-        req.connection.close(1011);
+    req.connection.on('error', (err) => {
+      if (err) {
+        log.error({ err }, 'SSE connection error');
+        res.end();
       }
     });
 

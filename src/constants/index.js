@@ -104,7 +104,7 @@ export const CREATE_SSESUB_SUCCESS = 'CREATE_SSESUB_SUCCESS';
 export const CREATE_SSESUB_ERROR = 'CREATE_SSESUB_ERROR';
 export const SSE_UPDATE_SUCCESS = 'SSE_UPDATE_SUCCESS';
 export const RESET_ACTIVITY_COUNTER = 'RESET_ACTIVITY_COUNTER';
-export const ADD_ENTITIES = 'ADD_ENTITIES';
+export const SET_COOKIE_CONSENT = 'SET_COOKIE_CONSENT';
 
 // Con: Not very flexible, you cannot see the role/group/right
 export const PRIVILEGES = {

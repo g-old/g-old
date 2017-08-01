@@ -206,7 +206,9 @@ class AccountProfile extends React.Component {
       return null;
     }
     const { id, avatar, name, surname, role, emailVerified, lastLogin, privilege } = accountData;
-    let PrivilegePanel = null;
+    const { subjectError, notificationTextError } = this.visibleErrors(formFields);
+
+    let PrivilegePanel = <div />;
     // eslint-disable-next-line no-bitwise
     if (privilege && user.privilege & PRIVILEGES.canModifyRights) {
       PrivilegePanel = (
@@ -218,9 +220,67 @@ class AccountProfile extends React.Component {
         />
       );
     }
+
+    let RolePanel = <div />;
+
+    if (
+      /* eslint-disable no-bitwise */
+      privilege &&
+      (user.privilege & PRIVILEGES.canModifyRights ||
+        user.privilege & PRIVILEGES.canUnlockViewer ||
+        user.privilege & PRIVILEGES.canUnlockUser ||
+        user.privilege & PRIVILEGES.canUnlockMod)
+      /* eslint-enable no-bitwise */
+    ) {
+      RolePanel = (
+        <RoleManager
+          updates={updates.role}
+          accountId={id}
+          updateFn={this.props.update}
+          userRole={this.props.user.role.type}
+          accountRole={role.type}
+        />
+      );
+    }
+
+    let NotificationPanel = <div />;
+    // eslint-disable-next-line no-bitwise
+    if (privilege && user.privilege & PRIVILEGES.canNotifyUser) {
+      NotificationPanel = (
+        <AccordionPanel column pad heading={'Notify user'}>
+          <CheckBox checked label="Email" disabled />
+          <fieldset>
+            <FormField label="Subject" error={subjectError}>
+              <input
+                name="subject"
+                type="text"
+                onBlur={this.handleBlur}
+                value={this.state.subject}
+                onChange={this.handleValueChange}
+              />
+            </FormField>
+            <FormField label="Text" error={notificationTextError}>
+              <textarea
+                name="notificationText"
+                onBlur={this.handleBlur}
+                value={this.state.notificationText}
+                onChange={this.handleValueChange}
+              />
+            </FormField>
+          </fieldset>
+          <Button
+            fill
+            primary
+            onClick={this.handleNotification}
+            pending={this.props.updates.notification && this.props.updates.notification.pending}
+            label={<FormattedMessage {...messages.notify} />}
+          />
+        </AccordionPanel>
+      );
+    }
+
     const avatarSet = checkAvatar(avatar);
 
-    const { subjectError, notificationTextError } = this.visibleErrors(formFields);
     return (
       <Layer onClose={this.props.onClose}>
         <Box flex column>
@@ -270,47 +330,9 @@ class AccountProfile extends React.Component {
         {user.id != id &&
           <Box flex column>
             <Accordion>
-              <RoleManager
-                updates={updates.role}
-                accountId={id}
-                updateFn={this.props.update}
-                userRole={this.props.user.role.type}
-                accountRole={role.type}
-              />
-
+              {RolePanel}
               {PrivilegePanel}
-
-              <AccordionPanel column pad heading={'Notify user'}>
-                <CheckBox checked label="Email" disabled />
-                <fieldset>
-                  <FormField label="Subject" error={subjectError}>
-                    <input
-                      name="subject"
-                      type="text"
-                      onBlur={this.handleBlur}
-                      value={this.state.subject}
-                      onChange={this.handleValueChange}
-                    />
-                  </FormField>
-                  <FormField label="Text" error={notificationTextError}>
-                    <textarea
-                      name="notificationText"
-                      onBlur={this.handleBlur}
-                      value={this.state.notificationText}
-                      onChange={this.handleValueChange}
-                    />
-                  </FormField>
-                </fieldset>
-                <Button
-                  fill
-                  primary
-                  onClick={this.handleNotification}
-                  pending={
-                    this.props.updates.notification && this.props.updates.notification.pending
-                  }
-                  label={<FormattedMessage {...messages.notify} />}
-                />
-              </AccordionPanel>
+              {NotificationPanel}
             </Accordion>
           </Box>}
       </Layer>

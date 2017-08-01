@@ -33,7 +33,8 @@ class Layer extends React.Component {
   }
 
   componentWillUnmount() {
-    if (this.originalFocusedElement) {
+    const { hidden } = this.props;
+    if (this.originalFocusedElement && !hidden) {
       if (this.originalFocusedElement.focus) {
         // wait for the fixed positioning to come back to normal
         // see layer styling for reference

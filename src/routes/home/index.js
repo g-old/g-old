@@ -17,6 +17,7 @@ const title = 'Home';
 async function action({ store }) {
   const state = await store.getState();
   const user = getSessionUser(state);
+
   if (user) {
     if (user.role.type === 'guest') {
       return { redirect: '/account' };

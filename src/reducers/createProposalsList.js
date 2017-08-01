@@ -30,7 +30,7 @@ const createList = (filter) => {
         if (!activity.type === 'proposal') {
           return state;
         }
-        return [...new Set([...state, activity.objectId])];
+        return [...new Set([activity.objectId, ...state])];
       }
       case LOAD_PROPOSAL_LIST_SUCCESS: {
         const newEntries = action.payload.result || [];

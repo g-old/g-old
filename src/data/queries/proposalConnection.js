@@ -99,6 +99,7 @@ const proposal = {
       default:
         throw Error(`State not recognized: ${state}`);
     }
+
     const queries = proposals.map(p => Proposal.gen(viewer, p.id, loaders));
     const proposalsSet = proposals.reduce((acc, curr) => {
       acc[curr.id] = curr;
@@ -106,13 +107,14 @@ const proposal = {
     }, {});
     const data = await Promise.all(queries);
     const edges = data.map(p => ({ node: p }));
-    const endCursor = edges.length > 0
-      ? Buffer.from(
-          `${new Date(proposalsSet[edges[edges.length - 1].node.id].time).toJSON()}$${edges[
-            edges.length - 1
-          ].node.id}`,
-        ).toString('base64')
-      : null;
+    const endCursor =
+      edges.length > 0
+        ? Buffer.from(
+            `${new Date(proposalsSet[edges[edges.length - 1].node.id].time).toJSON()}$${edges[
+              edges.length - 1
+            ].node.id}`,
+          ).toString('base64')
+        : null;
 
     const hasNextPage = edges.length === first;
     return {

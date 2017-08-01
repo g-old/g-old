@@ -9,10 +9,21 @@ import {
   SESSION_LOGIN_START,
   SESSION_LOGIN_SUCCESS,
   SESSION_LOGIN_ERROR,
+  SET_COOKIE_CONSENT,
 } from '../constants';
 
 import { createSSESub, closeSSE } from './sseSubs';
 // import fetch from '../core/fetch';
+
+export function allowCookies() {
+  return async (dispatch) => {
+    dispatch({ type: SET_COOKIE_CONSENT, payload: 'YES' });
+    if (process.env.BROWSER) {
+      const maxAge = 3650 * 24 * 3600; // 10 years in seconds
+      document.cookie = `consent=YES;path=/;max-age=${maxAge}`;
+    }
+  };
+}
 
 export function logout() {
   return async (dispatch, getState, { fetch, history }) => {

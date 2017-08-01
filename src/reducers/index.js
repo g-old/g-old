@@ -4,6 +4,7 @@ import runtime from './runtime';
 import intl, * as fromIntl from './intl';
 import entities, * as fromEntity from './entities';
 import ui, * as fromUi from './ui';
+import consent from './consent';
 
 export default combineReducers({
   user,
@@ -12,6 +13,7 @@ export default combineReducers({
   entities,
   ui,
   webPushKey: (state = '') => state,
+  consent,
 });
 
 export const getVisibleProposals = (state, filter) =>

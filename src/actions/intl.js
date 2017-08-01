@@ -55,9 +55,12 @@ export function setLocale({ locale }) {
 
       // remember locale for every new request
       if (process.env.BROWSER) {
+        //  const consent = getState().consent;
+        //  if (consent === 'YES') {
         const maxAge = 3650 * 24 * 3600; // 10 years in seconds
         document.cookie = `lang=${locale};path=/;max-age=${maxAge}`;
         history.push(`?lang=${locale}`);
+        //  }
       }
 
       // return bound intl instance at the end

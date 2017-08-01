@@ -78,6 +78,9 @@ class Feed {
     // aggregate
 
     // filter deleted statements
+    // reverse so newest are in front BUT: not sorted by time
+
+    allActivities.reverse();
     const sorted = allActivities.reduce(
       (agg, curr) => {
         if (curr.type === 'statement') {
@@ -92,6 +95,9 @@ class Feed {
         }
         if (curr.type === 'proposal') {
           if (curr.verb === 'update') {
+            if (curr.objectId in agg.updatedProposals) {
+              return agg; // dont' push, as it is an old update
+            }
             // eslint-disable-next-line no-param-reassign
             agg.updatedProposals[curr.objectId] = curr.objectId;
           }

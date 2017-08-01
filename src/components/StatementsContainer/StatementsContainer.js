@@ -33,6 +33,7 @@ class StatementsContainer extends React.Component {
       ownVote: PropTypes.shape({
         id: PropTypes.string,
       }),
+      closedAt: PropTypes.string,
     }).isRequired,
 
     user: PropTypes.shape({ id: PropTypes.string }).isRequired,
@@ -100,7 +101,7 @@ class StatementsContainer extends React.Component {
             updates={updates['0000']}
             {...data}
             onCreate={this.props.createStatement}
-            asInput
+            asInput={!this.props.poll.closedAt}
             followees={followees}
           />
         );

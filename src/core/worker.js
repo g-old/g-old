@@ -1,6 +1,67 @@
 import knex from '../data/knex';
 import { insertIntoFeed } from './feed';
 import log from '../logger';
+import Proposal from '../data/models/Proposal';
+import createLoaders from '../data/dataLoader';
+
+export const computeNextState = (state, poll, tRef) => {
+  let newState;
+  let ref;
+
+  switch (tRef) {
+    case 'voters':
+      ref = poll.upvotes + poll.downvotes;
+      break;
+    case 'all':
+      ref = poll.num_voter;
+      break;
+
+    default:
+      throw Error(`Threshold reference not implemented: ${tRef}`);
+  }
+
+  ref *= poll.threshold / 100;
+
+  if (poll.upvotes >= ref) {
+    switch (state) {
+      case 'proposed': {
+        newState = 'proposed';
+        break;
+      }
+      case 'voting': {
+        newState = 'accepted';
+        break;
+      }
+      case 'survey': {
+        newState = 'survey';
+        break;
+      }
+
+      default:
+        throw Error(`State not recognized: ${state}`);
+    }
+  } else {
+    switch (state) {
+      case 'proposed': {
+        newState = 'accepted';
+        break;
+      }
+      case 'voting': {
+        newState = 'rejected';
+        break;
+      }
+      case 'survey': {
+        newState = 'survey';
+        break;
+      }
+
+      default:
+        throw Error(`State not recognized: ${state}`);
+    }
+  }
+
+  return newState;
+};
 
 async function proposalPolling(pubsub) {
   const proposals = await knex('proposals')
@@ -28,85 +89,42 @@ async function proposalPolling(pubsub) {
       'polls.num_voter',
       'polling_modes.threshold_ref as ref',
     );
-
+  let loaders = null;
+  if (proposals.length > 0) {
+    loaders = createLoaders();
+  }
   const mutations = proposals.map((proposal) => {
-    let newState;
-    let ref;
-
-    switch (proposal.ref) {
-      case 'voters':
-        ref = proposal.upvotes + proposal.downvotes;
-        break;
-      case 'all':
-        ref = proposal.num_voter;
-        break;
-
-      default:
-        throw Error(`Threshold reference not implemented: ${proposal.ref}`);
-    }
-
-    ref *= proposal.threshold / 100;
-
-    if (proposal.upvotes >= ref) {
-      switch (proposal.state) {
-        case 'proposed': {
-          newState = 'proposed';
-          break;
-        }
-        case 'voting': {
-          newState = 'accepted';
-          break;
-        }
-        case 'survey': {
-          newState = 'survey';
-          break;
-        }
-
-        default:
-          throw Error(`State not recognized: ${proposal.state}`);
-      }
-    } else {
-      switch (proposal.state) {
-        case 'proposed': {
-          newState = 'accepted';
-          break;
-        }
-        case 'voting': {
-          newState = 'rejected';
-          break;
-        }
-        case 'survey': {
-          newState = 'survey';
-          break;
-        }
-
-        default:
-          throw Error(`State not recognized: ${proposal.state}`);
-      }
-    }
     // TODO in transaction!
-
-    return knex('proposals')
-      .where({ id: proposal.id })
-      .update({ state: newState, updated_at: new Date() })
-      .returning(['id', 'body', 'title', 'state', 'author_id', 'poll_two_id', 'poll_two_id'])
+    const newState = computeNextState(proposal.state, proposal, proposal.ref);
+    return Proposal.update(
+      { id: 1, role: { type: 'system' } },
+      { id: proposal.id, state: newState },
+      loaders,
+    )
       .then((proposalData) => {
-        const data = proposalData[0];
-
-        return insertIntoFeed(
-          {
-            viewer: { id: 0, role: { type: 'system' } },
-            data: { type: 'proposal', content: data, objectId: data.id },
-            verb: 'update',
-          },
-          true,
-        )
-          .then((activityId) => {
-            if (activityId) {
-              pubsub.publish('activities', { id: activityId });
-            }
-          })
-          .catch(err => log.error({ err }, 'Feed insertion failed -worker- '));
+        if (proposalData) {
+          return insertIntoFeed(
+            {
+              viewer: { id: 0, role: { type: 'system' } },
+              data: { type: 'proposal', content: proposalData, objectId: proposalData.id },
+              verb: 'update',
+            },
+            true,
+          )
+            .then((activityId) => {
+              if (activityId) {
+                return pubsub.publish('activities', { id: activityId });
+              }
+              return Promise.reject();
+            })
+            .catch((err) => {
+              log.error({ err }, 'Feed insertion failed -worker- ');
+            });
+        }
+        return Promise.reject('Proposal update failed');
+      })
+      .catch((err) => {
+        log.error({ err, proposal }, 'Proposal update failed');
       });
   });
 
@@ -118,8 +136,8 @@ async function proposalPolling(pubsub) {
 const worker = async (pubsub) => {
   try {
     proposalPolling(pubsub);
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    log.error({ err }, 'Worker failed ');
   }
   setTimeout(() => {
     worker(pubsub);

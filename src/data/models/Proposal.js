@@ -2,6 +2,7 @@ import knex from '../knex';
 import Poll from './Poll';
 import PollingMode from './PollingMode';
 import { dedup } from '../../core/helpers';
+import { computeNextState } from '../../core/worker';
 
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
@@ -99,34 +100,70 @@ const validatePoll = async (viewer, poll, loaders) => {
 };
 
 const validateStateChange = async (viewer, { id, state, proposalInDB }, loaders) => {
-  // if accepted pollOne must have passed endTime and sufficient votes
-  if (!state || ['revoked', 'accepted'].indexOf(state) === -1) return false;
-  if (state === 'accepted' && proposalInDB.state !== 'proposed') return false;
-  if (state !== 'revoked') {
-    const pollInDB = await Poll.gen(viewer, proposalInDB.pollOne_id, loaders);
-    if (!pollInDB) throw Error('Poll not found');
+  const pollId =
+    proposalInDB.state === 'proposed' || proposalInDB.state === 'survey'
+      ? proposalInDB.pollOne_id
+      : proposalInDB.pollTwo_id;
+  const pollInDB = await Poll.gen(viewer, pollId, loaders);
+  if (pollInDB.closedAt) return false; // Dont allow alteration after closing;
+  if (state === 'revoked') return true; // Proposals can be revoked at any time
+  if (state !== 'voting') {
+    // check times
+    // poll mast have been ended!
     if (new Date(pollInDB.end_time) > new Date()) return false;
-    const pollingModeinDB = await PollingMode.gen(viewer, pollInDB.pollingModeId, loaders);
-    if (!pollingModeinDB) throw Error('PollingMode not found');
-
-    let ref = null;
-    switch (pollingModeinDB.thresholdRef) {
-      case 'voters':
-        ref = pollInDB.upvotes + pollInDB.downvotes;
-        break;
-      case 'all':
-        ref = pollInDB.num_voter;
-        break;
-
-      default:
-        throw Error(`Threshold reference not implemented: ${pollingModeinDB.thresholdRef}`);
-    }
-
-    ref *= pollInDB.threshold / 100;
-
-    if (pollInDB.upvotes > ref) return false;
+  }
+  const pollingModeinDB = await PollingMode.gen(viewer, pollInDB.pollingModeId, loaders);
+  if (!pollingModeinDB) throw Error('PollingMode not found');
+  if (state !== computeNextState(proposalInDB.state, pollInDB, pollingModeinDB.thresholdRef)) {
+    return false;
   }
   return true;
+
+  /*  const pollId =
+    proposalInDB.state === 'proposed' || proposalInDB.state === 'survey'
+      ? proposalInDB.pollOne_id
+      : proposalInDB.pollTwo_id;
+  const pollInDB = await Poll.gen(viewer, pollId, loaders);
+  if (!pollInDB) throw Error('Poll not found');
+  const pollingModeinDB = await PollingMode.gen(viewer, pollInDB.pollingModeId, loaders);
+  if (!pollingModeinDB) throw Error('PollingMode not found');
+  let ref = null;
+  switch (pollingModeinDB.thresholdRef) {
+    case 'voters':
+      ref = pollInDB.upvotes + pollInDB.downvotes;
+      break;
+    case 'all':
+      ref = pollInDB.num_voter;
+      break;
+
+    default:
+      throw Error(`Threshold reference not implemented: ${pollingModeinDB.thresholdRef}`);
+  }
+
+  ref *= pollInDB.threshold / 100;
+  console.log('VALIDATION', { proposalInDB, state });
+  if (pollId === proposalInDB.pollOne_id) {
+    if (state === 'accepted') {
+      // if accepted pollOne must have passed endTime and less votes than t-ref
+      if (new Date(pollInDB.end_time) > new Date()) return false;
+      if (pollInDB.upvotes >= ref) return false;
+    }
+    return true;
+  } else if (pollId === proposalInDB.pollTwo_id) {
+    if (state === 'accepted') {
+      // if accepted, pollTwo must have passed endTime and sufficient votes
+      if (new Date(pollInDB.end_time) > new Date()) return false;
+      if (pollInDB.upvotes < ref) return false;
+      return true;
+    }
+    if (state === 'rejected') {
+      // if rejected, pollTwo must have passed endTime and less votes than threshold
+      if (new Date(pollInDB.end_time) > new Date()) return false;
+      if (pollInDB.upvotes < ref) return false;
+    }
+  } else {
+    return false;
+  }*/
 };
 
 class Proposal {
@@ -162,7 +199,7 @@ class Proposal {
 
   // eslint-disable-next-line no-unused-vars
   static canMutate(viewer, data) {
-    return ['admin', 'mod'].includes(viewer.role.type);
+    return ['admin', 'mod', 'system'].includes(viewer.role.type);
   }
 
   static async followees(id, { followees }) {
@@ -181,7 +218,7 @@ class Proposal {
     if (!data.id) return null;
     const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
     if (!proposalInDB) return null;
-    if (data.state && ['revoked', 'accepted'].indexOf(data.state) === -1) return null;
+    // if (data.state && ['revoked', 'accepted'].indexOf(data.state) === -1) return null;
 
     const { pollData, pollingModeData, createPollingMode } = await validatePoll(
       viewer,
@@ -198,7 +235,6 @@ class Proposal {
         { id: data.id, state: data.state, proposalInDB },
         loaders,
       );
-
       if (isValid) {
         newValues.state = data.state;
       } else {
@@ -233,11 +269,15 @@ class Proposal {
         newValues.poll_two_id = pollTwo.id;
       }
       if (newValues.state && newValues.state !== 'voting') {
+        const pollId =
+          proposalInDB.state === 'proposed' || proposalInDB.state === 'survey'
+            ? proposalInDB.pollOne_id
+            : proposalInDB.pollTwo_id;
         await trx
-          .where({ id: proposalInDB.pollOne_id })
+          .where({ id: pollId })
           .update({ closed_at: new Date(), updated_at: new Date() })
           .into('polls');
-        loaders.polls.clear(proposalInDB.pollOne_id);
+        loaders.polls.clear(pollId);
       }
 
       await trx

@@ -43,6 +43,9 @@ class FeedContainer extends React.Component {
         {activities.map((activity) => {
           if (activity.type === 'statement') {
             if (activity.verb === 'update') {
+              if (activity.objectId in outDated) {
+                return null;
+              }
               outDated[activity.objectId] = activity.objectId;
             } else if (activity.verb === 'delete') {
               outDated[activity.objectId] = activity.objectId;

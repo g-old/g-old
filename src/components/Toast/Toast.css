@@ -1,0 +1,46 @@
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.toast {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 72px;
+  background-color: rgba(238, 238, 238, 0.9);
+  animation: toast-lower 1s;
+}
+
+@keyframes toast-lower {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes toast-raise {
+  0% {
+    transform: translateY(0%);
+  }
+
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+.close {
+  animation: toast-raise 1s;
+  animation-fill-mode: forwards;
+}
+
+.contents {
+  flex: 1;
+  padding: 12px;
+}

@@ -76,9 +76,9 @@ const byPoll = (state = {}, action) => {
         ...state,
         [pollId]: {
           ...state[pollId],
-          all: [...(currentState.all || []), ...sorted[pollId].all],
-          pro: [...(currentState.pro || []), ...sorted[pollId].pro],
-          con: [...(currentState.con || []), ...sorted[pollId].con],
+          all: [...new Set([...(currentState.all || []), ...sorted[pollId].all])],
+          pro: [...new Set([...(currentState.all || []), ...sorted[pollId].pro])],
+          con: [...new Set([...(currentState.all || []), ...sorted[pollId].con])],
         },
       };
     }
