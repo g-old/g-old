@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FeedContainer Displays activity 1`] = `
+<div>
+  <h1>
+    feed
+  </h1>
+  <div
+    className="container"
+  >
+    <span>
+      vor 2 Monaten
+    </span>
+    <h1>
+      Look at that statement!
+    </h1>
+    <div>
+      <a
+        href="/proposal/xxx/1"
+        onClick={[Function]}
+      >
+        <div
+          className="rootAlt contra"
+        >
+          <img
+            alt="IMG"
+            className="avatar"
+            src="https://api.adorable.io/avatars/32/GraceVon.io.png"
+          />
+          <div
+            style={
+              Object {
+                "width": "100%",
+              }
+            }
+          >
+            <div
+              className="header"
+            >
+              <div>
+                <span
+                  className="author"
+                >
+                  Grace
+                   
+                  Von
+                </span>
+                <span>
+                  
+                </span>
+              </div>
+            </div>
+            <div
+              className="text"
+            >
+              before
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+`;

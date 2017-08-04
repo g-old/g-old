@@ -107,6 +107,7 @@ subscription{
 }
 }
 `;
+
 let eventSource = null;
 export function createSSESub() {
   return async (dispatch, getState, { fetch }) => {

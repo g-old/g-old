@@ -30,7 +30,6 @@ const ProposalType = new ObjectType({
 
     body: {
       type: GraphQLString,
-      sqlColumn: 'body',
     },
     title: {
       type: GraphQLString,

@@ -37,6 +37,7 @@ class FeedContainer extends React.Component {
     }
 
     const outDated = {};
+    const polls = {};
     return (
       <div>
         <h1>feed</h1>
@@ -46,9 +47,18 @@ class FeedContainer extends React.Component {
               if (activity.objectId in outDated) {
                 return null;
               }
+              if (
+                activity.object.pollId in polls &&
+                activity.object.author.id === polls[activity.object.pollId]
+              ) {
+                return null;
+              }
               outDated[activity.objectId] = activity.objectId;
+              polls[activity.object.pollId] = activity.object.author.id;
             } else if (activity.verb === 'delete') {
-              outDated[activity.objectId] = activity.objectId;
+              outDated[activity.objectId] = activity.object.author.id;
+              polls[activity.object.pollId] = activity.object.author.id;
+
               return null;
             } else if (activity.objectId in outDated) {
               return null;
@@ -57,6 +67,12 @@ class FeedContainer extends React.Component {
                 if (
                   activity.object.pollId in outDated &&
                   activity.object.author.id === outDated[activity.object.pollId]
+                ) {
+                  return null;
+                }
+                if (
+                  activity.object.pollId in polls &&
+                  activity.object.author.id === polls[activity.object.pollId]
                 ) {
                   return null;
                 }

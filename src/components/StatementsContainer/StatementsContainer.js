@@ -84,7 +84,6 @@ class StatementsContainer extends React.Component {
     } = this.props;
     let ownStatementsNode = null;
     let statementsList = [];
-
     if (mode.withStatements) {
       if (!ownStatement && ownVote) {
         const data = {
@@ -126,33 +125,35 @@ class StatementsContainer extends React.Component {
       statementsList = statements.filter(s => s.author.id != user.id);
     }
     const outDated = {};
+    const toRender = statementsList.reduce((agg, curr) => {
+      if (curr.author.id in outDated) {
+        return agg;
+      }
+      outDated[curr.author.id] = curr.id;
+      agg.push(curr);
+      return agg;
+    }, []);
 
+    toRender.sort((a, b) => b.likes - a.likes);
     return (
       <div>
         {ownStatementsNode}
-        {statementsList.map((s) => {
-          if (s.author.id in outDated) {
-            return null; // older one passes, newer one not. TODO find solution
-          }
-          outDated[s.author.id] = s.id;
-
-          return (
-            <Statement
-              {...s}
-              user={user}
-              key={s.id}
-              ownLike={likedStatements && likedStatements.find(data => data.statementId === s.id)}
-              onLike={this.props.createLike}
-              onDeleteLike={this.props.deleteLike}
-              onFollow={this.props.updateUser}
-              onDelete={this.props.deleteStatement}
-              onModeration={this.props.solveFlag}
-              onFlagging={this.props.flag}
-              followees={followees}
-              isFollowee={followees.some(f => f.id === s.author.id)}
-            />
-          );
-        })}
+        {toRender.map(s =>
+          (<Statement
+            {...s}
+            user={user}
+            key={s.id}
+            ownLike={likedStatements && likedStatements.find(data => data.statementId === s.id)}
+            onLike={this.props.createLike}
+            onDeleteLike={this.props.deleteLike}
+            onFollow={this.props.updateUser}
+            onDelete={this.props.deleteStatement}
+            onModeration={this.props.solveFlag}
+            onFlagging={this.props.flag}
+            followees={followees}
+            isFollowee={followees.some(f => f.id === s.author.id)}
+          />),
+        )}
       </div>
     );
   }
@@ -160,9 +161,6 @@ class StatementsContainer extends React.Component {
 
 const mapStateToProps = (state, { poll: { id }, filter }) => {
   const statements = getVisibibleStatementsByPoll(state, id, filter);
-  if (statements) {
-    statements.sort((a, b) => b.likes - a.likes);
-  }
   return {
     statements,
     updates: getStatementUpdates(state),

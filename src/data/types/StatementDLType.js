@@ -9,12 +9,11 @@ import VoteType from './VoteDLType';
 import User from '../models/User';
 import Vote from '../models/Vote';
 import UserType from './UserType';
+// import Poll from '../models/Poll';
 
 const StatementType = new ObjectType({
   name: 'StatementDL',
   description: 'Statement on proposal',
-  sqlTable: 'statements', // the SQL table for this object type is called "accounts"
-  uniqueKey: 'id',
   fields: {
     id: {
       type: new NonNull(ID),
@@ -39,6 +38,19 @@ const StatementType = new ObjectType({
     pollId: {
       type: ID,
     },
+
+    /* pollInfo: {
+      type: new ObjectType({
+        name: 'PollInfo',
+        fields: {
+          id: { type: ID },
+          upvotes: { type: GraphQLInt },
+          downvotes: { type: GraphQLInt },
+          allVoters: { type: GraphQLInt, resolve: data => data.numVoter },
+        },
+      }),
+      resolve: (data, { id }, { viewer, loaders }) => Poll.gen(viewer, data.pollId, loaders),
+    },*/
 
     createdAt: {
       type: GraphQLString,

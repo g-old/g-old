@@ -20,7 +20,7 @@ const updateStatement = {
           data: { type: 'statement', objectId: updatedStatement.id, content: updatedStatement },
           verb: 'update',
         },
-        true,
+        false, // dont insert updates into system feed
       );
       if (activityId) {
         pubsub.publish('activities', { id: activityId });

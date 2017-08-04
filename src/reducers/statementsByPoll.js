@@ -18,7 +18,7 @@ const sortStatementsByPoll = (stmts, votes) =>
     return {
       ...acc,
       [statement.pollId]: {
-        all: [...new Set([...(acc[statement.pollId] ? acc[statement.pollId].all : []), curr])],
+        all: [...new Set([curr, ...(acc[statement.pollId] ? acc[statement.pollId].all : [])])],
         pro: [
           ...new Set([
             ...(acc[statement.pollId] ? acc[statement.pollId].pro : []),
@@ -76,9 +76,9 @@ const byPoll = (state = {}, action) => {
         ...state,
         [pollId]: {
           ...state[pollId],
-          all: [...new Set([...(currentState.all || []), ...sorted[pollId].all])],
-          pro: [...new Set([...(currentState.all || []), ...sorted[pollId].pro])],
-          con: [...new Set([...(currentState.all || []), ...sorted[pollId].con])],
+          all: [...new Set([...sorted[pollId].all, ...(currentState.all || [])])],
+          pro: [...new Set([...sorted[pollId].pro, ...(currentState.pro || [])])],
+          con: [...new Set([...sorted[pollId].con, ...(currentState.con || [])])],
         },
       };
     }
@@ -92,9 +92,9 @@ const byPoll = (state = {}, action) => {
         ...state,
         [pollId]: {
           ...state[pollId],
-          all: [...(currentState.all || []), ...sorted[pollId].all],
-          pro: [...(currentState.pro || []), ...sorted[pollId].pro],
-          con: [...(currentState.con || []), ...sorted[pollId].con],
+          all: [...new Set([...sorted[pollId].all, ...(currentState.all || [])])],
+          pro: [...new Set([...sorted[pollId].pro, ...(currentState.pro || [])])],
+          con: [...new Set([...sorted[pollId].con, ...(currentState.con || [])])],
         },
       };
     }

@@ -1,0 +1,96 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`StatementsContainer Displays statements 1`] = `
+<div>
+  <div
+    className="rootAlt contra"
+  >
+    <img
+      alt="IMG"
+      className="avatar"
+      src="https://api.adorable.io/avatars/32/firstTwo.io.png"
+    />
+    <div
+      style={
+        Object {
+          "width": "100%",
+        }
+      }
+    >
+      <div
+        className="header"
+      >
+        <div>
+          <span
+            className="author"
+          >
+            firstTwo
+             
+            lastTwo
+          </span>
+          <span>
+             (+4)
+            <button
+              className="button plain"
+              disabled={false}
+              onClick={[Function]}
+            >
+              <span
+                className="icon"
+              >
+                 
+                <svg
+                  height="16px"
+                  viewBox="0 0 24 24"
+                  width="16px"
+                >
+                  <path
+                    d="M1,23 L20,23 C22,23 23,22 23,20 L23,10 L16,10 L16,4 C16,2 15,1 13,1 L11,1 C11,1 10.9842682,7 10.9842677,8.32575545 C10.9842672,9.65151089 10,11 8,11 L1,11 L1,23 Z M6,23 L6,11"
+                    fill="none"
+                    stroke="#666"
+                    strokeWidth="1"
+                  />
+                </svg>
+              </span>
+            </button>
+          </span>
+        </div>
+        <div
+          className="root column"
+          onClick={null}
+        >
+          <button
+            className="button plain"
+            disabled={false}
+            onClick={[Function]}
+          >
+            <span
+              className="icon"
+            >
+               
+              <svg
+                height="24px"
+                role="img"
+                viewBox="0 0 24 24"
+                width="24px"
+              >
+                <path
+                  d="M3,13 L3,11 L5,11 L5,13 L3,13 Z M11,12.9995001 L11,11 L12.9995001,11 L12.9995001,12.9995001 L11,12.9995001 Z M19,12.9995001 L19,11 L20.9995001,11 L20.9995001,12.9995001 L19,12.9995001 Z"
+                  fill="none"
+                  stroke="#666"
+                  strokeWidth="2"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+      <div
+        className="text"
+      >
+        before
+      </div>
+    </div>
+  </div>
+</div>
+`;

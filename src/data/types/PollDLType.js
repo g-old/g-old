@@ -113,14 +113,12 @@ const PollType = new ObjectType({
     },
     statements: {
       type: new GraphQLList(StatementType),
-      resolve(data, args, { viewer, loaders }) {
-        return Promise.resolve(
+      resolve: (data, args, { viewer, loaders }) => Promise.resolve(
           knex('statements')
             .where({ poll_id: data.id })
             .pluck('id')
             .then(ids => ids.map(id => Statement.gen(viewer, id, loaders))),
-        );
-      },
+        ),
     },
     ownStatement: {
       type: StatementType,
