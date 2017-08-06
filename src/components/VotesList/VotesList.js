@@ -8,7 +8,7 @@ import FetchError from '../FetchError';
 class VotesList extends React.Component {
   static propTypes = {
     unipolar: PropTypes.bool.isRequired,
-    votes: PropTypes.arrayOf(PropTypes.object).isRequired,
+    votes: PropTypes.arrayOf(PropTypes.object),
     getVotes: PropTypes.func.isRequired,
     autoLoadVotes: PropTypes.bool,
     isFetching: PropTypes.bool.isRequired,
@@ -18,6 +18,7 @@ class VotesList extends React.Component {
   static defaultProps = {
     autoLoadVotes: false,
     errorMessage: null,
+    votes: null,
   };
 
   static renderVote(vote) {
@@ -48,7 +49,8 @@ class VotesList extends React.Component {
   render() {
     const pro = [];
     const con = [];
-    const { votes, unipolar } = this.props;
+    const { unipolar } = this.props;
+    const votes = this.props.votes || [];
     if (this.state.showVotes && votes) {
       votes.forEach((vote) => {
         if (vote && vote.position === 'pro') pro.push(vote);
@@ -58,7 +60,11 @@ class VotesList extends React.Component {
 
     const { isFetching, errorMessage } = this.props;
     if (isFetching && !votes.length) {
-      return <p>{'Loading...'} </p>;
+      return (
+        <p>
+          {'Loading...'}{' '}
+        </p>
+      );
     }
     if (errorMessage && !votes.length) {
       return (

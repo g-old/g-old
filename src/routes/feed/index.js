@@ -16,10 +16,11 @@ async function action({ store, path }) {
   }
   if (!process.env.BROWSER) {
     await store.dispatch(loadFeed());
+    await store.dispatch({ type: RESET_ACTIVITY_COUNTER, payload: { feed: true } });
   } else {
     store.dispatch(loadFeed());
+    store.dispatch({ type: RESET_ACTIVITY_COUNTER, payload: { feed: true } });
   }
-  store.dispatch({ type: RESET_ACTIVITY_COUNTER, payload: { feed: true } });
   return {
     chunks: ['feed'],
     title,

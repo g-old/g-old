@@ -71,7 +71,8 @@ const getMenu = (className, counter) =>
 
 class Navigation extends React.Component {
   static propTypes = {
-    activityCounter: PropTypes.number.isRequired,
+    activityCounter: PropTypes.shape({ feed: PropTypes.number, proposals: PropTypes.number })
+      .isRequired,
   };
 
   componentWillReceiveProps({ activityCounter }) {

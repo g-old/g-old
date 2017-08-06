@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import ProposalPreview from '../../components/ProposalPreview';
 import Navigation from '../../components/ProposalsNavigation';
 import { loadProposalsList } from '../../actions/proposal';
@@ -13,6 +14,13 @@ import {
 import Button from '../../components/Button';
 import FetchError from '../../components/FetchError';
 
+const messages = defineMessages({
+  loadMore: {
+    id: 'command.loadMore',
+    defaultMessage: 'Load more',
+    description: 'To get more data',
+  },
+});
 class ProposalContainer extends React.Component {
   static propTypes = {
     proposals: PropTypes.arrayOf(
@@ -38,7 +46,12 @@ class ProposalContainer extends React.Component {
   render() {
     const { filter, proposals, isFetching, errorMessage } = this.props;
     if (isFetching && !proposals.length) {
-      return <div> <Navigation filter={filter} /><p> Loading ... </p></div>;
+      return (
+        <div>
+          {' '}<Navigation filter={filter} />
+          <p> Loading ... </p>
+        </div>
+      );
     }
 
     if (errorMessage && !proposals.length) {
@@ -68,7 +81,7 @@ class ProposalContainer extends React.Component {
                 after: this.props.pageInfo.endCursor,
               });
             }}
-            label={'LOAD MORE'}
+            label={<FormattedMessage {...messages.loadMore} />}
           />}
       </div>
     );

@@ -888,5 +888,14 @@
     "files": [
       "src/routes/proposal/ProposalContainer.js"
     ]
+  },
+  {
+    "id": "command.loadMore",
+    "description": "To get more data",
+    "defaultMessage": "Load more",
+    "message": "",
+    "files": [
+      "src/routes/proposals/ProposalsOverviewContainer.js"
+    ]
   }
 ]

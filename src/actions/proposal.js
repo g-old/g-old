@@ -199,9 +199,10 @@ mutation($id:ID  $poll:PollInput $state:ProposalState ){
 export function loadProposal({ id, pollId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // Dont fetch if pending
-    if (getIsProposalFetching(getState(), id)) {
+    if (id && getIsProposalFetching(getState(), id)) {
       return false;
     }
+
     dispatch({
       type: LOAD_PROPOSAL_START,
       id,

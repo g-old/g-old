@@ -39,7 +39,7 @@ class Statement extends React.Component {
     }).isRequired,
     deletedAt: PropTypes.string,
 
-    followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    followees: PropTypes.arrayOf(PropTypes.shape({})),
     ownLike: PropTypes.shape({ id: PropTypes.string }),
     ownStatement: PropTypes.bool,
     user: PropTypes.shape({
@@ -77,6 +77,7 @@ class Statement extends React.Component {
     onDeleteLike: null,
     isFollowee: false,
     user: null,
+    followees: null,
   };
 
   constructor(props) {

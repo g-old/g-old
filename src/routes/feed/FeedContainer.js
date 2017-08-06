@@ -85,6 +85,7 @@ class FeedContainer extends React.Component {
 
           return (
             <Activity
+              key={activity.id}
               actor={activity.actor}
               date={activity.createdAt}
               verb={activity.verb}

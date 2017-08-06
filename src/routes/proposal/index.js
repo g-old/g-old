@@ -32,7 +32,7 @@ async function action({ store, path }, { id, pollId }) {
     await store.dispatch(loadProposal({ id: proposalId, pollId }));
   } else {
     if (!proposalId) {
-      proposalId = await store.dispatch(loadProposal({ id: proposalId, pollId }));
+      proposalId = await store.dispatch(loadProposal({ pollId }));
       return { redirect: `/proposal/${proposalId}/${pollId}` };
     }
     store.dispatch(loadProposal({ id: proposalId, pollId }));

@@ -16,8 +16,8 @@ class PollState extends React.Component {
     downvotes: PropTypes.number,
     threshold: PropTypes.number.isRequired,
     unipolar: PropTypes.bool.isRequired,
-    votes: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.string })).isRequired,
-    getVotes: PropTypes.func.isRequired,
+    votes: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.string })),
+    getVotes: PropTypes.func,
     updates: PropTypes.shape({ isPending: PropTypes.bool, error: PropTypes.node }),
   };
 
@@ -26,8 +26,9 @@ class PollState extends React.Component {
     downvotes: 0,
     threshold: 50,
     /* threshold_ref: 'all', */
-    votes: [],
+    votes: null,
     updates: null,
+    getVotes: null,
   };
 
   constructor(props) {
@@ -119,7 +120,7 @@ class PollState extends React.Component {
               autoLoadVotes
               unipolar={this.props.unipolar}
               votes={this.props.votes}
-              isFetching={updates && updates.isPending}
+              isFetching={(updates && updates.isPending) || false}
               errorMessage={updates && updates.error}
               getVotes={this.props.getVotes}
             />

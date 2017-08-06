@@ -52,7 +52,7 @@ class Poll extends React.Component {
     endTime: PropTypes.string.isRequired,
     allVoters: PropTypes.number.isRequired,
     ownStatement: PropTypes.shape({}),
-    closedAt: PropTypes.string.isRequired,
+    closedAt: PropTypes.string,
     // statements: PropTypes.arrayOf(PropTypes.object),
     upvotes: PropTypes.number.isRequired,
     downvotes: PropTypes.number.isRequired,
@@ -85,6 +85,7 @@ class Poll extends React.Component {
     votes: null,
     ownVote: null,
     ownStatement: null,
+    closedAt: null,
   };
   constructor(props) {
     super(props);
