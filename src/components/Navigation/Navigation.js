@@ -16,8 +16,6 @@ import { getActivityCounter } from '../../reducers';
 import s from './Navigation.css';
 import Link from '../Link';
 import Menu from '../Menu';
-import Icon from '../Icon';
-import { ICONS } from '../../constants';
 
 const messages = defineMessages({
   about: {
@@ -42,32 +40,31 @@ const messages = defineMessages({
   },
 });
 
-const getMenu = (className, counter) =>
-  (<div className={className}>
-    <Link className={s.link} to="/feed">
-      {counter.feed > 0 &&
-        <span className={s.news}>
-          {`(${counter.feed}) `}
-        </span>}
-      {'Feed'}
-    </Link>
-    <Link className={s.link} to="/proposals/active">
-      {counter.proposals > 0 &&
-        <span className={s.news}>
-          {'NEW '}
-        </span>}
-      <FormattedMessage {...messages.proposals} />
-    </Link>
-    <Link className={s.link} to="/surveys">
-      <FormattedMessage {...messages.surveys} />
-    </Link>
-    <Link className={s.link} to="/admin">
-      <FormattedMessage {...messages.admin} />
-    </Link>
-    <Link className={s.link} to="/about">
-      <FormattedMessage {...messages.about} />
-    </Link>
-  </div>);
+const getMenu = counter => [
+  <Link className={s.link} to="/feed">
+    {counter.feed > 0 &&
+      <span className={s.news}>
+        {`(${counter.feed}) `}
+      </span>}
+    {'Feed'}
+  </Link>,
+  <Link className={s.link} to="/proposals/active">
+    {counter.proposals > 0 &&
+      <span className={s.news}>
+        {'NEW '}
+      </span>}
+    <FormattedMessage {...messages.proposals} />
+  </Link>,
+  <Link className={s.link} to="/surveys">
+    <FormattedMessage {...messages.surveys} />
+  </Link>,
+  <Link className={s.link} to="/admin">
+    <FormattedMessage {...messages.admin} />
+  </Link>,
+  <Link className={s.link} to="/about">
+    <FormattedMessage {...messages.about} />
+  </Link>,
+];
 
 class Navigation extends React.Component {
   static propTypes = {
@@ -92,10 +89,33 @@ class Navigation extends React.Component {
   render() {
     return (
       <div className={s.root} role="navigation">
-        {getMenu(s.navBar, this.props.activityCounter)}
+        <div className={s.navBar}>
+          {getMenu(this.props.activityCounter)}
+        </div>
         <div className={s.menu}>
-          <Menu withControl icon={<Icon icon={ICONS.menu} size={20} color="grey" />}>
-            {getMenu(s.menuContent, this.props.activityCounter)}
+          <Menu
+            withControl
+            primary
+            dropAlign={{ top: 'top', right: 'right' }}
+            icon={
+              <svg
+                version="1.1"
+                viewBox="0 0 24 24"
+                width="24px"
+                height="24px"
+                role="img"
+                aria-label="menu"
+              >
+                <path
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth="2"
+                  d="M2,19 L22,19 M2,5 L22,5 M2,12 L22,12"
+                />
+              </svg>
+            }
+          >
+            {getMenu(this.props.activityCounter)}
           </Menu>
         </div>
       </div>

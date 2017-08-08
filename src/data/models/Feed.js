@@ -41,6 +41,48 @@ function rankInPlace(activity) {
 const loadActivities = (viewer, ids, loaders) =>
   Promise.all(ids.map(id => Activity.gen(viewer, id, loaders)));
 
+const aggregateActivities = activities =>
+  activities.reduce(
+    (agg, curr) => {
+      if (curr.type === 'statement') {
+        if (curr.verb === 'delete') {
+          // eslint-disable-next-line no-param-reassign
+          agg.del[curr.objectId] = curr.objectId;
+          return agg;
+        }
+        if (curr.verb === 'update') {
+          if (curr.objectId in agg.updatedStatements) {
+            return agg; // dont' push, as it is an old update
+          }
+          // eslint-disable-next-line no-param-reassign
+          agg.updatedStatements[curr.objectId] = curr.objectId;
+        }
+        if (curr.verb === 'create') {
+          if (
+            curr.content.pollId in agg.polls &&
+            curr.content.author_id === agg.polls[curr.content.pollId]
+          ) {
+            return agg;
+          }
+          // eslint-disable-next-line no-param-reassign
+          agg.polls[curr.content.pollId] = curr.content.author_id;
+        }
+      }
+      if (curr.type === 'proposal') {
+        if (curr.verb === 'update') {
+          if (curr.objectId in agg.updatedProposals) {
+            return agg; // dont' push, as it is an old update
+          }
+          // eslint-disable-next-line no-param-reassign
+          agg.updatedProposals[curr.objectId] = curr.objectId;
+        }
+      }
+      agg.all.push(curr);
+      return agg;
+    },
+    { del: {}, all: [], updatedProposals: {}, updatedStatements: {}, polls: {} },
+  );
+
 class Feed {
   constructor(data) {
     this.id = data.id;
@@ -54,6 +96,7 @@ class Feed {
   static async gen(viewer, id, loaders) {
     // authorize
     // get proposalsfeed;
+
     let aIds = await knex('system_feeds').where({ user_id: 1 }).select('activity_ids');
     let sIds = await knex('system_feeds').where({ user_id: 2 }).select('activity_ids');
     let fIds = await User.followees(viewer.id, loaders)
@@ -81,32 +124,7 @@ class Feed {
     // reverse so newest are in front BUT: not sorted by time
 
     allActivities.reverse();
-    const sorted = allActivities.reduce(
-      (agg, curr) => {
-        if (curr.type === 'statement') {
-          if (curr.verb === 'delete') {
-            // eslint-disable-next-line no-param-reassign
-            agg.del[curr.objectId] = curr.objectId;
-            return agg;
-          }
-          if (curr.verb === 'update') {
-            return agg;
-          }
-        }
-        if (curr.type === 'proposal') {
-          if (curr.verb === 'update') {
-            if (curr.objectId in agg.updatedProposals) {
-              return agg; // dont' push, as it is an old update
-            }
-            // eslint-disable-next-line no-param-reassign
-            agg.updatedProposals[curr.objectId] = curr.objectId;
-          }
-        }
-        agg.all.push(curr);
-        return agg;
-      },
-      { del: {}, all: [], updatedProposals: {} },
-    );
+    const sorted = aggregateActivities(allActivities);
 
     const aggregated = sorted.all.filter((e) => {
       if (e.objectId in sorted.del) {
@@ -129,9 +147,15 @@ class Feed {
 
     aggregated.sort((a, b) => b.rank - a.rank);
 
+    // store to history;
+    const history = aggregated.map(a => a.id);
+    await knex('feeds')
+      .where({ user_id: viewer.id })
+      .update({ history: JSON.stringify(history), updated_at: new Date() });
+
     // TODO store activity ids in userfeed - then recompose only if updates in other feeds
     // TODO paginate feed. How?
-    return aggregated;
+    return aggregated.slice(0, 30);
   }
 }
 

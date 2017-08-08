@@ -38,6 +38,7 @@ class FeedContainer extends React.Component {
 
     const outDated = {};
     const polls = {};
+    const proposals = {};
     return (
       <div>
         <h1>feed</h1>
@@ -81,6 +82,11 @@ class FeedContainer extends React.Component {
                 return null;
               }
             }
+          } else if (activity.type === 'proposal') {
+            if (activity.objectId in proposals) {
+              return null;
+            }
+            proposals[activity.objectId] = activity.objectId;
           }
 
           return (

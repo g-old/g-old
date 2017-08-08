@@ -6,7 +6,7 @@ import log from '../logger';
 export async function insertIntoFeed({ viewer, data, verb }, mainFeed) {
   let result = null;
   const maxFeedLength = 30;
-  const userId = 2;
+  let userId = 2;
   try {
     const activity = await Activity.create(viewer, {
       verb,
@@ -18,6 +18,9 @@ export async function insertIntoFeed({ viewer, data, verb }, mainFeed) {
       return result;
     }
     if (mainFeed) {
+      if (data.type === 'proposal') {
+        userId = 1; // in systemfeed 1
+      }
       let systemActivities = await knex('system_feeds')
         .where({ user_id: userId })
         .select('activity_ids');

@@ -155,12 +155,9 @@ process.on('message', async (data) => {
   }
   return result;
 });
-
-process.on('close', (code, signal) => {
-  log.info({ signal }, 'Worker closing');
+function onClosing(code, signal) {
+  log.warn({ signal }, 'Worker closing');
   this.kill();
-});
-process.on('exit', (code, signal) => {
-  log.info({ signal }, 'Worker closing');
-  this.kill();
-});
+}
+process.on('close', onClosing);
+process.on('exit', onClosing);

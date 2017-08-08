@@ -18,7 +18,7 @@ const onSink = (event) => {
 
 class Menu extends React.Component {
   static propTypes = {
-    dropAlign: PropTypes.shape({}),
+    dropAlign: PropTypes.shape({ right: PropTypes.string }),
     icon: PropTypes.node,
     label: PropTypes.string,
     closeOnClick: PropTypes.bool,
@@ -120,6 +120,7 @@ class Menu extends React.Component {
         onClick={onClick}
         control={control}
         ref={ref => (this.menuDrop = ref)}
+        align={this.props.dropAlign}
       >
         {this.props.children}
       </MenuDrop>

@@ -14,12 +14,14 @@ class MenuDrop extends React.Component {
     control: PropTypes.node.isRequired,
     children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
     onClick: PropTypes.func.isRequired,
+    align: PropTypes.shape({ right: PropTypes.string }),
   };
 
   static defaultProps = {
     history: null,
     router: null,
     store: null,
+    align: null,
   };
   getChildContext() {
     return {
@@ -54,7 +56,7 @@ class MenuDrop extends React.Component {
         onClick={onClick}
         column
         clickable
-        className={s.menu_drop}
+        className={this.props.align.right ? s.menu_drop_right : s.menu_drop_left}
       >
         {contents}
       </Box>

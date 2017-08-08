@@ -9,7 +9,6 @@
 
 .root {
   float: right;
-  margin: 6px 0 0;
 }
 
 .link {
@@ -22,7 +21,7 @@
 .link,
 .link:active,
 .link:visited {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .link:hover {
@@ -37,11 +36,6 @@
   display: none;
 }
 
-.menuContent {
-  flex-direction: column;
-  display: flex;
-}
-
 .news {
   color: red;
 }
@@ -53,7 +47,6 @@
 
   .menu {
     position: relative;
-    top: 5px;
     display: block;
   }
 }

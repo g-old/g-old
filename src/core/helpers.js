@@ -50,7 +50,7 @@ export const utcCorrectedDate = (daysAdded) => {
   local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
   return local.toJSON();
 };
-
+/*
 const thresholdPassedUniversal = (poll, thresholdRef) => {
   let ref;
   switch (thresholdRef) {
@@ -67,7 +67,7 @@ const thresholdPassedUniversal = (poll, thresholdRef) => {
 
   ref *= poll.threshold / 100;
   return ref <= poll.upvotes;
-};
+}; */
 export const getLastActivePoll = (state, proposal) => {
   let poll;
   switch (state) {
@@ -81,7 +81,12 @@ export const getLastActivePoll = (state, proposal) => {
     }
     case 'accepted': {
       // TODO check only dates
-      if (thresholdPassedUniversal(proposal.pollOne, proposal.pollOne.mode.thresholdRef)) {
+      if (proposal.pollTwo && proposal.pollTwo.closedAt) {
+        poll = proposal.pollTwo;
+      } else {
+        poll = proposal.pollOne;
+      }
+      /*  if (thresholdPassedUniversal(proposal.pollOne, proposal.pollOne.mode.thresholdRef)) {
         if (thresholdPassedUniversal(proposal.pollTwo, proposal.pollTwo.mode.thresholdRef)) {
           poll = proposal.pollTwo;
         } else {
@@ -89,7 +94,7 @@ export const getLastActivePoll = (state, proposal) => {
         }
       } else {
         poll = proposal.pollOne;
-      }
+      } */
       break;
     }
     case 'revoked': {

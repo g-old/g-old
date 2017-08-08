@@ -22,10 +22,15 @@ import Poll from '../../components/Poll';
 import Filter from '../../components/Filter';
 
 const messages = defineMessages({
-  otherPoll: {
-    id: 'otherPoll',
-    defaultMessage: 'Switch poll',
-    description: 'Button for switching between polls',
+  voting: {
+    id: 'voting',
+    defaultMessage: 'Voting',
+    description: 'Switch to voting poll',
+  },
+  proposal: {
+    id: 'proposal',
+    defaultMessage: 'Proposal',
+    description: 'Switch to proposal poll',
   },
 });
 class ProposalContainer extends React.Component {
@@ -125,7 +130,7 @@ class ProposalContainer extends React.Component {
         switchPollBtn = (
           <Button
             reverse={isPollOne}
-            label={<FormattedMessage {...messages.otherPoll} />}
+            label={<FormattedMessage {...messages[isPollOne ? 'voting' : 'proposal']} />}
             icon={
               <svg version="1.1" viewBox="0 0 24 24" width="24px" height="24px" role="img">
                 <path
