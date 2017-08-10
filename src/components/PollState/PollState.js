@@ -72,7 +72,7 @@ class PollState extends React.Component {
               <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
                 <path
                   fill="none"
-                  stroke="#000"
+                  stroke="#fff"
                   strokeWidth="2"
                   d={ICONS.up}
                   transform="matrix(1 0 0 -1 0 24)"
@@ -86,7 +86,7 @@ class PollState extends React.Component {
         <Value
           trendIcon={
             <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-              <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.up} />
+              <path fill="none" stroke="#fff" strokeWidth="2" d={ICONS.up} />
             </svg>
           }
           value={this.props.upvotes}

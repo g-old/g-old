@@ -411,10 +411,7 @@
     "id": "otherPoll",
     "description": "Button for switching between polls",
     "defaultMessage": "Switch poll",
-    "message": "Abstimmung wechseln",
-    "files": [
-      "src/routes/proposal/ProposalContainer.js"
-    ]
+    "message": "Abstimmung wechseln"
   },
   {
     "id": "poll.closed",
@@ -950,6 +947,24 @@
     "message": "",
     "files": [
       "src/routes/proposals/ProposalsOverviewContainer.js"
+    ]
+  },
+  {
+    "id": "proposal",
+    "description": "Switch to proposal poll",
+    "defaultMessage": "Proposal",
+    "message": "",
+    "files": [
+      "src/routes/proposal/ProposalContainer.js"
+    ]
+  },
+  {
+    "id": "voting",
+    "description": "Switch to voting poll",
+    "defaultMessage": "Voting",
+    "message": "",
+    "files": [
+      "src/routes/proposal/ProposalContainer.js"
     ]
   }
 ]

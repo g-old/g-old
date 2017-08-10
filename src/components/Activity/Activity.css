@@ -1,6 +1,10 @@
+@import '../variables.css';
+
 .container {
   margin: 0 auto 2em;
-  border: solid 1px gray;
+  border: solid 2px #fff;
   padding: 1em;
   max-width: 480px;
+  background-color: var(--color-accent-1);
+  color: var(--color-accent-2);
 }

@@ -15,14 +15,16 @@ class Proposal extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <div className={s.state}>
-            {this.props.state}
-          </div>
           <div className={s.headline}>
             {this.props.title}
-          </div>
-          <div className={s.date}>
-            <FormattedRelative value={this.props.publishedAt} />
+            <div>
+              <div className={s.state}>
+                {this.props.state}
+              </div>
+              <div className={s.date}>
+                <FormattedRelative value={this.props.publishedAt} />
+              </div>
+            </div>
           </div>
           <div className={s.body} dangerouslySetInnerHTML={{ __html: this.props.body }} />
         </div>

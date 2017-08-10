@@ -9,12 +9,13 @@
 .header {
   display: flex;
   align-items: center;
+  color: #fff;
 }
 
 .barContainer {
   width: 100%;
-  height: 0.6em;
-  outline: solid 1px #555;
+  height: 1em;
+  outline: solid 2px #fff;
 }
 
 .compact {
@@ -44,7 +45,7 @@
   top: -100%;
   height: 100%;
   width: 0;
-  outline: solid 1px black;
+  outline: solid 1px #fff;
 }
 
 .unipolar {
@@ -53,17 +54,17 @@
   }
 
   .bar {
-    background-color: var(--color-accent-2);
+    background-color: var(--color-accent-1);
   }
 }
 
 .bipolar {
   .barContainer {
-    background-color: #ff324d;
+    background-color: var(--color-red);
   }
 
   .bar {
-    background-color: #8cc800;
+    background-color: var(--color-green);
   }
 }
 

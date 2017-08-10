@@ -3,7 +3,13 @@
 .pollState {
   margin-top: 1em;
   padding: 0.2em;
-  background-color: var(--color-accent-3-shade);
+  background-color: var(--color-accent-1);
+}
+
+.time {
+  color: var(--color-accent-1);
+  text-align: center;
+  font-weight: 600;
 }
 
 .followeeContainer {

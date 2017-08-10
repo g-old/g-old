@@ -263,12 +263,12 @@ class Poll extends React.Component {
               </Box>
             </Box>
           </Layer>}
-        <p>
+        <div className={s.time}>
           {closedAt
             ? <FormattedMessage {...messages.closed} />
-            : <FormattedMessage {...messages.closing} />}
+            : <FormattedMessage {...messages.closing} />}{' '}
           <FormattedRelative value={closedAt || endTime} />
-        </p>
+        </div>
         <div className={s.pollState}>
           <PollState
             pollId={id}

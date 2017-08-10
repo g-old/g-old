@@ -29,7 +29,7 @@ a:visited {
   font-weight: 300;
   font-size: 2rem;
   padding-top: 0;
-  color: black;
+  color: #fff;
 }
 
 /*
@@ -48,7 +48,8 @@ a:visited {
 }
 
 .body {
-  color: black;
+  color: #fff;
+  background-color: var(--color-gold);
   padding-top: 1em;
   max-height: 5em;
   overflow: hidden;

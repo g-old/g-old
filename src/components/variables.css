@@ -18,13 +18,14 @@
    * Colors
    * ======================================================================== */
 
-  --color-gold: #e0b000;
-  --color-accent-1: #25149b;
+  --color-gold: #be8b2f;
+  --color-accent-1: #804b51;
   --color-accent: #930793;
-  --color-green: #8cc800;
-  --color-red: #ff324d;
+  --color-green: #83ee62;
+  --color-red: #e4575d;
+  --color-background: #9fb0b7;
   --color-focus: #389789;
-  --color-accent-2: #e0d500;
+  --color-accent-2: #f9e58f;
   --color-accent-3: #540b97;
   --color-accent-4: #4080ff;
   --color-accent-3-shade: #eee7f5;

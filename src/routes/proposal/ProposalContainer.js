@@ -156,7 +156,7 @@ class ProposalContainer extends React.Component {
       }
       // return proposal, poll, statementslist
       return (
-        <div>
+        <div style={{ width: '100%' }}>
           <Box column pad>
             <Proposal {...proposal} />
             <Poll
