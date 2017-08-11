@@ -9,18 +9,19 @@ import {
   DELETE_STATEMENT_SUCCESS,
   DELETE_STATEMENT_ERROR,
 } from '../../constants';
-import { getErrors, getSuccessState } from '../../core/helpers';
 
 const statements = (state = {}, action) => {
   switch (action.type) {
     case UPDATE_STATEMENT_START:
     case DELETE_STATEMENT_START:
     case CREATE_STATEMENT_START: {
+      const id = action.id; // Is initial id!
       return {
         ...state,
-        [action.id]: {
-          ...state[action.id],
-          ...action.properties,
+        [id]: {
+          pending: true,
+          success: false,
+          errorMessage: null,
         },
       };
     }
@@ -28,13 +29,12 @@ const statements = (state = {}, action) => {
     case UPDATE_STATEMENT_SUCCESS:
     case DELETE_STATEMENT_SUCCESS: {
       const id = action.id; // Is initial id!
-      const current = state[id];
-      const newState = getSuccessState(current, action);
       return {
         ...state,
         [id]: {
-          ...state[id],
-          ...newState,
+          pending: false,
+          success: true,
+          errorMessage: null,
         },
       };
     }
@@ -42,13 +42,15 @@ const statements = (state = {}, action) => {
     case UPDATE_STATEMENT_ERROR:
     case DELETE_STATEMENT_ERROR:
     case CREATE_STATEMENT_ERROR: {
-      const current = state[action.id];
-      const newState = getErrors(current, action);
+      const id = action.id; // Is initial id!
+      const statement = action.statement;
       return {
         ...state,
-        [action.id]: {
-          ...state[action.id],
-          ...newState,
+        [id]: {
+          pending: false,
+          success: false,
+          errorMessage: action.message,
+          statement,
         },
       };
     }

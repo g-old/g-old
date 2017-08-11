@@ -3,9 +3,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import cn from 'classnames';
 import s from './Statement.css';
 import { ICONS } from '../../constants';
+import Notification from '../Notification';
 
 import Menu from '../Menu';
 import Button from '../Button';
@@ -59,6 +61,7 @@ class Statement extends React.Component {
     onFollow: PropTypes.func,
     onLike: PropTypes.func,
     onDeleteLike: PropTypes.func,
+    updates: PropTypes.shape({ updateStmt: PropTypes.shape({ pending: PropTypes.bool }) }),
   };
 
   static defaultProps = {
@@ -78,6 +81,7 @@ class Statement extends React.Component {
     isFollowee: false,
     user: null,
     followees: null,
+    updates: null,
   };
 
   constructor(props) {
@@ -85,6 +89,7 @@ class Statement extends React.Component {
     this.state = {
       textArea: { val: this.props.text || '' },
       edit: props.asInput === true,
+      pending: false,
     };
     this.onDeleteStatement = this.onDeleteStatement.bind(this);
     this.onEditStatement = this.onEditStatement.bind(this);
@@ -94,6 +99,21 @@ class Statement extends React.Component {
     this.handleFlag = this.handleFlag.bind(this);
     this.handleFollowing = this.handleFollowing.bind(this);
     this.handleLiking = this.handleLiking.bind(this);
+  }
+
+  componentWillReceiveProps({ updates }) {
+    if (updates) {
+      if (updates.success) {
+        this.onEndEditing();
+      }
+      if (updates.pending !== this.state.pending) {
+        this.setState({ pending: updates.pending });
+      }
+
+      if (updates.errorMessage) {
+        this.setState({ textArea: { val: updates.statement.text || '' } });
+      }
+    }
   }
 
   onDeleteStatement() {
@@ -124,7 +144,7 @@ class Statement extends React.Component {
   onTextSubmit(e) {
     const { pollId, vote } = this.props;
     const text = this.state.textArea.val.trim();
-    if (text) {
+    if (text && text !== this.props.text) {
       // TODO validation
       if (this.props.text) {
         // update;
@@ -134,7 +154,7 @@ class Statement extends React.Component {
       }
     }
 
-    this.onEndEditing();
+    // this.onEndEditing();
     e.preventDefault();
   }
 
@@ -197,8 +217,8 @@ class Statement extends React.Component {
       followees,
       isFollowee,
       deletedAt,
+      updates,
     } = this.props;
-
     let canLike;
     let canDelete;
     let canFollow;
@@ -294,6 +314,22 @@ class Statement extends React.Component {
         </Menu>
       );
     }
+
+    if (updates && updates.errorMessage) {
+      return (
+        <Notification
+          type="error"
+          message={updates.errorMessage}
+          action={
+            <Button
+              primary
+              label="Resend"
+              onClick={updates.statement.delete ? this.onDeleteStatement : this.onTextSubmit}
+            />
+          }
+        />
+      );
+    }
     return (
       <div
         className={cn(
@@ -334,14 +370,15 @@ class Statement extends React.Component {
             </div>}
           <div className={s.text}>
             {this.state.edit
-              ? <div>
-                <textarea
-                  placeholder="Leave a statement (optional)"
-                  className={s.textEdit}
-                  value={this.state.textArea.val}
-                  onChange={this.onTextChange}
-                />
-              </div>
+              ? <Textarea
+                useCacheForDOMMeasurements
+                placeholder="Leave a statement (optional)"
+                value={this.state.textArea.val}
+                onChange={this.onTextChange}
+                className={s.textEdit}
+                minRows={2}
+                disabled={this.state.pending}
+              />
               : text}
           </div>
         </div>

@@ -161,6 +161,7 @@ export function createStatement(statement) {
         },
         message: error.message || 'Something went wrong',
         id: virtualId,
+        statement,
         properties,
       });
       return false;
@@ -195,7 +196,7 @@ export function updateStatement(statement) {
         },
         properties,
         message: error.message || 'Something went wrong',
-
+        statement,
         id: statement.id,
       });
       return false;
@@ -231,6 +232,7 @@ export function deleteStatement(statement) {
         message: error.message || 'Something went wrong',
         id: statement.id,
         properties,
+        statement: { delete: true },
       });
       return false;
     }

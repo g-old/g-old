@@ -63,6 +63,7 @@
     "react-infinite-calendar": "^2.2.0",
     "react-intl": "^2.3.0",
     "react-redux": "^5.0.5",
+    "react-textarea-autosize": "^5.1.0",
     "react-transition-group": "^1.2.0",
     "redux": "^3.7.1",
     "redux-logger": "^3.0.6",
