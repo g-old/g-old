@@ -103,6 +103,12 @@ publishedAt
 state
 body
 votes
+spokesman{
+  id
+  name
+  surname
+  avatar
+}
 pollOne ${pollFields}
 pollTwo ${pollFields}
 `;
@@ -171,8 +177,8 @@ query ($state:String $first:Int, $after:String) {
 `;
 
 const createProposalMutation = `
-mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput]){
-  createProposal(proposal:{title:$title text:$text state:$state poll:$poll tags:$tags}){
+mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput] $spokesmanId:ID){
+  createProposal(proposal:{title:$title text:$text state:$state poll:$poll tags:$tags spokesmanId:$spokesmanId}){
     ${proposal}
     tags{
       id

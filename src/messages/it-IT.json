@@ -408,15 +408,6 @@
     ]
   },
   {
-    "id": "otherPoll",
-    "description": "Button for switching between polls",
-    "defaultMessage": "Switch poll",
-    "message": "",
-    "files": [
-      "src/routes/proposal/ProposalContainer.js"
-    ]
-  },
-  {
     "id": "poll.closed",
     "description": "Poll closing time",
     "defaultMessage": "Closed at",
@@ -938,6 +929,24 @@
     "message": "",
     "files": [
       "src/routes/proposals/ProposalsOverviewContainer.js"
+    ]
+  },
+  {
+    "id": "proposal",
+    "description": "Switch to proposal poll",
+    "defaultMessage": "Proposal",
+    "message": "",
+    "files": [
+      "src/routes/proposal/ProposalContainer.js"
+    ]
+  },
+  {
+    "id": "voting",
+    "description": "Switch to voting poll",
+    "defaultMessage": "Voting",
+    "message": "",
+    "files": [
+      "src/routes/proposal/ProposalContainer.js"
     ]
   }
 ]

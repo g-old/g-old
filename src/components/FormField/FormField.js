@@ -12,11 +12,13 @@ class FormField extends React.Component {
     error: PropTypes.node,
     label: PropTypes.node,
     help: PropTypes.node,
+    overflow: PropTypes.bool,
   };
   static defaultProps = {
     error: null,
     label: null,
     help: null,
+    overflow: false,
   };
 
   constructor(props) {
@@ -61,19 +63,34 @@ class FormField extends React.Component {
   }
 
   render() {
-    const { error, children, label, help } = this.props;
-    const fieldError = error ? <span className={s.field_error}>{error}</span> : undefined;
-    const fieldHelp = help ? <span className={s.help}>{help}</span> : undefined;
+    const { error, children, label, help, overflow } = this.props;
+    const fieldError = error
+      ? (<span className={s.field_error}>
+        {error}
+      </span>)
+      : undefined;
+    const fieldHelp = help
+      ? (<span className={s.help}>
+        {help}
+      </span>)
+      : undefined;
     /* eslint-disable jsx-a11y/no-static-element-interactions */
     return (
       <div
         onClick={this.onClick}
-        className={cn(s.field, error ? s.error : null, this.state.focus ? s.focus : null)}
+        className={cn(
+          s.field,
+          error ? s.error : null,
+          this.state.focus ? s.focus : null,
+          overflow ? s.overflow : null,
+        )}
       >
         {fieldError}
         {label}
         {fieldHelp}
-        <span ref={ref => (this.contentsRef = ref)} className={s.contents}>{children}</span>
+        <span ref={ref => (this.contentsRef = ref)} className={s.contents}>
+          {children}
+        </span>
       </div>
     );
   }

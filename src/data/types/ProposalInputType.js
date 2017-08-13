@@ -42,6 +42,9 @@ const ProposalInputType = new GraphQLInputObjectType({
     tags: {
       type: new GraphQLList(TagInputType),
     },
+    spokesmanId: {
+      type: ID,
+    },
     id: {
       type: ID,
       description: 'Must be provided for mutations',

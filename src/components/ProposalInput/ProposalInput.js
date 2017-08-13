@@ -7,12 +7,14 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 
 // import Calendar from '../Calendar';
 import { createProposal } from '../../actions/proposal';
+import { findUser } from '../../actions/user';
 import s from './ProposalInput.css';
 import {
   getTags,
   getIsProposalFetching,
   getProposalErrorMessage,
   getProposalSuccess,
+  getVisibleUsers,
 } from '../../reducers';
 import TagInput from '../TagInput';
 import PollInput from '../PollInput';
@@ -28,15 +30,22 @@ import {
   createValidator,
   dateToValidation,
   timeToValidation,
+  selectValidation,
 } from '../../core/validation';
 import Notification from '../Notification';
 import history from '../../history';
+import SearchField from '../SearchField';
 
 const messages = defineMessages({
   empty: {
     id: 'form.error-empty',
     defaultMessage: "You can't leave this empty",
     description: 'Help for empty fields',
+  },
+  wrongSelect: {
+    id: 'form.error-select',
+    defaultMessage: 'You selection is not correct. Click on a suggestion',
+    description: 'Help for selection, when input does not match with a suggestion',
   },
   past: {
     id: 'form.error-past',
@@ -57,11 +66,13 @@ const messages = defineMessages({
 
 const standardValues = {
   textArea: { val: '', selection: [0, 0] },
-  settings: { pollOption: '1', title: '', body: '' },
+  settings: { pollOption: '1', title: '', body: '', spokesman: null },
   tags: {},
   showInput: false,
   tagId: 'xt0',
   currentTagIds: [],
+  spokesmanValue: undefined,
+  clearSpokesman: false,
   errors: {
     title: {
       touched: false,
@@ -75,10 +86,13 @@ const standardValues = {
     timeTo: {
       touched: false,
     },
+    spokesman: {
+      touched: false,
+    },
   },
 };
 
-const formFields = ['title', 'body', 'dateTo', 'timeTo'];
+const formFields = ['title', 'body', 'dateTo', 'timeTo', 'spokesman'];
 class ProposalInput extends React.Component {
   static propTypes = {
     createProposal: PropTypes.func.isRequired,
@@ -96,6 +110,8 @@ class ProposalInput extends React.Component {
     ).isRequired,
     defaultPollValues: PropTypes.shape({}).isRequired,
     pollOptions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    userArray: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    findUser: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -125,6 +141,7 @@ class ProposalInput extends React.Component {
     this.handleValidation = this.handleValidation.bind(this);
     this.visibleErrors = this.visibleErrors.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
+    this.handleSpokesmanValueChange = this.handleSpokesmanValueChange.bind(this);
 
     this.md = new MarkdownIt({
       // html: true,
@@ -136,6 +153,7 @@ class ProposalInput extends React.Component {
       body: { fn: 'name' },
       dateTo: { fn: 'date' },
       timeTo: { fn: 'time' },
+      spokesman: { fn: 'spokesman', valuesResolver: obj => obj.state.spokesmanValue },
     };
     this.Validator = createValidator(
       testValues,
@@ -143,6 +161,7 @@ class ProposalInput extends React.Component {
         name: nameValidation,
         date: dateToValidation,
         time: timeToValidation,
+        spokesman: selectValidation,
       },
       this,
       obj => obj.state.settings,
@@ -151,7 +170,19 @@ class ProposalInput extends React.Component {
 
   componentWillReceiveProps({ success, errorMessage }) {
     if (success) {
-      this.setState({ ...standardValues, success: !this.props.success });
+      if (!this.props.success) {
+        this.setState({
+          ...standardValues,
+          success: true,
+          clearSpokesman: true,
+        });
+      } /* else if (!this.state.success) {
+        this.setState({
+          ...standardValues,
+          success: false,
+          clearSpokesman: false,
+        });
+      }*/
     }
     if (errorMessage) {
       this.setState({ error: !this.props.errorMessage });
@@ -191,7 +222,9 @@ class ProposalInput extends React.Component {
   }
   onAddLink() {
     const url = prompt('URL', 'https://');
-    this.insertAtSelection(this.isSomethingSelected() ? '[' : '[link', `](${url})`);
+    if (url) {
+      this.insertAtSelection(this.isSomethingSelected() ? '[' : '[link', `](${url})`);
+    }
   }
 
   onTRefChange(e) {
@@ -217,7 +250,14 @@ class ProposalInput extends React.Component {
 
         endTime = concatDateAndTime(date, time);
       }
-      const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
+      const {
+        withStatements,
+        secret,
+        threshold,
+        thresholdRef,
+        unipolar,
+        spokesman,
+      } = this.state.settings;
 
       /* eslint-disable no-confusing-arrow */
       const tags =
@@ -228,7 +268,7 @@ class ProposalInput extends React.Component {
               : { id: this.state.tags[id].id },
         ) || null;
       /* eslint-enable no-confusing-arrow */
-
+      const spokesmanId = spokesman ? spokesman.id : null;
       this.props.createProposal({
         title: title.trim(),
         text: this.md.render(body),
@@ -246,9 +286,15 @@ class ProposalInput extends React.Component {
           },
         },
         tags,
+        spokesmanId,
       });
     }
   }
+
+  handleSpokesmanValueChange(e) {
+    this.setState({ spokesmanValue: e.value });
+  }
+
   visibleErrors(errorNames) {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
@@ -340,7 +386,7 @@ class ProposalInput extends React.Component {
 
   render() {
     const { title, body, spokesman } = this.state.settings;
-    const { titleError, bodyError, ...pollErrors } = this.visibleErrors(formFields);
+    const { titleError, bodyError, spokesmanError, ...pollErrors } = this.visibleErrors(formFields);
     return (
       <div className={s.root}>
         <Box column pad>
@@ -374,7 +420,6 @@ class ProposalInput extends React.Component {
               label={'Body'}
               help={
                 <Box pad>
-
                   <Button onClick={this.onStrong} plain icon={<strong>A</strong>} />
                   <Button onClick={this.onItalic} plain icon={<i>A</i>} />
                   <Button
@@ -392,7 +437,6 @@ class ProposalInput extends React.Component {
                       </svg>
                     }
                   />
-
                 </Box>
               }
             >
@@ -434,13 +478,22 @@ class ProposalInput extends React.Component {
                 }}
               />
             </FormField>
-            <FormField label="Spokesman">
-              <input
+            <FormField overflow label="Spokesman" error={spokesmanError}>
+              <SearchField
+                onChange={this.handleSpokesmanValueChange}
+                data={this.props.userArray}
+                fetch={this.props.findUser}
+                clear={this.state.clearSpokesman}
+                displaySelected={(data) => {
+                  this.setState({ settings: { ...this.state.settings, spokesman: data } });
+                }}
+              />
+              {/*              <input
                 name="spokesman"
                 type="text"
                 value={spokesman}
                 onChange={this.handleValueChanges}
-              />
+              /> */}
             </FormField>
           </div>
           {this.state.showPreview &&
@@ -456,9 +509,9 @@ class ProposalInput extends React.Component {
                   title: title.trim().length < 3 ? 'Title is missing!' : title.trim(),
                   body: this.md.render(body).length < 3 ? 'Body is missing' : this.md.render(body),
                   publishedAt: new Date(),
+                  spokesman,
                 }}
               />
-
             </Layer>}
 
           <Box pad>
@@ -475,7 +528,10 @@ class ProposalInput extends React.Component {
               }}
             />
           </Box>
-          {this.props.isPending && <span>{'...submitting'}</span>}
+          {this.props.isPending &&
+            <span>
+              {'...submitting'}
+            </span>}
           {this.state.error && <Notification type="error" message={this.props.errorMessage} />}
           {this.state.success &&
             <Notification
@@ -513,10 +569,12 @@ const mapStateToProps = state => ({
   isPending: getIsProposalFetching(state, '0000'),
   errorMessage: getProposalErrorMessage(state, '0000'),
   success: getProposalSuccess(state, '0000'),
+  userArray: getVisibleUsers(state, 'all'),
 });
 
 const mapDispatch = {
   createProposal,
+  findUser,
 };
 ProposalInput.contextTypes = {
   intl: PropTypes.object,

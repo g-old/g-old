@@ -10,6 +10,14 @@ class Proposal extends React.Component {
     state: PropTypes.string.isRequired,
     body: PropTypes.string.isRequired,
     publishedAt: PropTypes.string.isRequired,
+    spokesman: PropTypes.shape({
+      avatar: PropTypes.string,
+      name: PropTypes.string,
+      surname: PropTypes.string,
+    }),
+  };
+  static defaultProps = {
+    spokesman: null,
   };
   render() {
     return (
@@ -25,6 +33,12 @@ class Proposal extends React.Component {
             <FormattedRelative value={this.props.publishedAt} />
           </div>
           <div className={s.body} dangerouslySetInnerHTML={{ __html: this.props.body }} />
+          {this.props.spokesman &&
+            <span>
+              {'Spokesman: '}
+              <img className={s.avatar} src={this.props.spokesman.avatar} alt="IMG" />
+              {`${this.props.spokesman.name} ${this.props.spokesman.surname}`}
+            </span>}
         </div>
       </div>
     );

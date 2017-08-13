@@ -10,6 +10,7 @@ import Accordion from '../../components/Accordion';
 import AccordionPanel from '../../components/AccordionPanel';
 import SearchField from '../../components/SearchField';
 import Box from '../Box';
+import FormField from '../FormField';
 
 import {
   getVisibleUsers,
@@ -78,13 +79,15 @@ class UserPanel extends React.Component {
 
     return (
       <Box wrap>
-        <SearchField
-          data={this.props.userArray}
-          fetch={this.props.findUser}
-          displaySelected={(data) => {
-            this.setState({ accountId: data.id, showAccount: true });
-          }}
-        />
+        <FormField overflow label="Username">
+          <SearchField
+            data={this.props.userArray}
+            fetch={this.props.findUser}
+            displaySelected={(data) => {
+              this.setState({ accountId: data.id, showAccount: true });
+            }}
+          />
+        </FormField>
         {this.state.showAccount &&
           <AccountProfile
             user={this.props.user}
@@ -132,8 +135,7 @@ class UserPanel extends React.Component {
                 />}
               {this.props.viewerArray.map(user => renderUserSuggestion(user, this))}
             </AccordionPanel>
-          </Accordion>
-          {' '}
+          </Accordion>{' '}
         </div>
       </Box>
     );

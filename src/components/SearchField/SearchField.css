@@ -1,4 +1,5 @@
 /*  ported from http://codepen.io/moroshko/pen/PZWbzK */
+@import '../../components/variables.css';
 
 .container {
   position: relative;
@@ -8,11 +9,10 @@
   width: 240px;
   height: 30px;
   padding: 10px 20px;
-  font-family: Helvetica, sans-serif;
+  font-family: var(--font-family-base);
   font-weight: 300;
   font-size: 16px;
-  border: 1px solid #aaa;
-  border-radius: 4px;
+  padding-left: 24px;
 }
 
 .inputFocused {
@@ -31,11 +31,12 @@
 .containerOpen .suggestionsContainer {
   display: block;
   position: absolute;
-  top: 51px;
-  width: 280px;
+  top: 56px;
+  left: -1px;
+  width: 100%;
   border: 1px solid #aaa;
   background-color: #fff;
-  font-family: Helvetica, sans-serif;
+  font-family: var(--font-family-base);
   font-weight: 300;
   font-size: 16px;
   border-bottom-left-radius: 4px;
