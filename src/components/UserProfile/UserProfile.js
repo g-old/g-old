@@ -6,9 +6,10 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import { updateUser, fetchUser } from '../../actions/user';
 import { verifyEmail } from '../../actions/verifyEmail';
 import { createWebPushSub, deleteWebPushSub, checkSubscription } from '../../actions/subscriptions';
+import { loadWorkTeams, joinWorkTeam } from '../../actions/workTeam';
 import { uploadAvatar } from '../../actions/file';
 import s from './UserProfile.css';
-import { getSessionUser, getAccountUpdates, getSubscription } from '../../reducers';
+import { getSessionUser, getAccountUpdates, getSubscription, getWorkTeams } from '../../reducers';
 import Avatar from '../Avatar';
 import UserSettings from '../UserSettings';
 import Accordion from '../Accordion';
@@ -35,6 +36,41 @@ const messages = defineMessages({
     defaultMessage: 'Followees',
     description: 'Followees',
   },
+  economy: {
+    id: 'workTeams.economy',
+    defaultMessage: 'Economy',
+    description: 'Economy',
+  },
+  environment: {
+    id: 'workTeams.environment',
+    defaultMessage: 'Environment',
+    description: 'Environment',
+  },
+  urbanism: {
+    id: 'workTeams.urbanism',
+    defaultMessage: 'Urbanism',
+    description: 'Urbanism',
+  },
+  mobility: {
+    id: 'workTeams.mobility',
+    defaultMessage: 'Mobilty and transport',
+    description: 'Mobility',
+  },
+  health: {
+    id: 'workTeams.health',
+    defaultMessage: 'Public health systems and welfare',
+    description: 'Health',
+  },
+  education: {
+    id: 'workTeams.education',
+    defaultMessage: 'Education, youth, sport',
+    description: 'Education',
+  },
+  events: {
+    id: 'workTeams.events',
+    defaultMessage: 'Event organization, admission',
+    description: 'Event',
+  },
 });
 
 const renderFollowee = (data, fn, del) =>
@@ -58,8 +94,45 @@ const renderFollowee = (data, fn, del) =>
           <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.delete} />
         </svg>}
     </Button>
-
   </li>);
+
+/* const workTeams = [
+  {
+    value: '1',
+    label: <FormattedMessage {...messages.economy} />,
+    mId: messages.economy.id,
+  },
+  {
+    value: '2',
+    label: <FormattedMessage {...messages.environment} />,
+    mId: messages.environment.id,
+  },
+  {
+    value: '3',
+    label: <FormattedMessage {...messages.urbanism} />,
+    mId: messages.urbanism.id,
+  },
+  {
+    value: '4',
+    label: <FormattedMessage {...messages.mobility} />,
+    mId: messages.mobility.id,
+  },
+  {
+    value: '5',
+    label: <FormattedMessage {...messages.health} />,
+    mId: messages.health.id,
+  },
+  {
+    value: '6',
+    label: <FormattedMessage {...messages.education} />,
+    mId: messages.education.id,
+  },
+  {
+    value: '7',
+    label: <FormattedMessage {...messages.events} />,
+    mId: messages.events.id,
+  },
+]; */
 
 class UserProfile extends React.Component {
   static propTypes = {
@@ -72,6 +145,7 @@ class UserProfile extends React.Component {
       numStatements: PropTypes.number,
       numFollowers: PropTypes.number,
       numLikes: PropTypes.number,
+      workTeams: PropTypes.arrayOf(PropTypes.shape({})),
       followees: PropTypes.arrayOf(
         PropTypes.shape({
           avatar: PropTypes.isRequired,
@@ -94,6 +168,9 @@ class UserProfile extends React.Component {
     deleteWebPushSub: PropTypes.func.isRequired,
     createWebPushSub: PropTypes.func.isRequired,
     verifyEmail: PropTypes.func.isRequired,
+    loadWorkTeams: PropTypes.func.isRequired, // TODO implement in settings
+    joinWorkTeam: PropTypes.func.isRequired,
+    workTeams: PropTypes.arrayOf(PropTypes.shape({})),
   };
   constructor(props) {
     super(props);
@@ -105,6 +182,7 @@ class UserProfile extends React.Component {
   componentDidMount() {
     const { id } = this.props.user;
     this.props.fetchUser({ id });
+    this.props.loadWorkTeams();
     const pushAvailable = isPushAvailable();
     if (pushAvailable) {
       this.props.checkSubscription();
@@ -142,7 +220,6 @@ class UserProfile extends React.Component {
       numFollowers,
       numLikes,
     } = this.props.user;
-
     return (
       <Box wrap>
         <Box flex>
@@ -169,7 +246,9 @@ class UserProfile extends React.Component {
                 }}
               />}
 
-            <Label>{name} {surname}</Label>
+            <Label>
+              {name} {surname}
+            </Label>
             <Box pad>
               <Value
                 icon={
@@ -226,8 +305,34 @@ class UserProfile extends React.Component {
                 value={numStatements || 0}
               />
             </Box>
+            {this.props.user.workTeams &&
+              this.props.user.workTeams.map(t =>
+                (<Value
+                  icon={
+                    <svg
+                      version="1.1"
+                      viewBox="0 0 24 24"
+                      width="24px"
+                      height="24px"
+                      role="img"
+                      aria-label="group"
+                    >
+                      <path
+                        fill="none"
+                        stroke="#000"
+                        strokeWidth="2"
+                        d="M12,13 C14.209139,13 16,11.209139 16,9 C16,6.790861 14.209139,5 12,5 C9.790861,5 8,6.790861 8,9 C8,11.209139 9.790861,13 12,13 Z M6,22 L6,19 C6,15.6862915 8.6862915,13 12,13 C15.3137085,13 18,15.6862915 18,19 L18,22 M13,5 C13.4037285,3.33566165 15.0151447,2 17,2 C19.172216,2 20.98052,3.790861 21,6 C20.98052,8.209139 19.172216,10 17,10 L16,10 L17,10 C20.287544,10 23,12.6862915 23,16 L23,18 M11,5 C10.5962715,3.33566165 8.98485529,2 7,2 C4.82778404,2 3.01948003,3.790861 3,6 C3.01948003,8.209139 4.82778404,10 7,10 L8,10 L7,10 C3.71245602,10 1,12.6862915 1,16 L1,18"
+                      />
+                    </svg>
+                  }
+                  label={'Workteam'}
+                  value={t.name}
+                />),
+              )}
             <div>
-              <Label><FormattedMessage {...messages.followees} /></Label>
+              <Label>
+                <FormattedMessage {...messages.followees} />
+              </Label>
               <Button
                 plain
                 icon={
@@ -256,8 +361,8 @@ class UserProfile extends React.Component {
                   )}
                 </Box>}
               {/* eslint-enable jsx-a11y/no-static-element-interactions */}
-
             </div>
+
             <FormField label={'WebPush'} error={subscription.error}>
               {/* <Button
                 fill
@@ -277,7 +382,23 @@ class UserProfile extends React.Component {
           </Box>
         </Box>
 
-        <Box flex>
+        <Box column flex>
+          {/* <FormField label="Workteams">
+            <Select
+              options={this.props.workTeams.map(wt => ({ value: wt.id, label: wt.name }))}
+              value={
+                this.props.user.workTeams &&
+                this.props.user.workTeams.map(wt => ({ value: wt.id, label: wt.name }))
+              }
+              onChange={(e) => {
+                this.props.joinWorkTeam({
+                  id: e.value.value,
+                  memberId: this.props.user.id,
+                });
+                // props.onValueChange({ target: { name: 'pollOption', value: e.value } });
+              }}
+            />
+          </FormField>*/}
           <Accordion>
             <AccordionPanel heading={<FormattedMessage {...messages.settings} />}>
               <div style={{ marginTop: '1em' }}>
@@ -286,6 +407,8 @@ class UserProfile extends React.Component {
                   updates={updates}
                   user={this.props.user}
                   updateUser={this.props.updateUser}
+                  onJoinWorkTeam={this.props.joinWorkTeam}
+                  workTeams={this.props.workTeams}
                 />
               </div>
             </AccordionPanel>
@@ -303,11 +426,14 @@ const mapDispatch = {
   deleteWebPushSub,
   checkSubscription,
   verifyEmail,
+  loadWorkTeams,
+  joinWorkTeam,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getSessionUser(state),
   updates: getAccountUpdates(state, user.id),
   subscription: getSubscription(state),
+  workTeams: getWorkTeams(state),
 });
 
 export default connect(mapStateToProps, mapDispatch)(withStyles(s)(UserProfile));

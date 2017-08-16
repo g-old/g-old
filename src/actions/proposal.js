@@ -205,7 +205,8 @@ mutation($id:ID  $poll:PollInput $state:ProposalState ){
 export function loadProposal({ id, pollId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // Dont fetch if pending
-    if (id && getIsProposalFetching(getState(), id)) {
+    const state = await getState();
+    if (id && getIsProposalFetching(state, id)) {
       return false;
     }
 
@@ -243,7 +244,8 @@ export function loadProposalsList({ state, first, after }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
     // Dont fetch if pending
-    if (getProposalsIsFetching(getState(), state)) {
+    const reduxState = await getState();
+    if (getProposalsIsFetching(reduxState, state)) {
       return false;
     }
     dispatch({

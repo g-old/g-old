@@ -4,19 +4,23 @@ import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './UserPanel.css';
 import { updateUser, loadUserList, findUser } from '../../actions/user';
+import { loadWorkTeams, createWorkTeam } from '../../actions/workTeam';
 import FetchError from '../FetchError';
 import AccountProfile from '../AccountProfile';
 import Accordion from '../../components/Accordion';
 import AccordionPanel from '../../components/AccordionPanel';
 import SearchField from '../../components/SearchField';
 import Box from '../Box';
+import Button from '../Button';
 import FormField from '../FormField';
+import WorkTeamInput from '../WorkTeamInput';
 
 import {
   getVisibleUsers,
   getUsersIsFetching,
   getUsersErrorMessage,
   getSessionUser,
+  getWorkTeams,
 } from '../../reducers';
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 
@@ -44,6 +48,73 @@ function renderUserSuggestion(user, obj) {
 }
 /* eslint-enable jsx-a11y/no-static-element-interactions */
 
+const renderWorkTeams = teams =>
+  (<table className={s.workTeams}>
+    <thead>
+      <tr>
+        <th className={s.team}>
+          {'Name'}
+        </th>
+        <th className={s.members}>
+          {'Members'}
+        </th>
+        <th className={s.coordinator}>
+          {'Coordinator'}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {teams &&
+        teams.map(t =>
+          (<tr>
+            <td className={s.team}>
+              {t.name}
+            </td>
+            <td className={s.members}>
+              {t.members &&
+                t.members.map(m =>
+                  <img style={{ height: '1em', width: '1em' }} alt="member" src={m.avatar} />,
+                )}
+            </td>
+            <td className={s.coordinator}>
+              {t.coordinator &&
+                <span>
+                  {`${t.coordinator.name} ${t.coordinator.surname}`}
+                  <img
+                    style={{ height: '1em', width: '1em' }}
+                    alt="coordinator"
+                    src={t.coordinator.avatar}
+                  />
+                  <Button
+                    plain
+                    icon={
+                      <svg
+                        version="1.1"
+                        viewBox="0 0 24 24"
+                        width="24px"
+                        height="24px"
+                        role="img"
+                        aria-label="mail"
+                      >
+                        <path
+                          fill="none"
+                          stroke="#000"
+                          strokeWidth="2"
+                          d="M1,5 L12,14 L23,5 M1,20 L23,20 L23,4 L1,4 L1,20 L1,20 Z"
+                        />
+                      </svg>
+                    }
+                    onClick={() => {
+                      alert('TO IMPLEMENT');
+                    }}
+                  />
+                </span>}
+            </td>
+          </tr>),
+        )}
+    </tbody>
+  </table>);
+
 class UserPanel extends React.Component {
   static propTypes = {
     guestArray: PropTypes.arrayOf(PropTypes.object),
@@ -58,7 +129,11 @@ class UserPanel extends React.Component {
     userArray: PropTypes.arrayOf(PropTypes.object),
     user: PropTypes.shape({
       id: PropTypes.string,
+      role: PropTypes.shape({ type: PropTypes.string }),
     }).isRequired,
+    createWorkTeam: PropTypes.func.isRequired,
+    loadWorkTeams: PropTypes.func.isRequired,
+    workTeams: PropTypes.arrayOf(PropTypes.shape({})),
   };
   constructor(props) {
     super(props);
@@ -75,8 +150,8 @@ class UserPanel extends React.Component {
       viewerArrayErrorMessage,
       viewerArray,
       guestArray,
+      workTeams,
     } = this.props;
-
     return (
       <Box wrap>
         <FormField overflow label="Username">
@@ -135,7 +210,25 @@ class UserPanel extends React.Component {
                 />}
               {this.props.viewerArray.map(user => renderUserSuggestion(user, this))}
             </AccordionPanel>
-          </Accordion>{' '}
+            <AccordionPanel heading="Workteams" onActive={() => this.props.loadWorkTeams(true)}>
+              {renderWorkTeams(workTeams)}
+
+              <Button
+                primary
+                disabled={this.props.user.role.type !== 'admin'}
+                label={'ADD Workteam'}
+                onClick={() => this.setState({ showCreateWG: true })}
+              />
+
+              {this.state.showCreateWG &&
+                <WorkTeamInput
+                  createWorkTeam={this.props.createWorkTeam}
+                  findUser={this.props.findUser}
+                  users={this.props.userArray}
+                  onClose={() => this.setState({ showCreateWG: false })}
+                />}
+            </AccordionPanel>
+          </Accordion>
         </div>
       </Box>
     );
@@ -151,12 +244,15 @@ const mapStateToProps = state => ({
   viewerArrayErrorMessage: getUsersErrorMessage(state, 'viewer'),
   userArray: getVisibleUsers(state, 'all'),
   user: getSessionUser(state),
+  workTeams: getWorkTeams(state),
 });
 
 const mapDispatch = {
   updateUser,
   loadUserList,
   findUser,
+  loadWorkTeams,
+  createWorkTeam,
 };
 
 export default connect(mapStateToProps, mapDispatch)(withStyles(s)(UserPanel));

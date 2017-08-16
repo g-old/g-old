@@ -11,6 +11,7 @@ import statementLikes from './statementLikes';
 import flaggedStatements, * as fromFlaggedStatements from './flaggedStatements';
 import activities, * as fromActivities from './activities';
 import followees, * as fromFollowees from './followees';
+import workTeams, * as fromWorkTeams from './workTeams';
 
 export default combineReducers({
   users,
@@ -25,6 +26,7 @@ export default combineReducers({
   flaggedStatements,
   activities,
   followees,
+  workTeams,
 });
 
 export const getVisibleProposals = (state, filter) =>
@@ -81,3 +83,5 @@ export const getAllStatementsByPoll = (state, id) =>
 
 export const getVisibibleStatementsByPoll = (state, id, filter) =>
   fromStatements.getVisibibleStatementsByPoll(state.statements, id, state, filter);
+
+export const getWorkTeams = state => fromWorkTeams.getWorkTeams(state.workTeams, state);

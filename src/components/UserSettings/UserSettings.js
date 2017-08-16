@@ -5,6 +5,7 @@ import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
 import Notification from '../Notification';
+import Select from '../Select';
 import {
   createValidator,
   passwordValidation,
@@ -124,11 +125,16 @@ const initState = {
 
 class UserSettings extends React.Component {
   static propTypes = {
-    user: PropTypes.shape({ email: PropTypes.string.isRequired, id: PropTypes.string.isRequired })
-      .isRequired,
+    user: PropTypes.shape({
+      workTeams: PropTypes.arrayOf(PropTypes.shape({})),
+      email: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
+    }).isRequired,
     updateUser: PropTypes.func.isRequired,
     resendEmail: PropTypes.func.isRequired,
     updates: PropTypes.shape({}).isRequired,
+    workTeams: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    onJoinWorkTeam: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -263,7 +269,6 @@ class UserSettings extends React.Component {
       }
     }
   }
-
   render() {
     const { showEmailInput } = this.state;
     const { updates, user, resendEmail } = this.props;
@@ -301,6 +306,22 @@ class UserSettings extends React.Component {
 
     return (
       <Box column pad>
+        <FormField label="Workteams">
+          <Select
+            options={this.props.workTeams.map(wt => ({ value: wt.id, label: wt.name }))}
+            value={
+              this.props.user.workTeams &&
+              this.props.user.workTeams.map(wt => ({ value: wt.id, label: wt.name }))
+            }
+            onChange={(e) => {
+              this.props.onJoinWorkTeam({
+                id: e.value.value,
+                /* e.value[0].value,*/ memberId: this.props.user.id,
+              });
+              // props.onValueChange({ target: { name: 'pollOption', value: e.value } });
+            }}
+          />
+        </FormField>
         <fieldset>
           {this.state.emailError &&
             <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
@@ -318,9 +339,7 @@ class UserSettings extends React.Component {
               name="email"
               readOnly={showEmailInput === false}
             />
-
           </FormField>
-
         </fieldset>
         <Box wrap>
           {!emailSuccess && !emailPending && updateEmailBtn}

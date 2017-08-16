@@ -5,6 +5,9 @@ exports.seed = function (knex, Promise) {
     knex('webpush_subscriptions')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE webpush_subscriptions_id_seq RESTART WITH 1;')),
+    knex('verify_tokens')
+      .del()
+      .then(() => knex.raw('ALTER SEQUENCE verify_tokens_id_seq RESTART WITH 1;')),
     knex('activities')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE activities_id_seq RESTART WITH 1;')),

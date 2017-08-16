@@ -50,16 +50,19 @@ const renderLabel = (option) => {
   return option || '';
 };
 
+// eslint-disable-next-line consistent-return
 const renderValue = (option) => {
   if (Array.isArray(option)) {
     if (option.length === 1) {
       return renderValue(option[0]);
+    } else if (option.length > 1) {
+      return `Selected ${option.length}`; // TODO FormattedMessage
     }
-    return `Selected ${option.length}`; // TODO FormattedMessage
   } else if (option && typeof option === 'object') {
     return option.label || option.value || '';
+  } else {
+    return undefined === option || option === null ? '' : option;
   }
-  return option || '';
 };
 
 const optionSelected = (option, value) => {
@@ -86,11 +89,13 @@ class Select extends React.Component {
     value: PropTypes.oneOfType([valueType, PropTypes.arrayOf(valueType)]),
     onChange: PropTypes.func.isRequired,
     placeHolder: PropTypes.string,
+    multiple: PropTypes.bool,
   };
 
   static defaultProps = {
     value: '',
     placeHolder: '',
+    multiple: false,
   };
   constructor(props) {
     super(props);
@@ -98,6 +103,7 @@ class Select extends React.Component {
     this.onRemoveDrop = this.onRemoveDrop.bind(this);
     this.onClickOption = this.onClickOption.bind(this);
     this.renderOptions = this.renderOptions.bind(this);
+    this.valueForSelectedOption = this.valueForSelectedOption.bind(this);
 
     this.state = { dropActive: false, activeOptionIndex: -1 };
   }
@@ -142,6 +148,14 @@ class Select extends React.Component {
       this.drop.remove();
     }
   }
+  onClickOption(option) {
+    const { onChange } = this.props;
+    const value = this.valueForSelectedOption(option);
+    this.setState({ dropActive: false, value });
+    if (onChange) {
+      onChange({ target: this.inputRef, option, value });
+    }
+  }
 
   onAddDrop(e) {
     e.preventDefault();
@@ -161,13 +175,29 @@ class Select extends React.Component {
     this.setState({ dropActive: false });
   }
 
-  onClickOption(option) {
-    const { onChange } = this.props;
-    const value = option.value || option;
-    this.setState({ dropActive: false, value });
-    if (onChange) {
-      onChange({ target: this.inputRef, option, value });
+  valueForSelectedOption(option) {
+    const { multiple } = this.props;
+    const { value } = this.state;
+    let nextValue;
+    if (multiple) {
+      nextValue = value.slice(0);
+      let index;
+      for (index = 0; index < nextValue.length; index += 1) {
+        if (valueEqualsOption(nextValue[index], option)) {
+          break;
+        }
+      }
+      if (index < nextValue.length) {
+        // already existing, remove
+        nextValue.splice(index, 1);
+      } else {
+        // not there, add
+        nextValue.push(option);
+      }
+    } else {
+      nextValue = option;
     }
+    return nextValue;
   }
 
   renderOptions() {
@@ -199,7 +229,9 @@ class Select extends React.Component {
 
     return (
       <div className={s.select_drop}>
-        <ol onClick={this.onRemoveDrop} className={s.options}> {items}</ol>
+        <ol onClick={this.onRemoveDrop} className={s.options}>
+          {items}
+        </ol>
       </div>
     );
   }

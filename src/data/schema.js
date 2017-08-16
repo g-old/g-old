@@ -43,6 +43,9 @@ import createPushSub from './mutations/createPushSub';
 import deletePushSub from './mutations/deletePushSub';
 import notify from './mutations/sendNotification';
 import activities from './subscriptions/activities';
+import createWorkTeam from './mutations/createWorkTeam';
+import joinWorkTeam from './mutations/joinWorkTeam';
+import workTeams from './queries/workTeams';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -63,6 +66,7 @@ const schema = new Schema({
       pollingModes,
       proposalConnection,
       flagConnection,
+      workTeams,
     },
   }),
   mutation: new ObjectType({
@@ -86,6 +90,8 @@ const schema = new Schema({
       createPushSub,
       deletePushSub,
       notify,
+      createWorkTeam,
+      joinWorkTeam,
     },
   }),
   subscription: new ObjectType({

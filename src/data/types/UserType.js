@@ -10,6 +10,8 @@ import {
 import knex from '../knex';
 
 import RoleType from './RoleType';
+import WorkTeamType from './WorkTeamType';
+import WorkTeam from '../models/WorkTeam';
 import Role from '../models/Role';
 import User from '../models/User';
 
@@ -92,6 +94,20 @@ const UserType = new ObjectType({
             .then(countData => Number(countData[0].count));
         }
         return 0;
+      },
+    },
+
+    workTeams: {
+      type: new GraphQLList(WorkTeamType),
+      resolve: (data, args, { viewer, loaders }) => {
+        if (viewer && viewer.id === data.id) {
+          return knex('user_work_teams')
+            .where({ user_id: data.id })
+            .innerJoin('work_teams', 'work_teams.id', 'user_work_teams.work_team_id')
+            .select()
+            .then(wts => wts.map(wt => WorkTeam.gen(viewer, wt.id, loaders)));
+        }
+        return null;
       },
     },
   }),

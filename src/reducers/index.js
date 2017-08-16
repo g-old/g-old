@@ -97,3 +97,5 @@ export const getVisibibleStatementsByPoll = (state, id, filter) =>
 export const getSubscription = state => fromUi.getSubscription(state.ui);
 
 export const getActivityCounter = state => fromUi.getActivityCounter(state.ui);
+
+export const getWorkTeams = state => fromEntity.getWorkTeams(state.entities);

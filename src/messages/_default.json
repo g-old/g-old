@@ -906,5 +906,14 @@
     "files": [
       "src/routes/proposal/ProposalContainer.js"
     ]
+  },
+  {
+    "id": "form.error-select",
+    "description": "Help for selection, when input does not match with a suggestion",
+    "defaultMessage": "You selection is not correct. Click on a suggestion",
+    "message": "",
+    "files": [
+      "src/components/ProposalInput/ProposalInput.js"
+    ]
   }
 ]

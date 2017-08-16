@@ -151,7 +151,7 @@ class ProposalContainer extends React.Component {
         hideOwnStatement = false;
       }
       let filterNode = null;
-      if (poll.mode.withStatements) {
+      if (poll.mode && poll.mode.withStatements) {
         filterNode = <Filter filter={filter} filterFn={this.filterStatements} />;
       }
       // return proposal, poll, statementslist
