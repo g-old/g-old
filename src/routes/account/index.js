@@ -1,9 +1,9 @@
-import React from "react";
-import Layout from "../../components/Layout";
-import UserProfile from "../../components/UserProfile";
-import { getSessionUser } from "../../reducers";
+import React from 'react';
+import Layout from '../../components/Layout';
+import UserProfile from '../../components/UserProfile';
+import { getSessionUser } from '../../reducers';
 
-const title = "User account";
+const title = 'User account';
 
 async function action({ store, path }) {
   // TODO check if token is valid and not expirated
@@ -13,14 +13,15 @@ async function action({ store, path }) {
   if (!user) {
     return { redirect: `/?redirect=${path}` };
   }
+
   return {
     title,
-    chunks: ["account"],
+    chunks: ['account'],
     component: (
       <Layout>
         <UserProfile user={user} />
       </Layout>
-    )
+    ),
   };
 }
 export default action;

@@ -96,6 +96,14 @@ class Feed {
   static async gen(viewer, id, loaders) {
     // authorize
     // get proposalsfeed;
+    if (viewer && id) {
+      let logIds = await knex('feeds').where({ user_id: id }).select('activity_ids');
+      logIds = logIds[0];
+      if (!logIds) return null;
+      logIds = logIds.activity_ids;
+      const logs = await loadActivities(viewer, logIds, loaders);
+      return logs ? logs.reverse() : null;
+    }
 
     let aIds = await knex('system_feeds').where({ user_id: 1 }).select('activity_ids');
     let sIds = await knex('system_feeds').where({ user_id: 2 }).select('activity_ids');

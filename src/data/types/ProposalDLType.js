@@ -55,6 +55,12 @@ const ProposalType = new ObjectType({
         Poll.gen(viewer, parent.pollTwo_id, loaders),
     },
 
+    spokesman: {
+      type: UserType,
+      resolve: (parent, { id }, { viewer, loaders }) =>
+        User.gen(viewer, parent.spokesmanId, loaders),
+    },
+
     state: {
       type: GraphQLString,
     },

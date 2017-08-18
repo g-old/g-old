@@ -1,5 +1,6 @@
 import knex from '../knex';
 import Poll from './Poll';
+import User from './User';
 import PollingMode from './PollingMode';
 import { dedup } from '../../core/helpers';
 import { computeNextState } from '../../core/worker';
@@ -177,6 +178,7 @@ class Proposal {
     this.pollTwo_id = data.poll_two_id;
     this.state = data.state;
     this.createdAt = data.created_at;
+    this.spokesmanId = data.spokesman_id;
   }
   static async gen(viewer, id, { proposals }) {
     const data = await proposals.load(id);
@@ -307,6 +309,13 @@ class Proposal {
       data.poll,
       loaders,
     );
+    const additionalData = {};
+    if (data.spokesmanId) {
+      const spokesman = await User.gen(viewer, data.spokesmanId, loaders);
+      if (spokesman) {
+        additionalData.spokesman_id = spokesman.id;
+      }
+    }
 
     // tags
     const { existingTags, newTags } = await validateTags(data.tags);
@@ -335,6 +344,7 @@ class Proposal {
           body: data.text,
           poll_one_id: pollOne.id,
           state: data.state === 'survey' ? 'survey' : 'proposed',
+          ...additionalData,
           created_at: new Date(),
         },
           'id',

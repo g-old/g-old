@@ -2,9 +2,14 @@ import { schema } from 'normalizr';
 
 export const role = new schema.Entity('roles');
 export const user = new schema.Entity('users');
+export const workTeam = new schema.Entity('workTeams', {
+  coordinator: user,
+  members: [user],
+});
 user.define({
   role,
   followees: [user],
+  workTeams: [workTeam],
 });
 export const pollingMode = new schema.Entity('pollingModes');
 export const vote = new schema.Entity('votes', {
@@ -39,11 +44,15 @@ export const proposal = new schema.Entity('proposals', {
   pollTwo: poll,
   tags: [tag],
 });
+export const notification = new schema.Entity('notifications', {
+  sender: user,
+});
 export const unionSchema = new schema.Union(
   {
     ProposalDL: proposal,
     VoteDL: vote,
     StatementDL: statement,
+    Notification: notification,
   },
   '__typename',
 );
@@ -51,6 +60,7 @@ export const activity = new schema.Entity('activities', {
   actor: user,
   object: unionSchema,
 });
+
 export const proposalList = [proposal];
 export const voteList = [vote];
 export const userList = [user];
@@ -58,3 +68,4 @@ export const flaggedStatementArray = [flaggedStatement];
 export const activityArray = [activity];
 export const tagArray = [tag];
 export const statementArray = [statement];
+export const workTeamList = [workTeam];

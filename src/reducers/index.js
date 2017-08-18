@@ -75,11 +75,13 @@ export const getFlagsErrorMessage = (state, filter) =>
 
 export const getFlagsPage = (state, filter) => fromEntity.getFlagsPage(state.entities, filter);
 
-export const getActivities = state => fromEntity.getActivities(state.entities);
+export const getActivities = (state, filter) => fromEntity.getActivities(state.entities, filter);
 
-export const getFeedIsFetching = state => fromEntity.getFeedIsFetching(state.entities);
+export const getFeedIsFetching = (state, filter) =>
+  fromEntity.getFeedIsFetching(state.entities, filter);
 
-export const getFeedErrorMessage = state => fromEntity.getFeedErrorMessage(state.entities);
+export const getFeedErrorMessage = (state, filter) =>
+  fromEntity.getFeedErrorMessage(state.entities, filter);
 
 export const getTags = state => fromEntity.getTags(state.entities);
 
@@ -97,3 +99,5 @@ export const getVisibibleStatementsByPoll = (state, id, filter) =>
 export const getSubscription = state => fromUi.getSubscription(state.ui);
 
 export const getActivityCounter = state => fromUi.getActivityCounter(state.ui);
+
+export const getWorkTeams = state => fromEntity.getWorkTeams(state.entities);

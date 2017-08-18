@@ -68,25 +68,18 @@
   -ms-word-break: break-all;
   overflow-wrap: break-word;
   word-break: break-word;
+  white-space: pre-line;
   line-height: 1.3em;
   width: 100%;
+  display: inline-block;
 }
 
 .textEdit {
   font-family: var(--font-family-base);
-  height: 2.8em;
   width: 99%;
+  line-height: 1.3em;
+  box-sizing: border-box;
 }
-
-/*
-.textEditAlt {
-  font-family: var(--font-family-base);
-  height: 2.8em;
-  width: 99%;
-  border: none;
-  outline: none;
-  background-color: var(--color-accent-1);
-} */
 
 .inactive {
   .avatar {

@@ -22,7 +22,11 @@ const hydrateUsers = (state, data, entities) =>
 
 export const getUser = (state, id, entities) => {
   const user = fromById.getUser(state.byId, id);
-  return hydrateUser(user, { ...entities, users: entities.users.byId });
+  return hydrateUser(user, {
+    ...entities,
+    users: entities.users.byId,
+    workTeams: entities.workTeams.byId,
+  });
 };
 
 export const getVisibleUsers = (state, filter, entities) => {

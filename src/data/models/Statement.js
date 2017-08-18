@@ -45,6 +45,12 @@ class Statement {
   }
 
   static async delete(viewer, data, loaders) {
+    /* const e = Math.random();
+    if (e > 0.5) {
+      console.log('ERROR');
+      throw new Error('TESTERROR');
+    } */
+
     if (!Statement.canMutate(viewer, data)) return null;
 
     // validate
@@ -62,6 +68,11 @@ class Statement {
   }
 
   static async update(viewer, data, loaders) {
+    /* const e = Math.random();
+    if (e > 0.5) {
+      console.log('ERROR');
+      throw new Error('TESTERROR');
+    } */
     if (!Statement.canMutate(viewer, data)) return null;
 
     // validate
@@ -88,6 +99,11 @@ class Statement {
   }
 
   static async create(viewer, data, loaders) {
+    /* const e = Math.random();
+    if (e > 0.5) {
+      console.log('ERROR');
+      throw new Error('TESTERROR');
+    } */
     // authorize
     if (!Statement.canMutate(viewer, data)) return null;
     // validate

@@ -103,6 +103,12 @@ publishedAt
 state
 body
 votes
+spokesman{
+  id
+  name
+  surname
+  avatar
+}
 pollOne ${pollFields}
 pollTwo ${pollFields}
 `;
@@ -171,8 +177,8 @@ query ($state:String $first:Int, $after:String) {
 `;
 
 const createProposalMutation = `
-mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput]){
-  createProposal(proposal:{title:$title text:$text state:$state poll:$poll tags:$tags}){
+mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput] $spokesmanId:ID){
+  createProposal(proposal:{title:$title text:$text state:$state poll:$poll tags:$tags spokesmanId:$spokesmanId}){
     ${proposal}
     tags{
       id
@@ -199,7 +205,8 @@ mutation($id:ID  $poll:PollInput $state:ProposalState ){
 export function loadProposal({ id, pollId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // Dont fetch if pending
-    if (id && getIsProposalFetching(getState(), id)) {
+    const state = await getState();
+    if (id && getIsProposalFetching(state, id)) {
       return false;
     }
 
@@ -237,7 +244,8 @@ export function loadProposalsList({ state, first, after }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
     // Dont fetch if pending
-    if (getProposalsIsFetching(getState(), state)) {
+    const reduxState = await getState();
+    if (getProposalsIsFetching(reduxState, state)) {
       return false;
     }
     dispatch({

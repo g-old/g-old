@@ -10,6 +10,7 @@ import {
   resetSuccessMail,
   notificationMail,
 } from './mailer';
+import { circularFeedNotification } from './feed';
 
 const mailWithToken = async ({ address, viewer, connection, template, type }) => {
   const result = false;
@@ -52,6 +53,23 @@ const mailNotification = async (mailData) => {
     log.error({ err }, 'Sending email failed');
   }
   return null;
+};
+
+const handleNotifications = async (viewer, notificationData, receiver) => {
+  switch (receiver.type) {
+    case 'team': {
+      return circularFeedNotification({
+        viewer,
+        data: notificationData,
+        verb: 'create',
+        receiver,
+      });
+    }
+
+    default: {
+      throw Error(`Notification type not recognized: ${notificationData.mailType}`);
+    }
+  }
 };
 
 const handleMails = (mailData) => {
@@ -144,6 +162,11 @@ process.on('message', async (data) => {
         log.info('Starting mail');
         const mailData = data.data;
         result = handleMails(mailData);
+        break;
+      }
+
+      case 'notification': {
+        result = handleNotifications(data.data.viewer, data.data, data.data.receiver);
         break;
       }
 

@@ -1,0 +1,6 @@
+{
+  "name": "ActivityLog",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ActivityLog.js"
+}

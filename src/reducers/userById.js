@@ -15,6 +15,8 @@ import {
   LOAD_FEED_SUCCESS,
   SESSION_LOGIN_SUCCESS,
   SSE_UPDATE_SUCCESS,
+  LOAD_WORKTEAMS_SUCCESS,
+  JOIN_WORKTEAM_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -39,6 +41,12 @@ export default function byId(state = {}, action) {
       return merge({}, state, action.payload.entities.users);
     }
     case CREATE_USER_SUCCESS: {
+      return merge({}, state, action.payload.entities.users);
+    }
+    case LOAD_WORKTEAMS_SUCCESS: {
+      return merge({}, state, action.payload.entities.users);
+    }
+    case JOIN_WORKTEAM_SUCCESS: {
       return merge({}, state, action.payload.entities.users);
     }
     case SSE_UPDATE_SUCCESS: {

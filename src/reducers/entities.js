@@ -7,10 +7,12 @@ import roles from './roles';
 import tags, * as fromTags from './tags';
 import pollingModes from './pollingModes';
 import votes from './votes';
+import notifications from './notifications';
 import statementLikes from './statementLikes';
 import flaggedStatements, * as fromFlaggedStatements from './flaggedStatements';
 import activities, * as fromActivities from './activities';
 import followees, * as fromFollowees from './followees';
+import workTeams, * as fromWorkTeams from './workTeams';
 
 export default combineReducers({
   users,
@@ -25,6 +27,8 @@ export default combineReducers({
   flaggedStatements,
   activities,
   followees,
+  workTeams,
+  notifications,
 });
 
 export const getVisibleProposals = (state, filter) =>
@@ -63,11 +67,14 @@ export const getFlagsPage = (state, filter) =>
 export const getFlagsErrorMessage = (state, filter) =>
   fromFlaggedStatements.getErrorMessage(state.flaggedStatements, filter);
 
-export const getActivities = state => fromActivities.getActivities(state.activities, state);
+export const getActivities = (state, filter) =>
+  fromActivities.getActivities(state.activities, filter, state);
 
-export const getFeedIsFetching = state => fromActivities.getIsFetching(state.activities);
+export const getFeedIsFetching = (state, filter) =>
+  fromActivities.getIsFetching(state.activities, filter);
 
-export const getFeedErrorMessage = state => fromActivities.getErrorMessage(state.activities);
+export const getFeedErrorMessage = (state, filter) =>
+  fromActivities.getErrorMessage(state.activities, filter);
 
 export const getTags = state => fromTags.getTags(state.tags);
 
@@ -81,3 +88,5 @@ export const getAllStatementsByPoll = (state, id) =>
 
 export const getVisibibleStatementsByPoll = (state, id, filter) =>
   fromStatements.getVisibibleStatementsByPoll(state.statements, id, state, filter);
+
+export const getWorkTeams = state => fromWorkTeams.getWorkTeams(state.workTeams, state);

@@ -40,6 +40,29 @@ export function passwordAgainValidation(passwordAgain, { password }) {
   return result;
 }
 
+export function selectValidation(selection, inputField) {
+  const result = {
+    touched: false,
+  };
+  if (inputField) {
+    if (!selection) {
+      return {
+        touched: true,
+        errorName: 'wrongSelect',
+      };
+    }
+    const sel = `${selection.name} ${selection.surname}`;
+    if (sel !== inputField) {
+      return {
+        touched: true,
+        errorName: 'wrongSelect',
+      };
+    }
+  }
+
+  return result;
+}
+
 export function dateToValidation(date) {
   // TODO finish
   let result = {
@@ -133,8 +156,12 @@ export function createValidator(allValues, validators, obj, resolverFn, options 
   return (properties) => {
     const result = properties.reduce(
       (acc, curr) => {
-        const state = resolverFn(obj);
+        let state = resolverFn(obj);
         const value = state[curr]; // obj[curr];
+        if ('valuesResolver' in allValues[curr]) {
+          state = allValues[curr].valuesResolver(obj);
+        }
+
         const errors = validators[allValues[curr].fn](value, state, options);
         // eslint-disable-next-line no-param-reassign
         acc.errors[curr] = {

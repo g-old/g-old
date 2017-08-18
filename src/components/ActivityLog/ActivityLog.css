@@ -1,0 +1,10 @@
+.container {
+  margin: 0 auto 2em;
+  border: solid 1px gray;
+  padding: 1em;
+  max-width: 480px;
+}
+
+.notification {
+  border: 4px solid orange;
+}

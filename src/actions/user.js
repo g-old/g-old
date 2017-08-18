@@ -38,7 +38,15 @@ query ($role:String) {
   }
 }
 `;
-
+const workTeam = `
+  id
+  name
+  coordinator{
+    name
+    surname
+    avatar
+    id
+  }`;
 const userQuery = `
 query ($id:ID!) {
   user (id:$id) {
@@ -48,6 +56,9 @@ query ($id:ID!) {
     numStatements
     numFollowers
     numLikes
+    workTeams{
+      ${workTeam}
+    }
     followees{
       ${userFields}
     }

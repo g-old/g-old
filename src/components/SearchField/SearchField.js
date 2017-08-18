@@ -28,8 +28,12 @@ function renderSuggestion(suggestion, { query }) {
       <span className={s.name}>
         {parts.map((part, index) => {
           const className = part.highlight ? 'highlight' : null;
-          // eslint-disable-next-line react/no-array-index-key
-          return <span className={className && s.highlight} key={index}>{part.text}</span>;
+          return (
+            // eslint-disable-next-line react/no-array-index-key
+            <span className={className && s.highlight} key={index}>
+              {part.text}
+            </span>
+          );
         })}
       </span>
     </span>
@@ -44,6 +48,11 @@ class SearchField extends React.Component {
     data: PropTypes.arrayOf(PropTypes.object),
     fetch: PropTypes.func.isRequired,
     displaySelected: PropTypes.func.isRequired,
+    onChange: PropTypes.func,
+    clear: PropTypes.bool,
+  };
+  static defaultProps = {
+    onChange: null,
   };
   constructor() {
     super();
@@ -55,10 +64,19 @@ class SearchField extends React.Component {
     this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
   }
 
+  componentWillReceiveProps({ clear }) {
+    if (clear && !this.props.clear) {
+      this.setState({ value: '' });
+    }
+  }
+
   onChange = (event, { newValue }) => {
     this.setState({
       value: newValue,
     });
+    if (this.props.onChange) {
+      this.props.onChange({ value: newValue });
+    }
   };
 
   // Autosuggest will call this function every time you need to update suggestions.

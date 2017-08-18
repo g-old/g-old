@@ -16,6 +16,32 @@ const NotificationInputType = new GraphQLInputObjectType({
       type: String,
     },
 
+    receiver: {
+      type: new GraphQLInputObjectType({
+        name: 'ReceiverInput',
+        fields: {
+          type: {
+            type: new GraphQLEnumType({
+              name: 'ReceiverType',
+              values: {
+                team: {
+                  value: 'team',
+                  description: 'Notify team',
+                },
+
+                user: {
+                  value: 'user',
+                  description: 'Notify user',
+                },
+              },
+            }),
+          },
+          id: {
+            type: GraphQLID,
+          },
+        },
+      }),
+    },
     receiverId: { type: new GraphQLNonNull(GraphQLID) },
 
     type: {
@@ -25,6 +51,10 @@ const NotificationInputType = new GraphQLInputObjectType({
           email: {
             value: 'email',
             description: 'Notification by email',
+          },
+          notification: {
+            value: 'notification',
+            description: 'Notification by message in feed',
           },
         },
       }),
