@@ -7,9 +7,16 @@ import { updateUser, fetchUser } from '../../actions/user';
 import { verifyEmail } from '../../actions/verifyEmail';
 import { createWebPushSub, deleteWebPushSub, checkSubscription } from '../../actions/subscriptions';
 import { loadWorkTeams, joinWorkTeam } from '../../actions/workTeam';
+import { loadFeed } from '../../actions/feed';
 import { uploadAvatar } from '../../actions/file';
 import s from './UserProfile.css';
-import { getSessionUser, getAccountUpdates, getSubscription, getWorkTeams } from '../../reducers';
+import {
+  getSessionUser,
+  getAccountUpdates,
+  getSubscription,
+  getWorkTeams,
+  getActivities,
+} from '../../reducers';
 import Avatar from '../Avatar';
 import UserSettings from '../UserSettings';
 import Accordion from '../Accordion';
@@ -24,6 +31,7 @@ import { isPushAvailable } from '../../core/helpers';
 import CheckBox from '../CheckBox';
 import ProfilePicture from '../ProfilePicture';
 import { ICONS } from '../../constants';
+import ActivityLog from '../ActivityLog';
 
 const messages = defineMessages({
   settings: {
@@ -171,6 +179,11 @@ class UserProfile extends React.Component {
     loadWorkTeams: PropTypes.func.isRequired, // TODO implement in settings
     joinWorkTeam: PropTypes.func.isRequired,
     workTeams: PropTypes.arrayOf(PropTypes.shape({})),
+    loadFeed: PropTypes.func.isRequired,
+    activities: PropTypes.arrayOf(PropTypes.shape({})),
+  };
+  static defaultProps = {
+    activities: null,
   };
   constructor(props) {
     super(props);
@@ -182,7 +195,8 @@ class UserProfile extends React.Component {
   componentDidMount() {
     const { id } = this.props.user;
     this.props.fetchUser({ id });
-    this.props.loadWorkTeams();
+    //  this.props.loadWorkTeams();
+    // this.props.loadFeed(true);
     const pushAvailable = isPushAvailable();
     if (pushAvailable) {
       this.props.checkSubscription();
@@ -210,7 +224,6 @@ class UserProfile extends React.Component {
   render() {
     if (!this.props.user) return null;
     const { subscription, updates } = this.props;
-
     const {
       avatar,
       name,
@@ -383,24 +396,13 @@ class UserProfile extends React.Component {
         </Box>
 
         <Box column flex>
-          {/* <FormField label="Workteams">
-            <Select
-              options={this.props.workTeams.map(wt => ({ value: wt.id, label: wt.name }))}
-              value={
-                this.props.user.workTeams &&
-                this.props.user.workTeams.map(wt => ({ value: wt.id, label: wt.name }))
-              }
-              onChange={(e) => {
-                this.props.joinWorkTeam({
-                  id: e.value.value,
-                  memberId: this.props.user.id,
-                });
-                // props.onValueChange({ target: { name: 'pollOption', value: e.value } });
-              }}
-            />
-          </FormField>*/}
           <Accordion>
-            <AccordionPanel heading={<FormattedMessage {...messages.settings} />}>
+            <AccordionPanel
+              heading={<FormattedMessage {...messages.settings} />}
+              onActive={() => {
+                this.props.loadWorkTeams();
+              }}
+            >
               <div style={{ marginTop: '1em' }}>
                 <UserSettings
                   resendEmail={this.props.verifyEmail}
@@ -411,6 +413,23 @@ class UserProfile extends React.Component {
                   workTeams={this.props.workTeams}
                 />
               </div>
+            </AccordionPanel>
+            <AccordionPanel
+              heading="Log / Notifications"
+              onActive={() => {
+                this.props.loadFeed(true);
+              }}
+            >
+              {this.props.activities &&
+                this.props.activities.map(a =>
+                  (<ActivityLog
+                    key={a.id}
+                    actor={a.actor}
+                    date={a.createdAt}
+                    verb={a.verb}
+                    content={a.object}
+                  />),
+                )}
             </AccordionPanel>
           </Accordion>
         </Box>
@@ -428,12 +447,14 @@ const mapDispatch = {
   verifyEmail,
   loadWorkTeams,
   joinWorkTeam,
+  loadFeed,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getSessionUser(state),
   updates: getAccountUpdates(state, user.id),
   subscription: getSubscription(state),
   workTeams: getWorkTeams(state),
+  activities: getActivities(state, 'log'),
 });
 
 export default connect(mapStateToProps, mapDispatch)(withStyles(s)(UserProfile));

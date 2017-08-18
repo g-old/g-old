@@ -334,17 +334,17 @@ class Statement extends React.Component {
       <div
         className={cn(
           s.rootAlt,
-          vote.position === 'pro' ? s.pro : s.contra,
+          vote && vote.position === 'pro' ? s.pro : s.contra,
           inactive && s.inactive,
         )}
       >
-        {!inactive && <img className={cn(s.avatar)} src={author.avatar} alt="IMG" />}
+        {!inactive && <img className={cn(s.avatar)} src={author && author.avatar} alt="IMG" />}
         <div style={{ width: '100%' }}>
           {!inactive &&
             <div className={s.header}>
               <div>
                 <span className={s.author}>
-                  {author.name} {author.surname}
+                  {author && author.name} {author && author.surname}
                 </span>
                 <span>
                   {likes ? ` (+${likes})` : ''}

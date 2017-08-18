@@ -8,8 +8,8 @@ import {
 import { genStatusIndicators } from '../core/helpers';
 
 const notify = `
-mutation($message:String! $receiverId:ID! $type:Transport! $subject:String){
-  notify(notification: {message:$message receiverId:$receiverId type:$type subject:$subject})
+mutation($message:String! $receiverId:ID! $type:Transport! $subject:String $receiver:ReceiverInput){
+  notify(notification: {message:$message receiverId:$receiverId type:$type subject:$subject receiver:$receiver})
 }`;
 
 export function notifyUser(notificationData) {

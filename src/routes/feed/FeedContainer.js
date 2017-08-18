@@ -105,9 +105,9 @@ class FeedContainer extends React.Component {
 }
 // TODO implement memoiziation with reselect
 const mapStateToProps = state => ({
-  activities: getActivities(state),
-  isFetching: getFeedIsFetching(state),
-  errorMessage: getFeedErrorMessage(state),
+  activities: getActivities(state, 'all'),
+  isFetching: getFeedIsFetching(state, 'all'),
+  errorMessage: getFeedErrorMessage(state, 'all'),
 });
 
 const mapDispatch = {

@@ -2,6 +2,7 @@ import { GraphQLString, GraphQLObjectType, GraphQLID, GraphQLNonNull } from 'gra
 import User from '../models/User';
 import UserType from './UserType';
 import ObjectType from './ObjectType';
+import Notification from '../models/Notification';
 import Proposal from '../models/Proposal';
 import Statement from '../models/Statement';
 import Vote from '../models/Vote';
@@ -54,6 +55,9 @@ const ActivityType = new GraphQLObjectType({
         }
         if (parent.type === 'vote') {
           return Vote.gen(viewer, parent.objectId, loaders);
+        }
+        if (parent.type === 'notification') {
+          return Notification.gen(viewer, parent.objectId, loaders);
         }
         return null;
       },

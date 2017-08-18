@@ -35,6 +35,22 @@ const sendNotification = {
         };
         return sendJob(job);
       }
+      case 'notification': {
+        // eslint-disable-next-line no-bitwise
+        if (!viewer || !(viewer.privilege & PRIVILEGES.canNotifyUser)) return false;
+        if (!notification.receiver || !notification.message) return false;
+
+        const job = {
+          type: 'notification',
+          data: {
+            receiver: notification.receiver,
+            viewer,
+            notificationType: 'msg', // TODO not hardcode
+            ...JSON.parse(notification.message),
+          },
+        };
+        return sendJob(job);
+      }
 
       default:
         throw Error(`Notification type not recognized: ${notification.type}`);

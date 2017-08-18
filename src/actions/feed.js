@@ -3,11 +3,11 @@ import { normalize } from 'normalizr';
 import { LOAD_FEED_START, LOAD_FEED_SUCCESS, LOAD_FEED_ERROR } from '../constants';
 
 import { activityArray as activitiesSchema } from '../store/schema';
-import { getFeedIsFetching } from '../reducers';
+import { getFeedIsFetching, getSessionUser } from '../reducers';
 
 const feed = `
-query{
-  feed {
+query($userId:ID){
+  feed(userId:$userId) {
   id
   type
   objectId
@@ -91,27 +91,44 @@ query{
         avatar
       }
     }
+    ... on Notification {
+      id
+      sender {
+        name
+        surname
+        avatar
+        id
+      }
+      msg
+      title
+    }
   }
 }
 }
 `;
-export function loadFeed() {
+export function loadFeed(log) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
-
-    if (getFeedIsFetching(getState())) {
+    const state = await getState();
+    if (getFeedIsFetching(state, log ? 'log' : 'all')) {
       return false;
+    }
+    let userId;
+    if (log) {
+      userId = getSessionUser(state).id;
     }
     dispatch({
       type: LOAD_FEED_START,
+      log,
     });
 
     try {
-      const { data } = await graphqlRequest(feed);
+      const { data } = await graphqlRequest(feed, { userId });
       const normalizedData = normalize(data.feed, activitiesSchema);
       dispatch({
         type: LOAD_FEED_SUCCESS,
         payload: normalizedData,
+        log,
       });
     } catch (error) {
       dispatch({
@@ -120,6 +137,7 @@ export function loadFeed() {
           error,
         },
         message: error.message || 'Something went wrong',
+        log,
       });
       return false;
     }

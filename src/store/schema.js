@@ -44,11 +44,15 @@ export const proposal = new schema.Entity('proposals', {
   pollTwo: poll,
   tags: [tag],
 });
+export const notification = new schema.Entity('notifications', {
+  sender: user,
+});
 export const unionSchema = new schema.Union(
   {
     ProposalDL: proposal,
     VoteDL: vote,
     StatementDL: statement,
+    Notification: notification,
   },
   '__typename',
 );

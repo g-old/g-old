@@ -12,8 +12,9 @@ import {
 const sortStatementsByPoll = (stmts, votes) =>
   Object.keys(stmts).reduce((acc, curr) => {
     const statement = stmts[curr];
-
-    const votePos = votes[statement.vote].position;
+    const vote = votes[statement.vote];
+    if (!vote) return {};
+    const votePos = vote.position;
 
     return {
       ...acc,

@@ -28,6 +28,7 @@ class NotificationInput extends React.Component {
     notifyUser: PropTypes.func.isRequired,
     updates: PropTypes.shape({ notification: PropTypes.shape({ pending: PropTypes.bool }) })
       .isRequired,
+    types: PropTypes.arrayOf(PropTypes.string).isRequired,
   };
   constructor(props) {
     super(props);
@@ -37,6 +38,8 @@ class NotificationInput extends React.Component {
     this.visibleErrors = this.visibleErrors.bind(this);
     this.onNotify = this.onNotify.bind(this);
     this.state = {
+      subject: '',
+      notificationText: '',
       errors: {
         subject: {
           touched: false,
@@ -46,6 +49,10 @@ class NotificationInput extends React.Component {
         },
       },
     };
+
+    if (props.types.length) {
+      this.state[props.types[0]] = true;
+    }
 
     const testValues = {
       subject: { fn: 'text' },
@@ -65,7 +72,13 @@ class NotificationInput extends React.Component {
       const message = this.state.notificationText.trim();
       const subject = this.state.subject ? this.state.subject.trim() : null;
       const receiverId = this.props.receiverId;
-      this.props.notifyUser({ message, subject, type: 'email', receiverId });
+      this.props.notifyUser({
+        message: JSON.stringify({ notificationType: 'msg', msg: message, title: subject }),
+        subject,
+        type: 'notification',
+        receiverId,
+        receiver: { type: 'team', id: receiverId },
+      });
     }
   }
   handleValidation(fields) {
@@ -97,35 +110,57 @@ class NotificationInput extends React.Component {
     const { subjectError, notificationTextError } = this.visibleErrors(formFields);
 
     return (
-      <Box>
-        <CheckBox checked label="Email" disabled />
-        <fieldset>
-          <FormField label="Subject" error={subjectError}>
-            <input
-              name="subject"
-              type="text"
-              onBlur={this.handleBlur}
-              value={this.state.subject}
+      <div style={{ height: '480px' }}>
+        <Box column pad>
+          <FormField label="Type">
+            {this.props.types &&
+              this.props.types.map(t =>
+                (<CheckBox
+                  name={t}
+                  checked={this.state[t]}
+                  label={t}
+                  onChange={this.handleValueChange}
+                  disabled
+                />),
+              )}
+          </FormField>
+          <FormField>
+            <CheckBox
+              name={'event'}
+              checked={false}
+              label={'Event'}
               onChange={this.handleValueChange}
+              disabled
             />
           </FormField>
-          <FormField label="Text" error={notificationTextError}>
-            <textarea
-              name="notificationText"
-              onBlur={this.handleBlur}
-              value={this.state.notificationText}
-              onChange={this.handleValueChange}
-            />
-          </FormField>
-        </fieldset>
-        <Button
-          fill
-          primary
-          onClick={this.onNotify}
-          pending={this.props.updates.notification && this.props.updates.notification.pending}
-          label={<FormattedMessage {...messages.notify} />}
-        />
-      </Box>
+          <fieldset>
+            <FormField label="Subject" error={subjectError}>
+              <input
+                name="subject"
+                type="text"
+                onBlur={this.handleBlur}
+                value={this.state.subject}
+                onChange={this.handleValueChange}
+              />
+            </FormField>
+            <FormField label="Text" error={notificationTextError}>
+              <textarea
+                name="notificationText"
+                onBlur={this.handleBlur}
+                value={this.state.notificationText}
+                onChange={this.handleValueChange}
+              />
+            </FormField>
+          </fieldset>
+          <Button
+            fill
+            primary
+            onClick={this.onNotify}
+            pending={this.props.updates.notification && this.props.updates.notification.pending}
+            label={<FormattedMessage {...messages.notify} />}
+          />
+        </Box>
+      </div>
     );
   }
 }

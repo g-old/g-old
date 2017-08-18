@@ -268,7 +268,8 @@
     "defaultMessage": "Notify user",
     "message": "Benutzer kontaktieren",
     "files": [
-      "src/components/AccountProfile/AccountProfile.js"
+      "src/components/AccountProfile/AccountProfile.js",
+      "src/components/NotificationInput/NotificationInput.js"
     ]
   },
   {
@@ -550,10 +551,12 @@
     "files": [
       "src/components/AccountProfile/AccountProfile.js",
       "src/components/Login/Login.js",
+      "src/components/NotificationInput/NotificationInput.js",
       "src/components/ProposalInput/ProposalInput.js",
       "src/components/ProposalSettings/ProposalSettings.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js",
+      "src/components/WorkTeamInput/WorkTeamInput.js",
       "src/routes/passwordRecovery/PasswordRecovery.js"
     ]
   },
@@ -973,7 +976,71 @@
     "defaultMessage": "You selection is not correct. Click on a suggestion",
     "message": "",
     "files": [
-      "src/components/ProposalInput/ProposalInput.js"
+      "src/components/ProposalInput/ProposalInput.js",
+      "src/components/WorkTeamInput/WorkTeamInput.js"
+    ]
+  },
+  {
+    "id": "workTeams.economy",
+    "description": "Economy",
+    "defaultMessage": "Economy",
+    "message": "",
+    "files": [
+      "src/components/UserProfile/UserProfile.js"
+    ]
+  },
+  {
+    "id": "workTeams.education",
+    "description": "Education",
+    "defaultMessage": "Education, youth, sport",
+    "message": "",
+    "files": [
+      "src/components/UserProfile/UserProfile.js"
+    ]
+  },
+  {
+    "id": "workTeams.environment",
+    "description": "Environment",
+    "defaultMessage": "Environment",
+    "message": "",
+    "files": [
+      "src/components/UserProfile/UserProfile.js"
+    ]
+  },
+  {
+    "id": "workTeams.events",
+    "description": "Event",
+    "defaultMessage": "Event organization, admission",
+    "message": "",
+    "files": [
+      "src/components/UserProfile/UserProfile.js"
+    ]
+  },
+  {
+    "id": "workTeams.health",
+    "description": "Health",
+    "defaultMessage": "Public health systems and welfare",
+    "message": "",
+    "files": [
+      "src/components/UserProfile/UserProfile.js"
+    ]
+  },
+  {
+    "id": "workTeams.mobility",
+    "description": "Mobility",
+    "defaultMessage": "Mobilty and transport",
+    "message": "",
+    "files": [
+      "src/components/UserProfile/UserProfile.js"
+    ]
+  },
+  {
+    "id": "workTeams.urbanism",
+    "description": "Urbanism",
+    "defaultMessage": "Urbanism",
+    "message": "",
+    "files": [
+      "src/components/UserProfile/UserProfile.js"
     ]
   }
 ]
