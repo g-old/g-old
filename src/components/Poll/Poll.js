@@ -185,7 +185,6 @@ class Poll extends React.Component {
         votingButtons = (
           <div>
             <Button disabled={votePending} onClick={() => this.canVote('pro')} plain>
-              Stop this!
               <img
                 style={{ maxWidth: '5em', maxHeight: '5em' }}
                 alt="Vote"
