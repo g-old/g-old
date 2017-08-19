@@ -66,7 +66,7 @@ const messages = defineMessages({
 
 const standardValues = {
   textArea: { val: '', selection: [0, 0] },
-  settings: { pollOption: '1', title: '', body: '', spokesman: null },
+  settings: { pollOption: { value: '1' }, title: '', body: '', spokesman: null },
   tags: {},
   showInput: false,
   tagId: 'xt0',
@@ -272,15 +272,15 @@ class ProposalInput extends React.Component {
       this.props.createProposal({
         title: title.trim(),
         text: this.md.render(body),
-        state: pollOption === '3' ? 'survey' : null,
+        state: pollOption.value === '3' ? 'survey' : null,
         poll: {
           startTime,
           endTime,
           secret,
-          threshold: threshold || this.props.defaultPollValues[pollOption].threshold,
+          threshold: threshold || this.props.defaultPollValues[pollOption.value].threshold,
           mode: {
             withStatements,
-            id: pollOption,
+            id: pollOption.value,
             unipolar,
             thresholdRef,
           },
@@ -505,7 +505,7 @@ class ProposalInput extends React.Component {
               <Proposal
                 {...{
                   id: '0000',
-                  state: this.state.settings.pollOption === '3' ? 'survey' : 'proposed',
+                  state: this.state.settings.pollOption.value === '3' ? 'survey' : 'proposed',
                   title: title.trim().length < 3 ? 'Title is missing!' : title.trim(),
                   body: this.md.render(body).length < 3 ? 'Body is missing' : this.md.render(body),
                   publishedAt: new Date(),

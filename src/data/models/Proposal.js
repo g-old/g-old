@@ -116,6 +116,13 @@ const validateStateChange = async (viewer, { id, state, proposalInDB }, loaders)
   const pollingModeinDB = await PollingMode.gen(viewer, pollInDB.pollingModeId, loaders);
   if (!pollingModeinDB) throw Error('PollingMode not found');
   if (state !== computeNextState(proposalInDB.state, pollInDB, pollingModeinDB.thresholdRef)) {
+    /* console.log('State change not valid', {
+      state,
+      oldState: proposalInDB.state,
+      pollInDB,
+      tref: pollingModeinDB.thresholdRef,
+      nextState: computeNextState(proposalInDB.state, pollInDB, pollingModeinDB.thresholdRef),
+    }); */
     return false;
   }
   return true;

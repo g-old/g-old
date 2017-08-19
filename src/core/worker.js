@@ -13,7 +13,7 @@ export const computeNextState = (state, poll, tRef) => {
       ref = poll.upvotes + poll.downvotes;
       break;
     case 'all':
-      ref = poll.num_voter;
+      ref = poll.numVoter;
       break;
 
     default:
@@ -86,7 +86,7 @@ async function proposalPolling(pubsub) {
       'polls.threshold as threshold',
       'polls.upvotes as upvotes',
       'polls.downvotes as downvotes',
-      'polls.num_voter',
+      'polls.num_voter as numVoter',
       'polling_modes.threshold_ref as ref',
     );
   let loaders = null;
