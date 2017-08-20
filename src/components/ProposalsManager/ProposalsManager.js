@@ -19,7 +19,9 @@ import Label from '../Label';
 
 const ProposalInfo = props =>
   (<Box clickable column onClick={props.onClick}>
-    <Label>{props.title}</Label>
+    <Label>
+      {props.title}
+    </Label>
     <div style={{ marginTop: '1em' }}>
       <PollState
         compact
@@ -71,7 +73,7 @@ class ProposalsManager extends React.Component {
   };
   constructor(props) {
     super(props);
-    this.state = { settings: { pollOption: '2' } };
+    this.state = { settings: { pollOption: { value: '2' } } };
     this.handleValueChanges = this.handleValueChanges.bind(this);
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
     this.handleStateChange = this.handleStateChange.bind(this);
@@ -128,7 +130,7 @@ class ProposalsManager extends React.Component {
       endTime = concatDateAndTime(dateTo, timeTo);
     }
     const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
-    const pollingModeId = this.state.settings.pollOption;
+    const pollingModeId = this.state.settings.pollOption.value;
     this.props.updateProposal({
       id: this.state.currentProposal,
       poll: {
@@ -151,7 +153,11 @@ class ProposalsManager extends React.Component {
   render() {
     const { pageInfo, proposals, isFetching, errorMessage } = this.props;
     if (isFetching && !proposals.length) {
-      return <p>{'Loading...'} </p>;
+      return (
+        <p>
+          {'Loading...'}{' '}
+        </p>
+      );
     }
     if (errorMessage && !proposals.length) {
       return (
@@ -190,7 +196,6 @@ class ProposalsManager extends React.Component {
               <span style={{ height: '1em', display: 'flex', justifyContent: 'space-between' }}>
                 {p.state}
                 <span>
-
                   <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
                     <path
                       fill="none"
@@ -202,7 +207,6 @@ class ProposalsManager extends React.Component {
                   <FormattedRelative value={p.pollOne.endTime} />
                 </span>
               </span>
-
             </ProposalInfo>,
         )}
         {pageInfo.hasNextPage &&

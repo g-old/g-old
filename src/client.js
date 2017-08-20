@@ -24,6 +24,7 @@ import { updateMeta } from './DOMUtils';
 import history from './history';
 import router from './router';
 import { getIntl } from './actions/intl';
+import { LOADING_START, LOADING_SUCCESS } from './constants';
 
 /* @intl-code-template addLocaleData(${lang}); */
 addLocaleData(de);
@@ -119,6 +120,8 @@ let currentLocation = history.location;
 // Re-render the app when window.location changes
 async function onLocationChange(location, action) {
   // Remember the latest scroll position for the previous location
+  store.dispatch({ type: 'SHOW_SPINNER_START' });
+
   scrollPositionsHistory[currentLocation.key] = {
     scrollX: window.pageXOffset,
     scrollY: window.pageYOffset,
@@ -135,6 +138,7 @@ async function onLocationChange(location, action) {
     // Traverses the list of routes in the order they are defined until
     // it finds the first route that matches provided URL path string
     // and whose action method returns anything other than `undefined`.
+    store.dispatch({ type: LOADING_START });
     const route = await router.resolve({
       ...context,
       path: location.pathname,
@@ -159,6 +163,7 @@ async function onLocationChange(location, action) {
       container,
       () => onRenderComplete(route, location),
     );
+    store.dispatch({ type: LOADING_SUCCESS });
   } catch (error) {
     if (__DEV__) {
       throw error;

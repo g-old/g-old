@@ -95,7 +95,6 @@ const DateInput = props =>
         onChange={props.handleChange}
       />
   </p> */}
-
   </div>);
 
 DateInput.propTypes = {
@@ -133,7 +132,6 @@ const PollSettings = props =>
     </FormField>
 
     <FormField label={<FormattedMessage {...messages.threshold} />} help={props.threshold}>
-
       <input
         value={props.threshold}
         onChange={props.onValueChange}
@@ -160,7 +158,6 @@ const PollSettings = props =>
         }}
       />
     </FormField>
-
   </div>);
 
 PollSettings.propTypes = {
@@ -176,7 +173,7 @@ const PollInput = (props) => {
   const selected = props.selectedPMode;
   let settings;
   if (props.displaySettings) {
-    const defaultVal = props.defaultPollValues[selected];
+    const defaultVal = props.defaultPollValues[selected.value];
     const { withStatements, secret, unipolar, threshold, thresholdRef } = props.pollValues;
     settings = {
       withStatements: withStatements == null ? defaultVal.withStatements : withStatements,
@@ -186,7 +183,7 @@ const PollInput = (props) => {
       thresholdRef: thresholdRef == null ? defaultVal.thresholdRef : thresholdRef,
     };
   }
-  const msg = props.pollOptions.find(o => o.value === selected);
+  const msg = props.pollOptions.find(o => o.value === selected.value);
 
   const value = {
     label: props.intl.messages[msg.mId] || props.intl.messages,
@@ -256,7 +253,7 @@ PollInput.propTypes = {
   }).isRequired,
   onValueChange: PropTypes.func.isRequired,
   displaySettings: PropTypes.bool,
-  selectedPMode: PropTypes.string.isRequired,
+  selectedPMode: PropTypes.shape({ value: PropTypes.string }).isRequired,
   toggleSettings: PropTypes.func.isRequired,
   pollOptions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   intl: PropTypes.shape({ messages: PropTypes.shape({}) }).isRequired,

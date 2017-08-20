@@ -117,27 +117,30 @@ class UserPanel extends React.Component {
                         alt="coordinator"
                         src={t.coordinator.avatar}
                       />
-                      <Button
-                        plain
-                        icon={
-                          <svg
-                            version="1.1"
-                            viewBox="0 0 24 24"
-                            width="24px"
-                            height="24px"
-                            role="img"
-                            aria-label="mail"
-                          >
-                            <path
-                              fill="none"
-                              stroke="#000"
-                              strokeWidth="2"
-                              d="M1,5 L12,14 L23,5 M1,20 L23,20 L23,4 L1,4 L1,20 L1,20 Z"
-                            />
-                          </svg>
-                        }
-                        onClick={() => this.setState({ showNotify: t.id })}
-                      />
+                      {// eslint-disable-next-line eqeqeq
+                      (this.props.user.id == t.coordinator.id ||
+                        this.props.user.role.type === 'admin') &&
+                        <Button
+                          plain
+                          icon={
+                            <svg
+                              version="1.1"
+                              viewBox="0 0 24 24"
+                              width="24px"
+                              height="24px"
+                              role="img"
+                              aria-label="mail"
+                            >
+                              <path
+                                fill="none"
+                                stroke="#000"
+                                strokeWidth="2"
+                                d="M1,5 L12,14 L23,5 M1,20 L23,20 L23,4 L1,4 L1,20 L1,20 Z"
+                              />
+                            </svg>
+                          }
+                          onClick={() => this.setState({ showNotify: t.id })}
+                        />}
                     </span>}
                 </td>
               </tr>),

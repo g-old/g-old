@@ -44,12 +44,12 @@ const loadActivities = (viewer, ids, loaders) =>
 const aggregateActivities = activities =>
   activities.reduce(
     (agg, curr) => {
+      if (curr.verb === 'delete') {
+        // eslint-disable-next-line no-param-reassign
+        agg.del[curr.objectId] = curr.objectId;
+        return agg;
+      }
       if (curr.type === 'statement') {
-        if (curr.verb === 'delete') {
-          // eslint-disable-next-line no-param-reassign
-          agg.del[curr.objectId] = curr.objectId;
-          return agg;
-        }
         if (curr.verb === 'update') {
           if (curr.objectId in agg.updatedStatements) {
             return agg; // dont' push, as it is an old update
@@ -76,6 +76,10 @@ const aggregateActivities = activities =>
           // eslint-disable-next-line no-param-reassign
           agg.updatedProposals[curr.objectId] = curr.objectId;
         }
+      }
+      if (curr.type === 'notification') {
+        // dont't include other notifications!
+        return agg;
       }
       agg.all.push(curr);
       return agg;

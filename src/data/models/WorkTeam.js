@@ -61,7 +61,7 @@ class WorkTeam {
   }
   canNotify(viewer) {
     // eslint-disable-next-line eqeqeq
-    return viewer.id == this.coordinatorId;
+    return viewer.id == this.coordinatorId || viewer.role.type === 'admin';
   }
   async join(viewer, memberId, loaders) {
     // viewer is already checked

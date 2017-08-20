@@ -1,10 +1,10 @@
 import knex from '../knex';
-import { PRIVILEGES } from '../../constants';
+// import { PRIVILEGES } from '../../constants';
 
 // eslint-disable-next-line no-unused-vars
 function canMutate(viewer, data) {
   // eslint-disable-next-line no-bitwise
-  if (viewer && viewer.privilege & PRIVILEGES.canNotifyUser) {
+  if (viewer /* && viewer.privilege & PRIVILEGES.canNotifyUser*/) {
     return true;
   }
   return false;

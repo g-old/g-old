@@ -81,7 +81,7 @@ class ProposalSettings extends React.Component {
     this.handleBlur = this.handleBlur.bind(this);
     this.visibleErrors = this.visibleErrors.bind(this);
     this.state = {
-      settings: { pollOption: '2' },
+      settings: { pollOption: { value: '2' } },
       error: false,
       errors: {
         dateTo: {
@@ -192,10 +192,10 @@ class ProposalSettings extends React.Component {
           startTime,
           endTime,
           secret,
-          threshold: threshold || this.props.defaultPollValues[pollOption].threshold,
+          threshold: threshold || this.props.defaultPollValues[pollOption.value].threshold,
           mode: {
             withStatements,
-            id: pollOption,
+            id: pollOption.value,
             unipolar,
             thresholdRef,
           },
@@ -213,7 +213,9 @@ class ProposalSettings extends React.Component {
       <Layer onClose={onClose}>
         <Box className={s.container} pad column justify>
           {this.state.error && <Notification type="error" message={error} />}
-          <h4>{proposal.title}</h4>
+          <h4>
+            {proposal.title}
+          </h4>
           <Accordion>
             <AccordionPanel heading={<FormattedMessage {...messages.revoke} />}>
               <Box pad column justify>
@@ -227,7 +229,6 @@ class ProposalSettings extends React.Component {
             </AccordionPanel>
             <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
               <Box className={s.innerContainer} column pad>
-
                 <PollInput
                   onValueChange={this.handleValueChanges}
                   handleDateChange={this.handleValueChanges}

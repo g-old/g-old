@@ -6,7 +6,7 @@ import cn from 'classnames';
 import s from './ActivityLog.css';
 import Avatar from '../Avatar';
 import Statement from '../Statement';
-import Icon from '../Icon';
+import { ICONS } from '../../constants';
 import Link from '../Link';
 
 class ActivityLog extends React.Component {
@@ -22,6 +22,7 @@ class ActivityLog extends React.Component {
       pollId: PropTypes.string,
       msg: PropTypes.string,
       title: PropTypes.string,
+      position: PropTypes.string,
     }),
     date: PropTypes.string.isRequired,
   };
@@ -56,8 +57,18 @@ class ActivityLog extends React.Component {
             <div>
               <Avatar user={this.props.content.voter} />
               {`${this.props.content.voter.name} ${this.props.content.voter.surname}`}
-              <br />
-              <Icon icon={'M27 4l-15 15-7-7-5 5 12 12 20-20z'} color={'green'} size={'64'} />
+
+              {
+                <svg viewBox="0 0 24 24" width="60px" height="24px" role="img" aria-label="halt">
+                  <path
+                    fill="none"
+                    stroke={this.props.content.position === 'pro' ? '#8cc800' : '#ff324d'}
+                    strokeWidth="1"
+                    d={ICONS.thumbUpAlt}
+                    transform={this.props.content.position === 'pro' ? '' : 'rotate(180 12 12)'}
+                  />
+                </svg>
+              }
             </div>
           </Link>
         );

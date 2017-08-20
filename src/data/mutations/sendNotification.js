@@ -37,7 +37,7 @@ const sendNotification = {
       }
       case 'notification': {
         // eslint-disable-next-line no-bitwise
-        if (!viewer || !(viewer.privilege & PRIVILEGES.canNotifyUser)) return false;
+        if (!viewer) return false;
         if (!notification.receiver || !notification.message) return false;
 
         const job = {

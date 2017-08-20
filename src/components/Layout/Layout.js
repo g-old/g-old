@@ -23,6 +23,7 @@ class Layout extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     createSSESub: PropTypes.func.isRequired,
+    loading: PropTypes.bool.isRequired,
   };
   componentDidMount() {
     this.props.createSSESub();
@@ -30,6 +31,7 @@ class Layout extends React.Component {
   render() {
     return (
       <div>
+        {this.props.loading && <div className={s.loader} />}
         <Header />
         <div className={s.content}>
           {this.props.children}
@@ -43,4 +45,5 @@ class Layout extends React.Component {
 const mapDispatch = {
   createSSESub,
 };
-export default connect(null, mapDispatch)(withStyles(normalizeCss, s)(Layout));
+const mapStateToProps = state => ({ loading: state.ui.loading });
+export default connect(mapStateToProps, mapDispatch)(withStyles(normalizeCss, s)(Layout));
