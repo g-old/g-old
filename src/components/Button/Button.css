@@ -2,7 +2,7 @@
 
 .button {
   background-color: transparent;
-  border: 2px solid #e0b000;
+  border: 2px solid var(--color-accent-1);
   border-radius: 5px;
   color: #333;
   font-size: 19px;
@@ -23,16 +23,16 @@
 }
 
 .button:not(.disabled):not(.accent):not(.plain):hover {
-  box-shadow: 0 0 0 2px #e0b000;
+  box-shadow: 0 0 0 2px var(--color-accent-1);
 }
 
 .primary {
-  color: #fff;
-  background-color: #e0b000;
+  color: var(--color-accent-2);
+  background-color: var(--color-accent-1);
 }
 
 .primary :not(.disabled):hover {
-  box-shadow: 0 0 0 2px #e0b000;
+  box-shadow: 0 0 0 2px var(--color-accent-1);
 }
 
 .icon {

@@ -3,10 +3,10 @@
 .field {
   position: relative;
   padding: 6px 24px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--color-accent-1);
   margin-bottom: -1px;
-  background-color: #fff;
-  color: #333;
+  background-color: inherit;
+  color: var(--color-accent-1);
   opacity: 1;
   overflow: auto;
   transition: all 0.4s, padding-top 0.3s 0.1s, padding-bottom 0.3s 0.1s;
