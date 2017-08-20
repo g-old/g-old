@@ -36,7 +36,7 @@ const messages = defineMessages({
   },
 });
 const DateInput = props =>
-  (<div>
+  <div>
     {/*  <p>
       <label htmlFor="dateFrom">DATE FROM</label>
       <input
@@ -56,7 +56,10 @@ const DateInput = props =>
         name="timeFrom"
       />
     </p> */}
-    <FormField label={<FormattedMessage {...messages.dateTo} />} error={props.dateToError}>
+    <FormField
+      label={<FormattedMessage {...messages.dateTo} />}
+      error={props.dateToError}
+    >
       <input
         type="date"
         defaultValue={utcCorrectedDate(3).slice(0, 10)}
@@ -66,7 +69,10 @@ const DateInput = props =>
         onBlur={props.handleBlur}
       />
     </FormField>
-    <FormField label={<FormattedMessage {...messages.timeTo} />} error={props.timeToError}>
+    <FormField
+      label={<FormattedMessage {...messages.timeTo} />}
+      error={props.timeToError}
+    >
       <input
         type="time"
         name="timeTo"
@@ -95,7 +101,7 @@ const DateInput = props =>
         onChange={props.handleChange}
       />
   </p> */}
-  </div>);
+  </div>;
 
 DateInput.propTypes = {
   handleChange: PropTypes.func.isRequired,
@@ -109,7 +115,7 @@ DateInput.defaultProps = {
 };
 
 const PollSettings = props =>
-  (<div>
+  <div>
     <FormField>
       <CheckBox
         label={'with statements'}
@@ -131,7 +137,10 @@ const PollSettings = props =>
       />
     </FormField>
 
-    <FormField label={<FormattedMessage {...messages.threshold} />} help={props.threshold}>
+    <FormField
+      label={<FormattedMessage {...messages.threshold} />}
+      help={props.threshold}
+    >
       <input
         value={props.threshold}
         onChange={props.onValueChange}
@@ -153,12 +162,14 @@ const PollSettings = props =>
           value: props.thresholdRef,
           label: props.thresholdRef === 'all' ? 'ALL' : 'VOTERS',
         }}
-        onChange={(e) => {
-          props.onValueChange({ target: { name: 'thresholdRef', value: e.value } });
+        onChange={e => {
+          props.onValueChange({
+            target: { name: 'thresholdRef', value: e.value },
+          });
         }}
       />
     </FormField>
-  </div>);
+  </div>;
 
 PollSettings.propTypes = {
   withStatements: PropTypes.bool.isRequired,
@@ -169,18 +180,26 @@ PollSettings.propTypes = {
   onValueChange: PropTypes.func.isRequired,
 };
 
-const PollInput = (props) => {
+const PollInput = props => {
   const selected = props.selectedPMode;
   let settings;
   if (props.displaySettings) {
     const defaultVal = props.defaultPollValues[selected.value];
-    const { withStatements, secret, unipolar, threshold, thresholdRef } = props.pollValues;
+    const {
+      withStatements,
+      secret,
+      unipolar,
+      threshold,
+      thresholdRef,
+    } = props.pollValues;
     settings = {
-      withStatements: withStatements == null ? defaultVal.withStatements : withStatements,
+      withStatements:
+        withStatements == null ? defaultVal.withStatements : withStatements,
       secret: secret == null ? defaultVal.secret : secret,
       unipolar: unipolar == null ? defaultVal.unipolar : unipolar,
       threshold: threshold == null ? defaultVal.threshold : threshold,
-      thresholdRef: thresholdRef == null ? defaultVal.thresholdRef : thresholdRef,
+      thresholdRef:
+        thresholdRef == null ? defaultVal.thresholdRef : thresholdRef,
     };
   }
   const msg = props.pollOptions.find(o => o.value === selected.value);
@@ -202,8 +221,10 @@ const PollInput = (props) => {
           options={props.pollOptions}
           onSearch={false}
           value={value}
-          onChange={(e) => {
-            props.onValueChange({ target: { name: 'pollOption', value: e.value } });
+          onChange={e => {
+            props.onValueChange({
+              target: { name: 'pollOption', value: e.value },
+            });
           }}
         />
       </FormField>

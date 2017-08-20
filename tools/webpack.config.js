@@ -17,7 +17,8 @@ import pkg from '../package.json';
 
 const isDebug = !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
-const isAnalyze = process.argv.includes('--analyze') || process.argv.includes('--analyse');
+const isAnalyze =
+  process.argv.includes('--analyze') || process.argv.includes('--analyse');
 
 // Hard choice here...
 // You can enforce this for test environments :-)
@@ -27,7 +28,9 @@ const reScript = /\.jsx?$/;
 const reGraphql = /\.(graphql|gql)$/;
 const reStyle = /\.(css|less|scss|sss)$/;
 const reImage = /\.(bmp|gif|jpe?g|png|svg)$/;
-const staticAssetName = isDebug ? '[path][name].[ext]?[hash:8]' : '[hash:8].[ext]';
+const staticAssetName = isDebug
+  ? '[path][name].[ext]?[hash:8]'
+  : '[hash:8].[ext]';
 
 //
 // Common configuration chunk to be used for both
@@ -42,8 +45,11 @@ const config = {
     publicPath: '/assets/',
     pathinfo: isVerbose,
     filename: isDebug ? '[name].js' : '[name].[chunkhash:8].js',
-    chunkFilename: isDebug ? '[name].chunk.js' : '[name].[chunkhash:8].chunk.js',
-    devtoolModuleFilenameTemplate: info => path.resolve(info.absoluteResourcePath),
+    chunkFilename: isDebug
+      ? '[name].chunk.js'
+      : '[name].[chunkhash:8].chunk.js',
+    devtoolModuleFilenameTemplate: info =>
+      path.resolve(info.absoluteResourcePath),
   },
 
   resolve: {
@@ -103,7 +109,10 @@ const config = {
             [
               'react-intl',
               {
-                messagesDir: path.resolve(__dirname, '../build/messages/extracted'),
+                messagesDir: path.resolve(
+                  __dirname,
+                  '../build/messages/extracted',
+                ),
                 extractSourceLocation: true,
                 enforceDescriptions: REACT_INTL_ENFORCE_DESCRIPTIONS,
               },
@@ -150,7 +159,9 @@ const config = {
               sourceMap: isDebug,
               // CSS Modules https://github.com/css-modules/css-modules
               modules: true,
-              localIdentName: isDebug ? '[name]-[local]-[hash:base64:5]' : '[hash:base64:5]',
+              localIdentName: isDebug
+                ? '[name]-[local]-[hash:base64:5]'
+                : '[hash:base64:5]',
               // CSS Nano http://cssnano.co/options/
               minimize: !isDebug,
               discardComments: { removeAll: true },
@@ -239,7 +250,15 @@ const config = {
       // Return public URL for all assets unless explicitly excluded
       // DO NOT FORGET to update `exclude` list when you adding a new loader
       {
-        exclude: [reScript, reStyle, reImage, reGraphql, /\.json$/, /\.txt$/, /\.md$/],
+        exclude: [
+          reScript,
+          reStyle,
+          reImage,
+          reGraphql,
+          /\.json$/,
+          /\.txt$/,
+          /\.md$/,
+        ],
         loader: 'file-loader',
         options: {
           name: staticAssetName,
@@ -250,11 +269,14 @@ const config = {
       ...(isDebug
         ? []
         : [
-          {
-            test: path.resolve(__dirname, '../node_modules/react-deep-force-update/lib/index.js'),
-            loader: 'null-loader',
-          },
-        ]),
+            {
+              test: path.resolve(
+                __dirname,
+                '../node_modules/react-deep-force-update/lib/index.js',
+              ),
+              loader: 'null-loader',
+            },
+          ]),
     ],
   },
 
@@ -326,27 +348,27 @@ const clientConfig = {
       : [
           // Decrease script evaluation time
           // https://github.com/webpack/webpack/blob/master/examples/scope-hoisting/README.md
-        new webpack.optimize.ModuleConcatenationPlugin(),
+          new webpack.optimize.ModuleConcatenationPlugin(),
 
           // Minimize all JavaScript output of chunks
           // https://github.com/mishoo/UglifyJS2#compressor-options
-        new webpack.optimize.UglifyJsPlugin({
-          sourceMap: true,
-          compress: {
-            screw_ie8: true, // React doesn't support IE8
-            warnings: isVerbose,
-            unused: true,
-            dead_code: true,
-          },
-          mangle: {
-            screw_ie8: true,
-          },
-          output: {
-            comments: false,
-            screw_ie8: true,
-          },
-        }),
-      ]),
+          new webpack.optimize.UglifyJsPlugin({
+            sourceMap: true,
+            compress: {
+              screw_ie8: true, // React doesn't support IE8
+              warnings: isVerbose,
+              unused: true,
+              dead_code: true,
+            },
+            mangle: {
+              screw_ie8: true,
+            },
+            output: {
+              comments: false,
+              screw_ie8: true,
+            },
+          }),
+        ]),
 
     // Webpack Bundle Analyzer
     // https://github.com/th0r/webpack-bundle-analyzer
@@ -395,7 +417,7 @@ const serverConfig = {
   module: {
     ...config.module,
 
-    rules: overrideRules(config.module.rules, (rule) => {
+    rules: overrideRules(config.module.rules, rule => {
       // Override babel-preset-env configuration for Node.js
       if (rule.loader === 'babel-loader') {
         return {
@@ -407,16 +429,16 @@ const serverConfig = {
                 preset[0] !== 'env'
                   ? preset
                   : [
-                    'env',
-                    {
-                      targets: {
-                        node: pkg.engines.node.match(/(\d+\.?)+/)[0],
+                      'env',
+                      {
+                        targets: {
+                          node: pkg.engines.node.match(/(\d+\.?)+/)[0],
+                        },
+                        modules: false,
+                        useBuiltIns: false,
+                        debug: false,
                       },
-                      modules: false,
-                      useBuiltIns: false,
-                      debug: false,
-                    },
-                  ],
+                    ],
             ),
           },
         };
@@ -510,7 +532,7 @@ const workerConfig = {
   module: {
     ...config.module,
 
-    rules: overrideRules(config.module.rules, (rule) => {
+    rules: overrideRules(config.module.rules, rule => {
       // Override babel-preset-env configuration for Node.js
       if (rule.loader === 'babel-loader') {
         return {
@@ -522,16 +544,16 @@ const workerConfig = {
                 preset[0] !== 'env'
                   ? preset
                   : [
-                    'env',
-                    {
-                      targets: {
-                        node: pkg.engines.node.match(/(\d+\.?)+/)[0],
+                      'env',
+                      {
+                        targets: {
+                          node: pkg.engines.node.match(/(\d+\.?)+/)[0],
+                        },
+                        modules: false,
+                        useBuiltIns: false,
+                        debug: false,
                       },
-                      modules: false,
-                      useBuiltIns: false,
-                      debug: false,
-                    },
-                  ],
+                    ],
             ),
           },
         };

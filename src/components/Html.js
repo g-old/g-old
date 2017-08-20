@@ -40,29 +40,33 @@ class Html extends React.Component {
         <head>
           <meta charSet="utf-8" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />
-          <title>{title}</title>
+          <title>
+            {title}
+          </title>
           <meta name="description" content={description} />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
-          {scripts.map(script => <link key={script} rel="preload" href={script} as="script" />)}
+          {scripts.map(script =>
+            <link key={script} rel="preload" href={script} as="script" />,
+          )}
           <link rel="apple-touch-icon" href="apple-touch-icon.png" />
           <link
             href="https://fonts.googleapis.com/css?family=Open+Sans|Work+Sans"
             rel="stylesheet"
           />
           {styles.map(style =>
-            (<style
+            <style
               key={style.id}
               id={style.id}
               dangerouslySetInnerHTML={{ __html: style.cssText }}
-            />),
+            />,
           )}
         </head>
         <body>
-
           <div id="app" dangerouslySetInnerHTML={{ __html: children }} />
-          <script dangerouslySetInnerHTML={{ __html: `window.App=${serialize(app)}` }} />
+          <script
+            dangerouslySetInnerHTML={{ __html: `window.App=${serialize(app)}` }}
+          />
           {scripts.map(script => <script key={script} src={script} />)}
-
         </body>
       </html>
     );

@@ -45,7 +45,8 @@ const messages = defineMessages({
   wrongSelect: {
     id: 'form.error-select',
     defaultMessage: 'You selection is not correct. Click on a suggestion',
-    description: 'Help for selection, when input does not match with a suggestion',
+    description:
+      'Help for selection, when input does not match with a suggestion',
   },
   past: {
     id: 'form.error-past',
@@ -66,7 +67,12 @@ const messages = defineMessages({
 
 const standardValues = {
   textArea: { val: '', selection: [0, 0] },
-  settings: { pollOption: { value: '1' }, title: '', body: '', spokesman: null },
+  settings: {
+    pollOption: { value: '1' },
+    title: '',
+    body: '',
+    spokesman: null,
+  },
   tags: {},
   showInput: false,
   tagId: 'xt0',
@@ -141,7 +147,9 @@ class ProposalInput extends React.Component {
     this.handleValidation = this.handleValidation.bind(this);
     this.visibleErrors = this.visibleErrors.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
-    this.handleSpokesmanValueChange = this.handleSpokesmanValueChange.bind(this);
+    this.handleSpokesmanValueChange = this.handleSpokesmanValueChange.bind(
+      this,
+    );
 
     this.md = new MarkdownIt({
       // html: true,
@@ -153,7 +161,10 @@ class ProposalInput extends React.Component {
       body: { fn: 'name' },
       dateTo: { fn: 'date' },
       timeTo: { fn: 'time' },
-      spokesman: { fn: 'spokesman', valuesResolver: obj => obj.state.spokesmanValue },
+      spokesman: {
+        fn: 'spokesman',
+        valuesResolver: obj => obj.state.spokesmanValue,
+      },
     };
     this.Validator = createValidator(
       testValues,
@@ -223,7 +234,10 @@ class ProposalInput extends React.Component {
   onAddLink() {
     const url = prompt('URL', 'https://');
     if (url) {
-      this.insertAtSelection(this.isSomethingSelected() ? '[' : '[link', `](${url})`);
+      this.insertAtSelection(
+        this.isSomethingSelected() ? '[' : '[link',
+        `](${url})`,
+      );
     }
   }
 
@@ -277,7 +291,9 @@ class ProposalInput extends React.Component {
           startTime,
           endTime,
           secret,
-          threshold: threshold || this.props.defaultPollValues[pollOption.value].threshold,
+          threshold:
+            threshold ||
+            this.props.defaultPollValues[pollOption.value].threshold,
           mode: {
             withStatements,
             id: pollOption.value,
@@ -299,7 +315,9 @@ class ProposalInput extends React.Component {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
       if (this.state.errors[curr].touched) {
-        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+        acc[err] = (
+          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
+        );
       }
       return acc;
     }, {});
@@ -343,7 +361,9 @@ class ProposalInput extends React.Component {
       default:
         throw Error(`Element not recognized: ${e.target.name}`);
     }
-    this.setState({ settings: { ...this.state.settings, [e.target.name]: value } });
+    this.setState({
+      settings: { ...this.state.settings, [e.target.name]: value },
+    });
   }
   toggleSettings() {
     this.setState({ displaySettings: !this.state.displaySettings });
@@ -355,9 +375,10 @@ class ProposalInput extends React.Component {
   insertAtSelection(pre, post) {
     let val = this.state.settings.body;
     let sel = this.state.textSelection;
-    val = `${val.substring(0, sel[0])}${pre}${val.substring(sel[0], sel[1])}${post}${val.substring(
+    val = `${val.substring(0, sel[0])}${pre}${val.substring(
+      sel[0],
       sel[1],
-    )}`;
+    )}${post}${val.substring(sel[1])}`;
     sel = [val.length, val.length];
 
     this.setState({
@@ -386,7 +407,12 @@ class ProposalInput extends React.Component {
 
   render() {
     const { title, body, spokesman } = this.state.settings;
-    const { titleError, bodyError, spokesmanError, ...pollErrors } = this.visibleErrors(formFields);
+    const {
+      titleError,
+      bodyError,
+      spokesmanError,
+      ...pollErrors
+    } = this.visibleErrors(formFields);
     return (
       <div className={s.root}>
         <Box column pad>
@@ -420,7 +446,11 @@ class ProposalInput extends React.Component {
               label={'Body'}
               help={
                 <Box pad>
-                  <Button onClick={this.onStrong} plain icon={<strong>A</strong>} />
+                  <Button
+                    onClick={this.onStrong}
+                    plain
+                    icon={<strong>A</strong>}
+                  />
                   <Button onClick={this.onItalic} plain icon={<i>A</i>} />
                   <Button
                     plain
@@ -433,7 +463,12 @@ class ProposalInput extends React.Component {
                         role="img"
                         aria-label="link"
                       >
-                        <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.link} />
+                        <path
+                          fill="none"
+                          stroke="#000"
+                          strokeWidth="2"
+                          d={ICONS.link}
+                        />
                       </svg>
                     }
                   />
@@ -454,12 +489,16 @@ class ProposalInput extends React.Component {
               <TagInput
                 name={'tagInput'}
                 tags={this.state.currentTagIds.map(t => this.state.tags[t])}
-                availableTags={Object.keys(this.props.tags).map(t => this.props.tags[t])}
-                handleAddition={(t) => {
+                availableTags={Object.keys(this.props.tags).map(
+                  t => this.props.tags[t],
+                )}
+                handleAddition={t => {
                   if (this.state.currentTagIds.length < this.props.maxTags) {
                     let tag = t;
                     const duplicate = Object.keys(this.props.tags).find(
-                      id => this.props.tags[id].text.toLowerCase() === t.text.toLowerCase(),
+                      id =>
+                        this.props.tags[id].text.toLowerCase() ===
+                        t.text.toLowerCase(),
                     );
                     if (duplicate) {
                       tag = this.props.tags[duplicate];
@@ -467,13 +506,17 @@ class ProposalInput extends React.Component {
 
                     this.setState({
                       tags: { ...this.state.tags, [tag.id]: tag },
-                      currentTagIds: [...new Set([...this.state.currentTagIds, tag.id])],
+                      currentTagIds: [
+                        ...new Set([...this.state.currentTagIds, tag.id]),
+                      ],
                     });
                   }
                 }}
-                handleDelete={(id) => {
+                handleDelete={id => {
                   this.setState({
-                    currentTagIds: this.state.currentTagIds.filter(tId => tId !== id),
+                    currentTagIds: this.state.currentTagIds.filter(
+                      tId => tId !== id,
+                    ),
                   });
                 }}
               />
@@ -484,8 +527,10 @@ class ProposalInput extends React.Component {
                 data={this.props.userArray}
                 fetch={this.props.findUser}
                 clear={this.state.clearSpokesman}
-                displaySelected={(data) => {
-                  this.setState({ settings: { ...this.state.settings, spokesman: data } });
+                displaySelected={data => {
+                  this.setState({
+                    settings: { ...this.state.settings, spokesman: data },
+                  });
                 }}
               />
               {/*              <input
@@ -505,9 +550,18 @@ class ProposalInput extends React.Component {
               <Proposal
                 {...{
                   id: '0000',
-                  state: this.state.settings.pollOption.value === '3' ? 'survey' : 'proposed',
-                  title: title.trim().length < 3 ? 'Title is missing!' : title.trim(),
-                  body: this.md.render(body).length < 3 ? 'Body is missing' : this.md.render(body),
+                  state:
+                    this.state.settings.pollOption.value === '3'
+                      ? 'survey'
+                      : 'proposed',
+                  title:
+                    title.trim().length < 3
+                      ? 'Title is missing!'
+                      : title.trim(),
+                  body:
+                    this.md.render(body).length < 3
+                      ? 'Body is missing'
+                      : this.md.render(body),
                   publishedAt: new Date(),
                   spokesman,
                 }}
@@ -532,7 +586,8 @@ class ProposalInput extends React.Component {
             <span>
               {'...submitting'}
             </span>}
-          {this.state.error && <Notification type="error" message={this.props.errorMessage} />}
+          {this.state.error &&
+            <Notification type="error" message={this.props.errorMessage} />}
           {this.state.success &&
             <Notification
               type="success"
@@ -542,7 +597,12 @@ class ProposalInput extends React.Component {
                   plain
                   reverse
                   icon={
-                    <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="24px"
+                      height="24px"
+                      role="img"
+                    >
                       <path
                         fill="none"
                         stroke="#000"
@@ -579,4 +639,6 @@ const mapDispatch = {
 ProposalInput.contextTypes = {
   intl: PropTypes.object,
 };
-export default connect(mapStateToProps, mapDispatch)(withStyles(s)(ProposalInput));
+export default connect(mapStateToProps, mapDispatch)(
+  withStyles(s)(ProposalInput),
+);

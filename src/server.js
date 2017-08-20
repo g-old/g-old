@@ -74,14 +74,14 @@ app.use(
   requestLanguage({
     languages: config.locales,
     queryName: 'lang',
-    /* cookie: {
+    cookie: {
       name: 'lang',
       options: {
         path: '/',
         maxAge: 3650 * 24 * 3600 * 1000, // 10 years in miliseconds
       },
       url: '/lang/{language}',
-    },*/
+    },
   }),
 );
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -140,7 +140,7 @@ app.post('/signup', (req, res) => {
   return; */
 
   User.create(req.body.user)
-    .then((user) => {
+    .then(user => {
       if (!user) throw Error('User creation failed');
       const job = {
         type: 'mail',
@@ -168,9 +168,11 @@ app.post('/signup', (req, res) => {
         }),
     )
     .then(() => res.status(200).json({ user: req.session.passport.user }))
-    .catch((error) => {
+    .catch(error => {
       if (error.code === '23505') {
-        res.status(200).json({ error: { fields: { email: { unique: false } } } });
+        res
+          .status(200)
+          .json({ error: { fields: { email: { unique: false } } } });
       }
       res.status(500).json({ error: error.message });
     });
@@ -190,7 +192,7 @@ app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
   ) // eslint-disable-next-line no-confusing-arrow
     // TODO update session
     // .then(user => user ? res.status(200).json(user) : res.status(500))
-    .then((user) => {
+    .then(user => {
       if (!user) {
         throw Error('User update failed');
       }
@@ -227,7 +229,7 @@ app.post('/forgot', (req, res) => {
   return knex('users')
     .where({ email: req.body.email })
     .select()
-    .then((usr) => {
+    .then(usr => {
       const user = usr[0];
       if (user) {
         const job = {
@@ -247,7 +249,7 @@ app.post('/forgot', (req, res) => {
       }
     })
     .then(() => res.status(200).json({ ok: true }))
-    .catch((err) => {
+    .catch(err => {
       log.error({ err, req }, 'Password reset  failed');
       res.status(200).json({ ok: true });
     });
@@ -255,7 +257,7 @@ app.post('/forgot', (req, res) => {
 // TODO change to /reset only ?
 app.post('/reset/:token', (req, res) =>
   checkToken({ token: req.params.token, table: 'reset_tokens' }) // TODO checkToken and delete it
-    .then((data) => {
+    .then(data => {
       if (!data) throw Error('Token invalid');
       return User.update(
         { id: 0, role: { type: 'system' } },
@@ -263,7 +265,7 @@ app.post('/reset/:token', (req, res) =>
         createLoaders(),
       );
     })
-    .then((userData) => {
+    .then(userData => {
       const user = userData.user;
       if (user) {
         if (!user) throw Error('Update failed');
@@ -291,7 +293,7 @@ app.post('/reset/:token', (req, res) =>
       throw Error('Could not store data');
     })
     .then(() => res.status(200).json({ user: req.user }))
-    .catch((error) => {
+    .catch(error => {
       log.error({ err: error }, 'Password reset failed');
       return res.status(200).json({ user: null, error: error.message });
     }),
@@ -300,7 +302,7 @@ app.post('/reset/:token', (req, res) =>
 app.get('/verify/:token', (req, res) => {
   // ! No check if user is logged in !
   checkToken({ token: req.params.token, table: 'verify_tokens' })
-    .then((data) => {
+    .then(data => {
       if (data) {
         return knex('users')
           .forUpdate()
@@ -310,14 +312,14 @@ app.get('/verify/:token', (req, res) => {
       }
       throw Error('Token not valid');
     })
-    .then((id) => {
+    .then(id => {
       if (id[0]) {
         // TODO insert into feed
         return res.redirect('/account');
       }
       throw Error('User not found');
     })
-    .catch((err) => {
+    .catch(err => {
       log.error({ err }, 'Email verification failed');
       return res.redirect('/verify');
     });
@@ -326,12 +328,13 @@ app.get('/verify/:token', (req, res) => {
 app.post('/verify', (req, res) =>
   // ! No check if user is logged in !
   User.gen(req.user, req.user.id, createLoaders())
-    .then((user) => {
+    .then(user => {
       if (user) {
         const job = {
           type: 'mail',
           data: {
-            mailType: req.user.role.type === 'viewer' ? 'verifyEmail' : 'mailChanged',
+            mailType:
+              req.user.role.type === 'viewer' ? 'verifyEmail' : 'mailChanged',
             lang: req.cookies.lang,
             verify: true,
             address: user.email,
@@ -349,7 +352,7 @@ app.post('/verify', (req, res) =>
     .then(() => {
       res.status(200).send();
     })
-    .catch((err) => {
+    .catch(err => {
       log.error({ err }, 'Verification process failed');
       res.status(500).send();
     }),
@@ -374,7 +377,7 @@ app.get('/test', (req, res, next) => {
     .where({ name: 'admin' })
     .join('roles', 'users.role_id', '=', 'roles.id')
     .select('type')
-    .then((data) => {
+    .then(data => {
       res.status(200).json(data);
     })
     .catch(error => next(error));

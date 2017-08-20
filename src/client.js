@@ -120,7 +120,6 @@ let currentLocation = history.location;
 // Re-render the app when window.location changes
 async function onLocationChange(location, action) {
   // Remember the latest scroll position for the previous location
-  store.dispatch({ type: 'SHOW_SPINNER_START' });
 
   scrollPositionsHistory[currentLocation.key] = {
     scrollX: window.pageXOffset,

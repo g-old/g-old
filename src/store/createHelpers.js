@@ -1,4 +1,3 @@
-
 function createGraphqlRequest(fetchKnowingCookie) {
   return async function graphqlRequest(query, variables) {
     const fetchConfig = {
@@ -38,7 +37,6 @@ function createFetchKnowingCookie({ cookie }) {
 
   return fetch;
 } */
-
 
 export default function createHelpers({ fetch, history }) {
   return {

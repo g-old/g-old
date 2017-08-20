@@ -19,7 +19,12 @@ const sortStatementsByPoll = (stmts, votes) =>
     return {
       ...acc,
       [statement.pollId]: {
-        all: [...new Set([curr, ...(acc[statement.pollId] ? acc[statement.pollId].all : [])])],
+        all: [
+          ...new Set([
+            curr,
+            ...(acc[statement.pollId] ? acc[statement.pollId].all : []),
+          ]),
+        ],
         pro: [
           ...new Set([
             ...(acc[statement.pollId] ? acc[statement.pollId].pro : []),
@@ -52,7 +57,8 @@ const byPoll = (state = {}, action) => {
     case SSE_UPDATE_SUCCESS: {
       const stmts = action.payload.entities.statements;
       if (!stmts) return state;
-      const activity = action.payload.entities.activities[action.payload.result];
+      const activity =
+        action.payload.entities.activities[action.payload.result];
       const pollId = stmts[activity.objectId].pollId;
 
       if (activity.type === 'statement' && activity.verb === 'delete') {
@@ -77,9 +83,15 @@ const byPoll = (state = {}, action) => {
         ...state,
         [pollId]: {
           ...state[pollId],
-          all: [...new Set([...sorted[pollId].all, ...(currentState.all || [])])],
-          pro: [...new Set([...sorted[pollId].pro, ...(currentState.pro || [])])],
-          con: [...new Set([...sorted[pollId].con, ...(currentState.con || [])])],
+          all: [
+            ...new Set([...sorted[pollId].all, ...(currentState.all || [])]),
+          ],
+          pro: [
+            ...new Set([...sorted[pollId].pro, ...(currentState.pro || [])]),
+          ],
+          con: [
+            ...new Set([...sorted[pollId].con, ...(currentState.con || [])]),
+          ],
         },
       };
     }
@@ -93,15 +105,22 @@ const byPoll = (state = {}, action) => {
         ...state,
         [pollId]: {
           ...state[pollId],
-          all: [...new Set([...sorted[pollId].all, ...(currentState.all || [])])],
-          pro: [...new Set([...sorted[pollId].pro, ...(currentState.pro || [])])],
-          con: [...new Set([...sorted[pollId].con, ...(currentState.con || [])])],
+          all: [
+            ...new Set([...sorted[pollId].all, ...(currentState.all || [])]),
+          ],
+          pro: [
+            ...new Set([...sorted[pollId].pro, ...(currentState.pro || [])]),
+          ],
+          con: [
+            ...new Set([...sorted[pollId].con, ...(currentState.con || [])]),
+          ],
         },
       };
     }
 
     case DELETE_STATEMENT_SUCCESS: {
-      const statement = action.payload.entities.statements[action.payload.result];
+      const statement =
+        action.payload.entities.statements[action.payload.result];
       return {
         ...state,
         [statement.pollId]: {
