@@ -5,6 +5,7 @@ import users, * as fromUser from './ui/users';
 import polls, * as fromPoll from './ui/polls';
 import subscription, * as fromSubscription from './ui/subscription';
 import activityCounter, * as fromActivityCounter from './ui/activities';
+import loading from './ui/loading';
 import { SESSION_LOGOUT_SUCCESS } from '../constants';
 
 /* export default combineReducers({
@@ -20,6 +21,7 @@ const uiReducer = combineReducers({
   users,
   subscription,
   activityCounter,
+  loading,
 });
 export default (state, action) => {
   if (action.type === SESSION_LOGOUT_SUCCESS) {

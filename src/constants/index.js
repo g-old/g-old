@@ -114,6 +114,8 @@ export const CREATE_WORKTEAM_ERROR = 'CREATE_WORKTEAM_ERROR';
 export const JOIN_WORKTEAM_START = 'JOIN_WORKTEAM_START';
 export const JOIN_WORKTEAM_ERROR = 'JOIN_WORKTEAM_ERROR';
 export const JOIN_WORKTEAM_SUCCESS = 'JOIN_WORKTEAM_SUCCESS';
+export const LOADING_START = 'LOADING_START';
+export const LOADING_SUCCESS = 'LOADING_SUCCESS';
 
 // Con: Not very flexible, you cannot see the role/group/right
 export const PRIVILEGES = {

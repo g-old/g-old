@@ -85,7 +85,7 @@ class StatementsContainer extends React.Component {
     let ownStatementsNode = null;
     let statementsList = [];
     if (mode.withStatements) {
-      if (!ownStatement && ownVote) {
+      if (!ownStatement && ownVote && !this.props.poll.closedAt) {
         const data = {
           vote: ownVote,
           author: user,

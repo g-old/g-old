@@ -119,11 +119,12 @@ class Login extends React.Component {
       ? <FormattedMessage {...messages[this.state.errors.password.errorName]} />
       : null;
 
-    const loginError = status.login && status.login.error
-      ? (<div style={{ backgroundColor: 'rgba(255, 50, 77,0.3)' }}>
-        <FormattedMessage {...messages.error} />
-      </div>)
-      : null;
+    const loginError =
+      status.login && status.login.error
+        ? (<div style={{ backgroundColor: 'rgba(255, 50, 77,0.3)' }}>
+          <FormattedMessage {...messages.error} />
+        </div>)
+        : null;
     return (
       <Box column pad>
         <form onSubmit={this.onSubmit}>
