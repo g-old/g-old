@@ -5,8 +5,16 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { updateUser, fetchUser } from '../../actions/user';
 import { verifyEmail } from '../../actions/verifyEmail';
-import { createWebPushSub, deleteWebPushSub, checkSubscription } from '../../actions/subscriptions';
-import { loadWorkTeams, joinWorkTeam } from '../../actions/workTeam';
+import {
+  createWebPushSub,
+  deleteWebPushSub,
+  checkSubscription,
+} from '../../actions/subscriptions';
+import {
+  loadWorkTeams,
+  joinWorkTeam,
+  leaveWorkTeam,
+} from '../../actions/workTeam';
 import { loadFeed } from '../../actions/feed';
 import { uploadAvatar } from '../../actions/file';
 import s from './UserProfile.css';
@@ -82,7 +90,7 @@ const messages = defineMessages({
 });
 
 const renderFollowee = (data, fn, del) =>
-  (<li key={data.followee.id}>
+  <li key={data.followee.id}>
     <Button
       disabled={!del}
       onClick={() => {
@@ -102,7 +110,7 @@ const renderFollowee = (data, fn, del) =>
           <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.delete} />
         </svg>}
     </Button>
-  </li>);
+  </li>;
 
 /* const workTeams = [
   {
@@ -178,6 +186,7 @@ class UserProfile extends React.Component {
     verifyEmail: PropTypes.func.isRequired,
     loadWorkTeams: PropTypes.func.isRequired, // TODO implement in settings
     joinWorkTeam: PropTypes.func.isRequired,
+    leaveWorkTeam: PropTypes.func.isRequired,
     workTeams: PropTypes.arrayOf(PropTypes.shape({})),
     loadFeed: PropTypes.func.isRequired,
     activities: PropTypes.arrayOf(PropTypes.shape({})),
@@ -188,7 +197,11 @@ class UserProfile extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { showUpload: false, disableSubscription: true, editFollowees: false };
+    this.state = {
+      showUpload: false,
+      disableSubscription: true,
+      editFollowees: false,
+    };
     this.handleWPSubscription = this.handleWPSubscription.bind(this);
   }
 
@@ -248,7 +261,7 @@ class UserProfile extends React.Component {
 
             {this.state.showUpload &&
               <ImageUpload
-                uploadAvatar={(data) => {
+                uploadAvatar={data => {
                   this.props.uploadAvatar({ ...data, id: this.props.user.id });
                 }}
                 uploadPending={updates.dataUrl && updates.dataUrl.pending}
@@ -265,7 +278,12 @@ class UserProfile extends React.Component {
             <Box pad>
               <Value
                 icon={
-                  <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24px"
+                    height="24px"
+                    role="img"
+                  >
                     <path
                       fill="none"
                       stroke="#000"
@@ -320,7 +338,7 @@ class UserProfile extends React.Component {
             </Box>
             {this.props.user.workTeams &&
               this.props.user.workTeams.map(t =>
-                (<Value
+                <Value
                   icon={
                     <svg
                       version="1.1"
@@ -340,7 +358,7 @@ class UserProfile extends React.Component {
                   }
                   label={'Workteam'}
                   value={t.name}
-                />),
+                />,
               )}
             <div>
               <Label>
@@ -377,19 +395,14 @@ class UserProfile extends React.Component {
             </div>
 
             <FormField label={'WebPush'} error={subscription.error}>
-              {/* <Button
-                fill
-                primary={!subscription.isPushEnabled}
-                label={subscription.isPushEnabled ? 'UNSUBSCRIBEFROMPUSH' : 'SUBSCRIBEFORPUSH'}
-                disabled={this.state.disableSubscription || subscription.pending}
-                onClick={this.handleWPSubscription}
-              /> */}
               <CheckBox
                 toggle
                 checked={subscription.isPushEnabled}
                 label={subscription.isPushEnabled ? 'ON' : 'OFF'}
                 onChange={this.handleWPSubscription}
-                disabled={this.state.disableSubscription || subscription.pending}
+                disabled={
+                  this.state.disableSubscription || subscription.pending
+                }
               />
             </FormField>
           </Box>
@@ -410,6 +423,7 @@ class UserProfile extends React.Component {
                   user={this.props.user}
                   updateUser={this.props.updateUser}
                   onJoinWorkTeam={this.props.joinWorkTeam}
+                  onLeaveWorkTeam={this.props.leaveWorkTeam}
                   workTeams={this.props.workTeams}
                 />
               </div>
@@ -422,13 +436,13 @@ class UserProfile extends React.Component {
             >
               {this.props.activities &&
                 this.props.activities.map(a =>
-                  (<ActivityLog
+                  <ActivityLog
                     key={a.id}
                     actor={a.actor}
                     date={a.createdAt}
                     verb={a.verb}
                     content={a.object}
-                  />),
+                  />,
                 )}
             </AccordionPanel>
           </Accordion>
@@ -447,6 +461,7 @@ const mapDispatch = {
   verifyEmail,
   loadWorkTeams,
   joinWorkTeam,
+  leaveWorkTeam,
   loadFeed,
 };
 const mapStateToProps = (state, { user }) => ({
@@ -457,4 +472,6 @@ const mapStateToProps = (state, { user }) => ({
   activities: getActivities(state, 'log'),
 });
 
-export default connect(mapStateToProps, mapDispatch)(withStyles(s)(UserProfile));
+export default connect(mapStateToProps, mapDispatch)(
+  withStyles(s)(UserProfile),
+);

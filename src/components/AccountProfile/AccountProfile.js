@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import { fetchUser } from '../../actions/user';
 import { getUser, getAccountUpdates } from '../../reducers';
 import Accordion from '../Accordion';
@@ -102,7 +102,10 @@ class AccountProfile extends React.Component {
     uploadAvatar: PropTypes.func.isRequired,
     updates: PropTypes.shape({
       dataUrl: PropTypes.string,
-      notification: PropTypes.shape({ success: PropTypes.bool, pending: PropTypes.bool }),
+      notification: PropTypes.shape({
+        success: PropTypes.bool,
+        pending: PropTypes.bool,
+      }),
     }).isRequired,
     onClose: PropTypes.func.isRequired,
     notifyUser: PropTypes.func.isRequired,
@@ -195,7 +198,9 @@ class AccountProfile extends React.Component {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
       if (this.state.errors[curr].touched) {
-        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+        acc[err] = (
+          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
+        );
       }
       return acc;
     }, {});
@@ -205,8 +210,19 @@ class AccountProfile extends React.Component {
     if (!accountData) {
       return null;
     }
-    const { id, avatar, name, surname, role, emailVerified, lastLogin, privilege } = accountData;
-    const { subjectError, notificationTextError } = this.visibleErrors(formFields);
+    const {
+      id,
+      avatar,
+      name,
+      surname,
+      role,
+      emailVerified,
+      lastLogin,
+      privilege,
+    } = accountData;
+    const { subjectError, notificationTextError } = this.visibleErrors(
+      formFields,
+    );
 
     let PrivilegePanel = <div />;
     // eslint-disable-next-line no-bitwise
@@ -272,7 +288,10 @@ class AccountProfile extends React.Component {
             fill
             primary
             onClick={this.handleNotification}
-            pending={this.props.updates.notification && this.props.updates.notification.pending}
+            pending={
+              this.props.updates.notification &&
+              this.props.updates.notification.pending
+            }
             label={<FormattedMessage {...messages.notify} />}
           />
         </AccordionPanel>
@@ -295,12 +314,18 @@ class AccountProfile extends React.Component {
 
           {this.state.showUpload &&
             <ImageUpload
-              uploadAvatar={(data) => {
+              uploadAvatar={data => {
                 this.props.uploadAvatar({ ...data, id });
               }}
-              uploadPending={this.props.updates.dataUrl && this.props.updates.dataUrl.pending}
-              uploadError={this.props.updates.dataUrl && this.props.updates.dataUrl.error}
-              uploadSuccess={this.props.updates.dataUrl && this.props.updates.dataUrl.success}
+              uploadPending={
+                this.props.updates.dataUrl && this.props.updates.dataUrl.pending
+              }
+              uploadError={
+                this.props.updates.dataUrl && this.props.updates.dataUrl.error
+              }
+              uploadSuccess={
+                this.props.updates.dataUrl && this.props.updates.dataUrl.success
+              }
               onClose={() => {
                 this.setState({ showUpload: false });
               }}
@@ -322,7 +347,8 @@ class AccountProfile extends React.Component {
             </div>
 
             <div>
-              <FormattedMessage {...messages.lastLogin} /> : {lastLogin || 'No Data'}
+              <FormattedMessage {...messages.lastLogin} /> :{' '}
+              {<FormattedDate value={lastLogin} /> || 'No Data'}
             </div>
           </div>
         </Box>

@@ -48,6 +48,7 @@ import notify from './mutations/sendNotification';
 import activities from './subscriptions/activities';
 import createWorkTeam from './mutations/createWorkTeam';
 import joinWorkTeam from './mutations/joinWorkTeam';
+import leaveWorkTeam from './mutations/leaveWorkTeam';
 import workTeams from './queries/workTeams';
 
 const schema = new Schema({
@@ -95,6 +96,7 @@ const schema = new Schema({
       notify,
       createWorkTeam,
       joinWorkTeam,
+      leaveWorkTeam,
     },
   }),
   subscription: new ObjectType({

@@ -128,6 +128,7 @@ app.post('/login', passport.authenticate('local'), (req, res) => {
 });
 app.post('/logout', (req, res) => {
   if (req.isAuthenticated()) {
+    // TODO save logoutDate as lastLoginDate
     req.logout();
   }
   // Logout from other tab -not sure how handle errors

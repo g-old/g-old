@@ -29,7 +29,9 @@ function canJoin(viewer, memberId) {
 
 async function pushToFeed(userId, activityId) {
   try {
-    let userActivities = await knex('feeds').where({ user_id: userId }).select('activity_ids');
+    let userActivities = await knex('feeds')
+      .where({ user_id: userId })
+      .select('activity_ids');
 
     userActivities = userActivities[0];
     if (!userActivities) {
@@ -44,11 +46,15 @@ async function pushToFeed(userId, activityId) {
       userActivities.shift();
     }
     userActivities.push(activityId);
-    return knex('feeds')
-      .where({ user_id: userId })
-      .update({ activity_ids: JSON.stringify(userActivities), updated_at: new Date() });
+    return knex('feeds').where({ user_id: userId }).update({
+      activity_ids: JSON.stringify(userActivities),
+      updated_at: new Date(),
+    });
   } catch (err) {
-    log.error({ err, data: { userId, activityId } }, 'Notification insertion failed');
+    log.error(
+      { err, data: { userId, activityId } },
+      'Notification insertion failed',
+    );
     return Promise.resolve();
   }
 }
@@ -76,10 +82,26 @@ class WorkTeam {
     return wtId ? User.gen(viewer, memberId, loaders) : null;
   }
 
+  async leave(viewer, memberId, loaders) {
+    // viewer is already checked
+    if (!canJoin(viewer, memberId)) return null;
+    let wtId = await knex.transaction(async trx =>
+      trx
+        .where({ user_id: memberId, work_team_id: this.id })
+        .into('user_work_teams')
+        .del()
+        .returning('id'),
+    );
+    wtId = wtId[0];
+    return wtId ? User.gen(viewer, memberId, loaders) : null;
+  }
+
   async circularFeedNotification(viewer, activity) {
     if (!this.canNotify(viewer)) return null;
 
-    const teamIds = await knex('user_work_teams').where({ work_team_id: this.id }).pluck('user_id');
+    const teamIds = await knex('user_work_teams')
+      .where({ work_team_id: this.id })
+      .pluck('user_id');
     const promises = teamIds.map(id => pushToFeed(id, activity.id));
 
     return Promise.all(promises);
@@ -102,7 +124,8 @@ class WorkTeam {
     const newData = {};
     newData.name = data.name;
     if (data.coordinatorId) {
-      if (!validateCoordinator(viewer, data.coordinatorId, loaders)) return null;
+      if (!validateCoordinator(viewer, data.coordinatorId, loaders))
+        return null;
       newData.coordinator_id = data.coordinatorId;
     }
     newData.created_at = new Date();
@@ -122,13 +145,18 @@ class WorkTeam {
       newData.name = data.name;
     }
     if (data.coordinatorId) {
-      if (!validateCoordinator(viewer, data.coordinatorId, loaders)) return null;
+      if (!validateCoordinator(viewer, data.coordinatorId, loaders))
+        return null;
       newData.coordinator_id = data.coordinatorId;
     }
     newData.updated_at = new Date();
     let wtId = await knex.transaction(async trx =>
       // eslint-disable-next-line newline-per-chained-call
-      knex('work_teams').transacting(trx).forUpdate().update(newData).returning('id'),
+      knex('work_teams')
+        .transacting(trx)
+        .forUpdate()
+        .update(newData)
+        .returning('id'),
     );
     wtId = wtId[0];
     return wtId ? WorkTeam.gen(viewer, wtId, loaders) : null;

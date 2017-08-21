@@ -10,6 +10,9 @@ import {
   JOIN_WORKTEAM_START,
   JOIN_WORKTEAM_SUCCESS,
   JOIN_WORKTEAM_ERROR,
+  LEAVE_WORKTEAM_START,
+  LEAVE_WORKTEAM_SUCCESS,
+  LEAVE_WORKTEAM_ERROR,
 } from '../constants';
 import {
   workTeamList as workTeamListSchema,
@@ -57,6 +60,15 @@ const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID){
   }
 }`;
 
+const leaveWorkTeamMutation = `mutation($id:ID, $memberId:ID){
+  leaveWorkTeam( workTeam:{id:$id, memberId:$memberId}){
+    id
+    workTeams{
+      ${workTeam}
+    }
+  }
+}`;
+
 export function loadWorkTeams(withMembers) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
@@ -64,7 +76,9 @@ export function loadWorkTeams(withMembers) {
     });
 
     try {
-      const { data } = await graphqlRequest(withMembers ? workTeamsWithMembers : workTeams);
+      const { data } = await graphqlRequest(
+        withMembers ? workTeamsWithMembers : workTeams,
+      );
       const normalizedData = normalize(data.workTeams, workTeamListSchema);
 
       dispatch({ type: LOAD_WORKTEAMS_SUCCESS, payload: normalizedData });
@@ -84,7 +98,10 @@ export function createWorkTeam(workTeamData) {
     });
 
     try {
-      const { data } = await graphqlRequest(createWorkTeamMutation, workTeamData);
+      const { data } = await graphqlRequest(
+        createWorkTeamMutation,
+        workTeamData,
+      );
       const normalizedData = normalize(data.createWorkTeam, workTeamSchema);
 
       dispatch({ type: CREATE_WORKTEAM_SUCCESS, payload: normalizedData });
@@ -111,6 +128,29 @@ export function joinWorkTeam(workTeamData) {
     } catch (e) {
       dispatch({
         type: JOIN_WORKTEAM_ERROR,
+        message: e.message || 'Something went wrong',
+      });
+    }
+  };
+}
+
+export function leaveWorkTeam(workTeamData) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: LEAVE_WORKTEAM_START,
+    });
+
+    try {
+      const { data } = await graphqlRequest(
+        leaveWorkTeamMutation,
+        workTeamData,
+      );
+      const normalizedData = normalize(data.leaveWorkTeam, userSchema);
+
+      dispatch({ type: LEAVE_WORKTEAM_SUCCESS, payload: normalizedData });
+    } catch (e) {
+      dispatch({
+        type: LEAVE_WORKTEAM_ERROR,
         message: e.message || 'Something went wrong',
       });
     }
