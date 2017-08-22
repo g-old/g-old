@@ -13,23 +13,35 @@ const createPushSub = {
   },
   resolve: async (data, { subscription }, { viewer }) => {
     try {
-      log.info({ subInfo: { sub: subscription, viewer } }, 'Creating subscription');
+      log.info(
+        { subInfo: { sub: subscription, viewer } },
+        'Creating subscription',
+      );
       if (!viewer.id) return false;
       await knex('webpush_subscriptions').insert({
         ...subscription,
         user_id: viewer.id,
         created_at: new Date(),
       });
-      log.info({ subInfo: { sub: subscription, viewer } }, 'Creating subscription success');
+      log.info(
+        { subInfo: { sub: subscription, viewer } },
+        'Creating subscription success',
+      );
 
       return true;
     } catch (e) {
       if (e.code === '23505') {
-        log.info({ subInfo: { err: e, sub: subscription, viewer } }, 'Subscription already stored');
+        log.info(
+          { subInfo: { err: e, sub: subscription, viewer } },
+          'Subscription already stored',
+        );
 
         return true;
       }
-      log.error({ subInfo: { err: e, sub: subscription, viewer } }, 'Creating subscription failed');
+      log.error(
+        { subInfo: { err: e, sub: subscription, viewer } },
+        'Creating subscription failed',
+      );
 
       return false;
     }

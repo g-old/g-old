@@ -1,4 +1,8 @@
-import { GraphQLString as String, GraphQLInputObjectType } from 'graphql';
+import {
+  GraphQLString as String,
+  GraphQLInputObjectType,
+  GraphQLID,
+} from 'graphql';
 
 const PushSubInput = new GraphQLInputObjectType({
   name: 'PushSubInput',
@@ -11,6 +15,9 @@ const PushSubInput = new GraphQLInputObjectType({
     },
     auth: {
       type: String,
+    },
+    proposalId: {
+      type: GraphQLID,
     },
   },
 });

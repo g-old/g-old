@@ -4,10 +4,10 @@
 self.addEventListener('push', event => {
   console.info('Received a push message', event.data.text());
   const info = JSON.parse(event.data.text());
-  const title = 'NEW proposal on GOLD';
+  const title = info.title;
   const body = info.body;
   const icon = '/tile.png';
-  const tag = 'proposal';
+  const tag = info.tag;
 
   event.waitUntil(
     self.registration.showNotification(title, {
@@ -15,7 +15,7 @@ self.addEventListener('push', event => {
       icon,
       tag,
       data: info.link,
-    }),
+    })
   );
 });
 
@@ -35,12 +35,12 @@ self.addEventListener('notificationclick', event => {
     /* eslint-disable */
     clients
       .matchAll({
-        type: 'window',
+        type: "window",
       })
       .then(clientList => {
         for (let i = 0; i < clientList.length; i++) {
           const client = clientList[i];
-          if (client.url === link && 'focus' in client) {
+          if (client.url === link && "focus" in client) {
             return client.focus();
           }
         }

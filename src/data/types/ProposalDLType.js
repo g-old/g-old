@@ -5,6 +5,7 @@ import {
   GraphQLID as ID,
   GraphQLList,
   GraphQLInt,
+  GraphQLBoolean,
 } from 'graphql';
 import TagType from './TagType';
 import PollType from './PollDLType';
@@ -15,17 +16,18 @@ import knex from '../knex';
 
 const ProposalType = new ObjectType({
   name: 'ProposalDL',
-  args: {
+  /* args: {
     userID: {
       description: 'The proposals ID number',
       type: GraphQLInt,
     },
-  },
+  },*/
   fields: {
     id: { type: new NonNull(ID) },
     author: {
       type: UserType,
-      resolve: (parent, { id }, { viewer, loaders }) => User.gen(viewer, parent.author_id, loaders),
+      resolve: (parent, { id }, { viewer, loaders }) =>
+        User.gen(viewer, parent.author_id, loaders),
     },
 
     body: {
@@ -76,6 +78,19 @@ const ProposalType = new ObjectType({
     publishedAt: {
       type: GraphQLString,
       resolve: data => data.createdAt,
+    },
+
+    subscribed: {
+      type: GraphQLBoolean,
+      resolve: async (parent, { id }, { viewer }) => {
+        const count = await knex('proposal_user_subscriptions')
+          .where({
+            user_id: viewer.id,
+            proposal_id: parent.id,
+          })
+          .count('id');
+        return count[0].count === '1';
+      },
     },
   },
 });
