@@ -1,25 +1,25 @@
 // from https://github.com/GoogleChrome/samples/blob/gh-pages/push-messaging-and-notifications/service-worker.js
 /* eslint-disable comma-dangle */
 
-self.addEventListener('push', (event) => {
+self.addEventListener('push', event => {
   console.info('Received a push message', event.data.text());
   const info = JSON.parse(event.data.text());
-  const title = 'NEW proposal on GOLD';
+  const title = info.title;
   const body = info.body;
   const icon = '/tile.png';
-  const tag = 'proposal';
+  const tag = info.tag;
 
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
       icon,
       tag,
-      data: info.link
-    })
+      data: info.link,
+    }),
   );
 });
 
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', event => {
   console.info('On notification click: ', event.notification.tags);
   // Android doesn’t close the notification when you click on it
   // See: http://crbug.com/463146
@@ -35,12 +35,12 @@ self.addEventListener('notificationclick', (event) => {
     /* eslint-disable */
     clients
       .matchAll({
-        type: 'window',
+        type: "window",
       })
       .then(clientList => {
         for (let i = 0; i < clientList.length; i++) {
           const client = clientList[i];
-          if (client.url === '/' && 'focus' in client) {
+          if (client.url === link && "focus" in client) {
             return client.focus();
           }
         }

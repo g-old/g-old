@@ -11,7 +11,7 @@ function checkCanSee(viewer, data) {
   return true;
 }
 
-const validateTags = async (tags) => {
+const validateTags = async tags => {
   let existingTags;
   let newTags;
   // max tags
@@ -20,14 +20,18 @@ const validateTags = async (tags) => {
   newTags = tags.filter(tag => 'text' in tag);
 
   // check if new tags don't already exist
-  const queries = newTags.map(tag => knex('tags').where('text', 'ilike', tag.text).select());
+  const queries = newTags.map(tag =>
+    knex('tags').where('text', 'ilike', tag.text).select(),
+  );
 
   let duplicates = await Promise.all(queries);
   duplicates = duplicates.reduce((acc, curr) => acc.concat(curr), []);
-  duplicates.forEach((dup) => {
+  duplicates.forEach(dup => {
     if (dup.id) {
       existingTags.push(dup);
-      newTags = newTags.filter(t => t.text.toLowerCase() !== dup.text.toLowerCase());
+      newTags = newTags.filter(
+        t => t.text.toLowerCase() !== dup.text.toLowerCase(),
+      );
     }
   });
 
@@ -39,8 +43,10 @@ const validateTags = async (tags) => {
 
 const validateDates = ({ poll }) => {
   const serverTime = new Date();
-  const startTime = poll && poll.startTime ? new Date(poll.startTime) : serverTime;
-  if (!startTime.getMonth || typeof startTime.getMonth !== 'function') return null;
+  const startTime =
+    poll && poll.startTime ? new Date(poll.startTime) : serverTime;
+  if (!startTime.getMonth || typeof startTime.getMonth !== 'function')
+    return null;
 
   let endTime;
   if (poll && poll.endTime) {
@@ -50,7 +56,8 @@ const validateDates = ({ poll }) => {
     endTime.setDate(startTime.getDate() + 3);
   }
   if (!endTime.getMonth || typeof endTime.getMonth !== 'function') return null;
-  if (startTime < serverTime || startTime >= endTime) throw Error('DateTime wrong');
+  if (startTime < serverTime || startTime >= endTime)
+    throw Error('DateTime wrong');
   return { startTime, endTime };
 };
 
@@ -100,7 +107,11 @@ const validatePoll = async (viewer, poll, loaders) => {
   return { pollData, pollingModeData, createPollingMode };
 };
 
-const validateStateChange = async (viewer, { id, state, proposalInDB }, loaders) => {
+const validateStateChange = async (
+  viewer,
+  { id, state, proposalInDB },
+  loaders,
+) => {
   const pollId =
     proposalInDB.state === 'proposed' || proposalInDB.state === 'survey'
       ? proposalInDB.pollOne_id
@@ -113,9 +124,16 @@ const validateStateChange = async (viewer, { id, state, proposalInDB }, loaders)
     // poll mast have been ended!
     if (new Date(pollInDB.end_time) > new Date()) return false;
   }
-  const pollingModeinDB = await PollingMode.gen(viewer, pollInDB.pollingModeId, loaders);
+  const pollingModeinDB = await PollingMode.gen(
+    viewer,
+    pollInDB.pollingModeId,
+    loaders,
+  );
   if (!pollingModeinDB) throw Error('PollingMode not found');
-  if (state !== computeNextState(proposalInDB.state, pollInDB, pollingModeinDB.thresholdRef)) {
+  if (
+    state !==
+    computeNextState(proposalInDB.state, pollInDB, pollingModeinDB.thresholdRef)
+  ) {
     /* console.log('State change not valid', {
       state,
       oldState: proposalInDB.state,
@@ -126,52 +144,6 @@ const validateStateChange = async (viewer, { id, state, proposalInDB }, loaders)
     return false;
   }
   return true;
-
-  /*  const pollId =
-    proposalInDB.state === 'proposed' || proposalInDB.state === 'survey'
-      ? proposalInDB.pollOne_id
-      : proposalInDB.pollTwo_id;
-  const pollInDB = await Poll.gen(viewer, pollId, loaders);
-  if (!pollInDB) throw Error('Poll not found');
-  const pollingModeinDB = await PollingMode.gen(viewer, pollInDB.pollingModeId, loaders);
-  if (!pollingModeinDB) throw Error('PollingMode not found');
-  let ref = null;
-  switch (pollingModeinDB.thresholdRef) {
-    case 'voters':
-      ref = pollInDB.upvotes + pollInDB.downvotes;
-      break;
-    case 'all':
-      ref = pollInDB.num_voter;
-      break;
-
-    default:
-      throw Error(`Threshold reference not implemented: ${pollingModeinDB.thresholdRef}`);
-  }
-
-  ref *= pollInDB.threshold / 100;
-  console.log('VALIDATION', { proposalInDB, state });
-  if (pollId === proposalInDB.pollOne_id) {
-    if (state === 'accepted') {
-      // if accepted pollOne must have passed endTime and less votes than t-ref
-      if (new Date(pollInDB.end_time) > new Date()) return false;
-      if (pollInDB.upvotes >= ref) return false;
-    }
-    return true;
-  } else if (pollId === proposalInDB.pollTwo_id) {
-    if (state === 'accepted') {
-      // if accepted, pollTwo must have passed endTime and sufficient votes
-      if (new Date(pollInDB.end_time) > new Date()) return false;
-      if (pollInDB.upvotes < ref) return false;
-      return true;
-    }
-    if (state === 'rejected') {
-      // if rejected, pollTwo must have passed endTime and less votes than threshold
-      if (new Date(pollInDB.end_time) > new Date()) return false;
-      if (pollInDB.upvotes < ref) return false;
-    }
-  } else {
-    return false;
-  }*/
 };
 
 class Proposal {
@@ -186,6 +158,7 @@ class Proposal {
     this.state = data.state;
     this.createdAt = data.created_at;
     this.spokesmanId = data.spokesman_id;
+    this.notifiedAt = data.notified_at;
   }
   static async gen(viewer, id, { proposals }) {
     const data = await proposals.load(id);
@@ -219,6 +192,7 @@ class Proposal {
     .then(ids => {return ids; }));
       */
   }
+  // TODO make member method
   static async update(viewer, data, loaders) {
     // throw Error('TESTERROR');
     // authorize
@@ -250,13 +224,17 @@ class Proposal {
         throw Error('State transition not allowed');
       }
     }
-    const proposalId = await knex.transaction(async (trx) => {
+    const proposalId = await knex.transaction(async trx => {
       if (pollData) {
         // create poll
         let pId = data.poll.mode.id;
         // TODO check if they get reverted in case of rollback
         if (createPollingMode && pollingModeData) {
-          const pMode = await PollingMode.create(viewer, pollingModeData, loaders);
+          const pMode = await PollingMode.create(
+            viewer,
+            pollingModeData,
+            loaders,
+          );
           if (!pMode) throw Error('PollingMode failed');
           pId = pMode.id;
         }
@@ -327,11 +305,15 @@ class Proposal {
     // tags
     const { existingTags, newTags } = await validateTags(data.tags);
 
-    const newProposalId = await knex.transaction(async (trx) => {
+    const newProposalId = await knex.transaction(async trx => {
       let pId = data.poll.mode.id;
       // TODO check if they get reverted in case of rollback
       if (createPollingMode && pollingModeData) {
-        const pMode = await PollingMode.create(viewer, pollingModeData, loaders);
+        const pMode = await PollingMode.create(
+          viewer,
+          pollingModeData,
+          loaders,
+        );
         if (!pMode) throw Error('PollingMode failed');
         pId = pMode.id;
       }
@@ -345,15 +327,15 @@ class Proposal {
 
       const id = await trx
         .insert(
-        {
-          author_id: viewer.id,
-          title: data.title,
-          body: data.text,
-          poll_one_id: pollOne.id,
-          state: data.state === 'survey' ? 'survey' : 'proposed',
-          ...additionalData,
-          created_at: new Date(),
-        },
+          {
+            author_id: viewer.id,
+            title: data.title,
+            body: data.text,
+            poll_one_id: pollOne.id,
+            state: data.state === 'survey' ? 'survey' : 'proposed',
+            ...additionalData,
+            created_at: new Date(),
+          },
           'id',
         )
         .into('proposals');
@@ -367,7 +349,9 @@ class Proposal {
 
         // update counts
         await Promise.all(
-          existingTags.map(t => trx.where({ id: t.id }).increment('count', 1).into('tags')),
+          existingTags.map(t =>
+            trx.where({ id: t.id }).increment('count', 1).into('tags'),
+          ),
         );
       }
 
@@ -377,7 +361,11 @@ class Proposal {
           .into('tags')
           .returning('id');
         await Promise.all(
-          ids.map(tId => trx.insert({ proposal_id: id[0], tag_id: tId }).into('proposal_tags')),
+          ids.map(tId =>
+            trx
+              .insert({ proposal_id: id[0], tag_id: tId })
+              .into('proposal_tags'),
+          ),
         );
         //
       }
@@ -385,6 +373,16 @@ class Proposal {
     });
     if (!newProposalId) return null;
     return Proposal.gen(viewer, newProposalId, loaders);
+  }
+
+  async subscribe(viewer) {
+    if (['accepted, revoked, rejected'].indexOf(this.state) !== -1) return null;
+
+    let sId = await knex('proposal_user_subscriptions')
+      .insert({ proposal_id: this.id, user_id: viewer.id })
+      .returning('id');
+    sId = sId[0];
+    return sId || null;
   }
 }
 

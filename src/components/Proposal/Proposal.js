@@ -32,11 +32,18 @@ class Proposal extends React.Component {
           <div className={s.date}>
             <FormattedRelative value={this.props.publishedAt} />
           </div>
-          <div className={s.body} dangerouslySetInnerHTML={{ __html: this.props.body }} />
+          <div
+            className={s.body}
+            dangerouslySetInnerHTML={{ __html: this.props.body }}
+          />
           {this.props.spokesman &&
             <span>
               {'Spokesman: '}
-              <img className={s.avatar} src={this.props.spokesman.avatar} alt="IMG" />
+              <img
+                className={s.avatar}
+                src={this.props.spokesman.avatar}
+                alt="IMG"
+              />
               {`${this.props.spokesman.name} ${this.props.spokesman.surname}`}
             </span>}
         </div>

@@ -21,7 +21,11 @@ const createProposal = {
       const activityId = await insertIntoFeed(
         {
           viewer,
-          data: { type: 'proposal', content: newProposal, objectId: newProposal.id },
+          data: {
+            type: 'proposal',
+            content: newProposal,
+            objectId: newProposal.id,
+          },
           verb: 'create',
         },
         true,

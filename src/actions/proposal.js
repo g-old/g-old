@@ -16,6 +16,9 @@ import {
   LOAD_TAGS_START,
   LOAD_TAGS_ERROR,
   LOAD_TAGS_SUCCESS,
+  CREATE_PROPOSALSUB_START,
+  CREATE_PROPOSALSUB_SUCCESS,
+  CREATE_PROPOSALSUB_ERROR,
 } from '../constants';
 import {
   proposal as proposalSchema,
@@ -117,6 +120,7 @@ const query = `
   query ($id:ID $pollId: ID) {
     proposalDL (id:$id pollId:$pollId) {
       ${proposal}
+      subscribed
     }
   }
 `;
@@ -202,6 +206,10 @@ mutation($id:ID  $poll:PollInput $state:ProposalState ){
 }
 `;
 
+const createProposalSubMutation = `mutation($proposalId:ID!){
+createProposalSub(subscription:{proposalId:$proposalId})
+}`;
+
 export function loadProposal({ id, pollId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // Dont fetch if pending
@@ -255,7 +263,11 @@ export function loadProposalsList({ state, first, after }) {
     });
 
     try {
-      const { data } = await graphqlRequest(proposalConnection, { state, first, after });
+      const { data } = await graphqlRequest(proposalConnection, {
+        state,
+        first,
+        after,
+      });
       const proposals = data.proposalConnection.edges.map(p => p.node);
       const normalizedData = normalize(proposals, proposalListSchema);
       // dispatch(addEntities(normalizedData.entities, state));
@@ -291,7 +303,10 @@ export function createProposal(proposalData) {
       id: virtualId,
     });
     try {
-      const { data } = await graphqlRequest(createProposalMutation, proposalData);
+      const { data } = await graphqlRequest(
+        createProposalMutation,
+        proposalData,
+      );
       const normalizedData = normalize(data.createProposal, proposalSchema);
       // TODO change filter structure of reducer
       const filter = getFilter(data.createProposal.state);
@@ -301,8 +316,9 @@ export function createProposal(proposalData) {
         payload: normalizedData,
         filter,
         id: virtualId,
-        info: `${normalizedData.result}/${normalizedData.entities.proposals[normalizedData.result]
-          .pollOne}`,
+        info: `${normalizedData.result}/${normalizedData.entities.proposals[
+          normalizedData.result
+        ].pollOne}`,
       });
     } catch (error) {
       dispatch({
@@ -327,7 +343,10 @@ export function updateProposal(proposalData) {
       id: proposalData.id,
     });
     try {
-      const { data } = await graphqlRequest(updateProposalMutation, proposalData);
+      const { data } = await graphqlRequest(
+        updateProposalMutation,
+        proposalData,
+      );
       const normalizedData = normalize(data.updateProposal, proposalSchema);
       // TODO change filter structure of reducer
       const filter = getFilter(data.updateProposal.state);
@@ -369,6 +388,39 @@ export function loadTags() {
     } catch (error) {
       dispatch({
         type: LOAD_TAGS_ERROR,
+        payload: {
+          error,
+        },
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function createProposalSub(proposalId) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: CREATE_PROPOSALSUB_START,
+    });
+    try {
+      const { data } = await graphqlRequest(createProposalSubMutation, {
+        proposalId,
+      });
+      const normalizedData = {
+        entities: {
+          proposals: { [proposalId]: { subscribed: data.createProposalSub } },
+        },
+        result: proposalId,
+      };
+      dispatch({
+        type: CREATE_PROPOSALSUB_SUCCESS,
+        payload: normalizedData,
+      });
+    } catch (error) {
+      dispatch({
+        type: CREATE_PROPOSALSUB_ERROR,
         payload: {
           error,
         },

@@ -10,15 +10,26 @@ import {
   resetSuccessMail,
   notificationMail,
 } from './mailer';
+import Proposal from '../data/models/Proposal';
 import { circularFeedNotification } from './feed';
 
-const mailWithToken = async ({ address, viewer, connection, template, type }) => {
+const mailWithToken = async ({
+  address,
+  viewer,
+  connection,
+  template,
+  type,
+}) => {
   const result = false;
   try {
     let token = null;
     switch (type) {
       case 'reset': {
-        token = await createToken({ email: address, table: 'reset_tokens', hoursValid: 2 });
+        token = await createToken({
+          email: address,
+          table: 'reset_tokens',
+          hoursValid: 2,
+        });
         break;
       }
       case 'verify': {
@@ -44,7 +55,7 @@ const mailWithToken = async ({ address, viewer, connection, template, type }) =>
   return result;
 };
 
-const mailNotification = async (mailData) => {
+const mailNotification = async mailData => {
   try {
     const { viewer, template, ...data } = mailData;
     const mail = template({ ...data, name: viewer.name });
@@ -67,24 +78,38 @@ const handleNotifications = async (viewer, notificationData, receiver) => {
     }
 
     default: {
-      throw Error(`Notification type not recognized: ${notificationData.mailType}`);
+      throw Error(
+        `Notification type not recognized: ${notificationData.mailType}`,
+      );
     }
   }
 };
 
-const handleMails = (mailData) => {
+const handleMails = mailData => {
   let result = null;
   switch (mailData.mailType) {
     case 'verifyEmail': {
-      result = mailWithToken({ ...mailData, template: emailVerificationMail, type: 'verify' });
+      result = mailWithToken({
+        ...mailData,
+        template: emailVerificationMail,
+        type: 'verify',
+      });
       break;
     }
     case 'mailChanged': {
-      result = mailWithToken({ ...mailData, template: emailChangedMail, type: 'verify' });
+      result = mailWithToken({
+        ...mailData,
+        template: emailChangedMail,
+        type: 'verify',
+      });
       break;
     }
     case 'resetPassword': {
-      result = mailWithToken({ ...mailData, template: resetLinkMail, type: 'reset' });
+      result = mailWithToken({
+        ...mailData,
+        template: resetLinkMail,
+        type: 'reset',
+      });
       break;
     }
 
@@ -104,11 +129,9 @@ const handleMails = (mailData) => {
   return result;
 };
 
-const notifyProposalCreation = async (proposal) => {
+const push = async (subscriptionData, msg) => {
   let result;
   try {
-    const subscriptionData = await knex('webpush_subscriptions').select();
-
     const subscriptions = subscriptionData.map(s => ({
       endpoint: s.endpoint,
       keys: { auth: s.auth, p256dh: s.p256dh },
@@ -119,20 +142,24 @@ const notifyProposalCreation = async (proposal) => {
         .sendNotification(
           sub,
           JSON.stringify({
-            body: proposal.title,
-            link: `/proposal/${proposal.id}/${proposal.pollOne_id}`,
+            body: msg.body,
+            link: msg.link,
+            title: msg.title,
+            tag: msg.tag,
           }),
         )
-        .then((response) => {
+        .then(response => {
           log.info({ pushService: response });
           if (response.statusCode !== 201) {
             log.warn({ pushService: response });
           }
         })
-        .catch((err) => {
+        .catch(err => {
           if (err.statusCode === 410) {
             log.error({ pushService: err }, 'Subscription should be deleted');
-            return knex('webpush_subscriptions').where({ endpoint: sub.endpoint }).del();
+            return knex('webpush_subscriptions')
+              .where({ endpoint: sub.endpoint })
+              .del();
           }
           log.error(err, 'Subscription no longer valid');
           return Promise.resolve();
@@ -146,7 +173,64 @@ const notifyProposalCreation = async (proposal) => {
   return result;
 };
 
-process.on('message', async (data) => {
+const notifyNewStatements = async (viewer, data) => {
+  // check proposal
+  const proposal = await Proposal.genByPoll(viewer, data.pollId);
+  if (!proposal) return null;
+  if (proposal.notifiedAt) {
+    if (
+      new Date(proposal.notifiedAt).getTime() >
+      new Date().getTime() - 60 * 60 * 1000
+    ) {
+      return null;
+    }
+  }
+
+  const subscriptionData = await knex
+    .from('proposal_user_subscriptions')
+    .where({ proposal_id: proposal.id })
+    .innerJoin(
+      'webpush_subscriptions',
+      'proposal_user_subscriptions.user_id',
+      'webpush_subscriptions.user_id',
+    )
+    .select();
+
+  const body =
+    proposal.title.length > 40
+      ? `${proposal.title.slice(0, 36)}...`
+      : proposal.title;
+  await push(subscriptionData, {
+    body,
+    link: `/proposal/${proposal.id}/${data.pollId}`,
+    title: 'NEW Statements!',
+    tag: 'statements',
+  });
+
+  const now = new Date();
+  return knex('proposals')
+    .where({ id: proposal.id })
+    .update({ notified_at: now, updated_at: now });
+};
+
+const notifyProposalCreation = async proposal => {
+  const subscriptionData = await knex('webpush_subscriptions').select();
+  const body =
+    proposal.title.length > 40
+      ? `${proposal.title.slice(0, 36)}...`
+      : proposal.title;
+  const pollId = proposal.pollTwo_id
+    ? proposal.pollTwo_id
+    : proposal.pollOne_id;
+  return push(subscriptionData, {
+    body,
+    link: `/proposal/${proposal.id}/${pollId}`,
+    title: 'NEW Proposal!',
+    tag: 'proposal',
+  });
+};
+
+process.on('message', async data => {
   log.info({ data }, 'Job received');
   let result = null;
   try {
@@ -158,6 +242,12 @@ process.on('message', async (data) => {
 
         break;
       }
+      case 'webpushforstatementsTEST': {
+        log.info('Starting webpush');
+        result = notifyNewStatements(data.viewer, data.data);
+
+        break;
+      }
       case 'mail': {
         log.info('Starting mail');
         const mailData = data.data;
@@ -166,7 +256,11 @@ process.on('message', async (data) => {
       }
 
       case 'notification': {
-        result = handleNotifications(data.data.viewer, data.data, data.data.receiver);
+        result = handleNotifications(
+          data.data.viewer,
+          data.data,
+          data.data.receiver,
+        );
         break;
       }
 

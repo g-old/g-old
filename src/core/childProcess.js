@@ -4,18 +4,18 @@ import log from '../logger';
 let initialized = false;
 let worker = null;
 
-const handleResults = (msg) => {
+const handleResults = msg => {
   log.info(msg);
 };
 
-const fork = async (file) => {
+const fork = async file => {
   log.info('Creating background worker');
   if (!initialized) {
     worker = await cp.fork(file);
     if (worker) {
       worker.on('message', handleResults);
       // Listen for an exit event:
-      worker.on('exit', (exitCode) => {
+      worker.on('exit', exitCode => {
         log.error({ exitCode }, 'Worker terminated!');
         initialized = false;
         // Restart
@@ -31,10 +31,10 @@ const fork = async (file) => {
   }
 };
 
-export const sendJob = ({ type, data }) => {
+export const sendJob = ({ type, data, viewer }) => {
   let result = false;
   if (initialized) {
-    const sent = worker.send({ type, data });
+    const sent = worker.send({ type, data, viewer });
     if (sent) {
       result = true;
     } else {

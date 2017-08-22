@@ -3,8 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import history from '../../history';
-import { loadProposal } from '../../actions/proposal';
-import { createVote, updateVote, deleteVote, getVotes } from '../../actions/vote';
+import { loadProposal, createProposalSub } from '../../actions/proposal';
+import {
+  createVote,
+  updateVote,
+  deleteVote,
+  getVotes,
+} from '../../actions/vote';
 import {
   getVoteUpdates,
   getProposal,
@@ -20,6 +25,7 @@ import Box from '../../components/Box';
 import Button from '../../components/Button';
 import Poll from '../../components/Poll';
 import Filter from '../../components/Filter';
+import CheckBox from '../../components/CheckBox';
 
 const messages = defineMessages({
   voting: {
@@ -35,8 +41,10 @@ const messages = defineMessages({
 });
 class ProposalContainer extends React.Component {
   static propTypes = {
-    proposal: PropTypes.shape({ pollOne: PropTypes.shape({}), pollTwo: PropTypes.shape({}) })
-      .isRequired,
+    proposal: PropTypes.shape({
+      pollOne: PropTypes.shape({}),
+      pollTwo: PropTypes.shape({}),
+    }).isRequired,
     user: PropTypes.shape({}).isRequired,
     proposalId: PropTypes.number.isRequired,
     isFetching: PropTypes.bool.isRequired,
@@ -50,6 +58,7 @@ class ProposalContainer extends React.Component {
     voteUpdates: PropTypes.shape({}).isRequired,
     followeeVotes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    createProposalSub: PropTypes.func.isRequired,
   };
   static defaultProps = {
     errorMessage: null,
@@ -64,7 +73,10 @@ class ProposalContainer extends React.Component {
 
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
-    return (this.props.proposal && this.props.proposal.pollOne) || this.props.proposal.pollTwo;
+    return (
+      (this.props.proposal && this.props.proposal.pollOne) ||
+      this.props.proposal.pollTwo
+    );
   }
 
   filterStatements(e, { filter }) {
@@ -120,7 +132,10 @@ class ProposalContainer extends React.Component {
       );
     }
     if (this.isReady()) {
-      const poll = proposal.pollOne.id === this.props.pollId ? proposal.pollOne : proposal.pollTwo;
+      const poll =
+        proposal.pollOne.id === this.props.pollId
+          ? proposal.pollOne
+          : proposal.pollTwo;
       const canSwitchPolls = !!(proposal.pollOne && proposal.pollTwo);
 
       let switchPollBtn = null;
@@ -130,9 +145,19 @@ class ProposalContainer extends React.Component {
         switchPollBtn = (
           <Button
             reverse={isPollOne}
-            label={<FormattedMessage {...messages[isPollOne ? 'voting' : 'proposal']} />}
+            label={
+              <FormattedMessage
+                {...messages[isPollOne ? 'voting' : 'proposal']}
+              />
+            }
             icon={
-              <svg version="1.1" viewBox="0 0 24 24" width="24px" height="24px" role="img">
+              <svg
+                version="1.1"
+                viewBox="0 0 24 24"
+                width="24px"
+                height="24px"
+                role="img"
+              >
                 <path
                   fill="none"
                   stroke="#000"
@@ -147,17 +172,30 @@ class ProposalContainer extends React.Component {
         );
       }
       let hideOwnStatement = true;
-      if (filter === 'all' || (poll.ownVote && filter === poll.ownVote.position)) {
+      if (
+        filter === 'all' ||
+        (poll.ownVote && filter === poll.ownVote.position)
+      ) {
         hideOwnStatement = false;
       }
       let filterNode = null;
       if (poll.mode && poll.mode.withStatements) {
-        filterNode = <Filter filter={filter} filterFn={this.filterStatements} />;
+        filterNode = (
+          <Filter filter={filter} filterFn={this.filterStatements} />
+        );
       }
       // return proposal, poll, statementslist
       return (
         <div>
           <Box column pad>
+            <CheckBox
+              toggle
+              checked={proposal.subscribed}
+              label={proposal.subscribed ? 'ON' : 'OFF'}
+              onChange={() => {
+                this.props.createProposalSub(proposal.id);
+              }}
+            />
             <Proposal {...proposal} />
             <Poll
               {...poll}
@@ -203,6 +241,7 @@ const mapDispatch = {
   updateVote,
   deleteVote,
   getVotes,
+  createProposalSub,
 };
 
 export default connect(mapStateToProps, mapDispatch)(ProposalContainer);
