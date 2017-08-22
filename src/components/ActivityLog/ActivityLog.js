@@ -56,16 +56,31 @@ class ActivityLog extends React.Component {
           <Link to={`/proposal/xxx/${this.props.content.pollId}`}>
             <div>
               <Avatar user={this.props.content.voter} />
-              {`${this.props.content.voter.name} ${this.props.content.voter.surname}`}
+              {`${this.props.content.voter.name} ${this.props.content.voter
+                .surname}`}
 
               {
-                <svg viewBox="0 0 24 24" width="60px" height="24px" role="img" aria-label="halt">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="60px"
+                  height="24px"
+                  role="img"
+                  aria-label="halt"
+                >
                   <path
                     fill="none"
-                    stroke={this.props.content.position === 'pro' ? '#8cc800' : '#ff324d'}
+                    stroke={
+                      this.props.content.position === 'pro'
+                        ? '#8cc800'
+                        : '#ff324d'
+                    }
                     strokeWidth="1"
                     d={ICONS.thumbUpAlt}
-                    transform={this.props.content.position === 'pro' ? '' : 'rotate(180 12 12)'}
+                    transform={
+                      this.props.content.position === 'pro'
+                        ? ''
+                        : 'rotate(180 12 12)'
+                    }
                   />
                 </svg>
               }
@@ -98,7 +113,12 @@ class ActivityLog extends React.Component {
     /* eslint-enable no-underscore-dangle */
 
     return (
-      <div className={cn(s.container, type === 'Notification' ? s.notification : null)}>
+      <div
+        className={cn(
+          s.container,
+          type === 'Notification' ? s.notification : null,
+        )}
+      >
         <FormattedRelative value={this.props.date} />
 
         <div>

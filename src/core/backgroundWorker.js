@@ -12,13 +12,23 @@ import {
 } from './mailer';
 import { circularFeedNotification } from './feed';
 
-const mailWithToken = async ({ address, viewer, connection, template, type }) => {
+const mailWithToken = async ({
+  address,
+  viewer,
+  connection,
+  template,
+  type,
+}) => {
   const result = false;
   try {
     let token = null;
     switch (type) {
       case 'reset': {
-        token = await createToken({ email: address, table: 'reset_tokens', hoursValid: 2 });
+        token = await createToken({
+          email: address,
+          table: 'reset_tokens',
+          hoursValid: 2,
+        });
         break;
       }
       case 'verify': {
@@ -44,7 +54,7 @@ const mailWithToken = async ({ address, viewer, connection, template, type }) =>
   return result;
 };
 
-const mailNotification = async (mailData) => {
+const mailNotification = async mailData => {
   try {
     const { viewer, template, ...data } = mailData;
     const mail = template({ ...data, name: viewer.name });
@@ -67,24 +77,38 @@ const handleNotifications = async (viewer, notificationData, receiver) => {
     }
 
     default: {
-      throw Error(`Notification type not recognized: ${notificationData.mailType}`);
+      throw Error(
+        `Notification type not recognized: ${notificationData.mailType}`,
+      );
     }
   }
 };
 
-const handleMails = (mailData) => {
+const handleMails = mailData => {
   let result = null;
   switch (mailData.mailType) {
     case 'verifyEmail': {
-      result = mailWithToken({ ...mailData, template: emailVerificationMail, type: 'verify' });
+      result = mailWithToken({
+        ...mailData,
+        template: emailVerificationMail,
+        type: 'verify',
+      });
       break;
     }
     case 'mailChanged': {
-      result = mailWithToken({ ...mailData, template: emailChangedMail, type: 'verify' });
+      result = mailWithToken({
+        ...mailData,
+        template: emailChangedMail,
+        type: 'verify',
+      });
       break;
     }
     case 'resetPassword': {
-      result = mailWithToken({ ...mailData, template: resetLinkMail, type: 'reset' });
+      result = mailWithToken({
+        ...mailData,
+        template: resetLinkMail,
+        type: 'reset',
+      });
       break;
     }
 
@@ -104,7 +128,7 @@ const handleMails = (mailData) => {
   return result;
 };
 
-const notifyProposalCreation = async (proposal) => {
+const notifyProposalCreation = async proposal => {
   let result;
   try {
     const subscriptionData = await knex('webpush_subscriptions').select();
@@ -123,16 +147,18 @@ const notifyProposalCreation = async (proposal) => {
             link: `/proposal/${proposal.id}/${proposal.pollOne_id}`,
           }),
         )
-        .then((response) => {
+        .then(response => {
           log.info({ pushService: response });
           if (response.statusCode !== 201) {
             log.warn({ pushService: response });
           }
         })
-        .catch((err) => {
+        .catch(err => {
           if (err.statusCode === 410) {
             log.error({ pushService: err }, 'Subscription should be deleted');
-            return knex('webpush_subscriptions').where({ endpoint: sub.endpoint }).del();
+            return knex('webpush_subscriptions')
+              .where({ endpoint: sub.endpoint })
+              .del();
           }
           log.error(err, 'Subscription no longer valid');
           return Promise.resolve();
@@ -146,7 +172,7 @@ const notifyProposalCreation = async (proposal) => {
   return result;
 };
 
-process.on('message', async (data) => {
+process.on('message', async data => {
   log.info({ data }, 'Job received');
   let result = null;
   try {
@@ -166,7 +192,11 @@ process.on('message', async (data) => {
       }
 
       case 'notification': {
-        result = handleNotifications(data.data.viewer, data.data, data.data.receiver);
+        result = handleNotifications(
+          data.data.viewer,
+          data.data,
+          data.data.receiver,
+        );
         break;
       }
 

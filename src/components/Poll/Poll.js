@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedRelative, defineMessages, FormattedMessage } from 'react-intl';
+import {
+  FormattedRelative,
+  defineMessages,
+  FormattedMessage,
+} from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import PollState from '../PollState';
@@ -114,13 +118,13 @@ class Poll extends React.Component {
     return this.props.followeeVotes
       .filter(user => user.position === pos)
       .map(user =>
-        (<img
+        <img
           key={user.id}
           className={s.followee}
           src={user.voter.avatar}
           title={`${user.voter.name} ${user.voter.surname}`}
           alt="IMG"
-        />),
+        />,
       );
   }
 
@@ -180,11 +184,16 @@ class Poll extends React.Component {
     if (!closedAt && !['viewer', 'guest'].includes(user.role.type)) {
       // TODO Find better check
       // eslint-disable-next-line no-nested-ternary
-      const proBtnColor = ownVote && ownVote.position === 'pro' ? s.proBtnColor : '';
+      const proBtnColor =
+        ownVote && ownVote.position === 'pro' ? s.proBtnColor : '';
       if (mode.unipolar) {
         votingButtons = (
           <div>
-            <Button disabled={votePending} onClick={() => this.canVote('pro')} plain>
+            <Button
+              disabled={votePending}
+              onClick={() => this.canVote('pro')}
+              plain
+            >
               <img
                 style={{ maxWidth: '5em', maxHeight: '5em' }}
                 alt="Vote"
@@ -203,15 +212,22 @@ class Poll extends React.Component {
         );
       } else {
         // eslint-disable-next-line no-nested-ternary
-        const conBtnColor = ownVote && ownVote.position === 'con' ? s.conBtnColor : '';
+        const conBtnColor =
+          ownVote && ownVote.position === 'con' ? s.conBtnColor : '';
         votingButtons = (
           <div style={{ paddingBottom: '2em' }}>
             <Box pad>
-              <Button plain onClick={() => this.canVote('pro')} disabled={votePending}>
+              <Button
+                plain
+                onClick={() => this.canVote('pro')}
+                disabled={votePending}
+              >
                 <img
                   style={{ maxWidth: '5em', maxHeight: '5em' }}
                   alt="Vote"
-                  src={proBtnColor ? '/abstimmung-03.png' : '/abstimmung-04.png'}
+                  src={
+                    proBtnColor ? '/abstimmung-03.png' : '/abstimmung-04.png'
+                  }
                 />
                 {/* <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
                   <path
@@ -222,11 +238,17 @@ class Poll extends React.Component {
                   />
               </svg> */}
               </Button>
-              <Button plain onClick={() => this.canVote('con')} disabled={votePending}>
+              <Button
+                plain
+                onClick={() => this.canVote('con')}
+                disabled={votePending}
+              >
                 <img
                   style={{ maxWidth: '5em', maxHeight: '5em' }}
                   alt="Vote"
-                  src={conBtnColor ? '/abstimmung-05.png' : '/abstimmung-06.png'}
+                  src={
+                    conBtnColor ? '/abstimmung-05.png' : '/abstimmung-06.png'
+                  }
                 />
                 {/* <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
                   <path
@@ -249,9 +271,15 @@ class Poll extends React.Component {
         {this.state.confirmationFunc &&
           <Layer>
             <Box column pad className={s.confirmationBox}>
-              <Notification type="alert" message={<FormattedMessage {...messages.notify} />} />
+              <Notification
+                type="alert"
+                message={<FormattedMessage {...messages.notify} />}
+              />
               <Box justify>
-                <Button onClick={() => this.state.confirmationFunc()} label={'Ok'} />
+                <Button
+                  onClick={() => this.state.confirmationFunc()}
+                  label={'Ok'}
+                />
                 <Button
                   primary
                   label={<FormattedMessage {...messages.cancel} />}
@@ -295,7 +323,10 @@ class Poll extends React.Component {
           {votingButtons}
         </Box>
         {this.state.voteError &&
-          <Notification type="error" message={<FormattedMessage {...messages.error} />} />}
+          <Notification
+            type="error"
+            message={<FormattedMessage {...messages.error} />}
+          />}
       </div>
     );
   }

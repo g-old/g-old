@@ -144,12 +144,15 @@ export function createSSESub() {
       eventSource = new EventSource(`/updates/${resp.subId}`, {
         withCredentials: true,
       });
-      eventSource.onmessage = (e) => {
+      eventSource.onmessage = e => {
         const message = JSON.parse(e.data);
 
         switch (message.type) {
           case 'DATA': {
-            const normalizedData = normalize(message.data.activities, activitySchema);
+            const normalizedData = normalize(
+              message.data.activities,
+              activitySchema,
+            );
             let filter = null;
             if (message.data.activities.type === 'proposal') {
               filter = getFilter(message.data.activities.object.state);
@@ -158,6 +161,7 @@ export function createSSESub() {
               type: SSE_UPDATE_SUCCESS,
               payload: normalizedData,
               filter,
+              userId: user.id,
             });
             break;
           }
