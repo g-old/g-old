@@ -2,7 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadFeed } from '../../actions/feed';
-import { getActivities, getFeedIsFetching, getFeedErrorMessage } from '../../reducers/index';
+import {
+  getActivities,
+  getFeedIsFetching,
+  getFeedErrorMessage,
+} from '../../reducers/index';
 import FetchError from '../../components/FetchError';
 import Activity from '../../components/Activity';
 
@@ -11,7 +15,7 @@ class FeedContainer extends React.Component {
     activities: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,
-      }),
+      })
     ).isRequired,
     isFetching: PropTypes.bool.isRequired,
     loadFeed: PropTypes.func.isRequired,
@@ -33,7 +37,12 @@ class FeedContainer extends React.Component {
     }
 
     if (errorMessage && !activities.length) {
-      return <FetchError message={errorMessage} onRetry={() => this.props.loadFeed()} />;
+      return (
+        <FetchError
+          message={errorMessage}
+          onRetry={() => this.props.loadFeed()}
+        />
+      );
     }
 
     const outDated = {};
@@ -42,7 +51,8 @@ class FeedContainer extends React.Component {
     return (
       <div>
         <h1>feed</h1>
-        {activities.map((activity) => {
+        {activities.map(activity => {
+          if (!activity.object) return null; // hotfix - problem is ondelete cascade for votes
           if (activity.type === 'statement') {
             if (activity.verb === 'update') {
               if (activity.objectId in outDated) {
