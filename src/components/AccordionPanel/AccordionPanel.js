@@ -41,7 +41,12 @@ class AccordionPanel extends React.Component {
     const { children, heading, active } = this.props;
     const icon = (
       <svg className={s.control} viewBox="0 0 24 24" width="24px" height="24px">
-        <polygon fill="none" stroke="#000" strokeWidth="2" points="6 2 18 12 6 22" />
+        <polygon
+          fill="none"
+          stroke="#000"
+          strokeWidth="2"
+          points="6 2 18 12 6 22"
+        />
       </svg>
     );
     return (

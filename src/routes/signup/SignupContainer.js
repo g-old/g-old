@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-// import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import SignUp from '../../components/SignUp';
 // import ImageUpload from '../../components/ImageUpload';
 // import AccountSettings from '../../components/AccountSettings';
@@ -10,12 +10,28 @@ import { uploadAvatar } from '../../actions/file';
 import { getAccountUpdates, getLocale } from '../../reducers';
 import Button from '../../components/Button';
 import history from '../../history';
+import Headline from '../../components/Headline';
+import Help from '../../components/Help';
+
+const messages = defineMessages({
+  welcome: {
+    id: 'signup.welcome-title',
+    defaultMessage: 'Welcome on board!',
+    description: 'Welcome message header',
+  },
+  next: {
+    id: 'signup.next',
+    defaultMessage: 'Next step',
+    description: 'Next',
+  },
+});
 
 class SignupContainer extends React.Component {
   static propTypes = {
     createUser: PropTypes.func.isRequired,
     // uploadAvatar: PropTypes.func.isRequired,
     updates: PropTypes.shape({}).isRequired,
+    locale: PropTypes.string.isRequired,
   };
 
   constructor(props) {
@@ -28,11 +44,14 @@ class SignupContainer extends React.Component {
     this.onCreateUser = this.onCreateUser.bind(this);
   }
 
-  componentWillReceiveProps({ updates }) {
+  componentWillReceiveProps({ updates, user }) {
     if (updates) {
-      const success = Object.keys(updates).find(key => !updates[key].success) == null;
+      const success =
+        Object.keys(updates).find(key => !updates[key].success) == null;
       const error = Object.keys(updates).some(key => updates[key].error);
-      const pending = Object.keys(updates).some(key => updates[key].pending === true);
+      const pending = Object.keys(updates).some(
+        key => updates[key].pending === true,
+      );
       if (error !== this.state.error) {
         this.setState({ error });
       }
@@ -40,6 +59,9 @@ class SignupContainer extends React.Component {
         this.setState({ pending });
       }
       if (success && this.state.serverCalled) {
+        this.setState({ step: 1 });
+      }
+      if (this.state.step === 0 && user) {
         this.setState({ step: 1 });
       }
     }
@@ -67,35 +89,20 @@ class SignupContainer extends React.Component {
           />
         );
       case 1:
-        return <Button onClick={() => history.push('/account')} label={'Next'} />;
-      /*
         return (
-          <Box pad column>
-            <Headline>
-              UPLOAD AVATAR - or later
+          <div>
+            <Headline medium>
+              <FormattedMessage {...messages.welcome} />
             </Headline>
-
+            <Help locale={this.props.locale} firstSteps />
             <Button
-              onClick={() => {
-                this.setState({ showUpload: true });
-              }}
-              label={<FormattedMessage {...messages.upload} />}
-              disabled={this.state.showUpload}
+              primary
+              onClick={() => history.push('/account')}
+              label={<FormattedMessage {...messages.next} />}
             />
-            <ImageUpload
-              uploadPending={updates.dataUrl && updates.dataUrl.pending}
-              uploadSuccess={updates.dataUrl && updates.dataUrl.success}
-              uploadError={updates.dataUrl && updates.dataUrl.error}
-              uploadAvatar={this.props.uploadAvatar}
-              open={this.state.showUpload}
-              onClose={() => {
-                this.setState({ showUpload: false });
-              }}
-            />
-            <AccountSettings />
-          </Box>
+          </div>
         );
-        */
+
       default:
         return <div />;
     }

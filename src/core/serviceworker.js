@@ -9,6 +9,7 @@ self.addEventListener('push', event => {
   const icon = '/tile.png';
   const tag = info.tag;
 
+  // prettier-ignore
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
@@ -47,7 +48,7 @@ self.addEventListener('notificationclick', event => {
         if (clients.openWindow) {
           return clients.openWindow(link);
         }
-      })
+      }),
     /* eslint-enable */
   );
 });

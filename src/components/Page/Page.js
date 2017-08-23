@@ -14,8 +14,11 @@ import s from './Page.css';
 
 class Page extends React.Component {
   static propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string,
     html: PropTypes.string.isRequired,
+  };
+  static defaultProps = {
+    title: null,
   };
 
   render() {

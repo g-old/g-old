@@ -16,6 +16,11 @@ import {
 
 const fieldNames = ['name', 'surname', 'email', 'password', 'passwordAgain'];
 const messages = defineMessages({
+  title: {
+    id: 'signup.title',
+    defaultMessage: 'Please fill out the form below',
+    description: 'Heading of signup form',
+  },
   email: {
     id: 'signup.email',
     defaultMessage: 'Your current email address',
@@ -46,11 +51,6 @@ const messages = defineMessages({
     defaultMessage: 'Surname',
     description: 'Surname',
   },
-  title: {
-    id: 'signup.title',
-    defaultMessage: 'Create your account',
-    description: 'Title for signup',
-  },
   nextStep: {
     id: 'signup.next',
     defaultMessage: 'Next step',
@@ -63,7 +63,8 @@ const messages = defineMessages({
   },
   shortPassword: {
     id: 'form.error-shortPassword',
-    defaultMessage: 'Short passwords are easy to guess. Try one with at least 6 characters ',
+    defaultMessage:
+      'Short passwords are easy to guess. Try one with at least 6 characters ',
     description: 'Help for short passwords',
   },
   passwordMismatch: {
@@ -87,7 +88,9 @@ const messages = defineMessages({
     description: 'Default signup error message',
   },
 });
-
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 class SignUp extends React.Component {
   static propTypes = {
     onCreateUser: PropTypes.func.isRequired,
@@ -161,8 +164,14 @@ class SignUp extends React.Component {
     if (notUniqueEmail) {
       this.setState({
         ...this.state,
-        invalidEmails: [...this.state.invalidEmails, this.state.email.trim().toLowerCase()],
-        errors: { ...this.state.errors, email: { touched: true, errorName: 'emailTaken' } },
+        invalidEmails: [
+          ...this.state.invalidEmails,
+          this.state.email.trim().toLowerCase(),
+        ],
+        errors: {
+          ...this.state.errors,
+          email: { touched: true, errorName: 'emailTaken' },
+        },
       });
     }
   }
@@ -171,7 +180,9 @@ class SignUp extends React.Component {
     if (this.handleValidation(fieldNames)) {
       let { name, surname, email, password } = this.state;
       name = name.trim();
+      name = capitalizeFirstLetter(name);
       surname = surname.trim();
+      surname = capitalizeFirstLetter(surname);
       email = email.trim().toLowerCase();
       password = password.trim();
       const data = {
@@ -190,7 +201,10 @@ class SignUp extends React.Component {
     const value = e.target.value;
     if (this.state.errors[field].touched) {
       this.setState({
-        errors: { ...this.state.errors, [field]: { ...this.state.errors[field], touched: false } },
+        errors: {
+          ...this.state.errors,
+          [field]: { ...this.state.errors[field], touched: false },
+        },
       });
     }
     this.setState({ [field]: value });
@@ -217,7 +231,9 @@ class SignUp extends React.Component {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
       if (this.state.errors[curr].touched) {
-        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+        acc[err] = (
+          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
+        );
       }
       return acc;
     }, {});
@@ -233,19 +249,22 @@ class SignUp extends React.Component {
     } = this.visibleErrors(fieldNames);
 
     const loginError = this.props.error
-      ? (<div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
-        <FormattedMessage {...messages.error} />
-      </div>)
+      ? <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
+          <FormattedMessage {...messages.error} />
+        </div>
       : null;
     return (
       <div className={s.root}>
         <div className={s.container}>
           <h1>
-            Please fill out the form below
+            <FormattedMessage {...messages.title} />
           </h1>
           <Box pad column>
             <fieldset>
-              <FormField label={<FormattedMessage {...messages.forename} />} error={nameError}>
+              <FormField
+                label={<FormattedMessage {...messages.forename} />}
+                error={nameError}
+              >
                 <input
                   type="text"
                   name="name"
@@ -254,7 +273,10 @@ class SignUp extends React.Component {
                   onBlur={this.handleBlur}
                 />
               </FormField>
-              <FormField label={<FormattedMessage {...messages.surname} />} error={surnameError}>
+              <FormField
+                label={<FormattedMessage {...messages.surname} />}
+                error={surnameError}
+              >
                 <input
                   type="text"
                   name="surname"
@@ -263,7 +285,10 @@ class SignUp extends React.Component {
                   onBlur={this.handleBlur}
                 />
               </FormField>
-              <FormField label={<FormattedMessage {...messages.password} />} error={passwordError}>
+              <FormField
+                label={<FormattedMessage {...messages.password} />}
+                error={passwordError}
+              >
                 <input
                   id="password"
                   type="password"
@@ -286,7 +311,10 @@ class SignUp extends React.Component {
                   onBlur={this.handleBlur}
                 />
               </FormField>
-              <FormField label={<FormattedMessage {...messages.email} />} error={emailError}>
+              <FormField
+                label={<FormattedMessage {...messages.email} />}
+                error={emailError}
+              >
                 <input
                   id="email"
                   type="text"
@@ -298,7 +326,12 @@ class SignUp extends React.Component {
               </FormField>
               {!this.props.notUniqueEmail && loginError}
             </fieldset>
-            <Button primary fill onClick={this.onSubmit} disabled={this.props.pending}>
+            <Button
+              primary
+              fill
+              onClick={this.onSubmit}
+              disabled={this.props.pending}
+            >
               <FormattedMessage {...messages.nextStep} />
             </Button>
           </Box>

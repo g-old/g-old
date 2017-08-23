@@ -8,7 +8,10 @@ import s from './Accordion.css';
 class Accordion extends React.Component {
   static propTypes = {
     openMulti: PropTypes.bool,
-    active: PropTypes.oneOfType([PropTypes.number, PropTypes.arrayOf(PropTypes.number)]),
+    active: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.arrayOf(PropTypes.number),
+    ]),
     children: PropTypes.node,
     onActive: PropTypes.func,
   };

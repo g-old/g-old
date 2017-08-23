@@ -1,0 +1,3 @@
+
+### Was ist ein Beschluss?
+Ein Beschluss ist ...
