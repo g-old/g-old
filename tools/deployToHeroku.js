@@ -38,6 +38,13 @@ const erebor = {
   website: 'https://g-old.org',
 };
 
+const test = {
+  name: 'erebor',
+  url: 'erebor:/home/git/goldTest.git',
+  branch: 'master',
+  website: 'https://test.g-old.org',
+};
+
 const options = {
   cwd: path.resolve(__dirname, '../build'),
   stdio: ['ignore', 'inherit', 'inherit'],
@@ -51,6 +58,8 @@ async function deploy() {
   let remote = heroku;
   if (repo === '--erebor') {
     remote = erebor;
+  } else if (repo === '--test') {
+    remote = test;
   }
 
   // Initialize a new repository

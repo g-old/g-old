@@ -14,7 +14,7 @@ module.exports = {
       directory: './data/db/migrations',
     },
     seeds: {
-      directory: './data/db/seeds',
+      directory: './data/db/seeds/dev',
     },
     debug: true,
   },
@@ -30,7 +30,7 @@ module.exports = {
       directory: './migrations',
     },
     seeds: {
-      directory: './seeds',
+      directory: './seeds/production',
     },
     ssl: true,
   },

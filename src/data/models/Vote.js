@@ -1,5 +1,6 @@
 import knex from '../knex';
 import Poll from './Poll';
+import Proposal from './Proposal';
 
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
@@ -25,6 +26,8 @@ class Vote {
 
   static async validate(viewer, data, loaders, poll, trx, mutation = false) {
     if (!poll || !poll.isVotable(viewer)) return null;
+    const proposal = await Proposal.genByPoll(viewer, poll.id, loaders);
+    if (!proposal || !proposal.isVotable(viewer)) return null;
     const voteInDB = await knex('votes')
       .transacting(trx)
       .forUpdate()
@@ -40,8 +43,15 @@ class Vote {
     if (!data.pollId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
 
-    const deletedVote = await knex.transaction(async (trx) => {
-      const oldVote = await Vote.validate(viewer, data, loaders, poll, trx, true);
+    const deletedVote = await knex.transaction(async trx => {
+      const oldVote = await Vote.validate(
+        viewer,
+        data,
+        loaders,
+        poll,
+        trx,
+        true,
+      );
       if (!oldVote || !oldVote.position) throw Error('Request invalid!');
       // eslint-disable-next-line eqeqeq
       if (data.id != oldVote.id) throw Error('Request invalid!');
@@ -56,9 +66,14 @@ class Vote {
         .where({ vote_id: data.id })
         .select();
       statementInDB = statementInDB[0] || [];
-      if (statementInDB.id && statementInDB.deleted_at) throw Error('Cannot be modified!');
+      if (statementInDB.id && statementInDB.deleted_at)
+        throw Error('Cannot be modified!');
       // eslint-disable-next-line newline-per-chained-call
-      await knex('votes').transacting(trx).forUpdate().where({ id: data.id }).del();
+      await knex('votes')
+        .transacting(trx)
+        .forUpdate()
+        .where({ id: data.id })
+        .del();
       // update votecount
       const columns = ['upvotes', 'downvotes'];
       const index = newPosition === 'con' ? 1 : 0;
@@ -82,8 +97,15 @@ class Vote {
     if (await poll.isUnipolar(viewer, loaders)) {
       return null; // delete is the right method
     }
-    await knex.transaction(async (trx) => {
-      const oldVote = await Vote.validate(viewer, data, loaders, poll, trx, true);
+    await knex.transaction(async trx => {
+      const oldVote = await Vote.validate(
+        viewer,
+        data,
+        loaders,
+        poll,
+        trx,
+        true,
+      );
       if (!oldVote || !oldVote.position) throw Error('Position mismatch');
       // eslint-disable-next-line eqeqeq
       if (data.id != oldVote.id) throw Error('Id mismatch');
@@ -94,19 +116,28 @@ class Vote {
         .where({ vote_id: data.id })
         .select('id', 'deleted_at');
       statementInDB = statementInDB[0] || [];
-      if (statementInDB && statementInDB.deleted_at) throw Error('Cannot be modified!');
+      if (statementInDB && statementInDB.deleted_at)
+        throw Error('Cannot be modified!');
       if (statementInDB.id) {
         // eslint-disable-next-line newline-per-chained-call
-        await knex('statements').transacting(trx).forUpdate().where({ vote_id: data.id }).del();
+        await knex('statements')
+          .transacting(trx)
+          .forUpdate()
+          .where({ vote_id: data.id })
+          .del();
       }
 
       const newPosition = data.position === 1 ? 'pro' : 'con'; // dangerous?
       if (newPosition === oldVote.position) throw Error('Request invalid');
       // eslint-disable-next-line newline-per-chained-call
-      await knex('votes').transacting(trx).forUpdate().where({ id: data.id }).update({
-        position: newPosition,
-        updated_at: new Date(),
-      });
+      await knex('votes')
+        .transacting(trx)
+        .forUpdate()
+        .where({ id: data.id })
+        .update({
+          position: newPosition,
+          updated_at: new Date(),
+        });
       // update votecount
       const columns = ['upvotes', 'downvotes'];
       let index = newPosition === 'con' ? 1 : 0;
@@ -132,13 +163,17 @@ class Vote {
     if (!data.pollId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
     if (!poll || !poll.isVotable(viewer)) return null;
+    //
+    const proposal = await Proposal.genByPoll(viewer, poll.id, loaders);
+    if (!proposal || !proposal.isVotable(viewer)) return null;
+    //
 
     let position = data.position === 1 ? 'pro' : 'con';
 
     if (await poll.isUnipolar(viewer, loaders)) {
       position = 'pro';
     }
-    const newVoteId = await knex.transaction(async (trx) => {
+    const newVoteId = await knex.transaction(async trx => {
       const voteInDB = await knex('votes')
         .transacting(trx)
         .forUpdate()

@@ -65,8 +65,8 @@ export const computeNextState = (state, poll, tRef) => {
 
 async function proposalPolling(pubsub) {
   const proposals = await knex('proposals')
-    .innerJoin('polls', function () {
-      this.on(function () {
+    .innerJoin('polls', function() {
+      this.on(function() {
         this.on(
           knex.raw(
             "(proposals.state = 'proposed' and proposals.poll_one_id = polls.id) or (proposals.state = 'voting' and proposals.poll_two_id = polls.id) or(proposals.state = 'survey' and proposals.poll_one_id = polls.id)",
@@ -93,7 +93,7 @@ async function proposalPolling(pubsub) {
   if (proposals.length > 0) {
     loaders = createLoaders();
   }
-  const mutations = proposals.map((proposal) => {
+  const mutations = proposals.map(proposal => {
     // TODO in transaction!
     const newState = computeNextState(proposal.state, proposal, proposal.ref);
     return Proposal.update(
@@ -101,29 +101,33 @@ async function proposalPolling(pubsub) {
       { id: proposal.id, state: newState },
       loaders,
     )
-      .then((proposalData) => {
+      .then(proposalData => {
         if (proposalData) {
           return insertIntoFeed(
             {
               viewer: { id: 0, role: { type: 'system' } },
-              data: { type: 'proposal', content: proposalData, objectId: proposalData.id },
+              data: {
+                type: 'proposal',
+                content: proposalData,
+                objectId: proposalData.id,
+              },
               verb: 'update',
             },
             true,
           )
-            .then((activityId) => {
+            .then(activityId => {
               if (activityId) {
                 return pubsub.publish('activities', { id: activityId });
               }
               return Promise.reject();
             })
-            .catch((err) => {
+            .catch(err => {
               log.error({ err }, 'Feed insertion failed -worker- ');
             });
         }
         return Promise.reject('Proposal update failed');
       })
-      .catch((err) => {
+      .catch(err => {
         log.error({ err, proposal }, 'Proposal update failed');
       });
   });
@@ -133,7 +137,7 @@ async function proposalPolling(pubsub) {
   // workerFn();
 }
 
-const worker = async (pubsub) => {
+const worker = async pubsub => {
   try {
     proposalPolling(pubsub);
   } catch (err) {

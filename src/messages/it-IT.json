@@ -386,7 +386,7 @@
   {
     "id": "proposalManager.phaseOnePoll",
     "description": "PhaseOnePoll presets",
-    "defaultMessage": "TR: 20 - PHASE ONE - NO STATEMENTS",
+    "defaultMessage": "TR: 25 - PHASE ONE - NO STATEMENTS",
     "message": "Richiesta di votazione",
     "files": ["src/components/ProposalPanel/ProposalPanel.js"]
   },
@@ -863,5 +863,26 @@
     "defaultMessage": "Welcome on board!",
     "message": "",
     "files": ["src/routes/signup/SignupContainer.js"]
+  },
+  {
+    "id": "statements.delete",
+    "description": "Menu entry on statements to delete statement",
+    "defaultMessage": "delete",
+    "message": "",
+    "files": ["src/components/Statement/Statement.js"]
+  },
+  {
+    "id": "statements.flag",
+    "description": "Menu entry on statements to flag statement",
+    "defaultMessage": "flag",
+    "message": "",
+    "files": ["src/components/Statement/Statement.js"]
+  },
+  {
+    "id": "statements.follow",
+    "description": "Menu entry on statements to follow author",
+    "defaultMessage": "follow",
+    "message": "",
+    "files": ["src/components/Statement/Statement.js"]
   }
 ]

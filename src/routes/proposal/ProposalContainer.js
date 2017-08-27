@@ -215,6 +215,7 @@ class ProposalContainer extends React.Component {
             <Proposal {...proposal} />
             <Poll
               {...poll}
+              canVote={proposal.canVote}
               onVote={this.handleVoting}
               onFetchVoters={this.props.getVotes}
               user={user}

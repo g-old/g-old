@@ -71,17 +71,12 @@ class Poll extends React.Component {
       unipolar: PropTypes.bool,
       thresholdRef: PropTypes.string,
     }).isRequired,
-    user: PropTypes.shape({
-      id: PropTypes.string,
-      role: PropTypes.shape({
-        type: PropTypes.string,
-      }),
-    }).isRequired,
     onVote: PropTypes.func.isRequired,
     onFetchVoters: PropTypes.func.isRequired,
     followeeVotes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     filter: PropTypes.string.isRequired,
     updates: PropTypes.shape({ vote: PropTypes.shape({}) }).isRequired,
+    canVote: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -90,6 +85,7 @@ class Poll extends React.Component {
     ownVote: null,
     ownStatement: null,
     closedAt: null,
+    canVote: null,
   };
   constructor(props) {
     super(props);
@@ -170,18 +166,18 @@ class Poll extends React.Component {
       downvotes,
       threshold,
       mode,
-      user,
       closedAt,
       endTime,
       votes,
       updates,
       onFetchVoters,
+      canVote,
     } = this.props;
 
     let votingButtons = null;
     /* eslint-disable max-len*/
     const votePending = updates.vote ? updates.vote.pending : false;
-    if (!closedAt && !['viewer', 'guest'].includes(user.role.type)) {
+    if (canVote && !closedAt) {
       // TODO Find better check
       // eslint-disable-next-line no-nested-ternary
       const proBtnColor =

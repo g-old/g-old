@@ -69,12 +69,7 @@ const ProposalType = new ObjectType({
     votes: {
       type: GraphQLInt,
     },
-    starts: {
-      type: GraphQLString,
-    },
-    ends: {
-      type: GraphQLString,
-    },
+
     publishedAt: {
       type: GraphQLString,
       resolve: data => data.createdAt,
@@ -91,6 +86,10 @@ const ProposalType = new ObjectType({
           .count('id');
         return count[0].count === '1';
       },
+    },
+    canVote: {
+      type: GraphQLBoolean,
+      resolve: async (parent, { id }, { viewer }) => parent.isVotable(viewer),
     },
   },
 });

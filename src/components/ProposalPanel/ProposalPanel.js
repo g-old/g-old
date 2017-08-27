@@ -21,7 +21,7 @@ const messages = defineMessages({
   },
   phaseOnePoll: {
     id: 'proposalManager.phaseOnePoll',
-    defaultMessage: 'TR: 20 - PHASE ONE - NO STATEMENTS',
+    defaultMessage: 'TR: 25 - PHASE ONE - NO STATEMENTS',
     description: 'PhaseOnePoll presets',
   },
   phaseTwoPoll: {
@@ -39,7 +39,7 @@ const defaultPollValues = {
   1: {
     withStatements: false,
     unipolar: true,
-    threshold: 20,
+    threshold: 25,
     secret: false,
     thresholdRef: 'all',
   },
@@ -105,11 +105,12 @@ class ProposalPanel extends React.Component {
               this.props.loadProposalsList({ state: 'active', first: 50 });
             }}
           >
-            <ProposalsManager pollOptions={pollOptions} defaultPollValues={defaultPollValues} />
+            <ProposalsManager
+              pollOptions={pollOptions}
+              defaultPollValues={defaultPollValues}
+            />
           </AccordionPanel>
-
         </Accordion>
-
       </div>
     );
   }

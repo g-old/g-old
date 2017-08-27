@@ -3,6 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import cn from 'classnames';
 import s from './Statement.css';
@@ -12,10 +13,27 @@ import Notification from '../Notification';
 import Menu from '../Menu';
 import Button from '../Button';
 
+const messages = defineMessages({
+  flag: {
+    id: 'statements.flag',
+    defaultMessage: 'flag',
+    description: 'Menu entry on statements to flag statement',
+  },
+  follow: {
+    id: 'statements.follow',
+    defaultMessage: 'follow',
+    description: 'Menu entry on statements to follow author',
+  },
+  delete: {
+    id: 'statements.delete',
+    defaultMessage: 'delete',
+    description: 'Menu entry on statements to delete statement',
+  },
+});
 const EditMenu = props =>
-  (<div>
+  <div>
     {props.children}
-  </div>);
+  </div>;
 EditMenu.propTypes = {
   children: PropTypes.element,
 };
@@ -61,7 +79,9 @@ class Statement extends React.Component {
     onFollow: PropTypes.func,
     onLike: PropTypes.func,
     onDeleteLike: PropTypes.func,
-    updates: PropTypes.shape({ updateStmt: PropTypes.shape({ pending: PropTypes.bool }) }),
+    updates: PropTypes.shape({
+      updateStmt: PropTypes.shape({ pending: PropTypes.bool }),
+    }),
   };
 
   static defaultProps = {
@@ -244,49 +264,85 @@ class Statement extends React.Component {
             <span style={{ marginRight: '0.5em' }}>
               {this.state.edit
                 ? <span>
-                  <Button
+                    <Button
+                      plain
+                      onClick={this.onTextSubmit}
+                      disabled={!hasMinimumInput}
+                      icon={
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="24px"
+                          height="24px"
+                          role="img"
+                        >
+                          <polyline
+                            fill="none"
+                            stroke="#000"
+                            strokeWidth="2"
+                            points={ICONS.check}
+                          />
+                        </svg>
+                      }
+                    />
+
+                    <Button
+                      plain
+                      onClick={this.onEndEditing}
+                      disabled={this.props.asInput && !hasMinimumInput}
+                      icon={
+                        <svg
+                          viewBox="0 0 24 24"
+                          width="24px"
+                          height="24px"
+                          role="img"
+                        >
+                          <path
+                            fill="none"
+                            stroke="#000"
+                            strokeWidth="2"
+                            d={ICONS.delete}
+                          />
+                        </svg>
+                      }
+                    />
+                  </span>
+                : <Button
                     plain
-                    onClick={this.onTextSubmit}
-                    disabled={!hasMinimumInput}
+                    onClick={this.onEditStatement}
                     icon={
-                      <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-                        <polyline
+                      <svg
+                        version="1.1"
+                        viewBox="0 0 24 24"
+                        width="24px"
+                        height="24px"
+                        role="img"
+                      >
+                        <path
                           fill="none"
                           stroke="#000"
                           strokeWidth="2"
-                          points={ICONS.check}
+                          d={ICONS.edit}
                         />
                       </svg>
-                      }
-                  />
-
-                  <Button
-                    plain
-                    onClick={this.onEndEditing}
-                    disabled={this.props.asInput && !hasMinimumInput}
-                    icon={
-                      <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-                        <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.delete} />
-                      </svg>
-                      }
-                  />
-                </span>
-                : <Button
-                  plain
-                  onClick={this.onEditStatement}
-                  icon={
-                    <svg version="1.1" viewBox="0 0 24 24" width="24px" height="24px" role="img">
-                      <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.edit} />
-                    </svg>
                     }
-                />}
+                  />}
               {!asInput &&
                 <Button
                   plain
                   onClick={this.onDeleteStatement}
                   icon={
-                    <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-                      <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.trash} />
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="24px"
+                      height="24px"
+                      role="img"
+                    >
+                      <path
+                        fill="none"
+                        stroke="#000"
+                        strokeWidth="2"
+                        d={ICONS.trash}
+                      />
                     </svg>
                   }
                 />}
@@ -308,9 +364,24 @@ class Statement extends React.Component {
             </svg>
           }
         >
-          {canFollow && <Button onClick={this.handleFollowing} plain label="Followme" />}
-          {canFlag && <Button onClick={this.handleFlag} plain label="Flag" />}
-          {canDelete && <Button onClick={this.onDeleteStatement} plain label="Delete" />}
+          {canFollow &&
+            <Button
+              onClick={this.handleFollowing}
+              plain
+              label={<FormattedMessage {...messages.follow} />}
+            />}
+          {canFlag &&
+            <Button
+              onClick={this.handleFlag}
+              plain
+              label={<FormattedMessage {...messages.flag} />}
+            />}
+          {canDelete &&
+            <Button
+              onClick={this.onDeleteStatement}
+              plain
+              label={<FormattedMessage {...messages.delete} />}
+            />}
         </Menu>
       );
     }
@@ -324,7 +395,11 @@ class Statement extends React.Component {
             <Button
               primary
               label="Resend"
-              onClick={updates.statement.delete ? this.onDeleteStatement : this.onTextSubmit}
+              onClick={
+                updates.statement.delete
+                  ? this.onDeleteStatement
+                  : this.onTextSubmit
+              }
             />
           }
         />
@@ -338,7 +413,12 @@ class Statement extends React.Component {
           inactive && s.inactive,
         )}
       >
-        {!inactive && <img className={cn(s.avatar)} src={author && author.avatar} alt="IMG" />}
+        {!inactive &&
+          <img
+            className={cn(s.avatar)}
+            src={author && author.avatar}
+            alt="IMG"
+          />}
         <div style={{ width: '100%' }}>
           {!inactive &&
             <div className={s.header}>
@@ -371,14 +451,14 @@ class Statement extends React.Component {
           <div className={s.text}>
             {this.state.edit
               ? <Textarea
-                useCacheForDOMMeasurements
-                placeholder="Leave a statement (optional)"
-                value={this.state.textArea.val}
-                onChange={this.onTextChange}
-                className={s.textEdit}
-                minRows={2}
-                disabled={this.state.pending}
-              />
+                  useCacheForDOMMeasurements
+                  placeholder="Leave a statement (optional)"
+                  value={this.state.textArea.val}
+                  onChange={this.onTextChange}
+                  className={s.textEdit}
+                  minRows={2}
+                  disabled={this.state.pending}
+                />
               : text}
           </div>
         </div>

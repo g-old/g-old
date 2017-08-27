@@ -1,6 +1,10 @@
 /* eslint-disable import/prefer-default-export */
 import { normalize } from 'normalizr';
-import { LOAD_FEED_START, LOAD_FEED_SUCCESS, LOAD_FEED_ERROR } from '../constants';
+import {
+  LOAD_FEED_START,
+  LOAD_FEED_SUCCESS,
+  LOAD_FEED_ERROR,
+} from '../constants';
 
 import { activityArray as activitiesSchema } from '../store/schema';
 import { getFeedIsFetching, getSessionUser } from '../reducers';

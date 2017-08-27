@@ -124,6 +124,7 @@ const query = `
     proposalDL (id:$id pollId:$pollId) {
       ${proposal}
       subscribed
+      canVote
     }
   }
 `;

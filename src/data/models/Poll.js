@@ -35,7 +35,10 @@ class Poll {
     if (this.closedAt || new Date(this.endTime) < new Date()) {
       return false;
     }
-    if (!viewer || !['admin', 'mod', 'user'].includes(viewer.role.type)) {
+    if (
+      !viewer ||
+      !['admin', 'mod', 'user', 'viewer'].includes(viewer.role.type)
+    ) {
       return false;
     }
 
@@ -67,24 +70,31 @@ class Poll {
     if (!data.threshold) return null;
     if (!data.end_time) return null;
     // create
-    const newPollId = await knex.transaction(async (trx) => {
-      const pollingMode = await PollingMode.gen(viewer, data.polling_mode_id, loaders);
+    const newPollId = await knex.transaction(async trx => {
+      const pollingMode = await PollingMode.gen(
+        viewer,
+        data.polling_mode_id,
+        loaders,
+      );
       if (!pollingMode) throw Error('No valid PollingMode provided');
       let numVoter = 0;
 
       if (pollingMode.thresholdRef === 'all') {
         // TODO check vote privilege for count of numVoter
-        numVoter = await trx.whereIn('role_id', [1, 2, 3, 4]).count('id').into('users');
+        numVoter = await trx
+          .whereIn('role_id', [1, 2, 3, 4])
+          .count('id')
+          .into('users');
         numVoter = Number(numVoter[0].count);
         if (numVoter < 1) throw Error('Not enough user');
       }
       const id = await trx
         .insert(
-        {
-          ...data,
-          num_voter: numVoter,
-          created_at: new Date(),
-        },
+          {
+            ...data,
+            num_voter: numVoter,
+            created_at: new Date(),
+          },
           'id',
         )
         .into('polls');
@@ -104,7 +114,7 @@ class Poll {
       newData.closed_at = data.closedAt;
     }
 
-    const pollId = await knex.transaction(async (trx) => {
+    const pollId = await knex.transaction(async trx => {
       await trx
         .where({ id: data.id })
         .update({

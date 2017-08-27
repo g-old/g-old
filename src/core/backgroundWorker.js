@@ -265,6 +265,12 @@ process.on('message', async data => {
         break;
       }
 
+      case 'clean': {
+        // clean up proposal_voters, etc
+        throw Error('TO IMPLEMENT');
+        // result = handleCleaning();
+      }
+
       default:
         throw Error(`Job type not recognized: ${data.type}`);
     }

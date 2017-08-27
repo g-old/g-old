@@ -277,8 +277,10 @@ class Proposal {
         .into('proposals');
       return data.id;
     });
+
     if (!proposalId) return null;
     loaders.proposals.clear(proposalId);
+
     return Proposal.gen(viewer, proposalId, loaders);
   }
 
@@ -324,15 +326,15 @@ class Proposal {
       };
       const pollOne = await Poll.create(viewer, pollOneData, loaders);
       if (!pollOne) throw Error('No pollOne provided');
-
-      const id = await trx
+      const state = data.state === 'survey' ? 'survey' : 'proposed';
+      let id = await trx
         .insert(
           {
             author_id: viewer.id,
             title: data.title,
             body: data.text,
             poll_one_id: pollOne.id,
-            state: data.state === 'survey' ? 'survey' : 'proposed',
+            state,
             ...additionalData,
             created_at: new Date(),
           },
@@ -340,6 +342,7 @@ class Proposal {
         )
         .into('proposals');
 
+      id = id[0];
       // tags
 
       if (existingTags && existingTags.length) {
@@ -369,7 +372,29 @@ class Proposal {
         );
         //
       }
-      return id[0];
+      // get all  possible voters;
+
+      let voters;
+      if (state === 'survey') {
+        voters = await trx
+          .whereIn('role_id', [1, 2, 3, 4])
+          .into('users')
+          .pluck('id');
+      } else {
+        voters = await trx
+          .whereIn('role_id', [1, 2, 3])
+          .into('users')
+          .pluck('id');
+      }
+      const voteData = voters.map(vId => ({
+        proposal_id: id,
+        user_id: vId,
+      }));
+      // await trx.insert(voteData).into('proposal_voters');
+      await trx.batchInsert('proposal_voters', voteData, 100);
+
+      //
+      return id;
     });
     if (!newProposalId) return null;
     return Proposal.gen(viewer, newProposalId, loaders);
@@ -389,6 +414,20 @@ class Proposal {
     return knex('proposal_user_subscriptions')
       .where({ proposal_id: this.id, user_id: viewer.id })
       .del();
+  }
+
+  async isVotable(viewer) {
+    if (
+      ['proposed', 'voting', 'survey'].indexOf(this.state) === -1 ||
+      !viewer
+    ) {
+      return false;
+    }
+    const res = await knex('proposal_voters')
+      .count('id')
+      .where({ proposal_id: this.id, user_id: viewer.id });
+
+    return res[0] ? res[0].count === '1' : false;
   }
 }
 
