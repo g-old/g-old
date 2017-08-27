@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import history from '../../history';
-import { loadProposal, createProposalSub } from '../../actions/proposal';
+import {
+  loadProposal,
+  createProposalSub,
+  deleteProposalSub,
+} from '../../actions/proposal';
 import {
   createVote,
   updateVote,
@@ -44,6 +48,8 @@ class ProposalContainer extends React.Component {
     proposal: PropTypes.shape({
       pollOne: PropTypes.shape({}),
       pollTwo: PropTypes.shape({}),
+      id: PropTypes.string,
+      subscribed: PropTypes.bool,
     }).isRequired,
     user: PropTypes.shape({}).isRequired,
     proposalId: PropTypes.number.isRequired,
@@ -59,6 +65,7 @@ class ProposalContainer extends React.Component {
     followeeVotes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     createProposalSub: PropTypes.func.isRequired,
+    deleteProposalSub: PropTypes.func.isRequired,
   };
   static defaultProps = {
     errorMessage: null,
@@ -69,6 +76,7 @@ class ProposalContainer extends React.Component {
     this.filterStatements = this.filterStatements.bind(this);
     this.handlePollSwitching = this.handlePollSwitching.bind(this);
     this.handleVoting = this.handleVoting.bind(this);
+    this.handleSubscription = this.handleSubscription.bind(this);
   }
 
   isReady() {
@@ -113,6 +121,15 @@ class ProposalContainer extends React.Component {
         throw Error('Unknown method');
     }
   }
+  handleSubscription() {
+    const { subscribed, id } = this.props.proposal;
+    if (subscribed) {
+      this.props.deleteProposalSub(id);
+    } else {
+      this.props.createProposalSub(id);
+    }
+  }
+
   render() {
     const { proposal, isFetching, errorMessage, user, followees } = this.props;
     const { filter } = this.state;
@@ -192,9 +209,8 @@ class ProposalContainer extends React.Component {
               toggle
               checked={proposal.subscribed}
               label={proposal.subscribed ? 'ON' : 'OFF'}
-              onChange={() => {
-                this.props.createProposalSub(proposal.id);
-              }}
+              onChange={this.handleSubscription}
+              disabled={isFetching}
             />
             <Proposal {...proposal} />
             <Poll
@@ -242,6 +258,7 @@ const mapDispatch = {
   deleteVote,
   getVotes,
   createProposalSub,
+  deleteProposalSub,
 };
 
 export default connect(mapStateToProps, mapDispatch)(ProposalContainer);

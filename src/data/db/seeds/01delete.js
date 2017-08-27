@@ -1,23 +1,26 @@
+/* eslint-disable comma-dangle */
 exports.seed = function(knex, Promise) {
   // Deletes ALL existing entries
   // TODO maybe put in a transaction
+
+  // prettier-ignore
   const deleteQueue = [
     knex('proposal_user_subscriptions')
       .del()
       .then(() =>
         knex.raw(
-          'ALTER SEQUENCE proposal_user_subscriptions_id_seq RESTART WITH 1;',
-        ),
+          'ALTER SEQUENCE proposal_user_subscriptions_id_seq RESTART WITH 1;'
+        )
       ),
     knex('notifications')
       .del()
       .then(() =>
-        knex.raw('ALTER SEQUENCE notifications_id_seq RESTART WITH 1;'),
+        knex.raw('ALTER SEQUENCE notifications_id_seq RESTART WITH 1;')
       ),
     knex('user_work_teams')
       .del()
       .then(() =>
-        knex.raw('ALTER SEQUENCE user_work_teams_id_seq RESTART WITH 1;'),
+        knex.raw('ALTER SEQUENCE user_work_teams_id_seq RESTART WITH 1;')
       ),
     knex('work_teams')
       .del()
@@ -25,12 +28,12 @@ exports.seed = function(knex, Promise) {
     knex('webpush_subscriptions')
       .del()
       .then(() =>
-        knex.raw('ALTER SEQUENCE webpush_subscriptions_id_seq RESTART WITH 1;'),
+        knex.raw('ALTER SEQUENCE webpush_subscriptions_id_seq RESTART WITH 1;')
       ),
     knex('verify_tokens')
       .del()
       .then(() =>
-        knex.raw('ALTER SEQUENCE verify_tokens_id_seq RESTART WITH 1;'),
+        knex.raw('ALTER SEQUENCE verify_tokens_id_seq RESTART WITH 1;')
       ),
     knex('activities')
       .del()
@@ -41,12 +44,12 @@ exports.seed = function(knex, Promise) {
     knex('system_feeds')
       .del()
       .then(() =>
-        knex.raw('ALTER SEQUENCE system_feeds_id_seq RESTART WITH 1;'),
+        knex.raw('ALTER SEQUENCE system_feeds_id_seq RESTART WITH 1;')
       ),
     knex('flagged_statements')
       .del()
       .then(() =>
-        knex.raw('ALTER SEQUENCE flagged_statements_id_seq RESTART WITH 1;'),
+        knex.raw('ALTER SEQUENCE flagged_statements_id_seq RESTART WITH 1;')
       ),
     knex('tags')
       .del()
@@ -54,17 +57,17 @@ exports.seed = function(knex, Promise) {
     knex('proposal_tags')
       .del()
       .then(() =>
-        knex.raw('ALTER SEQUENCE proposal_tags_id_seq RESTART WITH 1;'),
+        knex.raw('ALTER SEQUENCE proposal_tags_id_seq RESTART WITH 1;')
       ),
     knex('user_follows')
       .del()
       .then(() =>
-        knex.raw('ALTER SEQUENCE user_follows_id_seq RESTART WITH 1;'),
+        knex.raw('ALTER SEQUENCE user_follows_id_seq RESTART WITH 1;')
       ),
     knex('statement_likes')
       .del()
       .then(() =>
-        knex.raw('ALTER SEQUENCE statement_likes_id_seq RESTART WITH 1;'),
+        knex.raw('ALTER SEQUENCE statement_likes_id_seq RESTART WITH 1;')
       ),
     knex('statements')
       .del()
@@ -82,7 +85,7 @@ exports.seed = function(knex, Promise) {
     knex('polling_modes')
       .del()
       .then(() =>
-        knex.raw('ALTER SEQUENCE polling_modes_id_seq RESTART WITH 1;'),
+        knex.raw('ALTER SEQUENCE polling_modes_id_seq RESTART WITH 1;')
       ),
     knex('users')
       .del()
@@ -94,7 +97,8 @@ exports.seed = function(knex, Promise) {
     Promise.resolve(console.log('deleting entries in table ... '))
   ).catch((e)=> console.log(e));
   return chain.catch((e)=>console.log(e));*/
+  // prettier-ignore
   return Promise.each(deleteQueue, () =>
-    console.info('deleting entries in table ... '),
+    console.info('deleting entries in table ... ')
   );
 };

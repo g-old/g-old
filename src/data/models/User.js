@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import knex from '../knex';
 import { validateEmail } from '../../core/helpers';
 import { PRIVILEGES } from '../../constants';
+import Role from './Role';
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
@@ -56,7 +57,9 @@ class User {
   }
 
   static async vote(id, pollId) {
-    const data = await knex('votes').where({ user_id: id, poll_id: pollId }).select('id');
+    const data = await knex('votes')
+      .where({ user_id: id, poll_id: pollId })
+      .select('id');
     return data;
     /*  return Promise.resolve(knex('user_follows')
     .where({ follower_id: id }).pluck('followee_id')
@@ -66,7 +69,31 @@ class User {
   // eslint-disable-next-line no-unused-vars
   static canMutate(viewer, data) {
     // TODO Allow mutation of own data - attention to guests
-    return ['admin', 'mod', 'system', 'user', 'viewer', 'guest'].includes(viewer.role.type);
+    return ['admin', 'mod', 'system', 'user', 'viewer', 'guest'].includes(
+      viewer.role.type,
+    );
+  }
+
+  async modifySessions(viewer, loaders) {
+    const role = await Role.gen(viewer, this.role_id, loaders);
+    const serializedUser = JSON.stringify({
+      user: {
+        id: this.id,
+        name: this.name,
+        surname: this.surname,
+        email: this.email,
+        avatar: this.avatar, // TODO change!
+        privilege: this.privilege,
+        role: {
+          id: role.id,
+          type: role.type,
+        },
+      },
+    });
+    await knex.raw(
+      "update sessions set sess = jsonb_set(sess::jsonb, '{passport}',?) where sess->'passport'->'user'->>'id'=?",
+      [serializedUser, this.id],
+    );
   }
 
   static async update(viewer, data, loaders) {
@@ -89,7 +116,9 @@ class User {
     }
     if (data.password) {
       if (data.passwordOld) {
-        let passwordHash = await knex('users').where({ id: data.id }).pluck('password_hash');
+        let passwordHash = await knex('users')
+          .where({ id: data.id })
+          .pluck('password_hash');
         passwordHash = passwordHash[0];
         const same = await bcrypt.compare(data.passwordOld, passwordHash);
         if (!same) {
@@ -105,7 +134,7 @@ class User {
 
     if (data.role) {
       const reg = new RegExp(data.role, 'i');
-      const neededPrivilege = Object.keys(PRIVILEGES).find((key) => {
+      const neededPrivilege = Object.keys(PRIVILEGES).find(key => {
         const res = reg.exec(key);
         return res !== null;
       });
@@ -141,7 +170,7 @@ class User {
     // update
     let updatedId = null;
     try {
-      updatedId = await knex.transaction(async (trx) => {
+      updatedId = await knex.transaction(async trx => {
         // TODO log certain actions in a separate table (role changes, rights, deletions)
 
         if (data.followee) {
@@ -192,7 +221,13 @@ class User {
     if (!updatedId) return null;
     // invalidate cache
     loaders.users.clear(updatedId);
+    // updates session store;
+    if (newData.role_id) {
+      const updatedUser = await User.gen(viewer, data.id, loaders);
+      await updatedUser.modifySessions(viewer, loaders);
+    }
 
+    //
     return { user: (await User.gen(viewer, data.id, loaders)) || null, errors };
   }
 
@@ -215,21 +250,21 @@ class User {
     const avatar_path = `https://api.adorable.io/avatars/32/${name}${surname}.io.png`;
     // create
     // TODO check if locking with forUpdate is necessary (duplicate emails)
-    const newUserId = await knex.transaction(async (trx) => {
+    const newUserId = await knex.transaction(async trx => {
       const hash = await bcrypt.hash(data.password, 10);
       if (!hash) throw Error('Something went wrong');
       const id = await trx
         .insert(
-        {
-          name,
-          surname,
-          email,
-          avatar_path,
-          email_verified: false,
-          password_hash: hash,
-          role_id: 5, // TODO make better
-          created_at: new Date(),
-        },
+          {
+            name,
+            surname,
+            email,
+            avatar_path,
+            email_verified: false,
+            password_hash: hash,
+            role_id: 5, // TODO make better
+            created_at: new Date(),
+          },
           'id',
         )
         .into('users');
@@ -253,21 +288,21 @@ class User {
     // Since checks are applied in the gen method, we can skip authorization for now
     const searchTerms = data.split(' ');
     return knex('users')
-      .modify((queryBuilder) => {
+      .modify(queryBuilder => {
         if (searchTerms.length === 1) {
           queryBuilder
             .where('name', 'ilike', `${searchTerms[0]}%`)
             .orWhere('surname', 'ilike', `${searchTerms[0]}%`);
         } else if (searchTerms.length > 1) {
           queryBuilder
-            .where(function () {
+            .where(function() {
               this.where('name', 'ilike', `${searchTerms[0]}%`).orWhere(
                 'surname',
                 'ilike',
                 `${searchTerms[1]}%`,
               );
             })
-            .orWhere(function () {
+            .orWhere(function() {
               this.where('name', 'ilike', `${searchTerms[1]}%`).orWhere(
                 'surname',
                 'ilike',

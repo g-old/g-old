@@ -384,6 +384,12 @@ class Proposal {
     sId = sId[0];
     return sId || null;
   }
+
+  async unSubscribe(viewer) {
+    return knex('proposal_user_subscriptions')
+      .where({ proposal_id: this.id, user_id: viewer.id })
+      .del();
+  }
 }
 
 export default Proposal;

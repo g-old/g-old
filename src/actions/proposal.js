@@ -19,6 +19,9 @@ import {
   CREATE_PROPOSALSUB_START,
   CREATE_PROPOSALSUB_SUCCESS,
   CREATE_PROPOSALSUB_ERROR,
+  DELETE_PROPOSALSUB_START,
+  DELETE_PROPOSALSUB_SUCCESS,
+  DELETE_PROPOSALSUB_ERROR,
 } from '../constants';
 import {
   proposal as proposalSchema,
@@ -207,7 +210,17 @@ mutation($id:ID  $poll:PollInput $state:ProposalState ){
 `;
 
 const createProposalSubMutation = `mutation($proposalId:ID!){
-createProposalSub(subscription:{proposalId:$proposalId})
+createProposalSub(subscription:{proposalId:$proposalId}){
+  id
+  subscribed
+}
+}`;
+
+const deleteProposalSubMutation = `mutation($proposalId:ID!){
+deleteProposalSub(subscription:{proposalId:$proposalId}){
+  id
+  subscribed
+}
 }`;
 
 export function loadProposal({ id, pollId }) {
@@ -403,20 +416,17 @@ export function createProposalSub(proposalId) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: CREATE_PROPOSALSUB_START,
+      id: proposalId,
     });
     try {
       const { data } = await graphqlRequest(createProposalSubMutation, {
         proposalId,
       });
-      const normalizedData = {
-        entities: {
-          proposals: { [proposalId]: { subscribed: data.createProposalSub } },
-        },
-        result: proposalId,
-      };
+      const normalizedData = normalize(data.createProposalSub, proposalSchema);
       dispatch({
         type: CREATE_PROPOSALSUB_SUCCESS,
         payload: normalizedData,
+        id: proposalId,
       });
     } catch (error) {
       dispatch({
@@ -424,6 +434,40 @@ export function createProposalSub(proposalId) {
         payload: {
           error,
         },
+        message: error.message || 'Something went wrong',
+        id: proposalId,
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function deleteProposalSub(proposalId) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: DELETE_PROPOSALSUB_START,
+      id: proposalId,
+    });
+    try {
+      const { data } = await graphqlRequest(deleteProposalSubMutation, {
+        proposalId,
+      });
+      const normalizedData = normalize(data.deleteProposalSub, proposalSchema);
+      dispatch({
+        type: DELETE_PROPOSALSUB_SUCCESS,
+        payload: normalizedData,
+        id: proposalId,
+      });
+    } catch (error) {
+      dispatch({
+        type: DELETE_PROPOSALSUB_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
+        id: proposalId,
       });
       return false;
     }

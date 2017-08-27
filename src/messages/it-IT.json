@@ -107,12 +107,15 @@
     "description": "Next",
     "defaultMessage": "Next step",
     "message": "Passaggio successivo",
-    "files": ["src/components/SignUp/SignUp.js"]
+    "files": [
+      "src/components/SignUp/SignUp.js",
+      "src/routes/signup/SignupContainer.js"
+    ]
   },
   {
     "id": "signup.title",
-    "description": "Title for signup",
-    "defaultMessage": "Create your account",
+    "description": "Heading of signup form",
+    "defaultMessage": "Please fill out the form below",
     "message": "Crea il tuo account",
     "files": ["src/components/SignUp/SignUp.js"]
   },
@@ -853,5 +856,12 @@
     "defaultMessage": "What to do next",
     "message": "",
     "files": ["src/components/Help/Help.js"]
+  },
+  {
+    "id": "signup.welcome-title",
+    "description": "Welcome message header",
+    "defaultMessage": "Welcome on board!",
+    "message": "",
+    "files": ["src/routes/signup/SignupContainer.js"]
   }
 ]

@@ -194,6 +194,7 @@ const notifyNewStatements = async (viewer, data) => {
       'proposal_user_subscriptions.user_id',
       'webpush_subscriptions.user_id',
     )
+    .where('webpush_subscriptions.user_id', '!=', viewer.id)
     .select();
 
   const body =

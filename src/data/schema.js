@@ -51,6 +51,7 @@ import joinWorkTeam from './mutations/joinWorkTeam';
 import leaveWorkTeam from './mutations/leaveWorkTeam';
 import workTeams from './queries/workTeams';
 import createProposalSub from './mutations/createProposalSub';
+import deleteProposalSub from './mutations/deleteProposalSub';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -99,6 +100,7 @@ const schema = new Schema({
       joinWorkTeam,
       leaveWorkTeam,
       createProposalSub,
+      deleteProposalSub,
     },
   }),
   subscription: new ObjectType({

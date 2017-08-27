@@ -1,11 +1,10 @@
 import { GraphQLNonNull } from 'graphql';
 import PushSubInputType from '../types/PushSubInputType';
-import knex from '../knex';
 import log from '../../logger';
 import Proposal from '../models/Proposal';
 import ProposalType from '../types/ProposalDLType';
 
-const createProposalSub = {
+const deleteProposalSub = {
   type: new GraphQLNonNull(ProposalType),
   args: {
     subscription: {
@@ -16,12 +15,6 @@ const createProposalSub = {
   resolve: async (data, { subscription }, { viewer, loaders }) => {
     try {
       if (!viewer.id) return false;
-      // check if user is subscribed
-      let subIds = await knex('webpush_subscriptions')
-        .where({ user_id: viewer.id })
-        .count('id');
-      subIds = subIds[0].count;
-      if (!subIds) return false;
 
       // Proposal.subscribe(user)
       const proposal = await Proposal.gen(
@@ -30,24 +23,17 @@ const createProposalSub = {
         loaders,
       );
       if (!proposal) return null;
-      await proposal.subscribe(viewer);
+      await proposal.unSubscribe(viewer);
       return Proposal.gen(viewer, subscription.proposalId, loaders);
     } catch (err) {
-      if (err.code === '23505') {
-        log.warn(
-          { subInfo: { err, sub: subscription, viewer } },
-          'Subscription already stored',
-        );
-      } else {
-        log.error(
-          { subInfo: { err, sub: subscription, viewer } },
-          'Creating subscription failed',
-        );
-      }
+      log.error(
+        { subInfo: { err, sub: subscription, viewer } },
+        'Deleting subscription failed',
+      );
 
-      return Proposal.gen(viewer, subscription.proposalId, loaders);
+      return null;
     }
   },
 };
 
-export default createProposalSub;
+export default deleteProposalSub;
