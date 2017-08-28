@@ -19,6 +19,7 @@ const mailWithToken = async ({
   connection,
   template,
   type,
+  lang,
 }) => {
   const result = false;
   try {
@@ -46,7 +47,7 @@ const mailWithToken = async ({
         throw Error(`Token type not recognized: ${type}`);
       }
     }
-    const mail = template(address, connection, token, viewer.name);
+    const mail = template(address, connection, token, viewer.name, lang);
 
     return sendMail(mail);
   } catch (err) {

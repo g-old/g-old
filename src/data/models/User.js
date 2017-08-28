@@ -76,7 +76,7 @@ class User {
 
   async modifySessions(viewer, loaders) {
     const role = await Role.gen(viewer, this.role_id, loaders);
-    const serializedUser = JSON.stringify({
+    /*  const serializedUser = JSON.stringify({
       user: {
         id: this.id,
         name: this.name,
@@ -89,11 +89,29 @@ class User {
           type: role.type,
         },
       },
+    }); */
+    const oldSessions = await knex('sessions')
+      .whereRaw("sess->'passport'->'user'->>'id'=?", [this.id])
+      .select('sess', 'sid');
+    const updates = oldSessions.map(data => {
+      const session = data.sess;
+      const newSession = {
+        ...session,
+        passport: {
+          ...session.passport,
+          user: { ...session.passport.user, role },
+        },
+      };
+      return knex('sessions')
+        .where({ sid: data.sid })
+        .update({ sess: JSON.stringify(newSession) });
     });
-    await knex.raw(
+    // TODO UPDATE TO POSTGRES 9.6!!
+    await Promise.all(updates);
+    /* await knex.raw(
       "update sessions set sess = jsonb_set(sess::jsonb, '{passport}',?) where sess->'passport'->'user'->>'id'=?",
       [serializedUser, this.id],
-    );
+    ); */
   }
 
   static async update(viewer, data, loaders) {

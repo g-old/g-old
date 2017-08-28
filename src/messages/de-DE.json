@@ -426,35 +426,35 @@
     "id": "navigation.surveys",
     "description": "Surveys link in header",
     "defaultMessage": "Surveys",
-    "message": "",
+    "message": "Umfragen",
     "files": ["src/components/Navigation/Navigation.js"]
   },
   {
     "id": "login.error",
     "description": "Failed login",
     "defaultMessage": "Login attempt failed",
-    "message": "",
+    "message": "Anmeldung fehlgeschlagen",
     "files": ["src/components/Login/Login.js"]
   },
   {
     "id": "signup.error",
     "description": "Default signup error message",
     "defaultMessage": "Could not create your account",
-    "message": "",
+    "message": "Leider wurde ihr Konto nicht erstellt",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
     "id": "form.email",
     "description": "Email-address",
     "defaultMessage": "Email",
-    "message": "",
+    "message": "E-Mail-Adresse",
     "files": ["src/components/Login/Login.js"]
   },
   {
     "id": "form.error-empty",
     "description": "Help for empty fields",
     "defaultMessage": "You can't leave this empty",
-    "message": "",
+    "message": "Bitte ausfüllen",
     "files": [
       "src/components/AccountProfile/AccountProfile.js",
       "src/components/Login/Login.js",
@@ -471,7 +471,7 @@
     "id": "form.error-invalidEmail",
     "description": "Help for email",
     "defaultMessage": "Your email address seems to be invalid",
-    "message": "",
+    "message": "Ihre E-Mail-Adresse scheint ungültig zu sein",
     "files": [
       "src/components/Login/Login.js",
       "src/components/SignUp/SignUp.js",
@@ -483,14 +483,14 @@
     "id": "form.password",
     "description": "Password",
     "defaultMessage": "Password",
-    "message": "",
+    "message": "Passwort",
     "files": ["src/components/Login/Login.js"]
   },
   {
     "id": "form.error-emailTaken",
     "description": "Help for not unique email",
     "defaultMessage": "Email address already in use",
-    "message": "",
+    "message": "Diese E-Mail-Adresse wird bereits verwendet",
     "files": [
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
@@ -500,7 +500,7 @@
     "id": "form.error-passwordMismatch",
     "description": "Help for mismatching passwords",
     "defaultMessage": "These passwords don't match. Try again?",
-    "message": "",
+    "message": "Die Passwörter stimmen nicht überein. Nochmal versuchen?",
     "files": [
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
@@ -510,7 +510,7 @@
     "id": "form.error-shortPassword",
     "description": "Help for short passwords",
     "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
-    "message": "",
+    "message": "Kurze Passwörter sind leicht zu erraten. Bitte mindestens 6 Zeichen verwenden",
     "files": [
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
@@ -520,28 +520,28 @@
     "id": "form.forename",
     "description": "Forename",
     "defaultMessage": "First",
-    "message": "",
+    "message": "Vorname",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
     "id": "form.name",
     "description": "Name",
     "defaultMessage": "Name",
-    "message": "",
+    "message": "Vorname",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
     "id": "form.surname",
     "description": "Surname",
     "defaultMessage": "Surname",
-    "message": "",
+    "message": "Nachname",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
     "id": "commands.cancel",
     "description": "Short command to cancel a operation",
     "defaultMessage": "Cancel",
-    "message": "",
+    "message": "Abbrechen",
     "files": [
       "src/components/ImageUpload/ImageUpload.js",
       "src/components/Poll/Poll.js",
@@ -552,7 +552,7 @@
     "id": "commands.change",
     "description": "Short command to change a setting",
     "defaultMessage": "Change",
-    "message": "",
+    "message": "Ändern",
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js",
       "src/components/RoleManager/RoleManager.js",
@@ -563,28 +563,28 @@
     "id": "settings.email",
     "description": "Email label in settings",
     "defaultMessage": "Your current email address",
-    "message": "",
+    "message": "Aktuelle E-Mail-Adresse",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
     "id": "userSettings.oldPW",
     "description": "Current account password for form label",
     "defaultMessage": "Enter your current password",
-    "message": "",
+    "message": "Aktuelles Passwort eingeben",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
     "id": "settings.title",
     "description": "Header for settings",
     "defaultMessage": "Settings",
-    "message": "",
+    "message": "Einstellungen",
     "files": ["src/components/UserProfile/UserProfile.js"]
   },
   {
     "id": "action.error",
     "description": "Short failure notification",
     "defaultMessage": "Action failed. Please retry!",
-    "message": "",
+    "message": "Die Aktion ist leider fehlgeschlagen. Bitte wiederholen!",
     "files": [
       "src/components/ImageUpload/ImageUpload.js",
       "src/components/UserSettings/UserSettings.js"
@@ -632,63 +632,63 @@
     "id": "commands.upload",
     "description": "Short command for uploading",
     "defaultMessage": "Upload",
-    "message": "",
+    "message": "Hochladen",
     "files": ["src/components/ImageUpload/ImageUpload.js"]
   },
   {
     "id": "commands.rotate",
     "description": "Short command for rotation",
     "defaultMessage": "Rotate",
-    "message": "",
+    "message": "Drehen",
     "files": ["src/components/ImageUpload/ImageUpload.js"]
   },
   {
     "id": "manager.close",
     "description": "Close the proposal",
     "defaultMessage": "Close proposal",
-    "message": "",
+    "message": "Beschluss schließen",
     "files": ["src/components/ProposalSettings/ProposalSettings.js"]
   },
   {
     "id": "date.to",
     "description": "Date until",
     "defaultMessage": "End date",
-    "message": "",
+    "message": "Enddatum",
     "files": ["src/components/PollInput/PollInput.js"]
   },
   {
     "id": "poll.reference",
     "description": "Threshold reference of poll",
     "defaultMessage": "Threshold reference",
-    "message": "",
+    "message": "Schwellenreferenz",
     "files": ["src/components/PollInput/PollInput.js"]
   },
   {
     "id": "poll.threshold",
     "description": "Poll threshold",
     "defaultMessage": "Threshold",
-    "message": "",
+    "message": "Schwelle",
     "files": ["src/components/PollInput/PollInput.js"]
   },
   {
     "id": "poll.type",
     "description": "Poll type",
     "defaultMessage": "Poll type",
-    "message": "",
+    "message": "Wahlmodus",
     "files": ["src/components/PollInput/PollInput.js"]
   },
   {
     "id": "time.to",
     "description": "Time until",
     "defaultMessage": "End time",
-    "message": "",
+    "message": "Endet",
     "files": ["src/components/PollInput/PollInput.js"]
   },
   {
     "id": "form.error-past",
     "description": "Help for wrong time settings",
     "defaultMessage": "Time already passed",
-    "message": "",
+    "message": "Zeitraum abgelaufen",
     "files": [
       "src/components/ProposalInput/ProposalInput.js",
       "src/components/ProposalSettings/ProposalSettings.js"
@@ -698,28 +698,28 @@
     "id": "poll.retractVote",
     "description": "Drawing back the vote",
     "defaultMessage": "Retract your vote",
-    "message": "",
+    "message": "Stimme zurückziehen",
     "files": ["src/components/Poll/Poll.js"]
   },
   {
     "id": "notification.success",
     "description": "Should notify a successful action",
     "defaultMessage": "Success!",
-    "message": "",
+    "message": "Erfolgreich!",
     "files": ["src/components/ProposalInput/ProposalInput.js"]
   },
   {
     "id": "poll.notify",
     "description": "Notice that vote change will lead to statement deletion",
     "defaultMessage": "Your statement will be deleted!",
-    "message": "",
+    "message": "Ihr Statement wird dabei gelöscht!",
     "files": ["src/components/Poll/Poll.js"]
   },
   {
     "id": "notifications.error.undefined",
     "description": "Server or network error",
     "defaultMessage": "Something went wrong",
-    "message": "",
+    "message": "Etwas ist schief gegangen...",
     "files": [
       "src/components/PrivilegeManager/PrivilegeManager.js",
       "src/components/RoleManager/RoleManager.js"
@@ -729,56 +729,56 @@
     "id": "commands.delete",
     "description": "Short command to invoke deletion",
     "defaultMessage": "Delete",
-    "message": "",
+    "message": "Löschen",
     "files": ["src/components/SupervisionPanel/SupervisionPanel.js"]
   },
   {
     "id": "commands.more",
     "description": "Load more resources",
     "defaultMessage": "Show more",
-    "message": "",
+    "message": "Mehr anzeigen",
     "files": ["src/components/SupervisionPanel/SupervisionPanel.js"]
   },
   {
     "id": "commands.reject",
     "description": "Short command to invoke rejection",
     "defaultMessage": "Reject",
-    "message": "",
+    "message": "Zurückweisen",
     "files": ["src/components/SupervisionPanel/SupervisionPanel.js"]
   },
   {
     "id": "poll.voteError",
     "description": "Notice that voting was not successful",
     "defaultMessage": "Voting failed!",
-    "message": "",
+    "message": "Abstimmung fehlgeschlagen",
     "files": ["src/components/Poll/Poll.js"]
   },
   {
     "id": "command.submit",
     "description": "Short command for sending data to the server",
     "defaultMessage": "Submit",
-    "message": "",
+    "message": "Abschicken",
     "files": ["src/components/ProposalInput/ProposalInput.js"]
   },
   {
     "id": "settings.email.notVerified",
     "description": "Email not yet verified",
     "defaultMessage": "Email not verified",
-    "message": "",
+    "message": "E-Mail nicht bestätigt",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
     "id": "settings.email.resend",
     "description": "Resend verification email",
     "defaultMessage": "Resend verification email",
-    "message": "",
+    "message": "Bestätigung zusenden ",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
     "id": "settings.email.verified",
     "description": "Email got verified",
     "defaultMessage": "Email verified!",
-    "message": "",
+    "message": "E-Mail bestätigt",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
@@ -792,28 +792,28 @@
     "id": "command.loadMore",
     "description": "To get more data",
     "defaultMessage": "Load more",
-    "message": "",
+    "message": "Mehr",
     "files": ["src/routes/proposals/ProposalsOverviewContainer.js"]
   },
   {
     "id": "proposal",
     "description": "Switch to proposal poll",
     "defaultMessage": "Proposal",
-    "message": "",
+    "message": "Abstimmungsanfrage",
     "files": ["src/routes/proposal/ProposalContainer.js"]
   },
   {
     "id": "voting",
     "description": "Switch to voting poll",
     "defaultMessage": "Voting",
-    "message": "",
+    "message": "Abstimmung",
     "files": ["src/routes/proposal/ProposalContainer.js"]
   },
   {
     "id": "form.error-select",
     "description": "Help for selection, when input does not match with a suggestion",
     "defaultMessage": "You selection is not correct. Click on a suggestion",
-    "message": "",
+    "message": "Bitte auf einen Vorschlag klicken",
     "files": [
       "src/components/ProposalInput/ProposalInput.js",
       "src/components/WorkTeamInput/WorkTeamInput.js"
@@ -872,35 +872,35 @@
     "id": "help.firstSteps",
     "description": "Title of help section",
     "defaultMessage": "What to do next",
-    "message": "",
+    "message": "Die nächsten Schritte",
     "files": ["src/components/Help/Help.js"]
   },
   {
     "id": "signup.welcome-title",
     "description": "Welcome message header",
     "defaultMessage": "Welcome on board!",
-    "message": "",
+    "message": "Herzlich willkommen!",
     "files": ["src/routes/signup/SignupContainer.js"]
   },
   {
     "id": "statements.delete",
     "description": "Menu entry on statements to delete statement",
     "defaultMessage": "delete",
-    "message": "",
+    "message": "Löschen",
     "files": ["src/components/Statement/Statement.js"]
   },
   {
     "id": "statements.flag",
     "description": "Menu entry on statements to flag statement",
     "defaultMessage": "flag",
-    "message": "",
+    "message": "Melden",
     "files": ["src/components/Statement/Statement.js"]
   },
   {
     "id": "statements.follow",
     "description": "Menu entry on statements to follow author",
     "defaultMessage": "follow",
-    "message": "",
+    "message": "Folgen",
     "files": ["src/components/Statement/Statement.js"]
   }
 ]

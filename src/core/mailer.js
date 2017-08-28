@@ -6,23 +6,102 @@ const env = process.env.NODE_ENV || 'development';
 const mailOptions = config[env].mailer;
 const Transporter = nodemailer.createTransport(mailOptions.config);
 
-export const resetLinkMail = (email, connection, token, name) => {
+const composeMail = ({ lang, type, connection, token, address, name }) => {
+  const mailContent = {
+    'de-DE': {
+      resetMail: {
+        subject: 'G-old Passwortänderung',
+        text: `Hallo ${name}! \n\n
+          Wir schicken Ihnen diese Email, da Sie (oder jemand anderes) das Password für ihr Konto zurücksetzen möchten.\n\n
+          Bitte klicken Sie auf den folgenden Link, oder fügen Sie ihn in Ihrem Browser ein, um den Vorgang abzuschließen:\n\n
+          ${connection.protocol}://${connection.host}${process.env.EPORT
+          ? `:${process.env.EPORT}`
+          : ''}/reset/${token}\n\n
+          Wenn Sie das nicht angefragt haben, ignorieren Sie bitte diese Email, ihr Passwort bleibt dann unverändert.\n`,
+      },
+      resetSuccess: {
+        subject: 'G-old - Ihr Passwort wurde geändert!',
+        text: `Hallo ${name},\n\n dies ist die Bestätigung, dass das Password für ihr Konto ${address} gerade geändert wurde.\n`,
+      },
+      verification: {
+        subject: 'G-old - Bestätigungslink',
+        text: `Hallo ${name}! \n\n Vielen Dank, dass Sie sich auf der Plattform G-old mitmachen wollen. Um die Anmeldung zu vollenden, müssen Sie \n nur bestätigen, dass wir die korrekte Email-Adresse erhalten haben. \n \n
+        Bitte klicken Sie auf den folgenden Link, oder fügen Sie ihn in Ihrem Browser ein:\n\n ${connection.protocol}://${connection.host}${process
+          .env.EPORT
+          ? `:${process.env.EPORT}`
+          : ''}/verify/${token} \n\n
+        `,
+      },
+      mailChange: {
+        subject: 'G-old Email-Adresse geändert!',
+        text: `Hallo ${name}! \n\n Sie haben Ihre Email-Adresse auf der Plattform G-old geändert. Sie müssen \n nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben. \n \n
+        Bitte klicken Sie auf den folgenden Link, oder fügen Sie ihn in Ihrem Browser ein:\n\n ${connection.protocol}://${connection.host}${process
+          .env.EPORT
+          ? `:${process.env.EPORT}`
+          : ''}/verify/${token} \n\n
+        `,
+      },
+    },
+    'en-EN': {
+      resetMail: {
+        subject: 'G-old Password Reset',
+        text: `Hi ${name}! \n\n
+          You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+          Please click on the following link, or paste this into your browser to complete the process:\n\n
+          ${connection.protocol}://${connection.host}${process.env.EPORT
+          ? `:${process.env.EPORT}`
+          : ''}/reset/${token}\n\n
+          If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+      },
+      resetSuccess: {
+        subject: 'Your password has been changed',
+        text: `Hello ${name},\n\n This is a confirmation that the password for your account ${address} has just been changed.\n`,
+      },
+      verification: {
+        subject: 'G-old Verification Link',
+        text: `Hi ${name}! \n\n Thanks so much for joining GOLD. To finish signing up, you just \n need to confirm that we got your email right. \n \n
+        Please click on the following link, or paste this into your browser :\n\n ${connection.protocol}://${connection.host}${process
+          .env.EPORT
+          ? `:${process.env.EPORT}`
+          : ''}/verify/${token} \n\n
+        `,
+      },
+      mailChange: {
+        subject: 'G-old Email changed',
+        text: `Hi ${name}! \n\n You have changed your email address for your account on GOLD. You just \n need to confirm that we got your email right. \n \n
+        Please click on the following link, or paste this into your browser :\n\n ${connection.protocol}://${connection.host}${process
+          .env.EPORT
+          ? `:${process.env.EPORT}`
+          : ''}/verify/${token} \n\n
+        `,
+      },
+    },
+  };
+
+  return mailContent[lang]
+    ? mailContent[lang][type]
+    : mailContent['en-EN'][type];
+};
+
+export const resetLinkMail = (email, connection, token, name, lang) => {
   if (!email || !connection || !connection.host || !token || !name) {
     throw Error('Mail details not provided');
   }
   // TODO further checks
   // TODO Lang option
+  const content = composeMail({
+    lang,
+    email,
+    connection,
+    token,
+    name,
+    type: 'resetMail',
+  });
   return {
     from: mailOptions.sender || 'passwordreset@g-old.com',
     to: email,
-    subject: 'G-old Password Reset',
-    text: `Hi ${name}! \n\n
-      You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
-      Please click on the following link, or paste this into your browser to complete the process:\n\n
-      ${connection.protocol}://${connection.host}${process.env.EPORT
-      ? `:${process.env.EPORT}`
-      : ''}/reset/${token}\n\n
-      If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+    subject: content.subject,
+    text: content.text,
   };
 };
 export const sendMail = mail =>
@@ -32,58 +111,84 @@ export const sendMail = mail =>
       if (err) reject(err);
       resolve(data);
     });
-  }).then((info) => {
+  }).then(info => {
     // TODO ONLY for TESTING!
     console.info(info.envelope);
     console.info(info.messageId);
     console.info(info.message);
   });
 
-export const resetSuccessMail = ({ address, name }) => {
+export const resetSuccessMail = ({ address, name, lang }) => {
   if (!address || !name) throw Error('Mail details not provided');
+  const content = composeMail({
+    lang,
+    address,
+    name,
+    type: 'resetSuccess',
+  });
   return {
     from: mailOptions.sender || 'passwordreset@g-old.com',
     to: address,
-    subject: 'Your password has been changed',
-    text: `Hello ${name},\n\n This is a confirmation that the password for your account ${address} has just been changed.\n`,
+    subject: content.subject,
+    text: content.text,
   };
 };
 
-export const emailVerificationMail = (email, connection, token, name) => {
-  if (!email || !connection || !connection.host || !connection.protocol || !token || !name) {
+export const emailVerificationMail = (email, connection, token, name, lang) => {
+  if (
+    !email ||
+    !connection ||
+    !connection.host ||
+    !connection.protocol ||
+    !token ||
+    !name
+  ) {
     throw Error('Mail details not provided');
   }
   // TODO further checks
   // TODO Lang option
+  const content = composeMail({
+    lang,
+    connection,
+    token,
+    email,
+    name,
+    type: 'verification',
+  });
   return {
     from: mailOptions.sender || 'emailverification@g-old.com',
     to: email,
-    subject: 'G-old Verification Link',
-    text: `Hi ${name}! \n\n Thanks so much for joining GOLD. To finish signing up, you just \n need to confirm that we got your email right. \n \n
-    Please click on the following link, or paste this into your browser :\n\n ${connection.protocol}://${connection.host}${process
-      .env.EPORT
-      ? `:${process.env.EPORT}`
-      : ''}/verify/${token} \n\n
-    `,
+    subject: content.subject,
+    text: content.text,
   };
 };
 
-export const emailChangedMail = (email, connection, token, name) => {
-  if (!email || !connection || !connection.host || !connection.protocol || !token || !name) {
+export const emailChangedMail = (email, connection, token, name, lang) => {
+  if (
+    !email ||
+    !connection ||
+    !connection.host ||
+    !connection.protocol ||
+    !token ||
+    !name
+  ) {
     throw Error('Mail details not provided');
   }
   // TODO further checks
   // TODO Lang option
+  const content = composeMail({
+    lang,
+    email,
+    connection,
+    token,
+    name,
+    type: 'mailChange',
+  });
   return {
     from: mailOptions.sender || 'emailverification@g-old.com',
     to: email,
-    subject: 'G-old Email changed',
-    text: `Hi ${name}! \n\n You have changed your email address for your account on GOLD. You just \n need to confirm that we got your email right. \n \n
-    Please click on the following link, or paste this into your browser :\n\n ${connection.protocol}://${connection.host}${process
-      .env.EPORT
-      ? `:${process.env.EPORT}`
-      : ''}/verify/${token} \n\n
-    `,
+    subject: content.subject,
+    text: content.text,
   };
 };
 
