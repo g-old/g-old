@@ -26,9 +26,15 @@ class NotificationInput extends React.Component {
   static propTypes = {
     receiverId: PropTypes.string.isRequired,
     notifyUser: PropTypes.func.isRequired,
-    updates: PropTypes.shape({ notification: PropTypes.shape({ pending: PropTypes.bool }) })
-      .isRequired,
+    updates: PropTypes.shape({
+      pending: PropTypes.bool,
+    }).isRequired,
     types: PropTypes.arrayOf(PropTypes.string).isRequired,
+    notifyGroup: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    notifyGroup: null,
   };
   constructor(props) {
     super(props);
@@ -67,17 +73,31 @@ class NotificationInput extends React.Component {
       obj => obj.state,
     );
   }
+
+  componentWillReceiveProps({ updates }) {
+    if (updates && updates.success) {
+      this.setState({ subject: '', notificationText: '' });
+    }
+  }
+
   onNotify() {
     if (this.handleValidation(formFields)) {
       const message = this.state.notificationText.trim();
       const subject = this.state.subject ? this.state.subject.trim() : null;
       const receiverId = this.props.receiverId;
       this.props.notifyUser({
-        message: JSON.stringify({ notificationType: 'msg', msg: message, title: subject }),
+        message: JSON.stringify({
+          notificationType: 'msg',
+          msg: message,
+          title: subject,
+        }),
         subject,
-        type: 'notification',
+        type: this.props.types.find(type => this.state[type] === true),
         receiverId,
-        receiver: { type: 'team', id: receiverId },
+        receiver: {
+          type: this.props.notifyGroup ? 'team' : 'user',
+          id: receiverId,
+        },
       });
     }
   }
@@ -87,7 +107,27 @@ class NotificationInput extends React.Component {
     return validated.failed === 0;
   }
   handleValueChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
+    let newState;
+    switch (e.target.name) {
+      case 'event':
+      case 'subject':
+      case 'notificationText': {
+        newState = { [e.target.name]: e.target.value };
+        break;
+      }
+
+      default: {
+        newState = this.props.types.reduce((acc, curr) => {
+          if (curr !== e.target.name) {
+            acc[curr] = false;
+          } else {
+            acc[curr] = true;
+          }
+          return acc;
+        }, {});
+      }
+    }
+    this.setState(newState);
   }
   handleBlur(e) {
     const field = e.target.name;
@@ -100,28 +140,31 @@ class NotificationInput extends React.Component {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
       if (this.state.errors[curr].touched) {
-        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+        acc[err] = (
+          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
+        );
       }
       return acc;
     }, {});
   }
 
   render() {
-    const { subjectError, notificationTextError } = this.visibleErrors(formFields);
-
+    const { subjectError, notificationTextError } = this.visibleErrors(
+      formFields,
+    );
     return (
       <div style={{ height: '480px' }}>
         <Box column pad>
           <FormField label="Type">
             {this.props.types &&
               this.props.types.map(t =>
-                (<CheckBox
+                <CheckBox
                   name={t}
                   checked={this.state[t]}
                   label={t}
                   onChange={this.handleValueChange}
-                  disabled
-                />),
+                  disabled={this.props.types.length < 2}
+                />,
               )}
           </FormField>
           <FormField>
@@ -156,7 +199,7 @@ class NotificationInput extends React.Component {
             fill
             primary
             onClick={this.onNotify}
-            pending={this.props.updates.notification && this.props.updates.notification.pending}
+            pending={this.props.updates && this.props.updates.pending}
             label={<FormattedMessage {...messages.notify} />}
           />
         </Box>

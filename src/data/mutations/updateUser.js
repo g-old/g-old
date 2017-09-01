@@ -23,6 +23,20 @@ const updateSession = (req, user) =>
       ),
   );
 
+const notifyRoleChange = (viewer, user, message) => {
+  const job = {
+    type: 'notification',
+    data: {
+      receiver: { type: 'user', id: user.id },
+      viewer,
+      notificationType: 'msg', // TODO not hardcode
+      msg: message.body,
+      title: message.subject,
+    },
+  };
+  return sendJob(job);
+};
+
 const updateUser = {
   type: new GraphQLNonNull(
     new GraphQLObjectType({
@@ -63,6 +77,15 @@ const updateUser = {
         if (!sendJob(job)) {
           log.error({ job }, 'Job not sent!');
         }
+      }
+
+      if (user.role) {
+        // TODO better check!
+        notifyRoleChange(viewer, result.user, {
+          subject: 'Your role got changed!',
+          body: `Congratulations ${result.user
+            .name}, your new status is ${user.role}`,
+        });
       }
       // TODO check if necessary
       if (viewer.id === result.user.id) {

@@ -28,14 +28,12 @@ class PollingMode {
   }
 
   static async create(viewer, data, loaders) {
-    console.log('CREATINGPOLLMODES', data);
     if (!checkCanMutate(viewer, data)) return null;
     if (!data.name) return null;
     if (!data.thresholdRef) return null;
 
     if (data.name.length < 0) return null;
-    console.log('INSERTING PM');
-    const id = await knex.transaction(async (trx) => {
+    const id = await knex.transaction(async trx => {
       const pMId = await trx
         .insert({
           name: data.name,

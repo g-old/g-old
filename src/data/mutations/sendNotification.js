@@ -16,10 +16,15 @@ const sendNotification = {
     switch (notification.type) {
       case 'email': {
         // eslint-disable-next-line no-bitwise
-        if (!viewer || !(viewer.privilege & PRIVILEGES.canNotifyUser)) return false;
+        if (!viewer || !(viewer.privilege & PRIVILEGES.canNotifyUser))
+          return false;
         if (!notification.receiverId || !notification.message) return false;
 
-        const receiver = await User.gen(viewer, notification.receiverId, loaders);
+        const receiver = await User.gen(
+          viewer,
+          notification.receiverId,
+          loaders,
+        );
 
         if (!receiver) return false;
 

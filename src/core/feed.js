@@ -4,10 +4,43 @@ import Notification from '../data/models/Notification';
 import WorkTeam from '../data/models/WorkTeam';
 import knex from '../data/knex';
 import log from '../logger';
+import User from '../data/models/User';
 
+const maxFeedLength = 30;
+
+async function pushToLog(userId, activityId) {
+  try {
+    let userActivities = await knex('feeds')
+      .where({ user_id: userId })
+      .select('activity_ids');
+
+    userActivities = userActivities[0];
+    if (!userActivities) {
+      return knex('feeds').insert({
+        user_id: userId,
+        activity_ids: JSON.stringify([activityId]),
+        created_at: new Date(),
+      });
+    }
+    userActivities = userActivities.activity_ids || [];
+    while (userActivities.length >= maxFeedLength) {
+      userActivities.shift();
+    }
+    userActivities.push(activityId);
+    return knex('feeds').where({ user_id: userId }).update({
+      activity_ids: JSON.stringify(userActivities),
+      updated_at: new Date(),
+    });
+  } catch (err) {
+    log.error(
+      { err, data: { userId, activityId } },
+      'Notification insertion failed',
+    );
+    return Promise.resolve();
+  }
+}
 export async function insertIntoFeed({ viewer, data, verb }, mainFeed) {
   let result = null;
-  const maxFeedLength = 30;
   let userId = 2;
   try {
     const activity = await Activity.create(viewer, {
@@ -31,14 +64,18 @@ export async function insertIntoFeed({ viewer, data, verb }, mainFeed) {
         systemActivities.shift();
       }
       systemActivities.push(activity.id);
-      await knex('system_feeds')
-        .where({ user_id: userId })
-        .update({ activity_ids: JSON.stringify(systemActivities), updated_at: new Date() });
+      await knex('system_feeds').where({ user_id: userId }).update({
+        activity_ids: JSON.stringify(systemActivities),
+        updated_at: new Date(),
+      });
 
       if (data.type === 'proposal') return activity.id; // or whole data?
     }
     // insert also in own feed to for followers
-    let userActivities = await knex('feeds').where({ user_id: viewer.id }).select('activity_ids');
+    await pushToLog(viewer.id, activity.id);
+    /*  let userActivities = await knex('feeds')
+      .where({ user_id: viewer.id })
+      .select('activity_ids');
 
     userActivities = userActivities[0];
     if (!userActivities) {
@@ -53,10 +90,11 @@ export async function insertIntoFeed({ viewer, data, verb }, mainFeed) {
         userActivities.shift();
       }
       userActivities.push(activity.id);
-      await knex('feeds')
-        .where({ user_id: viewer.id })
-        .update({ activity_ids: JSON.stringify(userActivities), updated_at: new Date() });
-    }
+      await knex('feeds').where({ user_id: viewer.id }).update({
+        activity_ids: JSON.stringify(userActivities),
+        updated_at: new Date(),
+      });
+    }*/
     result = activity.id; // or whole data?
   } catch (err) {
     log.error({ err, viewer, data, verb }, 'Insertion failed!');
@@ -65,7 +103,13 @@ export async function insertIntoFeed({ viewer, data, verb }, mainFeed) {
   return result;
 }
 
-export async function circularFeedNotification({ viewer, data, verb, receiver }) {
+export async function circularFeedNotification({
+  viewer,
+  data,
+  verb,
+  receiver,
+  loaders,
+}) {
   if (!viewer || !data || !verb || !receiver || !receiver.id) {
     throw new Error(`Arguments missing for circularFeedInsertion:
     viewer: ${viewer}, data: ${data}, verb: ${verb}, receiver: ${receiver} `);
@@ -91,20 +135,36 @@ export async function circularFeedNotification({ viewer, data, verb, receiver })
       await knex('notifications').where({ id: notification.id }).del();
       return result;
     }
-
-    if (receiver.type !== 'team') throw Error(`Other receivers not implemented: ${receiver}`);
-    const team = await WorkTeam.gen(viewer, receiver.id);
-    if (!team) throw new Error(`Team not found: Receiver: ${JSON.stringify(receiver)}`);
-    const res = await team.circularFeedNotification(viewer, activity);
+    let res;
+    if (receiver.type === 'team') {
+      const team = await WorkTeam.gen(viewer, receiver.id);
+      if (!team) {
+        throw new Error(
+          `Team not found: Receiver: ${JSON.stringify(receiver)}`,
+        );
+      }
+      res = await team.circularFeedNotification(viewer, activity, pushToLog);
+      log.info(`Notification sent to team ${team.name}`);
+    } else if (receiver.type === 'user') {
+      // get user
+      const recipient = await User.gen(viewer, receiver.id, loaders);
+      if (recipient) {
+        res = pushToLog(recipient.id, activity.id);
+      }
+    } else {
+      throw Error(`Other receivers not implemented: ${receiver}`);
+    }
     if (!res) {
       // delete all
       await knex('notifications').where({ id: notification.id }).del();
       await knex('activities').where({ id: activity.id }).del();
     }
-    log.info(`Notification sent to team ${team.name}`);
     return res;
   } catch (err) {
-    log.error({ err, args: { viewer, data, verb, receiver } }, 'CircularFeedInsertion failed');
+    log.error(
+      { err, args: { viewer, data, verb, receiver } },
+      'CircularFeedInsertion failed',
+    );
     return null;
   }
 }

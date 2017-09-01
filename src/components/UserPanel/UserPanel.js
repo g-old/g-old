@@ -98,14 +98,18 @@ class UserPanel extends React.Component {
         <tbody>
           {teams &&
             teams.map(t =>
-              (<tr>
+              <tr>
                 <td className={s.team}>
                   {t.name}
                 </td>
                 <td className={s.members}>
                   {t.members &&
                     t.members.map(m =>
-                      <img style={{ height: '1em', width: '1em' }} alt="member" src={m.avatar} />,
+                      <img
+                        style={{ height: '1em', width: '1em' }}
+                        alt="member"
+                        src={m.avatar}
+                      />,
                     )}
                 </td>
                 <td className={s.coordinator}>
@@ -143,7 +147,7 @@ class UserPanel extends React.Component {
                         />}
                     </span>}
                 </td>
-              </tr>),
+              </tr>,
             )}
         </tbody>
       </table>
@@ -165,7 +169,7 @@ class UserPanel extends React.Component {
           <SearchField
             data={this.props.userArray}
             fetch={this.props.findUser}
-            displaySelected={(data) => {
+            displaySelected={data => {
               this.setState({ accountId: data.id, showAccount: true });
             }}
           />
@@ -197,7 +201,9 @@ class UserPanel extends React.Component {
                   message={guestArrayErrorMessage}
                   onRetry={() => this.props.loadUserList('guest')}
                 />}
-              {this.props.guestArray.map(user => renderUserSuggestion(user, this))}
+              {this.props.guestArray.map(user =>
+                renderUserSuggestion(user, this),
+              )}
             </AccordionPanel>
             <AccordionPanel
               heading="Viewer accounts"
@@ -205,7 +211,9 @@ class UserPanel extends React.Component {
                 this.props.loadUserList('viewer');
               }}
             >
-              {viewerArrayIsFetching && !viewerArray.length && <p>Loading...</p>}
+              {viewerArrayIsFetching &&
+                !viewerArray.length &&
+                <p>Loading...</p>}
               {!viewerArrayIsFetching &&
                 !viewerArray.length &&
                 !viewerArrayErrorMessage &&
@@ -215,9 +223,14 @@ class UserPanel extends React.Component {
                   message={viewerArrayErrorMessage}
                   onRetry={() => this.props.loadUserList('viewer')}
                 />}
-              {this.props.viewerArray.map(user => renderUserSuggestion(user, this))}
+              {this.props.viewerArray.map(user =>
+                renderUserSuggestion(user, this),
+              )}
             </AccordionPanel>
-            <AccordionPanel heading="Workteams" onActive={() => this.props.loadWorkTeams(true)}>
+            <AccordionPanel
+              heading="Workteams"
+              onActive={() => this.props.loadWorkTeams(true)}
+            >
               {this.renderWorkTeams(workTeams)}
 
               <Button
@@ -229,6 +242,7 @@ class UserPanel extends React.Component {
               {this.state.showNotify &&
                 <Layer onClose={() => this.setState({ showNotify: false })}>
                   <NotificationInput
+                    notifyGroup
                     updates={{}}
                     notifyUser={this.props.notifyUser}
                     types={['notification']}

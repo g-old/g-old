@@ -1,8 +1,5 @@
 import knex from '../knex';
 import User from './User';
-import log from '../../logger';
-
-const maxFeedLength = 30; // TODO extract, refactor
 
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
@@ -25,38 +22,6 @@ function canJoin(viewer, memberId) {
     return true; // TODO specify rules;
   }
   return false;
-}
-
-async function pushToFeed(userId, activityId) {
-  try {
-    let userActivities = await knex('feeds')
-      .where({ user_id: userId })
-      .select('activity_ids');
-
-    userActivities = userActivities[0];
-    if (!userActivities) {
-      return knex('feeds').insert({
-        user_id: userId,
-        activity_ids: JSON.stringify([activityId]),
-        created_at: new Date(),
-      });
-    }
-    userActivities = userActivities.activity_ids || [];
-    while (userActivities.length >= maxFeedLength) {
-      userActivities.shift();
-    }
-    userActivities.push(activityId);
-    return knex('feeds').where({ user_id: userId }).update({
-      activity_ids: JSON.stringify(userActivities),
-      updated_at: new Date(),
-    });
-  } catch (err) {
-    log.error(
-      { err, data: { userId, activityId } },
-      'Notification insertion failed',
-    );
-    return Promise.resolve();
-  }
 }
 
 class WorkTeam {
@@ -96,13 +61,13 @@ class WorkTeam {
     return wtId ? User.gen(viewer, memberId, loaders) : null;
   }
 
-  async circularFeedNotification(viewer, activity) {
+  async circularFeedNotification(viewer, activity, pushFn) {
     if (!this.canNotify(viewer)) return null;
 
     const teamIds = await knex('user_work_teams')
       .where({ work_team_id: this.id })
       .pluck('user_id');
-    const promises = teamIds.map(id => pushToFeed(id, activity.id));
+    const promises = teamIds.map(id => pushFn(id, activity.id));
 
     return Promise.all(promises);
   }

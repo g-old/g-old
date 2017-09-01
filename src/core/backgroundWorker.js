@@ -12,6 +12,7 @@ import {
 } from './mailer';
 import Proposal from '../data/models/Proposal';
 import { circularFeedNotification } from './feed';
+import createLoaders from '../data/dataLoader';
 
 const mailWithToken = async ({
   address,
@@ -67,24 +68,14 @@ const mailNotification = async mailData => {
   return null;
 };
 
-const handleNotifications = async (viewer, notificationData, receiver) => {
-  switch (receiver.type) {
-    case 'team': {
-      return circularFeedNotification({
-        viewer,
-        data: notificationData,
-        verb: 'create',
-        receiver,
-      });
-    }
-
-    default: {
-      throw Error(
-        `Notification type not recognized: ${notificationData.mailType}`,
-      );
-    }
-  }
-};
+const handleNotifications = async (viewer, notificationData, receiver) =>
+  circularFeedNotification({
+    viewer,
+    data: notificationData,
+    verb: 'create',
+    receiver,
+    loaders: createLoaders(),
+  });
 
 const handleMails = mailData => {
   let result = null;
