@@ -130,7 +130,7 @@ class User {
     const newData = { updated_at: new Date() };
     if (data.email) {
       newData.email = data.email.trim();
-      newData.email_verified = false;
+      newData.email_verified = !!data.emailVerified;
     }
     if (data.password) {
       if (data.passwordOld) {
@@ -165,9 +165,11 @@ class User {
       ) {
         /* eslint-enable no-bitwise */
         // check level
+
         if (await getIsLowerLevel(viewer, data.id)) {
           // check if right level
           const roleId = roles.indexOf(data.role) + 1;
+
           if (roleId > -1) {
             newData.role_id = roleId;
           }
@@ -240,13 +242,15 @@ class User {
     // invalidate cache
     loaders.users.clear(updatedId);
     // updates session store;
-    if (newData.role_id) {
-      const updatedUser = await User.gen(viewer, data.id, loaders);
-      await updatedUser.modifySessions(viewer, loaders);
+    const updatedUser = await User.gen(viewer, data.id, loaders);
+    if (viewer.id !== updatedUser.id) {
+      if (newData.role_id || newData.privilege || newData.email) {
+        await updatedUser.modifySessions(viewer, loaders);
+      }
     }
 
     //
-    return { user: (await User.gen(viewer, data.id, loaders)) || null, errors };
+    return { user: updatedUser || null, errors };
   }
 
   static async create(data) {
@@ -268,35 +272,25 @@ class User {
     const avatar_path = `https://api.adorable.io/avatars/32/${name}${surname}.io.png`;
     // create
     // TODO check if locking with forUpdate is necessary (duplicate emails)
-    const newUserId = await knex.transaction(async trx => {
-      const hash = await bcrypt.hash(data.password, 10);
-      if (!hash) throw Error('Something went wrong');
-      const id = await trx
-        .insert(
-          {
-            name,
-            surname,
-            email,
-            avatar_path,
-            email_verified: false,
-            password_hash: hash,
-            role_id: 5, // TODO make better
-            created_at: new Date(),
-          },
-          'id',
-        )
-        .into('users');
-      return id[0];
-    });
-    if (!newUserId) return null;
-    return new User({
-      id: newUserId,
-      name: data.name,
-      surname: data.surname,
-      role_id: 5,
-      email: data.email,
+    const hash = await bcrypt.hash(data.password, 10);
+    if (!hash) throw Error('Something went wrong');
+    const newUserData = {
+      name,
+      surname,
+      email,
       avatar_path,
+      email_verified: false,
+      password_hash: hash,
+      role_id: 5, // TODO make better
+      created_at: new Date(),
+      privilege: 1,
+    };
+    const newUser = await knex.transaction(async trx => {
+      const uData = await trx.insert(newUserData).into('users').returning('*');
+      return uData[0];
     });
+    if (!newUser) return null;
+    return new User(newUser);
   }
 
   static async find(viewer, data, loaders) {

@@ -41,14 +41,15 @@ passport.use(
           'avatar_path',
           'privilege',
           'role_id',
+          'email_verified',
         ])
         .update({ last_login_at: new Date() })
-        .then((userData) => {
+        .then(userData => {
           const user = userData[0];
           if (!user) {
             return done(null, false);
           }
-          return verifyUser(user, password).then((verified) => {
+          return verifyUser(user, password).then(verified => {
             if (verified) {
               log.info({ user }, 'User logged in');
               return done(null, user);
@@ -57,7 +58,7 @@ passport.use(
             return done(null, false);
           });
         })
-        .catch((error) => {
+        .catch(error => {
           log.error({ err: error }, 'User log in failed');
           return done(error);
         }),
@@ -68,9 +69,11 @@ passport.serializeUser((user, done) =>
   knex('roles')
     .where({ id: user.role_id })
     .select('id', 'type')
-    .then((data) => {
+    .then(data => {
       const role = data[0];
       if (role) {
+        const emailVerified =
+          'emailVerified' in user ? user.emailVerified : user.email_verified;
         const sessionUser = {
           id: user.id,
           name: user.name,
@@ -78,6 +81,7 @@ passport.serializeUser((user, done) =>
           email: user.email,
           avatar: user.avatar_path || user.avatar, // TODO change!
           privilege: user.privilege,
+          emailVerified,
           role: {
             id: role.id,
             type: role.type,
@@ -90,7 +94,7 @@ passport.serializeUser((user, done) =>
       done({ message: 'Serializing failed', name: 'SerializeError' });
       return null;
     })
-    .catch((error) => {
+    .catch(error => {
       log.error({ err: error, user }, 'Serializing failed');
       done(error);
       return null;

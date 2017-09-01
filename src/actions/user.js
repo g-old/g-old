@@ -73,6 +73,7 @@ mutation($id:ID $name:String, $surname:String, $role:String, $email:String, $pas
   updateUser( user:{id:$id name:$name, surname:$surname, role:$role, email:$email, password:$password passwordOld:$passwordOld followee:$followee privilege:$privilege}){
     user{${userFields}
     email,
+    emailVerified,
     privilege
     followees{
       id,
@@ -135,7 +136,7 @@ export function loadUserList(role) {
 
 const initialId = '0000';
 export function createUser(newUser) {
-  return async (dispatch) => {
+  return async dispatch => {
     const properties = genStatusIndicators(newUser);
     dispatch({
       type: CREATE_USER_START,

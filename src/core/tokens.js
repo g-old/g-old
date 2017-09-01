@@ -5,7 +5,10 @@ import { validateEmail } from './helpers';
 const genToken = () =>
   new Promise((resolve, reject) => {
     // eslint-disable-next-line no-confusing-arrow
-    crypto.randomBytes(20, (err, buffer) => (err ? reject(err) : resolve(buffer.toString('hex'))));
+    crypto.randomBytes(
+      20,
+      (err, buffer) => (err ? reject(err) : resolve(buffer.toString('hex'))),
+    );
   });
 
 class Token {
@@ -20,16 +23,24 @@ class Token {
 export const checkToken = async ({ token, table }) => {
   if (!token || typeof token !== 'string') return null;
   if (!table || typeof table !== 'string') return null;
-  const dbData = await knex.transaction(async (trx) => {
+  const dbData = await knex.transaction(async trx => {
     let data = await trx.where({ token }).into(table).select();
     data = data[0];
     if (data) {
       // eslint-disable-next-line newline-per-chained-call
-      await knex(table).transacting(trx).forUpdate().where({ id: data.id }).del('id');
+      await knex(table)
+        .transacting(trx)
+        .forUpdate()
+        .where({ id: data.id })
+        .del('id');
     }
     return data;
   });
-  if (!dbData || new Date(dbData.token_expires) < new Date()) return null;
+  if (
+    !dbData ||
+    new Date(dbData.token_expires).getTime() < new Date().getTime()
+  )
+    return null;
   // eslint-disable-next-line new-cap
   return new Token(dbData);
 };
@@ -40,7 +51,7 @@ export const createToken = async ({ email, table, hoursValid, withEmail }) => {
   if (!hoursValid || hoursValid < 1 || hoursValid > 72) return null;
   if (!validateEmail(email)) return null;
 
-  const validToken = await knex.transaction(async (trx) => {
+  const validToken = await knex.transaction(async trx => {
     let userId = await trx.where({ email }).into('users').pluck('id');
     userId = userId[0];
     if (!userId) throw Error('User not found');
@@ -65,10 +76,14 @@ export const createToken = async ({ email, table, hoursValid, withEmail }) => {
 
     if (exists[0]) {
       // eslint-disable-next-line newline-per-chained-call
-      await knex(table).transacting(trx).forUpdate().where({ user_id: userId }).update({
-        ...newData,
-        updated_at: new Date(),
-      });
+      await knex(table)
+        .transacting(trx)
+        .forUpdate()
+        .where({ user_id: userId })
+        .update({
+          ...newData,
+          updated_at: new Date(),
+        });
     } else {
       await knex(table).transacting(trx).forUpdate().insert({
         ...newData,

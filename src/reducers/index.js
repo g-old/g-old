@@ -28,24 +28,32 @@ export const getProposalsErrorMessage = (state, filter) =>
 export const getProposalsPage = (state, filter) =>
   fromEntity.getProposalsPage(state.entities, filter);
 
-export const getSessionUser = state => fromEntity.getUser(state.entities, state.user);
+export const getSessionUser = state =>
+  fromEntity.getUser(state.entities, state.user);
 
-export const getProposal = (state, id) => fromEntity.getProposal(state.entities, id);
+export const getProposal = (state, id) =>
+  fromEntity.getProposal(state.entities, id);
 
-export const getIsProposalFetching = (state, id) => fromUi.getIsProposalFetching(state.ui, id);
+export const getIsProposalFetching = (state, id) =>
+  fromUi.getIsProposalFetching(state.ui, id);
 
-export const getProposalSuccess = (state, id) => fromUi.getProposalSuccess(state.ui, id);
+export const getProposalSuccess = (state, id) =>
+  fromUi.getProposalSuccess(state.ui, id);
 
-export const getProposalErrorMessage = (state, id) => fromUi.getProposalErrorMessage(state.ui, id);
+export const getProposalErrorMessage = (state, id) =>
+  fromUi.getProposalErrorMessage(state.ui, id);
 
-export const getVotingListIsFetching = (state, id) => fromUi.getVotingListIsFetching(state.ui, id);
+export const getVotingListIsFetching = (state, id) =>
+  fromUi.getVotingListIsFetching(state.ui, id);
 
 export const getVotingListErrorMessage = (state, id) =>
   fromUi.getVotingListErrorMessage(state.ui, id);
 
-export const getVoteUpdates = (state, id) => fromUi.getVoteUpdates(state.ui, id);
+export const getVoteUpdates = (state, id) =>
+  fromUi.getVoteUpdates(state.ui, id);
 
-export const getStatementUpdates = state => fromUi.getStatementUpdates(state.ui);
+export const getStatementUpdates = state =>
+  fromUi.getStatementUpdates(state.ui);
 
 export const getVisibleUsers = (state, filter) =>
   fromEntity.getVisibleUsers(state.entities, filter);
@@ -56,7 +64,8 @@ export const getUsersIsFetching = (state, filter) =>
 export const getUsersErrorMessage = (state, filter) =>
   fromEntity.getUsersErrorMessage(state.entities, filter);
 
-export const getAccountUpdates = (state, id) => fromUi.getAccountUpdates(state.ui, id);
+export const getAccountUpdates = (state, id) =>
+  fromUi.getAccountUpdates(state.ui, id);
 
 export const getLocale = state => fromIntl.getLocale(state.intl);
 
@@ -73,9 +82,11 @@ export const getFlagsIsFetching = (state, filter) =>
 export const getFlagsErrorMessage = (state, filter) =>
   fromEntity.getFlagsErrorMessage(state.entities, filter);
 
-export const getFlagsPage = (state, filter) => fromEntity.getFlagsPage(state.entities, filter);
+export const getFlagsPage = (state, filter) =>
+  fromEntity.getFlagsPage(state.entities, filter);
 
-export const getActivities = (state, filter) => fromEntity.getActivities(state.entities, filter);
+export const getActivities = (state, filter) =>
+  fromEntity.getActivities(state.entities, filter);
 
 export const getFeedIsFetching = (state, filter) =>
   fromEntity.getFeedIsFetching(state.entities, filter);

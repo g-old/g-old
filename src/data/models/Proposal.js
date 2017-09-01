@@ -344,10 +344,9 @@ class Proposal {
 
       id = id[0];
       // tags
-
       if (existingTags && existingTags.length) {
         await trx
-          .insert(existingTags.map(t => ({ proposal_id: id[0], tag_id: t.id })))
+          .insert(existingTags.map(t => ({ proposal_id: id, tag_id: t.id })))
           .into('proposal_tags');
 
         // update counts
@@ -365,9 +364,7 @@ class Proposal {
           .returning('id');
         await Promise.all(
           ids.map(tId =>
-            trx
-              .insert({ proposal_id: id[0], tag_id: tId })
-              .into('proposal_tags'),
+            trx.insert({ proposal_id: id, tag_id: tId }).into('proposal_tags'),
           ),
         );
         //

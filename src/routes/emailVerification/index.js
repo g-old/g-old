@@ -11,16 +11,17 @@ async function action({ store, path }) {
 
   if (!user) {
     return { redirect: `/?redirect=${path}` };
-  } else if (user.emailVerified) {
-    return { redirect: '/' };
   }
+  if (user.emailVerified === true) {
+    return { redirect: '/account' };
+  }
+
   return {
     chunks: ['emailVerification'],
     title,
     component: (
       <Layout>
-        <EmailVerification user={user} />
-        {' '}
+        <EmailVerification user={user} />{' '}
       </Layout>
     ),
   };

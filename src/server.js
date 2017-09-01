@@ -305,18 +305,31 @@ app.get('/verify/:token', (req, res) => {
   checkToken({ token: req.params.token, table: 'verify_tokens' })
     .then(data => {
       if (data) {
-        return knex('users')
-          .forUpdate()
-          .where({ email: data.email })
-          .update({ email_verified: true, updated_at: new Date() })
-          .returning('id');
+        return User.update(
+          { id: 1, role: { type: 'system' } },
+          { email: data.email, id: data.userId, emailVerified: true },
+          createLoaders(),
+        ).then(result => (result ? result.user : null));
       }
       throw Error('Token not valid');
     })
-    .then(id => {
-      if (id[0]) {
+    .then(user => {
+      if (user) {
+        // update session
+        return new Promise((resolve, reject) => {
+          // eslint-disable-next-line no-confusing-arrow
+          req.login(user, err => (err ? reject(err) : resolve()));
+        })
+          .then(
+            () =>
+              new Promise((resolve, reject) => {
+                // eslint-disable-next-line no-confusing-arrow
+                req.session.save(err => (err ? reject(err) : resolve()));
+              }),
+          )
+          .then(() => res.redirect('/account'));
         // TODO insert into feed
-        return res.redirect('/account');
+        // return res.redirect('/account');
       }
       throw Error('User not found');
     })

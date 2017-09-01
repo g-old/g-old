@@ -32,6 +32,7 @@ self.addEventListener('notificationclick', event => {
   if (event.notification.data) {
     link = event.notification.data;
   }
+  // prettier-ignore
   event.waitUntil(
     /* eslint-disable */
     clients
@@ -48,7 +49,7 @@ self.addEventListener('notificationclick', event => {
         if (clients.openWindow) {
           return clients.openWindow(link);
         }
-      }),
+      })
     /* eslint-enable */
   );
 });

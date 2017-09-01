@@ -13,11 +13,14 @@ class EmailVerification extends React.Component {
     updates: PropTypes.shape({}).isRequired,
     verifyEmail: PropTypes.func.isRequired,
   };
+
   render() {
     const { updates } = this.props;
     // const verifyError = updates && updates.verifyEmail && updates.verifyEmail.error;
-    const verifyPending = updates && updates.verifyEmail && updates.verifyEmail.pending;
-    const verifySuccess = updates && updates.verifyEmail && updates.verifyEmail.success;
+    const verifyPending =
+      updates && updates.verifyEmail && updates.verifyEmail.pending;
+    const verifySuccess =
+      updates && updates.verifyEmail && updates.verifyEmail.success;
     let content = null;
     if (verifySuccess) {
       content =
@@ -26,11 +29,13 @@ class EmailVerification extends React.Component {
       content = (
         <Notification
           type="error"
-          message={'Verification failed'}
+          message={
+            'Could not verify your email. The link is expired or invalid.'
+          }
           action={
             <Button
               primary
-              label={'Resend'}
+              label={'Send new link'}
               disabled={verifyPending}
               onClick={this.props.verifyEmail}
             />
@@ -38,7 +43,11 @@ class EmailVerification extends React.Component {
         />
       );
     }
-    return <Box column pad> {content} </Box>;
+    return (
+      <Box column pad>
+        {content}
+      </Box>
+    );
   }
 }
 
