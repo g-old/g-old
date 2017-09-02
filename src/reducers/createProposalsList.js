@@ -15,7 +15,7 @@ const handlePageInfo = (state, action) => {
   return { ...state, ...action.pagination };
 };
 
-const createList = (filter) => {
+const createList = filter => {
   const ids = (state = [], action) => {
     if (action.filter !== filter) {
       return state;
@@ -26,7 +26,8 @@ const createList = (filter) => {
         return [...new Set([...state, action.payload.result])];
       }
       case SSE_UPDATE_SUCCESS: {
-        const activity = action.payload.entities.activities[action.payload.result];
+        const activity =
+          action.payload.entities.activities[action.payload.result];
         if (!activity.type === 'proposal') {
           return state;
         }

@@ -20,8 +20,9 @@ const createProposalSub = {
       let subIds = await knex('webpush_subscriptions')
         .where({ user_id: viewer.id })
         .count('id');
+
       subIds = subIds[0].count;
-      if (!subIds) return false;
+      if (subIds < 1) return null;
 
       // Proposal.subscribe(user)
       const proposal = await Proposal.gen(

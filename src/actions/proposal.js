@@ -241,7 +241,7 @@ export function loadProposal({ id, pollId }) {
       const { data } = await graphqlRequest(query, { id, pollId });
       const normalizedData = normalize(data.proposalDL, proposalSchema);
       // dispatch(addEntities(normalizedData.entities, 'all'));
-      const filter = getFilter(data.proposalDL.state);
+      const filter = getFilter(data.proposalDL);
       dispatch({
         type: LOAD_PROPOSAL_SUCCESS,
         payload: normalizedData,
@@ -267,6 +267,10 @@ export function loadProposalsList({ state, first, after }) {
     // TODO caching!
     // Dont fetch if pending
     const reduxState = await getState();
+    if (!reduxState) {
+      console.error('REDUX IS NOT READY!', { state, first, after });
+      return false;
+    }
     if (getProposalsIsFetching(reduxState, state)) {
       return false;
     }
@@ -323,7 +327,7 @@ export function createProposal(proposalData) {
       );
       const normalizedData = normalize(data.createProposal, proposalSchema);
       // TODO change filter structure of reducer
-      const filter = getFilter(data.createProposal.state);
+      const filter = getFilter(data.createProposal);
 
       dispatch({
         type: CREATE_PROPOSAL_SUCCESS,
@@ -363,7 +367,7 @@ export function updateProposal(proposalData) {
       );
       const normalizedData = normalize(data.updateProposal, proposalSchema);
       // TODO change filter structure of reducer
-      const filter = getFilter(data.updateProposal.state);
+      const filter = getFilter(data.updateProposal);
 
       dispatch({
         type: UPDATE_PROPOSAL_SUCCESS,

@@ -82,8 +82,8 @@ class ProposalContainer extends React.Component {
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
     return (
-      (this.props.proposal && this.props.proposal.pollOne) ||
-      this.props.proposal.pollTwo
+      this.props.proposal &&
+      (this.props.proposal.pollOne || this.props.proposal.pollTwo)
     );
   }
 
@@ -154,7 +154,9 @@ class ProposalContainer extends React.Component {
           ? proposal.pollOne
           : proposal.pollTwo;
       const canSwitchPolls = !!(proposal.pollOne && proposal.pollTwo);
-
+      if (!poll) {
+        return <div>SOMETHING GOT REALLY WRONG</div>;
+      }
       let switchPollBtn = null;
 
       if (canSwitchPolls) {

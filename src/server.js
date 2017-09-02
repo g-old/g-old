@@ -334,7 +334,7 @@ app.get('/verify/:token', (req, res) => {
       throw Error('User not found');
     })
     .catch(err => {
-      log.error({ err }, 'Email verification failed');
+      log.warn({ err }, 'Email verification failed');
       return res.redirect('/verify');
     });
 });

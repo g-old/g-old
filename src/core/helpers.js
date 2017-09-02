@@ -3,7 +3,7 @@ export const thresholdPassed = poll =>
   // eslint-disable-next-line no-mixed-operators
   poll.upvotes >= Math.floor(poll.allVoters / 100 * poll.threshold);
 
-export const validateEmail = (email) => {
+export const validateEmail = email => {
   // http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
   // eslint-disable-next-line no-useless-escape
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line max-len
@@ -24,10 +24,10 @@ export function b(a) {
 /* eslint-enable */
 
 // http://www.jstips.co/en/javascript/deduplicate-an-array/
-export const dedup = (arr) => {
+export const dedup = arr => {
   const hashTable = {};
 
-  return arr.filter((el) => {
+  return arr.filter(el => {
     const key = JSON.stringify(el);
     const match = Boolean(hashTable[key]);
 
@@ -42,7 +42,7 @@ export const concatDateAndTime = (date, time) => {
 };
 
 // http://stackoverflow.com/questions/6982692/html5-input-type-date-default-value-to-today
-export const utcCorrectedDate = (daysAdded) => {
+export const utcCorrectedDate = daysAdded => {
   const local = new Date();
   if (daysAdded) {
     local.setDate(local.getDate() + daysAdded);
@@ -175,7 +175,7 @@ export const getSuccessState = (state, action) =>
     return acc;
   }, {});
 
-export const genStatusIndicators = (data) => {
+export const genStatusIndicators = data => {
   let component = null;
   if (Array.isArray(data)) {
     component = data;
@@ -195,9 +195,11 @@ export const genStatusIndicators = (data) => {
 
 // from: https://gist.github.com/malko/ff77f0af005f684c44639e4061fa8019
 /* eslint-disable no-mixed-operators */
-export const urlBase64ToUint8Array = (base64String) => {
+export const urlBase64ToUint8Array = base64String => {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/'); // eslint-disable-line
+  const base64 = (base64String + padding)
+    .replace(/\-/g, "+") //eslint-disable-line
+    .replace(/_/g, "/"); // eslint-disable-line
   const rawData = window.atob(base64);
   return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
 };
@@ -214,18 +216,20 @@ export const isPushAvailable = () =>
 /* eslint-enable no-prototype-builtins */
 
 // from https://stackoverflow.com/questions/10348906/how-to-know-if-a-request-is-http-or-https-in-node-js
-export const getProtocol = (req) => {
+export const getProtocol = req => {
   let proto = req.connection.encrypted ? 'https' : 'http';
   // only do this if you trust the proxy
   proto = req.headers['x-forwarded-proto'] || proto;
   return proto.split(/\s*,\s*/)[0];
 };
 
-export const getFilter = (status) => {
+export const getFilter = proposal => {
+  const status = proposal.state;
   switch (status) {
     case 'accepted':
       return 'accepted';
     case 'proposed':
+      return proposal.pollOne.closedAt ? 'wait' : 'active';
     case 'voting':
       return 'active';
     case 'survey':

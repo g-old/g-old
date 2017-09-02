@@ -118,12 +118,13 @@ export const sendMail = mail =>
     console.info(info.message);
   });
 
-export const resetSuccessMail = ({ address, name, lang }) => {
+export const resetSuccessMail = ({ address, name, connection, lang }) => {
   if (!address || !name) throw Error('Mail details not provided');
   const content = composeMail({
     lang,
     address,
     name,
+    connection,
     type: 'resetSuccess',
   });
   return {

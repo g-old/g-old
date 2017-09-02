@@ -4,6 +4,7 @@ import { eventsToAsyncIterator } from './events-to-async-iterator';
 export default class PubSub {
   constructor() {
     this.ee = new EventEmitter();
+    this.ee.setMaxListeners(0); // or set to a specific number
     this.subscriptions = {};
     this.subIdCounter = 0;
   }
