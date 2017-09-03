@@ -56,7 +56,7 @@ class Statement {
     // validate
     if (!data.id) return null;
     // eslint-disable-next-line prefer-arrow-callback
-    const deletedStatement = await knex.transaction(async function (trx) {
+    const deletedStatement = await knex.transaction(async function(trx) {
       const statementInDB = await Statement.gen(viewer, data.id, loaders);
       if (!statementInDB) throw Error('Statement does not exist!');
       if (statementInDB.deletedAt) throw Error('Statement cannot be modified!');
@@ -77,10 +77,11 @@ class Statement {
 
     // validate
     if (!data.id) return null;
-    if (data.text && data.text.length < 1 && data.text !== 'string') return null;
+    if (data.text && data.text.length < 1 && data.text !== 'string')
+      return null;
     // update
     // eslint-disable-next-line prefer-arrow-callback
-    const updatedId = await knex.transaction(async function (trx) {
+    const updatedId = await knex.transaction(async function(trx) {
       const statementInDB = await Statement.gen(viewer, data.id, loaders);
       if (!statementInDB) throw Error('Statement does not exist!');
       if (statementInDB.deletedAt) throw Error('Statement cannot be changed');
@@ -118,7 +119,7 @@ class Statement {
 
     // create
     // eslint-disable-next-line prefer-arrow-callback
-    const newStatementId = await knex.transaction(async function (trx) {
+    const newStatementId = await knex.transaction(async function(trx) {
       const vote = await Statement.validateVote(viewer, data.voteId, loaders);
       if (!vote.id) throw Error('Vote not valid');
       const statementInDB = await knex('statements')
@@ -127,14 +128,14 @@ class Statement {
       if (statementInDB.length !== 0) throw Error('Already commented!');
       const id = await trx
         .insert(
-        {
-          author_id: viewer.id,
-          poll_id: data.pollId,
-          body: data.text,
-          position: vote.position,
-          vote_id: vote.id,
-          created_at: new Date(),
-        },
+          {
+            author_id: viewer.id,
+            poll_id: data.pollId,
+            body: data.text,
+            position: vote.position,
+            vote_id: vote.id,
+            created_at: new Date(),
+          },
           'id',
         )
         .into('statements');
@@ -154,9 +155,13 @@ class Statement {
     if (!data.statementId || !data.content) return null;
     const content = data.content.trim();
     if (!content.length > 1) return null;
-    const newFlaggedId = await knex.transaction(async (trx) => {
+    const newFlaggedId = await knex.transaction(async trx => {
       // get statement
-      const statementInDB = await Statement.gen(viewer, data.statementId, loaders);
+      const statementInDB = await Statement.gen(
+        viewer,
+        data.statementId,
+        loaders,
+      );
       if (!statementInDB) return null;
       const author = await User.gen(viewer, statementInDB.author_id, loaders);
       if (!author) return null;
@@ -166,7 +171,8 @@ class Statement {
         .select()
         .into('flagged_statements');
       flaggedStmtInDB = flaggedStmtInDB[0] || [];
-      if (flaggedStmtInDB.state && flaggedStmtInDB.state !== 'open') return null; // throw Error('Already solved!');
+      if (flaggedStmtInDB.state && flaggedStmtInDB.state !== 'open')
+        return null; // throw Error('Already solved!');
       if (flaggedStmtInDB.id) {
         // update count;
         await knex('flagged_statements')
@@ -193,7 +199,9 @@ class Statement {
       // should throw automatically if flagger, flagged or statment does not exist
     });
     if (!newFlaggedId) return null;
-    const res = await knex('flagged_statements').where({ id: newFlaggedId }).select();
+    const res = await knex('flagged_statements')
+      .where({ id: newFlaggedId })
+      .select();
     return res[0];
   }
 
@@ -205,7 +213,7 @@ class Statement {
     if (!data) return null;
     //  if (!data.id) return null;
 
-    const id = await knex.transaction(async (trx) => {
+    const id = await knex.transaction(async trx => {
       // update
       let flaggedStmtInDb = data.id
         ? await knex('flagged_statements')
@@ -219,7 +227,8 @@ class Statement {
             .where({ statement_id: data.statementId })
             .select();
       flaggedStmtInDb = flaggedStmtInDb[0] || [];
-      if (flaggedStmtInDb.state && flaggedStmtInDb.state !== 'open') throw Error('Already solved!');
+      if (flaggedStmtInDb.state && flaggedStmtInDb.state !== 'open')
+        throw Error('Already solved!');
       // check statement exists
       const statementInDB = await Statement.gen(
         viewer,

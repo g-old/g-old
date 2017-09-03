@@ -1,4 +1,9 @@
-import { GraphQLString, GraphQLObjectType, GraphQLID, GraphQLNonNull } from 'graphql';
+import {
+  GraphQLString,
+  GraphQLObjectType,
+  GraphQLID,
+  GraphQLNonNull,
+} from 'graphql';
 import User from '../models/User';
 import UserType from './UserType';
 import ObjectType from './ObjectType';
@@ -18,7 +23,8 @@ const ActivityType = new GraphQLObjectType({
     // not sure if this is the right way as we have to make a system user
     actor: {
       type: UserType,
-      resolve: (parent, args, { viewer, loaders }) => User.gen(viewer, parent.actorId, loaders),
+      resolve: (parent, args, { viewer, loaders }) =>
+        User.gen(viewer, parent.actorId, loaders),
     },
     type: {
       type: GraphQLString, // or enum?
@@ -54,6 +60,14 @@ const ActivityType = new GraphQLObjectType({
           return Statement.gen(viewer, parent.objectId, loaders);
         }
         if (parent.type === 'vote') {
+          if (parent.verb === 'delete') {
+            return new Vote({
+              id: parent.content.id,
+              user_id: parent.content.userId,
+              position: parent.content.position,
+              poll_id: parent.content.pollId,
+            });
+          }
           return Vote.gen(viewer, parent.objectId, loaders);
         }
         if (parent.type === 'notification') {

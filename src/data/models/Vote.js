@@ -1,6 +1,7 @@
 import knex from '../knex';
 import Poll from './Poll';
 import Proposal from './Proposal';
+import Statement from './Statement';
 
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
@@ -42,7 +43,7 @@ class Vote {
     if (!data.id) return null;
     if (!data.pollId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
-
+    let deletedStatement;
     const deletedVote = await knex.transaction(async trx => {
       const oldVote = await Vote.validate(
         viewer,
@@ -65,10 +66,16 @@ class Vote {
         .forUpdate()
         .where({ vote_id: data.id })
         .select();
-      statementInDB = statementInDB[0] || [];
-      if (statementInDB.id && statementInDB.deleted_at)
-        throw Error('Cannot be modified!');
+      statementInDB = statementInDB[0] || {};
+      if (statementInDB.id) {
+        if (statementInDB.deleted_at) {
+          throw Error('Cannot be modified!');
+        }
+        deletedStatement = new Statement(statementInDB);
+        // statement gets deleted by cascading on delete
+      }
       // eslint-disable-next-line newline-per-chained-call
+
       await knex('votes')
         .transacting(trx)
         .forUpdate()
@@ -84,7 +91,7 @@ class Vote {
         .decrement(columns[index], 1);
       return oldVote;
     });
-    return new Vote(deletedVote) || null;
+    return { deletedVote: new Vote(deletedVote) || null, deletedStatement };
   }
 
   static async update(viewer, data, loaders) {
@@ -97,6 +104,7 @@ class Vote {
     if (await poll.isUnipolar(viewer, loaders)) {
       return null; // delete is the right method
     }
+    let deletedStatement;
     await knex.transaction(async trx => {
       const oldVote = await Vote.validate(
         viewer,
@@ -114,11 +122,14 @@ class Vote {
         .transacting(trx)
         .forUpdate()
         .where({ vote_id: data.id })
-        .select('id', 'deleted_at');
-      statementInDB = statementInDB[0] || [];
-      if (statementInDB && statementInDB.deleted_at)
-        throw Error('Cannot be modified!');
+        .select();
+      statementInDB = statementInDB[0] || {};
       if (statementInDB.id) {
+        if (statementInDB.deleted_at) {
+          throw Error('Cannot be modified!');
+        }
+        deletedStatement = new Statement(statementInDB);
+
         // eslint-disable-next-line newline-per-chained-call
         await knex('statements')
           .transacting(trx)
@@ -153,7 +164,11 @@ class Vote {
         .where({ id: data.pollId })
         .decrement(columns[(index = 1 - index)], 1);
     });
-    return Vote.gen(viewer, data.id, loaders);
+
+    return {
+      updatedVote: await Vote.gen(viewer, data.id, loaders),
+      deletedStatement,
+    };
   }
 
   static async create(viewer, data, loaders) {
@@ -174,7 +189,7 @@ class Vote {
       position = 'pro';
     }
     const newVoteId = await knex.transaction(async trx => {
-      const voteInDB = await knex('votes')
+      const voteInDB = await knex('votes') // TODO prob. superflue bc constraint
         .transacting(trx)
         .forUpdate()
         .where({ poll_id: data.pollId, user_id: viewer.id })

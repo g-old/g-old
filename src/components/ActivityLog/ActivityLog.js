@@ -25,6 +25,7 @@ class ActivityLog extends React.Component {
       position: PropTypes.string,
     }),
     date: PropTypes.string.isRequired,
+    verb: PropTypes.string.isRequired,
   };
   static defaultProps = {
     content: {},
@@ -32,7 +33,8 @@ class ActivityLog extends React.Component {
 
   render() {
     /* eslint-disable no-underscore-dangle */
-    const type = this.props.content && this.props.content.__typename;
+    const { content, verb, date } = this.props;
+    const type = content && content.__typename;
     if (!type) {
       return (
         <div>
@@ -40,69 +42,112 @@ class ActivityLog extends React.Component {
         </div>
       );
     }
-    let content = null;
+    let activity = null;
     switch (type) {
       case 'StatementDL': {
-        content = (
-          <Link to={`/proposal/xxx/${this.props.content.pollId}`}>
-            <Statement {...this.props.content} />
+        const obj = Object.assign({}, content, {
+          vote: {
+            position: content.position,
+            id: content.voteId,
+          },
+        });
+        activity = (
+          <Link to={`/proposal/xxx/${content.pollId}`}>
+            <Statement {...obj} />
           </Link>
         );
         break;
       }
 
       case 'VoteDL': {
-        content = (
-          <Link to={`/proposal/xxx/${this.props.content.pollId}`}>
+        let displayVote;
+        if (verb === 'update') {
+          displayVote = (
+            <span>
+              <svg
+                viewBox="0 0 24 24"
+                width="60px"
+                height="24px"
+                role="img"
+                aria-label="halt"
+              >
+                <path
+                  fill="none"
+                  stroke={content.position !== 'pro' ? '#8cc800' : '#ff324d'}
+                  strokeWidth="1"
+                  d={ICONS.thumbUpAlt}
+                  transform={
+                    content.position !== 'pro' ? '' : 'rotate(180 12 12)'
+                  }
+                />
+              </svg>
+              TO{' '}
+              <svg
+                viewBox="0 0 24 24"
+                width="60px"
+                height="24px"
+                role="img"
+                aria-label="halt"
+              >
+                <path
+                  fill="none"
+                  stroke={content.position === 'pro' ? '#8cc800' : '#ff324d'}
+                  strokeWidth="1"
+                  d={ICONS.thumbUpAlt}
+                  transform={
+                    content.position === 'pro' ? '' : 'rotate(180 12 12)'
+                  }
+                />
+              </svg>
+            </span>
+          );
+        } else {
+          displayVote = (
+            <svg
+              viewBox="0 0 24 24"
+              width="60px"
+              height="24px"
+              role="img"
+              aria-label="halt"
+            >
+              <path
+                fill="none"
+                stroke={content.position === 'pro' ? '#8cc800' : '#ff324d'}
+                strokeWidth="1"
+                d={ICONS.thumbUpAlt}
+                transform={
+                  content.position === 'pro' ? '' : 'rotate(180 12 12)'
+                }
+              />
+            </svg>
+          );
+        }
+        activity = (
+          <Link to={`/proposal/xxx/${content.pollId}`}>
             <div>
-              <Avatar user={this.props.content.voter} />
-              {`${this.props.content.voter.name} ${this.props.content.voter
-                .surname}`}
+              <Avatar user={content.voter} />
+              {`${content.voter.name} ${content.voter.surname}`}
 
-              {
-                <svg
-                  viewBox="0 0 24 24"
-                  width="60px"
-                  height="24px"
-                  role="img"
-                  aria-label="halt"
-                >
-                  <path
-                    fill="none"
-                    stroke={
-                      this.props.content.position === 'pro'
-                        ? '#8cc800'
-                        : '#ff324d'
-                    }
-                    strokeWidth="1"
-                    d={ICONS.thumbUpAlt}
-                    transform={
-                      this.props.content.position === 'pro'
-                        ? ''
-                        : 'rotate(180 12 12)'
-                    }
-                  />
-                </svg>
-              }
+              {displayVote}
             </div>
           </Link>
         );
         break;
       }
       case 'Notification': {
-        content = (
+        activity = (
           <div>
             <h3>
-              {this.props.content.title}
+              {content.title}
             </h3>
-            {this.props.content.msg}
+            {content.msg}
           </div>
         );
         break;
       }
 
       default: {
-        content = (
+        activity = (
           <div>
             {'TYPE NOT RECOGNIZED'}
           </div>
@@ -117,12 +162,13 @@ class ActivityLog extends React.Component {
         className={cn(
           s.container,
           type === 'Notification' ? s.notification : null,
+          verb === 'delete' ? s.deleted : null,
         )}
       >
-        <FormattedRelative value={this.props.date} />
+        <FormattedRelative value={date} />
 
         <div>
-          {content}
+          {activity}
         </div>
       </div>
     );

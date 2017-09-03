@@ -88,6 +88,14 @@ export const getFlagsPage = (state, filter) =>
 export const getActivities = (state, filter) =>
   fromEntity.getActivities(state.entities, filter);
 
+export const getLogs = state => fromEntity.getLogs(state.entities);
+
+export const getLogIsFetching = state =>
+  fromEntity.getLogIsFetching(state.entities);
+
+export const getLogErrorMessage = state =>
+  fromEntity.getLogErrorMessage(state.entities);
+
 export const getFeedIsFetching = (state, filter) =>
   fromEntity.getFeedIsFetching(state.entities, filter);
 

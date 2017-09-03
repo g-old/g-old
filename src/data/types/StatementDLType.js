@@ -20,11 +20,17 @@ const StatementType = new ObjectType({
     },
     author: {
       type: UserType,
-      resolve: (data, { id }, { viewer, loaders }) => User.gen(viewer, data.author_id, loaders),
+      resolve: (data, { id }, { viewer, loaders }) =>
+        User.gen(viewer, data.author_id, loaders),
     },
     vote: {
       type: VoteType,
-      resolve: (data, { id }, { viewer, loaders }) => Vote.gen(viewer, data.voteId, loaders),
+      resolve: (data, { id }, { viewer, loaders }) =>
+        Vote.gen(viewer, data.voteId, loaders),
+    },
+
+    position: {
+      type: GraphQLString,
     },
     text: {
       type: GraphQLString,

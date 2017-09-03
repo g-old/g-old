@@ -13,6 +13,7 @@ import flaggedStatements, * as fromFlaggedStatements from './flaggedStatements';
 import activities, * as fromActivities from './activities';
 import followees, * as fromFollowees from './followees';
 import workTeams, * as fromWorkTeams from './workTeams';
+import logs, * as fromLogs from './logs';
 
 export default combineReducers({
   users,
@@ -29,6 +30,7 @@ export default combineReducers({
   followees,
   workTeams,
   notifications,
+  logs,
 });
 
 export const getVisibleProposals = (state, filter) =>
@@ -45,12 +47,14 @@ export const getProposalsPage = (state, filter) =>
 
 export const getUser = (state, id) => fromUsers.getUser(state.users, id, state);
 
-export const getProposal = (state, id) => fromProposals.getProposal(state.proposals, id, state);
+export const getProposal = (state, id) =>
+  fromProposals.getProposal(state.proposals, id, state);
 
 export const getVisibleUsers = (state, filter) =>
   fromUsers.getVisibleUsers(state.users, filter, state);
 
-export const getUsersIsFetching = (state, filter) => fromUsers.getIsFetching(state.users, filter);
+export const getUsersIsFetching = (state, filter) =>
+  fromUsers.getIsFetching(state.users, filter);
 
 export const getUsersErrorMessage = (state, filter) =>
   fromUsers.getErrorMessage(state.users, filter);
@@ -70,6 +74,12 @@ export const getFlagsErrorMessage = (state, filter) =>
 export const getActivities = (state, filter) =>
   fromActivities.getActivities(state.activities, filter, state);
 
+export const getLogs = state => fromLogs.getLogs(state.logs, state);
+
+export const getLogIsFetching = state => fromLogs.getIsFetching(state.logs);
+
+export const getLogErrorMessage = state => fromLogs.getErrorMessage(state.logs);
+
 export const getFeedIsFetching = (state, filter) =>
   fromActivities.getIsFetching(state.activities, filter);
 
@@ -87,6 +97,12 @@ export const getAllStatementsByPoll = (state, id) =>
   fromStatements.getAllStatementsByPoll(state.statements, id, state);
 
 export const getVisibibleStatementsByPoll = (state, id, filter) =>
-  fromStatements.getVisibibleStatementsByPoll(state.statements, id, state, filter);
+  fromStatements.getVisibibleStatementsByPoll(
+    state.statements,
+    id,
+    state,
+    filter,
+  );
 
-export const getWorkTeams = state => fromWorkTeams.getWorkTeams(state.workTeams, state);
+export const getWorkTeams = state =>
+  fromWorkTeams.getWorkTeams(state.workTeams, state);

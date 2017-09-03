@@ -60,6 +60,9 @@ export const activity = new schema.Entity('activities', {
   actor: user,
   object: unionSchema,
 });
+export const log = new schema.Entity('logs', {
+  actor: user,
+});
 
 export const proposalList = [proposal];
 export const voteList = [vote];
@@ -69,3 +72,4 @@ export const activityArray = [activity];
 export const tagArray = [tag];
 export const statementArray = [statement];
 export const workTeamList = [workTeam];
+export const logList = [log];

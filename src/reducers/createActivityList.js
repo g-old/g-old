@@ -8,14 +8,18 @@ import {
 
 // TODO handle DELETE_USER
 
-const createList = (filter) => {
+const createList = filter => {
   const ids = (state = [], action) => {
     switch (action.type) {
       case LOAD_FEED_SUCCESS: {
         if (filter) {
-          return action.log ? [...new Set([...action.payload.result, ...state])] : state;
+          return action.log
+            ? [...new Set([...action.payload.result, ...state])]
+            : state;
         }
-        return action.log ? state : [...new Set([...action.payload.result, ...state])];
+        return action.log
+          ? state
+          : [...new Set([...action.payload.result, ...state])];
       }
       case SSE_UPDATE_SUCCESS: {
         return filter ? state : [action.payload.result, ...state];

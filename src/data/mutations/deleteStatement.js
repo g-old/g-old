@@ -17,7 +17,11 @@ const deleteStatement = {
       const activityId = await insertIntoFeed(
         {
           viewer,
-          data: { type: 'statement', objectId: deletedStatement.id, content: deletedStatement },
+          data: {
+            type: 'statement',
+            objectId: deletedStatement.id,
+            content: deletedStatement,
+          },
           verb: 'delete',
         },
         true,

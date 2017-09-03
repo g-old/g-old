@@ -16,7 +16,10 @@ import {
 } from '../constants';
 import { genStatusIndicators } from '../core/helpers';
 
-import { voteList as voteListSchema, vote as voteSchema } from '../store/schema';
+import {
+  voteList as voteListSchema,
+  vote as voteSchema,
+} from '../store/schema';
 import { getVoteUpdates } from '../reducers';
 
 const voteInfo = `{

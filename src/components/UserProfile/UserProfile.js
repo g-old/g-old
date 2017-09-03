@@ -5,6 +5,8 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { updateUser, fetchUser } from '../../actions/user';
 import { verifyEmail } from '../../actions/verifyEmail';
+import { loadLogs } from '../../actions/log';
+
 import {
   createWebPushSub,
   deleteWebPushSub,
@@ -23,7 +25,9 @@ import {
   getAccountUpdates,
   getSubscription,
   getWorkTeams,
-  getActivities,
+  getLogs,
+  getLogIsFetching,
+  getLogErrorMessage,
 } from '../../reducers';
 import Avatar from '../Avatar';
 import UserSettings from '../UserSettings';
@@ -40,6 +44,7 @@ import CheckBox from '../CheckBox';
 import ProfilePicture from '../ProfilePicture';
 import { ICONS } from '../../constants';
 import ActivityLog from '../ActivityLog';
+import Notification from '../Notification';
 
 const messages = defineMessages({
   settings: {
@@ -188,11 +193,14 @@ class UserProfile extends React.Component {
     joinWorkTeam: PropTypes.func.isRequired,
     leaveWorkTeam: PropTypes.func.isRequired,
     workTeams: PropTypes.arrayOf(PropTypes.shape({})),
-    loadFeed: PropTypes.func.isRequired,
-    activities: PropTypes.arrayOf(PropTypes.shape({})),
+    loadLogs: PropTypes.func.isRequired,
+    logs: PropTypes.arrayOf(PropTypes.shape({})),
+    logPending: PropTypes.bool.isRequired,
+    logError: PropTypes.shape({}),
   };
   static defaultProps = {
-    activities: null,
+    logs: null,
+    logError: null,
   };
   constructor(props) {
     super(props);
@@ -431,11 +439,26 @@ class UserProfile extends React.Component {
             <AccordionPanel
               heading="Log / Notifications"
               onActive={() => {
-                this.props.loadFeed(true);
+                this.props.loadLogs(true);
               }}
             >
-              {this.props.activities &&
-                this.props.activities.map(a =>
+              {!this.props.logs.length && this.props.logPending && 'Loading...'}
+              {!this.props.logs.length &&
+                this.props.logError &&
+                <Notification
+                  type="error"
+                  message={this.props.logError}
+                  action={
+                    <Button
+                      label="Retry"
+                      onClick={() => {
+                        this.props.loadLogs(true);
+                      }}
+                    />
+                  }
+                />}
+              {this.props.logs &&
+                this.props.logs.map(a =>
                   <ActivityLog
                     key={a.id}
                     actor={a.actor}
@@ -463,13 +486,16 @@ const mapDispatch = {
   joinWorkTeam,
   leaveWorkTeam,
   loadFeed,
+  loadLogs,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getSessionUser(state),
   updates: getAccountUpdates(state, user.id),
   subscription: getSubscription(state),
   workTeams: getWorkTeams(state),
-  activities: getActivities(state, 'log'),
+  logs: getLogs(state),
+  logPending: getLogIsFetching(state),
+  logError: getLogErrorMessage(state),
 });
 
 export default connect(mapStateToProps, mapDispatch)(

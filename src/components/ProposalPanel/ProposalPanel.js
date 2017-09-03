@@ -37,7 +37,7 @@ const messages = defineMessages({
 });
 const defaultPollValues = {
   1: {
-    withStatements: true,
+    withStatements: false,
     unipolar: true,
     threshold: 25,
     secret: false,

@@ -8,3 +8,7 @@
 .notification {
   border: 4px solid orange;
 }
+
+.deleted {
+  opacity: 0.3;
+}

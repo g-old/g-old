@@ -84,7 +84,13 @@ const aggregateActivities = activities =>
       agg.all.push(curr);
       return agg;
     },
-    { del: {}, all: [], updatedProposals: {}, updatedStatements: {}, polls: {} },
+    {
+      del: {},
+      all: [],
+      updatedProposals: {},
+      updatedStatements: {},
+      polls: {},
+    },
   );
 
 class Feed {
@@ -101,7 +107,14 @@ class Feed {
     // authorize
     // get proposalsfeed;
     if (viewer && id) {
-      let logIds = await knex('feeds').where({ user_id: id }).select('activity_ids');
+      /*  const e = Math.random();
+      if (e > 0.5) {
+        console.log('ERROR');
+        throw new Error('TESTERROR');
+      } */
+      let logIds = await knex('feeds')
+        .where({ user_id: id })
+        .select('activity_ids');
       logIds = logIds[0];
       if (!logIds) return null;
       logIds = logIds.activity_ids;
@@ -109,11 +122,19 @@ class Feed {
       return logs ? logs.reverse() : null;
     }
 
-    let aIds = await knex('system_feeds').where({ user_id: 1 }).select('activity_ids');
-    let sIds = await knex('system_feeds').where({ user_id: 2 }).select('activity_ids');
+    let aIds = await knex('system_feeds')
+      .where({ user_id: 1 })
+      .select('activity_ids');
+    let sIds = await knex('system_feeds')
+      .where({ user_id: 2 })
+      .select('activity_ids');
     let fIds = await User.followees(viewer.id, loaders)
       .then(data =>
-        Promise.all(data.map(u => knex('feeds').where({ user_id: u }).select('activity_ids'))),
+        Promise.all(
+          data.map(u =>
+            knex('feeds').where({ user_id: u }).select('activity_ids'),
+          ),
+        ),
       )
       .then(data => data);
     // TODO flatten arrays
@@ -138,7 +159,7 @@ class Feed {
     allActivities.reverse();
     const sorted = aggregateActivities(allActivities);
 
-    const aggregated = sorted.all.filter((e) => {
+    const aggregated = sorted.all.filter(e => {
       if (e.objectId in sorted.del) {
         return false;
       }
@@ -153,7 +174,7 @@ class Feed {
       return true;
     });
 
-    aggregated.forEach((el) => {
+    aggregated.forEach(el => {
       rankInPlace(el);
     });
 
