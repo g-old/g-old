@@ -1,4 +1,7 @@
-.followeeContainer {
-  list-style: none;
-  padding: 0;
+.profile {
+  margin: 0 1em !important;
+
+  > * {
+    padding-bottom: 2em;
+  }
 }

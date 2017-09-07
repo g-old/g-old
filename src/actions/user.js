@@ -68,6 +68,20 @@ query ($id:ID!) {
 }
 `;
 
+const profileQuery = `
+query ($id:ID!) {
+  user (id:$id) {
+    numStatements
+    numFollowers
+    numLikes
+    workTeams{
+      ${workTeam}
+    }
+    ${userFields}
+  }
+}
+`;
+
 const updateUserMutation = `
 mutation($id:ID $name:String, $surname:String, $role:String, $email:String, $password:String, $passwordOld:String, $followee:ID, $privilege:Int){
   updateUser( user:{id:$id name:$name, surname:$surname, role:$role, email:$email, password:$password passwordOld:$passwordOld followee:$followee privilege:$privilege}){
@@ -288,6 +302,37 @@ export function fetchUser({ id }) {
 
     try {
       const { data } = await graphqlRequest(userQuery, { id });
+      const normalizedData = normalize(data.user, userSchema);
+      dispatch({
+        type: FETCH_USER_SUCCESS,
+        payload: normalizedData,
+        filter: 'all',
+      });
+    } catch (error) {
+      dispatch({
+        type: FETCH_USER_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function fetchProfileData({ id }) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    // eslint-disable-next-line no-unused-vars
+
+    dispatch({
+      type: FETCH_USER_START,
+    });
+
+    try {
+      const { data } = await graphqlRequest(profileQuery, { id });
       const normalizedData = normalize(data.user, userSchema);
       dispatch({
         type: FETCH_USER_SUCCESS,

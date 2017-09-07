@@ -8,17 +8,24 @@ class Label extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     margin: PropTypes.bool,
+    big: PropTypes.bool,
     htmlFor: PropTypes.string,
   };
 
   static defaultProps = {
     margin: false,
     htmlFor: '',
+    big: false,
   };
   render() {
-    const { children, margin, htmlFor } = this.props;
+    const { children, margin, htmlFor, big } = this.props;
     return (
-      <label htmlFor={htmlFor} className={cn(s.label, margin ? s.margin : null)}>{children}</label>
+      <label
+        htmlFor={htmlFor}
+        className={cn(s.label, margin ? s.margin : null, big ? s.big : null)}
+      >
+        {children}
+      </label>
     );
   }
 }

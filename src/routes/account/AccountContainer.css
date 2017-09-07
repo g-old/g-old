@@ -1,0 +1,12 @@
+.account {
+  padding-top: 2em;
+}
+
+.followeeContainer {
+  list-style: none;
+  padding: 0 0 12px 12px;
+}
+
+.details {
+  padding: 0 1em;
+}

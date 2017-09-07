@@ -44,14 +44,14 @@ const UserType = new ObjectType({
     role: {
       type: RoleType,
       resolve(data, args, { viewer, loaders }) {
-        return Role.gen(viewer, data.role_id, loaders);
+        return data.role_id ? Role.gen(viewer, data.role_id, loaders) : null;
       },
     },
     followees: {
       type: new GraphQLList(UserType),
       resolve: (data, args, { viewer, loaders }) =>
         Promise.resolve(
-          User.followees(data.id, loaders).then(ids =>
+          User.followees(viewer, data.id, loaders).then(ids =>
             ids.map(id => User.gen(viewer, id, loaders)),
           ),
         ),
@@ -100,10 +100,14 @@ const UserType = new ObjectType({
     workTeams: {
       type: new GraphQLList(WorkTeamType),
       resolve: (data, args, { viewer, loaders }) => {
-        if (viewer && viewer.id === data.id) {
+        if (viewer) {
           return knex('user_work_teams')
             .where({ user_id: data.id })
-            .innerJoin('work_teams', 'work_teams.id', 'user_work_teams.work_team_id')
+            .innerJoin(
+              'work_teams',
+              'work_teams.id',
+              'user_work_teams.work_team_id',
+            )
             .select()
             .then(wts => wts.map(wt => WorkTeam.gen(viewer, wt.id, loaders)));
         }

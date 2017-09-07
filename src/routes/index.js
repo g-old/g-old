@@ -44,6 +44,10 @@ const routes = {
       load: () => import(/* webpackChunkName: 'account' */ './account'),
     },
     {
+      path: '/accounts/:id',
+      load: () => import(/* webpackChunkName: 'account' */ './accounts'),
+    },
+    {
       path: '/admin',
       load: () => import(/* webpackChunkName: 'admin' */ './admin'),
     },
@@ -57,15 +61,18 @@ const routes = {
     },
     {
       path: '/account/password/reset',
-      load: () => import(/* webpackChunkName: 'passwordRecovery' */ './passwordRecovery'),
+      load: () =>
+        import(/* webpackChunkName: 'passwordRecovery' */ './passwordRecovery'),
     },
     {
       path: '/reset/:token',
-      load: () => import(/* webpackChunkName: 'passwordReset' */ './passwordReset'),
+      load: () =>
+        import(/* webpackChunkName: 'passwordReset' */ './passwordReset'),
     },
     {
       path: '/verify',
-      load: () => import(/* webpackChunkName: 'emailVerification' */ './emailVerification'),
+      load: () =>
+        import(/* webpackChunkName: 'emailVerification' */ './emailVerification'),
     },
 
     // Wildcard routes, e.g. { path: '*', ... } (must go last)

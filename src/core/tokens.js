@@ -68,13 +68,23 @@ export const createToken = async ({ email, table, hoursValid, withEmail }) => {
     if (withEmail) {
       newData.email = email;
     }
-    const exists = await knex(table)
+    let oldToken = await knex(table)
       .transacting(trx)
       .forUpdate()
       .where({ user_id: userId })
-      .pluck('id');
+      .select('id', 'created_at', 'updated_at');
 
-    if (exists[0]) {
+    oldToken = oldToken[0];
+    if (oldToken) {
+      // cancel if token sent within last hour
+      const lastTime = oldToken.updated_at
+        ? oldToken.updated_at
+        : oldToken.created_at;
+      const limit = new Date().getTime() - 30 * 60 * 1000;
+      if (new Date(lastTime) > limit) {
+        // TODO return error message
+        return null;
+      }
       // eslint-disable-next-line newline-per-chained-call
       await knex(table)
         .transacting(trx)

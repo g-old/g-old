@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import SignUp from '../../components/SignUp';
 // import ImageUpload from '../../components/ImageUpload';
-// import AccountSettings from '../../components/AccountSettings';
 import { createUser } from '../../actions/user';
 import { uploadAvatar } from '../../actions/file';
 import { getAccountUpdates, getLocale } from '../../reducers';
@@ -32,6 +31,10 @@ class SignupContainer extends React.Component {
     // uploadAvatar: PropTypes.func.isRequired,
     updates: PropTypes.shape({}).isRequired,
     locale: PropTypes.string.isRequired,
+  };
+
+  static defaultProps = {
+    user: null,
   };
 
   constructor(props) {
@@ -97,7 +100,7 @@ class SignupContainer extends React.Component {
             <Help locale={this.props.locale} firstSteps />
             <Button
               primary
-              onClick={() => history.push('/account')}
+              onClick={() => history.push(`/account`)}
               label={<FormattedMessage {...messages.next} />}
             />
           </div>

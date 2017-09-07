@@ -128,7 +128,7 @@ class Feed {
     let sIds = await knex('system_feeds')
       .where({ user_id: 2 })
       .select('activity_ids');
-    let fIds = await User.followees(viewer.id, loaders)
+    let fIds = await User.followees(viewer, viewer.id, loaders)
       .then(data =>
         Promise.all(
           data.map(u =>
@@ -147,7 +147,6 @@ class Feed {
     // deduplicate Ids
     const allIds = [...new Set([...aIds, ...sIds, ...fIds])];
     const allActivities = await loadActivities(viewer, allIds, loaders);
-
     // process them
     // deduplicate
 
@@ -179,7 +178,6 @@ class Feed {
     });
 
     aggregated.sort((a, b) => b.rank - a.rank);
-
     // store to history;
     const history = aggregated.map(a => a.id);
     await knex('feeds')

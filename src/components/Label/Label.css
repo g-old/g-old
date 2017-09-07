@@ -9,3 +9,9 @@
   margin-top: 24px;
   margin-bottom: 24px;
 }
+
+.big {
+  font-size: 2.5rem;
+  padding-bottom: 1em;
+  color: rgba(37, 20, 155, 0.6);
+}

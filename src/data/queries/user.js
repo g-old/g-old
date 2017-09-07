@@ -11,7 +11,8 @@ const user = {
       type: new GraphQLNonNull(GraphQLID),
     },
   },
-  resolve: (parent, { id }, { viewer, loaders }) => User.gen(viewer, id, loaders),
+  resolve: (parent, { id }, { viewer, loaders }) =>
+    User.gen(viewer, id, loaders),
 };
 
 export default user;

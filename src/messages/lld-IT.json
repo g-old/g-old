@@ -583,14 +583,14 @@
     "description": "Followees",
     "defaultMessage": "Followees",
     "message": "Followees",
-    "files": ["src/components/UserProfile/UserProfile.js"]
+    "files": ["src/routes/account/AccountContainer.js"]
   },
   {
     "id": "settings.title",
     "description": "Header for settings",
     "defaultMessage": "Settings",
     "message": "Settings",
-    "files": ["src/components/UserProfile/UserProfile.js"]
+    "files": ["src/routes/account/AccountContainer.js"]
   },
   {
     "id": "action.success",
@@ -770,49 +770,49 @@
     "description": "Economy",
     "defaultMessage": "Economy",
     "message": "",
-    "files": ["src/components/UserProfile/UserProfile.js"]
+    "files": ["src/routes/account/AccountContainer.js"]
   },
   {
     "id": "workTeams.education",
     "description": "Education",
     "defaultMessage": "Education, youth, sport",
     "message": "",
-    "files": ["src/components/UserProfile/UserProfile.js"]
+    "files": ["src/routes/account/AccountContainer.js"]
   },
   {
     "id": "workTeams.environment",
     "description": "Environment",
     "defaultMessage": "Environment",
     "message": "",
-    "files": ["src/components/UserProfile/UserProfile.js"]
+    "files": ["src/routes/account/AccountContainer.js"]
   },
   {
     "id": "workTeams.events",
     "description": "Event",
     "defaultMessage": "Event organization, admission",
     "message": "",
-    "files": ["src/components/UserProfile/UserProfile.js"]
+    "files": ["src/routes/account/AccountContainer.js"]
   },
   {
     "id": "workTeams.health",
     "description": "Health",
     "defaultMessage": "Public health systems and welfare",
     "message": "",
-    "files": ["src/components/UserProfile/UserProfile.js"]
+    "files": ["src/routes/account/AccountContainer.js"]
   },
   {
     "id": "workTeams.mobility",
     "description": "Mobility",
     "defaultMessage": "Mobilty and transport",
     "message": "",
-    "files": ["src/components/UserProfile/UserProfile.js"]
+    "files": ["src/routes/account/AccountContainer.js"]
   },
   {
     "id": "workTeams.urbanism",
     "description": "Urbanism",
     "defaultMessage": "Urbanism",
     "message": "",
-    "files": ["src/components/UserProfile/UserProfile.js"]
+    "files": ["src/routes/account/AccountContainer.js"]
   },
   {
     "id": "help.firstSteps",
@@ -848,5 +848,26 @@
     "defaultMessage": "follow",
     "message": "",
     "files": ["src/components/Statement/Statement.js"]
+  },
+  {
+    "id": "settings.email.heading",
+    "description": "Heading of email section",
+    "defaultMessage": "Email",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "settings.password.heading",
+    "description": "Heading of password section",
+    "defaultMessage": "Password",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "settings.workTeams",
+    "description": "Workteam",
+    "defaultMessage": "Workteams",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
   }
 ]

@@ -20,11 +20,12 @@ const deletePushSub = `mutation($endpoint:String! $p256dh:String! $auth:String!)
 deletePushSub(subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})
 }`;
 
-const registerSW = async (file) => {
+const registerSW = async file => {
   if ('serviceWorker' in navigator && 'PushManager' in window) {
     const registration = await navigator.serviceWorker.register(file);
     console.info('Getting sw registration', registration);
-    const serviceWorker = registration.installing || registration.waiting || registration.active;
+    const serviceWorker =
+      registration.installing || registration.waiting || registration.active;
     console.info('Sw status', serviceWorker);
 
     const isReady = await navigator.serviceWorker.ready;
@@ -56,7 +57,7 @@ const registerSW = async (file) => {
   return null;
 };
 
-const subscriptionToObject = (subscription) => {
+const subscriptionToObject = subscription => {
   const sub = JSON.parse(JSON.stringify(subscription));
   if (!sub) throw Error('Could not parse subscription');
   return {
@@ -66,7 +67,7 @@ const subscriptionToObject = (subscription) => {
   };
 };
 
-const getPushSubscription = async (publicKey) => {
+const getPushSubscription = async publicKey => {
   const registration = await registerSW('serviceworker.js');
   if (!registration) {
     throw Error('Could not register SW');
@@ -84,7 +85,9 @@ const getPushSubscription = async (publicKey) => {
     applicationServerKey: urlBase64ToUint8Array(publicKey),
   };
   // throw Error('TESTERROR');
-  const subscription = await registration.pushManager.subscribe(subscribeOptions);
+  const subscription = await registration.pushManager.subscribe(
+    subscribeOptions,
+  );
   if (!subscription) throw Error('Could not subscribe to push service');
   console.info('Subscription received!');
 
@@ -172,7 +175,10 @@ export function deleteWebPushSub() {
     try {
       const deleted = await deletePushSubscription();
       if (!deleted || !deleted.status) throw Error('Unsubscribing failed');
-      const { data } = await graphqlRequest(deletePushSub, deleted.subscription);
+      const { data } = await graphqlRequest(
+        deletePushSub,
+        deleted.subscription,
+      );
       const result = data.deletePushSub;
       if (result) {
         dispatch({
@@ -209,7 +215,11 @@ export function checkSubscription() {
     let disabled = true;
     const user = getSessionUser(getState());
     if (!user) throw Error('User not logged in');
-    if ('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window) {
+    if (
+      'serviceWorker' in navigator &&
+      'PushManager' in window &&
+      'Notification' in window
+    ) {
       if (Notification.permission === 'denied') {
         error = 'User has blocked subscription';
       } else {

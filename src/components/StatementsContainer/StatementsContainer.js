@@ -11,8 +11,15 @@ import {
 } from '../../actions/statement';
 import { createLike, deleteLike } from '../../actions/statement_like';
 import { updateUser } from '../../actions/user';
-import { getStatementUpdates, getVisibibleStatementsByPoll } from '../../reducers';
+import {
+  getStatementUpdates,
+  getVisibibleStatementsByPoll,
+} from '../../reducers';
+import history from '../../history';
 
+const handleProfileClick = ({ id }) => {
+  history.push(`/accounts/${id}`);
+};
 class StatementsContainer extends React.Component {
   static propTypes = {
     statements: PropTypes.arrayOf(
@@ -73,6 +80,7 @@ class StatementsContainer extends React.Component {
       this.props.updateStatement({ id, text });
     }
   }
+
   render() {
     const {
       poll: { ownStatement, ownVote, id, likedStatements, mode },
@@ -139,20 +147,24 @@ class StatementsContainer extends React.Component {
       <div>
         {ownStatementsNode}
         {toRender.map(s =>
-          (<Statement
+          <Statement
             {...s}
             user={user}
             key={s.id}
-            ownLike={likedStatements && likedStatements.find(data => data.statementId === s.id)}
+            ownLike={
+              likedStatements &&
+              likedStatements.find(data => data.statementId === s.id)
+            }
             onLike={this.props.createLike}
             onDeleteLike={this.props.deleteLike}
             onFollow={this.props.updateUser}
             onDelete={this.props.deleteStatement}
             onModeration={this.props.solveFlag}
+            onProfileClick={handleProfileClick}
             onFlagging={this.props.flag}
             followees={followees}
             isFollowee={followees.some(f => f.id === s.author.id)}
-          />),
+          />,
         )}
       </div>
     );

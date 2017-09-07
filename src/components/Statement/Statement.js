@@ -82,6 +82,7 @@ class Statement extends React.Component {
     updates: PropTypes.shape({
       updateStmt: PropTypes.shape({ pending: PropTypes.bool }),
     }),
+    onProfileClick: PropTypes.func,
   };
 
   static defaultProps = {
@@ -102,6 +103,7 @@ class Statement extends React.Component {
     user: null,
     followees: null,
     updates: null,
+    onProfileClick: null,
   };
 
   constructor(props) {
@@ -119,6 +121,7 @@ class Statement extends React.Component {
     this.handleFlag = this.handleFlag.bind(this);
     this.handleFollowing = this.handleFollowing.bind(this);
     this.handleLiking = this.handleLiking.bind(this);
+    this.handleProfileClick = this.handleProfileClick.bind(this);
   }
 
   componentWillReceiveProps({ updates }) {
@@ -223,6 +226,13 @@ class Statement extends React.Component {
     e.preventDefault();
   }
 
+  handleProfileClick() {
+    const { onProfileClick, author } = this.props;
+    if (onProfileClick) {
+      onProfileClick({ id: author.id });
+    }
+  }
+
   render() {
     //  const { mutationIsPending, mutationSuccess, mutationError } = this.props;
     // TODO create authorization decorator
@@ -238,6 +248,7 @@ class Statement extends React.Component {
       isFollowee,
       deletedAt,
       updates,
+      onProfileClick,
     } = this.props;
     let canLike;
     let canDelete;
@@ -405,6 +416,7 @@ class Statement extends React.Component {
         />
       );
     }
+
     return (
       <div
         className={cn(
@@ -413,12 +425,20 @@ class Statement extends React.Component {
           inactive && s.inactive,
         )}
       >
+        {/* eslint-disable jsx-a11y/interactive-supports-focus */}
         {!inactive &&
-          <img
-            className={cn(s.avatar)}
-            src={author && author.avatar}
-            alt="IMG"
-          />}
+          <div
+            role="button"
+            style={{ cursor: onProfileClick ? 'pointer' : 'auto' }}
+            onClick={this.handleProfileClick}
+          >
+            <img
+              className={cn(s.avatar)}
+              src={author && author.avatar}
+              alt="IMG"
+            />
+          </div>}
+        {/* eslint-enable jsx-a11y/interactive-supports-focus */}
         <div style={{ width: '100%' }}>
           {!inactive &&
             <div className={s.header}>

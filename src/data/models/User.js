@@ -45,13 +45,19 @@ class User {
     if (data == null) return null;
     if (viewer.id == null) return null;
     const canSee = checkCanSee(viewer, data);
-    if (!canSee) data.email = null;
+    if (!canSee) {
+      // protected info
+      data.email = null;
+      data.last_login_at = null;
+      data.privilege = null;
+      data.role_id = null;
+    }
     return new User(data);
     // return canSee ? new User(data) : new User(data.email = null);
   }
 
-  static async followees(id, { followees }) {
-    if (!id) return null;
+  static async followees(viewer, id, { followees }) {
+    if (!viewer || !id || viewer.id !== id) return [];
     const data = await followees.load(id);
     return data;
   }
@@ -69,9 +75,22 @@ class User {
   // eslint-disable-next-line no-unused-vars
   static canMutate(viewer, data) {
     // TODO Allow mutation of own data - attention to guests
-    return ['admin', 'mod', 'system', 'user', 'viewer', 'guest'].includes(
-      viewer.role.type,
-    );
+    if (
+      ['admin', 'mod', 'system', 'user', 'viewer', 'guest'].includes(
+        viewer.role.type,
+      )
+    ) {
+      // eslint-disable-next-line eqeqeq
+      if (data.email && viewer.id != data.id) {
+        return false;
+      }
+      // eslint-disable-next-line eqeqeq
+      if (data.password && viewer.id != data.id) {
+        return false;
+      }
+      return true;
+    }
+    return false;
   }
 
   async modifySessions(viewer, loaders) {

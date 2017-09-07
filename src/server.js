@@ -327,7 +327,7 @@ app.get('/verify/:token', (req, res) => {
                 req.session.save(err => (err ? reject(err) : resolve()));
               }),
           )
-          .then(() => res.redirect('/account'));
+          .then(() => res.redirect(`/account`));
         // TODO insert into feed
         // return res.redirect('/account');
       }

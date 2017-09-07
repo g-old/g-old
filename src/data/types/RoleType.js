@@ -5,7 +5,6 @@ import {
   GraphQLID as ID,
 } from 'graphql';
 
-
 const RoleType = new ObjectType({
   name: 'Role',
 
@@ -15,6 +14,5 @@ const RoleType = new ObjectType({
       type: GraphQLString,
     },
   },
-
 });
 export default RoleType;

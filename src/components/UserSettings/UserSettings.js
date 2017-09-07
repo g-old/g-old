@@ -107,6 +107,21 @@ const messages = defineMessages({
     defaultMessage: 'Resend verification email',
     description: 'Resend verification email ',
   },
+  emailHeading: {
+    id: 'settings.email.heading',
+    defaultMessage: 'Email',
+    description: 'Heading of email section',
+  },
+  passwordHeading: {
+    id: 'settings.password.heading',
+    defaultMessage: 'Password',
+    description: 'Heading of password section',
+  },
+  workteams: {
+    id: 'settings.workTeams',
+    defaultMessage: 'Workteams',
+    description: 'Workteam',
+  },
 });
 
 const initState = {
@@ -277,8 +292,10 @@ class UserSettings extends React.Component {
   handleEmailUpdate() {
     if (this.handleValidation(['email'])) {
       const newEmail = this.state.email.trim().toLowerCase();
-      if (newEmail !== this.props.user.email.trim().toLowerCase()) {
-        this.props.updateUser({ id: this.props.user.id, email: newEmail });
+      if (this.props.user.email) {
+        if (newEmail !== this.props.user.email.trim().toLowerCase()) {
+          this.props.updateUser({ id: this.props.user.id, email: newEmail });
+        }
       }
     }
   }
@@ -326,6 +343,9 @@ class UserSettings extends React.Component {
 
     return (
       <Box column pad>
+        <legend>
+          {<FormattedMessage {...messages.workteams} />}
+        </legend>
         <FormField label="Workteams">
           <Select
             options={this.props.workTeams.map(wt => ({
@@ -357,6 +377,10 @@ class UserSettings extends React.Component {
             }}
           />
         </FormField>
+        <legend>
+          {<FormattedMessage {...messages.emailHeading} />}
+        </legend>
+
         <fieldset>
           {this.state.emailError &&
             <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
@@ -376,7 +400,7 @@ class UserSettings extends React.Component {
             />
           </FormField>
         </fieldset>
-        <Box wrap>
+        <Box wrap justify>
           {!emailSuccess && !emailPending && updateEmailBtn}
           {!emailSuccess &&
             <Button
@@ -399,6 +423,10 @@ class UserSettings extends React.Component {
               'Look in your mail account. Soon something should be there'
             }
           />}
+        <legend>
+          {<FormattedMessage {...messages.passwordHeading} />}
+        </legend>
+
         <fieldset>
           {this.state.passwordError &&
             <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
@@ -442,7 +470,7 @@ class UserSettings extends React.Component {
               <FormattedMessage {...messages.success} />
             </div>}
         </fieldset>
-        <Box>
+        <Box justify>
           {!passwordSuccess &&
             <Button
               disabled={passwordPending}

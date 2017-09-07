@@ -13,7 +13,7 @@ async function action({ store, path }) {
     return { redirect: `/?redirect=${path}` };
   }
   if (user.emailVerified === true) {
-    return { redirect: '/account' };
+    return { redirect: `/account` };
   }
 
   return {

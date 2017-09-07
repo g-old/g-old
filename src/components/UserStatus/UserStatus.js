@@ -18,7 +18,7 @@ const onVisitProfile = e => {
   }
 
   e.preventDefault();
-  history.push('/account');
+  history.push(`/account`);
 };
 
 class UserStatus extends React.Component {

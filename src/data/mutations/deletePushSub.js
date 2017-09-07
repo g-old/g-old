@@ -13,16 +13,25 @@ const deletePushSub = {
   },
   resolve: async (data, { subscription }, { viewer }) => {
     try {
-      log.info({ subInfo: { sub: subscription, viewer } }, 'Deleting subscription start');
+      log.info(
+        { subInfo: { sub: subscription, viewer } },
+        'Deleting subscription start',
+      );
 
       if (!viewer.id) return false;
       await knex('webpush_subscriptions')
         .where({ endpoint: subscription.endpoint, user_id: viewer.id })
         .del();
-      log.info({ subInfo: { sub: subscription, viewer } }, 'Deleting subscription success');
+      log.info(
+        { subInfo: { sub: subscription, viewer } },
+        'Deleting subscription success',
+      );
       return true;
     } catch (e) {
-      log.error({ subInfo: { sub: subscription, viewer } }, 'Deleting subscription failed');
+      log.error(
+        { subInfo: { sub: subscription, viewer } },
+        'Deleting subscription failed',
+      );
 
       return false;
     }
