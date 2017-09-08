@@ -115,9 +115,9 @@ class Feed {
       let logIds = await knex('feeds')
         .where({ user_id: id })
         .select('activity_ids');
-      logIds = logIds[0];
-      if (!logIds) return null;
-      logIds = logIds.activity_ids;
+      logIds = logIds[0] || {};
+      //  if (!logIds) return null;
+      logIds = logIds.activity_ids || [];
       const logs = await loadActivities(viewer, logIds, loaders);
       return logs ? logs.reverse() : null;
     }

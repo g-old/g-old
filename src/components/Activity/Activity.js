@@ -39,7 +39,10 @@ class Activity extends React.Component {
         </Link>
       );
       header = 'Look at that statement!';
-    } else if (this.props.content && this.props.content.__typename === 'ProposalDL') {
+    } else if (
+      this.props.content &&
+      this.props.content.__typename === 'ProposalDL'
+    ) {
       content = <ProposalPreview proposal={this.props.content} />;
       if (this.props.verb === 'create') {
         if (this.props.content.state === 'survey') {
@@ -64,14 +67,22 @@ class Activity extends React.Component {
           header = 'This proposal has been rejected!';
         }
       }
-    } else if (this.props.content && this.props.content.__typename === 'VoteDL') {
+    } else if (
+      this.props.content &&
+      this.props.content.__typename === 'VoteDL'
+    ) {
       content = (
         <Link to={`/proposal/xxx/${this.props.content.pollId}`}>
           <div>
             <Avatar user={this.props.content.voter} isFollowee />
-            {`${this.props.content.voter.name} ${this.props.content.voter.surname}`}
+            {`${this.props.content.voter.name} ${this.props.content.voter
+              .surname}`}
             <br />
-            <Icon icon={'M27 4l-15 15-7-7-5 5 12 12 20-20z'} color={'green'} size={'64'} />
+            <Icon
+              icon={'M27 4l-15 15-7-7-5 5 12 12 20-20z'}
+              color={'green'}
+              size={'64'}
+            />
           </div>
         </Link>
       );

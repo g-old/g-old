@@ -28,7 +28,7 @@ const valueEqualsOption = (value, option) => {
   return result;
 };
 
-const normalizeValue = (props) => {
+const normalizeValue = props => {
   const { multiple, value } = props;
   let normalizedValue = value;
   if (multiple) {
@@ -43,7 +43,7 @@ const normalizeValue = (props) => {
   return normalizedValue;
 };
 
-const renderLabel = (option) => {
+const renderLabel = option => {
   if (option && typeof option === 'object') {
     return option.label || option.value || '';
   }
@@ -51,7 +51,7 @@ const renderLabel = (option) => {
 };
 
 // eslint-disable-next-line consistent-return
-const renderValue = (option) => {
+const renderValue = option => {
   if (Array.isArray(option)) {
     if (option.length === 1) {
       return renderValue(option[0]);
@@ -90,12 +90,14 @@ class Select extends React.Component {
     onChange: PropTypes.func.isRequired,
     placeHolder: PropTypes.string,
     multiple: PropTypes.bool,
+    inField: PropTypes.bool,
   };
 
   static defaultProps = {
     value: '',
     placeHolder: '',
     multiple: false,
+    inField: false,
   };
   constructor(props) {
     super(props);
@@ -129,7 +131,9 @@ class Select extends React.Component {
 
     if (dropActive && !prevState.dropActive) {
       document.addEventListener('click', this.onRemoveDrop);
-      const control = /* findAncestor(this.componentRef, FORM_FIELD) ||*/ this.componentRef;
+      const control = this.props.inField
+        ? this.componentRef.parentNode.parentNode
+        : this.componentRef;
       this.drop = new Drop(control, this.renderOptions(), {
         align: { top: 'bottom', left: 'left' },
         context: this.context,
@@ -160,7 +164,7 @@ class Select extends React.Component {
   onAddDrop(e) {
     e.preventDefault();
     const { options, value } = this.props;
-    const optionValues = options.map((o) => {
+    const optionValues = options.map(o => {
       if (o && typeof o === 'object') {
         return o.value;
       }
@@ -239,7 +243,11 @@ class Select extends React.Component {
   render() {
     const { placeHolder, value } = this.props;
     return (
-      <div ref={ref => (this.componentRef = ref)} className={s.select} onClick={this.onAddDrop}>
+      <div
+        ref={ref => (this.componentRef = ref)}
+        className={s.select}
+        onClick={this.onAddDrop}
+      >
         <input
           ref={ref => (this.inputRef = ref)}
           className={s.input}
@@ -252,7 +260,12 @@ class Select extends React.Component {
           plain
           icon={
             <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-              <polygon fill="none" stroke="#000" strokeWidth="2" points="22 8 12 20 2 8" />
+              <polygon
+                fill="none"
+                stroke="#000"
+                strokeWidth="2"
+                points="22 8 12 20 2 8"
+              />
             </svg>
           }
         />

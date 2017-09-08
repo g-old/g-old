@@ -21,6 +21,7 @@ import { loadFeed } from '../../actions/feed';
 import { uploadAvatar } from '../../actions/file';
 import {
   getUser,
+  getSessionUser,
   getAccountUpdates,
   getSubscription,
   getWorkTeams,
@@ -198,6 +199,7 @@ class AccountContainer extends React.Component {
     ownAccount: PropTypes.bool.isRequired,
     fetched: PropTypes.bool.isRequired,
     fetchProfileData: PropTypes.func.isRequired,
+    sessionUser: PropTypes.shape({ id: PropTypes.string }).isRequired,
   };
   static defaultProps = {
     logs: null,
@@ -237,7 +239,9 @@ class AccountContainer extends React.Component {
 
   getUserData(user) {
     const { id } = user;
-    if (this.props.ownAccount) {
+    const { sessionUser } = this.props;
+    // eslint-disable-next-line eqeqeq
+    if (user.id == sessionUser.id) {
       this.props.fetchUser({ id });
       const pushAvailable = isPushAvailable();
       if (pushAvailable) {
@@ -263,7 +267,14 @@ class AccountContainer extends React.Component {
 
   render() {
     if (!this.props.user) return null;
-    const { subscription, updates, ownAccount } = this.props;
+    const {
+      subscription,
+      updates,
+      ownAccount,
+      logs,
+      logError,
+      logPending,
+    } = this.props;
     const { followees = [] } = this.props.user;
     const profile = (
       <Profile
@@ -321,6 +332,39 @@ class AccountContainer extends React.Component {
       );
     }
 
+    let displayLog;
+    if (logs && logs.length) {
+      displayLog = logs.map(a =>
+        <ActivityLog
+          key={a.id}
+          actor={a.actor}
+          date={a.createdAt}
+          verb={a.verb}
+          content={a.object}
+        />,
+      );
+    } else if (logPending) {
+      displayLog = 'Loading...';
+    } else if (logError) {
+      displayLog = (
+        <Notification
+          type="error"
+          message={logError}
+          action={
+            <Button
+              primary
+              label="Retry"
+              onClick={() => {
+                this.props.loadLogs(true);
+              }}
+            />
+          }
+        />
+      );
+    } else {
+      displayLog = 'No data';
+    }
+
     return (
       <Box flex justify wrap className={s.account}>
         {this.state.showUpload &&
@@ -370,35 +414,12 @@ class AccountContainer extends React.Component {
             </AccordionPanel>
             <AccordionPanel
               heading="Log / Notifications"
+              column
               onActive={() => {
                 this.props.loadLogs(true);
               }}
             >
-              {!this.props.logs.length && this.props.logPending && 'Loading...'}
-              {!this.props.logs.length &&
-                this.props.logError &&
-                <Notification
-                  type="error"
-                  message={this.props.logError}
-                  action={
-                    <Button
-                      label="Retry"
-                      onClick={() => {
-                        this.props.loadLogs(true);
-                      }}
-                    />
-                  }
-                />}
-              {this.props.logs &&
-                this.props.logs.map(a =>
-                  <ActivityLog
-                    key={a.id}
-                    actor={a.actor}
-                    date={a.createdAt}
-                    verb={a.verb}
-                    content={a.object}
-                  />,
-                )}
+              {displayLog}
             </AccordionPanel>
           </Accordion>
         </Box>
@@ -423,6 +444,7 @@ const mapDispatch = {
 };
 const mapStateToProps = (state, { user }) => ({
   user: getUser(state, user.id) || user,
+  sessionUser: getSessionUser(state),
   updates: getAccountUpdates(state, user.id),
   subscription: getSubscription(state),
   workTeams: getWorkTeams(state),

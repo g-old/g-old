@@ -37,9 +37,10 @@ class Drop {
     if (!normalizedOptions.align.left && !normalizedOptions.align.right) {
       normalizedOptions.align.left = 'left';
     }
-    normalizedOptions.responsive = normalizedOptions.responsive !== false
-      ? true
-      : normalizedOptions.responsive;
+    normalizedOptions.responsive =
+      normalizedOptions.responsive !== false
+        ? true
+        : normalizedOptions.responsive;
 
     this.state = {
       container,
@@ -55,7 +56,7 @@ class Drop {
   }
   listen() {
     const { scrollParents } = this.state;
-    scrollParents.forEach((scrollParent) => {
+    scrollParents.forEach(scrollParent => {
       scrollParent.addEventListener('scroll', this.place);
     });
     // we intentionally skipped debounce as we believe resizing
@@ -68,13 +69,13 @@ class Drop {
     const { scrollParents } = this.state;
     // we need to update scroll parents as Responsive options may change
     // the parent for the target element
-    scrollParents.forEach((scrollParent) => {
+    scrollParents.forEach(scrollParent => {
       scrollParent.removeEventListener('scroll', this.place);
     });
 
     const nextScrollParents = findScrollParents(this.control);
 
-    nextScrollParents.forEach((scrollParent) => {
+    nextScrollParents.forEach(scrollParent => {
       scrollParent.addEventListener('scroll', this.place);
     });
 
@@ -98,7 +99,10 @@ class Drop {
     const containerRect = container.getBoundingClientRect();
 
     // determine width
-    const width = Math.min(Math.max(controlRect.width, containerRect.width), windowWidth);
+    const width = Math.min(
+      Math.max(controlRect.width, containerRect.width),
+      windowWidth,
+    );
     //
     // set left position
     let left;
@@ -131,7 +135,10 @@ class Drop {
         maxHeight = Math.min(windowHeight - controlRect.top, windowHeight);
       } else {
         top = controlRect.bottom;
-        maxHeight = Math.min(windowHeight - controlRect.bottom, windowHeight - controlRect.height);
+        maxHeight = Math.min(
+          windowHeight - controlRect.bottom,
+          windowHeight - controlRect.height,
+        );
       }
     } else if (align.bottom) {
       if (align.bottom === 'bottom') {
@@ -142,7 +149,6 @@ class Drop {
         maxHeight = Math.max(controlRect.top, 0);
       }
     }
-
     // if we can't fit it all, see if there's more room the other direction
     if (containerRect.height > maxHeight) {
       // We need more room than we have.
@@ -170,7 +176,10 @@ class Drop {
           if (responsive) {
             top = controlRect.bottom;
           }
-          maxHeight = Math.min(windowHeight - top, windowHeight - controlRect.height);
+          maxHeight = Math.min(
+            windowHeight - top,
+            windowHeight - controlRect.height,
+          );
         }
       }
     }
@@ -179,7 +188,8 @@ class Drop {
     // for Chrome, Safari, and Opera, use document.body
     // for Firefox and IE, use document.documentElement
     const scrollTop =
-      (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop;
+      (document.documentElement && document.documentElement.scrollTop) ||
+      document.body.scrollTop;
 
     container.style.left = `${left}px`;
     container.style.width = `${width}px`;
@@ -193,16 +203,20 @@ class Drop {
   render(content) {
     const { container, options: { context } } = this.state;
     const originalScrollPosition = container.scrollTop;
-    render(<DropContents content={content} context={context} />, container, () => {
-      this.place();
-      // reset container to its original scroll position
-      container.scrollTop = originalScrollPosition;
-    });
+    render(
+      <DropContents content={content} context={context} />,
+      container,
+      () => {
+        this.place();
+        // reset container to its original scroll position
+        container.scrollTop = originalScrollPosition;
+      },
+    );
   }
 
   remove() {
     const { container, scrollParents } = this.state;
-    scrollParents.forEach((scrollParent) => {
+    scrollParents.forEach(scrollParent => {
       scrollParent.removeEventListener('scroll', this.place);
     });
     window.removeEventListener('resize', this.onResize);

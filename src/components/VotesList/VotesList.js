@@ -52,7 +52,7 @@ class VotesList extends React.Component {
     const { unipolar } = this.props;
     const votes = this.props.votes || [];
     if (this.state.showVotes && votes) {
-      votes.forEach((vote) => {
+      votes.forEach(vote => {
         if (vote && vote.position === 'pro') pro.push(vote);
         else con.push(vote);
       });
@@ -70,7 +70,7 @@ class VotesList extends React.Component {
       return (
         <FetchError
           message={errorMessage}
-          onRetry={(e) => {
+          onRetry={e => {
             e.stopPropagation();
             this.props.getVotes();
           }}
@@ -82,14 +82,14 @@ class VotesList extends React.Component {
       <div>
         {this.state.showVotes
           ? <div className={cn(!unipolar && s.bipolar)}>
-            <div className={cn(s.votes)}>
-              {pro.map(vote => VotesList.renderVote(vote))}
+              <div className={cn(s.votes)}>
+                {pro.map(vote => VotesList.renderVote(vote))}
+              </div>
+              {!unipolar &&
+                <div className={cn(s.votes, s.con)}>
+                  {con.map(vote => VotesList.renderVote(vote))}
+                </div>}
             </div>
-            {!unipolar &&
-            <div className={cn(s.votes, s.con)}>
-              {con.map(vote => VotesList.renderVote(vote))}
-            </div>}
-          </div>
           : <button onClick={this.onGetVotes}> GETVOTES</button>}
       </div>
     );

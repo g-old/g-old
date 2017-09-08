@@ -5,6 +5,13 @@ exports.seed = function(knex, Promise) {
 
   // prettier-ignore
   const deleteQueue = [
+    knex('proposal_voters')
+      .del()
+      .then(() =>
+        knex.raw(
+          'ALTER SEQUENCE proposal_voters_id_seq RESTART WITH 1;'
+        )
+      ),
     knex('proposal_user_subscriptions')
       .del()
       .then(() =>

@@ -348,6 +348,7 @@ class UserSettings extends React.Component {
         </legend>
         <FormField label="Workteams">
           <Select
+            inField
             options={this.props.workTeams.map(wt => ({
               value: wt.id,
               label: wt.name,
@@ -404,12 +405,14 @@ class UserSettings extends React.Component {
           {!emailSuccess && !emailPending && updateEmailBtn}
           {!emailSuccess &&
             <Button
+              primary={!showResendBtn}
               disabled={emailPending}
               onClick={this.onEditEmail}
               label={<FormattedMessage {...messages[buttonLabel]} />}
             />}
           {showResendBtn &&
             <Button
+              primary
               disabled={verifyPending}
               onClick={resendEmail}
               label={<FormattedMessage {...messages.resend} />}
@@ -473,6 +476,7 @@ class UserSettings extends React.Component {
         <Box justify>
           {!passwordSuccess &&
             <Button
+              primary
               disabled={passwordPending}
               onClick={this.handlePasswordUpdate}
               label={<FormattedMessage {...messages.change} />}

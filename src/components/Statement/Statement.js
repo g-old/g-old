@@ -259,7 +259,7 @@ class Statement extends React.Component {
       canDelete = !deletedAt && ['admin', 'mod'].includes(user.role.type);
       canFlag = !ownStatement && !deletedAt;
       if (followees) {
-        canFollow = !isFollowee && followees.length <= 5;
+        canFollow = !isFollowee && followees.length < 5;
       }
     }
 

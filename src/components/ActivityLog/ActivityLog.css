@@ -1,12 +1,16 @@
 .container {
   margin: 0 auto 2em;
-  border: solid 1px gray;
   padding: 1em;
+  background-color: rgba(125, 115, 195, 0.13);
+  border-radius: 12px;
+  color: #666;
+  justify-content: center;
   max-width: 480px;
 }
 
 .notification {
-  border: 4px solid orange;
+  background-color: #ffd602;
+  color: #000;
 }
 
 .deleted {

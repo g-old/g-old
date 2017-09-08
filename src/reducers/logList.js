@@ -8,7 +8,7 @@ import {
 const ids = (state = [], action) => {
   switch (action.type) {
     case LOAD_LOGS_SUCCESS: {
-      return [...action.payload.result]; // [...new Set([...state, ...action.payload.result])];
+      return action.payload.result ? [...action.payload.result] : state; // [...new Set([...state, ...action.payload.result])];
     }
 
     default:

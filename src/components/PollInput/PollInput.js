@@ -153,6 +153,7 @@ const PollSettings = props =>
     </FormField>
     <FormField label={<FormattedMessage {...messages.reference} />}>
       <Select
+        inField
         options={[
           { value: 'all', label: <span>ALL</span> },
           { value: 'voters', label: <span>VOTERS</span> },
@@ -218,6 +219,7 @@ const PollInput = props => {
       />
       <FormField label={<FormattedMessage {...messages.type} />}>
         <Select
+          inField
           options={props.pollOptions}
           onSearch={false}
           value={value}

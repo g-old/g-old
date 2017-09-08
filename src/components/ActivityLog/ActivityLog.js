@@ -81,7 +81,21 @@ class ActivityLog extends React.Component {
                   }
                 />
               </svg>
-              TO{' '}
+              <svg
+                version="1.1"
+                viewBox="0 0 24 24"
+                width="24px"
+                height="24px"
+                role="img"
+                aria-label="link next"
+              >
+                <path
+                  fill="none"
+                  stroke="#666"
+                  strokeWidth="2"
+                  d="M2,12 L22,12 M13,3 L22,12 L13,21"
+                />
+              </svg>
               <svg
                 viewBox="0 0 24 24"
                 width="60px"
@@ -116,7 +130,9 @@ class ActivityLog extends React.Component {
                 strokeWidth="1"
                 d={ICONS.thumbUpAlt}
                 transform={
-                  content.position === 'pro' ? '' : 'rotate(180 12 12)'
+                  content.position === 'pro'
+                    ? ''
+                    : 'scale(1,-1) translate(0,-24)'
                 }
               />
             </svg>
@@ -124,12 +140,10 @@ class ActivityLog extends React.Component {
         }
         activity = (
           <Link to={`/proposal/xxx/${content.pollId}`}>
-            <div>
-              <Avatar user={content.voter} />
-              {`${content.voter.name} ${content.voter.surname}`}
-
+            <span style={{ display: 'flex', justifyContent: 'space-between' }}>
+              {content.voter && <Avatar user={content.voter} />}
               {displayVote}
-            </div>
+            </span>
           </Link>
         );
         break;

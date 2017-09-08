@@ -123,7 +123,9 @@ export function loadLogs() {
 
     try {
       const { data } = await graphqlRequest(logs, { userId });
+
       const normalizedData = normalize(data.logs, logsSchema);
+
       dispatch({
         type: LOAD_LOGS_SUCCESS,
         payload: normalizedData,
