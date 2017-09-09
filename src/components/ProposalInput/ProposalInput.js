@@ -295,7 +295,10 @@ class ProposalInput extends React.Component {
             threshold ||
             this.props.defaultPollValues[pollOption.value].threshold,
           mode: {
-            withStatements,
+            withStatements:
+              withStatements === undefined
+                ? this.props.defaultPollValues[pollOption.value].withStatements
+                : withStatements,
             id: pollOption.value,
             unipolar,
             thresholdRef,

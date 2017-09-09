@@ -37,6 +37,7 @@ class User {
     this.avatar = data.avatar_path;
     this.emailVerified = data.email_verified;
     this.lastLogin = data.last_login_at;
+    this.createdAt = data.created_at;
   }
   static async gen(viewer, id, { users }) {
     if (!id) return null;

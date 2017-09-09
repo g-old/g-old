@@ -35,6 +35,8 @@ const userList = `
 query ($role:String) {
   users (role:$role) {
     ${userFields}
+    createdAt,
+    lastLogin
   }
 }
 `;

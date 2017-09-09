@@ -46,4 +46,6 @@ const mapDispatch = {
   createSSESub,
 };
 const mapStateToProps = state => ({ loading: state.ui.loading });
-export default connect(mapStateToProps, mapDispatch)(withStyles(normalizeCss, s)(Layout));
+export default connect(mapStateToProps, mapDispatch)(
+  withStyles(normalizeCss, s)(Layout),
+);

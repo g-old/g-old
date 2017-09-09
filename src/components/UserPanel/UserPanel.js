@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { FormattedDate } from 'react-intl';
 import s from './UserPanel.css';
 import { notifyUser } from '../../actions/notifications';
 import { updateUser, loadUserList, findUser } from '../../actions/user';
@@ -17,6 +18,7 @@ import FormField from '../FormField';
 import WorkTeamInput from '../WorkTeamInput';
 import Layer from '../Layer';
 import NotificationInput from '../NotificationInput';
+import Avatar from '../Avatar';
 
 import {
   getVisibleUsers,
@@ -25,44 +27,19 @@ import {
   getSessionUser,
   getWorkTeams,
 } from '../../reducers';
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-
-function renderUserSuggestion(user, obj) {
-  return (
-    <span
-      style={{
-        backgroundImage: `url(${user.avatar})`,
-        backgroundSize: '3em 3em',
-        backgroundRepeat: 'no-repeat',
-        marginBottom: '1em',
-        cursor: 'pointer',
-      }}
-      key={user.id}
-      className={s.suggestionContent}
-      onClick={() => {
-        obj.setState({ showAccount: true, accountId: user.id });
-      }}
-    >
-      <span className={s.name}>
-        <span>{`${user.name} ${user.surname}`}</span>
-      </span>
-    </span>
-  );
-}
-/* eslint-enable jsx-a11y/no-static-element-interactions */
 
 class UserPanel extends React.Component {
   static propTypes = {
     guestArray: PropTypes.arrayOf(PropTypes.object),
     viewerArray: PropTypes.arrayOf(PropTypes.object),
-    loadUserList: PropTypes.func,
-    updateUser: PropTypes.func,
+    loadUserList: PropTypes.func.isRequired,
+    updateUser: PropTypes.func.isRequired,
     guestArrayIsFetching: PropTypes.bool,
     guestArrayErrorMessage: PropTypes.string,
     viewerArrayIsFetching: PropTypes.bool,
     viewerArrayErrorMessage: PropTypes.string,
     findUser: PropTypes.func.isRequired,
-    userArray: PropTypes.arrayOf(PropTypes.object),
+    userArray: PropTypes.arrayOf(PropTypes.object).isRequired,
     user: PropTypes.shape({
       id: PropTypes.string,
       role: PropTypes.shape({ type: PropTypes.string }),
@@ -72,6 +49,16 @@ class UserPanel extends React.Component {
     workTeams: PropTypes.arrayOf(PropTypes.shape({})),
     notifyUser: PropTypes.func.isRequired,
   };
+
+  static defaultProps = {
+    guestArray: null,
+    viewerArray: null,
+    guestArrayIsFetching: null,
+    viewerArrayIsFetching: null,
+    viewerArrayErrorMessage: null,
+    guestArrayErrorMessage: null,
+    workTeams: null,
+  };
   constructor(props) {
     super(props);
     this.state = { selectedAccount: null, showAccount: false };
@@ -79,6 +66,52 @@ class UserPanel extends React.Component {
   componentDidMount() {
     // this.props.loadUserList('viewer');
   }
+
+  renderUserList(users) {
+    return (
+      <table className={s.userList}>
+        <thead>
+          <tr>
+            <th>
+              {'Avatar'}
+            </th>
+            <th>
+              {'Name'}
+            </th>
+            <th>
+              {'Created at'}
+            </th>
+            <th>
+              {'Last login'}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {users &&
+            users.map(u =>
+              <tr
+                onClick={() =>
+                  this.setState({ showAccount: true, accountId: u.id })}
+              >
+                <td>
+                  <Avatar user={u} />
+                </td>
+                <td>
+                  {`${u.name} ${u.surname}`}
+                </td>
+                <td>
+                  <FormattedDate value={u.createdAt} />
+                </td>
+                <td>
+                  <FormattedDate value={u.lastLogin} />
+                </td>
+              </tr>,
+            )}
+        </tbody>
+      </table>
+    );
+  }
+
   renderWorkTeams(teams) {
     return (
       <table className={s.workTeams}>
@@ -165,15 +198,17 @@ class UserPanel extends React.Component {
     } = this.props;
     return (
       <Box wrap>
-        <FormField overflow label="Username">
-          <SearchField
-            data={this.props.userArray}
-            fetch={this.props.findUser}
-            displaySelected={data => {
-              this.setState({ accountId: data.id, showAccount: true });
-            }}
-          />
-        </FormField>
+        <div style={{ marginLeft: '12px' }}>
+          <FormField overflow label="Username">
+            <SearchField
+              data={this.props.userArray}
+              fetch={this.props.findUser}
+              displaySelected={data => {
+                this.setState({ accountId: data.id, showAccount: true });
+              }}
+            />
+          </FormField>
+        </div>
         {this.state.showAccount &&
           <AccountProfile
             user={this.props.user}
@@ -201,9 +236,7 @@ class UserPanel extends React.Component {
                   message={guestArrayErrorMessage}
                   onRetry={() => this.props.loadUserList('guest')}
                 />}
-              {this.props.guestArray.map(user =>
-                renderUserSuggestion(user, this),
-              )}
+              {this.renderUserList(this.props.guestArray)}
             </AccordionPanel>
             <AccordionPanel
               heading="Viewer accounts"
@@ -223,9 +256,7 @@ class UserPanel extends React.Component {
                   message={viewerArrayErrorMessage}
                   onRetry={() => this.props.loadUserList('viewer')}
                 />}
-              {this.props.viewerArray.map(user =>
-                renderUserSuggestion(user, this),
-              )}
+              {this.renderUserList(this.props.viewerArray)}
             </AccordionPanel>
             <AccordionPanel
               heading="Workteams"

@@ -38,6 +38,9 @@ const UserType = new ObjectType({
     lastLogin: {
       type: GraphQLString,
     },
+    createdAt: {
+      type: GraphQLString,
+    },
     privilege: {
       type: GraphQLInt,
     },

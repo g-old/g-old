@@ -1,14 +1,3 @@
-.name {
-  margin-left: 68px;
-  line-height: 45px;
-}
-
-.suggestionContent {
-  display: flex;
-  align-items: center;
-  background-repeat: no-repeat;
-}
-
 .coordinator {
   text-align: right;
 }
@@ -32,5 +21,16 @@
   tr {
     height: 3em;
     vertical-align: center;
+  }
+}
+
+.userList {
+  width: 100%;
+
+  tr {
+    height: 3em;
+    vertical-align: center;
+    cursor: pointer;
+    text-align: center;
   }
 }

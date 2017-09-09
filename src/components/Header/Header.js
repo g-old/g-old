@@ -32,14 +32,17 @@ class Header extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <Navigation />
           <UserStatus />
-          <div className={s.banner}>
-            <h1 className={s.bannerTitle}>
+          <span className={s.brand}>
+            <FormattedMessage {...messages.bannerTitle} />
+          </span>
+          <Navigation />
+          {/*  <div className={s.banner}>
+             <h1 className={s.bannerTitle}>
               <FormattedMessage {...messages.bannerTitle} />
             </h1>
             {'Government by OnLine Democracy'}
-          </div>
+          </div>*/}
         </div>
       </div>
     );

@@ -68,12 +68,17 @@ const getMenu = counter => [
 
 class Navigation extends React.Component {
   static propTypes = {
-    activityCounter: PropTypes.shape({ feed: PropTypes.number, proposals: PropTypes.number })
-      .isRequired,
+    activityCounter: PropTypes.shape({
+      feed: PropTypes.number,
+      proposals: PropTypes.number,
+    }).isRequired,
   };
 
   componentWillReceiveProps({ activityCounter }) {
-    if (process.env.BROWSER && (activityCounter.feed !== 0 || activityCounter.proposals !== 0)) {
+    if (
+      process.env.BROWSER &&
+      (activityCounter.feed !== 0 || activityCounter.proposals !== 0)
+    ) {
       let oldTitle = document.title;
       const news = oldTitle.indexOf(')');
       if (news > -1) {
@@ -88,7 +93,7 @@ class Navigation extends React.Component {
   }
   render() {
     return (
-      <div className={s.root} role="navigation">
+      <div role="navigation">
         <div className={s.navBar}>
           {getMenu(this.props.activityCounter)}
         </div>

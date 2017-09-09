@@ -21,19 +21,22 @@
 
 .container {
   margin: 0 auto;
+  height: 3.625em;
   max-width: var(--max-content-width);
   padding: 0.1em;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
 }
 
-.banner {
-  text-align: center;
+.brand {
+  font-size: 2.5em;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
 }
 
-.bannerTitle {
-  font-weight: 300;
-  margin: 0;
-  padding: 0.2em 0 0;
-  font-size: 4em;
-  line-height: 0.7em;
-  font-family: 'Segoe UI', sans-serif;
+@media only screen and (max-width: 40em) {
+  .brand {
+    display: none;
+  }
 }

@@ -25,23 +25,21 @@ class Admin extends React.Component {
 
   render() {
     return (
-      <div className={s.root}>
-        <div className={s.container}>
-          <Tabs>
-            <Tab title="USERMANAGEMENT">
-              <UserPanel />
-            </Tab>
-            <Tab title="PROPOSALPANEL">
-              <ProposalPanel />
-            </Tab>
-            <Tab title="TECHPANEL">
-              <TechPanel />
-            </Tab>
-            <Tab title="SUPERVISIONPANEL">
-              <SupervisionPanel />
-            </Tab>
-          </Tabs>
-        </div>
+      <div className={s.container}>
+        <Tabs>
+          <Tab title="USERMANAGEMENT">
+            <UserPanel />
+          </Tab>
+          <Tab title="PROPOSALPANEL">
+            <ProposalPanel />
+          </Tab>
+          <Tab title="TECHPANEL">
+            <TechPanel />
+          </Tab>
+          <Tab title="SUPERVISIONPANEL">
+            <SupervisionPanel />
+          </Tab>
+        </Tabs>
       </div>
     );
   }

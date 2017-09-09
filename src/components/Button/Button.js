@@ -48,12 +48,20 @@ class Button extends React.Component {
     } = this.props;
     let buttonIcon;
     if (icon) {
-      buttonIcon = <span className={s.icon}> {icon}</span>;
+      buttonIcon = (
+        <span className={s.icon}>
+          {icon}
+        </span>
+      );
     }
     let buttonLabel;
     if (label) {
       // eslint-disable-next-line css-modules/no-undef-class
-      buttonLabel = <span className={s.label}>{label}</span>;
+      buttonLabel = (
+        <span className={s.label}>
+          {label}
+        </span>
+      );
     }
     const first = reverse ? buttonLabel : buttonIcon;
     const second = reverse ? buttonIcon : buttonLabel;

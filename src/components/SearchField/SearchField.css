@@ -65,7 +65,7 @@
 }
 
 .suggestionHighlighted {
-  background-color: #0c7eaf;
+  background-color: rgba(150, 8, 150, 0.3);
   color: #fff;
 }
 

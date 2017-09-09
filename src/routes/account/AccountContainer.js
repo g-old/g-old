@@ -240,6 +240,7 @@ class AccountContainer extends React.Component {
   getUserData(user) {
     const { id } = user;
     const { sessionUser } = this.props;
+    if (!sessionUser) return;
     // eslint-disable-next-line eqeqeq
     if (user.id == sessionUser.id) {
       this.props.fetchUser({ id });

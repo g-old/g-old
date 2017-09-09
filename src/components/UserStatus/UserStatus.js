@@ -12,13 +12,23 @@ const onVisitProfile = e => {
     // leftclick
     return;
   }
-
   if (e.defaultPrevented === true) {
     return;
   }
-
   e.preventDefault();
   history.push(`/account`);
+};
+
+const goHome = e => {
+  if (e.button !== 0) {
+    // leftclick
+    return;
+  }
+  if (e.defaultPrevented === true) {
+    return;
+  }
+  e.preventDefault();
+  history.push(`/`);
 };
 
 class UserStatus extends React.Component {
@@ -50,7 +60,13 @@ class UserStatus extends React.Component {
       if (this.props.user.avatar) {
         avatar = (
           <img
-            style={{ height: '2em', width: '2em', marginBottom: '12px' }}
+            style={{
+              boxShadow: '0 0 0 2px white',
+              borderRadius: '2px',
+              height: '2em',
+              width: '2em',
+              verticalAlign: 'bottom',
+            }}
             src={this.props.user.avatar}
             alt="IMG"
           />
@@ -63,7 +79,6 @@ class UserStatus extends React.Component {
             width="24px"
             height="24px"
             role="img"
-            className="grommetux-control-icon grommetux-control-icon-user grommetux-control-icon--xlarge grommetux-control-icon--responsive"
             aria-label="user"
           >
             <path
@@ -86,6 +101,12 @@ class UserStatus extends React.Component {
             <Button plain onClick={this.onLogout} label="Logout" />
           </Menu>
         </div>
+      );
+    } else {
+      userAvatar = (
+        <Button plain onClick={goHome}>
+          <span style={{ fontSize: '2em', fontWeight: 600 }}>G</span>
+        </Button>
       );
     }
     return userAvatar;
