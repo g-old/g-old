@@ -153,57 +153,55 @@ class NotificationInput extends React.Component {
       formFields,
     );
     return (
-      <div style={{ height: '480px' }}>
-        <Box column pad>
-          <FormField label="Type">
-            {this.props.types &&
-              this.props.types.map(t =>
-                <CheckBox
-                  name={t}
-                  checked={this.state[t]}
-                  label={t}
-                  onChange={this.handleValueChange}
-                  disabled={this.props.types.length < 2}
-                />,
-              )}
-          </FormField>
-          <FormField>
-            <CheckBox
-              name={'event'}
-              checked={false}
-              label={'Event'}
+      <Box column pad>
+        <FormField label="Type">
+          {this.props.types &&
+            this.props.types.map(t =>
+              <CheckBox
+                name={t}
+                checked={this.state[t]}
+                label={t}
+                onChange={this.handleValueChange}
+                disabled={this.props.types.length < 2}
+              />,
+            )}
+        </FormField>
+        <FormField>
+          <CheckBox
+            name={'event'}
+            checked={false}
+            label={'Event'}
+            onChange={this.handleValueChange}
+            disabled
+          />
+        </FormField>
+        <fieldset>
+          <FormField label="Subject" error={subjectError}>
+            <input
+              name="subject"
+              type="text"
+              onBlur={this.handleBlur}
+              value={this.state.subject}
               onChange={this.handleValueChange}
-              disabled
             />
           </FormField>
-          <fieldset>
-            <FormField label="Subject" error={subjectError}>
-              <input
-                name="subject"
-                type="text"
-                onBlur={this.handleBlur}
-                value={this.state.subject}
-                onChange={this.handleValueChange}
-              />
-            </FormField>
-            <FormField label="Text" error={notificationTextError}>
-              <textarea
-                name="notificationText"
-                onBlur={this.handleBlur}
-                value={this.state.notificationText}
-                onChange={this.handleValueChange}
-              />
-            </FormField>
-          </fieldset>
-          <Button
-            fill
-            primary
-            onClick={this.onNotify}
-            pending={this.props.updates && this.props.updates.pending}
-            label={<FormattedMessage {...messages.notify} />}
-          />
-        </Box>
-      </div>
+          <FormField label="Text" error={notificationTextError}>
+            <textarea
+              name="notificationText"
+              onBlur={this.handleBlur}
+              value={this.state.notificationText}
+              onChange={this.handleValueChange}
+            />
+          </FormField>
+        </fieldset>
+        <Button
+          fill
+          primary
+          onClick={this.onNotify}
+          pending={this.props.updates && this.props.updates.pending}
+          label={<FormattedMessage {...messages.notify} />}
+        />
+      </Box>
     );
   }
 }

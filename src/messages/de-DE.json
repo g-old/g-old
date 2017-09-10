@@ -172,28 +172,31 @@
     "description": "Avatar missing",
     "defaultMessage": "No photo set",
     "message": "",
-    "files": ["src/components/AccountProfile/AccountProfile.js"]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.emailValidationMissing",
     "description": "Email not validated",
     "defaultMessage": "Email not validated",
     "message": "",
-    "files": ["src/components/AccountProfile/AccountProfile.js"]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.lastLogin",
     "description": "Last login date",
     "defaultMessage": "Last login at",
     "message": "",
-    "files": ["src/components/AccountProfile/AccountProfile.js"]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.role",
     "description": "Role of the user",
     "defaultMessage": "Role",
     "message": "Benutzerrolle",
-    "files": ["src/components/AccountProfile/AccountProfile.js"]
+    "files": [
+      "src/components/AccountDetails/AccountDetails.js",
+      "src/components/RoleManager/RoleManager.js"
+    ]
   },
   {
     "id": "navigation.admin",
@@ -214,14 +217,14 @@
     "description": "Changing the rights of the user",
     "defaultMessage": "Change users rights",
     "message": "Benutzerrechte verändern",
-    "files": ["src/components/AccountProfile/AccountProfile.js"]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.delete",
     "description": "Deleting the account",
     "defaultMessage": "Delete account",
     "message": "",
-    "files": ["src/components/AccountProfile/AccountProfile.js"]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.notify",
@@ -229,7 +232,7 @@
     "defaultMessage": "Notify user",
     "message": "Benutzer kontaktieren",
     "files": [
-      "src/components/AccountProfile/AccountProfile.js",
+      "src/components/AccountDetails/AccountDetails.js",
       "src/components/NotificationInput/NotificationInput.js"
     ]
   },
@@ -287,10 +290,7 @@
     "description": "Header of privilegemanager",
     "defaultMessage": "Set & Change Privileges",
     "message": "Rechte vergeben",
-    "files": [
-      "src/components/AccountProfile/AccountProfile.js",
-      "src/components/PrivilegeManager/PrivilegeManager.js"
-    ]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "calendar.blank",
@@ -372,7 +372,7 @@
     "description": "Ask for confirmation",
     "defaultMessage": "Are you sure?",
     "message": "Aktion ausführen?",
-    "files": ["src/components/ProposalSettings/ProposalSettings.js"]
+    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
   },
   {
     "id": "manager.clsoe",
@@ -385,21 +385,21 @@
     "description": "Starts the voting process",
     "defaultMessage": "Open voting",
     "message": "Abstimmung starten",
-    "files": ["src/components/ProposalSettings/ProposalSettings.js"]
+    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
   },
   {
     "id": "manager.revoke",
     "description": "Revoke proposal",
     "defaultMessage": "Revoke proposal",
     "message": "Beschluss zurückziehen",
-    "files": ["src/components/ProposalSettings/ProposalSettings.js"]
+    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
   },
   {
     "id": "manager.revokeShort",
     "description": "Revoke proposal, short",
     "defaultMessage": "Revoke",
     "message": "Zurückziehen",
-    "files": ["src/components/ProposalSettings/ProposalSettings.js"]
+    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
   },
   {
     "id": "proposalManager.phaseOnePoll",
@@ -456,11 +456,11 @@
     "defaultMessage": "You can't leave this empty",
     "message": "Bitte ausfüllen",
     "files": [
-      "src/components/AccountProfile/AccountProfile.js",
+      "src/components/AccountDetails/AccountDetails.js",
       "src/components/Login/Login.js",
       "src/components/NotificationInput/NotificationInput.js",
+      "src/components/ProposalDetails/ProposalDetails.js",
       "src/components/ProposalInput/ProposalInput.js",
-      "src/components/ProposalSettings/ProposalSettings.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js",
       "src/components/WorkTeamInput/WorkTeamInput.js",
@@ -616,10 +616,7 @@
     "description": "Header of rolesemanager",
     "defaultMessage": "Set & Change Roles",
     "message": "",
-    "files": [
-      "src/components/AccountProfile/AccountProfile.js",
-      "src/components/RoleManager/RoleManager.js"
-    ]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "roles.unlock",
@@ -647,7 +644,7 @@
     "description": "Close the proposal",
     "defaultMessage": "Close proposal",
     "message": "Beschluss schließen",
-    "files": ["src/components/ProposalSettings/ProposalSettings.js"]
+    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
   },
   {
     "id": "date.to",
@@ -690,8 +687,8 @@
     "defaultMessage": "Time already passed",
     "message": "Zeitraum abgelaufen",
     "files": [
-      "src/components/ProposalInput/ProposalInput.js",
-      "src/components/ProposalSettings/ProposalSettings.js"
+      "src/components/ProposalDetails/ProposalDetails.js",
+      "src/components/ProposalInput/ProposalInput.js"
     ]
   },
   {
@@ -923,5 +920,19 @@
     "defaultMessage": "Workteams",
     "message": "",
     "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "account.workTeamMissing",
+    "description": "No team choosen",
+    "defaultMessage": "No team choosen",
+    "message": "",
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
+  },
+  {
+    "id": "account.privileges",
+    "description": "Privileges",
+    "defaultMessage": "Privileges",
+    "message": "",
+    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
   }
 ]

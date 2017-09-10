@@ -8,7 +8,7 @@
   background-color: #fff;
   color: #333;
   opacity: 1;
-  overflow: auto;
+  overflow: visible;
   transition: all 0.4s, padding-top 0.3s 0.1s, padding-bottom 0.3s 0.1s;
 }
 

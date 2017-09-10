@@ -1,0 +1,12 @@
+.root {
+  padding-top: 2em;
+  padding-bottom: 2em;
+}
+
+.profile {
+  margin: 0 1em !important;
+}
+
+.details {
+  min-width: 10em;
+}

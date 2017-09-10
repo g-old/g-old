@@ -8,10 +8,10 @@ import FormField from '../FormField';
 import CheckBox from '../CheckBox';
 
 const messages = defineMessages({
-  header: {
-    id: 'privilege.header',
-    defaultMessage: 'Set & Change Privileges',
-    description: 'Header of privilegemanager',
+  privileges: {
+    id: 'account.privileges',
+    defaultMessage: 'Privileges',
+    description: 'Privileges',
   },
   canUnlockGuest: {
     id: 'privilege.unlockGuest',
@@ -69,7 +69,7 @@ const messages = defineMessages({
     description: 'Server or network error ',
   },
 });
-const readPrivileges = (privilege) => {
+const readPrivileges = privilege => {
   const rights = Object.keys(PRIVILEGES).reduce((acc, curr) => {
     if (curr === 'none') return acc;
     // eslint-disable-next-line no-bitwise
@@ -90,7 +90,10 @@ class PrivilegeManager extends React.Component {
     privilege: PropTypes.number.isRequired,
     updateFn: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
-    updates: PropTypes.shape({ error: PropTypes.bool, pending: PropTypes.bool }),
+    updates: PropTypes.shape({
+      error: PropTypes.bool,
+      pending: PropTypes.bool,
+    }),
   };
 
   static defaultProps = {
@@ -149,8 +152,11 @@ class PrivilegeManager extends React.Component {
     const error = this.state.error && <FormattedMessage {...messages.error} />;
     return (
       <Box column pad>
-        <FormField error={error} label={<FormattedMessage {...messages.header} />}>
-          {Object.keys(PRIVILEGES).map((p) => {
+        <FormField
+          error={error}
+          label={<FormattedMessage {...messages.privileges} />}
+        >
+          {Object.keys(PRIVILEGES).map(p => {
             if (p === 'none') {
               return null;
             }
@@ -165,7 +171,6 @@ class PrivilegeManager extends React.Component {
             );
           })}
         </FormField>
-
       </Box>
     );
   }

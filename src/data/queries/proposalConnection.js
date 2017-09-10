@@ -18,7 +18,11 @@ const proposal = {
       type: GraphQLString,
     },
   },
-  resolve: async (parent, { first = 10, after = '', state }, { viewer, loaders }) => {
+  resolve: async (
+    parent,
+    { first = 10, after = '', state },
+    { viewer, loaders },
+  ) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
     // cursor = cursor ? new Date(cursor) : new Date();
     let [cursor = null, id = 0] = pagination ? pagination.split('$') : [];
@@ -29,8 +33,8 @@ const proposal = {
       case 'active': {
         cursor = cursor ? new Date(cursor) : new Date(null);
         proposals = await knex('proposals')
-          .innerJoin('polls', function () {
-            this.on(function () {
+          .innerJoin('polls', function() {
+            this.on(function() {
               this.on(
                 knex.raw(
                   "(proposals.state = 'proposed' and proposals.poll_one_id = polls.id) or proposals.state = 'voting' and proposals.poll_two_id = polls.id",
@@ -38,7 +42,7 @@ const proposal = {
               );
             });
           })
-          .where({ 'polls.closed_at': null })
+          //  .where({ 'polls.closed_at': null }) TODO find some other way to p1 to p2 transitioning
           .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
           .limit(first)
           .orderBy('polls.end_time', 'asc')
@@ -51,10 +55,12 @@ const proposal = {
       case 'accepted': {
         cursor = cursor ? new Date(cursor) : new Date();
         proposals = await knex('proposals')
-          .innerJoin('polls', function () {
-            this.on(function () {
+          .innerJoin('polls', function() {
+            this.on(function() {
               this.on(
-                knex.raw('coalesce (proposals.poll_two_id, proposals.poll_one_id) = polls.id'),
+                knex.raw(
+                  'coalesce (proposals.poll_two_id, proposals.poll_one_id) = polls.id',
+                ),
               );
             });
           })
@@ -70,8 +76,8 @@ const proposal = {
         cursor = cursor ? new Date(cursor) : new Date();
 
         proposals = await knex('proposals')
-          .innerJoin('polls', function () {
-            this.on(function () {
+          .innerJoin('polls', function() {
+            this.on(function() {
               this.on(
                 knex.raw(
                   "(proposals.state = 'revoked' and proposals.poll_one_id = polls.id) or proposals.state = 'rejected' and proposals.poll_two_id = polls.id",
@@ -110,9 +116,9 @@ const proposal = {
     const endCursor =
       edges.length > 0
         ? Buffer.from(
-            `${new Date(proposalsSet[edges[edges.length - 1].node.id].time).toJSON()}$${edges[
-              edges.length - 1
-            ].node.id}`,
+            `${new Date(
+              proposalsSet[edges[edges.length - 1].node.id].time,
+            ).toJSON()}$${edges[edges.length - 1].node.id}`,
           ).toString('base64')
         : null;
 

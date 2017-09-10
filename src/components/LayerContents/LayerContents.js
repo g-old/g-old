@@ -9,20 +9,33 @@ class LayerContents extends React.Component {
     className: PropTypes.string.isRequired,
     intl: PropTypes.shape({}).isRequired,
     insertCss: PropTypes.func.isRequired,
+    store: PropTypes.func.isRequired,
   };
   constructor(props, context) {
     super(props, context);
     this.state = {};
   }
   getChildContext() {
-    return { intl: this.props.intl, insertCss: this.props.insertCss };
+    return {
+      intl: this.props.intl,
+      insertCss: this.props.insertCss,
+      store: this.props.store,
+    };
   }
   render() {
     const { onClose, children, className } = this.props;
     let closeNode = null;
     if (onClose) {
       closeNode = (
-        <div style={{ position: 'absolute', top: 0, right: 0, zIndex: 1, margin: '0.75em' }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            zIndex: 1,
+            margin: '0.75em',
+          }}
+        >
           <Button
             onClick={onClose}
             plain
@@ -35,7 +48,12 @@ class LayerContents extends React.Component {
                 role="img"
                 aria-label="close"
               >
-                <path fill="none" stroke="#000" strokeWidth="2" d="M3,3 L21,21 M3,21 L21,3" />
+                <path
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth="2"
+                  d="M3,3 L21,21 M3,21 L21,3"
+                />
               </svg>
             }
           />

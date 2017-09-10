@@ -36,7 +36,8 @@ query ($role:String) {
   users (role:$role) {
     ${userFields}
     createdAt,
-    lastLogin
+    lastLogin,
+    emailVerified,
   }
 }
 `;
@@ -53,6 +54,7 @@ const userQuery = `
 query ($id:ID!) {
   user (id:$id) {
     lastLogin
+    createdAt
     emailVerified
     email
     numStatements

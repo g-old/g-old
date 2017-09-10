@@ -40,7 +40,10 @@ class Layer extends React.Component {
         // see layer styling for reference
         setTimeout(() => {
           this.originalFocusedElement.focus();
-          window.scrollTo(this.originalScrollPosition.left, this.originalScrollPosition.top);
+          window.scrollTo(
+            this.originalScrollPosition.left,
+            this.originalScrollPosition.top,
+          );
         }, 0);
       } else if (
         this.originalFocusedElement.parentNode &&
@@ -48,7 +51,10 @@ class Layer extends React.Component {
       ) {
         // required for IE11 and Edge
         this.originalFocusedElement.parentNode.focus();
-        window.scrollTo(this.originalScrollPosition.left, this.originalScrollPosition.top);
+        window.scrollTo(
+          this.originalScrollPosition.left,
+          this.originalScrollPosition.top,
+        );
       }
     }
 
@@ -72,7 +78,10 @@ class Layer extends React.Component {
       beforeElement = document.body.firstChild;
     }
     if (beforeElement) {
-      this.element = beforeElement.parentNode.insertBefore(element, beforeElement);
+      this.element = beforeElement.parentNode.insertBefore(
+        element,
+        beforeElement,
+      );
     }
   }
 
@@ -88,11 +97,13 @@ class Layer extends React.Component {
   handleAriaHidden(hideOverlay) {
     const hidden = hideOverlay || false;
     const apps = document.querySelectorAll('#app');
-    const visibleLayers = document.querySelectorAll(`.${s.layer}:not(.${s.hidden})`);
+    const visibleLayers = document.querySelectorAll(
+      `.${s.layer}:not(.${s.hidden})`,
+    );
 
     if (apps) {
       /* eslint-disable no-param-reassign */
-      Array.prototype.slice.call(apps).forEach((app) => {
+      Array.prototype.slice.call(apps).forEach(app => {
         if (hidden && visibleLayers.length === 0) {
           // make sure to only show grommet apps if there is no other layer
           app.setAttribute('aria-hidden', false);
@@ -123,6 +134,7 @@ class Layer extends React.Component {
           className={s.container}
           insertCss={this.context.insertCss}
           intl={this.context.intl}
+          store={this.context.store}
           context={this.context}
           onClose={this.props.onClose}
         />

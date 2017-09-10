@@ -177,6 +177,8 @@ class User {
         return res !== null;
       });
 
+      // TODO  implement check of workteams , email erification and img
+
       /* eslint-disable no-bitwise */
       if (
         neededPrivilege &&

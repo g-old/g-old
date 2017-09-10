@@ -2,18 +2,32 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import s from './ProposalSettings.css';
+import {
+  defineMessages,
+  FormattedMessage,
+  FormattedRelative,
+} from 'react-intl';
+import s from './ProposalDetails.css';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
-import { getIsProposalFetching, getProposalErrorMessage, getProposalSuccess } from '../../reducers';
-import Layer from '../Layer';
+import {
+  getProposal,
+  getIsProposalFetching,
+  getProposalErrorMessage,
+  getProposalSuccess,
+} from '../../reducers';
 import Box from '../Box';
 import Button from '../Button';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
 import PollInput from '../PollInput';
-import { createValidator, dateToValidation, timeToValidation } from '../../core/validation';
+import {
+  createValidator,
+  dateToValidation,
+  timeToValidation,
+} from '../../core/validation';
 import Notification from '../Notification';
+import Label from '../Label';
+import PollState from '../PollState';
 
 const messages = defineMessages({
   confirmation: {
@@ -55,21 +69,39 @@ const messages = defineMessages({
 });
 
 const formFields = ['dateTo', 'timeTo'];
+const isThresholdPassed = poll => {
+  let ref;
+  const tRef = poll.mode.thresholdRef;
+  switch (tRef) {
+    case 'voters':
+      ref = poll.upvotes + poll.downvotes;
+      break;
+    case 'all':
+      ref = poll.allVoters;
+      break;
 
-class ProposalSettings extends React.Component {
+    default:
+      throw Error(`Threshold reference not implemented: ${tRef}`);
+  }
+  ref *= poll.threshold / 100;
+  return poll.upvotes >= ref;
+};
+class ProposalDetails extends React.Component {
   static propTypes = {
     updateProposal: PropTypes.func.isRequired,
     defaultPollValues: PropTypes.shape({}).isRequired,
     pollOptions: PropTypes.shape({}).isRequired,
     intl: PropTypes.shape({}).isRequired,
-    onClose: PropTypes.func.isRequired,
+    onFinish: PropTypes.func.isRequired,
     error: PropTypes.shape({}),
     proposal: PropTypes.shape({ id: PropTypes.string }).isRequired,
     pending: PropTypes.bool,
+    success: PropTypes.bool,
   };
   static defaultProps = {
     error: null,
     pending: false,
+    success: false,
   };
   constructor(props) {
     super(props);
@@ -108,7 +140,7 @@ class ProposalSettings extends React.Component {
   }
   componentWillReceiveProps({ success, error }) {
     if (success === true) {
-      this.props.onClose();
+      this.props.onFinish();
     }
     if (error) {
       this.setState({ error: !this.props.error });
@@ -129,7 +161,9 @@ class ProposalSettings extends React.Component {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
       if (this.state.errors[curr].touched) {
-        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+        acc[err] = (
+          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
+        );
       }
       return acc;
     }, {});
@@ -157,7 +191,9 @@ class ProposalSettings extends React.Component {
       default:
         throw Error(`Element not recognized: ${e.target.name}`);
     }
-    this.setState({ settings: { ...this.state.settings, [e.target.name]: value } });
+    this.setState({
+      settings: { ...this.state.settings, [e.target.name]: value },
+    });
   }
 
   handleStateChange() {
@@ -185,14 +221,22 @@ class ProposalSettings extends React.Component {
 
         endTime = concatDateAndTime(date, time);
       }
-      const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
+      const {
+        withStatements,
+        secret,
+        threshold,
+        thresholdRef,
+        unipolar,
+      } = this.state.settings;
       this.props.updateProposal({
         id: this.props.proposal.id,
         poll: {
           startTime,
           endTime,
           secret,
-          threshold: threshold || this.props.defaultPollValues[pollOption.value].threshold,
+          threshold:
+            threshold ||
+            this.props.defaultPollValues[pollOption.value].threshold,
           mode: {
             withStatements,
             id: pollOption.value,
@@ -206,62 +250,103 @@ class ProposalSettings extends React.Component {
   toggleSettings() {
     this.setState({ displaySettings: !this.state.displaySettings });
   }
+
   render() {
     const settings = this.state.settings;
-    const { onClose, error, pending, proposal } = this.props;
+    const { error, pending, proposal } = this.props;
+    const pollOne = proposal.pollOne;
+    const thresholdPassed = isThresholdPassed(pollOne);
+    const numVotersForThreshold = Math.ceil(
+      pollOne.allVoters * pollOne.threshold / 100,
+    );
     return (
-      <Layer onClose={onClose}>
-        <Box className={s.container} pad column justify>
+      <Box className={s.container} flex>
+        <Box flex column pad>
           {this.state.error && <Notification type="error" message={error} />}
-          <h4>
+          <Label>
             {proposal.title}
-          </h4>
-          <Accordion>
-            <AccordionPanel heading={<FormattedMessage {...messages.revoke} />}>
-              <Box pad column justify>
-                <Button
-                  disabled={pending}
-                  onClick={this.handleStateChange}
-                  primary
-                  label={<FormattedMessage {...messages.revokeShort} />}
-                />
-              </Box>
-            </AccordionPanel>
-            <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
-              <Box className={s.innerContainer} column pad>
-                <PollInput
-                  onValueChange={this.handleValueChanges}
-                  handleDateChange={this.handleValueChanges}
-                  selectedPMode={this.state.settings.pollOption}
-                  displaySettings={this.state.displaySettings}
-                  defaultPollValues={this.props.defaultPollValues}
-                  pollValues={settings}
-                  toggleSettings={this.toggleSettings}
-                  pollOptions={this.props.pollOptions}
-                  intl={this.props.intl}
-                  formErrors={this.visibleErrors(formFields)}
-                  handleBlur={this.handleBlur}
-                />
-                <Button
-                  disabled={pending}
-                  label={<FormattedMessage {...messages.open} />}
-                  primary
-                  onClick={this.handleOnSubmit}
-                />
-                {/* <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '}*/}
-              </Box>
-            </AccordionPanel>
-          </Accordion>
+          </Label>
+          <Label>
+            {'Poll One'}
+          </Label>
+          {pollOne &&
+            <div>
+              <PollState
+                compact
+                allVoters={pollOne.allVoters}
+                upvotes={pollOne.upvotes}
+                downvotes={pollOne.downvotes}
+                thresholdRef={pollOne.mode.thresholdRef}
+                threshold={pollOne.threshold}
+                unipolar={pollOne.mode.unipolar}
+              />
+            </div>}
+          <span>
+            {'Upvotes:'} {pollOne.upvotes}
+          </span>
+          <span>
+            {'Threshold (votes): '}
+            {numVotersForThreshold}
+          </span>
+          {!thresholdPassed &&
+            <span>
+              {'Votes left for threshold: '}{' '}
+              {numVotersForThreshold - pollOne.upvotes}
+            </span>}
+          {!pollOne.closedAt &&
+            <span>
+              {'Endtime: '}
+              {<FormattedRelative value={pollOne.endTime} />}
+            </span>}
+          {(pollOne.closedAt || thresholdPassed) &&
+            <Notification type="alert" message="Ready for voting" />}
         </Box>
-      </Layer>
+        <Accordion>
+          <AccordionPanel heading={<FormattedMessage {...messages.revoke} />}>
+            <Box pad column justify>
+              <Button
+                disabled={pending}
+                onClick={this.handleStateChange}
+                primary
+                label={<FormattedMessage {...messages.revokeShort} />}
+              />
+            </Box>
+          </AccordionPanel>
+          <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
+            <Box className={s.innerContainer} column pad>
+              <PollInput
+                onValueChange={this.handleValueChanges}
+                handleDateChange={this.handleValueChanges}
+                selectedPMode={this.state.settings.pollOption}
+                displaySettings={this.state.displaySettings}
+                defaultPollValues={this.props.defaultPollValues}
+                pollValues={settings}
+                toggleSettings={this.toggleSettings}
+                pollOptions={this.props.pollOptions}
+                intl={this.props.intl}
+                formErrors={this.visibleErrors(formFields)}
+                handleBlur={this.handleBlur}
+              />
+              <Button
+                disabled={pending}
+                label={<FormattedMessage {...messages.open} />}
+                primary
+                onClick={this.handleOnSubmit}
+              />
+              {/* <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '}*/}
+            </Box>
+          </AccordionPanel>
+        </Accordion>
+      </Box>
     );
   }
 }
 
-const mapStateToProps = (state, { proposal: { id } }) => ({
+const mapStateToProps = (state, { id }) => ({
   success: getProposalSuccess(state, id),
   pending: getIsProposalFetching(state, id),
   error: getProposalErrorMessage(state, id),
+  proposal: getProposal(state, id),
 });
 
-export default connect(mapStateToProps)(withStyles(s)(ProposalSettings));
+export default connect(mapStateToProps)(withStyles(s)(ProposalDetails));

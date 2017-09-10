@@ -5,14 +5,15 @@ import CheckBox from '../CheckBox';
 import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
+import { PRIVILEGES } from '../../constants';
 
 const roles = ['admin', 'mod', 'user', 'viewer', 'guest'];
 
 const messages = defineMessages({
-  header: {
-    id: 'roles.header',
-    defaultMessage: 'Set & Change Roles',
-    description: 'Header of rolesemanager',
+  role: {
+    id: 'account.role',
+    defaultMessage: 'Role',
+    description: 'Role of the user',
   },
   change: {
     id: 'commands.change',
@@ -43,10 +44,24 @@ const calcState = (roleNames, role) =>
 class RoleManager extends React.Component {
   static propTypes = {
     userRole: PropTypes.string.isRequired,
-    accountRole: PropTypes.string.isRequired,
-    accountId: PropTypes.string.isRequired,
+    account: PropTypes.shape({
+      role: PropTypes.shape({
+        type: PropTypes.string,
+      }),
+      id: PropTypes.string,
+    }).isRequired,
+    user: PropTypes.shape({
+      role: PropTypes.shape({
+        type: PropTypes.string,
+      }),
+      id: PropTypes.string,
+    }).isRequired,
+
     updateFn: PropTypes.func.isRequired,
-    updates: PropTypes.shape({ error: PropTypes.bool, pending: PropTypes.bool }),
+    updates: PropTypes.shape({
+      error: PropTypes.bool,
+      pending: PropTypes.bool,
+    }),
   };
   static defaultProps = {
     updates: {},
@@ -56,7 +71,7 @@ class RoleManager extends React.Component {
     super(props);
     this.onChange = this.onChange.bind(this);
     this.availableRoles = roles.slice(roles.indexOf(props.userRole) + 1);
-    this.state = calcState(this.availableRoles, props.accountRole);
+    this.state = calcState(this.availableRoles, props.account.role.type);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -66,47 +81,75 @@ class RoleManager extends React.Component {
     }
     if (nextProps !== this.props) {
       this.availableRoles = roles.slice(roles.indexOf(nextProps.userRole) + 1);
-      const newState = calcState(this.availableRoles, nextProps.accountRole);
+      const newState = calcState(
+        this.availableRoles,
+        nextProps.account.role.type,
+      );
       this.setState(newState);
     }
   }
 
   onChange(e) {
-    if (e.target.name !== this.props.accountRole) {
-      this.props.updateFn({ id: this.props.accountId, role: e.target.name });
+    const {
+      user,
+      account: { role, id, emailVerified, workTeams, avatar },
+    } = this.props;
+    // TODO VALIDATION FN
+    if (e.target.name !== role.type) {
+      // dont allow change from guest if no profile, no workteam and no email verification
+      if (
+        user.role.type === 'admin' ||
+        (emailVerified && avatar && workTeams && workTeams.length)
+      ) {
+        this.props.updateFn({ id, role: e.target.name });
+      }
     }
   }
 
   availableRoles = [];
   render() {
     let promoteButton = null;
-    const { userRole, updates } = this.props;
-    if (!['admin', 'mod'].includes(userRole)) {
+    const { user, updates } = this.props;
+    if (
+      !['admin'].includes(user.role.type) ||
+      !user.privilege & PRIVILEGES.canUnlockUser // eslint-disable-line no-bitwise
+    ) {
       promoteButton = (
         <Button
-          label={<FormattedMessage {...messages.unlockViewer} />}
-          onClick={() => this.props.updateFn({ id: this.props.accountId, role: 'viewer' })}
+          primary
+          label={<FormattedMessage {...messages.unlock} />}
+          onClick={() => this.onChange({ target: { name: 'viewer' } })}
         />
       );
     }
 
     const error = this.state.error && <FormattedMessage {...messages.error} />;
-    return (
-      <Box column pad>
-        {promoteButton}
-        <FormField label={<FormattedMessage {...messages.header} />} error={error}>
+    let input;
+    if (promoteButton) {
+      input = promoteButton;
+    } else {
+      input = (
+        <FormField
+          label={<FormattedMessage {...messages.role} />}
+          error={error}
+        >
           {!promoteButton &&
             this.availableRoles.map(r =>
-              (<CheckBox
+              <CheckBox
                 label={r}
                 disabled={updates && updates.pending}
                 checked={this.state[r]}
                 onChange={this.onChange}
                 name={r}
-              />),
+              />,
             )}
         </FormField>
+      );
+    }
 
+    return (
+      <Box column pad>
+        {input}
       </Box>
     );
   }

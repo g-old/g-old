@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+
 import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import { fetchUser } from '../../actions/user';
 import { getUser, getAccountUpdates } from '../../reducers';
@@ -12,11 +14,12 @@ import { PRIVILEGES } from '../../constants';
 import ImageUpload from '../ImageUpload';
 import { uploadAvatar } from '../../actions/file';
 import { notifyUser } from '../../actions/notifications';
-import Layer from '../Layer';
-import { nameValidation, createValidator } from '../../core/validation';
 import ProfilePicture from '../ProfilePicture';
 import Box from '../Box';
 import NotificationInput from '../NotificationInput';
+import Notification from '../Notification';
+import Label from '../Label';
+import s from './AccountDetails.css';
 
 const messages = defineMessages({
   headerPrivilege: {
@@ -38,6 +41,11 @@ const messages = defineMessages({
     id: 'account.emailValidationMissing',
     defaultMessage: 'Email not validated',
     description: 'Email not validated',
+  },
+  workteam: {
+    id: 'account.workTeamMissing',
+    defaultMessage: 'No team choosen',
+    description: 'No team choosen',
   },
   lastLogin: {
     id: 'account.lastLogin',
@@ -71,9 +79,9 @@ const messages = defineMessages({
     description: 'Help for empty fields',
   },
 });
-const checkAvatar = url => url && url.indexOf('http') === -1;
+const checkAvatar = url => (url ? url.indexOf('http') !== -1 : false);
 
-class AccountProfile extends React.Component {
+class AccountDetails extends React.Component {
   static propTypes = {
     accountData: PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -104,7 +112,6 @@ class AccountProfile extends React.Component {
         pending: PropTypes.bool,
       }),
     }).isRequired,
-    onClose: PropTypes.func.isRequired,
     notifyUser: PropTypes.func.isRequired,
   };
 
@@ -112,24 +119,10 @@ class AccountProfile extends React.Component {
     super(props);
     this.props.fetchUser({ id: props.accountId });
     this.onPromoteToViewer = this.onPromoteToViewer.bind(this);
+    this.displayUploadLayer = this.displayUploadLayer.bind(this);
     this.state = {
       showUpload: false,
     };
-    const testValues = {
-      subject: { fn: 'text' },
-      notificationText: { fn: 'text' },
-      name: { fn: 'name' },
-      surname: { fn: 'name' },
-      email: { fn: 'email' },
-    };
-    this.Validator = createValidator(
-      testValues,
-      {
-        text: nameValidation,
-      },
-      this,
-      obj => obj.state,
-    );
   }
 
   componentDidMount(props) {
@@ -154,6 +147,10 @@ class AccountProfile extends React.Component {
     }
   }
 
+  displayUploadLayer() {
+    this.setState({ showUpload: true });
+  }
+
   render() {
     const { updates, accountData, user } = this.props;
     if (!accountData) {
@@ -168,6 +165,7 @@ class AccountProfile extends React.Component {
       emailVerified,
       lastLogin,
       privilege,
+      workTeams,
     } = accountData;
 
     let PrivilegePanel = <div />;
@@ -197,10 +195,9 @@ class AccountProfile extends React.Component {
       RolePanel = (
         <RoleManager
           updates={updates.role}
-          accountId={id}
+          account={accountData}
           updateFn={this.props.update}
-          userRole={this.props.user.role.type}
-          accountRole={role.type}
+          user={user}
         />
       );
     }
@@ -221,69 +218,76 @@ class AccountProfile extends React.Component {
     }
 
     const avatarSet = checkAvatar(avatar);
+    const workTeamChoosen = workTeams ? workTeams.length > 0 : false;
 
     return (
-      <Layer onClose={this.props.onClose}>
-        <Box flex column>
-          <ProfilePicture
-            img={avatar}
-            canChange
-            onChange={() => {
-              this.setState({ showUpload: true });
-            }}
-            updates={updates.dataUrl}
-          />
-
+      <Box className={s.root} flex wrap>
+        <Box className={s.profile} flex pad align column>
           {this.state.showUpload &&
             <ImageUpload
               uploadAvatar={data => {
                 this.props.uploadAvatar({ ...data, id });
               }}
-              uploadPending={
-                this.props.updates.dataUrl && this.props.updates.dataUrl.pending
-              }
-              uploadError={
-                this.props.updates.dataUrl && this.props.updates.dataUrl.error
-              }
-              uploadSuccess={
-                this.props.updates.dataUrl && this.props.updates.dataUrl.success
-              }
+              uploadPending={updates.dataUrl && updates.dataUrl.pending}
+              uploadError={updates.dataUrl && updates.dataUrl.error}
+              uploadSuccess={updates.dataUrl && updates.dataUrl.success}
               onClose={() => {
                 this.setState({ showUpload: false });
               }}
             />}
-          <div>
-            <span>
-              {name} {surname}
-            </span>
-            {!avatarSet &&
-              <div>
-                <FormattedMessage {...messages.avatarMissing} />
-              </div>}
-            {!emailVerified &&
-              <div>
+          <ProfilePicture
+            img={avatar}
+            canChange
+            onChange={this.displayUploadLayer}
+            updates={updates.dataUrl}
+          />
+          <Label>
+            {name} {surname}
+          </Label>
+          {!avatarSet &&
+            <Notification
+              type={'alert'}
+              message={<FormattedMessage {...messages.avatarMissing} />}
+            />}
+          {!emailVerified &&
+            <Notification
+              type={'alert'}
+              message={
                 <FormattedMessage {...messages.emailValidationMissing} />
-              </div>}
-            <div>
-              <FormattedMessage {...messages.role} /> : {role.type}
-            </div>
+              }
+            />}
 
-            <div>
-              <FormattedMessage {...messages.lastLogin} /> :{' '}
-              {<FormattedDate value={lastLogin} /> || 'No Data'}
-            </div>
-          </div>
+          {!workTeamChoosen &&
+            <Notification
+              type={'alert'}
+              message={<FormattedMessage {...messages.workteam} />}
+            />}
+          <span>
+            <FormattedMessage {...messages.role} />: {role.type}{' '}
+          </span>
+          <span>
+            <FormattedMessage {...messages.lastLogin} />:
+            {lastLogin ? <FormattedDate value={lastLogin} /> : null}
+          </span>
         </Box>
         {/* eslint-disable eqeqeq */}
         {user.id != id &&
-          <Box flex column>
-            <Accordion>
-              {RolePanel}
-              {PrivilegePanel}
+          <Box flex className={s.details}>
+            <Accordion column>
+              <AccordionPanel
+                heading={<FormattedMessage {...messages.headerRole} />}
+              >
+                {RolePanel}
+              </AccordionPanel>
+              <AccordionPanel
+                heading={<FormattedMessage {...messages.headerPrivilege} />}
+              >
+                {PrivilegePanel}
+              </AccordionPanel>
               {NotificationPanel}
             </Accordion>
           </Box>}
-      </Layer>
+      </Box>
     );
   }
 }
@@ -296,4 +300,6 @@ const mapDispatch = {
   uploadAvatar,
   notifyUser,
 };
-export default connect(mapStateToProps, mapDispatch)(AccountProfile);
+export default connect(mapStateToProps, mapDispatch)(
+  withStyles(s)(AccountDetails),
+);

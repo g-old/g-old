@@ -4,35 +4,35 @@
     "description": "Avatar missing",
     "defaultMessage": "No photo set",
     "message": "deguna fotografia",
-    "files": ["src/components/AccountProfile/AccountProfile.js"]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.changeRights",
     "description": "Changing the rights of the user",
     "defaultMessage": "Change users rights",
     "message": "muda derc dl user",
-    "files": ["src/components/AccountProfile/AccountProfile.js"]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.delete",
     "description": "Deleting the account",
     "defaultMessage": "Delete account",
     "message": "eliminé account",
-    "files": ["src/components/AccountProfile/AccountProfile.js"]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.emailValidationMissing",
     "description": "Email not validated",
     "defaultMessage": "Email not validated",
     "message": "Email nia validada",
-    "files": ["src/components/AccountProfile/AccountProfile.js"]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.lastLogin",
     "description": "Last login date",
     "defaultMessage": "Last login at",
     "message": "data ultimo login",
-    "files": ["src/components/AccountProfile/AccountProfile.js"]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.notify",
@@ -40,7 +40,7 @@
     "defaultMessage": "Notify user",
     "message": "notifiché al user",
     "files": [
-      "src/components/AccountProfile/AccountProfile.js",
+      "src/components/AccountDetails/AccountDetails.js",
       "src/components/NotificationInput/NotificationInput.js"
     ]
   },
@@ -49,7 +49,10 @@
     "description": "Role of the user",
     "defaultMessage": "Role",
     "message": "pert",
-    "files": ["src/components/AccountProfile/AccountProfile.js"]
+    "files": [
+      "src/components/AccountDetails/AccountDetails.js",
+      "src/components/RoleManager/RoleManager.js"
+    ]
   },
   {
     "id": "form.error-empty",
@@ -57,11 +60,11 @@
     "defaultMessage": "You can't leave this empty",
     "message": "Nia lascé lede",
     "files": [
-      "src/components/AccountProfile/AccountProfile.js",
+      "src/components/AccountDetails/AccountDetails.js",
       "src/components/Login/Login.js",
       "src/components/NotificationInput/NotificationInput.js",
+      "src/components/ProposalDetails/ProposalDetails.js",
       "src/components/ProposalInput/ProposalInput.js",
-      "src/components/ProposalSettings/ProposalSettings.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js",
       "src/components/WorkTeamInput/WorkTeamInput.js",
@@ -73,20 +76,14 @@
     "description": "Header of privilegemanager",
     "defaultMessage": "Set & Change Privileges",
     "message": "dé y mudé privileje",
-    "files": [
-      "src/components/AccountProfile/AccountProfile.js",
-      "src/components/PrivilegeManager/PrivilegeManager.js"
-    ]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "roles.header",
     "description": "Header of rolesemanager",
     "defaultMessage": "Set & Change Roles",
     "message": "dé y mudé pert",
-    "files": [
-      "src/components/AccountProfile/AccountProfile.js",
-      "src/components/RoleManager/RoleManager.js"
-    ]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "calendar.blank",
@@ -365,8 +362,8 @@
     "defaultMessage": "Time already passed",
     "message": "L temp é passé",
     "files": [
-      "src/components/ProposalInput/ProposalInput.js",
-      "src/components/ProposalSettings/ProposalSettings.js"
+      "src/components/ProposalDetails/ProposalDetails.js",
+      "src/components/ProposalInput/ProposalInput.js"
     ]
   },
   {
@@ -416,35 +413,35 @@
     "description": "Ask for confirmation",
     "defaultMessage": "Are you sure?",
     "message": "Siede segur?",
-    "files": ["src/components/ProposalSettings/ProposalSettings.js"]
+    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
   },
   {
     "id": "manager.close",
     "description": "Close the proposal",
     "defaultMessage": "Close proposal",
     "message": "Sclú la proposta",
-    "files": ["src/components/ProposalSettings/ProposalSettings.js"]
+    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
   },
   {
     "id": "manager.open",
     "description": "Starts the voting process",
     "defaultMessage": "Open voting",
     "message": "Daurí la votazion",
-    "files": ["src/components/ProposalSettings/ProposalSettings.js"]
+    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
   },
   {
     "id": "manager.revoke",
     "description": "Revoke proposal",
     "defaultMessage": "Revoke proposal",
     "message": "Tré endo la proposta",
-    "files": ["src/components/ProposalSettings/ProposalSettings.js"]
+    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
   },
   {
     "id": "manager.revokeShort",
     "description": "Revoke proposal, short",
     "defaultMessage": "Revoke",
     "message": "Revoché",
-    "files": ["src/components/ProposalSettings/ProposalSettings.js"]
+    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
   },
   {
     "id": "roles.unlock",
@@ -869,5 +866,19 @@
     "defaultMessage": "Workteams",
     "message": "",
     "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "account.workTeamMissing",
+    "description": "No team choosen",
+    "defaultMessage": "No team choosen",
+    "message": "",
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
+  },
+  {
+    "id": "account.privileges",
+    "description": "Privileges",
+    "defaultMessage": "Privileges",
+    "message": "",
+    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
   }
 ]

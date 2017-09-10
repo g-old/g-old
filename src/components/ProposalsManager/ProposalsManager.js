@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { FormattedRelative } from 'react-intl';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import s from './ProposalManager.css';
 import {
   getVisibleProposals,
   getProposalsIsFetching,
@@ -14,11 +15,13 @@ import PollState from '../PollState';
 import Button from '../Button';
 import FetchError from '../FetchError';
 import Box from '../Box';
-import ProposalSettings from '../ProposalSettings';
+import ProposalDetails from '../ProposalDetails';
 import Label from '../Label';
+import ProposalListEntry from './ProposalListEntry';
+import Layer from '../Layer';
 
 const ProposalInfo = props =>
-  (<Box clickable column onClick={props.onClick}>
+  <Box clickable column onClick={props.onClick}>
     <Label>
       {props.title}
     </Label>
@@ -35,7 +38,7 @@ const ProposalInfo = props =>
     </div>
 
     {props.children}
-  </Box>);
+  </Box>;
 
 ProposalInfo.propTypes = {
   title: PropTypes.string.isRequired,
@@ -78,7 +81,14 @@ class ProposalsManager extends React.Component {
     this.handleOnSubmit = this.handleOnSubmit.bind(this);
     this.handleStateChange = this.handleStateChange.bind(this);
     this.toggleSettings = this.toggleSettings.bind(this);
+    this.handleProposalClick = this.handleProposalClick.bind(this);
+    this.renderProposalList = this.renderProposalList.bind(this);
+    this.handleLayerClosing = this.handleLayerClosing.bind(this);
   }
+  handleProposalClick({ id }) {
+    this.setState({ showDetails: true, activeProposal: id });
+  }
+
   // TODO refactor - same in ProposalInput
   handleValueChanges(e) {
     let value;
@@ -103,13 +113,22 @@ class ProposalsManager extends React.Component {
       default:
         throw Error(`Element not recognized: ${e.target.name}`);
     }
-    this.setState({ settings: { ...this.state.settings, [e.target.name]: value } });
+    this.setState({
+      settings: { ...this.state.settings, [e.target.name]: value },
+    });
   }
 
   handleStateChange() {
     const newState = this.state.action;
-    this.props.updateProposal({ id: this.state.currentProposal, state: newState });
+    this.props.updateProposal({
+      id: this.state.currentProposal,
+      state: newState,
+    });
     this.setState({ currentProposal: null });
+  }
+
+  handleLayerClosing() {
+    this.setState({ showDetails: false });
   }
 
   handleOnSubmit() {
@@ -129,7 +148,13 @@ class ProposalsManager extends React.Component {
 
       endTime = concatDateAndTime(dateTo, timeTo);
     }
-    const { withStatements, secret, threshold, thresholdRef, unipolar } = this.state.settings;
+    const {
+      withStatements,
+      secret,
+      threshold,
+      thresholdRef,
+      unipolar,
+    } = this.state.settings;
     const pollingModeId = this.state.settings.pollOption.value;
     this.props.updateProposal({
       id: this.state.currentProposal,
@@ -137,7 +162,8 @@ class ProposalsManager extends React.Component {
         startTime,
         endTime,
         secret,
-        threshold: threshold || this.props.defaultPollValues[pollingModeId].threshold,
+        threshold:
+          threshold || this.props.defaultPollValues[pollingModeId].threshold,
         mode: {
           withStatements,
           id: pollingModeId,
@@ -149,6 +175,35 @@ class ProposalsManager extends React.Component {
   }
   toggleSettings() {
     this.setState({ displaySettings: !this.state.displaySettings });
+  }
+  renderProposalList(proposals) {
+    return (
+      <table className={s.proposalList}>
+        <thead>
+          <tr>
+            <th className={s.title}>
+              {'Title'}
+            </th>
+            <th>
+              {'Poll'}
+            </th>
+            <th className={s.date}>
+              {'Endtime'}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {proposals &&
+            proposals.map(p =>
+              <ProposalListEntry
+                key={p.id}
+                proposal={p}
+                onProposalClick={this.handleProposalClick}
+              />,
+            )}
+        </tbody>
+      </table>
+    );
   }
   render() {
     const { pageInfo, proposals, isFetching, errorMessage } = this.props;
@@ -168,35 +223,50 @@ class ProposalsManager extends React.Component {
       );
     }
     const toRender = proposals.filter(p => p.state === 'proposed');
-    toRender.sort((a, b) => new Date(a.pollOne.endTime) - new Date(b.pollOne.endTime));
+    toRender.sort(
+      (a, b) => new Date(a.pollOne.endTime) - new Date(b.pollOne.endTime),
+    );
 
     return (
       <Box column pad>
-        {this.state.showSettings &&
-          <ProposalSettings
-            onClose={() => {
-              this.setState({ showSettings: false });
-            }}
-            pollOptions={this.props.pollOptions}
-            defaultPollValues={this.props.defaultPollValues}
-            intl={this.context.intl}
-            updateProposal={this.props.updateProposal}
-            proposal={this.state.activeProposal}
-          />}
-        {toRender.map(
+        {this.state.showDetails &&
+          <Layer onClose={this.handleLayerClosing}>
+            <ProposalDetails
+              pollOptions={this.props.pollOptions}
+              defaultPollValues={this.props.defaultPollValues}
+              intl={this.context.intl}
+              updateProposal={this.props.updateProposal}
+              id={this.state.activeProposal}
+              onFinish={this.handleLayerClosing}
+            />
+          </Layer>}
+
+        {this.renderProposalList(toRender)}
+        {/* toRender.map(
           p =>
             p.state === 'proposed' &&
             <ProposalInfo
               title={p.title}
               poll={p.pollOne}
               onClick={() => {
-                this.setState({ showSettings: true, activeProposal: p });
+                this.setState({ showDetails: true, activeProposal: p });
               }}
             >
-              <span style={{ height: '1em', display: 'flex', justifyContent: 'space-between' }}>
+              <span
+                style={{
+                  height: '1em',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                }}
+              >
                 {p.state}
                 <span>
-                  <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24px"
+                    height="24px"
+                    role="img"
+                  >
                     <path
                       fill="none"
                       stroke="#000"
@@ -208,7 +278,7 @@ class ProposalsManager extends React.Component {
                 </span>
               </span>
             </ProposalInfo>,
-        )}
+        ) */}
         {pageInfo.hasNextPage &&
           <Button
             disabled={this.props.isFetching}
@@ -238,4 +308,6 @@ const mapDispatch = {
 ProposalsManager.contextTypes = {
   intl: PropTypes.object,
 };
-export default connect(mapPropsToState, mapDispatch)(ProposalsManager);
+export default connect(mapPropsToState, mapDispatch)(
+  withStyles(s)(ProposalsManager),
+);

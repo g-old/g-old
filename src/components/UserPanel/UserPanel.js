@@ -2,13 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { FormattedDate } from 'react-intl';
 import s from './UserPanel.css';
 import { notifyUser } from '../../actions/notifications';
 import { updateUser, loadUserList, findUser } from '../../actions/user';
 import { loadWorkTeams, createWorkTeam } from '../../actions/workTeam';
 import FetchError from '../FetchError';
-import AccountProfile from '../AccountProfile';
+import AccountDetails from '../AccountDetails';
 import Accordion from '../../components/Accordion';
 import AccordionPanel from '../../components/AccordionPanel';
 import SearchField from '../../components/SearchField';
@@ -18,7 +17,8 @@ import FormField from '../FormField';
 import WorkTeamInput from '../WorkTeamInput';
 import Layer from '../Layer';
 import NotificationInput from '../NotificationInput';
-import Avatar from '../Avatar';
+import UserListEntry from './UserListEntry';
+// import history from '../../history';
 
 import {
   getVisibleUsers,
@@ -62,9 +62,19 @@ class UserPanel extends React.Component {
   constructor(props) {
     super(props);
     this.state = { selectedAccount: null, showAccount: false };
+    this.handleProfileClick = this.handleProfileClick.bind(this);
+    this.handleLayerClosing = this.handleLayerClosing.bind(this);
   }
   componentDidMount() {
     // this.props.loadUserList('viewer');
+  }
+
+  handleProfileClick({ id }) {
+    this.setState({ showAccount: true, accountId: id });
+    // history.push(`/admin/accounts/${id}`);
+  }
+  handleLayerClosing() {
+    this.setState({ showAccount: false });
   }
 
   renderUserList(users) {
@@ -89,23 +99,11 @@ class UserPanel extends React.Component {
         <tbody>
           {users &&
             users.map(u =>
-              <tr
-                onClick={() =>
-                  this.setState({ showAccount: true, accountId: u.id })}
-              >
-                <td>
-                  <Avatar user={u} />
-                </td>
-                <td>
-                  {`${u.name} ${u.surname}`}
-                </td>
-                <td>
-                  <FormattedDate value={u.createdAt} />
-                </td>
-                <td>
-                  <FormattedDate value={u.lastLogin} />
-                </td>
-              </tr>,
+              <UserListEntry
+                key={u.id}
+                user={u}
+                onProfileClick={this.handleProfileClick}
+              />,
             )}
         </tbody>
       </table>
@@ -210,14 +208,13 @@ class UserPanel extends React.Component {
           </FormField>
         </div>
         {this.state.showAccount &&
-          <AccountProfile
-            user={this.props.user}
-            accountId={this.state.accountId}
-            update={this.props.updateUser}
-            onClose={() => {
-              this.setState({ showAccount: false });
-            }}
-          />}
+          <Layer onClose={this.handleLayerClosing}>
+            <AccountDetails
+              user={this.props.user}
+              accountId={this.state.accountId}
+              update={this.props.updateUser}
+            />
+          </Layer>}
         <div style={{ width: '100%' }}>
           <Accordion openMulti>
             <AccordionPanel
