@@ -109,10 +109,11 @@ class RoleManager extends React.Component {
   availableRoles = [];
   render() {
     let promoteButton = null;
-    const { user, updates } = this.props;
+    const { user, updates, account } = this.props;
     if (
-      !['admin'].includes(user.role.type) ||
-      !user.privilege & PRIVILEGES.canUnlockUser // eslint-disable-line no-bitwise
+      !['admin', 'mod'].includes(user.role.type) ||
+      (!user.privilege & PRIVILEGES.canUnlockUser && // eslint-disable-line no-bitwise
+        account.role.type === 'guest')
     ) {
       promoteButton = (
         <Button

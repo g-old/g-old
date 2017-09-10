@@ -132,7 +132,7 @@ class AccountDetails extends React.Component {
   }
   componentWillReceiveProps({ accountId, updates }) {
     if (accountId && accountId !== this.props.accountId) {
-      this.props.fetchUser({ id: this.props.accountId });
+      this.props.fetchUser({ id: accountId });
     }
     if (updates.dataUrl && updates.dataUrl.success) {
       this.setState({ showUpload: false });
@@ -172,12 +172,16 @@ class AccountDetails extends React.Component {
     // eslint-disable-next-line no-bitwise
     if (privilege && user.privilege & PRIVILEGES.canModifyRights) {
       PrivilegePanel = (
-        <PrivilegeManager
-          updates={updates.privilege}
-          updateFn={this.props.update}
-          privilege={privilege}
-          id={id}
-        />
+        <AccordionPanel
+          heading={<FormattedMessage {...messages.headerPrivilege} />}
+        >
+          <PrivilegeManager
+            updates={updates.privilege}
+            updateFn={this.props.update}
+            privilege={privilege}
+            id={id}
+          />
+        </AccordionPanel>
       );
     }
 
@@ -193,12 +197,14 @@ class AccountDetails extends React.Component {
       /* eslint-enable no-bitwise */
     ) {
       RolePanel = (
-        <RoleManager
-          updates={updates.role}
-          account={accountData}
-          updateFn={this.props.update}
-          user={user}
-        />
+        <AccordionPanel heading={<FormattedMessage {...messages.headerRole} />}>
+          <RoleManager
+            updates={updates.role}
+            account={accountData}
+            updateFn={this.props.update}
+            user={user}
+          />
+        </AccordionPanel>
       );
     }
 
@@ -274,16 +280,8 @@ class AccountDetails extends React.Component {
         {user.id != id &&
           <Box flex className={s.details}>
             <Accordion column>
-              <AccordionPanel
-                heading={<FormattedMessage {...messages.headerRole} />}
-              >
-                {RolePanel}
-              </AccordionPanel>
-              <AccordionPanel
-                heading={<FormattedMessage {...messages.headerPrivilege} />}
-              >
-                {PrivilegePanel}
-              </AccordionPanel>
+              {RolePanel}
+              {PrivilegePanel}
               {NotificationPanel}
             </Accordion>
           </Box>}

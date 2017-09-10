@@ -41,7 +41,8 @@ query ($role:String) {
   }
 }
 `;
-const workTeam = `
+// makes problems bc it overwrites user
+/* const workTeam = `
   id
   name
   coordinator{
@@ -49,7 +50,11 @@ const workTeam = `
     surname
     avatar
     id
-  }`;
+  }`;*/
+const workTeam = `
+    id
+    name
+    `;
 const userQuery = `
 query ($id:ID!) {
   user (id:$id) {

@@ -10,7 +10,8 @@ function checkCanSee(viewer, data) {
     viewer.id === data.id ||
     viewer.role.type === 'admin' ||
     viewer.role.type === 'mod' ||
-    viewer.role.type === 'system'
+    viewer.role.type === 'system' ||
+    viewer.privilege & PRIVILEGES.canUnlockViewer // eslint-disable-line no-bitwise
   );
 }
 const roles = ['admin', 'mod', 'user', 'viewer', 'guest'];
