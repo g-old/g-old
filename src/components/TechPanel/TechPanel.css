@@ -1,0 +1,21 @@
+.tables {
+  width: 100%;
+
+  tr {
+    height: 3em;
+    vertical-align: center;
+    cursor: pointer;
+    text-align: center;
+  }
+}
+
+.status {
+  display: flex;
+  justify-content: space-between;
+}
+
+.db {
+  span {
+    display: block;
+  }
+}

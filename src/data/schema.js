@@ -53,6 +53,7 @@ import workTeams from './queries/workTeams';
 import createProposalSub from './mutations/createProposalSub';
 import deleteProposalSub from './mutations/deleteProposalSub';
 import logs from './queries/logs';
+import statistics from './queries/statistics';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -75,6 +76,7 @@ const schema = new Schema({
       flagConnection,
       workTeams,
       logs,
+      statistics,
     },
   }),
   mutation: new ObjectType({

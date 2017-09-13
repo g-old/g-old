@@ -5,6 +5,7 @@ import intl, * as fromIntl from './intl';
 import entities, * as fromEntity from './entities';
 import ui, * as fromUi from './ui';
 import consent from './consent';
+import statistics from './statistics';
 
 export default combineReducers({
   user,
@@ -14,6 +15,7 @@ export default combineReducers({
   ui,
   webPushKey: (state = '') => state,
   consent,
+  statistics,
 });
 
 export const getVisibleProposals = (state, filter) =>
@@ -120,3 +122,5 @@ export const getSubscription = state => fromUi.getSubscription(state.ui);
 export const getActivityCounter = state => fromUi.getActivityCounter(state.ui);
 
 export const getWorkTeams = state => fromEntity.getWorkTeams(state.entities);
+
+export const getStatistics = state => state.statistics;

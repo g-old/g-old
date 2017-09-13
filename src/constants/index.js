@@ -128,6 +128,9 @@ export const DELETE_PROPOSALSUB_ERROR = 'DELETE_PROPOSALSUB_ERROR';
 export const LOAD_LOGS_START = 'LOAD_LOGS_START';
 export const LOAD_LOGS_SUCCESS = 'LOAD_LOGS_SUCCESS';
 export const LOAD_LOGS_ERROR = 'LOAD_LOGS_ERROR';
+export const LOAD_STATISTICS_START = 'LOAD_STATISTICS_START';
+export const LOAD_STATISTICS_SUCCESS = 'LOAD_STATISTICS_SUCCESS';
+export const LOAD_STATISTICS_ERROR = 'LOAD_STATISTICS_ERROR';
 
 // Con: Not very flexible, you cannot see the role/group/right
 export const PRIVILEGES = {
