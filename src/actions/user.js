@@ -93,7 +93,7 @@ query ($id:ID!) {
 
 const updateUserMutation = `
 mutation($id:ID $name:String, $surname:String, $role:String, $email:String, $password:String, $passwordOld:String, $followee:ID, $privilege:Int){
-  updateUser( user:{id:$id name:$name, surname:$surname, role:$role, email:$email, password:$password passwordOld:$passwordOld followee:$followee privilege:$privilege}){
+  updateUser ( user:{id:$id name:$name, surname:$surname, role:$role, email:$email, password:$password passwordOld:$passwordOld followee:$followee privilege:$privilege}){
     user{${userFields}
     email,
     emailVerified,

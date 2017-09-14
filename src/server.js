@@ -50,6 +50,7 @@ import { checkToken } from './core/tokens';
 import log from './logger';
 import { SubscriptionManager, SubscriptionServer } from './core/sse';
 import PubSub from './core/pubsub';
+import responseTiming from './core/timing';
 
 const pubsub = new PubSub();
 
@@ -67,6 +68,10 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 //
 // Register Node.js middleware
 // -----------------------------------------------------------------------------
+
+if (config.profiling) {
+  app.use(responseTiming());
+}
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '/avatars')));
 app.use(cookieParser());

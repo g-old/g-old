@@ -186,7 +186,7 @@ query ($state:String $first:Int, $after:String) {
 
 const createProposalMutation = `
 mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput] $spokesmanId:ID){
-  createProposal(proposal:{title:$title text:$text state:$state poll:$poll tags:$tags spokesmanId:$spokesmanId}){
+  createProposal (proposal:{title:$title text:$text state:$state poll:$poll tags:$tags spokesmanId:$spokesmanId}){
     ${proposal}
     tags{
       id
@@ -199,7 +199,7 @@ mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $ta
 
 const updateProposalMutation = `
 mutation($id:ID  $poll:PollInput $state:ProposalState ){
-  updateProposal(proposal:{ id:$id poll:$poll state:$state }){
+  updateProposal (proposal:{ id:$id poll:$poll state:$state }){
     ${proposal}
     tags{
       id
@@ -211,14 +211,14 @@ mutation($id:ID  $poll:PollInput $state:ProposalState ){
 `;
 
 const createProposalSubMutation = `mutation($proposalId:ID!){
-createProposalSub(subscription:{proposalId:$proposalId}){
+createProposalSub (subscription:{proposalId:$proposalId}){
   id
   subscribed
 }
 }`;
 
 const deleteProposalSubMutation = `mutation($proposalId:ID!){
-deleteProposalSub(subscription:{proposalId:$proposalId}){
+deleteProposalSub (subscription:{proposalId:$proposalId}){
   id
   subscribed
 }

@@ -30,12 +30,12 @@ const workTeam = `
     id
   }`;
 const workTeams = `query{
-  workTeams{
+  workTeams {
     ${workTeam}
   }}`;
 
 const workTeamsWithMembers = `query{
-    workTeams{
+    workTeams {
       ${workTeam}
       members{
         name
@@ -46,13 +46,13 @@ const workTeamsWithMembers = `query{
     }}`;
 
 const createWorkTeamMutation = `mutation($name:String, $coordinatorId:ID){
-  createWorkTeam( workTeam:{name:$name, coordinatorId:$coordinatorId}){
+  createWorkTeam (workTeam:{name:$name, coordinatorId:$coordinatorId}){
     ${workTeam}
   }
 }`;
 
 const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID){
-  joinWorkTeam( workTeam:{id:$id, memberId:$memberId}){
+  joinWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     id
     workTeams{
       ${workTeam}
@@ -61,7 +61,7 @@ const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID){
 }`;
 
 const leaveWorkTeamMutation = `mutation($id:ID, $memberId:ID){
-  leaveWorkTeam( workTeam:{id:$id, memberId:$memberId}){
+  leaveWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     id
     workTeams{
       ${workTeam}

@@ -11,7 +11,7 @@ import { getLogIsFetching, getSessionUser } from '../reducers';
 
 const logs = `
 query($userId:ID){
-  logs(userId:$userId) {
+  logs (userId:$userId) {
   id
   type
   objectId

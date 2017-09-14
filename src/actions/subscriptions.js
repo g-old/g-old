@@ -13,11 +13,11 @@ import { getSessionUser } from '../reducers';
 // import { webPush as publicKey } from '../../private_configs';
 
 const createPushSub = `mutation($endpoint:String! $p256dh:String! $auth:String!){
-createPushSub(subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})
+createPushSub (subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})
 }`;
 
 const deletePushSub = `mutation($endpoint:String! $p256dh:String! $auth:String!){
-deletePushSub(subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})
+deletePushSub (subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})
 }`;
 
 const registerSW = async file => {

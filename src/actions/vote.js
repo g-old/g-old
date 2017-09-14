@@ -35,18 +35,18 @@ const voteInfo = `{
 }`;
 const createVoteMutation = `
   mutation($pollId:ID! $position:Position!) {
-    createVote(vote:{pollId:$pollId position:$position}) ${voteInfo}
+    createVote (vote:{pollId:$pollId position:$position}) ${voteInfo}
   }
 `;
 const updateVoteMutation = `
   mutation($pollId:ID! $position:Position! $id:ID) {
-    updateVote(vote:{pollId:$pollId position:$position id:$id}) ${voteInfo}
+    updateVote (vote:{pollId:$pollId position:$position id:$id}) ${voteInfo}
   }
 `;
 
 const deleteVoteMutation = `
   mutation($pollId:ID! $position:Position! $id:ID) {
-    deleteVote( vote:{pollId:$pollId position:$position id:$id}) ${voteInfo}
+    deleteVote (vote:{pollId:$pollId position:$position id:$id}) ${voteInfo}
   }
 `;
 

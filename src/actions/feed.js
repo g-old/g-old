@@ -11,7 +11,7 @@ import { getFeedIsFetching, getSessionUser } from '../reducers';
 
 const feed = `
 query($userId:ID){
-  feed(userId:$userId) {
+  feed (userId:$userId) {
   id
   type
   objectId
