@@ -48,7 +48,7 @@ class Html extends React.Component {
           {scripts.map(script =>
             <link key={script} rel="preload" href={script} as="script" />,
           )}
-          <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+          <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
           <link
             href="https://fonts.googleapis.com/css?family=Open+Sans|Work+Sans"
             rel="stylesheet"

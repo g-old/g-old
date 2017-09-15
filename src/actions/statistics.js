@@ -10,6 +10,13 @@ const statisticsQuery = `
 query{
   statistics {
     usersOnline
+    performance {
+      avgTime
+      type
+      resource
+      numRequests
+      medianTime
+    }
     bucket {
       objects {
         usage

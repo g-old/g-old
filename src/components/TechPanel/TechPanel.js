@@ -7,6 +7,45 @@ import { loadStatistics } from '../../actions/statistics';
 import { getStatistics } from '../../reducers';
 import s from './TechPanel.css';
 
+const renderStats = stats =>
+  <table className={s.tables}>
+    <thead>
+      <tr>
+        <th>
+          {'Resource'}
+        </th>
+        <th>
+          {'Average time'}
+        </th>
+        <th>
+          {'Median time'}
+        </th>
+        <th>
+          {'Requests'}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {stats &&
+        stats.map(t =>
+          <tr>
+            <td>
+              {t.resource}
+            </td>
+            <td>
+              {`${Math.round(t.avgTime * 10) / 10} ms`}
+            </td>
+            <td>
+              {`${Math.round(t.medianTime * 10) / 10} ms`}
+            </td>
+            <td>
+              {t.numRequests}
+            </td>
+          </tr>,
+        )}
+    </tbody>
+  </table>;
+
 const renderTables = tables =>
   <table className={s.tables}>
     <thead>
@@ -41,6 +80,7 @@ const renderTables = tables =>
   </table>;
 
 const renderStatus = data =>
+  data &&
   <div className={s.status}>
     <span>{`Actual: ${data.usage}`}</span>
     <span>{`Limit: ${data.limit}`}</span>
@@ -81,7 +121,7 @@ class TechPanel extends React.Component {
             {`Size: ${size}`}
           </span>
           <span>
-            {`Cache Hit Rate: ${cacheHitRate}`}
+            {`Cache Hit Rate: ${cacheHitRate.toFixed(2)}`}
           </span>
           {'Index Usage'}
           {renderTables(indexUsage)}
@@ -99,15 +139,54 @@ class TechPanel extends React.Component {
             {`CPUs: ${numCpus}`}
           </span>
           <span>
-            {`Uptime: ${uptime / 3600} h`}
+            {`Uptime: ${Math.round(uptime / 3600 * 10) / 10} h`}
           </span>
           <span>
             {`Memory: ${Number(memory[1]) / 1024} FREE ${Number(memory[0]) /
               1024} TOTAL`}
           </span>
           <span>
-            {`Load Average: Last 5 min: ${loadAvg[0]}   Last 15 min: ${loadAvg[1]} Last hour: ${loadAvg[2]} `}
+            {`Load Average: Last 5 min: ${Math.round(loadAvg[0] * 10) /
+              10}   Last 15 min: ${Math.round(loadAvg[1] * 10) /
+              10} Last hour: ${Math.round(loadAvg[2]) / 10} `}
           </span>
+        </div>
+      );
+    }
+
+    let performanceInfo;
+    if (statistics.performance) {
+      const sse = statistics.performance.filter(stats => stats.type === 'SSE');
+      const queries = statistics.performance.filter(
+        stats => stats.type === 'query',
+      );
+      const mutations = statistics.performance.filter(
+        stats => stats.type === 'mutation',
+      );
+      const assets = statistics.performance.filter(
+        stats => stats.type === 'asset',
+      );
+      const graphql = statistics.performance.filter(
+        stats => stats.type === 'gQL',
+      );
+      const numReqs = statistics.performance.reduce(
+        // eslint-disable-next-line no-param-reassign
+        (acc, curr) => (acc += curr.numRequests),
+        0,
+      );
+      performanceInfo = (
+        <div>
+          {`Total requests: ${numReqs}`}
+          <h4>Server Side Rendering</h4>
+          {renderStats(sse)}
+          <h4>GraphQL Queries</h4>
+          {renderStats(graphql)}
+          <h4>Express Queries / Mutations</h4>
+          {renderStats(queries)}
+          <h4>Mutations</h4>
+          {renderStats(mutations)}
+          <h4>Assets</h4>
+          {renderStats(assets)}
         </div>
       );
     }
@@ -120,6 +199,12 @@ class TechPanel extends React.Component {
           </h3>
           {statistics.usersOnline &&
             `User online in the last 24h: ${statistics.usersOnline}`}
+        </div>
+        <div>
+          <h3>
+            {'Performance Data - over last 24h'}
+          </h3>
+          {performanceInfo}
         </div>
         <div>
           <h3>
