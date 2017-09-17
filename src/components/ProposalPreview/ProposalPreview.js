@@ -5,6 +5,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './ProposalPreview.css';
 import PollState from '../PollState';
 import history from '../../history';
+import { ICONS } from '../../constants';
 
 import { getLastActivePoll } from '../../core/helpers';
 // import { DOMParser } from 'xmldom';
@@ -28,63 +29,85 @@ class ProposalPreview extends React.Component {
   }
 
   render() {
-    const poll = getLastActivePoll(this.props.proposal.state, this.props.proposal);
-
-    const body = (
-      <div>
-        <div dangerouslySetInnerHTML={{ __html: this.props.proposal.body }} />
-        <div className={s.overlay} />
-      </div>
+    const poll = getLastActivePoll(
+      this.props.proposal.state,
+      this.props.proposal,
     );
-    // null;
-    // Disabled bc Nodejs Domparser (xmldom) has dep problems
-    /*  if (this.state.fullText) {
-      body = this.props.proposal.body;
-    } else {
-      body = `${new DOMParser()
-        .parseFromString(this.props.proposal.body, 'text/html')
-        .documentElement.textContent.substring(0, 100)}( ... )`;
-        // `${this.props.proposal.body.substring(0, 100)} (...)`;
 
-    } */
     /* eslint-disable jsx-a11y/interactive-supports-focus */
+
+    const pollPreview = [
+      <svg viewBox="0 0 24 24" width="16px" height="16px" role="img">
+        <path fill="none" stroke="#666" strokeWidth="2" d={ICONS.up} />
+      </svg>,
+      poll.upvotes,
+      <div className={s.pollState}>
+        <PollState
+          compact
+          pollId={poll.id}
+          allVoters={poll.allVoters}
+          upvotes={poll.upvotes}
+          downvotes={poll.downvotes}
+          thresholdRef={poll.mode.thresholdRef}
+          threshold={poll.threshold}
+          unipolar={poll.mode.unipolar}
+        />
+      </div>,
+    ];
+
+    if (!poll.mode.unipolar) {
+      pollPreview.push(poll.downvotes);
+      pollPreview.push(
+        <svg viewBox="0 0 24 24" width="16px" height="16px" role="img">
+          <path
+            fill="none"
+            stroke="#666"
+            strokeWidth="2"
+            d={ICONS.up}
+            transform="matrix(1 0 0 -1 0 24)"
+          />,
+        </svg>,
+      );
+    }
+
     return (
       <div className={s.root}>
-        <div
-          role="link"
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            history.push(`/proposal/${this.props.proposal.id}/${poll.id}`);
-          }}
-          className={s.container}
-        >
-          <div className={s.date}>
-            <FormattedRelative value={this.props.proposal.publishedAt} />
-          </div>
-          <h2 className={s.header}>
-            {this.props.proposal.title}
-          </h2>
+        <div className={s.container}>
+          <div style={{ display: 'flex' }}>
+            {/* <PollPreview poll={poll} />*/}
+            {
+              <div className={s.pollPreview}>
+                {pollPreview}
+              </div>
+            }
+            <div style={{ paddingLeft: '1em' }}>
+              <div className={s.date}>
+                <FormattedRelative value={poll.endTime} />
+              </div>
+              <div
+                role="link"
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  history.push(
+                    `/proposal/${this.props.proposal.id}/${poll.id}`,
+                  );
+                }}
+                className={s.header}
+              >
+                {this.props.proposal.title}
+              </div>
 
-          <div className={s.body}>
-            {body}
-          </div>
-          <div className={s.pollState}>
-            <PollState
-              compact
-              pollId={poll.id}
-              allVoters={poll.allVoters}
-              upvotes={poll.upvotes}
-              downvotes={poll.downvotes}
-              thresholdRef={poll.mode.thresholdRef}
-              threshold={poll.threshold}
-              unipolar={poll.mode.unipolar}
-            />
-          </div>
-          <div className={s.tags}>
-            {this.props.proposal.tags &&
-              this.props.proposal.tags.map(tag =>
-                <span key={tag.id} className={s.tag}>{`${tag.text}`}</span>,
-              )}
+              {/* <div className={s.body}>
+                {body}
+              </div>*/}
+
+              <div className={s.tags}>
+                {this.props.proposal.tags &&
+                  this.props.proposal.tags.map(tag =>
+                    <span key={tag.id} className={s.tag}>{`${tag.text}`}</span>,
+                  )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

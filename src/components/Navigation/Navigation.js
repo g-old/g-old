@@ -12,12 +12,18 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
+import cn from 'classnames';
 import { getActivityCounter } from '../../reducers';
 import s from './Navigation.css';
 import Link from '../Link';
 import Menu from '../Menu';
 
 const messages = defineMessages({
+  feed: {
+    id: 'navigation.feed',
+    defaultMessage: 'Feed',
+    description: 'Feed link in header',
+  },
   about: {
     id: 'navigation.about',
     defaultMessage: 'About',
@@ -40,31 +46,35 @@ const messages = defineMessages({
   },
 });
 
-const getMenu = counter => [
-  <Link className={s.link} to="/feed">
-    {counter.feed > 0 &&
-      <span className={s.news}>
-        {`(${counter.feed}) `}
-      </span>}
-    {'Feed'}
-  </Link>,
-  <Link className={s.link} to="/proposals/active">
-    {counter.proposals > 0 &&
-      <span className={s.news}>
-        {'NEW '}
-      </span>}
-    <FormattedMessage {...messages.proposals} />
-  </Link>,
-  <Link className={s.link} to="/surveys">
-    <FormattedMessage {...messages.surveys} />
-  </Link>,
-  <Link className={s.link} to="/admin">
-    <FormattedMessage {...messages.admin} />
-  </Link>,
-  <Link className={s.link} to="/about">
-    <FormattedMessage {...messages.about} />
-  </Link>,
+const contents = [
+  { id: 1, path: '/feed', name: 'feed' },
+  { id: 2, path: '/proposals/active', name: 'proposals' },
+  { id: 3, path: '/surveys', name: 'surveys' },
+  { id: 4, path: '/admin', name: 'admin' },
+  { id: 5, path: '/about', name: 'about' },
 ];
+
+const getMenu = (counter, path) =>
+  contents.map(p => {
+    const children = [<FormattedMessage {...messages[p.name]} />];
+    if (p.name === 'feed' && counter.feed > 0) {
+      children.unshift(
+        <span className={s.news}>
+          {`(${counter.feed}) `}
+        </span>,
+      );
+    }
+
+    return (
+      <Link
+        key={p.id}
+        className={cn(s.link, path === p.path ? s.current : null)}
+        to={p.path}
+      >
+        {children}
+      </Link>
+    );
+  });
 
 class Navigation extends React.Component {
   static propTypes = {
@@ -72,22 +82,18 @@ class Navigation extends React.Component {
       feed: PropTypes.number,
       proposals: PropTypes.number,
     }).isRequired,
+    path: PropTypes.string.isRequired,
   };
 
   componentWillReceiveProps({ activityCounter }) {
-    if (
-      process.env.BROWSER &&
-      (activityCounter.feed !== 0 || activityCounter.proposals !== 0)
-    ) {
+    if (process.env.BROWSER && activityCounter.feed !== 0) {
       let oldTitle = document.title;
       const news = oldTitle.indexOf(')');
       if (news > -1) {
         oldTitle = oldTitle.substr(news + 2);
       }
-      const notice =
-        activityCounter.feed > activityCounter.proposals
-          ? activityCounter.feed
-          : activityCounter.proposals;
+      const notice = activityCounter.feed;
+
       document.title = `(${notice}) ${oldTitle}`;
     }
   }
@@ -95,7 +101,7 @@ class Navigation extends React.Component {
     return (
       <div role="navigation">
         <div className={s.navBar}>
-          {getMenu(this.props.activityCounter)}
+          {getMenu(this.props.activityCounter, this.props.path)}
         </div>
         <div className={s.menu}>
           <Menu
@@ -120,7 +126,7 @@ class Navigation extends React.Component {
               </svg>
             }
           >
-            {getMenu(this.props.activityCounter)}
+            {getMenu(this.props.activityCounter, this.props.path || '')}
           </Menu>
         </div>
       </div>
@@ -130,6 +136,7 @@ class Navigation extends React.Component {
 
 const mapToProps = state => ({
   activityCounter: getActivityCounter(state),
+  path: state.ui.loading.path,
 });
 
 export default connect(mapToProps, null)(withStyles(s)(Navigation));

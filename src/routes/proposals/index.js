@@ -3,7 +3,6 @@ import Layout from '../../components/Layout';
 import { loadProposalsList } from '../../actions/proposal';
 import ProposalOverviewContainer from './ProposalsOverviewContainer';
 import { getSessionUser } from '../../reducers';
-import { RESET_ACTIVITY_COUNTER } from '../../constants';
 
 const title = 'Proposals';
 
@@ -19,7 +18,6 @@ async function action({ store, path }, { state }) {
   } else {
     store.dispatch(loadProposalsList({ state }));
   }
-  store.dispatch({ type: RESET_ACTIVITY_COUNTER, payload: { proposals: true } });
 
   return {
     chunks: ['proposals'],

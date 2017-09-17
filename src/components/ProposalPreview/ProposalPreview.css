@@ -12,24 +12,41 @@ a:visited {
 }
 
 .pollState {
-  height: 0.5em;
   width: 100%;
-  max-width: 400px;
-  margin-top: 1em;
+}
+
+.pollPreview {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  color: #666;
+  font-size: 1.825em;
+  min-width: 2.5em;
+  justify-content: center;
+  min-height: 3.5em;
 }
 
 .container {
   margin: 0 auto;
-  border: solid 1px gray;
+
+  /*  border: solid 1px gray; */
   padding: 0.4em;
-  box-shadow: #666 1px 1px 1px;
+
+  /* border-bottom: solid 1px #666; */
+
+  /* box-shadow: #666 1px 1px 1px; */
 }
 
 .header {
   font-weight: 300;
-  font-size: 2rem;
+  font-size: 1.25rem;
+  line-height: 1.25em;
   padding-top: 0;
   color: black;
+}
+
+.header:hover {
+  color: #7f4d4e;
 }
 
 /*
@@ -44,52 +61,24 @@ a:visited {
   text-align: right;
   font-size: 0.8em;
   font-style: italic;
-  float: right;
-}
-
-.body {
-  color: black;
-  padding-top: 1em;
-  max-height: 5em;
-  overflow: hidden;
-  position: relative;
-
-  img {
-    max-width: calc(var(--max-content-width) - 100px);
-  }
-
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-
-  th,
-  td {
-    padding: 0.25rem;
-    text-align: left;
-    border: 1px solid #ccc;
-  }
-}
-
-.overlay {
-  position: absolute;
-  top: 4em;
-  height: 2em;
-  width: 100%;
-  background: linear-gradient(transparent, white);
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
-  margin: 0.4em 1em 0;
+  padding-top: 1em;
   font-size: 0.8em;
   color: black;
 }
 
 .tag {
-  margin: 0 2px 2px;
-  padding: 0 2px;
-  border: solid 1px gray;
-  border-radius: 3px;
+  margin: 0 0.3em 0.3em;
+  padding: 0 0.3em;
+  background-color: rgba(37, 20, 155, 0.21); /* #7f4d4e */
+  color: #666; /* #f9e793 */
+  height: 2em;
+  line-height: 2em;
+
+  /*  border: solid 1px gray;
+  border-radius: 3px; */
 }

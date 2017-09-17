@@ -228,8 +228,10 @@ export function loadProposal({ id, pollId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // Dont fetch if pending
     const state = await getState();
-    if (id && getIsProposalFetching(state, id)) {
-      return false;
+    if (process.env.BROWSER) {
+      if (id && getIsProposalFetching(state, id)) {
+        return false;
+      }
     }
 
     dispatch({
@@ -271,8 +273,10 @@ export function loadProposalsList({ state, first, after }) {
       console.error('REDUX IS NOT READY!', { state, first, after });
       return false;
     }
-    if (getProposalsIsFetching(reduxState, state)) {
-      return false;
+    if (process.env.BROWSER) {
+      if (getProposalsIsFetching(reduxState, state)) {
+        return false;
+      }
     }
     dispatch({
       type: LOAD_PROPOSAL_LIST_START,

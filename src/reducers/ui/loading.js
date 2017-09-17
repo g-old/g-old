@@ -1,11 +1,11 @@
 import { LOADING_START, LOADING_SUCCESS } from '../../constants';
 
-export default (state = false, action) => {
+export default (state = { status: false, path: '/' }, action) => {
   switch (action.type) {
     case LOADING_START:
-      return true;
+      return { status: true, path: action.payload };
     case LOADING_SUCCESS:
-      return false;
+      return { ...state, status: false };
 
     default:
       return state;

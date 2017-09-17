@@ -45,7 +45,7 @@ class Layout extends React.Component {
 const mapDispatch = {
   createSSESub,
 };
-const mapStateToProps = state => ({ loading: state.ui.loading });
+const mapStateToProps = state => ({ loading: state.ui.loading.status });
 export default connect(mapStateToProps, mapDispatch)(
   withStyles(normalizeCss, s)(Layout),
 );
