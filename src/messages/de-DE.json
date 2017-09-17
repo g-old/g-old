@@ -934,5 +934,12 @@
     "defaultMessage": "Privileges",
     "message": "",
     "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
+  },
+  {
+    "id": "navigation.feed",
+    "description": "Feed link in header",
+    "defaultMessage": "Feed",
+    "message": "",
+    "files": ["src/components/Navigation/Navigation.js"]
   }
 ]

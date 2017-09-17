@@ -17,11 +17,28 @@ const fork = async file => {
       // Listen for an exit event:
       worker.on('exit', exitCode => {
         log.error({ exitCode }, 'Worker terminated!');
-        initialized = false;
-        // Restart
-        fork(file);
+        if (initialized) {
+          initialized = false;
+          // Restart
+          fork(file);
+        }
       });
       initialized = true;
+
+      process.on('exit', exitCode => {
+        log.error({ exitCode }, 'Server closing down, stopping worker');
+        worker.kill(exitCode);
+        initialized = false;
+      });
+      process.on('SIGTERM', exitCode => {
+        log.error({ exitCode }, 'SIGTERM received');
+        process.exit(exitCode);
+      });
+
+      process.on('SIGINT', exitCode => {
+        log.error({ exitCode }, 'SIGINT received');
+        process.exit(exitCode);
+      });
     } else {
       log.fatal('Worker could not been forked');
       throw Error('Worker could not been forked');
@@ -33,7 +50,7 @@ const fork = async file => {
 
 export const sendJob = ({ type, data, viewer }) => {
   let result = false;
-  if (initialized) {
+  if (initialized && worker) {
     const sent = worker.send({ type, data, viewer });
     if (sent) {
       result = true;
