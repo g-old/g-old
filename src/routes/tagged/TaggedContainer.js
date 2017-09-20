@@ -3,16 +3,19 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import ProposalPreview from '../../components/ProposalPreview';
-import Navigation from '../../components/ProposalsNavigation';
 import { loadProposalsList } from '../../actions/proposal';
 import {
-  getVisibleProposals,
+  getProposalsByTag,
+  getTag,
+  getTags,
   getProposalsIsFetching,
   getProposalsErrorMessage,
   getProposalsPage,
 } from '../../reducers/index';
 import Button from '../../components/Button';
 import FetchError from '../../components/FetchError';
+import Tag from '../../components/Tag';
+import Search from '../../components/Search';
 
 const messages = defineMessages({
   loadMore: {
@@ -28,7 +31,6 @@ class ProposalContainer extends React.Component {
         id: PropTypes.string,
       }),
     ).isRequired,
-    filter: PropTypes.string.isRequired,
     isFetching: PropTypes.bool.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
     errorMessage: PropTypes.string.isRequired,
@@ -36,7 +38,10 @@ class ProposalContainer extends React.Component {
       endCursor: PropTypes.string,
       hasNextPage: PropTypes.bool,
     }).isRequired,
-    state: PropTypes.string.isRequired,
+    tag: PropTypes.shape({ text: PropTypes.string }).isRequired,
+    tags: PropTypes.arrayOf(PropTypes.shape({ text: PropTypes.string }))
+      .isRequired,
+    tagId: PropTypes.string.isRequired,
   };
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
@@ -44,11 +49,17 @@ class ProposalContainer extends React.Component {
   }
 
   render() {
-    const { filter, proposals, isFetching, errorMessage } = this.props;
+    const {
+      proposals,
+      isFetching,
+      errorMessage,
+      tag,
+      tags,
+      tagId,
+    } = this.props;
     if (isFetching && !proposals.length) {
       return (
         <div>
-          <Navigation filter={filter} />
           <p> Loading ... </p>
         </div>
       );
@@ -57,19 +68,29 @@ class ProposalContainer extends React.Component {
     if (errorMessage && !proposals.length) {
       return (
         <div>
-          <Navigation filter={filter} />
           <FetchError
             isFetching={isFetching}
             message={errorMessage}
-            onRetry={() => this.props.loadProposalsList({ state: filter })}
+            onRetry={() =>
+              this.props.loadProposalsList({
+                state: 'active',
+                tagId,
+              })}
           />
         </div>
       );
     }
-
     return (
       <div>
-        <Navigation filter={filter} />
+        <h1> Tagged proposals</h1>
+        <Search
+          value={tag.text}
+          suggestions={tags && tags.map(t => t.text)}
+          onSelect={() => alert('TO IMPLEMENT')}
+        />
+        <div style={{ display: 'flex', fontSize: '0.8em', paddingTop: '1em' }}>
+          <Tag text={`${tag.text} (${tag.count})`} />
+        </div>
 
         {proposals.map(proposal =>
           <ProposalPreview key={proposal.id} proposal={proposal} />,
@@ -79,8 +100,9 @@ class ProposalContainer extends React.Component {
             disabled={isFetching}
             onClick={() => {
               this.props.loadProposalsList({
-                state: this.props.state,
+                state: 'active',
                 after: this.props.pageInfo.endCursor,
+                tagId,
               });
             }}
             label={<FormattedMessage {...messages.loadMore} />}
@@ -91,11 +113,12 @@ class ProposalContainer extends React.Component {
 }
 // TODO implement memoiziation with reselect
 const mapStateToProps = (state, ownProps) => ({
-  proposals: getVisibleProposals(state, ownProps.state),
-  filter: ownProps.state,
-  isFetching: getProposalsIsFetching(state, ownProps.state),
-  errorMessage: getProposalsErrorMessage(state, ownProps.state),
-  pageInfo: getProposalsPage(state, ownProps.state),
+  proposals: getProposalsByTag(state, ownProps.tagId),
+  tag: getTag(state, ownProps.tagId),
+  tags: getTags(state),
+  isFetching: getProposalsIsFetching(state, 'active'),
+  errorMessage: getProposalsErrorMessage(state, 'active'),
+  pageInfo: getProposalsPage(state, 'active'),
 });
 
 const mapDispatch = {

@@ -33,6 +33,11 @@ subscription{
       state
       body
       votes
+      tags {
+        id
+        text
+        count
+      }
       pollOne {
         id
         upvotes

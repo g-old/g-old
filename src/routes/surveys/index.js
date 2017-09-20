@@ -1,27 +1,31 @@
-import React from "react";
-import Layout from "../../components/Layout";
-import { loadProposalsList } from "../../actions/proposal";
-import SurveyListContainer from "./SurveyListContainer";
-import { getSessionUser } from "../../reducers";
+import React from 'react';
+import Layout from '../../components/Layout';
+import { loadProposalsList } from '../../actions/proposal';
+import SurveyListContainer from './SurveyListContainer';
+import { getSessionUser } from '../../reducers';
 
-const title = "Surveys";
+const title = 'Surveys';
 
 async function action({ store, path }) {
   const user = getSessionUser(store.getState());
   if (!user) {
     return { redirect: `/?redirect=${path}` };
-  } else if (user.role.type === "guest") {
-    return { redirect: "/" };
+  } else if (user.role.type === 'guest') {
+    return { redirect: '/' };
   }
   if (!process.env.BROWSER) {
-    await store.dispatch(loadProposalsList({ state: "survey" }));
+    await store.dispatch(loadProposalsList({ state: 'survey' }));
   } else {
-    store.dispatch(loadProposalsList({ state: "survey" }));
+    store.dispatch(loadProposalsList({ state: 'survey' }));
   }
   return {
-    chunks: ["surveys"],
+    chunks: ['surveys'],
     title,
-    component: <Layout><SurveyListContainer /> </Layout>
+    component: (
+      <Layout>
+        <SurveyListContainer />{' '}
+      </Layout>
+    ),
   };
 }
 export default action;

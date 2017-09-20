@@ -157,8 +157,8 @@ query{
 `;
 
 const proposalConnection = `
-query ($state:String $first:Int, $after:String) {
-  proposalConnection (state:$state first:$first after:$after) {
+query ($state:String $first:Int, $after:String, $tagId:ID) {
+  proposalConnection (state:$state first:$first after:$after tagId:$tagId) {
     pageInfo{
       endCursor
       hasNextPage
@@ -264,7 +264,7 @@ export function loadProposal({ id, pollId }) {
   };
 }
 
-export function loadProposalsList({ state, first, after }) {
+export function loadProposalsList({ state, first, after, tagId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
     // Dont fetch if pending
@@ -289,6 +289,7 @@ export function loadProposalsList({ state, first, after }) {
         state,
         first,
         after,
+        tagId,
       });
       const proposals = data.proposalConnection.edges.map(p => p.node);
       const normalizedData = normalize(proposals, proposalListSchema);

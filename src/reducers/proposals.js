@@ -3,6 +3,7 @@ import { denormalize } from 'normalizr';
 
 import byId, * as fromById from './proposalById';
 import createList, * as fromList from './createProposalsList';
+import byTag, * as fromByTag from './proposalsByTag';
 
 import { proposalList as proposalListSchema } from './../store/schema';
 
@@ -17,6 +18,7 @@ const listByFilter = combineReducers({
 export default combineReducers({
   byId,
   listByFilter,
+  byTag,
 });
 
 const hydrateProposals = (state, data, entities) =>
@@ -33,7 +35,8 @@ export const getVisibleProposals = (state, filter, entities) => {
   return hydrateProposals(state, data, entities);
 };
 
-export const getIsFetching = (state, filter) => fromList.getIsFetching(state.listByFilter[filter]);
+export const getIsFetching = (state, filter) =>
+  fromList.getIsFetching(state.listByFilter[filter]);
 export const getErrorMessage = (state, filter) =>
   fromList.getErrorMessage(state.listByFilter[filter]);
 
@@ -41,6 +44,15 @@ export const getProposal = (state, id, entities) => {
   const proposal = fromById.getProposal(state.byId, id);
   return hydrateProposals(state, [proposal], entities)[0];
 };
+
+export const getProposalsByTag = (state, tagId, entities) =>
+  hydrateProposals(
+    state,
+    fromByTag
+      .getIds(state.byTag, tagId)
+      .map(id => fromById.getProposal(state.byId, id)),
+    entities,
+  );
 
 export const getPageInfo = (state, filter) => ({
   ...fromList.getPageInfo(state.listByFilter[filter]),

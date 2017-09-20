@@ -36,6 +36,9 @@ export const getSessionUser = state =>
 export const getProposal = (state, id) =>
   fromEntity.getProposal(state.entities, id);
 
+export const getProposalsByTag = (state, tagId) =>
+  fromEntity.getProposalsByTag(state.entities, tagId);
+
 export const getIsProposalFetching = (state, id) =>
   fromUi.getIsProposalFetching(state.ui, id);
 
@@ -105,6 +108,8 @@ export const getFeedErrorMessage = (state, filter) =>
   fromEntity.getFeedErrorMessage(state.entities, filter);
 
 export const getTags = state => fromEntity.getTags(state.entities);
+
+export const getTag = (state, id) => fromEntity.getTag(state.entities, id);
 
 export const getFolloweeVotesByPoll = (state, id) =>
   fromEntity.getFolloweeVotesByPoll(state.entities, id);

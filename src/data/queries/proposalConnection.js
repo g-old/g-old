@@ -1,4 +1,4 @@
-import { GraphQLInt, GraphQLString } from 'graphql';
+import { GraphQLInt, GraphQLString, GraphQLID } from 'graphql';
 
 import PageType from '../types/PageType';
 import ProposalType from '../types/ProposalDLType';
@@ -17,10 +17,13 @@ const proposal = {
     state: {
       type: GraphQLString,
     },
+    tagId: {
+      type: GraphQLID,
+    },
   },
   resolve: async (
     parent,
-    { first = 10, after = '', state },
+    { first = 10, after = '', state, tagId },
     { viewer, loaders },
   ) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
@@ -29,81 +32,100 @@ const proposal = {
     id = Number(id);
     let proposals = [];
 
-    switch (state) {
-      case 'active': {
-        cursor = cursor ? new Date(cursor) : new Date(null);
-        proposals = await knex('proposals')
-          .innerJoin('polls', function() {
-            this.on(function() {
-              this.on(
-                knex.raw(
-                  "(proposals.state = 'proposed' and proposals.poll_one_id = polls.id) or proposals.state = 'voting' and proposals.poll_two_id = polls.id",
-                ),
-              );
-            });
-          })
-          //  .where({ 'polls.closed_at': null }) TODO find some other way to p1 to p2 transitioning
-          .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
-          .limit(first)
-          .orderBy('polls.end_time', 'asc')
-          .orderBy('polls.id', 'asc')
-          .select('proposals.id as id', 'polls.end_time as time');
+    if (tagId) {
+      cursor = cursor ? new Date(cursor) : new Date();
+      /*
+      select proposals.id from proposals join (select proposal_tags.proposal_id from proposal_tags where proposal_tags.tag_id =5)as tt on proposals.id = tt.proposal_id;
 
-        break;
-      }
+      */
+      proposals = await knex(
+        knex.raw(
+          'proposals join (select proposal_tags.proposal_id from proposal_tags where proposal_tags.tag_id = ?)as tt on proposals.id = tt.proposal_id',
+          [tagId],
+        ),
+      )
+        .whereRaw('(proposals.created_at, proposals.id) < (?,?)', [cursor, id])
+        .limit(first)
+        .orderBy('proposals.created_at', 'asc')
+        .orderBy('proposals.id', 'asc')
+        .select('proposals.id as id', 'proposals.created_at as time');
+    } else {
+      switch (state) {
+        case 'active': {
+          cursor = cursor ? new Date(cursor) : new Date(null);
+          proposals = await knex('proposals')
+            .innerJoin('polls', function() {
+              this.on(function() {
+                this.on(
+                  knex.raw(
+                    "(proposals.state = 'proposed' and proposals.poll_one_id = polls.id) or proposals.state = 'voting' and proposals.poll_two_id = polls.id",
+                  ),
+                );
+              });
+            })
+            //  .where({ 'polls.closed_at': null }) TODO find some other way to p1 to p2 transitioning
+            .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
+            .limit(first)
+            .orderBy('polls.end_time', 'asc')
+            .orderBy('polls.id', 'asc')
+            .select('proposals.id as id', 'polls.end_time as time');
 
-      case 'accepted': {
-        cursor = cursor ? new Date(cursor) : new Date();
-        proposals = await knex('proposals')
-          .innerJoin('polls', function() {
-            this.on(function() {
-              this.on(
-                knex.raw(
-                  'coalesce (proposals.poll_two_id, proposals.poll_one_id) = polls.id',
-                ),
-              );
-            });
-          })
-          .where('proposals.state', '=', 'accepted')
-          .whereRaw('(polls.end_time, polls.id) < (?,?)', [cursor, id])
-          .limit(first)
-          .orderBy('polls.end_time', 'desc')
-          .select('proposals.id as id', 'polls.closed_at as time');
-        break;
-      }
+          break;
+        }
 
-      case 'repelled': {
-        cursor = cursor ? new Date(cursor) : new Date();
+        case 'accepted': {
+          cursor = cursor ? new Date(cursor) : new Date();
+          proposals = await knex('proposals')
+            .innerJoin('polls', function() {
+              this.on(function() {
+                this.on(
+                  knex.raw(
+                    'coalesce (proposals.poll_two_id, proposals.poll_one_id) = polls.id',
+                  ),
+                );
+              });
+            })
+            .where('proposals.state', '=', 'accepted')
+            .whereRaw('(polls.end_time, polls.id) < (?,?)', [cursor, id])
+            .limit(first)
+            .orderBy('polls.end_time', 'desc')
+            .select('proposals.id as id', 'polls.closed_at as time');
+          break;
+        }
 
-        proposals = await knex('proposals')
-          .innerJoin('polls', function() {
-            this.on(function() {
-              this.on(
-                knex.raw(
-                  "(proposals.state = 'revoked' and proposals.poll_one_id = polls.id) or proposals.state = 'rejected' and proposals.poll_two_id = polls.id",
-                ),
-              );
-            });
-          })
-          .whereRaw('(polls.closed_at, polls.id) < (?,?)', [cursor, id])
-          .limit(first)
-          .orderBy('polls.closed_at', 'desc')
-          .select('proposals.id as id', 'polls.closed_at as time');
-        break;
+        case 'repelled': {
+          cursor = cursor ? new Date(cursor) : new Date();
+
+          proposals = await knex('proposals')
+            .innerJoin('polls', function() {
+              this.on(function() {
+                this.on(
+                  knex.raw(
+                    "(proposals.state = 'revoked' and proposals.poll_one_id = polls.id) or proposals.state = 'rejected' and proposals.poll_two_id = polls.id",
+                  ),
+                );
+              });
+            })
+            .whereRaw('(polls.closed_at, polls.id) < (?,?)', [cursor, id])
+            .limit(first)
+            .orderBy('polls.closed_at', 'desc')
+            .select('proposals.id as id', 'polls.closed_at as time');
+          break;
+        }
+        case 'survey': {
+          cursor = cursor ? new Date(cursor) : new Date(null);
+          proposals = await knex('proposals')
+            .innerJoin('polls', 'proposals.poll_one_id', 'polls.id')
+            .where('proposals.state', '=', 'survey')
+            .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
+            .limit(first)
+            .orderBy('polls.end_time', 'asc')
+            .select('proposals.id as id', 'polls.end_time as time');
+          break;
+        }
+        default:
+          throw Error(`State not recognized: ${state}`);
       }
-      case 'survey': {
-        cursor = cursor ? new Date(cursor) : new Date(null);
-        proposals = await knex('proposals')
-          .innerJoin('polls', 'proposals.poll_one_id', 'polls.id')
-          .where('proposals.state', '=', 'survey')
-          .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
-          .limit(first)
-          .orderBy('polls.end_time', 'asc')
-          .select('proposals.id as id', 'polls.end_time as time');
-        break;
-      }
-      default:
-        throw Error(`State not recognized: ${state}`);
     }
 
     const queries = proposals.map(p => Proposal.gen(viewer, p.id, loaders));

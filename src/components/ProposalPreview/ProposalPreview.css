@@ -78,7 +78,12 @@ a:visited {
   color: #666; /* #f9e793 */
   height: 2em;
   line-height: 2em;
+  cursor: pointer;
 
   /*  border: solid 1px gray;
   border-radius: 3px; */
+}
+
+.tag:hover {
+  background-color: rgba(37, 20, 155, 0.5); /* #7f4d4e */
 }

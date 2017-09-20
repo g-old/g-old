@@ -1,0 +1,86 @@
+@import '../../components/variables.css';
+
+.search {
+  display: inline-block;
+  position: relative;
+
+  &:focus {
+    outline: none;
+    margin: -1px;
+    border: 1px solid red;
+    box-shadow: 0 0 1px 1px red;
+  }
+}
+
+.active {
+  text-decoration: none;
+}
+
+/* TODO  add to drop- component */
+.drop {
+  position: fixed;
+  z-index: 20;
+  border-radius: 4px;
+  overflow: auto;
+  background-color: rgba(248, 248, 248, 0.95);
+  border: none;
+  box-shadow: none;
+}
+
+.searchDrop {
+  input {
+    margin-right: 0;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px;
+
+    &:focus {
+      padding: (10px);
+    }
+  }
+}
+
+.searchDrop .searchSuggestion {
+  padding: 6px 24px;
+  cursor: pointer;
+  outline: none;
+
+  &:hover,
+  &.active {
+    background-color: var(--color-accent-3-shade);
+  }
+}
+
+.searchIcon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.searchInput {
+  background-color: transparent;
+  color: inherit;
+  padding: 11px 23px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.14902);
+  border-image: initial;
+  border-radius: 4px;
+  outline: none;
+  font: inherit;
+  margin: 0;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+
+  &:focus {
+    border-width: 2px;
+    border-color: var(--color-gold);
+    padding: 10px 22px;
+  }
+
+  .header &:not(:focus) {
+    border-color: transparent;
+  }
+}

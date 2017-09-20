@@ -96,15 +96,19 @@ class ProposalPreview extends React.Component {
               >
                 {this.props.proposal.title}
               </div>
-
               {/* <div className={s.body}>
                 {body}
               </div>*/}
-
+              {/* eslint-disable jsx-a11y/no-static-element-interactions */}
               <div className={s.tags}>
                 {this.props.proposal.tags &&
                   this.props.proposal.tags.map(tag =>
-                    <span key={tag.id} className={s.tag}>{`${tag.text}`}</span>,
+                    <span
+                      onClick={() =>
+                        history.push(`/proposals/tagged/${tag.id}`)}
+                      key={tag.id}
+                      className={s.tag}
+                    >{`${tag.text}`}</span>,
                   )}
               </div>
             </div>

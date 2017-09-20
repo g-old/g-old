@@ -21,3 +21,4 @@ export default function tags(state = {}, action) {
   }
 }
 export const getTags = state => Object.keys(state).map(id => state[id]);
+export const getTag = (state, id) => state[id];

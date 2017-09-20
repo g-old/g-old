@@ -50,6 +50,9 @@ export const getUser = (state, id) => fromUsers.getUser(state.users, id, state);
 export const getProposal = (state, id) =>
   fromProposals.getProposal(state.proposals, id, state);
 
+export const getProposalsByTag = (state, tagId) =>
+  fromProposals.getProposalsByTag(state.proposals, tagId, state);
+
 export const getVisibleUsers = (state, filter) =>
   fromUsers.getVisibleUsers(state.users, filter, state);
 
@@ -87,6 +90,8 @@ export const getFeedErrorMessage = (state, filter) =>
   fromActivities.getErrorMessage(state.activities, filter);
 
 export const getTags = state => fromTags.getTags(state.tags);
+
+export const getTag = (state, id) => fromTags.getTag(state.tags, id);
 
 export const getFolloweeVotesByPoll = (state, id) =>
   fromFollowees.getFolloweeVotesByPoll(state, id);

@@ -32,6 +32,10 @@ const routes = {
       load: () => import(/* webpackChunkName: 'proposals' */ './proposals'),
     },
     {
+      path: '/proposals/tagged/:tagId',
+      load: () => import(/* webpackChunkName: 'proposals' */ './tagged'),
+    },
+    {
       path: '/about',
       load: () => import(/* webpackChunkName: 'about' */ './about'),
     },

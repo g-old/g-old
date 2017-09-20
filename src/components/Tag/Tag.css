@@ -1,0 +1,9 @@
+.root {
+  margin: 0 0.3em 0.3em;
+  padding: 0 0.3em;
+  background-color: rgba(37, 20, 155, 0.21); /* #7f4d4e */
+  color: #666; /* #f9e793 */
+  height: 2em;
+  line-height: 2em;
+  cursor: pointer;
+}

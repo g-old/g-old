@@ -1,12 +1,12 @@
 import React from 'react';
 import Layout from '../../components/Layout';
 import { loadProposalsList } from '../../actions/proposal';
-import ProposalOverviewContainer from './ProposalsOverviewContainer';
+import TaggedContainer from './TaggedContainer';
 import { getSessionUser } from '../../reducers';
 
-const title = 'Proposals';
+const title = 'Tagged';
 
-async function action({ store, path }, { state }) {
+async function action({ store, path }, { tagId }) {
   const user = getSessionUser(store.getState());
   if (!user) {
     return { redirect: `/?redirect=${path}` };
@@ -14,20 +14,19 @@ async function action({ store, path }, { state }) {
     return { redirect: '/' };
   }
   if (!process.env.BROWSER) {
-    await store.dispatch(loadProposalsList({ state }));
+    // FAKE STATE active, TODO change
+    await store.dispatch(loadProposalsList({ state: 'active', tagId }));
   } else {
-    store.dispatch(loadProposalsList({ state }));
+    store.dispatch(loadProposalsList({ state: 'active', tagId }));
   }
-
   return {
     chunks: ['proposals'],
     title,
     component: (
       <Layout>
-        <ProposalOverviewContainer state={state} />
+        <TaggedContainer tagId={tagId} />
       </Layout>
     ),
   };
 }
-
 export default action;
