@@ -15,9 +15,9 @@ async function action({ store, path }, { tagId }) {
   }
   if (!process.env.BROWSER) {
     // FAKE STATE active, TODO change
-    await store.dispatch(loadProposalsList({ state: 'active', tagId }));
+    await store.dispatch(loadProposalsList({ state: 'all', tagId }));
   } else {
-    store.dispatch(loadProposalsList({ state: 'active', tagId }));
+    store.dispatch(loadProposalsList({ state: 'all', tagId }));
   }
   return {
     chunks: ['proposals'],

@@ -46,8 +46,8 @@ const proposal = {
       )
         .whereRaw('(proposals.created_at, proposals.id) < (?,?)', [cursor, id])
         .limit(first)
-        .orderBy('proposals.created_at', 'asc')
-        .orderBy('proposals.id', 'asc')
+        .orderBy('proposals.created_at', 'desc')
+        .orderBy('proposals.id', 'desc')
         .select('proposals.id as id', 'proposals.created_at as time');
     } else {
       switch (state) {

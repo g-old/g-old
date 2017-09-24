@@ -10,7 +10,7 @@ import {
   getTags,
   getProposalsIsFetching,
   getProposalsErrorMessage,
-  getProposalsPage,
+  getPageInfo,
 } from '../../reducers/index';
 import Button from '../../components/Button';
 import FetchError from '../../components/FetchError';
@@ -73,7 +73,7 @@ class ProposalContainer extends React.Component {
             message={errorMessage}
             onRetry={() =>
               this.props.loadProposalsList({
-                state: 'active',
+                state: 'all',
                 tagId,
               })}
           />
@@ -92,21 +92,23 @@ class ProposalContainer extends React.Component {
           <Tag text={`${tag.text} (${tag.count})`} />
         </div>
 
-        {proposals.map(proposal =>
-          <ProposalPreview key={proposal.id} proposal={proposal} />,
-        )}
-        {this.props.pageInfo.hasNextPage &&
+        {proposals.map(proposal => (
+          <ProposalPreview key={proposal.id} proposal={proposal} />
+        ))}
+        {this.props.pageInfo.hasNextPage && (
           <Button
+            primary
             disabled={isFetching}
             onClick={() => {
               this.props.loadProposalsList({
-                state: 'active',
+                state: 'all',
                 after: this.props.pageInfo.endCursor,
                 tagId,
               });
             }}
             label={<FormattedMessage {...messages.loadMore} />}
-          />}
+          />
+        )}
       </div>
     );
   }
@@ -116,9 +118,12 @@ const mapStateToProps = (state, ownProps) => ({
   proposals: getProposalsByTag(state, ownProps.tagId),
   tag: getTag(state, ownProps.tagId),
   tags: getTags(state),
-  isFetching: getProposalsIsFetching(state, 'active'),
-  errorMessage: getProposalsErrorMessage(state, 'active'),
-  pageInfo: getProposalsPage(state, 'active'),
+  isFetching: getProposalsIsFetching(state, 'all'),
+  errorMessage: getProposalsErrorMessage(state, 'all'),
+  pageInfo: getPageInfo(
+    state,
+    `${'all$'}${ownProps.tagId}`,
+  ) /* getProposalsPage(state, 'active') */,
 });
 
 const mapDispatch = {

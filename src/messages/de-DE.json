@@ -98,8 +98,10 @@
   {
     "id": "signup.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
-    "message": "Kurze Passwörter sind leicht zu erraten. Bitte verwenden Sie mindestens 6 Zeichen",
+    "defaultMessage":
+      "Short passwords are easy to guess. Try one with at least 6 characters",
+    "message":
+      "Kurze Passwörter sind leicht zu erraten. Bitte verwenden Sie mindestens 6 Zeichen",
     "files": ["src/routes/passwordReset/PasswordReset.js"]
   },
   {
@@ -156,14 +158,16 @@
   {
     "id": "passwordRecovery.stepOne",
     "description": "Password recovery instruction",
-    "defaultMessage": "Enter your email address below and we'll send you a link to reset your password",
+    "defaultMessage":
+      "Enter your email address below and we'll send you a link to reset your password",
     "message": "",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
     "id": "passwordRecovery.stepTwo",
     "description": "Password recovery instruction",
-    "defaultMessage": "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
+    "defaultMessage":
+      "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
     "message": "",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
@@ -509,8 +513,10 @@
   {
     "id": "form.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
-    "message": "Kurze Passwörter sind leicht zu erraten. Bitte mindestens 6 Zeichen verwenden",
+    "defaultMessage":
+      "Short passwords are easy to guess. Try one with at least 6 characters",
+    "message":
+      "Kurze Passwörter sind leicht zu erraten. Bitte mindestens 6 Zeichen verwenden",
     "files": [
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
@@ -790,7 +796,10 @@
     "description": "To get more data",
     "defaultMessage": "Load more",
     "message": "Mehr",
-    "files": ["src/routes/proposals/ProposalsOverviewContainer.js"]
+    "files": [
+      "src/routes/proposals/ProposalsOverviewContainer.js",
+      "src/routes/tagged/TaggedContainer.js"
+    ]
   },
   {
     "id": "proposal",
@@ -808,7 +817,8 @@
   },
   {
     "id": "form.error-select",
-    "description": "Help for selection, when input does not match with a suggestion",
+    "description":
+      "Help for selection, when input does not match with a suggestion",
     "defaultMessage": "You selection is not correct. Click on a suggestion",
     "message": "Bitte auf einen Vorschlag klicken",
     "files": [

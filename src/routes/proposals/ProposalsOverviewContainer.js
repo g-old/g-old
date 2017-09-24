@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import ProposalPreview from '../../components/ProposalPreview';
-import Navigation from '../../components/ProposalsNavigation';
 import { loadProposalsList } from '../../actions/proposal';
 import {
   getVisibleProposals,
@@ -13,6 +12,7 @@ import {
 } from '../../reducers/index';
 import Button from '../../components/Button';
 import FetchError from '../../components/FetchError';
+import ProposalsSubHeader from '../../components/ProposalsSubHeader';
 
 const messages = defineMessages({
   loadMore: {
@@ -48,7 +48,7 @@ class ProposalContainer extends React.Component {
     if (isFetching && !proposals.length) {
       return (
         <div>
-          <Navigation filter={filter} />
+          <ProposalsSubHeader filter={filter} />
           <p> Loading ... </p>
         </div>
       );
@@ -57,7 +57,8 @@ class ProposalContainer extends React.Component {
     if (errorMessage && !proposals.length) {
       return (
         <div>
-          <Navigation filter={filter} />
+          <ProposalsSubHeader filter={filter} />
+
           <FetchError
             isFetching={isFetching}
             message={errorMessage}
@@ -69,13 +70,14 @@ class ProposalContainer extends React.Component {
 
     return (
       <div>
-        <Navigation filter={filter} />
-
-        {proposals.map(proposal =>
-          <ProposalPreview key={proposal.id} proposal={proposal} />,
-        )}
-        {this.props.pageInfo.hasNextPage &&
+        {/* <Navigation filter={filter} /> */}
+        <ProposalsSubHeader filter={filter} />
+        {proposals.map(proposal => (
+          <ProposalPreview key={proposal.id} proposal={proposal} />
+        ))}
+        {this.props.pageInfo.hasNextPage && (
           <Button
+            primary
             disabled={isFetching}
             onClick={() => {
               this.props.loadProposalsList({
@@ -84,7 +86,8 @@ class ProposalContainer extends React.Component {
               });
             }}
             label={<FormattedMessage {...messages.loadMore} />}
-          />}
+          />
+        )}
       </div>
     );
   }

@@ -300,6 +300,7 @@ export function loadProposalsList({ state, first, after, tagId }) {
         filter: state,
         pagination: data.proposalConnection.pageInfo,
         savePageInfo: after != null,
+        pageIndex: `${state}$${tagId}`,
       });
     } catch (error) {
       dispatch({

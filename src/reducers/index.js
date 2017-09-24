@@ -129,3 +129,6 @@ export const getActivityCounter = state => fromUi.getActivityCounter(state.ui);
 export const getWorkTeams = state => fromEntity.getWorkTeams(state.entities);
 
 export const getStatistics = state => state.statistics;
+
+export const getPageInfo = (state, queryStateTag) =>
+  fromUi.getPageInfo(state.ui, queryStateTag);

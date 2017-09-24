@@ -6,6 +6,7 @@ import polls, * as fromPoll from './ui/polls';
 import subscription, * as fromSubscription from './ui/subscription';
 import activityCounter, * as fromActivityCounter from './ui/activities';
 import loading from './ui/loading';
+import pageInfo, * as fromPageInfo from './ui/pageInfo';
 import { SESSION_LOGOUT_SUCCESS } from '../constants';
 
 /* export default combineReducers({
@@ -22,6 +23,7 @@ const uiReducer = combineReducers({
   subscription,
   activityCounter,
   loading,
+  pageInfo,
 });
 export default (state, action) => {
   if (action.type === SESSION_LOGOUT_SUCCESS) {
@@ -32,33 +34,33 @@ export default (state, action) => {
 };
 
 // TODO Different design
-const getMutationPending = (state) => {
+const getMutationPending = state => {
   if (state && state.mutations) {
     return state.mutations.pending;
   }
   return false;
 };
 
-const getMutationError = (state) => {
+const getMutationError = state => {
   if (state && state.mutations) {
     return state.mutations.error;
   }
   return null;
 };
 
-const getMutationSuccess = (state) => {
+const getMutationSuccess = state => {
   if (state && state.mutations) {
     return state.mutations.success;
   }
   return false;
 };
-const getVotingListFetching = (state) => {
+const getVotingListFetching = state => {
   if (state && state.pollFetching) {
     return state.pollFetching.isFetching;
   }
   return false;
 };
-const getVotingListError = (state) => {
+const getVotingListError = state => {
   if (state && state.pollFetching) {
     return state.pollFetching.errorMessage;
   }
@@ -88,12 +90,20 @@ export const getVoteMutationSuccess = (state, id) =>
 export const getVoteMutationError = (state, id) =>
   getMutationError(fromPoll.getPoll(state.polls, id));
 
-export const getVoteUpdates = (state, id) => fromPoll.getUpdates(state.polls, id);
+export const getVoteUpdates = (state, id) =>
+  fromPoll.getUpdates(state.polls, id);
 
-export const getStatementUpdates = state => fromStatement.getUpdates(state.statements);
+export const getStatementUpdates = state =>
+  fromStatement.getUpdates(state.statements);
 
-export const getAccountUpdates = (state, id) => fromUser.getStatus(state.users, id) || {};
+export const getAccountUpdates = (state, id) =>
+  fromUser.getStatus(state.users, id) || {};
 
-export const getSubscription = state => fromSubscription.getStatus(state.subscription);
+export const getSubscription = state =>
+  fromSubscription.getStatus(state.subscription);
 
-export const getActivityCounter = state => fromActivityCounter.getCounter(state.activityCounter);
+export const getActivityCounter = state =>
+  fromActivityCounter.getCounter(state.activityCounter);
+
+export const getPageInfo = (state, queryStateTag) =>
+  fromPageInfo.getPageInfo(state.pageInfo, queryStateTag);
