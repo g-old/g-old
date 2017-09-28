@@ -1,6 +1,16 @@
 const faker = require('faker');
 const bcrypt = require('bcrypt');
-
+const Groups = {
+  SUPER_USER: 1,
+  ADMIN: 2,
+  MEMBER_MANAGER: 4,
+  DISTRICT_KEEPER: 6,
+  RELATOR: 8,
+  MODERATOR: 16,
+  VOTER: 32,
+  VIEWER: 64,
+  USER: 128,
+};
 const numUsers = 50;
 const numMods = numUsers / 10 > 0 ? numUsers / 10 : 1;
 const numTestUsers = numMods;
@@ -64,17 +74,17 @@ exports.seed = function (knex, Promise) {
     );
   }
 
-  function createUser(name, surname, passwordHash, email, roleId, time, emailVerified, privilege) {
+  function createUser(name, surname, passwordHash, email, groups, time, emailVerified, voteSince) {
     return knex('users').insert({
       name,
       surname,
       password_hash: passwordHash,
       email,
-      role_id: roleId,
+      groups,
+      canVoteSince : voteSince||new Date(),
       created_at: time,
       updated_at: time,
       email_verified: emailVerified,
-      privilege: privilege || 1,
       avatar_path: `https://api.adorable.io/avatars/32/${name}${surname}.io.png`,
     });
   }
@@ -83,10 +93,15 @@ exports.seed = function (knex, Promise) {
   function createUsers() {
     const time = new Date();
     let users = [];
+    const testSuperUser = Promise.resolve(
+      bcrypt
+        .hash('password', 10)
+        .then(hash => createUser('superuser', 'superuser', hash, 'superuser@example.com', Groups.SUPER_USER, time, true))
+    );
     const testAdmin = Promise.resolve(
       bcrypt
         .hash('password', 10)
-        .then(hash => createUser('admin', 'admin', hash, 'admin@example.com', 1, time, true, 1023))
+        .then(hash => createUser('admin', 'admin', hash, 'admin@example.com', Groups.ADMIN, time, true))
     );
     users.push(testAdmin);
     const testMods = [];
@@ -96,7 +111,7 @@ exports.seed = function (knex, Promise) {
         Promise.resolve(
           bcrypt
             .hash('password', 10)
-            .then(hash => createUser(name, name, hash, name + '@example.com', 2, time, true))
+            .then(hash => createUser(name, name, hash, name + '@example.com', Groups.MODERATOR, time, true))
         )
       );
     }
@@ -108,7 +123,7 @@ exports.seed = function (knex, Promise) {
         Promise.resolve(
           bcrypt
             .hash('password', 10)
-            .then(hash => createUser(name, name, hash, name + '@example.com', 3, time, true))
+            .then(hash => createUser(name, name, hash, name + '@example.com', Groups.VOTER, time, true))
         )
       );
     }
@@ -117,7 +132,7 @@ exports.seed = function (knex, Promise) {
     for (let i = 0; i < numUsersCalculated; i += 1) {
       const name = faker.name.firstName();
       const surname = faker.name.lastName();
-      const user = createUser(name, surname, null, faker.internet.email(), 3, time, true);
+      const user = createUser(name, surname, null, faker.internet.email(), Groups.VOTER, time, true);
       users.push(user);
     }
 
@@ -129,7 +144,7 @@ exports.seed = function (knex, Promise) {
         Promise.resolve(
           bcrypt
             .hash('password', 10)
-            .then(hash => createUser(name, name, hash, name + '@example.com', 5, time, true))
+            .then(hash => createUser(name, name, hash, name + '@example.com', Groups.USER, time, true))
         )
       );
     }
@@ -144,7 +159,7 @@ exports.seed = function (knex, Promise) {
         surname,
         null,
         faker.internet.email(),
-        5,
+        Groups.USER,
         time,
         Math.random() > 0.5
       );
@@ -155,7 +170,7 @@ exports.seed = function (knex, Promise) {
     return Promise.resolve(
       Promise.all(guestUsers).then(() =>
         Promise.all(users).then(() =>
-          knex('users').whereNot('role_id', 4).pluck('id').then(userIds => userIds)))
+          knex('users').whereNot('groups', Groups.USER).pluck('id').then(userIds => userIds)))
     );
   }
 
@@ -479,8 +494,8 @@ exports.seed = function (knex, Promise) {
   }
 
   return Promise.resolve(
-    createRoles()
-      .then(createPollingmodes)
+    //createRoles()
+    createPollingmodes()
       .then(createPolls)
       .then(pollData => createUsers().then(userIds => createProposals(userIds, pollData)))
       .then(createVotes)

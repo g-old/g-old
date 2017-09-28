@@ -18,6 +18,7 @@ import bcrypt from 'bcrypt';
 import { Strategy as LocalStrategy } from 'passport-local';
 import knex from '../src/data/knex';
 import log from './logger';
+import { calcRights } from './accessControl';
 
 function verifyUser(user, password) {
   return bcrypt.compare(password, user.password_hash);
@@ -74,6 +75,7 @@ passport.serializeUser((user, done) =>
       if (role) {
         const emailVerified =
           'emailVerified' in user ? user.emailVerified : user.email_verified;
+        const rights = calcRights(user.groups);
         const sessionUser = {
           id: user.id,
           name: user.name,
@@ -81,6 +83,8 @@ passport.serializeUser((user, done) =>
           email: user.email,
           avatar: user.avatar_path || user.avatar, // TODO change!
           privilege: user.privilege,
+          permissions: rights.perm,
+          privileges: rights.priv,
           emailVerified,
           role: {
             id: role.id,

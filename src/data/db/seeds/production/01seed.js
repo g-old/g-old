@@ -1,5 +1,5 @@
 
-
+const SUPER_USER = 1;
 exports.seed = function (knex, Promise) {
   /* eslint-disable comma-dangle */
 
@@ -25,22 +25,21 @@ exports.seed = function (knex, Promise) {
     );
   }
 
-  function createAdmin(){
+  function createSuperUser(){
     const hash = '$2a$10$2ZX.2Lgicib1coH163pIH.WsQdCcEnqAyglEa.6LYTVHnFqEVlOhe'
-    return createUser('Admin', 'Admin',hash,'admin@example.com',1, new Date(),false,1023);
+    return createUser('Superuser', 'Superuser',hash,'superuser@example.com',SUPER_USER, new Date(),false);
   }
 
-  function createUser(name, surname, passwordHash, email, roleId, time, emailVerified, privilege) {
+  function createUser(name, surname, passwordHash, email, groups, time, emailVerified) {
     return knex('users').insert({
       name,
       surname,
       password_hash: passwordHash,
       email,
-      role_id: roleId,
+      groups,
       created_at: time,
       updated_at: time,
       email_verified: emailVerified,
-      privilege: privilege || 1,
       avatar_path: `https://api.adorable.io/avatars/32/${name}${surname}.io.png`,
     });
   }
@@ -71,9 +70,8 @@ exports.seed = function (knex, Promise) {
 
 
   return Promise.resolve(
-    createRoles()
-      .then(createPollingmodes)
-      .then(createAdmin)
+      createPollingmodes()
+      .then(createSuperUser)
       .then(()=>createSystemFeeds({proposalFeedID: 1, statementFeedID:2}))
       .catch(e => console.log(e))
   );
