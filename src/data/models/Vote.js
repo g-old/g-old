@@ -2,12 +2,7 @@ import knex from '../knex';
 import Poll from './Poll';
 import Proposal from './Proposal';
 import Statement from './Statement';
-
-// eslint-disable-next-line no-unused-vars
-function checkCanSee(viewer, data) {
-  // TODO change data returned based on permissions
-  return true;
-}
+import { canSee, canMutate, Models } from '../../core/accessControl';
 
 class Vote {
   constructor(data) {
@@ -20,13 +15,12 @@ class Vote {
     if (!id) return null;
     const data = await votes.load(id);
     if (data === null) return null;
-    const canSee = checkCanSee(viewer, data);
-    if (!canSee) return null;
+    if (!canSee(viewer, data, Models.VOTE)) return null;
     return new Vote(data);
   }
 
   static async validate(viewer, data, loaders, poll, trx, mutation = false) {
-    if (!poll || !poll.isVotable(viewer)) return null;
+    if (!poll || !poll.isVotable()) return null;
     const proposal = await Proposal.genByPoll(viewer, poll.id, loaders);
     if (!proposal || !proposal.isVotable(viewer)) return null;
     const voteInDB = await knex('votes')
@@ -42,6 +36,7 @@ class Vote {
   static async delete(viewer, data, loaders) {
     if (!data.id) return null;
     if (!data.pollId) return null;
+    if (!canMutate(viewer, data, Models.VOTE)) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
     let deletedStatement;
     const deletedVote = await knex.transaction(async trx => {
@@ -99,6 +94,7 @@ class Vote {
 
     if (!data.id) return null;
     if (!data.pollId) return null;
+    if (!canMutate(viewer, data, Models.VOTE)) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
 
     if (await poll.isUnipolar(viewer, loaders)) {
@@ -176,8 +172,10 @@ class Vote {
     // throw Error('TESTERROR');
     // validate
     if (!data.pollId) return null;
+    if (!canMutate(viewer, data, Models.VOTE)) return null;
+
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
-    if (!poll || !poll.isVotable(viewer)) return null;
+    if (!poll || !poll.isVotable()) return null;
     //
     const proposal = await Proposal.genByPoll(viewer, poll.id, loaders);
     if (!proposal || !proposal.isVotable(viewer)) return null;
@@ -195,15 +193,18 @@ class Vote {
         .where({ poll_id: data.pollId, user_id: viewer.id })
         .pluck('id');
       if (voteInDB.length !== 0) throw Error('Already voted!');
-      const id = await knex('votes').transacting(trx).forUpdate().insert(
-        {
-          user_id: viewer.id,
-          poll_id: data.pollId,
-          position,
-          created_at: new Date(),
-        },
-        'id',
-      );
+      const id = await knex('votes')
+        .transacting(trx)
+        .forUpdate()
+        .insert(
+          {
+            user_id: viewer.id,
+            poll_id: data.pollId,
+            position,
+            created_at: new Date(),
+          },
+          'id',
+        );
       if (id.length === 0) throw Error('No Id returned');
       // update votecount;
       // TODO these updates are sequential - can db-ops be parallel in transactions?

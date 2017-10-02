@@ -1,6 +1,0 @@
-{
-  "name": "RoleManager",
-  "version": "0.0.0",
-  "private": true,
-  "main": "./RoleManager.js"
-}

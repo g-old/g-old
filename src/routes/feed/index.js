@@ -4,6 +4,7 @@ import { loadFeed } from '../../actions/feed';
 import FeedContainer from './FeedContainer';
 import { getSessionUser } from '../../reducers';
 import { RESET_ACTIVITY_COUNTER } from '../../constants';
+import { canAccess } from '../../organization';
 
 const title = 'Feed';
 
@@ -11,7 +12,7 @@ async function action({ store, path }) {
   const user = getSessionUser(store.getState());
   if (!user) {
     return { redirect: `/?redirect=${path}` };
-  } else if (user.role.type === 'guest') {
+  } else if (!canAccess(user, title)) {
     return { redirect: '/' };
   }
   if (!process.env.BROWSER) {

@@ -146,6 +146,11 @@ export const PRIVILEGES = {
   canPostProposals: 512,
 };
 
+export const ErrorCodes = {
+  PERMISSION_WRONG: 1,
+  EMAIL_DUPLICATE: 2,
+};
+
 export const ICONS = {
   menu: 'M2 6h28v6h-28zM2 14h28v6h-28zM2 22h28v6h-28z',
   flag:

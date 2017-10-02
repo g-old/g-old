@@ -4,13 +4,17 @@ import { denormalize } from 'normalizr';
 import byId, * as fromById from './userById';
 import createList, * as fromList from './createUserList';
 import { user as userSchema, userList as userArray } from './../store/schema';
+import { Groups } from '../organization';
 
+/* eslint-disable no-bitwise */
 const listByFilter = combineReducers({
   all: createList('all'),
   user: createList('user'),
-  viewer: createList('viewer'),
-  guest: createList('guest'),
+  [Groups.VIEWER | Groups.USER]: createList(Groups.VIEWER | Groups.USER),
+  [Groups.USER]: createList(Groups.USER),
 });
+/* eslint-enable no-bitwise */
+
 export default combineReducers({
   byId,
   listByFilter,
@@ -35,6 +39,5 @@ export const getVisibleUsers = (state, filter, entities) => {
   return hydrateUsers(state, data, entities);
 };
 
-export const getIsFetching = (state, filter) => fromList.getIsFetching(state.listByFilter[filter]);
-export const getErrorMessage = (state, filter) =>
-  fromList.getErrorMessage(state.listByFilter[filter]);
+export const getStatus = (state, filter) =>
+  fromList.getStatus(state.listByFilter[filter]);

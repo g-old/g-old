@@ -1,10 +1,5 @@
 import knex from '../knex';
-
-// eslint-disable-next-line no-unused-vars
-function checkCanSee(viewer, data) {
-  // TODO change data returned based on permissions
-  return true;
-}
+import { canSee, canMutate, Models } from '../../core/accessControl';
 
 class StatementLike {
   constructor(data) {
@@ -15,20 +10,23 @@ class StatementLike {
   static async gen(viewer, id, { statementLikes }) {
     const data = await statementLikes.load(id);
     if (data === null) return null;
-    const canSee = checkCanSee(viewer, data);
-    return canSee ? new StatementLike(data) : null;
+    return canSee(viewer, data, Models.S_LIKE) ? new StatementLike(data) : null;
   }
 
   static async delete(viewer, data) {
     if (!data.id || !viewer) return null;
+    if (!canMutate(viewer, data, Models.S_LIKE)) return null;
     // eslint-disable-next-line prefer-arrow-callback
-    const deletedLike = await knex.transaction(async function (trx) {
-      const likeInDB = await knex('statement_likes')
+    const deletedLike = await knex.transaction(async function(trx) {
+      let likeInDB = await knex('statement_likes')
         .transacting(trx)
         .forUpdate()
         .where({ id: data.id, user_id: viewer.id })
         .select();
-      if (likeInDB.length === 0) throw Error('Nothing to delete!');
+      likeInDB = likeInDB[0];
+      if (!likeInDB) throw Error('Nothing to delete!');
+      // eslint-disable-next-line eqeqeq
+      if (likeInDB.user_id != viewer.id) throw Error('Permission denied');
       await knex('statement_likes')
         .transacting(trx)
         .forUpdate()
@@ -43,18 +41,17 @@ class StatementLike {
       return likeInDB;
     });
 
-    const delLike = new StatementLike(deletedLike[0]);
-
-    return delLike || null;
+    return deletedLike ? new StatementLike(deletedLike) : null;
   }
 
   static async create(viewer, data, loaders) {
     // validate
     if (!data.statementId || !viewer) return null;
+    if (!canMutate(viewer, data, Models.S_LIKE)) return null;
 
     // create
     // eslint-disable-next-line prefer-arrow-callback
-    const newLikeId = await knex.transaction(async function (trx) {
+    const newLikeId = await knex.transaction(async function(trx) {
       const likeInDB = await knex('statement_likes')
         .transacting(trx)
         .forUpdate()
@@ -62,14 +59,17 @@ class StatementLike {
         .pluck('id')
         .into('statement_likes');
       if (likeInDB.length !== 0) throw Error('Already liked!');
-      const id = await knex('statement_likes').transacting(trx).forUpdate().insert(
-        {
-          user_id: viewer.id,
-          statement_id: data.statementId,
-          created_at: new Date(),
-        },
-        'id',
-      );
+      const id = await knex('statement_likes')
+        .transacting(trx)
+        .forUpdate()
+        .insert(
+          {
+            user_id: viewer.id,
+            statement_id: data.statementId,
+            created_at: new Date(),
+          },
+          'id',
+        );
 
       if (id.length === 0) throw Error('No Id returned');
 

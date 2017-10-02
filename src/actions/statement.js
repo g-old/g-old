@@ -72,10 +72,7 @@ id,
     name,
     surname,
     avatar
-    role{
-      id,
-      type
-    }
+    groups
     `;
 const flaggedStatement = `
 id,
@@ -252,7 +249,11 @@ export function loadFlaggedStatementsConnection(state, first, after) {
       filter: state,
     });
     try {
-      const { data } = await graphqlRequest(flagConnection, { state, first, after });
+      const { data } = await graphqlRequest(flagConnection, {
+        state,
+        first,
+        after,
+      });
       const flags = data.flagConnection.edges.map(f => f.node);
       const normalizedData = normalize(flags, flaggedArraySchema);
       dispatch({
@@ -285,7 +286,10 @@ export function loadFlaggedStatements(state) {
     });
     try {
       const { data } = await graphqlRequest(flaggedStatements, { state });
-      const normalizedData = normalize(data.flaggedStatements, flaggedArraySchema);
+      const normalizedData = normalize(
+        data.flaggedStatements,
+        flaggedArraySchema,
+      );
       dispatch({
         type: LOAD_FLAGGEDSTMTS_SUCCESS,
         payload: normalizedData,

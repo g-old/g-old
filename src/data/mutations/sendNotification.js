@@ -1,6 +1,6 @@
 import { GraphQLNonNull, GraphQLBoolean } from 'graphql';
 import NotificationInput from '../types/NotificationInputType';
-import { PRIVILEGES } from '../../constants';
+import { canAccess } from '../../organization';
 
 import { sendJob } from '../../core/childProcess';
 import User from '../models/User';
@@ -16,8 +16,7 @@ const sendNotification = {
     switch (notification.type) {
       case 'email': {
         // eslint-disable-next-line no-bitwise
-        if (!viewer || !(viewer.privilege & PRIVILEGES.canNotifyUser))
-          return false;
+        if (!canAccess(viewer, 'NotificationPanel')) return false;
         if (!notification.receiverId || !notification.message) return false;
 
         const receiver = await User.gen(

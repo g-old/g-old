@@ -1,9 +1,5 @@
 import knex from '../knex';
-
-// eslint-disable-next-line no-unused-vars
-function checkCanSee(viewer, data) {
-  return true;
-}
+import { canSee, canMutate, Models } from '../../core/accessControl';
 
 class Activity {
   constructor(data) {
@@ -18,13 +14,14 @@ class Activity {
   static async gen(viewer, id, { activities }) {
     const data = await activities.load(id);
     if (data === null) return null;
-    const canSee = checkCanSee(viewer, data);
-    return canSee ? new Activity(data) : null;
+    return canSee(viewer, data, Models.ACTIVITY) ? new Activity(data) : null;
   }
 
   static async create(viewer, data) {
     if (!viewer) return null;
-    if (!data.verb || !data.type || !data.objectId || !data.content) return null;
+    if (!data.verb || !data.type || !data.objectId || !data.content)
+      return null;
+    if (!canMutate(viewer, data, Models.ACTIVITY)) return null;
     const activity = {
       actor_id: viewer.id,
       verb: data.verb,
@@ -33,7 +30,9 @@ class Activity {
       content: JSON.stringify(data.content),
       created_at: new Date(),
     };
-    let id = await knex('activities').insert(activity).returning('id');
+    let id = await knex('activities')
+      .insert(activity)
+      .returning('id');
     id = id[0];
     if (id == null) return null;
     return new Activity({ ...activity, id });

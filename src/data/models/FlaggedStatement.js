@@ -1,13 +1,6 @@
 /* eslint-disable */
-import knex from '../knex';
-
-// eslint-disable-next-line no-unused-vars
-function checkCanSee(viewer, data) {
-  // TODO change data returned based on permissions
-  // return viewer.role === data.type || ['admin', 'mods'].includes(viewer.role.type);
-  return true;
-}
-
+import knex from "../knex";
+import { canSee, Models } from "../../core/accessControl";
 class FlaggedStatement {
   constructor(data) {
     this.id = data.id;
@@ -19,10 +12,13 @@ class FlaggedStatement {
     this.updatedAt = data.updated_at;
   }
   static async gen(viewer, id) {
-    const data = await knex('flagged_statements').where({ id }).select();
+    const data = await knex("flagged_statements")
+      .where({ id })
+      .select();
     if (data === null) return null;
-    const canSee = checkCanSee(viewer, data);
-    return canSee ? new FlaggedStatement(data) : null;
+    return canSee(viewer, data, Models.FLAG)
+      ? new FlaggedStatement(data)
+      : null;
   }
 }
 

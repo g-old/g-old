@@ -3,19 +3,6 @@ const SUPER_USER = 1;
 exports.seed = function (knex, Promise) {
   /* eslint-disable comma-dangle */
 
-  function createRoles() {
-    return Promise.resolve(
-      Promise.all([
-        // Inserts seed entries
-        knex('roles').insert({ id: 1, type: 'admin' }),
-        knex('roles').insert({ id: 2, type: 'mod' }),
-        knex('roles').insert({ id: 3, type: 'user' }),
-        knex('roles').insert({ id: 4, type: 'viewer' }),
-        knex('roles').insert({ id: 5, type: 'guest' }),
-      ])
-    );
-  }
-
   function createSystemFeeds({proposalFeedID, statementFeedID}) {
     return Promise.resolve(
       knex('system_feeds').insert([

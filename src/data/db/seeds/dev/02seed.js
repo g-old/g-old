@@ -4,12 +4,12 @@ const Groups = {
   SUPER_USER: 1,
   ADMIN: 2,
   MEMBER_MANAGER: 4,
-  DISTRICT_KEEPER: 6,
-  RELATOR: 8,
-  MODERATOR: 16,
-  VOTER: 32,
-  VIEWER: 64,
-  USER: 128,
+  DISTRICT_KEEPER: 8,
+  RELATOR: 16,
+  MODERATOR: 32,
+  VOTER: 64,
+  VIEWER: 128,
+  USER: 256,
 };
 const numUsers = 50;
 const numMods = numUsers / 10 > 0 ? numUsers / 10 : 1;

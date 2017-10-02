@@ -8,9 +8,10 @@ import { fetchUser } from '../../actions/user';
 import { getUser, getAccountUpdates } from '../../reducers';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
-import PrivilegeManager from '../PrivilegeManager';
-import RoleManager from '../RoleManager';
-import { PRIVILEGES } from '../../constants';
+import RightsManager from '../RightsManager';
+import GroupManager from '../GroupManager';
+// import { PRIVILEGES } from '../../constants';
+import { Groups, AccessMasks, canAccess } from '../../organization';
 import ImageUpload from '../ImageUpload';
 import { uploadAvatar } from '../../actions/file';
 import { notifyUser } from '../../actions/notifications';
@@ -22,20 +23,15 @@ import Label from '../Label';
 import s from './AccountDetails.css';
 
 const messages = defineMessages({
-  headerPrivilege: {
-    id: 'privilege.header',
-    defaultMessage: 'Set & Change Privileges',
+  headerRights: {
+    id: 'rights.header',
+    defaultMessage: 'Rights',
     description: 'Header of privilegemanager',
   },
-  headerRole: {
+  headerGroups: {
     id: 'roles.header',
-    defaultMessage: 'Set & Change Roles',
-    description: 'Header of rolesemanager',
-  },
-  role: {
-    id: 'account.role',
-    defaultMessage: 'Role',
-    description: 'Role of the user',
+    defaultMessage: 'Set & Change Groups',
+    description: 'Header of groupsemanager',
   },
   emailValidationMissing: {
     id: 'account.emailValidationMissing',
@@ -62,12 +58,6 @@ const messages = defineMessages({
     defaultMessage: 'Notify user',
     description: 'Contact user',
   },
-  changeRights: {
-    id: 'account.changeRights',
-    defaultMessage: 'Change users rights',
-    description: 'Changing the rights of the user',
-  },
-
   delete: {
     id: 'account.delete',
     defaultMessage: 'Delete account',
@@ -80,6 +70,14 @@ const messages = defineMessages({
   },
 });
 const checkAvatar = url => (url ? url.indexOf('http') !== -1 : false);
+
+/* const renderGroups = groups =>
+  Object.keys(Groups).reduce((acc, curr) => {
+    if (groups & Groups[curr]) {
+      acc.push(<div>{curr}</div>);
+    }
+    return acc;
+  }, []); */
 
 class AccountDetails extends React.Component {
   static propTypes = {
@@ -142,8 +140,12 @@ class AccountDetails extends React.Component {
     }
   }
   onPromoteToViewer() {
-    if (this.props.accountData.role.type === 'guest') {
-      this.props.update({ id: this.props.accountData.id, role: 'viewer' });
+    const { accountData: { groups, id } } = this.props;
+    if (groups === Groups.USER) {
+      this.props.update({
+        id,
+        groups: groups | Groups.VIEWER, // eslint-disable-line no-bitwise
+      });
     }
   }
 
@@ -161,44 +163,37 @@ class AccountDetails extends React.Component {
       avatar,
       name,
       surname,
-      role,
       emailVerified,
       lastLogin,
-      privilege,
       workTeams,
+      groups,
     } = accountData;
 
-    let PrivilegePanel = <div />;
+    let RightsPanel = <div />;
     // eslint-disable-next-line no-bitwise
-    if (privilege && user.privilege & PRIVILEGES.canModifyRights) {
-      PrivilegePanel = (
+    if (groups != null && (user.privileges & AccessMasks.GROUPS_MANAGER) > 0) {
+      RightsPanel = (
         <AccordionPanel
-          heading={<FormattedMessage {...messages.headerPrivilege} />}
+          heading={<FormattedMessage {...messages.headerRights} />}
         >
-          <PrivilegeManager
+          <RightsManager
             updates={updates.privilege}
             updateFn={this.props.update}
-            privilege={privilege}
+            account={accountData}
             id={id}
           />
         </AccordionPanel>
       );
     }
 
-    let RolePanel = <div />;
+    let GroupPanel = <div />;
 
-    if (
-      /* eslint-disable no-bitwise */
-      privilege &&
-      (user.privilege & PRIVILEGES.canModifyRights ||
-        user.privilege & PRIVILEGES.canUnlockViewer ||
-        user.privilege & PRIVILEGES.canUnlockUser ||
-        user.privilege & PRIVILEGES.canUnlockMod)
-      /* eslint-enable no-bitwise */
-    ) {
-      RolePanel = (
-        <AccordionPanel heading={<FormattedMessage {...messages.headerRole} />}>
-          <RoleManager
+    if (groups != null && canAccess(user, 'GroupsPanel')) {
+      GroupPanel = (
+        <AccordionPanel
+          heading={<FormattedMessage {...messages.headerGroups} />}
+        >
+          <GroupManager
             updates={updates.role}
             account={accountData}
             updateFn={this.props.update}
@@ -210,7 +205,7 @@ class AccountDetails extends React.Component {
 
     let NotificationPanel = <div />;
     // eslint-disable-next-line no-bitwise
-    if (privilege && user.privilege & PRIVILEGES.canNotifyUser) {
+    if (canAccess(user, 'NotificationPanel')) {
       NotificationPanel = (
         <AccordionPanel column pad heading={'Notify user'}>
           <NotificationInput
@@ -229,7 +224,7 @@ class AccountDetails extends React.Component {
     return (
       <Box className={s.root} flex wrap>
         <Box className={s.profile} flex pad align column>
-          {this.state.showUpload &&
+          {this.state.showUpload && (
             <ImageUpload
               uploadAvatar={data => {
                 this.props.uploadAvatar({ ...data, id });
@@ -240,7 +235,8 @@ class AccountDetails extends React.Component {
               onClose={() => {
                 this.setState({ showUpload: false });
               }}
-            />}
+            />
+          )}
           <ProfilePicture
             img={avatar}
             canChange
@@ -250,41 +246,48 @@ class AccountDetails extends React.Component {
           <Label>
             {name} {surname}
           </Label>
-          {!avatarSet &&
+          {!avatarSet && (
             <Notification
               type={'alert'}
               message={<FormattedMessage {...messages.avatarMissing} />}
-            />}
-          {!emailVerified &&
+            />
+          )}
+          {!emailVerified && (
             <Notification
               type={'alert'}
               message={
                 <FormattedMessage {...messages.emailValidationMissing} />
               }
-            />}
+            />
+          )}
 
-          {!workTeamChoosen &&
+          {!workTeamChoosen && (
             <Notification
               type={'alert'}
               message={<FormattedMessage {...messages.workteam} />}
-            />}
-          <span>
-            <FormattedMessage {...messages.role} />: {role.type}{' '}
+            />
+          )}
+          {/* <span>
+            <FormattedMessage {...messages.role} />
+            {':'}
           </span>
+         <div className={s.groups}>{renderGroups(groups)}</div> */}
+
           <span>
             <FormattedMessage {...messages.lastLogin} />:
             {lastLogin ? <FormattedDate value={lastLogin} /> : null}
           </span>
         </Box>
         {/* eslint-disable eqeqeq */}
-        {user.id != id &&
+        {user.id != id && (
           <Box flex className={s.details}>
             <Accordion column>
-              {RolePanel}
-              {PrivilegePanel}
+              {GroupPanel}
+              {RightsPanel}
               {NotificationPanel}
             </Accordion>
-          </Box>}
+          </Box>
+        )}
       </Box>
     );
   }

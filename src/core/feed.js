@@ -27,10 +27,12 @@ async function pushToLog(userId, activityId) {
       userActivities.shift();
     }
     userActivities.push(activityId);
-    return knex('feeds').where({ user_id: userId }).update({
-      activity_ids: JSON.stringify(userActivities),
-      updated_at: new Date(),
-    });
+    return knex('feeds')
+      .where({ user_id: userId })
+      .update({
+        activity_ids: JSON.stringify(userActivities),
+        updated_at: new Date(),
+      });
   } catch (err) {
     log.error(
       { err, data: { userId, activityId } },
@@ -64,10 +66,12 @@ export async function insertIntoFeed({ viewer, data, verb }, mainFeed) {
         systemActivities.shift();
       }
       systemActivities.push(activity.id);
-      await knex('system_feeds').where({ user_id: userId }).update({
-        activity_ids: JSON.stringify(systemActivities),
-        updated_at: new Date(),
-      });
+      await knex('system_feeds')
+        .where({ user_id: userId })
+        .update({
+          activity_ids: JSON.stringify(systemActivities),
+          updated_at: new Date(),
+        });
 
       if (data.type === 'proposal') return activity.id; // or whole data?
     }
@@ -132,7 +136,9 @@ export async function circularFeedNotification({
       content: notification,
     });
     if (!activity) {
-      await knex('notifications').where({ id: notification.id }).del();
+      await knex('notifications')
+        .where({ id: notification.id })
+        .del();
       return result;
     }
     let res;
@@ -156,8 +162,12 @@ export async function circularFeedNotification({
     }
     if (!res) {
       // delete all
-      await knex('notifications').where({ id: notification.id }).del();
-      await knex('activities').where({ id: activity.id }).del();
+      await knex('notifications')
+        .where({ id: notification.id })
+        .del();
+      await knex('activities')
+        .where({ id: activity.id })
+        .del();
     }
     return res;
   } catch (err) {

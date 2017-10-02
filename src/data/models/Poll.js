@@ -1,5 +1,7 @@
 import knex from '../knex';
 import PollingMode from './PollingMode';
+import { canSee, canMutate, Models } from '../../core/accessControl';
+import { Permissions } from '../../organization';
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
@@ -23,25 +25,14 @@ class Poll {
     if (!id) return null;
     const data = await polls.load(id);
     if (data === null) return null;
-    const canSee = checkCanSee(viewer, data);
-    return canSee ? new Poll(data) : null;
+    return canSee(viewer, data, Models.POLL) ? new Poll(data) : null;
   }
-  // eslint-disable-next-line no-unused-vars
-  static canMutate(viewer, data) {
-    return true;
-  }
+
   // eslint-disable-next-line class-methods-use-this
-  isVotable(viewer) {
+  isVotable() {
     if (this.closedAt || new Date(this.endTime) < new Date()) {
       return false;
     }
-    if (
-      !viewer ||
-      !['admin', 'mod', 'user', 'viewer'].includes(viewer.role.type)
-    ) {
-      return false;
-    }
-
     // TODO regional voting here
     return true;
   }
@@ -64,7 +55,7 @@ class Poll {
   /* eslint-enable class-methods-use-this*/
   static async create(viewer, data, loaders) {
     // authorize
-    if (!Poll.canMutate(viewer, data)) return null;
+    if (!canMutate(viewer, data, Models.POLL)) return null;
     // validate
     if (!data.polling_mode_id) return null;
     if (!data.threshold) return null;
@@ -82,7 +73,7 @@ class Poll {
       if (pollingMode.thresholdRef === 'all') {
         // TODO check vote privilege for count of numVoter
         numVoter = await trx
-          .whereIn('role_id', [1, 2, 3, 4])
+          .whereRaw('groups & ? > 0', [Permissions.VOTE]) // TODO whitelist
           .count('id')
           .into('users');
         numVoter = Number(numVoter[0].count);
@@ -106,7 +97,7 @@ class Poll {
 
   static async update(viewer, data, loaders) {
     // authorize
-    if (!Poll.canMutate(viewer, data)) return null;
+    if (!canMutate(viewer, data, Models.POLL)) return null;
     // validate
     if (!data.id) return null;
     const newData = {};

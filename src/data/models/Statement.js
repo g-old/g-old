@@ -2,16 +2,7 @@ import Poll from './Poll';
 import Vote from './Vote';
 import knex from '../knex';
 import User from './User';
-
-/* eslint-disable no-unused-vars */
-function checkCanSee(viewer, data) {
-  // TODO change data returned based on permissions
-  return true;
-}
-
-function validateVoter(viewer, data) {}
-function validateTitle(viewer, data) {}
-function validateBody(viewer, data) {}
+import { canSee, canMutate, Models } from '../../core/accessControl';
 
 class Statement {
   constructor(data) {
@@ -30,13 +21,9 @@ class Statement {
   static async gen(viewer, id, { statements }) {
     const data = await statements.load(id);
     if (data === null) return null;
-    const canSee = checkCanSee(viewer, data);
-    return canSee ? new Statement(data) : null;
+    return canSee(viewer, data, Models.STATEMENT) ? new Statement(data) : null;
   }
 
-  static canMutate(viewer, data) {
-    return true;
-  }
   /* eslint-enable no-unused-vars */
   static async validateVote(viewer, id, loaders) {
     const voteInDb = await Vote.gen(viewer, id, loaders);
@@ -51,7 +38,7 @@ class Statement {
       throw new Error('TESTERROR');
     } */
 
-    if (!Statement.canMutate(viewer, data)) return null;
+    if (!canMutate(viewer, data, Models.STATEMENT)) return null;
 
     // validate
     if (!data.id) return null;
@@ -59,8 +46,14 @@ class Statement {
     const deletedStatement = await knex.transaction(async function(trx) {
       const statementInDB = await Statement.gen(viewer, data.id, loaders);
       if (!statementInDB) throw Error('Statement does not exist!');
+      // eslint-disable-next-line eqeqeq
+      if (statementInDB.author_id != viewer.id)
+        throw Error('Permission denied');
       if (statementInDB.deletedAt) throw Error('Statement cannot be modified!');
-      await trx.where({ id: data.id }).into('statements').del();
+      await trx
+        .where({ id: data.id })
+        .into('statements')
+        .del();
 
       return statementInDB;
     });
@@ -73,7 +66,7 @@ class Statement {
       console.log('ERROR');
       throw new Error('TESTERROR');
     } */
-    if (!Statement.canMutate(viewer, data)) return null;
+    if (!canMutate(viewer, data, Models.STATEMENT)) return null;
 
     // validate
     if (!data.id) return null;
@@ -84,6 +77,10 @@ class Statement {
     const updatedId = await knex.transaction(async function(trx) {
       const statementInDB = await Statement.gen(viewer, data.id, loaders);
       if (!statementInDB) throw Error('Statement does not exist!');
+
+      // eslint-disable-next-line eqeqeq
+      if (statementInDB.author_id != viewer.id)
+        throw Error('Permission denied!');
       if (statementInDB.deletedAt) throw Error('Statement cannot be changed');
       const newData = { updated_at: new Date(), body: data.text };
       await trx
@@ -106,7 +103,7 @@ class Statement {
       throw new Error('TESTERROR');
     } */
     // authorize
-    if (!Statement.canMutate(viewer, data)) return null;
+    if (!canMutate(viewer, data, Models.STATEMENT)) return null;
     // validate
 
     if (!data.pollId || !data.voteId) return null;
@@ -122,6 +119,7 @@ class Statement {
     const newStatementId = await knex.transaction(async function(trx) {
       const vote = await Statement.validateVote(viewer, data.voteId, loaders);
       if (!vote.id) throw Error('Vote not valid');
+      // TODO check if unique is applied on table statements
       const statementInDB = await knex('statements')
         .where({ poll_id: data.pollId, author_id: viewer.id })
         .pluck('id');
@@ -149,7 +147,7 @@ class Statement {
 
   static async flag(viewer, data, loaders) {
     // authorize
-    if (!Statement.canMutate(viewer, data)) return null;
+    if (!canMutate(viewer, data, Models.FLAG)) return null;
     // validate
     if (!data) return null;
     if (!data.statementId || !data.content) return null;
@@ -207,7 +205,7 @@ class Statement {
 
   static async solveFlag(viewer, data, loaders) {
     // authorize
-    if (!Statement.canMutate(viewer, data)) return null;
+    if (!canMutate(viewer, data, Models.FLAG)) return null;
 
     // validate
     if (!data) return null;
@@ -294,7 +292,9 @@ class Statement {
       loaders.statements.clear(flaggedStmtInDb.statement_id);
       return flaggedStmtInDb.id;
     });
-    const res = await knex('flagged_statements').where({ id }).select();
+    const res = await knex('flagged_statements')
+      .where({ id })
+      .select();
     return res[0];
   }
 }

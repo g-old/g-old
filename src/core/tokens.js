@@ -24,7 +24,10 @@ export const checkToken = async ({ token, table }) => {
   if (!token || typeof token !== 'string') return null;
   if (!table || typeof table !== 'string') return null;
   const dbData = await knex.transaction(async trx => {
-    let data = await trx.where({ token }).into(table).select();
+    let data = await trx
+      .where({ token })
+      .into(table)
+      .select();
     data = data[0];
     if (data) {
       // eslint-disable-next-line newline-per-chained-call
@@ -52,7 +55,10 @@ export const createToken = async ({ email, table, hoursValid, withEmail }) => {
   if (!validateEmail(email)) return null;
 
   const validToken = await knex.transaction(async trx => {
-    let userId = await trx.where({ email }).into('users').pluck('id');
+    let userId = await trx
+      .where({ email })
+      .into('users')
+      .pluck('id');
     userId = userId[0];
     if (!userId) throw Error('User not found');
     const token = await genToken();
@@ -95,11 +101,14 @@ export const createToken = async ({ email, table, hoursValid, withEmail }) => {
           updated_at: new Date(),
         });
     } else {
-      await knex(table).transacting(trx).forUpdate().insert({
-        ...newData,
-        user_id: userId,
-        created_at: new Date(),
-      });
+      await knex(table)
+        .transacting(trx)
+        .forUpdate()
+        .insert({
+          ...newData,
+          user_id: userId,
+          created_at: new Date(),
+        });
     }
 
     return token || null;

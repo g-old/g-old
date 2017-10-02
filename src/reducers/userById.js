@@ -20,36 +20,37 @@ import {
   LEAVE_WORKTEAM_SUCCESS,
 } from '../constants';
 
+const handleUsers = (state, action) => {
+  const users = action.payload.entities.users;
+  const newState = Object.keys(users).reduce(
+    (acc, curr) => ({ ...acc, [curr]: { ...state[curr], ...users[curr] } }),
+    {},
+  );
+  return {
+    ...state,
+    ...newState,
+  };
+};
+
 export default function byId(state = {}, action) {
   switch (action.type) {
-    case LOAD_FEED_SUCCESS: {
+    case LOAD_FEED_SUCCESS:
+    case LOAD_PROPOSAL_SUCCESS:
+    case LOAD_PROPOSAL_LIST_SUCCESS:
+    case LOAD_VOTES_SUCCESS:
+    case CREATE_STATEMENT_SUCCESS:
+    case LOAD_USERS_SUCCESS:
+    case CREATE_USER_SUCCESS:
+    case LOAD_WORKTEAMS_SUCCESS:
+    case JOIN_WORKTEAM_SUCCESS:
+    case UPLOAD_AVATAR_SUCCESS:
+    case RESET_PASSWORD_SUCCESS:
+    case FIND_USER_SUCCESS:
+    case LOAD_FLAGGEDSTMTS_SUCCESS:
+    case SESSION_LOGIN_SUCCESS: {
       return merge({}, state, action.payload.entities.users);
     }
-    case LOAD_PROPOSAL_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
-    }
-    case LOAD_PROPOSAL_LIST_SUCCESS: {
-      // change
-      return merge({}, state, action.payload.entities.users);
-    }
-    case LOAD_VOTES_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
-    }
-    case CREATE_STATEMENT_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
-    }
-    case LOAD_USERS_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
-    }
-    case CREATE_USER_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
-    }
-    case LOAD_WORKTEAMS_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
-    }
-    case JOIN_WORKTEAM_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
-    }
+
     case LEAVE_WORKTEAM_SUCCESS: {
       return {
         ...state,
@@ -67,39 +68,12 @@ export default function byId(state = {}, action) {
     }
     case UPDATE_USER_SUCCESS: {
       // bc of deleted followees
-      const users = action.payload.entities.users;
-      const newState = Object.keys(users).reduce(
-        (acc, curr) => ({ ...acc, [curr]: { ...state[curr], ...users[curr] } }),
-        {},
-      );
-      return {
-        ...state,
-        ...newState,
-        //...action.payload.entities.users,
-      };
+      return handleUsers(state, action);
     }
-    case UPLOAD_AVATAR_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
-    }
-    case RESET_PASSWORD_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
-    }
-    case FIND_USER_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
-    }
-    case SESSION_LOGIN_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
-    }
+
     case FETCH_USER_SUCCESS: {
-      // bc of deleted followees
-      return {
-        ...state,
-        ...action.payload.entities.users,
-      };
-      // return merge({}, state, action.payload.entities.users);
-    }
-    case LOAD_FLAGGEDSTMTS_SUCCESS: {
-      return merge({}, state, action.payload.entities.users);
+      // bc of permissions
+      return handleUsers(state, action);
     }
     default:
       return state;

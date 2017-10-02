@@ -4,12 +4,7 @@ import User from './User';
 import PollingMode from './PollingMode';
 import { dedup } from '../../core/helpers';
 import { computeNextState } from '../../core/worker';
-
-// eslint-disable-next-line no-unused-vars
-function checkCanSee(viewer, data) {
-  // TODO change data returned based on permissions
-  return true;
-}
+import { canSee, canMutate, Models } from '../../core/accessControl';
 
 const validateTags = async tags => {
   let existingTags;
@@ -21,7 +16,9 @@ const validateTags = async tags => {
 
   // check if new tags don't already exist
   const queries = newTags.map(tag =>
-    knex('tags').where('text', 'ilike', tag.text).select(),
+    knex('tags')
+      .where('text', 'ilike', tag.text)
+      .select(),
   );
 
   let duplicates = await Promise.all(queries);
@@ -163,7 +160,7 @@ class Proposal {
   static async gen(viewer, id, { proposals }) {
     const data = await proposals.load(id);
     if (data == null) return null;
-    if (viewer == null) return null;
+    if (!canSee(viewer, data, Models.PROPOSAL)) return null;
     return new Proposal(data);
     // return canSee ? new Proposal(data) : new Proposal(data.email = null);
   }
@@ -179,11 +176,6 @@ class Proposal {
     return new Proposal(data[0]);
   }
 
-  // eslint-disable-next-line no-unused-vars
-  static canMutate(viewer, data) {
-    return ['admin', 'mod', 'system'].includes(viewer.role.type);
-  }
-
   static async followees(id, { followees }) {
     const data = await followees.load(id);
     return data;
@@ -196,7 +188,7 @@ class Proposal {
   static async update(viewer, data, loaders) {
     // throw Error('TESTERROR');
     // authorize
-    if (!Proposal.canMutate(viewer, data)) return null;
+    if (!canMutate(viewer, data, Models.PROPOSAL)) return null;
     // validate
     if (!data.id) return null;
     const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
@@ -287,7 +279,7 @@ class Proposal {
   static async create(viewer, data, loaders) {
     // throw Error('TestError');
     // authorize
-    if (!Proposal.canMutate(viewer, data)) return null;
+    if (!canMutate(viewer, data, Models.PROPOSAL)) return null;
     // validate
     if (!data.text) return null;
     if (!data.title) return null;
@@ -352,7 +344,10 @@ class Proposal {
         // update counts
         await Promise.all(
           existingTags.map(t =>
-            trx.where({ id: t.id }).increment('count', 1).into('tags'),
+            trx
+              .where({ id: t.id })
+              .increment('count', 1)
+              .into('tags'),
           ),
         );
       }
@@ -370,7 +365,7 @@ class Proposal {
         //
       }
       // get all  possible voters;
-
+      /*
       let voters;
       if (state === 'survey') {
         voters = await trx
@@ -389,7 +384,7 @@ class Proposal {
       }));
       // await trx.insert(voteData).into('proposal_voters');
       await trx.batchInsert('proposal_voters', voteData, 100);
-
+*/
       //
       return id;
     });
@@ -413,18 +408,16 @@ class Proposal {
       .del();
   }
 
-  async isVotable(viewer) {
-    if (
-      ['proposed', 'voting', 'survey'].indexOf(this.state) === -1 ||
-      !viewer
-    ) {
-      return false;
+  isVotable(viewer) {
+    if (['proposed', 'voting', 'survey'].indexOf(this.state) !== -1 && viewer) {
+      if (
+        viewer.canVoteSince &&
+        new Date(viewer.canVoteSince) < new Date(this.createdAt)
+      ) {
+        return true;
+      }
     }
-    const res = await knex('proposal_voters')
-      .count('id')
-      .where({ proposal_id: this.id, user_id: viewer.id });
-
-    return res[0] ? res[0].count === '1' : false;
+    return false;
   }
 }
 

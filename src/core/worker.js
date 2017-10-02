@@ -3,6 +3,18 @@ import { insertIntoFeed } from './feed';
 import log from '../logger';
 import Proposal from '../data/models/Proposal';
 import createLoaders from '../data/dataLoader';
+import { Permissions, Groups } from '../organization';
+
+/* eslint-disable no-bitwise */
+const SYSTEM = {
+  id: 1,
+  permissions:
+    Permissions.MODIFY_PROPOSALS |
+    Permissions.CLOSE_POLLS |
+    Permissions.VIEW_PROPOSALS,
+  groups: Groups.SYSTEM,
+};
+/* eslint-enable no-bitwise */
 
 export const computeNextState = (state, poll, tRef) => {
   let newState;
@@ -97,7 +109,7 @@ async function proposalPolling(pubsub) {
     // TODO in transaction!
     const newState = computeNextState(proposal.state, proposal, proposal.ref);
     return Proposal.update(
-      { id: 1, role: { type: 'system' } },
+      SYSTEM,
       { id: proposal.id, state: newState },
       loaders,
     )

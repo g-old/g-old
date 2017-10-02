@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { FormattedMessage, defineMessages } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './UserPanel.css';
 import { notifyUser } from '../../actions/notifications';
@@ -18,15 +19,27 @@ import WorkTeamInput from '../WorkTeamInput';
 import Layer from '../Layer';
 import NotificationInput from '../NotificationInput';
 import UserListEntry from './UserListEntry';
+import { Permissions, Groups } from '../../organization';
+
 // import history from '../../history';
 
 import {
   getVisibleUsers,
-  getUsersIsFetching,
-  getUsersErrorMessage,
+  getUsersStatus,
   getSessionUser,
   getWorkTeams,
 } from '../../reducers';
+
+const messages = defineMessages({
+  loadMore: {
+    id: 'command.loadMore',
+    defaultMessage: 'Load more',
+    description: 'To get more data',
+  },
+});
+
+// eslint-disable-next-line no-bitwise
+const VIEWERS = Groups.VIEWER | Groups.USER;
 
 class UserPanel extends React.Component {
   static propTypes = {
@@ -34,15 +47,14 @@ class UserPanel extends React.Component {
     viewerArray: PropTypes.arrayOf(PropTypes.object),
     loadUserList: PropTypes.func.isRequired,
     updateUser: PropTypes.func.isRequired,
-    guestArrayIsFetching: PropTypes.bool,
-    guestArrayErrorMessage: PropTypes.string,
-    viewerArrayIsFetching: PropTypes.bool,
-    viewerArrayErrorMessage: PropTypes.string,
+    guestArrayStatus: PropTypes.shape({ pending: PropTypes.bool }).isRequired,
+    viewerArrayStatus: PropTypes.shape({ pending: PropTypes.bool }).isRequired,
+
     findUser: PropTypes.func.isRequired,
     userArray: PropTypes.arrayOf(PropTypes.object).isRequired,
     user: PropTypes.shape({
       id: PropTypes.string,
-      role: PropTypes.shape({ type: PropTypes.string }),
+      permissions: PropTypes.number,
     }).isRequired,
     createWorkTeam: PropTypes.func.isRequired,
     loadWorkTeams: PropTypes.func.isRequired,
@@ -82,29 +94,21 @@ class UserPanel extends React.Component {
       <table className={s.userList}>
         <thead>
           <tr>
-            <th>
-              {'Avatar'}
-            </th>
-            <th>
-              {'Name'}
-            </th>
-            <th>
-              {'Created at'}
-            </th>
-            <th>
-              {'Last login'}
-            </th>
+            <th>{'Avatar'}</th>
+            <th>{'Name'}</th>
+            <th>{'Created at'}</th>
+            <th>{'Last login'}</th>
           </tr>
         </thead>
         <tbody>
           {users &&
-            users.map(u =>
+            users.map(u => (
               <UserListEntry
                 key={u.id}
                 user={u}
                 onProfileClick={this.handleProfileClick}
-              />,
-            )}
+              />
+            ))}
         </tbody>
       </table>
     );
@@ -115,36 +119,28 @@ class UserPanel extends React.Component {
       <table className={s.workTeams}>
         <thead>
           <tr>
-            <th className={s.team}>
-              {'Name'}
-            </th>
-            <th className={s.members}>
-              {'Members'}
-            </th>
-            <th className={s.coordinator}>
-              {'Coordinator'}
-            </th>
+            <th className={s.team}>{'Name'}</th>
+            <th className={s.members}>{'Members'}</th>
+            <th className={s.coordinator}>{'Coordinator'}</th>
           </tr>
         </thead>
         <tbody>
           {teams &&
-            teams.map(t =>
+            teams.map(t => (
               <tr>
-                <td className={s.team}>
-                  {t.name}
-                </td>
+                <td className={s.team}>{t.name}</td>
                 <td className={s.members}>
                   {t.members &&
-                    t.members.map(m =>
+                    t.members.map(m => (
                       <img
                         style={{ height: '1em', width: '1em' }}
                         alt="member"
                         src={m.avatar}
-                      />,
-                    )}
+                      />
+                    ))}
                 </td>
                 <td className={s.coordinator}>
-                  {t.coordinator &&
+                  {t.coordinator && (
                     <span>
                       {`${t.coordinator.name} ${t.coordinator.surname}`}
                       <img
@@ -152,48 +148,53 @@ class UserPanel extends React.Component {
                         alt="coordinator"
                         src={t.coordinator.avatar}
                       />
+                      {/* eslint-disable no-bitwise */}
                       {// eslint-disable-next-line eqeqeq
                       (this.props.user.id == t.coordinator.id ||
-                        this.props.user.role.type === 'admin') &&
-                        <Button
-                          plain
-                          icon={
-                            <svg
-                              version="1.1"
-                              viewBox="0 0 24 24"
-                              width="24px"
-                              height="24px"
-                              role="img"
-                              aria-label="mail"
-                            >
-                              <path
-                                fill="none"
-                                stroke="#000"
-                                strokeWidth="2"
-                                d="M1,5 L12,14 L23,5 M1,20 L23,20 L23,4 L1,4 L1,20 L1,20 Z"
-                              />
-                            </svg>
-                          }
-                          onClick={() => this.setState({ showNotify: t.id })}
-                        />}
-                    </span>}
+                        (this.props.user.permissions &
+                          Permissions.NOTIFY_GROUPS) >
+                          0) && (
+                          <Button
+                            plain
+                            icon={
+                              <svg
+                                version="1.1"
+                                viewBox="0 0 24 24"
+                                width="24px"
+                                height="24px"
+                                role="img"
+                                aria-label="mail"
+                              >
+                                <path
+                                  fill="none"
+                                  stroke="#000"
+                                  strokeWidth="2"
+                                  d="M1,5 L12,14 L23,5 M1,20 L23,20 L23,4 L1,4 L1,20 L1,20 Z"
+                                />
+                              </svg>
+                            }
+                            onClick={() => this.setState({ showNotify: t.id })}
+                          />
+                        )}
+                      {/* eslint-enable no-bitwise */}
+                    </span>
+                  )}
                 </td>
-              </tr>,
-            )}
+              </tr>
+            ))}
         </tbody>
       </table>
     );
   }
   render() {
     const {
-      guestArrayIsFetching,
-      guestArrayErrorMessage,
-      viewerArrayIsFetching,
-      viewerArrayErrorMessage,
+      guestArrayStatus,
+      viewerArrayStatus,
       viewerArray,
       guestArray,
       workTeams,
     } = this.props;
+    if (!this.props.user) return null;
     return (
       <Box wrap>
         <div style={{ marginLeft: '12px' }}>
@@ -207,67 +208,104 @@ class UserPanel extends React.Component {
             />
           </FormField>
         </div>
-        {this.state.showAccount &&
+        {this.state.showAccount && (
           <Layer onClose={this.handleLayerClosing}>
             <AccountDetails
               user={this.props.user}
               accountId={this.state.accountId}
               update={this.props.updateUser}
             />
-          </Layer>}
+          </Layer>
+        )}
         <div style={{ width: '100%' }}>
           <Accordion openMulti>
             <AccordionPanel
               heading="Guest accounts"
               onActive={() => {
-                this.props.loadUserList('guest');
+                this.props.loadUserList({ group: Groups.USER });
               }}
             >
-              {guestArrayIsFetching && !guestArray.length && <p>Loading...</p>}
-              {!guestArrayIsFetching &&
+              {guestArrayStatus.pending &&
+                !guestArray.length && <p>Loading...</p>}
+              {!guestArrayStatus.pending &&
                 !guestArray.length &&
-                !guestArrayErrorMessage &&
-                <p> No data</p>}
-              {guestArrayErrorMessage &&
+                !guestArrayStatus.error && <p> No data</p>}
+              {guestArrayStatus.error && (
                 <FetchError
-                  message={guestArrayErrorMessage}
-                  onRetry={() => this.props.loadUserList('guest')}
-                />}
+                  message={guestArrayStatus.error}
+                  onRetry={() =>
+                    this.props.loadUserList({ group: Groups.USER })}
+                />
+              )}
               {this.renderUserList(this.props.guestArray)}
+              {guestArrayStatus.pageInfo.hasNextPage && (
+                <Button
+                  primary
+                  disabled={guestArray.pending}
+                  onClick={() => {
+                    this.props.loadUserList({
+                      group: Groups.USER,
+                      after: guestArray.pageInfo.endCursor,
+                    });
+                  }}
+                  label={<FormattedMessage {...messages.loadMore} />}
+                />
+              )}
             </AccordionPanel>
             <AccordionPanel
               heading="Viewer accounts"
               onActive={() => {
-                this.props.loadUserList('viewer');
+                this.props.loadUserList({ group: VIEWERS });
               }}
             >
-              {viewerArrayIsFetching &&
+              {viewerArrayStatus.pending &&
+                !viewerArray.length && <p>Loading...</p>}
+              {!viewerArrayStatus.pending &&
                 !viewerArray.length &&
-                <p>Loading...</p>}
-              {!viewerArrayIsFetching &&
-                !viewerArray.length &&
-                !viewerArrayErrorMessage &&
-                <p> No data</p>}
-              {viewerArrayErrorMessage &&
+                !viewerArrayStatus.error && <p> No data</p>}
+              {viewerArrayStatus.error && (
                 <FetchError
-                  message={viewerArrayErrorMessage}
-                  onRetry={() => this.props.loadUserList('viewer')}
-                />}
+                  message={viewerArrayStatus.error}
+                  onRetry={() =>
+                    this.props.loadUserList({
+                      group: VIEWERS,
+                    })}
+                />
+              )}
               {this.renderUserList(this.props.viewerArray)}
+              {viewerArrayStatus.pageInfo.hasNextPage && (
+                <Button
+                  primary
+                  disabled={viewerArray.pending}
+                  onClick={() => {
+                    this.props.loadUserList({
+                      group: VIEWERS,
+                      after: viewerArray.pageInfo.endCursor,
+                    });
+                  }}
+                  label={<FormattedMessage {...messages.loadMore} />}
+                />
+              )}
             </AccordionPanel>
             <AccordionPanel
               heading="Workteams"
               onActive={() => this.props.loadWorkTeams(true)}
             >
               {this.renderWorkTeams(workTeams)}
-
+              {/* eslint-disable no-bitwise */}
               <Button
                 primary
-                disabled={this.props.user.role.type !== 'admin'}
+                disabled={
+                  (this.props.user.permissions &
+                    Permissions.CREATE_WORKTEAMS) ===
+                  0
+                }
                 label={'ADD Workteam'}
                 onClick={() => this.setState({ showCreateWG: true })}
               />
-              {this.state.showNotify &&
+              {/* eslint-enable no-bitwise */}
+
+              {this.state.showNotify && (
                 <Layer onClose={() => this.setState({ showNotify: false })}>
                   <NotificationInput
                     notifyGroup
@@ -276,15 +314,17 @@ class UserPanel extends React.Component {
                     types={['notification']}
                     receiverId={this.state.showNotify}
                   />
-                </Layer>}
+                </Layer>
+              )}
 
-              {this.state.showCreateWG &&
+              {this.state.showCreateWG && (
                 <WorkTeamInput
                   createWorkTeam={this.props.createWorkTeam}
                   findUser={this.props.findUser}
                   users={this.props.userArray}
                   onClose={() => this.setState({ showCreateWG: false })}
-                />}
+                />
+              )}
             </AccordionPanel>
           </Accordion>
         </div>
@@ -294,12 +334,10 @@ class UserPanel extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  guestArray: getVisibleUsers(state, 'guest'),
-  viewerArray: getVisibleUsers(state, 'viewer'),
-  guestArrayIsFetching: getUsersIsFetching(state, 'guest'),
-  viewerArrayIsFetching: getUsersIsFetching(state, 'viewer'),
-  guestArrayErrorMessage: getUsersErrorMessage(state, 'guest'),
-  viewerArrayErrorMessage: getUsersErrorMessage(state, 'viewer'),
+  guestArray: getVisibleUsers(state, Groups.USER),
+  viewerArray: getVisibleUsers(state, VIEWERS),
+  guestArrayStatus: getUsersStatus(state, Groups.USER),
+  viewerArrayStatus: getUsersStatus(state, VIEWERS),
   userArray: getVisibleUsers(state, 'all'),
   user: getSessionUser(state),
   workTeams: getWorkTeams(state),

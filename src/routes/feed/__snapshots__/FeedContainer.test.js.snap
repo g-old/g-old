@@ -9,7 +9,7 @@ exports[`FeedContainer Displays activity 1`] = `
     className="container"
   >
     <span>
-      vor 2 Monaten
+      vor 4 Monaten
     </span>
     <h1>
       Look at that statement!
@@ -22,11 +22,21 @@ exports[`FeedContainer Displays activity 1`] = `
         <div
           className="rootAlt contra"
         >
-          <img
-            alt="IMG"
-            className="avatar"
-            src="https://api.adorable.io/avatars/32/GraceVon.io.png"
-          />
+          <div
+            onClick={[Function]}
+            role="button"
+            style={
+              Object {
+                "cursor": "auto",
+              }
+            }
+          >
+            <img
+              alt="IMG"
+              className="avatar"
+              src="https://api.adorable.io/avatars/32/GraceVon.io.png"
+            />
+          </div>
           <div
             style={
               Object {

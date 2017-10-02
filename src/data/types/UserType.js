@@ -9,11 +9,15 @@ import {
 
 import knex from '../knex';
 
-import RoleType from './RoleType';
 import WorkTeamType from './WorkTeamType';
 import WorkTeam from '../models/WorkTeam';
-import Role from '../models/Role';
 import User from '../models/User';
+import { Permissions } from '../../organization';
+
+/* eslint-disable */
+const canSee = (viewer, data) =>
+  data.id == viewer.id || (viewer & Permissions.VIEW_USER_INFO) > 0;
+/* eslint-enable */
 
 const UserType = new ObjectType({
   name: 'User',
@@ -28,35 +32,36 @@ const UserType = new ObjectType({
     },
     email: {
       type: GraphQLString,
+      resolve(data, args, { viewer }) {
+        return canSee(viewer, data) ? data.email : null;
+      },
     },
     avatar: {
       type: GraphQLString,
     },
     emailVerified: {
       type: GraphQLBoolean,
+      resolve(data, args, { viewer }) {
+        return canSee(viewer, data) ? data.emailVerified : null;
+      },
     },
     lastLogin: {
       type: GraphQLString,
+      resolve(data, args, { viewer }) {
+        return canSee(viewer, data) ? data.lastLogin : null;
+      },
     },
     createdAt: {
       type: GraphQLString,
     },
-    privilege: {
+    groups: {
       type: GraphQLInt,
-    },
-    role: {
-      type: RoleType,
-      resolve(data, args, { viewer, loaders }) {
-        return data.role_id ? Role.gen(viewer, data.role_id, loaders) : null;
-      },
     },
     followees: {
       type: new GraphQLList(UserType),
       resolve: (data, args, { viewer, loaders }) =>
-        Promise.resolve(
-          User.followees(viewer, data.id, loaders).then(ids =>
-            ids.map(id => User.gen(viewer, id, loaders)),
-          ),
+        User.followees(viewer, data.id, loaders).then(ids =>
+          ids.map(id => User.gen(viewer, id, loaders)),
         ),
     },
 

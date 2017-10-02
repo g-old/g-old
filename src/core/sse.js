@@ -1,6 +1,7 @@
 import { validate, execute, parse } from 'graphql';
 import { EventEmitter } from 'events';
 import log from '../logger';
+import { canAccess } from '../organization';
 // import { getArgumentValues } from 'graphql/execution/values';
 // import { createAsyncIterator, forAwaitEach, isAsyncIterable } from 'iterall';
 
@@ -13,6 +14,8 @@ class ValidationError extends Error {
     this.message = 'Subscription query has validation errors';
   }
 }
+
+const HEART_BEAT = 30000;
 
 export class SubscriptionManager {
   constructor(options) {
@@ -38,7 +41,7 @@ export class SubscriptionManager {
     this.maxSubscriptionId = this.maxSubscriptionId + 1;
     const externalSubscriptionId = this.maxSubscriptionId;
 
-    parsedQuery.definitions.forEach((definition) => {
+    parsedQuery.definitions.forEach(definition => {
       if (definition.kind === 'OperationDefinition') {
         const rootField = definition.selectionSet.selections[0];
         subscriptionName = rootField.name.value;
@@ -50,7 +53,7 @@ export class SubscriptionManager {
 
     const onMessage = rootValue =>
       Promise.resolve(options.context)
-        .then((context) => {
+        .then(context => {
           execute(
             this.schema,
             parsedQuery,
@@ -62,7 +65,7 @@ export class SubscriptionManager {
         })
         .catch(error => options.callback(error));
 
-    return this.pubsub.subscribe(subscriptionName, onMessage).then((id) => {
+    return this.pubsub.subscribe(subscriptionName, onMessage).then(id => {
       this.subscriptions[externalSubscriptionId] = id;
       return externalSubscriptionId;
     });
@@ -117,7 +120,7 @@ export function SubscriptionServer(options) {
   ee.setMaxListeners(0);
 
   options.express.post(options.path, (req, res) => {
-    if (!req.user || req.user.role.type === 'guest') {
+    if (!canAccess(req.user, 'SSE')) {
       return res.status(404).json({ error: 'Not authorized' });
     }
     // subscribe
@@ -129,24 +132,31 @@ export function SubscriptionServer(options) {
       ee.emit(`e-${connectionSubId}`, error, data);
     };
 
-    return options.subscriptionManager.subscribe(subscription).then((subId) => {
+    return options.subscriptionManager.subscribe(subscription).then(subId => {
       connectionSubId = subId;
       res.status(200).json({ subId });
     });
   });
 
   options.express.get(`${options.path}/:id`, (req, res) => {
-    if (!req.user || req.user.role.type === 'guest') {
+    if (!canAccess(req.user, 'SSE')) {
       return res.status(404).json({ error: 'Not authorized' });
     }
     const connectionSubId = req.params.id;
-    if (!connectionSubId || !options.subscriptionManager.subscriptions[connectionSubId]) {
+    if (
+      !connectionSubId ||
+      !options.subscriptionManager.subscriptions[connectionSubId]
+    ) {
       return res.status(404).json({ error: 'Not authorized' });
     }
     res.setHeader('Content-Type', 'text/event-stream');
     function listenerCallback(error, data) {
       res.write(
-        `data: ${JSON.stringify({ type: 'DATA', subId: connectionSubId, data: data.data })}\n\n`,
+        `data: ${JSON.stringify({
+          type: 'DATA',
+          subId: connectionSubId,
+          data: data.data,
+        })}\n\n`,
       );
     }
     req.connection.on('close', () => {
@@ -158,7 +168,7 @@ export function SubscriptionServer(options) {
       ee.removeListener(`e-${connectionSubId}`, listenerCallback);
     });
 
-    req.connection.on('error', (err) => {
+    req.connection.on('error', err => {
       if (err) {
         log.error({ err }, 'SSE connection error');
         res.end();
@@ -174,11 +184,21 @@ export function SubscriptionServer(options) {
 
     const keepAliveTimer = setInterval(() => {
       if (req.connection.readyState === 'open') {
-        res.write(`data: ${JSON.stringify({ type: 'KEEPALIVE', subId: connectionSubId })}\n\n`);
+        res.write(
+          `data: ${JSON.stringify({
+            type: 'KEEPALIVE',
+            subId: connectionSubId,
+          })}\n\n`,
+        );
       } else {
         clearInterval(keepAliveTimer);
       }
-    }, 30000);
-    return res.write(`data: ${JSON.stringify({ type: 'SUCCESS', subId: connectionSubId })}\n\n`);
+    }, HEART_BEAT);
+    return res.write(
+      `data: ${JSON.stringify({
+        type: 'SUCCESS',
+        subId: connectionSubId,
+      })}\n\n`,
+    );
   });
 }

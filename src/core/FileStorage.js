@@ -4,18 +4,8 @@ import fs from 'fs';
 import User from '../data/models/User';
 import knex from '../data/knex';
 import cloudinary from '../data/cloudinary';
+import { canMutate, Models } from './accessControl';
 
-// eslint-disable-next-line no-unused-vars
-function canMutate(viewer, data) {
-  if (
-    // eslint-disable-next-line eqeqeq
-    viewer.id == data.id ||
-    ['admin', 'mod', 'system'].includes(viewer.role.type)
-  ) {
-    return true;
-  }
-  return false;
-}
 function deleteFile(filePath) {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line no-confusing-arrow
@@ -49,7 +39,7 @@ const getPublicIdFromUrl = url => {
 // TODO Integrate with Usermodel!
 
 const saveToCloudinary = async ({ viewer, data: { dataUrl, id }, loaders }) => {
-  if (!canMutate(viewer, { dataUrl, id })) return null;
+  if (!canMutate(viewer, { dataUrl, id }, Models.USER)) return null;
   const userId = id || viewer.id;
   const user = await User.gen(viewer, userId, loaders);
   if (user.avatar) {
@@ -97,7 +87,7 @@ const saveToCloudinary = async ({ viewer, data: { dataUrl, id }, loaders }) => {
   //
   const result = await knex('users')
     .where({ id: userId })
-    .select('id', 'name', 'surname', 'email', 'avatar_path', 'role_id'); // await User.gen(viewer, viewer.id, loaders);
+    .select('id', 'name', 'surname', 'email', 'avatar_path', 'groups'); // await User.gen(viewer, viewer.id, loaders);
   return result[0] || null;
 };
 
@@ -106,7 +96,7 @@ const saveLocal = async (
   folder,
 ) => {
   // throw Error('TEST');
-  if (!canMutate(viewer, { dataUrl, id })) return null;
+  if (!canMutate(viewer, { dataUrl, id }, Models.USER)) return null;
   const userId = id || viewer.id;
   const user = await User.gen(viewer, userId, loaders);
   if (user.avatar) {
@@ -152,7 +142,7 @@ const saveLocal = async (
   //
   const result = await knex('users')
     .where({ id: userId })
-    .select('id', 'name', 'surname', 'email', 'avatar_path', 'role_id'); // await User.gen(viewer, viewer.id, loaders);
+    .select('id', 'name', 'surname', 'email', 'avatar_path', 'groups'); // await User.gen(viewer, viewer.id, loaders);
   return result[0] || null;
 };
 

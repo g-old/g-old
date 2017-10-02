@@ -173,7 +173,7 @@ export const emailChangedMail = (email, connection, token, name, lang) => {
     !token ||
     !name
   ) {
-    throw Error('Mail details not provided');
+    throw Error('Mail details not provided. Fn: emailChangedMail');
   }
   // TODO further checks
   // TODO Lang option

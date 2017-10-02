@@ -1,15 +1,6 @@
 import knex from '../knex';
 import User from './User';
-
-// eslint-disable-next-line no-unused-vars
-function checkCanSee(viewer, data) {
-  // TODO change data returned based on permissions
-  return true;
-}
-// eslint-disable-next-line no-unused-vars
-function canMutate(viewer, data) {
-  return viewer.role.type === 'admin';
-}
+import { canSee, canMutate, Models } from '../../core/accessControl';
 
 async function validateCoordinator(viewer, id, loaders) {
   const coordinator = await User.gen(viewer, id, loaders);
@@ -74,16 +65,17 @@ class WorkTeam {
 
   static async gen(viewer, id) {
     if (!id) return null;
-    let data = await knex('work_teams').where({ id }).select();
+    let data = await knex('work_teams')
+      .where({ id })
+      .select();
     data = data[0];
     if (!data) return null;
-    const canSee = checkCanSee(viewer, data);
-    if (!canSee) return null;
+    if (!canSee(viewer, data, Models.WORKTEAM)) return null;
     return new WorkTeam(data);
   }
 
   static async create(viewer, data, loaders) {
-    if (!canMutate(viewer)) return null;
+    if (!canMutate(viewer, data, Models.WORKTEAM)) return null;
     if (!data) return null;
     if (!data.name) return null;
     const newData = {};
@@ -95,14 +87,17 @@ class WorkTeam {
     }
     newData.created_at = new Date();
     let wtId = await knex.transaction(async trx =>
-      trx.insert(newData).into('work_teams').returning('id'),
+      trx
+        .insert(newData)
+        .into('work_teams')
+        .returning('id'),
     );
     wtId = wtId[0];
     return wtId ? WorkTeam.gen(viewer, wtId, loaders) : null;
   }
 
   static async update(viewer, data, loaders) {
-    if (!canMutate(viewer)) return null;
+    if (!canMutate(viewer, data, Models.WORKTEAM)) return null;
     if (!data) return null;
     if (!data.id) return null;
     const newData = {};

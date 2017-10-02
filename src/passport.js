@@ -18,7 +18,7 @@ import bcrypt from 'bcrypt';
 import { Strategy as LocalStrategy } from 'passport-local';
 import knex from '../src/data/knex';
 import log from './logger';
-import { calcRights } from './accessControl';
+import { calcRights } from './organization';
 
 function verifyUser(user, password) {
   return bcrypt.compare(password, user.password_hash);
@@ -40,8 +40,8 @@ passport.use(
           'surname',
           'email',
           'avatar_path',
-          'privilege',
-          'role_id',
+          'groups',
+          'canVoteSince',
           'email_verified',
         ])
         .update({ last_login_at: new Date() })
@@ -66,44 +66,31 @@ passport.use(
   ),
 );
 
-passport.serializeUser((user, done) =>
-  knex('roles')
-    .where({ id: user.role_id })
-    .select('id', 'type')
-    .then(data => {
-      const role = data[0];
-      if (role) {
-        const emailVerified =
-          'emailVerified' in user ? user.emailVerified : user.email_verified;
-        const rights = calcRights(user.groups);
-        const sessionUser = {
-          id: user.id,
-          name: user.name,
-          surname: user.surname,
-          email: user.email,
-          avatar: user.avatar_path || user.avatar, // TODO change!
-          privilege: user.privilege,
-          permissions: rights.perm,
-          privileges: rights.priv,
-          emailVerified,
-          role: {
-            id: role.id,
-            type: role.type,
-          },
-        };
-        done(null, sessionUser);
-        return null;
-      }
-      log.error({ user }, 'Serializing failed');
-      done({ message: 'Serializing failed', name: 'SerializeError' });
-      return null;
-    })
-    .catch(error => {
-      log.error({ err: error, user }, 'Serializing failed');
-      done(error);
-      return null;
-    }),
-);
+passport.serializeUser((user, done) => {
+  try {
+    const emailVerified =
+      'emailVerified' in user ? user.emailVerified : user.email_verified;
+    const rights = calcRights(user.groups);
+    const sessionUser = {
+      id: user.id,
+      name: user.name,
+      surname: user.surname,
+      email: user.email,
+      avatar: user.avatar_path || user.avatar, // TODO change!
+      permissions: rights.perm,
+      privileges: rights.priv,
+      groups: user.groups,
+      canVoteSince: user.canVoteSince,
+      emailVerified,
+    };
+    done(null, sessionUser);
+    return null;
+  } catch (error) {
+    log.error({ user }, 'Serializing failed');
+    done({ message: 'Serializing failed', name: 'SerializeError' });
+    return null;
+  }
+});
 
 passport.deserializeUser((sessionUser, done) => {
   done(null, sessionUser);

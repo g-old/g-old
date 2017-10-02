@@ -9,6 +9,7 @@ import {
 import { activity as activitySchema } from '../store/schema';
 import { getFilter } from '../core/helpers';
 import { getSessionUser } from '../reducers';
+import { canAccess } from '../organization';
 
 const activitiesSubscription = `
 subscription{
@@ -117,7 +118,8 @@ let eventSource = null;
 export function createSSESub() {
   return async (dispatch, getState, { fetch }) => {
     const user = getSessionUser(getState());
-    if (!user || user.role.type === 'guest') {
+    // eslint-disable-next-line no-bitwise
+    if (!canAccess(user, 'SSE')) {
       return false;
     }
     if (eventSource && eventSource.readyState !== 2) {
@@ -146,49 +148,56 @@ export function createSSESub() {
       });
       // returns subId,
       const resp = await response.json();
-      eventSource = new EventSource(`/updates/${resp.subId}`, {
-        withCredentials: true,
-      });
-      eventSource.onmessage = e => {
-        const message = JSON.parse(e.data);
+      if (resp.subId) {
+        eventSource = new EventSource(`/updates/${resp.subId}`, {
+          withCredentials: true,
+        });
+        eventSource.onmessage = e => {
+          const message = JSON.parse(e.data);
 
-        switch (message.type) {
-          case 'DATA': {
-            const normalizedData = normalize(
-              message.data.activities,
-              activitySchema,
-            );
-            let filter = null;
-            if (message.data.activities.type === 'proposal') {
-              filter = getFilter(message.data.activities.object.state);
+          switch (message.type) {
+            case 'DATA': {
+              const normalizedData = normalize(
+                message.data.activities,
+                activitySchema,
+              );
+              let filter = null;
+              if (message.data.activities.type === 'proposal') {
+                filter = getFilter(message.data.activities.object.state);
+              }
+              dispatch({
+                type: SSE_UPDATE_SUCCESS,
+                payload: normalizedData,
+                filter,
+                userId: user.id,
+              });
+              break;
             }
-            dispatch({
-              type: SSE_UPDATE_SUCCESS,
-              payload: normalizedData,
-              filter,
-              userId: user.id,
-            });
-            break;
+            case 'KEEPALIVE':
+              break;
+            default:
+              break;
           }
-          case 'KEEPALIVE':
-            break;
-          default:
-            break;
-        }
-      };
+        };
 
-      eventSource.onerror = () => {
-        eventSource.close();
-        if (getState().user) {
-          setTimeout(() => {
-            dispatch(createSSESub());
-          }, 5000);
-        }
-      };
+        eventSource.onerror = () => {
+          eventSource.close();
+          if (getState().user) {
+            setTimeout(() => {
+              dispatch(createSSESub());
+            }, 5000);
+          }
+        };
 
-      dispatch({
-        type: CREATE_SSESUB_SUCCESS,
-      });
+        dispatch({
+          type: CREATE_SSESUB_SUCCESS,
+        });
+      } else {
+        dispatch({
+          type: CREATE_SSESUB_ERROR,
+          payload: resp,
+        });
+      }
     } catch (e) {
       dispatch({
         type: CREATE_SSESUB_ERROR,

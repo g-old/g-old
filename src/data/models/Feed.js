@@ -132,7 +132,9 @@ class Feed {
       .then(data =>
         Promise.all(
           data.map(u =>
-            knex('feeds').where({ user_id: u }).select('activity_ids'),
+            knex('feeds')
+              .where({ user_id: u })
+              .select('activity_ids'),
           ),
         ),
       )

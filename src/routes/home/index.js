@@ -11,6 +11,7 @@ import React from 'react';
 import Layout from '../../components/Layout';
 import Home from './Home';
 import { getSessionUser } from '../../reducers';
+import { canAccess } from '../../organization';
 
 const title = 'Home';
 
@@ -19,7 +20,7 @@ async function action({ store }) {
   const user = getSessionUser(state);
 
   if (user) {
-    if (user.role.type === 'guest') {
+    if (!canAccess(user, title)) {
       return { redirect: '/account' };
     }
     return { redirect: '/feed' };

@@ -19,6 +19,37 @@ import { IntlProvider } from 'react-intl';
 import FeedContainer from './FeedContainer';
 import App from '../../components/App';
 
+const setupApp = store => (
+  <IntlProvider locale="de-DE" initialNow={new Date()}>
+    <App
+      context={{
+        intl: {
+          initialNow: 1501773564065,
+          formattedMessage: () => 'translated text',
+          formatDate: () => 'formatted date',
+          formatTime: () => 'formatted time',
+          formatRelative: () => 'formatted relative',
+          formatNumber: () => 'formatted number',
+          formatPlural: () => 'formatted plural',
+          formatMessage: () => 'formatted message',
+          formatHTMLMessage: () => 'formatted html',
+          now: () => new Date(),
+          locale: 'de-DE',
+          newLocale: null,
+          messages: {
+            'de-DE': {},
+          },
+        },
+        fetch: () => {},
+        insertCss: () => {},
+        store,
+      }}
+    >
+      <FeedContainer isFetching={false} />
+    </App>
+  </IntlProvider>
+);
+
 const middlewares = [thunk.withExtraArgument({ fetch: () => {} })];
 const mockStore = configureStore(middlewares);
 const initialState = {
@@ -67,7 +98,10 @@ const initialState = {
       },
     },
     activities: {
-      allIds: { ids: [1] },
+      listByFilter: {
+        all: { ids: [1] },
+      },
+
       byId: {
         1: {
           id: '1',
@@ -126,7 +160,9 @@ const updatedEntities = {
       },
     },
     activities: {
-      allIds: { ids: [2, 1] },
+      listByFilter: {
+        all: { ids: [2, 1] },
+      },
       byId: {
         1: {
           id: '1',
@@ -160,15 +196,7 @@ describe('FeedContainer', () => {
   it('Displays activity', () => {
     const store = mockStore(initialState);
 
-    const wrapper = renderer
-      .create(
-        <IntlProvider>
-          <App context={{ insertCss: () => {}, store }}>
-            <FeedContainer />
-          </App>
-        </IntlProvider>,
-      )
-      .toJSON();
+    const wrapper = renderer.create(setupApp(store)).toJSON();
 
     expect(wrapper).toMatchSnapshot();
   });
@@ -182,15 +210,7 @@ describe('FeedContainer', () => {
     };
     const store = mockStore(updatedStore);
 
-    const wrapper = renderer
-      .create(
-        <IntlProvider>
-          <App context={{ insertCss: () => {}, store }}>
-            <FeedContainer />
-          </App>
-        </IntlProvider>,
-      )
-      .toJSON();
+    const wrapper = renderer.create(setupApp(store)).toJSON();
     const asString = JSON.stringify(wrapper);
     expect(asString).toMatch(/after/);
   });
@@ -201,7 +221,10 @@ describe('FeedContainer', () => {
       entities: {
         ...updatedEntities.entities,
         activities: {
-          allIds: { ids: [3, 2, 1] },
+          listByFilter: {
+            all: { ids: [3, 2, 1] },
+          },
+
           byId: {
             ...updatedEntities.entities.activities.byId,
             3: {
@@ -222,15 +245,7 @@ describe('FeedContainer', () => {
     };
     const store = mockStore(updatedStore);
 
-    const wrapper = renderer
-      .create(
-        <IntlProvider>
-          <App context={{ insertCss: () => {}, store }}>
-            <FeedContainer />
-          </App>
-        </IntlProvider>,
-      )
-      .toJSON();
+    const wrapper = renderer.create(setupApp(store)).toJSON();
     const asString = JSON.stringify(wrapper);
     expect(asString).not.toMatch(/after/);
   });
@@ -265,7 +280,10 @@ describe('FeedContainer', () => {
           },
         },
         activities: {
-          allIds: { ids: [3, 2, 1] },
+          listByFilter: {
+            all: { ids: [3, 2, 1] },
+          },
+
           byId: {
             ...updatedEntities.entities.activities.byId,
             3: {
@@ -286,15 +304,7 @@ describe('FeedContainer', () => {
     };
     let store = mockStore(updatedStore);
 
-    let wrapper = renderer
-      .create(
-        <IntlProvider>
-          <App context={{ insertCss: () => {}, store }}>
-            <FeedContainer />
-          </App>
-        </IntlProvider>,
-      )
-      .toJSON();
+    let wrapper = renderer.create(setupApp(store)).toJSON();
     let asString = JSON.stringify(wrapper);
     expect(asString).toMatch(/next/);
 
@@ -303,7 +313,9 @@ describe('FeedContainer', () => {
       entities: {
         ...updatedStore.entities,
         activities: {
-          allIds: { ids: [4, 3, 2, 1] },
+          listByFilter: {
+            all: { ids: [4, 3, 2, 1] },
+          },
           byId: {
             ...updatedStore.entities.activities.byId,
             4: {
@@ -325,15 +337,7 @@ describe('FeedContainer', () => {
 
     store = mockStore(deleteLastStatementAfterVoteChangeStore);
 
-    wrapper = renderer
-      .create(
-        <IntlProvider>
-          <App context={{ insertCss: () => {}, store }}>
-            <FeedContainer />
-          </App>
-        </IntlProvider>,
-      )
-      .toJSON();
+    wrapper = renderer.create(setupApp(store)).toJSON();
     asString = JSON.stringify(wrapper);
     expect(asString).not.toMatch(/next/);
     expect(asString).not.toMatch(/after/);
@@ -361,7 +365,9 @@ describe('FeedContainer', () => {
           },
         },
         activities: {
-          allIds: { ids: [4, 3, 2, 1] },
+          listByFilter: {
+            all: { ids: [4, 3, 2, 1] },
+          },
           byId: {
             ...updatedStore.entities.activities.byId,
             4: {
@@ -383,15 +389,7 @@ describe('FeedContainer', () => {
 
     store = mockStore(updateLastStatementAfterVoteChangeStore);
 
-    wrapper = renderer
-      .create(
-        <IntlProvider>
-          <App context={{ insertCss: () => {}, store }}>
-            <FeedContainer />
-          </App>
-        </IntlProvider>,
-      )
-      .toJSON();
+    wrapper = renderer.create(setupApp(store)).toJSON();
     asString = JSON.stringify(wrapper);
     expect(asString).not.toMatch(/next/);
     expect(asString).toMatch(/newest/);

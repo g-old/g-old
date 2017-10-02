@@ -11,32 +11,15 @@ import React from 'react';
 import Layout from '../../components/Layout';
 import { getSessionUser } from '../../reducers';
 import Admin from './Admin';
-import { PRIVILEGES } from '../../constants';
+import { canAccess } from '../../organization';
 
-const title = 'Admin Page';
-
-const canAccess = user => {
-  if (user.role && user.role.type && user.privilege) {
-    if (['admin', 'mod'].includes(user.role.type)) {
-      return true;
-    }
-    /* eslint-disable no-bitwise */
-    if (
-      user.privilege & PRIVILEGES.canModifyRights ||
-      user.privilege & PRIVILEGES.canUnlockViewer
-    ) {
-      return true;
-    }
-    /* eslint-enable no-bitwise */
-  }
-  return false;
-};
+const title = 'Admin';
 
 async function action({ store, path }) {
   const user = getSessionUser(store.getState());
   if (!user) {
     return { redirect: `/?redirect=${path}` };
-  } else if (!canAccess(user)) {
+  } else if (!canAccess(user, title)) {
     return { component: <div> You have to login as admin or mod!</div> };
   }
 

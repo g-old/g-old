@@ -3,6 +3,7 @@ import Layout from '../../components/Layout';
 import { loadProposal } from '../../actions/proposal';
 import ProposalContainer from './ProposalContainer';
 import { getSessionUser } from '../../reducers';
+import { canAccess } from '../../organization';
 
 const title = 'Proposal';
 
@@ -12,14 +13,15 @@ async function action({ store, path }, { id, pollId }) {
   let proposalId = id;
   if (!user) {
     return { redirect: `/?redirect=${path}` };
-  } else if (user.role.type === 'guest') {
+  } else if (!canAccess(user, title)) {
     return { redirect: '/' };
   }
 
   if (proposalId === 'xxx') {
     const proposals = state.entities.proposals.byId;
     proposalId = Object.keys(proposals).find(
-      pId => proposals[pId].pollOne === pollId || proposals[pId].pollTwo === pollId,
+      pId =>
+        proposals[pId].pollOne === pollId || proposals[pId].pollTwo === pollId,
     );
 
     if (proposalId) {
@@ -43,7 +45,11 @@ async function action({ store, path }, { id, pollId }) {
     chunks: ['proposal'],
     component: (
       <Layout>
-        <ProposalContainer proposalId={proposalId} pollId={pollId} user={user} />
+        <ProposalContainer
+          proposalId={proposalId}
+          pollId={pollId}
+          user={user}
+        />
       </Layout>
     ),
   };

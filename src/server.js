@@ -51,6 +51,7 @@ import log from './logger';
 import { SubscriptionManager, SubscriptionServer } from './core/sse';
 import PubSub from './core/pubsub';
 import responseTiming from './core/timing';
+import { Groups } from './organization';
 
 const pubsub = new PubSub();
 
@@ -145,7 +146,7 @@ app.post('/signup', (req, res) => {
   /* res.status(500).json();
   return; */
 
-  User.create(req.body.user)
+  User.create({ id: 1, groups: Groups.SYSTEM }, req.body.user)
     .then(user => {
       if (!user) throw Error('User creation failed');
       const job = {
@@ -311,7 +312,10 @@ app.get('/verify/:token', (req, res) => {
     .then(data => {
       if (data) {
         return User.update(
-          { id: 1, role: { type: 'system' } },
+          {
+            id: 1,
+            groups: Groups.SYSTEM,
+          },
           { email: data.email, id: data.userId, emailVerified: true },
           createLoaders(),
         ).then(result => (result ? result.user : null));
@@ -352,8 +356,7 @@ app.post('/verify', (req, res) =>
         const job = {
           type: 'mail',
           data: {
-            mailType:
-              req.user.role.type === 'viewer' ? 'verifyEmail' : 'mailChanged',
+            mailType: req.user.emailVerified ? 'mailChanged' : 'verifyEmail',
             lang: req.cookies.lang,
             verify: true,
             address: user.email,

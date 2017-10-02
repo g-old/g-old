@@ -63,11 +63,8 @@ export const getStatementUpdates = state =>
 export const getVisibleUsers = (state, filter) =>
   fromEntity.getVisibleUsers(state.entities, filter);
 
-export const getUsersIsFetching = (state, filter) =>
-  fromEntity.getUsersIsFetching(state.entities, filter);
-
-export const getUsersErrorMessage = (state, filter) =>
-  fromEntity.getUsersErrorMessage(state.entities, filter);
+export const getUsersStatus = (state, filter) =>
+  fromEntity.getUsersStatus(state.entities, filter);
 
 export const getAccountUpdates = (state, id) =>
   fromUi.getAccountUpdates(state.ui, id);

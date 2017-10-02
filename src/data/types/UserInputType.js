@@ -8,8 +8,8 @@ import {
 const UserInputType = new GraphQLInputObjectType({
   name: 'UserInput',
   fields: {
-    role: {
-      type: String,
+    groups: {
+      type: GraphQLInt,
     },
     surname: {
       type: String,
@@ -28,9 +28,6 @@ const UserInputType = new GraphQLInputObjectType({
 
     passwordOld: {
       type: String,
-    },
-    privilege: {
-      type: GraphQLInt,
     },
 
     followee: {

@@ -20,7 +20,38 @@ import Layout from './Layout';
 
 const middlewares = [thunk.withExtraArgument({ fetch: () => {} })];
 const mockStore = configureStore(middlewares);
+const setupApp = (store, element) => (
+  <IntlProvider locale="de-DE" initialNow={new Date()}>
+    <App
+      context={{
+        intl: {
+          initialNow: 1501773564065,
+          formattedMessage: () => 'translated text',
+          formatDate: () => 'formatted date',
+          formatTime: () => 'formatted time',
+          formatRelative: () => 'formatted relative',
+          formatNumber: () => 'formatted number',
+          formatPlural: () => 'formatted plural',
+          formatMessage: () => 'formatted message',
+          formatHTMLMessage: () => 'formatted html',
+          now: () => new Date(),
+          locale: 'de-DE',
+          newLocale: null,
+          messages: {
+            'de-DE': {},
+          },
+        },
+        fetch: () => {},
+        insertCss: () => {},
+        store,
+      }}
+    >
+      {element}
+    </App>
+  </IntlProvider>
+);
 const initialState = {
+  user: null,
   runtime: {
     initialNow: 1501773564066,
     availableLocales: ['de-DE'],
@@ -34,44 +65,33 @@ const initialState = {
     },
   },
   entities: {
-    users: { byId: {} },
+    users: {
+      byId: {},
+    },
+    workTeams: { byId: null },
   },
   ui: {
     activityCounter: {
       feed: 0,
       proposals: 0,
     },
+    loading: {
+      status: false,
+    },
   },
 };
 
 describe('Layout', () => {
-  it('renders children correctly', () => {
+  test('renders children correctly', () => {
     const store = mockStore(initialState);
-    const initialNow = new Date();
     const wrapper = renderer
       .create(
-        <IntlProvider locale="en" initialNow={initialNow}>
-          <App
-            context={{
-              intl: {
-                initialNow: 1501773564065,
-                locale: 'de-DE',
-                newLocale: null,
-                messages: {
-                  'de-DE': {},
-                },
-              },
-              fetch: () => {},
-              insertCss: () => {},
-              store,
-            }}
-            store={store}
-          >
-            <Layout>
-              <div className="child" />
-            </Layout>
-          </App>
-        </IntlProvider>,
+        setupApp(
+          store,
+          <Layout>
+            <div className="child" />
+          </Layout>,
+        ),
       )
       .toJSON();
 

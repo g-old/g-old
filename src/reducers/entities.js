@@ -56,11 +56,8 @@ export const getProposalsByTag = (state, tagId) =>
 export const getVisibleUsers = (state, filter) =>
   fromUsers.getVisibleUsers(state.users, filter, state);
 
-export const getUsersIsFetching = (state, filter) =>
-  fromUsers.getIsFetching(state.users, filter);
-
-export const getUsersErrorMessage = (state, filter) =>
-  fromUsers.getErrorMessage(state.users, filter);
+export const getUsersStatus = (state, filter) =>
+  fromUsers.getStatus(state.users, filter);
 
 export const getVisibleFlags = (state, filter) =>
   fromFlaggedStatements.getVisibleFlags(state.flaggedStatements, filter, state);

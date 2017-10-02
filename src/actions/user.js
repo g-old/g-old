@@ -18,26 +18,30 @@ import {
   FETCH_USER_SUCCESS,
   FETCH_USER_ERROR,
 } from '../constants';
-import { getUsersIsFetching } from '../reducers';
+import { getUsersStatus } from '../reducers';
 
 const userFields = `
   id,
-  privilege,
-    name,
-    surname,
-    avatar,
-    role{
-      id,
-      type
-    }
+  groups,
+  name,
+  surname,
+  avatar,
     `;
-const userList = `
-query ($role:String) {
-  users (role:$role) {
+const userConnection = `
+query ($group:Int) {
+  userConnection (group:$group) {
+    pageInfo{
+      endCursor
+      hasNextPage
+    }
+    edges{
+      node{
     ${userFields}
     createdAt,
     lastLogin,
     emailVerified,
+      }
+    }
   }
 }
 `;
@@ -92,12 +96,11 @@ query ($id:ID!) {
 `;
 
 const updateUserMutation = `
-mutation($id:ID $name:String, $surname:String, $role:String, $email:String, $password:String, $passwordOld:String, $followee:ID, $privilege:Int){
-  updateUser ( user:{id:$id name:$name, surname:$surname, role:$role, email:$email, password:$password passwordOld:$passwordOld followee:$followee privilege:$privilege}){
+mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $password:String, $passwordOld:String, $followee:ID,){
+  updateUser ( user:{id:$id name:$name, surname:$surname, groups:$groups, email:$email, password:$password passwordOld:$passwordOld followee:$followee }){
     user{${userFields}
     email,
     emailVerified,
-    privilege
     followees{
       id,
       name,
@@ -118,28 +121,35 @@ query ($term:String) {
 }
 `;
 
-export function loadUserList(role) {
+export function loadUserList({ group, first, after }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
 
-    if (getUsersIsFetching(getState(), role)) {
+    if (getUsersStatus(getState(), group).pending) {
       return false;
     }
     dispatch({
       type: LOAD_USERS_START,
       payload: {
-        role,
+        group,
       },
-      filter: role,
+      filter: group,
     });
 
     try {
-      const { data } = await graphqlRequest(userList, { role });
-      const normalizedData = normalize(data.users, userArray);
+      const { data } = await graphqlRequest(userConnection, {
+        group,
+        first,
+        after,
+      });
+      const users = data.userConnection.edges.map(u => u.node);
+      const normalizedData = normalize(users, userArray);
       dispatch({
         type: LOAD_USERS_SUCCESS,
         payload: normalizedData,
-        filter: role,
+        filter: group,
+        pagination: data.userConnection.pageInfo,
+        savePageInfo: after != null,
       });
     } catch (error) {
       dispatch({
@@ -148,7 +158,7 @@ export function loadUserList(role) {
           error,
         },
         message: error.message || 'Something went wrong',
-        filter: role,
+        filter: group,
       });
       return false;
     }

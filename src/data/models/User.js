@@ -1,31 +1,9 @@
 import bcrypt from 'bcrypt';
 import knex from '../knex';
 import { validateEmail } from '../../core/helpers';
-import { PRIVILEGES } from '../../constants';
-import Role from './Role';
-// eslint-disable-next-line no-unused-vars
-function checkCanSee(viewer, data) {
-  // TODO change data returned based on permissions
-  return (
-    viewer.id === data.id ||
-    viewer.role.type === 'admin' ||
-    viewer.role.type === 'mod' ||
-    viewer.role.type === 'system' ||
-    viewer.privilege & PRIVILEGES.canUnlockViewer // eslint-disable-line no-bitwise
-  );
-}
-const roles = ['admin', 'mod', 'user', 'viewer', 'guest'];
-
-async function getIsLowerLevel(viewer, accountId) {
-  const accountRole = await knex
-    .from('roles')
-    .innerJoin('users', 'users.role_id', 'roles.id')
-    .where('users.id', '=', accountId)
-    .select('type');
-  const accountPos = roles.indexOf(accountRole[0].type);
-  const viewerPos = roles.indexOf(viewer.role.type);
-  return accountPos > viewerPos;
-}
+import { canChangeGroups, calcRights, Groups } from '../../organization';
+import { canSee, canMutate, Models } from '../../core/accessControl';
+import log from '../../logger';
 
 class User {
   constructor(data) {
@@ -33,8 +11,7 @@ class User {
     this.name = data.name;
     this.surname = data.surname;
     this.email = data.email;
-    this.role_id = data.role_id;
-    this.privilege = data.privilege;
+    this.groups = data.groups;
     this.avatar = data.avatar_path;
     this.emailVerified = data.email_verified;
     this.lastLogin = data.last_login_at;
@@ -46,16 +23,12 @@ class User {
 
     if (data == null) return null;
     if (viewer.id == null) return null;
-    const canSee = checkCanSee(viewer, data);
-    if (!canSee) {
+    if (!canSee(viewer, data, Models.USER)) {
       // protected info
       data.email = null;
       data.last_login_at = null;
-      data.privilege = null;
-      data.role_id = null;
     }
     return new User(data);
-    // return canSee ? new User(data) : new User(data.email = null);
   }
 
   static async followees(viewer, id, { followees }) {
@@ -69,34 +42,9 @@ class User {
       .where({ user_id: id, poll_id: pollId })
       .select('id');
     return data;
-    /*  return Promise.resolve(knex('user_follows')
-    .where({ follower_id: id }).pluck('followee_id')
-    .then(ids => {return ids; }));
-      */
-  }
-  // eslint-disable-next-line no-unused-vars
-  static canMutate(viewer, data) {
-    // TODO Allow mutation of own data - attention to guests
-    if (
-      ['admin', 'mod', 'system', 'user', 'viewer', 'guest'].includes(
-        viewer.role.type,
-      )
-    ) {
-      // eslint-disable-next-line eqeqeq
-      if (data.email && viewer.id != data.id) {
-        return false;
-      }
-      // eslint-disable-next-line eqeqeq
-      if (data.password && viewer.id != data.id) {
-        return false;
-      }
-      return true;
-    }
-    return false;
   }
 
-  async modifySessions(viewer, loaders) {
-    const role = await Role.gen(viewer, this.role_id, loaders);
+  async modifySessions() {
     /*  const serializedUser = JSON.stringify({
       user: {
         id: this.id,
@@ -116,11 +64,17 @@ class User {
       .select('sess', 'sid');
     const updates = oldSessions.map(data => {
       const session = data.sess;
+      const rights = calcRights(this.groups);
       const newSession = {
         ...session,
         passport: {
           ...session.passport,
-          user: { ...session.passport.user, role },
+          user: {
+            ...session.passport.user,
+            groups: this.groups,
+            permissions: rights.perm,
+            privileges: rights.priv,
+          },
         },
       };
       return knex('sessions')
@@ -138,16 +92,19 @@ class User {
   static async update(viewer, data, loaders) {
     // authenticate
     // throw Error('TESTERROR');
-    if (!data.id) return null;
-    if (!User.canMutate(viewer, data)) return null;
+    const errors = [];
+    if (!data.id) return { errors: ['Arguments missing'] };
+    if (!canMutate(viewer, data, Models.USER))
+      return { errors: ['Permission denied!'] };
     // validate - if something seems corrupted, return.
-    if (data.email && !validateEmail(data.email)) return null;
-    if (data.password && data.password.trim() > 6) return null;
-    if (data.passwordOld && data.passwordOld.trim() > 6) return null;
-    if (data.privilege && data.privilege < 1) return null;
+    if (data.email && !validateEmail(data.email))
+      return { errors: ['Wrong argument'] };
+    if (data.password && data.password.trim().length <= 6)
+      return { errors: ['Wrong argument'] };
+    if (data.passwordOld && data.passwordOld.trim().length <= 6)
+      return { errors: ['Wrong argument'] };
     // TODO write fn which gets all the props with the right name
     // TODO Allow only specific updates, take car of role
-    const errors = [];
     const newData = { updated_at: new Date() };
     if (data.email) {
       newData.email = data.email.trim();
@@ -164,50 +121,25 @@ class User {
           errors.push('passwordOld');
           return { user: null, errors };
         }
-      } else if (viewer.role.type !== 'system') return null; // password resets
-
+      }
       const hash = await bcrypt.hash(data.password, 10);
-      if (!hash) return null;
+      if (!hash) throw Error('Hash generation failed');
       newData.password_hash = hash;
     }
 
-    if (data.role) {
-      const reg = new RegExp(data.role, 'i');
-      const neededPrivilege = Object.keys(PRIVILEGES).find(key => {
-        const res = reg.exec(key);
-        return res !== null;
-      });
-
-      // TODO  implement check of workteams , email erification and img
-
+    if (data.groups != null) {
+      // check i valid roles
       /* eslint-disable no-bitwise */
-      if (
-        neededPrivilege &&
-        (viewer.privilege & PRIVILEGES[neededPrivilege] ||
-          viewer.privilege & PRIVILEGES.canModifyRoles)
-      ) {
-        /* eslint-enable no-bitwise */
-        // check level
 
-        if (await getIsLowerLevel(viewer, data.id)) {
-          // check if right level
-          const roleId = roles.indexOf(data.role) + 1;
-
-          if (roleId > -1) {
-            newData.role_id = roleId;
-          }
-        }
+      const groups = Number(data.groups);
+      // TODO make it a member method - pro -cons?
+      const userInDB = await User.gen(viewer, data.id, loaders);
+      if (!canChangeGroups(viewer, userInDB, groups)) {
+        log.warn({ data, viewer }, 'Group change denied!');
+        return { user: null, errors: ['Permission denied'] };
       }
-    }
 
-    if (data.privilege) {
-      // eslint-disable-next-line no-bitwise
-      if (viewer.privilege & PRIVILEGES.canModifyRights) {
-        // check if lower level
-        if (await getIsLowerLevel(viewer, data.id)) {
-          newData.privilege = data.privilege;
-        }
-      }
+      newData.groups = groups;
     }
 
     // update
@@ -267,8 +199,8 @@ class User {
     // updates session store;
     const updatedUser = await User.gen(viewer, data.id, loaders);
     if (viewer.id !== updatedUser.id) {
-      if (newData.role_id || newData.privilege || newData.email) {
-        await updatedUser.modifySessions(viewer, loaders);
+      if (newData.groups || newData.email) {
+        await updatedUser.modifySessions();
       }
     }
 
@@ -276,9 +208,11 @@ class User {
     return { user: updatedUser || null, errors };
   }
 
-  static async create(data) {
+  static async create(viewer, data) {
     // authenticate
     // validate
+    if (!data) return null;
+    if (!canMutate(viewer, data, Models.USER)) return null;
     let { name, surname, email, password } = data;
 
     name = name.trim();
@@ -304,12 +238,14 @@ class User {
       avatar_path,
       email_verified: false,
       password_hash: hash,
-      role_id: 5, // TODO make better
+      groups: Groups.USER,
       created_at: new Date(),
-      privilege: 1,
     };
     const newUser = await knex.transaction(async trx => {
-      const uData = await trx.insert(newUserData).into('users').returning('*');
+      const uData = await trx
+        .insert(newUserData)
+        .into('users')
+        .returning('*');
       return uData[0];
     });
     if (!newUser) return null;

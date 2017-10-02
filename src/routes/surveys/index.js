@@ -3,6 +3,7 @@ import Layout from '../../components/Layout';
 import { loadProposalsList } from '../../actions/proposal';
 import SurveyListContainer from './SurveyListContainer';
 import { getSessionUser } from '../../reducers';
+import { canAccess } from '../../organization';
 
 const title = 'Surveys';
 
@@ -10,7 +11,7 @@ async function action({ store, path }) {
   const user = getSessionUser(store.getState());
   if (!user) {
     return { redirect: `/?redirect=${path}` };
-  } else if (user.role.type === 'guest') {
+  } else if (!canAccess(user, title)) {
     return { redirect: '/' };
   }
   if (!process.env.BROWSER) {

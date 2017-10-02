@@ -8,12 +8,19 @@ import {
 } from '../constants';
 
 // TODO handle DELETE_USER
+const handlePageInfo = (state, action) => {
+  if (state.endCursor && !action.savePageInfo) {
+    return state;
+  }
+  return { ...state, ...action.pagination };
+};
 
-const createList = (filter) => {
-  const handleRoleChange = (state, action) => {
-    const { result: userId, entities } = action.payload;
-    const { type } = entities.roles[entities.users[userId].role];
-    return type === filter ? [...new Set([...state, userId])] : state.filter(id => id !== userId);
+const createList = filter => {
+  const handleGroupChange = (state, action) => {
+    const { groups, id } = action.payload.entities.users[action.payload.result];
+    return groups === filter
+      ? [...new Set([...state, id])]
+      : state.filter(uId => uId !== id);
   };
   const ids = (state = [], action) => {
     switch (action.type) {
@@ -23,10 +30,14 @@ const createList = (filter) => {
           : state;
       }
       case FIND_USER_SUCCESS: {
-        return filter === 'all' ? [...new Set([...state, ...action.payload.result])] : state;
+        return filter === 'all'
+          ? [...new Set([...state, ...action.payload.result])]
+          : state;
       }
       case UPDATE_USER_SUCCESS: {
-        return action.properties.role && filter !== 'all' ? handleRoleChange(state, action) : state;
+        return action.properties.groups && filter !== 'all'
+          ? handleGroupChange(state, action)
+          : state;
       }
       default:
         return state;
@@ -62,14 +73,30 @@ const createList = (filter) => {
         return state;
     }
   };
+  const pageInfo = (state = { endCursor: '', hasNextPage: false }, action) => {
+    if (action.filter !== filter) {
+      return state;
+    }
+    switch (action.type) {
+      case LOAD_USERS_SUCCESS:
+        return handlePageInfo(state, action);
+
+      default:
+        return state;
+    }
+  };
   return combineReducers({
     ids,
     isFetching,
     errorMessage,
+    pageInfo,
   });
 };
 
 export default createList;
 export const getIds = state => state.ids;
-export const getIsFetching = state => state.isFetching;
-export const getErrorMessage = state => state.errorMessage;
+export const getStatus = state => ({
+  pageInfo: state.pageInfo,
+  pending: state.isFetching,
+  error: state.errorMessage,
+});

@@ -54,6 +54,7 @@ import createProposalSub from './mutations/createProposalSub';
 import deleteProposalSub from './mutations/deleteProposalSub';
 import logs from './queries/logs';
 import statistics from './queries/statistics';
+import userConnection from './queries/userConnection';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -65,6 +66,7 @@ const schema = new Schema({
       proposalDL,
       proposalsDL,
       users,
+      userConnection,
       votes,
       searchUser,
       user,

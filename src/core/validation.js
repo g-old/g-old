@@ -1,6 +1,10 @@
 import { validateEmail, concatDateAndTime, utcCorrectedDate } from './helpers';
 
-export function passwordValidation(password, values, { minPasswordLength = 0 }) {
+export function passwordValidation(
+  password,
+  values,
+  { minPasswordLength = 0 },
+) {
   const pw = password.trim();
   let result = {
     touched: false,
@@ -152,8 +156,14 @@ export function emailValidation(email, { invalidEmails = [] }) {
   return result;
 }
 
-export function createValidator(allValues, validators, obj, resolverFn, options = {}) {
-  return (properties) => {
+export function createValidator(
+  allValues,
+  validators,
+  obj,
+  resolverFn,
+  options = {},
+) {
+  return properties => {
     const result = properties.reduce(
       (acc, curr) => {
         let state = resolverFn(obj);

@@ -10,6 +10,7 @@ import UserType from '../types/UserType';
 import { sendJob } from '../../core/childProcess';
 import log from '../../logger';
 import { getProtocol } from '../../core/helpers';
+// import { Groups } from '../../organization';
 
 const updateSession = (req, user) =>
   new Promise((resolve, reject) =>
@@ -79,12 +80,11 @@ const updateUser = {
         }
       }
 
-      if (user.role) {
+      if (user.groups) {
         // TODO better check!
         notifyRoleChange(viewer, result.user, {
-          subject: 'Your role got changed!',
-          body: `Congratulations ${result.user
-            .name}, your new status is ${user.role}`,
+          subject: 'Group memberships changed',
+          body: `Your group memberships got changed.`,
         });
       }
       // TODO check if necessary

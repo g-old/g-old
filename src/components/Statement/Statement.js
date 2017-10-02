@@ -9,6 +9,7 @@ import cn from 'classnames';
 import s from './Statement.css';
 import { ICONS } from '../../constants';
 import Notification from '../Notification';
+import { Permissions } from '../../organization';
 
 import Menu from '../Menu';
 import Button from '../Button';
@@ -30,10 +31,7 @@ const messages = defineMessages({
     description: 'Menu entry on statements to delete statement',
   },
 });
-const EditMenu = props =>
-  <div>
-    {props.children}
-  </div>;
+const EditMenu = props => <div>{props.children}</div>;
 EditMenu.propTypes = {
   children: PropTypes.element,
 };
@@ -254,14 +252,22 @@ class Statement extends React.Component {
     let canDelete;
     let canFollow;
     let canFlag;
+
+    /* eslint-disable no-bitwise */
     if (user) {
-      canLike = user.role.type !== 'guest' && !asInput && !ownStatement;
-      canDelete = !deletedAt && ['admin', 'mod'].includes(user.role.type);
-      canFlag = !ownStatement && !deletedAt;
+      canLike =
+        !asInput && !ownStatement && (user.permissions & Permissions.LIKE) > 0;
+      canDelete =
+        !deletedAt && (user.permissions & Permissions.DELETE_STATEMENTS) > 0;
+      canFlag =
+        !ownStatement &&
+        !deletedAt &&
+        (user.permissions & Permissions.FLAG_STATEMENTS) > 0;
       if (followees) {
         canFollow = !isFollowee && followees.length < 5;
       }
     }
+    /* eslint-enable no-bitwise */
 
     const isEmpty = this.state.textArea.val.length === 0;
     const hasMinimumInput = this.state.textArea.val.length >= 5;
@@ -271,58 +277,37 @@ class Statement extends React.Component {
     if (ownStatement || asInput) {
       menu = (
         <EditMenu>
-          {!deletedAt &&
+          {!deletedAt && (
             <span style={{ marginRight: '0.5em' }}>
-              {this.state.edit
-                ? <span>
-                    <Button
-                      plain
-                      onClick={this.onTextSubmit}
-                      disabled={!hasMinimumInput}
-                      icon={
-                        <svg
-                          viewBox="0 0 24 24"
-                          width="24px"
-                          height="24px"
-                          role="img"
-                        >
-                          <polyline
-                            fill="none"
-                            stroke="#000"
-                            strokeWidth="2"
-                            points={ICONS.check}
-                          />
-                        </svg>
-                      }
-                    />
-
-                    <Button
-                      plain
-                      onClick={this.onEndEditing}
-                      disabled={this.props.asInput && !hasMinimumInput}
-                      icon={
-                        <svg
-                          viewBox="0 0 24 24"
-                          width="24px"
-                          height="24px"
-                          role="img"
-                        >
-                          <path
-                            fill="none"
-                            stroke="#000"
-                            strokeWidth="2"
-                            d={ICONS.delete}
-                          />
-                        </svg>
-                      }
-                    />
-                  </span>
-                : <Button
+              {this.state.edit ? (
+                <span>
+                  <Button
                     plain
-                    onClick={this.onEditStatement}
+                    onClick={this.onTextSubmit}
+                    disabled={!hasMinimumInput}
                     icon={
                       <svg
-                        version="1.1"
+                        viewBox="0 0 24 24"
+                        width="24px"
+                        height="24px"
+                        role="img"
+                      >
+                        <polyline
+                          fill="none"
+                          stroke="#000"
+                          strokeWidth="2"
+                          points={ICONS.check}
+                        />
+                      </svg>
+                    }
+                  />
+
+                  <Button
+                    plain
+                    onClick={this.onEndEditing}
+                    disabled={this.props.asInput && !hasMinimumInput}
+                    icon={
+                      <svg
                         viewBox="0 0 24 24"
                         width="24px"
                         height="24px"
@@ -332,12 +317,35 @@ class Statement extends React.Component {
                           fill="none"
                           stroke="#000"
                           strokeWidth="2"
-                          d={ICONS.edit}
+                          d={ICONS.delete}
                         />
                       </svg>
                     }
-                  />}
-              {!asInput &&
+                  />
+                </span>
+              ) : (
+                <Button
+                  plain
+                  onClick={this.onEditStatement}
+                  icon={
+                    <svg
+                      version="1.1"
+                      viewBox="0 0 24 24"
+                      width="24px"
+                      height="24px"
+                      role="img"
+                    >
+                      <path
+                        fill="none"
+                        stroke="#000"
+                        strokeWidth="2"
+                        d={ICONS.edit}
+                      />
+                    </svg>
+                  }
+                />
+              )}
+              {!asInput && (
                 <Button
                   plain
                   onClick={this.onDeleteStatement}
@@ -356,8 +364,10 @@ class Statement extends React.Component {
                       />
                     </svg>
                   }
-                />}
-            </span>}
+                />
+              )}
+            </span>
+          )}
         </EditMenu>
       );
     } else if (canFlag || canFollow || canDelete) {
@@ -375,24 +385,27 @@ class Statement extends React.Component {
             </svg>
           }
         >
-          {canFollow &&
+          {canFollow && (
             <Button
               onClick={this.handleFollowing}
               plain
               label={<FormattedMessage {...messages.follow} />}
-            />}
-          {canFlag &&
+            />
+          )}
+          {canFlag && (
             <Button
               onClick={this.handleFlag}
               plain
               label={<FormattedMessage {...messages.flag} />}
-            />}
-          {canDelete &&
+            />
+          )}
+          {canDelete && (
             <Button
               onClick={this.onDeleteStatement}
               plain
               label={<FormattedMessage {...messages.delete} />}
-            />}
+            />
+          )}
         </Menu>
       );
     }
@@ -426,7 +439,7 @@ class Statement extends React.Component {
         )}
       >
         {/* eslint-disable jsx-a11y/interactive-supports-focus */}
-        {!inactive &&
+        {!inactive && (
           <div
             role="button"
             style={{ cursor: onProfileClick ? 'pointer' : 'auto' }}
@@ -437,10 +450,11 @@ class Statement extends React.Component {
               src={author && author.avatar}
               alt="IMG"
             />
-          </div>}
+          </div>
+        )}
         {/* eslint-enable jsx-a11y/interactive-supports-focus */}
         <div style={{ width: '100%' }}>
-          {!inactive &&
+          {!inactive && (
             <div className={s.header}>
               <div>
                 <span className={s.author}>
@@ -449,7 +463,7 @@ class Statement extends React.Component {
                 <span>
                   {likes ? ` (+${likes})` : ''}
 
-                  {canLike &&
+                  {canLike && (
                     <Button
                       onClick={this.handleLiking}
                       plain
@@ -463,23 +477,27 @@ class Statement extends React.Component {
                           />
                         </svg>
                       }
-                    />}
+                    />
+                  )}
                 </span>
               </div>
               {menu}
-            </div>}
+            </div>
+          )}
           <div className={s.text}>
-            {this.state.edit
-              ? <Textarea
-                  useCacheForDOMMeasurements
-                  placeholder="Leave a statement (optional)"
-                  value={this.state.textArea.val}
-                  onChange={this.onTextChange}
-                  className={s.textEdit}
-                  minRows={2}
-                  disabled={this.state.pending}
-                />
-              : text}
+            {this.state.edit ? (
+              <Textarea
+                useCacheForDOMMeasurements
+                placeholder="Leave a statement (optional)"
+                value={this.state.textArea.val}
+                onChange={this.onTextChange}
+                className={s.textEdit}
+                minRows={2}
+                disabled={this.state.pending}
+              />
+            ) : (
+              text
+            )}
           </div>
         </div>
       </div>

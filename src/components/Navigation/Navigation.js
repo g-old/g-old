@@ -58,11 +58,7 @@ const getMenu = (counter, path) =>
   contents.map(p => {
     const children = [<FormattedMessage {...messages[p.name]} />];
     if (p.name === 'feed' && counter.feed > 0) {
-      children.unshift(
-        <span className={s.news}>
-          {`(${counter.feed}) `}
-        </span>,
-      );
+      children.unshift(<span className={s.news}>{`(${counter.feed}) `}</span>);
     }
 
     return (

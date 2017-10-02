@@ -11,6 +11,36 @@ import App from '../../components/App';
 
 const middlewares = [thunk.withExtraArgument({ fetch: () => {} })];
 const mockStore = configureStore(middlewares);
+const setupApp = (store, element) => (
+  <IntlProvider locale="de-DE" initialNow={new Date()}>
+    <App
+      context={{
+        intl: {
+          initialNow: 1501773564065,
+          formattedMessage: () => 'translated text',
+          formatDate: () => 'formatted date',
+          formatTime: () => 'formatted time',
+          formatRelative: () => 'formatted relative',
+          formatNumber: () => 'formatted number',
+          formatPlural: () => 'formatted plural',
+          formatMessage: () => 'formatted message',
+          formatHTMLMessage: () => 'formatted html',
+          now: () => new Date(),
+          locale: 'de-DE',
+          newLocale: null,
+          messages: {
+            'de-DE': {},
+          },
+        },
+        fetch: () => {},
+        insertCss: () => {},
+        store,
+      }}
+    >
+      {element}
+    </App>
+  </IntlProvider>
+);
 
 const defaultUser = {
   id: 1,
@@ -155,16 +185,15 @@ describe('StatementsContainer', () => {
     const store = mockStore(initialState);
     const wrapper = renderer
       .create(
-        <IntlProvider>
-          <App context={{ insertCss: () => {}, store }}>
-            <StatementsContainer
-              poll={initPoll}
-              user={defaultUser}
-              filter={'all'}
-              followees={defaultFollowees}
-            />
-          </App>
-        </IntlProvider>,
+        setupApp(
+          store,
+          <StatementsContainer
+            poll={initPoll}
+            user={defaultUser}
+            filter={'all'}
+            followees={defaultFollowees}
+          />,
+        ),
       )
       .toJSON();
 
@@ -174,16 +203,15 @@ describe('StatementsContainer', () => {
     let store = mockStore(initialState);
     let wrapper = renderer
       .create(
-        <IntlProvider>
-          <App context={{ insertCss: () => {}, store }}>
-            <StatementsContainer
-              poll={initPoll}
-              user={defaultUser}
-              filter={'all'}
-              followees={defaultFollowees}
-            />
-          </App>
-        </IntlProvider>,
+        setupApp(
+          store,
+          <StatementsContainer
+            poll={initPoll}
+            user={defaultUser}
+            filter={'all'}
+            followees={defaultFollowees}
+          />,
+        ),
       )
       .toJSON();
     let asString = JSON.stringify(wrapper);
@@ -221,16 +249,15 @@ describe('StatementsContainer', () => {
     store = mockStore(updatedState);
     wrapper = renderer
       .create(
-        <IntlProvider>
-          <App context={{ insertCss: () => {}, store }}>
-            <StatementsContainer
-              poll={initPoll}
-              user={defaultUser}
-              filter={'all'}
-              followees={defaultFollowees}
-            />
-          </App>
-        </IntlProvider>,
+        setupApp(
+          store,
+          <StatementsContainer
+            poll={initPoll}
+            user={defaultUser}
+            filter={'all'}
+            followees={defaultFollowees}
+          />,
+        ),
       )
       .toJSON();
     asString = JSON.stringify(wrapper);

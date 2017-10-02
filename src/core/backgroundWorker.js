@@ -48,9 +48,12 @@ const mailWithToken = async ({
         throw Error(`Token type not recognized: ${type}`);
       }
     }
-    const mail = template(address, connection, token, viewer.name, lang);
+    if (token) {
+      const mail = template(address, connection, token, viewer.name, lang);
 
-    return sendMail(mail);
+      return sendMail(mail);
+    }
+    throw Error('Token generation failed');
   } catch (err) {
     log.error({ err }, 'Sending token email failed');
   }

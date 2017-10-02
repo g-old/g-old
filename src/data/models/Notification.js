@@ -1,18 +1,5 @@
 import knex from '../knex';
-// import { PRIVILEGES } from '../../constants';
-
-// eslint-disable-next-line no-unused-vars
-function canMutate(viewer, data) {
-  // eslint-disable-next-line no-bitwise
-  if (viewer /* && viewer.privilege & PRIVILEGES.canNotifyUser*/) {
-    return true;
-  }
-  return false;
-}
-
-function checkCanSee(viewer) {
-  return viewer;
-}
+import { canSee, canMutate, Models } from '../../core/accessControl';
 
 class Notification {
   constructor(data) {
@@ -27,16 +14,19 @@ class Notification {
   }
 
   static async gen(viewer, id) {
-    if (!checkCanSee(viewer)) return null;
-
-    let data = await knex('notifications').where({ id }).select();
+    let data = await knex('notifications')
+      .where({ id })
+      .select();
     data = data[0];
-    return data ? new Notification(data) : null;
+    if (!data) return null;
+    return canSee(viewer, data, Models.NOTIFICATION)
+      ? new Notification(data)
+      : null;
   }
 
   static async create(viewer, data, loaders, trx) {
-    if (!canMutate(viewer, data)) return null;
     if (!data || !data.type || !data.msg) return null;
+    if (!canMutate(viewer, data, Models.NOTIFICATION)) return null;
 
     let notification;
     const newData = Object.keys(data).reduce(
@@ -54,9 +44,14 @@ class Notification {
     );
 
     if (trx) {
-      notification = await knex('notifications').transacting(trx).insert(newData).returning('*');
+      notification = await knex('notifications')
+        .transacting(trx)
+        .insert(newData)
+        .returning('*');
     } else {
-      notification = await knex('notifications').insert(newData).returning('*');
+      notification = await knex('notifications')
+        .insert(newData)
+        .returning('*');
     }
 
     notification = notification[0];
