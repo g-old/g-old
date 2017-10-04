@@ -10,7 +10,7 @@ import UserType from '../types/UserType';
 import { sendJob } from '../../core/childProcess';
 import log from '../../logger';
 import { getProtocol } from '../../core/helpers';
-// import { Groups } from '../../organization';
+import { Groups } from '../../organization';
 
 const updateSession = (req, user) =>
   new Promise((resolve, reject) =>
@@ -23,6 +23,26 @@ const updateSession = (req, user) =>
         req.session.save(err => (err ? reject(err) : resolve())),
       ),
   );
+
+/* eslint-disable no-bitwise */
+const getUpdatedGroup = (oldGroups, updatedGroups) => {
+  let groupDiff = oldGroups ^ updatedGroups;
+  let added = true;
+  if ((oldGroups & updatedGroups) !== oldGroups) {
+    // remove group
+    added = false;
+    groupDiff &= ~updatedGroups; // get only new bits
+  }
+  const groups = Object.keys(Groups).reduce((acc, curr) => {
+    if (groupDiff & Groups[curr]) {
+      acc.push(curr);
+    }
+    return acc;
+  }, []);
+
+  return { added, names: groups };
+};
+/* eslint-enable no-bitwise */
 
 const notifyRoleChange = (viewer, user, message) => {
   const job = {
@@ -82,10 +102,23 @@ const updateUser = {
 
       if (user.groups) {
         // TODO better check!
-        notifyRoleChange(viewer, result.user, {
-          subject: 'Group memberships changed',
-          body: `Your group memberships got changed.`,
-        });
+
+        if (result.oldUser) {
+          const groups = getUpdatedGroup(
+            result.oldUser.groups,
+            result.user.groups,
+          );
+          notifyRoleChange(viewer, result.user, {
+            subject: 'Group memberships changed',
+            body: `Your group memberships got changed. ${groups.added
+              ? `Congratulations ${result.user
+                  .name}, you are now member of the group ${groups.names.join(
+                  ',',
+                )}`
+              : `You got removed from the group ${groups.names.join(',')}`}`,
+          });
+          delete result.oldUser;
+        }
       }
       // TODO check if necessary
       if (viewer.id === result.user.id) {

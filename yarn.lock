@@ -7528,9 +7528,9 @@ react-autowhatever@^10.1.0:
     react-themeable "^1.1.0"
     section-iterator "^2.0.0"
 
-react-avatar-editor@^9.1.1:
-  version "9.1.1"
-  resolved "https://registry.yarnpkg.com/react-avatar-editor/-/react-avatar-editor-9.1.1.tgz#6a9c83c35698936530ff6c602966461abd145aeb"
+react-avatar-editor@^10.0.0:
+  version "10.2.1"
+  resolved "https://registry.yarnpkg.com/react-avatar-editor/-/react-avatar-editor-10.2.1.tgz#5acbc766287f96094fe9d3447382b2d7193883e3"
   dependencies:
     prop-types "^15.5.8"
 

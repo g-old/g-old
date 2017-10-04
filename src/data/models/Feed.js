@@ -46,7 +46,7 @@ const aggregateActivities = activities =>
     (agg, curr) => {
       if (curr.verb === 'delete') {
         // eslint-disable-next-line no-param-reassign
-        agg.del[curr.objectId] = curr.objectId;
+        agg.del[curr.id] = curr.objectId;
         return agg;
       }
       if (curr.type === 'statement') {
@@ -159,9 +159,8 @@ class Feed {
 
     allActivities.reverse();
     const sorted = aggregateActivities(allActivities);
-
     const aggregated = sorted.all.filter(e => {
-      if (e.objectId in sorted.del) {
+      if (e.id in sorted.del) {
         return false;
       }
       if (e.type === 'proposal') {

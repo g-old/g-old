@@ -39,7 +39,7 @@ const messages = defineMessages({
 });
 
 // eslint-disable-next-line no-bitwise
-const VIEWERS = Groups.VIEWER | Groups.USER;
+const VIEWERS = Groups.VIEWER | Groups.GUEST;
 
 class UserPanel extends React.Component {
   static propTypes = {
@@ -154,28 +154,28 @@ class UserPanel extends React.Component {
                         (this.props.user.permissions &
                           Permissions.NOTIFY_GROUPS) >
                           0) && (
-                          <Button
-                            plain
-                            icon={
-                              <svg
-                                version="1.1"
-                                viewBox="0 0 24 24"
-                                width="24px"
-                                height="24px"
-                                role="img"
-                                aria-label="mail"
-                              >
-                                <path
-                                  fill="none"
-                                  stroke="#000"
-                                  strokeWidth="2"
-                                  d="M1,5 L12,14 L23,5 M1,20 L23,20 L23,4 L1,4 L1,20 L1,20 Z"
-                                />
-                              </svg>
-                            }
-                            onClick={() => this.setState({ showNotify: t.id })}
-                          />
-                        )}
+                        <Button
+                          plain
+                          icon={
+                            <svg
+                              version="1.1"
+                              viewBox="0 0 24 24"
+                              width="24px"
+                              height="24px"
+                              role="img"
+                              aria-label="mail"
+                            >
+                              <path
+                                fill="none"
+                                stroke="#000"
+                                strokeWidth="2"
+                                d="M1,5 L12,14 L23,5 M1,20 L23,20 L23,4 L1,4 L1,20 L1,20 Z"
+                              />
+                            </svg>
+                          }
+                          onClick={() => this.setState({ showNotify: t.id })}
+                        />
+                      )}
                       {/* eslint-enable no-bitwise */}
                     </span>
                   )}
@@ -222,7 +222,7 @@ class UserPanel extends React.Component {
             <AccordionPanel
               heading="Guest accounts"
               onActive={() => {
-                this.props.loadUserList({ group: Groups.USER });
+                this.props.loadUserList({ group: Groups.GUEST });
               }}
             >
               {guestArrayStatus.pending &&
@@ -234,7 +234,7 @@ class UserPanel extends React.Component {
                 <FetchError
                   message={guestArrayStatus.error}
                   onRetry={() =>
-                    this.props.loadUserList({ group: Groups.USER })}
+                    this.props.loadUserList({ group: Groups.GUEST })}
                 />
               )}
               {this.renderUserList(this.props.guestArray)}
@@ -244,7 +244,7 @@ class UserPanel extends React.Component {
                   disabled={guestArray.pending}
                   onClick={() => {
                     this.props.loadUserList({
-                      group: Groups.USER,
+                      group: Groups.GUEST,
                       after: guestArray.pageInfo.endCursor,
                     });
                   }}
@@ -334,9 +334,9 @@ class UserPanel extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  guestArray: getVisibleUsers(state, Groups.USER),
+  guestArray: getVisibleUsers(state, Groups.GUEST),
   viewerArray: getVisibleUsers(state, VIEWERS),
-  guestArrayStatus: getUsersStatus(state, Groups.USER),
+  guestArrayStatus: getUsersStatus(state, Groups.GUEST),
   viewerArrayStatus: getUsersStatus(state, VIEWERS),
   userArray: getVisibleUsers(state, 'all'),
   user: getSessionUser(state),

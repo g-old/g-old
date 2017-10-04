@@ -10,13 +10,13 @@ import {
 } from './organization';
 
 describe('canChangeGroups', () => {
-  it('Should allow to assign a user to a group', () => {
+  it('Should allow to assign a guest to a group', () => {
     const testActor = {
-      privileges: Privileges.GRANT_USER,
-      groups: Groups.USER,
+      privileges: Privileges.GRANT_GUEST,
+      groups: Groups.GUEST,
     };
     const testTarget = { groups: 0, permissions: 0 };
-    const updatedGroups = Groups.USER;
+    const updatedGroups = Groups.GUEST;
     expect(canChangeGroups(testActor, testTarget, updatedGroups)).toBe(true);
     testActor.privileges = Privileges.GRANT_VIEWER; // Wrong privilege
     expect(canChangeGroups(testActor, testTarget, updatedGroups)).toBe(false);
@@ -24,10 +24,10 @@ describe('canChangeGroups', () => {
 
   it('Should allow to remove a user from a group', () => {
     const testActor = {
-      privileges: Privileges.GRANT_USER,
-      groups: Groups.USER,
+      privileges: Privileges.GRANT_GUEST,
+      groups: Groups.GUEST,
     };
-    const testTarget = { groups: Groups.USER, permissions: 0 };
+    const testTarget = { groups: Groups.GUEST, permissions: 0 };
     const updatedGroups = 0;
     expect(canChangeGroups(testActor, testTarget, updatedGroups)).toBe(true);
     testActor.privileges = Privileges.GRANT_VIEWER; // Wrong privilege
@@ -43,15 +43,15 @@ describe('canChangeGroups', () => {
     const updatedGroups = Groups.ADMIN;
     expect(canChangeGroups(testActor, testTarget, updatedGroups)).toBe(true);
     // Admin only!
-    expect(canChangeGroups(testActor, testTarget, Groups.USER)).toBe(false);
+    expect(canChangeGroups(testActor, testTarget, Groups.GUEST)).toBe(false);
   });
   it('Should deny membership change for restricted groups if not admin', () => {
     const testActor = {
-      privileges: Privileges.GRANT_USER | Privileges.GRANT_MEMBER_MANAGER,
+      privileges: Privileges.GRANT_GUEST | Privileges.GRANT_MEMBER_MANAGER,
       groups: 0,
     };
     const testTarget = {
-      groups: Groups.USER | Groups.MEMBER_MANAGER,
+      groups: Groups.GUEST | Groups.MEMBER_MANAGER,
       permissions: 0,
     };
     const updatedGroups = 0;
@@ -61,7 +61,7 @@ describe('canChangeGroups', () => {
     testTarget.groups = Groups.ADMIN;
     // Admin can change other admin
     expect(
-      canChangeGroups(testActor, testTarget, Groups.ADMIN | Groups.USER),
+      canChangeGroups(testActor, testTarget, Groups.ADMIN | Groups.GUEST),
     ).toBe(true);
   });
 });

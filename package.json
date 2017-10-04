@@ -54,7 +54,7 @@
     "react-addons-css-transition-group": "^15.5.2",
     "react-addons-transition-group": "^15.6.0",
     "react-autosuggest": "^9.0.1",
-    "react-avatar-editor": "^9.1.1",
+    "react-avatar-editor": "^10.0.0",
     "react-dom": "^15.5.4",
     "react-infinite-calendar": "^2.2.0",
     "react-intl": "^2.3.0",

@@ -7,9 +7,9 @@ describe('userWriteControl', () => {
   it('Should allow to change group membership', () => {
     const testViewer = {
       id: 1,
-      privileges: Privileges.GRANT_USER,
+      privileges: Privileges.GRANT_GUEST,
       permissions: Permissions.MUTATE_PROFILES,
-      groups: Groups.USER,
+      groups: Groups.GUEST,
     };
     const testData = { groups: 0, id: 2 };
     expect(canMutate(testViewer, testData, Models.USER)).toBe(true);
@@ -20,7 +20,7 @@ describe('userWriteControl', () => {
       id: 1,
       privileges: 0,
       permissions: Permissions.CHANGE_OWN_PROFILE,
-      groups: Groups.USER,
+      groups: Groups.GUEST,
     };
     const testData = { followee: '2', id: 1 };
     expect(canMutate(testViewer, testData, Models.USER)).toBe(true);
@@ -33,7 +33,7 @@ describe('workTeamWriteControl', () => {
       id: 1,
       privileges: 0,
       permissions: Permissions.CREATE_WORKTEAMS,
-      groups: Groups.USER,
+      groups: Groups.GUEST,
     };
     const testData = { coordinatorId: '2', name: 'NAME' };
     expect(canMutate(testViewer, testData, Models.WORKTEAM)).toBe(true);
@@ -46,7 +46,7 @@ describe('activityWriteControl', () => {
       id: 1,
       privileges: 0,
       permissions: Permissions.CHANGE_OWN_PROFILE,
-      groups: Groups.USER,
+      groups: Groups.GUEST,
     };
     const testData = {
       verb: 'VERB',

@@ -41,7 +41,7 @@ passport.use(
           'email',
           'avatar_path',
           'groups',
-          'canVoteSince',
+          'can_vote_since',
           'email_verified',
         ])
         .update({ last_login_at: new Date() })
@@ -80,7 +80,7 @@ passport.serializeUser((user, done) => {
       permissions: rights.perm,
       privileges: rights.priv,
       groups: user.groups,
-      canVoteSince: user.canVoteSince,
+      canVoteSince: user.can_vote_since || user.canVoteSince,
       emailVerified,
     };
     done(null, sessionUser);

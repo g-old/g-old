@@ -16,6 +16,7 @@ class User {
     this.emailVerified = data.email_verified;
     this.lastLogin = data.last_login_at;
     this.createdAt = data.created_at;
+    this.canVoteSince = data.can_vote_since;
   }
   static async gen(viewer, id, { users }) {
     if (!id) return null;
@@ -126,17 +127,26 @@ class User {
       if (!hash) throw Error('Hash generation failed');
       newData.password_hash = hash;
     }
+    let userInDB;
 
     if (data.groups != null) {
       // check i valid roles
       /* eslint-disable no-bitwise */
-
       const groups = Number(data.groups);
       // TODO make it a member method - pro -cons?
-      const userInDB = await User.gen(viewer, data.id, loaders);
+      userInDB = await User.gen(viewer, data.id, loaders);
       if (!canChangeGroups(viewer, userInDB, groups)) {
         log.warn({ data, viewer }, 'Group change denied!');
         return { user: null, errors: ['Permission denied'] };
+      }
+
+      if (
+        (groups & Groups.VOTER) > 0 &&
+        (userInDB.groups & Groups.VOTER) === 0
+      ) {
+        newData.can_vote_since = new Date();
+      } else if (userInDB.groups & Groups.VOTER) {
+        newData.can_vote_since = null;
       }
 
       newData.groups = groups;
@@ -205,7 +215,11 @@ class User {
     }
 
     //
-    return { user: updatedUser || null, errors };
+    return {
+      user: updatedUser || null,
+      ...(userInDB && { oldUser: userInDB }),
+      errors,
+    };
   }
 
   static async create(viewer, data) {
@@ -238,7 +252,7 @@ class User {
       avatar_path,
       email_verified: false,
       password_hash: hash,
-      groups: Groups.USER,
+      groups: Groups.GUEST,
       created_at: new Date(),
     };
     const newUser = await knex.transaction(async trx => {

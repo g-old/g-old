@@ -41,7 +41,7 @@ export const Permissions = {
   MANAGE_WORKTEAMS: 33554432,
 };
 
-/* Add new groups here - DON'T FORGET TO UPDATE THE SCHEMA*/
+/* Add new groups here - DON'T FORGET TO UPDATE THE SCHEMA */
 export const Groups = {
   SUPER_USER: 1,
   ADMIN: 2,
@@ -51,7 +51,7 @@ export const Groups = {
   MODERATOR: 32,
   VOTER: 64,
   VIEWER: 128,
-  USER: 256,
+  GUEST: 256,
   SYSTEM: 512,
 };
 
@@ -60,7 +60,7 @@ export const Groups = {
 /* Permission masks - Change here if you want to adjust permissions for groups */
 
 /* Users */
-const userMask =
+const guestMask =
   Permissions.CHANGE_OWN_PROFILE | Permissions.DELETE_OWN_ACCOUNT;
 
 /* Viewers */
@@ -112,7 +112,7 @@ const superUserMask =
 /* Add new privileges here - DON'T FORGET TO UPDATE THE SCHEMA */
 export const Privileges = {
   NONE: 0,
-  GRANT_USER: 2,
+  GRANT_GUEST: 2,
   GRANT_VIEWER: 4,
   GRANT_VOTER: 8,
   GRANT_MODERATOR: 16,
@@ -124,7 +124,7 @@ export const Privileges = {
 /* Privilege masks - Change here if you want to adjust privileges for groups */
 
 const memberManagerPrivileges =
-  Privileges.GRANT_USER | Privileges.GRANT_VIEWER | Privileges.GRANT_VOTER;
+  Privileges.GRANT_GUEST | Privileges.GRANT_VIEWER | Privileges.GRANT_VOTER;
 
 const adminPrivileges =
   memberManagerPrivileges |
@@ -145,7 +145,7 @@ export const PrivilegesSchema = {
   [Groups.MODERATOR]: Privileges.NONE,
   [Groups.VOTER]: Privileges.NONE,
   [Groups.VIEWER]: Privileges.NONE,
-  [Groups.USER]: Privileges.NONE,
+  [Groups.GUEST]: Privileges.NONE,
 };
 
 /* Permission schema */
@@ -158,7 +158,7 @@ export const PermissionsSchema = {
   [Groups.MODERATOR]: moderatorMask,
   [Groups.VOTER]: voterMask,
   [Groups.VIEWER]: viewerMask,
-  [Groups.USER]: userMask,
+  [Groups.GUEST]: guestMask,
 };
 
 export const AccessMasks = {
@@ -190,7 +190,7 @@ export const GroupConditions = {
   [Groups.RELATOR]: Privileges.GRANT_RELATOR,
   [Groups.VOTER]: Privileges.GRANT_VOTER,
   [Groups.VIEWER]: Privileges.GRANT_VIEWER,
-  [Groups.USER]: Privileges.GRANT_USER,
+  [Groups.GUEST]: Privileges.GRANT_GUEST,
 };
 
 export const calcRights = userGroups =>

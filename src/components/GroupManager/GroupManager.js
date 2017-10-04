@@ -144,7 +144,7 @@ class GroupManager extends React.Component {
     const { user, updates, account } = this.props;
     if (
       (user.privileges & Groups.MEMBER_MANAGER) > 0 && // eslint-disable-line no-bitwise
-      account.groups === Groups.USER
+      account.groups === Groups.GUEST
     ) {
       promoteButton = (
         <Button

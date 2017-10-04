@@ -141,7 +141,7 @@ class AccountDetails extends React.Component {
   }
   onPromoteToViewer() {
     const { accountData: { groups, id } } = this.props;
-    if (groups === Groups.USER) {
+    if (groups === Groups.GUEST) {
       this.props.update({
         id,
         groups: groups | Groups.VIEWER, // eslint-disable-line no-bitwise

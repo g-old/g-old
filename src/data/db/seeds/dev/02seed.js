@@ -9,7 +9,7 @@ const Groups = {
   MODERATOR: 32,
   VOTER: 64,
   VIEWER: 128,
-  USER: 256,
+  GUEST: 256,
 };
 const numUsers = 50;
 const numMods = numUsers / 10 > 0 ? numUsers / 10 : 1;
@@ -61,18 +61,7 @@ function shuffle(array) {
 exports.seed = function (knex, Promise) {
   /* eslint-disable comma-dangle */
 
-  function createRoles() {
-    return Promise.resolve(
-      Promise.all([
-        // Inserts seed entries
-        knex('roles').insert({ id: 1, type: 'admin' }),
-        knex('roles').insert({ id: 2, type: 'mod' }),
-        knex('roles').insert({ id: 3, type: 'user' }),
-        knex('roles').insert({ id: 4, type: 'viewer' }),
-        knex('roles').insert({ id: 5, type: 'guest' }),
-      ])
-    );
-  }
+
 
   function createUser(name, surname, passwordHash, email, groups, time, emailVerified, voteSince) {
     return knex('users').insert({
@@ -81,7 +70,7 @@ exports.seed = function (knex, Promise) {
       password_hash: passwordHash,
       email,
       groups,
-      canVoteSince : voteSince||new Date(),
+      can_vote_since : voteSince||new Date(),
       created_at: time,
       updated_at: time,
       email_verified: emailVerified,
@@ -101,17 +90,18 @@ exports.seed = function (knex, Promise) {
     const testAdmin = Promise.resolve(
       bcrypt
         .hash('password', 10)
-        .then(hash => createUser('admin', 'admin', hash, 'admin@example.com', Groups.ADMIN, time, true))
+        .then(hash => createUser('admin', 'admin', hash, 'admin@example.com', Groups.GUEST|Groups.VIEWER|Groups.VOTER|Groups.ADMIN, time, true))
     );
     users.push(testAdmin);
     const testMods = [];
     for (let i = 0; i < numMods; i += 1) {
       const name = 'mod_' + i;
+      const groups = Groups.GUEST|Groups.VIEWER|Groups.VOTER|Groups.MODERATOR
       testMods.push(
         Promise.resolve(
           bcrypt
             .hash('password', 10)
-            .then(hash => createUser(name, name, hash, name + '@example.com', Groups.MODERATOR, time, true))
+            .then(hash => createUser(name, name, hash, name + '@example.com', groups, time, true))
         )
       );
     }
@@ -123,7 +113,7 @@ exports.seed = function (knex, Promise) {
         Promise.resolve(
           bcrypt
             .hash('password', 10)
-            .then(hash => createUser(name, name, hash, name + '@example.com', Groups.VOTER, time, true))
+            .then(hash => createUser(name, name, hash, name + '@example.com', Groups.GUEST|Groups.VIEWER|Groups.VOTER, time, true))
         )
       );
     }
@@ -132,7 +122,7 @@ exports.seed = function (knex, Promise) {
     for (let i = 0; i < numUsersCalculated; i += 1) {
       const name = faker.name.firstName();
       const surname = faker.name.lastName();
-      const user = createUser(name, surname, null, faker.internet.email(), Groups.VOTER, time, true);
+      const user = createUser(name, surname, null, faker.internet.email(), Groups.GUEST|Groups.VIEWER|Groups.VOTER, time, true);
       users.push(user);
     }
 
@@ -144,7 +134,7 @@ exports.seed = function (knex, Promise) {
         Promise.resolve(
           bcrypt
             .hash('password', 10)
-            .then(hash => createUser(name, name, hash, name + '@example.com', Groups.USER, time, true))
+            .then(hash => createUser(name, name, hash, name + '@example.com', Groups.GUEST, time, true))
         )
       );
     }
@@ -159,7 +149,7 @@ exports.seed = function (knex, Promise) {
         surname,
         null,
         faker.internet.email(),
-        Groups.USER,
+        Groups.GUEST,
         time,
         Math.random() > 0.5
       );
@@ -170,7 +160,7 @@ exports.seed = function (knex, Promise) {
     return Promise.resolve(
       Promise.all(guestUsers).then(() =>
         Promise.all(users).then(() =>
-          knex('users').whereNot('groups', Groups.USER).pluck('id').then(userIds => userIds)))
+          knex('users').whereNot('groups', Groups.GUEST).pluck('id').then(userIds => userIds)))
     );
   }
 

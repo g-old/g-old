@@ -10,8 +10,8 @@ import { Groups } from '../organization';
 const listByFilter = combineReducers({
   all: createList('all'),
   user: createList('user'),
-  [Groups.VIEWER | Groups.USER]: createList(Groups.VIEWER | Groups.USER),
-  [Groups.USER]: createList(Groups.USER),
+  [Groups.VIEWER | Groups.GUEST]: createList(Groups.VIEWER | Groups.GUEST),
+  [Groups.GUEST]: createList(Groups.GUEST),
 });
 /* eslint-enable no-bitwise */
 
