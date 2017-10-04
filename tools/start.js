@@ -176,13 +176,14 @@ async function start() {
   serverCompiler.plugin('compile', () => {
     if (!appPromiseIsResolved) return;
     appPromiseIsResolved = false;
+    // eslint-disable-next-line no-return-assign
     appPromise = new Promise(resolve => (appPromiseResolve = resolve));
   });
 
   workerCompiler.plugin('compile', () => {
     /*  if (!appPromiseIsResolved) return;
     appPromiseIsResolved = false;
-    appPromise = new Promise(resolve => (appPromiseResolve = resolve));*/
+    appPromise = new Promise(resolve => (appPromiseResolve = resolve)); */
   });
 
   let app;
