@@ -34,4 +34,16 @@ module.exports = {
     },
     ssl: true,
   },
+  test: {
+    client: 'postgresql',
+    connection: config.test.dbConfig,
+    migrations: {
+      tableName: 'knex_migrations',
+      directory: './data/db/migrations',
+    },
+    pool: {
+      min: 2,
+      max: 10,
+    },
+  },
 };

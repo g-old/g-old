@@ -25,6 +25,14 @@ describe('userWriteControl', () => {
     const testData = { followee: '2', id: 1 };
     expect(canMutate(testViewer, testData, Models.USER)).toBe(true);
   });
+  it('Should allow [Groups.SYSTEM] to change email', () => {
+    const testViewer = {
+      id: 1,
+      groups: Groups.SYSTEM,
+    };
+    const testData = { email: 'email@example.com', id: 2 };
+    expect(canMutate(testViewer, testData, Models.USER)).toBe(true);
+  });
 });
 
 describe('workTeamWriteControl', () => {

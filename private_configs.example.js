@@ -45,6 +45,16 @@ module.exports = {
       },
     },
   },
+  test: {
+    dbConfig: {
+      // or dbConfig: process.env.DATABASE_URL,
+      database: 'database_name',
+      user: 'user',
+      password: 'password',
+      host: '127.0.0.1',
+      port: '5432',
+    },
+  },
   deploy: {
     url: 'https://git.heroku.com/{name}.git',
     website: 'https://{name}.herokuapp.com/',

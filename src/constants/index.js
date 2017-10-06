@@ -147,8 +147,10 @@ export const PRIVILEGES = {
 };
 
 export const ErrorCodes = {
-  PERMISSION_WRONG: 1,
+  NO_PERMSSION: 1,
   EMAIL_DUPLICATE: 2,
+  VOTE_DUPLICATE: 4,
+  ARGUMENT_MISSING: 8,
 };
 
 export const ICONS = {

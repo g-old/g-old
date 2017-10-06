@@ -10,8 +10,7 @@
     "id": "account.changeRights",
     "description": "Changing the rights of the user",
     "defaultMessage": "Change users rights",
-    "message": "muda derc dl user",
-    "files": ["src/components/AccountDetails/AccountDetails.js"]
+    "message": "muda derc dl user"
   },
   {
     "id": "account.delete",
@@ -49,10 +48,7 @@
     "description": "Role of the user",
     "defaultMessage": "Role",
     "message": "pert",
-    "files": [
-      "src/components/AccountDetails/AccountDetails.js",
-      "src/components/RoleManager/RoleManager.js"
-    ]
+    "files": ["src/components/GroupManager/GroupManager.js"]
   },
   {
     "id": "form.error-empty",
@@ -75,13 +71,12 @@
     "id": "privilege.header",
     "description": "Header of privilegemanager",
     "defaultMessage": "Set & Change Privileges",
-    "message": "dé y mudé privileje",
-    "files": ["src/components/AccountDetails/AccountDetails.js"]
+    "message": "dé y mudé privileje"
   },
   {
     "id": "roles.header",
-    "description": "Header of rolesemanager",
-    "defaultMessage": "Set & Change Roles",
+    "description": "Header of groupsemanager",
+    "defaultMessage": "Set & Change Groups",
     "message": "dé y mudé pert",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
@@ -271,8 +266,7 @@
     "defaultMessage": "Change",
     "message": "mudé",
     "files": [
-      "src/components/PrivilegeManager/PrivilegeManager.js",
-      "src/components/RoleManager/RoleManager.js",
+      "src/components/GroupManager/GroupManager.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -281,73 +275,61 @@
     "description": "Server or network error",
     "defaultMessage": "Something went wrong",
     "message": "Valch é jit fauz",
-    "files": [
-      "src/components/PrivilegeManager/PrivilegeManager.js",
-      "src/components/RoleManager/RoleManager.js"
-    ]
+    "files": ["src/components/GroupManager/GroupManager.js"]
   },
   {
     "id": "privilege.changeRights",
     "description": "Account can change rights",
     "defaultMessage": "change rights",
-    "message": "muda derc",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
+    "message": "muda derc"
   },
   {
     "id": "privilege.changeRoles",
     "description": "Account can change roles",
     "defaultMessage": "change roles",
-    "message": "muda pert",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
+    "message": "muda pert"
   },
   {
     "id": "privilege.notifyUser",
     "description": "Account can send messages to other account",
     "defaultMessage": "notify accounts",
-    "message": "messaje a de autri accounts",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
+    "message": "messaje a de autri accounts"
   },
   {
     "id": "privilege.postProposals",
     "description": "Account can post proposals",
     "defaultMessage": "post proposals",
-    "message": "scrive na proposta",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
+    "message": "scrive na proposta"
   },
   {
     "id": "privilege.unlockAdmin",
     "description": "Account can unlock admin rank",
     "defaultMessage": "unlock admin",
-    "message": "dejsaré admin",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
+    "message": "dejsaré admin"
   },
   {
     "id": "privilege.unlockGuest",
     "description": "Account can unlock guest rank",
     "defaultMessage": "unlock guest",
-    "message": "dejsaré guest",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
+    "message": "dejsaré guest"
   },
   {
     "id": "privilege.unlockMod",
     "description": "Account can unlock mod rank",
     "defaultMessage": "unlock mod",
-    "message": "dejsaré mod",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
+    "message": "dejsaré mod"
   },
   {
     "id": "privilege.unlockUser",
     "description": "Account can unlock user rank",
     "defaultMessage": "unlock user",
-    "message": "dejsaré user",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
+    "message": "dejsaré user"
   },
   {
     "id": "privilege.unlockViewer",
     "description": "Account can unlock viewer rank",
     "defaultMessage": "unlock viewer",
-    "message": "dejsaré viewer",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
+    "message": "dejsaré viewer"
   },
   {
     "id": "command.submit",
@@ -448,7 +430,7 @@
     "description": "Button label for those who can only unlock viewers",
     "defaultMessage": "Unlock viewer",
     "message": "Dejsaré viewer",
-    "files": ["src/components/RoleManager/RoleManager.js"]
+    "files": ["src/components/GroupManager/GroupManager.js"]
   },
   {
     "id": "form.error-emailTaken",
@@ -745,6 +727,7 @@
     "defaultMessage": "Load more",
     "message": "",
     "files": [
+      "src/components/UserPanel/UserPanel.js",
       "src/routes/proposals/ProposalsOverviewContainer.js",
       "src/routes/tagged/TaggedContainer.js"
     ]
@@ -887,17 +870,17 @@
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
-    "id": "account.privileges",
-    "description": "Privileges",
-    "defaultMessage": "Privileges",
-    "message": "",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
-  },
-  {
     "id": "navigation.feed",
     "description": "Feed link in header",
     "defaultMessage": "Feed",
     "message": "",
     "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "rights.header",
+    "description": "Header of privilegemanager",
+    "defaultMessage": "Rights",
+    "message": "",
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   }
 ]

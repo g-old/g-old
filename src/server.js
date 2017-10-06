@@ -267,7 +267,7 @@ app.post('/reset/:token', (req, res) =>
     .then(data => {
       if (!data) throw Error('Token invalid');
       return User.update(
-        { id: 0, role: { type: 'system' } },
+        { id: 0, groups: Groups.SYSTEM },
         { password: req.body.password, id: data.userId },
         createLoaders(),
       );

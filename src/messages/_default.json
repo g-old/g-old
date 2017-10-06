@@ -154,10 +154,7 @@
     "description": "Role of the user",
     "defaultMessage": "Role",
     "message": "",
-    "files": [
-      "src/components/AccountDetails/AccountDetails.js",
-      "src/components/RoleManager/RoleManager.js"
-    ]
+    "files": ["src/components/GroupManager/GroupManager.js"]
   },
   {
     "id": "navigation.admin",
@@ -172,13 +169,6 @@
     "defaultMessage": "Proposals",
     "message": "",
     "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
-    "id": "account.changeRights",
-    "description": "Changing the rights of the user",
-    "defaultMessage": "Change users rights",
-    "message": "",
-    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.delete",
@@ -196,62 +186,6 @@
       "src/components/AccountDetails/AccountDetails.js",
       "src/components/NotificationInput/NotificationInput.js"
     ]
-  },
-  {
-    "id": "privilege.changeRights",
-    "description": "Account can change rights",
-    "defaultMessage": "change rights",
-    "message": "",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
-  },
-  {
-    "id": "privilege.changeRoles",
-    "description": "Account can change roles",
-    "defaultMessage": "change roles",
-    "message": "",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
-  },
-  {
-    "id": "privilege.notifyUser",
-    "description": "Account can send messages to other account",
-    "defaultMessage": "notify accounts",
-    "message": "",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
-  },
-  {
-    "id": "privilege.unlockAdmin",
-    "description": "Account can unlock admin rank",
-    "defaultMessage": "unlock admin",
-    "message": "",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
-  },
-  {
-    "id": "privilege.unlockMod",
-    "description": "Account can unlock mod rank",
-    "defaultMessage": "unlock mod",
-    "message": "",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
-  },
-  {
-    "id": "privilege.unlockUser",
-    "description": "Account can unlock user rank",
-    "defaultMessage": "unlock user",
-    "message": "",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
-  },
-  {
-    "id": "privilege.unlockViewer",
-    "description": "Account can unlock viewer rank",
-    "defaultMessage": "unlock viewer",
-    "message": "",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
-  },
-  {
-    "id": "privilege.header",
-    "description": "Header of privilegemanager",
-    "defaultMessage": "Set & Change Privileges",
-    "message": "",
-    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "calendar.blank",
@@ -273,20 +207,6 @@
     "defaultMessage": "Today",
     "message": "",
     "files": ["src/components/Calendar/Calendar.js"]
-  },
-  {
-    "id": "privilege.postProposals",
-    "description": "Account can post proposals",
-    "defaultMessage": "post proposals",
-    "message": "",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
-  },
-  {
-    "id": "privilege.unlockGuest",
-    "description": "Account can unlock guest rank",
-    "defaultMessage": "unlock guest",
-    "message": "",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
   },
   {
     "id": "proposalInput",
@@ -498,8 +418,7 @@
     "defaultMessage": "Change",
     "message": "",
     "files": [
-      "src/components/PrivilegeManager/PrivilegeManager.js",
-      "src/components/RoleManager/RoleManager.js",
+      "src/components/GroupManager/GroupManager.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -557,8 +476,8 @@
   },
   {
     "id": "roles.header",
-    "description": "Header of rolesemanager",
-    "defaultMessage": "Set & Change Roles",
+    "description": "Header of groupsemanager",
+    "defaultMessage": "Set & Change Groups",
     "message": "",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
@@ -567,7 +486,7 @@
     "description": "Button label for those who can only unlock viewers",
     "defaultMessage": "Unlock viewer",
     "message": "",
-    "files": ["src/components/RoleManager/RoleManager.js"]
+    "files": ["src/components/GroupManager/GroupManager.js"]
   },
   {
     "id": "commands.upload",
@@ -661,10 +580,7 @@
     "description": "Server or network error",
     "defaultMessage": "Something went wrong",
     "message": "",
-    "files": [
-      "src/components/PrivilegeManager/PrivilegeManager.js",
-      "src/components/RoleManager/RoleManager.js"
-    ]
+    "files": ["src/components/GroupManager/GroupManager.js"]
   },
   {
     "id": "commands.delete",
@@ -735,6 +651,7 @@
     "defaultMessage": "Load more",
     "message": "",
     "files": [
+      "src/components/UserPanel/UserPanel.js",
       "src/routes/proposals/ProposalsOverviewContainer.js",
       "src/routes/tagged/TaggedContainer.js"
     ]
@@ -877,17 +794,17 @@
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
-    "id": "account.privileges",
-    "description": "Privileges",
-    "defaultMessage": "Privileges",
-    "message": "",
-    "files": ["src/components/PrivilegeManager/PrivilegeManager.js"]
-  },
-  {
     "id": "navigation.feed",
     "description": "Feed link in header",
     "defaultMessage": "Feed",
     "message": "",
     "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "rights.header",
+    "description": "Header of privilegemanager",
+    "defaultMessage": "Rights",
+    "message": "",
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   }
 ]
