@@ -1,7 +1,12 @@
 /* eslint-env jest */
 /* eslint-disable no-bitwise */
 import { canMutate, Models } from './accessControl';
-import { Groups, Privileges, Permissions } from '../organization';
+import {
+  Groups,
+  Privileges,
+  Permissions,
+  PermissionsSchema,
+} from '../organization';
 
 describe('userWriteControl', () => {
   it('Should allow to change group membership', () => {
@@ -31,6 +36,19 @@ describe('userWriteControl', () => {
       groups: Groups.SYSTEM,
     };
     const testData = { email: 'email@example.com', id: 2 };
+    expect(canMutate(testViewer, testData, Models.USER)).toBe(true);
+  });
+  it('Should allow [Groups.SUPER_USER] to change own email and password', () => {
+    const testViewer = {
+      id: 1,
+      groups: Groups.SUPER_USER,
+      permissions: PermissionsSchema[Groups.SUPER_USER],
+    };
+    const testData = {
+      email: 'email@example.com',
+      password: 'password',
+      id: 1,
+    };
     expect(canMutate(testViewer, testData, Models.USER)).toBe(true);
   });
 });

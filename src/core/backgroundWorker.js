@@ -3,13 +3,13 @@ import webPush from '../webPush';
 import log from '../logger';
 import { createToken } from './tokens';
 import {
-  sendMail,
   emailVerificationMail,
   emailChangedMail,
   resetLinkMail,
   resetSuccessMail,
   notificationMail,
 } from './mailer';
+import Mailer from '../email';
 import Proposal from '../data/models/Proposal';
 import { circularFeedNotification } from './feed';
 import createLoaders from '../data/dataLoader';
@@ -21,6 +21,7 @@ const mailWithToken = async ({
   template,
   type,
   lang,
+  ...options
 }) => {
   const result = false;
   try {
@@ -50,8 +51,9 @@ const mailWithToken = async ({
     }
     if (token) {
       const mail = template(address, connection, token, viewer.name, lang);
-
-      return sendMail(mail);
+      return Mailer.send({ ...mail, ...options }).catch(err => {
+        log.error({ err }, 'Sendgrid failed');
+      });
     }
     throw Error('Token generation failed');
   } catch (err) {
@@ -64,7 +66,9 @@ const mailNotification = async mailData => {
   try {
     const { viewer, template, ...data } = mailData;
     const mail = template({ ...data, name: viewer.name });
-    return sendMail(mail);
+    return Mailer.send({ ...mail, ...data }).catch(err => {
+      log.error({ err }, 'Sendgrid failed');
+    });
   } catch (err) {
     log.error({ err }, 'Sending email failed');
   }
@@ -226,7 +230,7 @@ const notifyProposalCreation = async proposal => {
   });
 };
 
-process.on('message', async data => {
+async function handleMessages(data) {
   log.info({ data }, 'Job received');
   let result = null;
   try {
@@ -247,7 +251,8 @@ process.on('message', async data => {
       case 'mail': {
         log.info('Starting mail');
         const mailData = data.data;
-        result = handleMails(mailData);
+        result = await handleMails(mailData);
+        // console.log('MAIL RES', result);
         break;
       }
 
@@ -273,7 +278,8 @@ process.on('message', async data => {
     log.error(e);
   }
   return result;
-});
+}
+process.on('message', handleMessages);
 function onClosing(code, signal) {
   log.warn({ signal }, 'Worker closing');
   this.kill();

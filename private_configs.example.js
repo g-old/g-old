@@ -41,9 +41,10 @@ module.exports = {
           user: '{local-part}@gmail.com',
           pass: 'password',
         },
-        sender: '{email address}',
+        sender: '{email address}', // (!)
       },
     },
+    SENDGRID_API_KEY: 'api key', // or set it as env variable
   },
   test: {
     dbConfig: {
@@ -53,6 +54,12 @@ module.exports = {
       password: 'password',
       host: '127.0.0.1',
       port: '5432',
+    },
+    mailer: {
+      config: {
+        jsonTransport: true, // stream output to console
+      },
+      sender: '{email address}',
     },
   },
   deploy: {

@@ -42,8 +42,9 @@ export const checkToken = async ({ token, table }) => {
   if (
     !dbData ||
     new Date(dbData.token_expires).getTime() < new Date().getTime()
-  )
+  ) {
     return null;
+  }
   // eslint-disable-next-line new-cap
   return new Token(dbData);
 };

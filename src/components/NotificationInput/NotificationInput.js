@@ -156,15 +156,15 @@ class NotificationInput extends React.Component {
       <Box column pad>
         <FormField label="Type">
           {this.props.types &&
-            this.props.types.map(t =>
+            this.props.types.map(t => (
               <CheckBox
                 name={t}
                 checked={this.state[t]}
                 label={t}
                 onChange={this.handleValueChange}
                 disabled={this.props.types.length < 2}
-              />,
-            )}
+              />
+            ))}
         </FormField>
         <FormField>
           <CheckBox

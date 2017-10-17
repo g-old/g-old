@@ -103,6 +103,7 @@ const adminMask = Permissions.NOTIFY_ALL | Permissions.CREATE_WORKTEAMS;
 /* SUPERUSER - ONLY ONE ALLOWED - should not be able to participate
  * in the day-to-day business */
 const superUserMask =
+  Permissions.CHANGE_OWN_PROFILE |
   Permissions.VIEW_PROPOSALS |
   Permissions.VIEW_STATEMENTS |
   Permissions.VIEW_VOTES |

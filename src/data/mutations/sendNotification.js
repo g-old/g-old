@@ -25,13 +25,15 @@ const sendNotification = {
           loaders,
         );
 
+        const msg = JSON.parse(notification.message);
+
         if (!receiver) return false;
 
         const job = {
           type: 'mail',
           data: {
             mailType: 'notification',
-            message: notification.message,
+            message: msg.msg,
             subject: notification.subject || 'Info from GOLD',
             address: receiver.email,
             viewer,
