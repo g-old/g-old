@@ -44,6 +44,7 @@ class UserProfile extends React.Component {
     return (
       <Box className={s.profile} column align>
         <ProfilePicture
+          user={this.props.user}
           img={avatar}
           canChange={canChangeImg}
           onChange={this.props.onImageChange}

@@ -238,6 +238,7 @@ class AccountDetails extends React.Component {
             />
           )}
           <ProfilePicture
+            user={accountData}
             img={avatar}
             canChange
             onChange={this.displayUploadLayer}
