@@ -46,7 +46,7 @@ const statementFields = `
         id
         name
         surname
-        avatar
+        thumbnail
       }
       pollId
     }
@@ -54,7 +54,7 @@ const statementFields = `
       id
       name
       surname
-      avatar
+      thumbnail
     }
 
 `;
@@ -72,7 +72,7 @@ const pollFields = `{
       id
       name
       surname
-      avatar
+      thumbnail
     }
   }
   ownStatement {${statementFields} deletedAt}
@@ -113,7 +113,7 @@ spokesman{
   id
   name
   surname
-  avatar
+  thumbnail
 }
 pollOne ${pollFields}
 pollTwo ${pollFields}

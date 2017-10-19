@@ -3,7 +3,11 @@ import { normalize } from 'normalizr';
 
 import { user as userSchema } from '../store/schema';
 // import fetch from '../core/fetch';
-import { UPLOAD_AVATAR_START, UPLOAD_AVATAR_SUCCESS, UPLOAD_AVATAR_ERROR } from '../constants';
+import {
+  UPLOAD_AVATAR_START,
+  UPLOAD_AVATAR_SUCCESS,
+  UPLOAD_AVATAR_ERROR,
+} from '../constants';
 
 // only clientside!
 export function uploadAvatar(data) {
@@ -39,7 +43,8 @@ export function uploadAvatar(data) {
       if (resp.status !== 200) throw new Error(resp.statusText);
       const user = await resp.json();
       if (user.message) throw new Error(user.message);
-      if (!user.avatar) throw new Error('Avatar upload failed');
+      if (!user.avatar && !user.thumbnail)
+        throw new Error('Avatar upload failed');
       const normalizedData = normalize(user, userSchema);
       dispatch({
         type: UPLOAD_AVATAR_SUCCESS,

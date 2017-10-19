@@ -21,7 +21,7 @@ query($userId:ID){
     id
     name
     surname
-    avatar
+    thumbnail
   }
   object {
     __typename
@@ -80,7 +80,7 @@ query($userId:ID){
         id
         name
         surname
-        avatar
+        thumbnail
       }
 
     }
@@ -92,7 +92,7 @@ query($userId:ID){
         id
         name
         surname
-        avatar
+        thumbnail
       }
     }
     ... on Notification {
@@ -100,7 +100,7 @@ query($userId:ID){
       sender {
         name
         surname
-        avatar
+        thumbnail
         id
       }
       msg

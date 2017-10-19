@@ -23,7 +23,7 @@ subscription{
     id
     name
     surname
-    avatar
+    thumbnail
   }
   object {
     __typename
@@ -87,14 +87,14 @@ subscription{
           id
           name
           surname
-          avatar
+          thumbnail
         }
       }
       author{
         id
         name
         surname
-        avatar
+        thumbnail
       }
 
     }
@@ -106,7 +106,7 @@ subscription{
         id
         name
         surname
-        avatar
+        thumbnail
       }
     }
   }

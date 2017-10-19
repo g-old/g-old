@@ -113,15 +113,15 @@ class Poll extends React.Component {
     }
     return this.props.followeeVotes
       .filter(user => user.position === pos)
-      .map(user =>
+      .map(user => (
         <img
           key={user.id}
           className={s.followee}
-          src={user.voter.avatar}
+          src={user.voter.thumbnail}
           title={`${user.voter.name} ${user.voter.surname}`}
           alt="IMG"
-        />,
-      );
+        />
+      ));
   }
 
   canVote(position) {
@@ -175,7 +175,7 @@ class Poll extends React.Component {
     } = this.props;
 
     let votingButtons = null;
-    /* eslint-disable max-len*/
+    /* eslint-disable max-len */
     const votePending = updates.vote ? updates.vote.pending : false;
     if (canVote && !closedAt) {
       // TODO Find better check
@@ -264,7 +264,7 @@ class Poll extends React.Component {
 
     return (
       <div>
-        {this.state.confirmationFunc &&
+        {this.state.confirmationFunc && (
           <Layer>
             <Box column pad className={s.confirmationBox}>
               <Notification
@@ -285,11 +285,14 @@ class Poll extends React.Component {
                 />
               </Box>
             </Box>
-          </Layer>}
+          </Layer>
+        )}
         <p>
-          {closedAt
-            ? <FormattedMessage {...messages.closed} />
-            : <FormattedMessage {...messages.closing} />}
+          {closedAt ? (
+            <FormattedMessage {...messages.closed} />
+          ) : (
+            <FormattedMessage {...messages.closing} />
+          )}
           <FormattedRelative value={closedAt || endTime} />
         </p>
         <div className={s.pollState}>
@@ -307,22 +310,19 @@ class Poll extends React.Component {
           />
         </div>
         <div className={s.followeeContainer}>
-          <div className={s.followeeBlock}>
-            {this.getFolloweeVotes('pro')}
-          </div>
+          <div className={s.followeeBlock}>{this.getFolloweeVotes('pro')}</div>
           <div className={cn(s.followeeBlock, s.contra)}>
             {this.getFolloweeVotes('con')}
           </div>
         </div>
 
-        <Box justify>
-          {votingButtons}
-        </Box>
-        {this.state.voteError &&
+        <Box justify>{votingButtons}</Box>
+        {this.state.voteError && (
           <Notification
             type="error"
             message={<FormattedMessage {...messages.error} />}
-          />}
+          />
+        )}
       </div>
     );
   }

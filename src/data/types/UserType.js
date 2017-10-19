@@ -36,7 +36,7 @@ const UserType = new ObjectType({
         return canSee(viewer, data) ? data.email : null;
       },
     },
-    avatar: {
+    thumbnail: {
       type: GraphQLString,
     },
     emailVerified: {

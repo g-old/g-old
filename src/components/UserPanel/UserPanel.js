@@ -135,7 +135,7 @@ class UserPanel extends React.Component {
                       <img
                         style={{ height: '1em', width: '1em' }}
                         alt="member"
-                        src={m.avatar}
+                        src={m.thumbnail}
                       />
                     ))}
                 </td>
@@ -146,7 +146,7 @@ class UserPanel extends React.Component {
                       <img
                         style={{ height: '1em', width: '1em' }}
                         alt="coordinator"
-                        src={t.coordinator.avatar}
+                        src={t.coordinator.thumbnail}
                       />
                       {/* eslint-disable no-bitwise */}
                       {// eslint-disable-next-line eqeqeq

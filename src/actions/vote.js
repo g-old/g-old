@@ -30,7 +30,7 @@ const voteInfo = `{
     id
     name
     surname
-    avatar
+    thumbnail
   }
 }`;
 const createVoteMutation = `
@@ -60,7 +60,7 @@ const votesList = `
       id
       name
       surname
-      avatar
+      thumbnail
     }
     }
   }

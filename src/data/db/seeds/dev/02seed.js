@@ -74,7 +74,7 @@ exports.seed = function (knex, Promise) {
       created_at: time,
       updated_at: time,
       email_verified: emailVerified,
-      avatar_path: `https://api.adorable.io/avatars/32/${name}${surname}.io.png`,
+      thumbnail: `https://api.adorable.io/avatars/32/${name}${surname}.io.png`,
     });
   }
 

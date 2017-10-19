@@ -1,17 +1,22 @@
-exports.up = function (knex, Promise) {
+exports.up = function(knex, Promise) {
   return Promise.all([
-    knex.schema.createTable('polling_modes', (table) => {
-      table.increments();
-      table.string('name').notNullable();
-      table.string('description');
-      table.boolean('unipolar').notNullable();
-      table.boolean('with_statements').notNullable();
-      table.enu('threshold_ref', ['all', 'voters']).notNullable();
-      table.timestamps();
+    knex.schema.hasTable('polling_modes').then(exists => {
+      if (!exists) {
+        return knex.schema.createTable('polling_modes', table => {
+          table.increments();
+          table.string('name').notNullable();
+          table.string('description');
+          table.boolean('unipolar').notNullable();
+          table.boolean('with_statements').notNullable();
+          table.enu('threshold_ref', ['all', 'voters']).notNullable();
+          table.timestamps();
+        });
+      }
+      return null;
     }),
   ]);
 };
 
-exports.down = function (knex, Promise) {
+exports.down = function(knex, Promise) {
   return Promise.all([knex.schema.dropTable('polling_modes')]);
 };

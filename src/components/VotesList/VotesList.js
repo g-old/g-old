@@ -26,7 +26,7 @@ class VotesList extends React.Component {
       <img
         key={vote.id}
         className={s.avatar}
-        src={vote.voter.avatar}
+        src={vote.voter.thumbnail}
         title={`${vote.voter.name} ${vote.voter.surname}`}
         alt="IMG"
       />
@@ -60,11 +60,7 @@ class VotesList extends React.Component {
 
     const { isFetching, errorMessage } = this.props;
     if (isFetching && !votes.length) {
-      return (
-        <p>
-          {'Loading...'}{' '}
-        </p>
-      );
+      return <p>{'Loading...'} </p>;
     }
     if (errorMessage && !votes.length) {
       return (
@@ -80,17 +76,20 @@ class VotesList extends React.Component {
     /* eslint-disable css-modules/no-undef-class */
     return (
       <div>
-        {this.state.showVotes
-          ? <div className={cn(!unipolar && s.bipolar)}>
-              <div className={cn(s.votes)}>
-                {pro.map(vote => VotesList.renderVote(vote))}
-              </div>
-              {!unipolar &&
-                <div className={cn(s.votes, s.con)}>
-                  {con.map(vote => VotesList.renderVote(vote))}
-                </div>}
+        {this.state.showVotes ? (
+          <div className={cn(!unipolar && s.bipolar)}>
+            <div className={cn(s.votes)}>
+              {pro.map(vote => VotesList.renderVote(vote))}
             </div>
-          : <button onClick={this.onGetVotes}> GETVOTES</button>}
+            {!unipolar && (
+              <div className={cn(s.votes, s.con)}>
+                {con.map(vote => VotesList.renderVote(vote))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <button onClick={this.onGetVotes}> GETVOTES</button>
+        )}
       </div>
     );
     /* eslint-enable css-modules/no-undef-class */

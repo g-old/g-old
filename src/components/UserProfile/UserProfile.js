@@ -110,7 +110,7 @@ class UserProfile extends React.Component {
           />
         </Box>
         {this.props.user.workTeams &&
-          this.props.user.workTeams.map(t =>
+          this.props.user.workTeams.map(t => (
             <Value
               icon={
                 <svg
@@ -131,8 +131,8 @@ class UserProfile extends React.Component {
               }
               label={'Workteam'}
               value={t.name}
-            />,
-          )}
+            />
+          ))}
       </Box>
     );
   }

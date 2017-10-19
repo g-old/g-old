@@ -20,7 +20,7 @@ function renderSuggestion(suggestion, { query }) {
     <span
       className={s.suggestionContent}
       style={{
-        backgroundImage: `url(${suggestion.avatar})`,
+        backgroundImage: `url(${suggestion.thumbnail})`,
         backgroundSize: '3em 3em',
         backgroundRepeat: 'no-repeat',
       }}
@@ -53,6 +53,8 @@ class SearchField extends React.Component {
   };
   static defaultProps = {
     onChange: null,
+    clear: false,
+    data: null,
   };
   constructor() {
     super();
@@ -96,7 +98,7 @@ class SearchField extends React.Component {
 
   onSuggestionSelected(
     event,
-    { suggestion /* suggestionValue, suggestionIndex, sectionIndex, method*/ },
+    { suggestion /* suggestionValue, suggestionIndex, sectionIndex, method */ },
   ) {
     this.props.displaySelected(suggestion);
   }
@@ -109,7 +111,9 @@ class SearchField extends React.Component {
     }
     this.props.fetch({ term: escapedValue });
     const regex = new RegExp(`\\b${escapedValue}`, 'i');
-    const res = this.props.data.filter(person => regex.test(getSuggestionValue(person)));
+    const res = this.props.data.filter(person =>
+      regex.test(getSuggestionValue(person)),
+    );
     return res;
   }
   render() {

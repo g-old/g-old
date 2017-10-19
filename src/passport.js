@@ -39,7 +39,7 @@ passport.use(
           'password_hash',
           'surname',
           'email',
-          'avatar_path',
+          'thumbnail',
           'groups',
           'can_vote_since',
           'email_verified',
@@ -71,12 +71,20 @@ passport.serializeUser((user, done) => {
     const emailVerified =
       'emailVerified' in user ? user.emailVerified : user.email_verified;
     const rights = calcRights(user.groups);
+    let avatar = user.thumbnail;
+    const stIndex = avatar.indexOf('c_scale');
+    if (stIndex) {
+      // has thumbnailUrl
+      const endIndex = stIndex + 18; // (!)
+      avatar = avatar.slice(0, stIndex) + avatar.substring(endIndex);
+    }
     const sessionUser = {
       id: user.id,
       name: user.name,
       surname: user.surname,
       email: user.email,
-      avatar: user.avatar_path || user.avatar, // TODO change!
+      avatar,
+      thumbnail: user.thumbnail,
       permissions: rights.perm,
       privileges: rights.priv,
       groups: user.groups,

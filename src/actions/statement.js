@@ -45,7 +45,7 @@ const statementResult = `{
     id
     name
     surname
-    avatar
+    thumbnail
   }
 }
 `;
@@ -71,7 +71,7 @@ const userFields = `
 id,
     name,
     surname,
-    avatar
+    thumbnail
     groups
     `;
 const flaggedStatement = `

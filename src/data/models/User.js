@@ -12,7 +12,7 @@ class User {
     this.surname = data.surname;
     this.email = data.email;
     this.groups = data.groups;
-    this.avatar = data.avatar_path;
+    this.thumbnail = data.thumbnail;
     this.emailVerified = data.email_verified;
     this.lastLogin = data.last_login_at;
     this.createdAt = data.created_at;
@@ -240,7 +240,7 @@ class User {
     if (!password) return null;
     if (password.length < 6) return null;
     // eslint-disable-next-line camelcase
-    const avatar_path = `https://api.adorable.io/avatars/32/${name}${surname}.io.png`;
+    const thumbnail = `https://api.adorable.io/avatars/32/${name}${surname}.io.png`;
     // create
     // TODO check if locking with forUpdate is necessary (duplicate emails)
     const hash = await bcrypt.hash(data.password, 10);
@@ -249,7 +249,7 @@ class User {
       name,
       surname,
       email,
-      avatar_path,
+      thumbnail,
       email_verified: false,
       password_hash: hash,
       groups: Groups.GUEST,

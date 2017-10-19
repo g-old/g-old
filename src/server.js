@@ -186,7 +186,6 @@ app.post('/signup', (req, res) => {
 });
 const storage = multer.memoryStorage();
 const FileStore = FileStorage(AvatarManager({ local: !!__DEV__ }));
-
 app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
   if (!req.user) res.status(505);
   FileStore.save(
@@ -203,10 +202,6 @@ app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
       if (!user) {
         throw Error('User update failed');
       }
-      if (req.body.id && req.body.id !== req.user.id) {
-        // eslint-disable-next-line no-throw-literal
-        throw { id: req.body.id, user };
-      }
       return new Promise((resolve, reject) => {
         // eslint-disable-next-line no-confusing-arrow
         req.login(user, err => (err ? reject(err) : resolve(user)));
@@ -220,14 +215,7 @@ app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
         }),
     )
     .then(() => res.json(req.session.passport.user))
-    .catch(
-      // TODO rewrite hole function
-      // eslint-disable-next-line no-confusing-arrow
-      e =>
-        e.id === req.body.id
-          ? res.json(new User(e.user))
-          : res.status(500).json({ message: e.message }),
-    );
+    .catch(e => res.status(500).json({ message: e.message }));
 });
 
 app.post('/forgot', (req, res) => {

@@ -25,7 +25,7 @@ const userFields = `
   groups,
   name,
   surname,
-  avatar,
+  thumbnail,
     `;
 const userConnection = `
 query ($group:Int) {
@@ -54,7 +54,7 @@ query ($group:Int) {
     surname
     avatar
     id
-  }`;*/
+  }`; */
 const workTeam = `
     id
     name
@@ -105,7 +105,7 @@ mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $pass
       id,
       name,
       surname,
-      avatar
+      thumbnail
     }
   }
   errors
@@ -241,10 +241,13 @@ export function updateUser(user) {
       const { data } = await graphqlRequest(updateUserMutation, user);
       const errors = data.updateUser.errors;
       if (errors.length) {
+        /* eslint-disable no-return-assign */
         const standardError = errors.reduce(
           (acc, curr) => (acc[curr] = { [curr]: { [curr]: true } }),
           {},
         );
+        /* eslint-enable no-return-assign */
+
         dispatch({
           type: UPDATE_USER_ERROR,
           payload: {

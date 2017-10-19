@@ -26,7 +26,7 @@ const workTeam = `
   coordinator{
     name
     surname
-    avatar
+    thumbnail
     id
   }`;
 const workTeams = `query{
@@ -40,7 +40,7 @@ const workTeamsWithMembers = `query{
       members{
         name
         surname
-        avatar
+        thumbnail
         id
       }
     }}`;

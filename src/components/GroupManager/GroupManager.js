@@ -111,14 +111,14 @@ class GroupManager extends React.Component {
   onChange(e) {
     const {
       user,
-      account: { groups, id, emailVerified, workTeams, avatar },
+      account: { groups, id, emailVerified, workTeams, thumbnail },
     } = this.props;
     // TODO VALIDATION FN
     // dont allow change from guest if no profile, no workteam and no email verification
     /* eslint-disable no-bitwise */
     if (
       (user.groups & (Groups.ADMIN | Groups.SUPER_USER)) > 0 ||
-      (emailVerified && avatar && workTeams && workTeams.length)
+      (emailVerified && thumbnail && workTeams && workTeams.length)
     ) {
       if (this.state[e.target.name].status === true) {
         // remove

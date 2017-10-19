@@ -7,7 +7,7 @@ function Avatar(props) {
   return (
     <img
       className={props.isFollowee ? s.followee : s.avatar}
-      src={props.user.avatar}
+      src={props.user.thumbnail}
       alt={props.user.name}
     />
   );
@@ -15,7 +15,7 @@ function Avatar(props) {
 
 Avatar.propTypes = {
   user: PropTypes.shape({
-    avatar: PropTypes.string.isRequired,
+    thumbnail: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }).isRequired,
   isFollowee: PropTypes.bool,

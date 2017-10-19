@@ -52,7 +52,7 @@ class Statement extends React.Component {
     author: PropTypes.shape({
       name: PropTypes.string,
       surname: PropTypes.string,
-      avatar: PropTypes.string,
+      thumbnail: PropTypes.string,
       id: PropTypes.string,
     }).isRequired,
     deletedAt: PropTypes.string,
@@ -447,7 +447,7 @@ class Statement extends React.Component {
           >
             <img
               className={cn(s.avatar)}
-              src={author && author.avatar}
+              src={author && author.thumbnail}
               alt="IMG"
             />
           </div>

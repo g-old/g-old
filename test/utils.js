@@ -32,7 +32,7 @@ export const createTestUser = (args = { groups: Groups.GUEST }) => ({
   ...(args.id && { id: args.id }),
   can_vote_since: args.canVoteSince || null,
   email_verified: args.emailVerified || false,
-  avatar_path: args.avatar || '',
+  thumbnail: args.thumbnail || '',
   last_login_at: args.lastLogin || null,
 });
 
