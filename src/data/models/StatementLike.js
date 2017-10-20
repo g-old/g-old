@@ -1,5 +1,6 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import log from '../../logger';
 
 class StatementLike {
   constructor(data) {
@@ -51,38 +52,50 @@ class StatementLike {
 
     // create
     // eslint-disable-next-line prefer-arrow-callback
-    const newLikeId = await knex.transaction(async function(trx) {
-      const likeInDB = await knex('statement_likes')
-        .transacting(trx)
-        .forUpdate()
-        .where({ statement_id: data.statementId, user_id: viewer.id })
-        .pluck('id')
-        .into('statement_likes');
-      if (likeInDB.length !== 0) throw Error('Already liked!');
-      const id = await knex('statement_likes')
-        .transacting(trx)
-        .forUpdate()
-        .insert(
-          {
-            user_id: viewer.id,
-            statement_id: data.statementId,
-            created_at: new Date(),
-          },
-          'id',
-        );
+    let newLikeId;
+    try {
+      newLikeId = await knex.transaction(async trx => {
+        const likeInDB = await knex('statement_likes')
+          .transacting(trx)
+          .forUpdate()
+          .where({ statement_id: data.statementId, user_id: viewer.id })
+          .pluck('id')
+          .into('statement_likes');
+        if (likeInDB.length !== 0) throw Error('Already liked!');
+        const id = await knex('statement_likes')
+          .transacting(trx)
+          .forUpdate()
+          .insert(
+            {
+              user_id: viewer.id,
+              statement_id: data.statementId,
+              created_at: new Date(),
+            },
+            'id',
+          );
 
-      if (id.length === 0) throw Error('No Id returned');
+        if (id.length === 0) throw Error('No Id returned');
 
-      // update votecount;
-      // TODO these updates are sequential - can db-ops be parallel in transactions?
-      await knex('statements')
-        .transacting(trx)
-        .forUpdate()
-        .where({ id: data.statementId })
-        .increment('likes', 1)
-        .into('statements');
-      return id[0];
-    });
+        // update votecount;
+        // TODO these updates are sequential - can db-ops be parallel in transactions?
+        const authorId = await knex('statements')
+          .transacting(trx)
+          .forUpdate()
+          .where({ id: data.statementId })
+          .increment('likes', 1)
+          .into('statements')
+          .returning('author_id');
+        // No self liking!
+        // eslint-disable-next-line eqeqeq
+        if (authorId[0] && authorId[0] == viewer.id) {
+          throw new Error('Permission denied');
+        }
+        return id[0];
+      });
+    } catch (err) {
+      log.error({ err, viewer, data }, 'Like failed');
+      return null;
+    }
     if (!newLikeId) return null;
 
     return StatementLike.gen(viewer, newLikeId, loaders);

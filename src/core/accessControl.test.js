@@ -53,7 +53,7 @@ describe('userWriteControl', () => {
     expect(canMutate(testViewer, testData, Models.USER)).toBe(true);
   });
 
-  it.only('Should allow own name changes only to guests ', () => {
+  it('Should allow own name changes only to guests ', () => {
     const testData = {
       name: 'newname',
       surname: 'newsurname',
