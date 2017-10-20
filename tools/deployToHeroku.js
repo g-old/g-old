@@ -47,7 +47,7 @@ const test = {
 
 const gold = {
   name: 'gold',
-  url: 'gold:/home/git/g-old.org',
+  url: 'gold:/home/git/g-old.org/repo.git',
   branch: 'master',
   website: 'https://g-old.org',
 };

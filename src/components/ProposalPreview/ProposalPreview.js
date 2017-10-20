@@ -23,13 +23,24 @@ class ProposalPreview extends React.Component {
       pollTwo: PropTypes.object,
       tags: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
+    onClick: PropTypes.func.isRequired,
   };
   constructor(props) {
     super(props);
     this.state = { fullText: false };
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    if (this.props.onClick) {
+      const { id, state } = this.props.proposal;
+      const poll = getLastActivePoll(state, this.props.proposal);
+      this.props.onClick({ proposalId: id, pollId: poll.id });
+    }
   }
 
   render() {
+    // TODO move to state
     const poll = getLastActivePoll(
       this.props.proposal.state,
       this.props.proposal,
@@ -167,7 +178,7 @@ class ProposalPreview extends React.Component {
       <div className={s.root}>
         <div className={s.container}>
           <div style={{ display: 'flex' }}>
-            {/* <PollPreview poll={poll} />*/}
+            {/* <PollPreview poll={poll} /> */}
             {
               <div className={s.pollPreview}>
                 {pollPreview} {state}
@@ -181,18 +192,14 @@ class ProposalPreview extends React.Component {
               <div
                 role="link"
                 style={{ cursor: 'pointer' }}
-                onClick={() => {
-                  history.push(
-                    `/proposal/${this.props.proposal.id}/${poll.id}`,
-                  );
-                }}
+                onClick={this.handleClick}
                 className={s.header}
               >
                 {this.props.proposal.title}
               </div>
               {/* <div className={s.body}>
                 {body}
-              </div>*/}
+              </div> */}
               {/* eslint-disable jsx-a11y/no-static-element-interactions */}
               <div className={s.tags}>
                 {this.props.proposal.tags &&

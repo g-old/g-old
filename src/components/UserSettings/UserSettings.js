@@ -11,9 +11,17 @@ import {
   passwordValidation,
   passwordAgainValidation,
   emailValidation,
+  nameValidation,
+  capitalizeFirstLetter,
 } from '../../core/validation';
 
-const fieldNames = ['passwordOld', 'password', 'passwordAgain'];
+const fieldNames = [
+  'passwordOld',
+  'password',
+  'passwordAgain',
+  'name',
+  'surname',
+];
 
 const messages = defineMessages({
   currentPassword: {
@@ -122,6 +130,21 @@ const messages = defineMessages({
     defaultMessage: 'Workteams',
     description: 'Workteam',
   },
+  nameHeading: {
+    id: 'settings.name.heading',
+    defaultMessage: 'Name',
+    description: 'Heading of name section',
+  },
+  name: {
+    id: 'settings.name',
+    defaultMessage: 'Name',
+    description: 'First name',
+  },
+  surname: {
+    id: 'settings.surname',
+    defaultMessage: 'Surname',
+    description: 'Surname',
+  },
 });
 
 const initState = {
@@ -130,11 +153,15 @@ const initState = {
   passwordOld: '',
   passwordAgain: '',
   email: '',
+  name: '',
+  surname: '',
   errors: {
     password: { touched: false },
     passwordAgain: { touched: false },
     passwordOld: { touched: false },
     email: { touched: false },
+    name: { touched: false },
+    surname: { touched: false },
   },
   showEmailInput: false,
 };
@@ -145,6 +172,8 @@ class UserSettings extends React.Component {
       workTeams: PropTypes.arrayOf(PropTypes.shape({})),
       email: PropTypes.string.isRequired,
       id: PropTypes.string.isRequired,
+      name: PropTypes.string,
+      surname: PropTypes.string,
     }).isRequired,
     updateUser: PropTypes.func.isRequired,
     resendEmail: PropTypes.func.isRequired,
@@ -167,11 +196,14 @@ class UserSettings extends React.Component {
     this.handleValueChange = this.handleValueChange.bind(this);
     this.handleEmailUpdate = this.handleEmailUpdate.bind(this);
     this.handlePasswordUpdate = this.handlePasswordUpdate.bind(this);
+    this.handleNameUpdate = this.handleNameUpdate.bind(this);
     const testValues = {
       passwordOld: { fn: 'password' },
       password: { fn: 'password' },
       passwordAgain: { fn: 'passwordAgain' },
       email: { fn: 'email' },
+      name: { fn: 'name' },
+      surname: { fn: 'name' },
     };
     this.Validator = createValidator(
       testValues,
@@ -179,6 +211,7 @@ class UserSettings extends React.Component {
         password: passwordValidation,
         passwordAgain: passwordAgainValidation,
         email: emailValidation,
+        name: nameValidation,
       },
       this,
       obj => obj.state,
@@ -226,6 +259,17 @@ class UserSettings extends React.Component {
           passwordAgain: '',
           password: '',
           passwordOld: '',
+        });
+      }
+      if (
+        (updates.name && updates.name.success) ||
+        (updates.surname && updates.surname.success)
+      ) {
+        this.setState({
+          nameSuccess: true,
+          nameError: false,
+          name: '',
+          surname: '',
         });
       }
     }
@@ -281,7 +325,7 @@ class UserSettings extends React.Component {
     }, {});
   }
   handlePasswordUpdate() {
-    if (this.handleValidation(fieldNames)) {
+    if (this.handleValidation(fieldNames.slice(0, 3))) {
       this.props.updateUser({
         id: this.props.user.id,
         passwordOld: this.state.passwordOld.trim(),
@@ -289,6 +333,28 @@ class UserSettings extends React.Component {
       });
     }
   }
+
+  handleNameUpdate() {
+    const fields = [];
+
+    if (this.state.name) {
+      fields.push('name');
+    }
+    if (this.state.surname) {
+      fields.push('surname');
+    }
+    const args = fields.reduce(
+      (acc, curr) => {
+        acc[curr] = capitalizeFirstLetter(this.state[curr]);
+        return acc;
+      },
+      { id: this.props.user.id },
+    );
+    if (this.handleValidation(fields)) {
+      this.props.updateUser(args);
+    }
+  }
+
   handleEmailUpdate() {
     if (this.handleValidation(['email'])) {
       const newEmail = this.state.email.trim().toLowerCase();
@@ -313,20 +379,26 @@ class UserSettings extends React.Component {
       updates && updates.verifyEmail && updates.verifyEmail.pending;
     const verifySuccess =
       updates && updates.verifyEmail && updates.verifyEmail.success;
-    const updateEmailBtn = this.state.showEmailInput
-      ? <Button
-          disabled={emailPending}
-          onClick={this.handleEmailUpdate}
-          label={<FormattedMessage {...messages.change} />}
-        />
-      : null;
+    const updateEmailBtn = this.state.showEmailInput ? (
+      <Button
+        disabled={emailPending}
+        onClick={this.handleEmailUpdate}
+        label={<FormattedMessage {...messages.change} />}
+      />
+    ) : null;
     const buttonLabel = this.state.showEmailInput ? 'cancel' : 'change';
-
+    const nameSuccess =
+      updates &&
+      ((updates.name && updates.name.success) ||
+        (updates.surname && updates.surname.success));
+    const namePending = updates && updates.name && updates.name.pending;
     const {
       passwordOldError,
       passwordError,
       passwordAgainError,
       emailError,
+      nameError,
+      surnameError,
     } = this.visibleErrors([...fieldNames, 'email']);
 
     let emailStatus = null;
@@ -343,9 +415,7 @@ class UserSettings extends React.Component {
 
     return (
       <Box column pad>
-        <legend>
-          {<FormattedMessage {...messages.workteams} />}
-        </legend>
+        <legend>{<FormattedMessage {...messages.workteams} />}</legend>
         <FormField label="Workteams">
           <Select
             inField
@@ -372,21 +442,57 @@ class UserSettings extends React.Component {
               } else {
                 this.props.onJoinWorkTeam({
                   id: e.value.value,
-                  /* e.value[0].value,*/ memberId: this.props.user.id,
+                  /* e.value[0].value, */ memberId: this.props.user.id,
                 });
               }
             }}
           />
         </FormField>
-        <legend>
-          {<FormattedMessage {...messages.emailHeading} />}
-        </legend>
+        <legend>{<FormattedMessage {...messages.nameHeading} />}</legend>
+        <fieldset>
+          <FormField
+            label={<FormattedMessage {...messages.name} />}
+            error={nameError}
+          >
+            <input
+              type="text"
+              onChange={this.handleValueChange}
+              value={this.state.name}
+              name="name"
+              placeholder={this.props.user.name}
+            />
+          </FormField>
+          <FormField
+            label={<FormattedMessage {...messages.surname} />}
+            error={surnameError}
+          >
+            <input
+              type="text"
+              onChange={this.handleValueChange}
+              value={this.state.surname}
+              placeholder={this.props.user.surname}
+              name="surname"
+            />
+          </FormField>
+        </fieldset>
+        <Box justify>
+          {!nameSuccess && (
+            <Button
+              primary
+              disabled={namePending}
+              onClick={this.handleNameUpdate}
+              label={<FormattedMessage {...messages.change} />}
+            />
+          )}
+        </Box>
+        <legend>{<FormattedMessage {...messages.emailHeading} />}</legend>
 
         <fieldset>
-          {this.state.emailError &&
+          {this.state.emailError && (
             <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
               <FormattedMessage {...messages.error} />
-            </div>}
+            </div>
+          )}
           <FormField
             label={<FormattedMessage {...messages.email} />}
             error={emailError}
@@ -403,38 +509,40 @@ class UserSettings extends React.Component {
         </fieldset>
         <Box wrap justify>
           {!emailSuccess && !emailPending && updateEmailBtn}
-          {!emailSuccess &&
+          {!emailSuccess && (
             <Button
               primary={!showResendBtn}
               disabled={emailPending}
               onClick={this.onEditEmail}
               label={<FormattedMessage {...messages[buttonLabel]} />}
-            />}
-          {showResendBtn &&
+            />
+          )}
+          {showResendBtn && (
             <Button
               primary
               disabled={verifyPending}
               onClick={resendEmail}
               label={<FormattedMessage {...messages.resend} />}
-            />}
+            />
+          )}
         </Box>
         {(verifySuccess || emailSuccess) &&
-          !user.emailVerified &&
-          <Notification
-            type="alert"
-            message={
-              'Look in your mail account. Soon something should be there'
-            }
-          />}
-        <legend>
-          {<FormattedMessage {...messages.passwordHeading} />}
-        </legend>
+          !user.emailVerified && (
+            <Notification
+              type="alert"
+              message={
+                'Look in your mail account. Soon something should be there'
+              }
+            />
+          )}
+        <legend>{<FormattedMessage {...messages.passwordHeading} />}</legend>
 
         <fieldset>
-          {this.state.passwordError &&
+          {this.state.passwordError && (
             <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
               <FormattedMessage {...messages.error} />
-            </div>}
+            </div>
+          )}
           <FormField
             label={<FormattedMessage {...messages.currentPassword} />}
             error={passwordOldError}
@@ -468,19 +576,21 @@ class UserSettings extends React.Component {
               value={this.state.passwordAgain}
             />
           </FormField>
-          {this.state.passwordSuccess &&
+          {this.state.passwordSuccess && (
             <div style={{ backgroundColor: 'rgba(140, 200, 0, 0.3)' }}>
               <FormattedMessage {...messages.success} />
-            </div>}
+            </div>
+          )}
         </fieldset>
         <Box justify>
-          {!passwordSuccess &&
+          {!passwordSuccess && (
             <Button
               primary
               disabled={passwordPending}
               onClick={this.handlePasswordUpdate}
               label={<FormattedMessage {...messages.change} />}
-            />}
+            />
+          )}
         </Box>
       </Box>
     );

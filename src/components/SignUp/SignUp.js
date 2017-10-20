@@ -12,6 +12,7 @@ import {
   passwordAgainValidation,
   emailValidation,
   nameValidation,
+  capitalizeFirstLetter,
 } from '../../core/validation';
 
 const fieldNames = ['name', 'surname', 'email', 'password', 'passwordAgain'];
@@ -88,9 +89,7 @@ const messages = defineMessages({
     description: 'Default signup error message',
   },
 });
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
+
 class SignUp extends React.Component {
   static propTypes = {
     onCreateUser: PropTypes.func.isRequired,
@@ -248,11 +247,11 @@ class SignUp extends React.Component {
       emailError,
     } = this.visibleErrors(fieldNames);
 
-    const loginError = this.props.error
-      ? <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
-          <FormattedMessage {...messages.error} />
-        </div>
-      : null;
+    const loginError = this.props.error ? (
+      <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
+        <FormattedMessage {...messages.error} />
+      </div>
+    ) : null;
     return (
       <div className={s.root}>
         <div className={s.container}>

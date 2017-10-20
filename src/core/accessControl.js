@@ -23,12 +23,20 @@ export const Models = {
 /* eslint-disable no-unused-vars */
 
 function userWriteControl(viewer, data) {
+  if (Object.keys(data).length < 2) {
+    return false;
+  }
   // own data can be changed
   if (
     viewer &&
-    viewer.id == data.id && // eslint-disable-line eqeqeq
-    (viewer.permissions & Permissions.CHANGE_OWN_PROFILE) > 0
+    viewer.id == data.id // eslint-disable-line eqeqeq
   ) {
+    if (!(viewer.permissions & Permissions.CHANGE_OWN_PROFILE)) {
+      return false;
+    }
+    if (data.name || data.surname) {
+      return viewer.groups === Groups.GUEST;
+    }
     if (data.groups == null) {
       return true; // Nobody can change his own memberships
     }

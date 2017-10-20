@@ -50,5 +50,20 @@ describe('User Model', () => {
       expect(result.user).toBe(undefined);
       expect(result.errors).toContain('Wrong argument');
     });
+    test('Should update both name and surname ', async () => {
+      const id = 2;
+      const testName = 'newName';
+      const testSurname = 'newSurname';
+
+      const testUser = createTestUser({ id });
+      await knex('users').insert(testUser);
+      const testActor = createTestActor({ id });
+      const update = { id: testUser.id, name: testName, surname: testSurname };
+      const result = await User.update(testActor, update, createLoaders());
+      expect(result.user).toBeDefined();
+      expect(result.user).toEqual(
+        expect.objectContaining({ name: testName, surname: testSurname }),
+      );
+    });
   });
 });

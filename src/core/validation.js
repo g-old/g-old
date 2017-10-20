@@ -156,6 +156,9 @@ export function emailValidation(email, { invalidEmails = [] }) {
   return result;
 }
 
+export const capitalizeFirstLetter = string =>
+  string.charAt(0).toUpperCase() + string.slice(1).trim();
+
 export function createValidator(
   allValues,
   validators,

@@ -134,11 +134,7 @@ class ProposalContainer extends React.Component {
     const { proposal, isFetching, errorMessage, user, followees } = this.props;
     const { filter } = this.state;
     if (isFetching && !proposal) {
-      return (
-        <p>
-          {'Loading...'}{' '}
-        </p>
-      );
+      return <p>{'Loading...'} </p>;
     }
     if (errorMessage && !proposal) {
       return (

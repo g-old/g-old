@@ -7,6 +7,7 @@ import {
   Permissions,
   PermissionsSchema,
 } from '../organization';
+import { createTestActor } from '../../test/utils';
 
 describe('userWriteControl', () => {
   it('Should allow to change group membership', () => {
@@ -50,6 +51,43 @@ describe('userWriteControl', () => {
       id: 1,
     };
     expect(canMutate(testViewer, testData, Models.USER)).toBe(true);
+  });
+
+  it.only('Should allow own name changes only to guests ', () => {
+    const testData = {
+      name: 'newname',
+      surname: 'newsurname',
+      id: 1,
+    };
+    expect(canMutate(createTestActor({ id: 1 }), testData, Models.USER)).toBe(
+      true,
+    );
+    expect(
+      canMutate(
+        createTestActor({
+          id: 1,
+          groups: Groups.GUEST | Groups.VIEWER | Groups.ADMIN,
+        }),
+        testData,
+        Models.USER,
+      ),
+    ).toBe(false);
+  });
+
+  it('Should block access if no data is submitted ', () => {
+    const testData = {
+      id: 1,
+    };
+    expect(
+      canMutate(
+        createTestActor({
+          id: 1,
+          groups: Groups.GUEST | Groups.VIEWER | Groups.ADMIN,
+        }),
+        testData,
+        Models.USER,
+      ),
+    ).toBe(false);
   });
 });
 

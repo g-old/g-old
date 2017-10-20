@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import ProposalPreview from '../../components/ProposalPreview';
-import { loadProposalsList } from '../../actions/proposal';
+import { loadProposalsList, loadProposal } from '../../actions/proposal';
+import history from '../../history';
 import {
   getVisibleProposals,
   getProposalsIsFetching,
@@ -21,7 +22,7 @@ const messages = defineMessages({
     description: 'To get more data',
   },
 });
-class ProposalContainer extends React.Component {
+class ProposalsOverviewContainer extends React.Component {
   static propTypes = {
     proposals: PropTypes.arrayOf(
       PropTypes.shape({
@@ -38,6 +39,17 @@ class ProposalContainer extends React.Component {
     }).isRequired,
     state: PropTypes.string.isRequired,
   };
+
+  constructor(props) {
+    super(props);
+    this.onProposalClick = this.onProposalClick.bind(this);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  onProposalClick({ proposalId, pollId }) {
+    history.push(`/proposal/${proposalId}/${pollId}`);
+  }
+
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
     return this.props.proposals != null;
@@ -73,7 +85,11 @@ class ProposalContainer extends React.Component {
         {/* <Navigation filter={filter} /> */}
         <ProposalsSubHeader filter={filter} />
         {proposals.map(proposal => (
-          <ProposalPreview key={proposal.id} proposal={proposal} />
+          <ProposalPreview
+            key={proposal.id}
+            proposal={proposal}
+            onClick={this.onProposalClick}
+          />
         ))}
         {this.props.pageInfo.hasNextPage && (
           <Button
@@ -103,6 +119,9 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatch = {
   loadProposalsList,
+  loadProposal,
 };
 
-export default connect(mapStateToProps, mapDispatch)(ProposalContainer);
+export default connect(mapStateToProps, mapDispatch)(
+  ProposalsOverviewContainer,
+);

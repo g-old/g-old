@@ -111,6 +111,12 @@ class User {
       newData.email = data.email.trim();
       newData.email_verified = !!data.emailVerified;
     }
+    if (data.name) {
+      newData.name = data.name.trim();
+    }
+    if (data.surname) {
+      newData.surname = data.surname.trim();
+    }
     if (data.password) {
       if (data.passwordOld) {
         let passwordHash = await knex('users')

@@ -167,8 +167,19 @@ const saveLocal = async (
     // TODO delete old avatar if existing
     // TODO resizing serverside
     if (user.thumbnail.indexOf('https') === -1) {
-      const pathToFile = path.resolve(__dirname, folder + user.thumbnail);
-      await deleteFile(pathToFile);
+      const pathToThumbnail = path.resolve(__dirname, folder, user.thumbnail);
+      await deleteFile(pathToThumbnail).catch(err =>
+        log.error({ err }, 'Deletion failed'),
+      );
+      const st = user.thumbnail.indexOf('c_scale');
+      const pathToFile = path.resolve(
+        __dirname,
+        folder,
+        user.thumbnail.slice(0, st) + user.thumbnail.substring(st + 18),
+      );
+      await deleteFile(pathToFile).catch(err =>
+        log.error({ err }, 'Deletion failed'),
+      );
     }
     await writeFile(filepath, buffer);
 

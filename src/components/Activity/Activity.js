@@ -8,6 +8,7 @@ import Statement from '../Statement';
 import ProposalPreview from '../ProposalPreview';
 import Icon from '../Icon';
 import Link from '../Link';
+import history from '../../history';
 
 class Activity extends React.Component {
   static propTypes = {
@@ -28,6 +29,11 @@ class Activity extends React.Component {
     content: {},
   };
 
+  // eslint-disable-next-line class-methods-use-this
+  onProposalClick({ proposalId, pollId }) {
+    history.push(`/proposal/${proposalId}/${pollId}`);
+  }
+
   render() {
     let content = null;
     let header = null;
@@ -43,7 +49,12 @@ class Activity extends React.Component {
       this.props.content &&
       this.props.content.__typename === 'ProposalDL'
     ) {
-      content = <ProposalPreview proposal={this.props.content} />;
+      content = (
+        <ProposalPreview
+          proposal={this.props.content}
+          onClick={this.onProposalClick}
+        />
+      );
       if (this.props.verb === 'create') {
         if (this.props.content.state === 'survey') {
           header = 'New Survey';
@@ -96,13 +107,9 @@ class Activity extends React.Component {
     return (
       <div className={s.container}>
         <FormattedRelative value={this.props.date} />
-        <h1>
-          {header}
-        </h1>
+        <h1>{header}</h1>
 
-        <div>
-          {content}
-        </div>
+        <div>{content}</div>
       </div>
     );
   }
