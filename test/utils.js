@@ -6,6 +6,13 @@ import {
   PermissionsSchema,
 } from '../src/organization';
 
+const uniqueMail = () => {
+  let i = 0;
+  // eslint-disable-next-line no-plusplus
+  return () => `testemail${i++}@example.com`;
+};
+const getUniqueMail = uniqueMail();
+
 export const clearDB = async () => {
   if (process.env.NODE_ENV !== 'test') {
     throw Error('Use only in testing environments!');
@@ -24,7 +31,7 @@ export const clearDB = async () => {
 const createUser = args => ({
   name: args.name || 'Test',
   surname: args.surname || 'TestTest',
-  email: args.email || 'testemail@example.com',
+  email: args.email || getUniqueMail(),
   groups: args.groups || Groups.GUEST,
 });
 export const createTestUser = (args = { groups: Groups.GUEST }) => ({

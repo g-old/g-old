@@ -23,7 +23,7 @@ export const Models = {
 /* eslint-disable no-unused-vars */
 
 function userWriteControl(viewer, data) {
-  if (Object.keys(data).length < 2) {
+  if (data.id && Object.keys(data).length < 2) {
     return false;
   }
   // own data can be changed
@@ -60,6 +60,9 @@ function userWriteControl(viewer, data) {
         // TODO further checks!
       }
     }
+  }
+  if (data.userId && (viewer.permissions & Permissions.DELETE_ACCOUNTS) > 0) {
+    return true;
   }
 
   return false;

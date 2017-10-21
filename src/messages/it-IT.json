@@ -849,5 +849,26 @@
     "defaultMessage": "Rights",
     "message": "",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
+  },
+  {
+    "id": "settings.name",
+    "description": "First name",
+    "defaultMessage": "Name",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "settings.name.heading",
+    "description": "Heading of name section",
+    "defaultMessage": "Name",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "settings.surname",
+    "description": "Surname",
+    "defaultMessage": "Surname",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
   }
 ]

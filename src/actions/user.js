@@ -17,6 +17,9 @@ import {
   FETCH_USER_START,
   FETCH_USER_SUCCESS,
   FETCH_USER_ERROR,
+  DELETE_USER_START,
+  DELETE_USER_SUCCESS,
+  DELETE_USER_ERROR,
 } from '../constants';
 import { getUsersStatus } from '../reducers';
 
@@ -112,6 +115,15 @@ mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $pass
   }
 }
 `;
+
+const deleteUserMutation = `
+mutation($userId:ID){
+  deleteUser(user:{userId:$userId}){
+    user{${userFields}}
+    errors
+
+  }
+}`;
 
 const userSearch = `
 query ($term:String) {
@@ -364,6 +376,55 @@ export function fetchProfileData({ id }) {
     } catch (error) {
       dispatch({
         type: FETCH_USER_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function deleteUser({ id }) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    // eslint-disable-next-line no-unused-vars
+
+    dispatch({
+      type: DELETE_USER_START,
+    });
+
+    try {
+      const { data } = await graphqlRequest(deleteUserMutation, { userId: id });
+      const errors = data.deleteUser.errors;
+      if (errors.length) {
+        /* eslint-disable no-return-assign */
+        const standardError = errors.reduce(
+          (acc, curr) => (acc[curr] = { [curr]: { [curr]: true } }),
+          {},
+        );
+        /* eslint-enable no-return-assign */
+
+        dispatch({
+          type: DELETE_USER_ERROR,
+          payload: {
+            errors,
+          },
+          message: { fields: standardError },
+        });
+        return false;
+      }
+      const normalizedData = normalize(data.deleteUser.user, userSchema);
+      dispatch({
+        type: DELETE_USER_SUCCESS,
+        payload: normalizedData,
+        filter: 'all',
+      });
+    } catch (error) {
+      dispatch({
+        type: DELETE_USER_ERROR,
         payload: {
           error,
         },

@@ -5,6 +5,7 @@ import {
   LOAD_USERS_START,
   FIND_USER_SUCCESS,
   UPDATE_USER_SUCCESS,
+  DELETE_USER_SUCCESS,
 } from '../constants';
 
 // TODO handle DELETE_USER
@@ -39,6 +40,10 @@ const createList = filter => {
           ? handleGroupChange(state, action)
           : state;
       }
+      case DELETE_USER_SUCCESS: {
+        return state.filter(uId => uId !== action.payload.result);
+      }
+
       default:
         return state;
     }

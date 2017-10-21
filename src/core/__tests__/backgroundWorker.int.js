@@ -29,7 +29,8 @@ describe('Background Worker Integration', () => {
         address: 'testg@byom.de',
         viewer: testActor,
         mail_settings: {
-          // for testing withoud sending a mail
+          // for testing - counts for the limit -email ist NOT delivered
+          // Internet connection required!
           sandbox_mode: {
             enable: true,
           },
@@ -52,24 +53,27 @@ describe('Background Worker Integration', () => {
     };
     /* eslint-disable no-underscore-dangle */
     backgroundWorker.__set__('Mailer', mockMailer);
-    const USER_ID = 1;
+    const testUser = createTestUser();
+    const [uID] = await knex('users')
+      .insert(testUser)
+      .returning('id');
     const testActor = createTestActor({
       permissions: Permissions.NOTIFY_ALL,
-      id: USER_ID,
+      id: uID,
+      email: testUser.email,
     });
     const connection = { host: '127.0.0.1', protocol: 'https' };
     const messageData = {
       type: 'mail',
       data: {
         mailType: 'resetPassword',
-        address: testActor.email,
+        address: testUser.email,
         viewer: testActor,
         lang: 'de-DE',
         connection,
       },
       viewer: testActor,
     };
-    await knex('users').insert(createTestUser({ id: USER_ID }));
     // eslint-disable-next-line no-underscore-dangle
     const handleMessages = backgroundWorker.__get__('handleMessages');
     const res = await handleMessages(messageData);

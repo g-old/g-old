@@ -165,6 +165,10 @@ class User {
         // TODO log certain actions in a separate table (role changes, rights, deletions)
 
         if (data.followee) {
+          // eslint-disable-next-line eqeqeq
+          if (data.followee == viewer.id) {
+            throw new Error('Permission denied');
+          }
           // check if they are already following each others
           const followee = await trx
             .where({ follower_id: data.id, followee_id: data.followee })
@@ -201,12 +205,13 @@ class User {
           .into('users');
         return data.id;
       });
-    } catch (e) {
-      if (e.code === '23505') {
+    } catch (err) {
+      if (err.code === '23505') {
         errors.push('email');
       } else {
-        throw Error(e.message);
+        errors.push(err.message);
       }
+      log.error({ err, viewer, data }, 'Update failed');
       return { user: null, errors };
     }
     if (!updatedId) return null;
@@ -304,6 +309,43 @@ class User {
       })
       .pluck('id')
       .then(ids => ids.map(id => User.gen(viewer, id, loaders)));
+  }
+
+  static async delete(viewer, data) {
+    const result = { user: null, errors: [] };
+    if (!data || !data.userId) {
+      result.errors.push('Missing args');
+      return result;
+    }
+
+    if (!canMutate(viewer, data, Models.USER)) {
+      result.errors.push('Permission denied');
+      return result;
+    }
+    let deletedUserData;
+    try {
+      deletedUserData = await knex.transaction(async trx => {
+        const [deletedUserInDB] = await knex('users')
+          .transacting(trx)
+          .forUpdate()
+          .where({ id: data.userId })
+          .del()
+          .returning('*');
+        if (deletedUserInDB.groups !== Groups.GUEST) {
+          throw new Error('Permission denied');
+        }
+        return deletedUserInDB;
+      });
+    } catch (err) {
+      result.errors.push(err.message);
+      log.error({ err, viewer, data }, 'Deletion failed');
+    }
+
+    if (deletedUserData) {
+      result.user = new User(deletedUserData);
+    }
+
+    return result;
   }
 }
 

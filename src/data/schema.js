@@ -31,6 +31,7 @@ import createProposal from './mutations/createProposal';
 import updateProposal from './mutations/updateProposal';
 // import createUser from './mutations/createUser';
 import updateUser from './mutations/updateUser';
+import deleteUser from './mutations/deleteUser';
 import uploadAvatar from './mutations/uploadAvatar';
 import searchUser from './queries/search';
 import user from './queries/user';
@@ -96,6 +97,7 @@ const schema = new Schema({
       updateProposal,
       //  createUser,
       updateUser,
+      deleteUser,
       uploadAvatar,
       flag,
       solveFlag,

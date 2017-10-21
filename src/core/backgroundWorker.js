@@ -49,8 +49,10 @@ const mailWithToken = async ({
         throw Error(`Token type not recognized: ${type}`);
       }
     }
+
     if (token) {
       const mail = template(address, connection, token, viewer.name, lang);
+
       return Mailer.send({ ...mail, ...options }).catch(err => {
         log.error({ err }, 'Sendgrid failed');
       });

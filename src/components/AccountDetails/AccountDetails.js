@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 
 import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
-import { fetchUser } from '../../actions/user';
+import { fetchUser, deleteUser } from '../../actions/user';
 import { getUser, getAccountUpdates } from '../../reducers';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
@@ -21,6 +21,7 @@ import NotificationInput from '../NotificationInput';
 import Notification from '../Notification';
 import Label from '../Label';
 import s from './AccountDetails.css';
+import Button from '../Button';
 
 const messages = defineMessages({
   headerRights: {
@@ -111,6 +112,7 @@ class AccountDetails extends React.Component {
       }),
     }).isRequired,
     notifyUser: PropTypes.func.isRequired,
+    deleteUser: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -118,6 +120,7 @@ class AccountDetails extends React.Component {
     this.props.fetchUser({ id: props.accountId });
     this.onPromoteToViewer = this.onPromoteToViewer.bind(this);
     this.displayUploadLayer = this.displayUploadLayer.bind(this);
+    this.handleDelete = this.handleDelete.bind(this);
     this.state = {
       showUpload: false,
     };
@@ -149,6 +152,10 @@ class AccountDetails extends React.Component {
     }
   }
 
+  handleDelete() {
+    this.props.deleteUser({ id: this.props.accountData.id });
+  }
+
   displayUploadLayer() {
     this.setState({ showUpload: true });
   }
@@ -165,7 +172,6 @@ class AccountDetails extends React.Component {
       surname,
       emailVerified,
       lastLogin,
-      workTeams,
       groups,
     } = accountData;
 
@@ -219,7 +225,6 @@ class AccountDetails extends React.Component {
     }
 
     const avatarSet = checkAvatar(avatar);
-    const workTeamChoosen = workTeams ? workTeams.length > 0 : false;
 
     return (
       <Box className={s.root} flex wrap>
@@ -262,12 +267,6 @@ class AccountDetails extends React.Component {
             />
           )}
 
-          {!workTeamChoosen && (
-            <Notification
-              type={'alert'}
-              message={<FormattedMessage {...messages.workteam} />}
-            />
-          )}
           {/* <span>
             <FormattedMessage {...messages.role} />
             {':'}
@@ -281,12 +280,17 @@ class AccountDetails extends React.Component {
         </Box>
         {/* eslint-disable eqeqeq */}
         {user.id != id && (
-          <Box flex className={s.details}>
+          <Box column pad flex className={s.details}>
             <Accordion column>
               {GroupPanel}
               {RightsPanel}
               {NotificationPanel}
             </Accordion>
+            <Button
+              onClick={this.handleDelete}
+              primary
+              label={<FormattedMessage {...messages.delete} />}
+            />
           </Box>
         )}
       </Box>
@@ -301,6 +305,7 @@ const mapDispatch = {
   fetchUser,
   uploadAvatar,
   notifyUser,
+  deleteUser,
 };
 export default connect(mapStateToProps, mapDispatch)(
   withStyles(s)(AccountDetails),

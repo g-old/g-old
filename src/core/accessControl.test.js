@@ -89,10 +89,26 @@ describe('userWriteControl', () => {
       ),
     ).toBe(false);
   });
+
+  it('Should allow [Groups.MEMBER_MANAGER] access to delete user', () => {
+    const testData = {
+      userId: 2,
+    };
+    expect(
+      canMutate(
+        createTestActor({
+          id: 1,
+          groups: Groups.MEMBER_MANAGER,
+        }),
+        testData,
+        Models.USER,
+      ),
+    ).toBe(true);
+  });
 });
 
 describe('workTeamWriteControl', () => {
-  it('Should allow to add new WT', () => {
+  it('Should allow to add a new WT', () => {
     const testViewer = {
       id: 1,
       privileges: 0,
@@ -102,6 +118,15 @@ describe('workTeamWriteControl', () => {
     const testData = { coordinatorId: '2', name: 'NAME' };
     expect(canMutate(testViewer, testData, Models.WORKTEAM)).toBe(true);
   });
+  /*  it('Should not allow exclusive members of [Groups.GUEST] to join a WT', () => {
+    const testViewer = {
+      id: 1,
+      privileges: 0,
+      groups: Groups.GUEST,
+    };
+    const testData = {};
+    expect(true).toBe(false);
+  }); */
 });
 
 describe('activityWriteControl', () => {
