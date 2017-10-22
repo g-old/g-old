@@ -267,7 +267,18 @@ class UserSettings extends React.Component {
       ) {
         this.setState({
           nameSuccess: true,
-          nameError: false,
+          nameUpdateError: false,
+          name: '',
+          surname: '',
+        });
+      }
+      if (
+        (updates.name && updates.name.error) ||
+        (updates.surname && updates.surname.error)
+      ) {
+        this.setState({
+          nameSuccess: false,
+          nameUpdateError: true,
           name: '',
           surname: '',
         });
@@ -342,6 +353,9 @@ class UserSettings extends React.Component {
     }
     if (this.state.surname) {
       fields.push('surname');
+    }
+    if (!fields.length) {
+      return;
     }
     const args = fields.reduce(
       (acc, curr) => {

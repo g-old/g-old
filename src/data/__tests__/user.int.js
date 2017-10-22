@@ -98,7 +98,7 @@ describe('User Model', () => {
 
       const maybeDeleteResult = await User.delete(
         testActor,
-        { userId: udID },
+        { id: udID },
         createLoaders(),
       );
       expect(maybeDeleteResult.user).toBeDefined();
@@ -113,7 +113,7 @@ describe('User Model', () => {
       expect(maybeDeletedId).not.toBeDefined();
       const maybeFailResult = await User.delete(
         testActor,
-        { userId: uID },
+        { id: uID },
         createLoaders(),
       );
       expect(maybeFailResult.user).toBeNull();
@@ -143,7 +143,7 @@ describe('User Model', () => {
       });
       const maybeDeleteResult = await User.delete(
         testActor,
-        { userId: uID },
+        { id: uID },
         createLoaders(),
       );
       expect(maybeDeleteResult.user).toBeDefined();

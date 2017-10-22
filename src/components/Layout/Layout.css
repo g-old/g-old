@@ -7,7 +7,7 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-@import '../variables.css';
+@import "../variables.css";
 
 /*
  * normalize.css is imported in JS file.
@@ -25,6 +25,13 @@ html {
   font-size: 1em; /* ~16px; */
   font-family: var(--font-family-base);
   line-height: 1.375; /* ~22px */
+
+  /* to disable scroll jumping
+  https://aykevl.nl/2014/09/fix-jumping-scrollbar
+  sideeffect: no horizontal scrolling possible
+  */
+  width: 100vw;
+  overflow-x: hidden;
 }
 
 .content {
@@ -135,11 +142,11 @@ textarea {
   }
 
   a[href]::after {
-    content: ' (' attr(href) ')';
+    content: " (" attr(href) ")";
   }
 
   abbr[title]::after {
-    content: ' (' attr(title) ')';
+    content: " (" attr(title) ")";
   }
 
   /*
@@ -147,9 +154,9 @@ textarea {
    * or use the `javascript:` pseudo protocol
    */
 
-  a[href^='#']::after,
-  a[href^='javascript:']::after {
-    content: '';
+  a[href^="#"]::after,
+  a[href^="javascript:"]::after {
+    content: "";
   }
 
   pre,
@@ -199,7 +206,7 @@ textarea {
 .loader::before {
   display: block;
   position: absolute;
-  content: '';
+  content: "";
   left: -200px;
   width: 200px;
   height: 4px;

@@ -10,14 +10,15 @@ import { ICONS } from '../../constants';
 
 const getUrl = thumbnail => {
   const stIndex = thumbnail.indexOf('c_scale');
-  let src;
-  if (stIndex) {
+  let src = thumbnail;
+  if (stIndex > 0) {
     // has thumbnailUrl
     const endIndex = stIndex + 18; // (!)
     src = thumbnail.slice(0, stIndex) + thumbnail.substring(endIndex);
   }
   return src;
 };
+const IMG_PH = '_';
 class ProfilePicture extends React.Component {
   static propTypes = {
     user: PropTypes.shape({
@@ -34,10 +35,15 @@ class ProfilePicture extends React.Component {
   };
   constructor(props) {
     super(props);
-
+    let image;
+    if (props.user.avatar) {
+      image = props.user.avatar === IMG_PH ? null : props.user.avatar;
+    } else {
+      image = props.user.thumbnail === IMG_PH ? null : props.user.thumbnail;
+    }
     this.state = {
       loading: false,
-      image: props.user.avatar ? props.user.avatar : props.user.thumbnail,
+      image,
     };
     this.onLoad = this.onLoad.bind(this);
     this.onError = this.onError.bind(this);
@@ -101,6 +107,20 @@ class ProfilePicture extends React.Component {
     const { canChange, updates, onChange } = this.props;
     if (canChange) {
       uploadBnt = (
+        <Button plain onClick={onChange} disabled={updates && updates.pending}>
+          <span className={s.uploadIcon}>
+            <svg viewBox="0 0 24 24" width="32px" height="32px">
+              <path
+                fill="none"
+                stroke="#fff"
+                strokeWidth="2"
+                d={ICONS.editBig}
+              />
+            </svg>
+          </span>
+        </Button>
+      );
+      /*  uploadBnt = (
         <Button
           icon={
             <svg viewBox="0 0 24 24" width="24px" height="24px">
@@ -116,15 +136,39 @@ class ProfilePicture extends React.Component {
           onClick={onChange}
           disabled={updates && updates.pending}
         />
-      );
+      ); */
     }
-    return (
-      <div className={cn(s.container, s.placeholder)}>
+    let picture;
+    if (this.state.image) {
+      picture = (
         <img
           className={cn(s.avatar, this.state.loading ? s.imgSmall : s.loaded)}
           src={this.state.image}
           alt="IMG"
         />
+      );
+    } else {
+      picture = (
+        <svg
+          version="1.1"
+          viewBox="0 0 24 24"
+          width="256px"
+          height="256px"
+          role="img"
+          aria-label="user"
+        >
+          <path
+            fill="none"
+            stroke=""
+            strokeWidth="2"
+            d="M8,24 L8,19 M16,24 L16,19 M3,24 L3,19 C3,14.0294373 7.02943725,11 12,11 C16.9705627,11 21,14.0294373 21,19 L21,24 M12,11 C14.7614237,11 17,8.76142375 17,6 C17,3.23857625 14.7614237,1 12,1 C9.23857625,1 7,3.23857625 7,6 C7,8.76142375 9.23857625,11 12,11 Z"
+          />
+        </svg>
+      );
+    }
+    return (
+      <div className={cn(s.container, s.placeholder)}>
+        {picture}
         <div className={s.overlay}>{uploadBnt}</div>
       </div>
     );

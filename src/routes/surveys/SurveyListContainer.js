@@ -9,6 +9,7 @@ import {
   getProposalsErrorMessage,
 } from '../../reducers/index';
 import FetchError from '../../components/FetchError';
+import history from '../../history';
 
 class SurveyListContainer extends React.Component {
   static propTypes = {
@@ -21,11 +22,19 @@ class SurveyListContainer extends React.Component {
     loadProposalsList: PropTypes.func.isRequired,
     errorMessage: PropTypes.string.isRequired,
   };
+  constructor(props) {
+    super(props);
+    this.handleSurveyClick = this.handleSurveyClick.bind(this);
+  }
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
     return this.props.proposals != null;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  handleSurveyClick({ proposalId, pollId }) {
+    history.push(`/proposal/${proposalId}/${pollId}`);
+  }
   render() {
     const { proposals, isFetching, errorMessage } = this.props;
     if (isFetching && !proposals.length) {
@@ -43,7 +52,13 @@ class SurveyListContainer extends React.Component {
 
     return (
       <div>
-        {proposals.map(proposal => <ProposalPreview key={proposal.id} proposal={proposal} />)}
+        {proposals.map(proposal => (
+          <ProposalPreview
+            key={proposal.id}
+            proposal={proposal}
+            onClick={this.handleSurveyClick}
+          />
+        ))}
       </div>
     );
   }

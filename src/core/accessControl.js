@@ -23,7 +23,10 @@ export const Models = {
 /* eslint-disable no-unused-vars */
 
 function userWriteControl(viewer, data) {
-  if (data.id && Object.keys(data).length < 2) {
+  if (data.id && Object.keys(data).length === 1) {
+    if ((viewer.permissions & Permissions.DELETE_ACCOUNTS) > 0) {
+      return true;
+    }
     return false;
   }
   // own data can be changed

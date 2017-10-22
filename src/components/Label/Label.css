@@ -1,3 +1,5 @@
+@import "../../components/variables.css";
+
 .label {
   font-weight: 300;
   cursor: inherit;
@@ -13,5 +15,5 @@
 .big {
   font-size: 2.5rem;
   padding-bottom: 1em;
-  color: rgba(37, 20, 155, 0.6);
+  color: var(--color-accent-5);
 }

@@ -57,7 +57,7 @@ class UserStatus extends React.Component {
     let userAvatar = null;
     let avatar;
     if (this.props.user) {
-      if (this.props.user.avatar) {
+      if (this.props.user.avatar !== '_') {
         avatar = (
           <img
             style={{
@@ -105,7 +105,8 @@ class UserStatus extends React.Component {
     } else {
       userAvatar = (
         <Button plain onClick={goHome}>
-          <span style={{ fontSize: '2em', fontWeight: 600 }}>G</span>
+          <img alt="avatar" width="42px" height="42px" src="/tile.png" />
+          {/* <span style={{ fontSize: '2em', fontWeight: 600 }}>G</span> */}
         </Button>
       );
     }

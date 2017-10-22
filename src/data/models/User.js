@@ -251,7 +251,7 @@ class User {
     if (!password) return null;
     if (password.length < 6) return null;
     // eslint-disable-next-line camelcase
-    const thumbnail = `https://api.adorable.io/avatars/32/${name}${surname}.io.png`;
+    // const thumbnail = `https://api.adorable.io/avatars/32/${name}${surname}.io.png`;
     // create
     // TODO check if locking with forUpdate is necessary (duplicate emails)
     const hash = await bcrypt.hash(data.password, 10);
@@ -260,7 +260,7 @@ class User {
       name,
       surname,
       email,
-      thumbnail,
+      thumbnail: '_',
       email_verified: false,
       password_hash: hash,
       groups: Groups.GUEST,
@@ -313,7 +313,7 @@ class User {
 
   static async delete(viewer, data) {
     const result = { user: null, errors: [] };
-    if (!data || !data.userId) {
+    if (!data || !data.id) {
       result.errors.push('Missing args');
       return result;
     }
@@ -328,7 +328,7 @@ class User {
         const [deletedUserInDB] = await knex('users')
           .transacting(trx)
           .forUpdate()
-          .where({ id: data.userId })
+          .where({ id: data.id })
           .del()
           .returning('*');
         if (deletedUserInDB.groups !== Groups.GUEST) {

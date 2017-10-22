@@ -117,8 +117,8 @@ mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $pass
 `;
 
 const deleteUserMutation = `
-mutation($userId:ID){
-  deleteUser(user:{userId:$userId}){
+mutation($id:ID){
+  deleteUser(user:{id:$id}){
     user{${userFields}}
     errors
 
@@ -254,18 +254,33 @@ export function updateUser(user) {
       const errors = data.updateUser.errors;
       if (errors.length) {
         /* eslint-disable no-return-assign */
-        const standardError = errors.reduce(
+        /*  const standardError = errors.reduce(
           (acc, curr) => (acc[curr] = { [curr]: { [curr]: true } }),
           {},
-        );
+        ); */
+        // TODO rewrite error handling
+        const standardError = errors.reduce((acc, curr) => {
+          if (curr in properties) {
+            acc[curr] = { [curr]: { [curr]: true } };
+            return acc;
+          }
+          acc.err = curr;
+          return acc;
+        }, {});
         /* eslint-enable no-return-assign */
+        let message;
+        if (standardError.err) {
+          message = standardError.err;
+        } else {
+          message = { fields: standardError };
+        }
 
         dispatch({
           type: UPDATE_USER_ERROR,
           payload: {
             errors,
           },
-          message: { fields: standardError },
+          message,
           properties,
           id: user.id,
         });
@@ -397,7 +412,7 @@ export function deleteUser({ id }) {
     });
 
     try {
-      const { data } = await graphqlRequest(deleteUserMutation, { userId: id });
+      const { data } = await graphqlRequest(deleteUserMutation, { id });
       const errors = data.deleteUser.errors;
       if (errors.length) {
         /* eslint-disable no-return-assign */

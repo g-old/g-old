@@ -1,3 +1,5 @@
+@import "../../components/variables.css";
+
 .avatar {
   width: 256px;
   height: 256px;
@@ -44,6 +46,7 @@
   position: relative;
   width: 256px;
   height: 256px;
+  stroke: var(--color-accent-5);
 }
 
 .overlay {
@@ -54,4 +57,16 @@
   position: absolute;
   z-index: 10;
   justify-content: flex-end;
+}
+
+.uploadIcon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  background-color: var(--color-gold);
+  border-radius: 32px;
+
+  svg {
+    margin: auto;
+  }
 }

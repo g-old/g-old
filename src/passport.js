@@ -71,9 +71,9 @@ passport.serializeUser((user, done) => {
     const emailVerified =
       'emailVerified' in user ? user.emailVerified : user.email_verified;
     const rights = calcRights(user.groups);
-    let avatar = user.thumbnail;
+    let avatar = user.thumbnail || '_';
     const stIndex = avatar.indexOf('c_scale');
-    if (stIndex) {
+    if (stIndex > 0) {
       // has thumbnailUrl
       const endIndex = stIndex + 18; // (!)
       avatar = avatar.slice(0, stIndex) + avatar.substring(endIndex);

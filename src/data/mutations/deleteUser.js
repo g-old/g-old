@@ -1,12 +1,11 @@
 import {
   GraphQLNonNull,
-  GraphQLInputObjectType,
-  GraphQLID,
   GraphQLObjectType,
   GraphQLList,
   GraphQLString,
 } from 'graphql';
 import UserType from '../types/UserType';
+import UserInput from '../types/UserInputType';
 import User from '../models/User';
 
 const deleteUser = {
@@ -23,14 +22,7 @@ const deleteUser = {
     user: {
       // TODO Use UserInputType -solve problem with accessControl
       // (check num args and recognize that the operation is delete)
-      type: new GraphQLInputObjectType({
-        name: 'UserDeleteInput',
-        fields: {
-          userId: {
-            type: GraphQLID,
-          },
-        },
-      }),
+      type: UserInput,
     },
   },
   resolve: async (data, { user }, { viewer, loaders }) => {

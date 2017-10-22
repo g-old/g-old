@@ -203,6 +203,11 @@ app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
         throw Error('User update failed');
       }
       return new Promise((resolve, reject) => {
+        // eslint-disable-next-line eqeqeq
+        if (req.user.id != user.id) {
+          // mod, etc
+          resolve();
+        }
         // eslint-disable-next-line no-confusing-arrow
         req.login(user, err => (err ? reject(err) : resolve(user)));
       });

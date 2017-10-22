@@ -121,6 +121,24 @@ class ProposalPreview extends React.Component {
       </svg>
     );
 
+    const survey = (
+      <svg
+        version="1.1"
+        viewBox="0 0 24 24"
+        width="24px"
+        height="24px"
+        role="img"
+        aria-label="survey"
+      >
+        <path
+          fill="none"
+          stroke="#000"
+          strokeWidth="2"
+          d="M12,22 C17.5228475,22 22,17.5228475 22,12 C22,6.4771525 17.5228475,2 12,2 C6.4771525,2 2,6.4771525 2,12 C2,17.5228475 6.4771525,22 12,22 Z M12,15 L12,14 C12,13 12,12.5 13,12 C14,11.5 15,11 15,9.5 C15,8.5 14,7 12,7 C10,7 9,8.26413718 9,10 M12,16 L12,18"
+        />
+      </svg>
+    );
+
     const pollPreview = [
       <svg viewBox="0 0 24 24" width="16px" height="16px" role="img">
         <path fill="none" stroke="#666" strokeWidth="2" d={ICONS.up} />
@@ -169,6 +187,10 @@ class ProposalPreview extends React.Component {
       }
       case 'accepted': {
         state = <div className={cn(s.status, s.accepted)}>{accepted}</div>;
+        break;
+      }
+      case 'survey': {
+        state = <div className={cn(s.status)}>{survey}</div>;
         break;
       }
       default:
