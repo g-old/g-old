@@ -4,7 +4,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Avatar.css';
 
 function Avatar(props) {
-  if (props.user.thumbnail !== '_') {
+  if (props.user.thumbnail) {
     return (
       <img
         className={props.isFollowee ? s.followee : s.avatar}

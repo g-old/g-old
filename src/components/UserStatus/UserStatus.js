@@ -57,7 +57,7 @@ class UserStatus extends React.Component {
     let userAvatar = null;
     let avatar;
     if (this.props.user) {
-      if (this.props.user.avatar !== '_') {
+      if (this.props.user.avatar) {
         avatar = (
           <img
             style={{

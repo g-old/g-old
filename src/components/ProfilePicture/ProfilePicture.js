@@ -18,7 +18,6 @@ const getUrl = thumbnail => {
   }
   return src;
 };
-const IMG_PH = '_';
 class ProfilePicture extends React.Component {
   static propTypes = {
     user: PropTypes.shape({
@@ -35,15 +34,10 @@ class ProfilePicture extends React.Component {
   };
   constructor(props) {
     super(props);
-    let image;
-    if (props.user.avatar) {
-      image = props.user.avatar === IMG_PH ? null : props.user.avatar;
-    } else {
-      image = props.user.thumbnail === IMG_PH ? null : props.user.thumbnail;
-    }
+
     this.state = {
       loading: false,
-      image,
+      image: props.user.avatar ? props.user.avatar : props.user.thumbnail,
     };
     this.onLoad = this.onLoad.bind(this);
     this.onError = this.onError.bind(this);
@@ -52,8 +46,9 @@ class ProfilePicture extends React.Component {
 
   componentDidMount() {
     const { user: { thumbnail, avatar } } = this.props;
-    if (!avatar) {
-      this.loadImage(getUrl(thumbnail));
+    const url = avatar || thumbnail;
+    if (url) {
+      this.loadImage(getUrl(url));
     }
   }
 

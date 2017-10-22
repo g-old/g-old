@@ -38,8 +38,11 @@ function writeFile(filePath, content) {
 }
 
 const deleteFileOnCloudinary = file =>
-  new Promise(resolve => {
-    cloudinary.uploader.destroy(file, data => resolve(data));
+  new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(
+      file,
+      (err, data) => (err ? reject(err) : resolve(data)),
+    );
   });
 const uploadToCloudinaryStream = (buffer, options) =>
   new Promise(resolve => {
@@ -53,6 +56,21 @@ const getPublicIdFromUrl = url => {
   const del = url.lastIndexOf('/') + 1;
   if (del >= p) throw Error(`Wrong cloudinary url provided:${url}`);
   return url.slice(del, p);
+};
+
+const deleteFromCloudinary = async ({ viewer, data: { id }, loaders }) => {
+  let result = false;
+  if (!canMutate(viewer, { id }, Models.USER)) return null;
+  const userId = id || viewer.id;
+  const user = await User.gen(viewer, userId, loaders);
+  if (user.thumbnail && user.thumbnail.indexOf('http') !== -1) {
+    const publicId = getPublicIdFromUrl(user.thumbnail);
+    result = await deleteFileOnCloudinary(publicId).catch(err => {
+      log.error({ err, viewer, data: { id } }, 'Cloudinary delete error');
+      return false;
+    });
+  }
+  return result;
 };
 
 // TODO Integrate with Usermodel!
@@ -79,10 +97,13 @@ const saveToCloudinary = async ({ viewer, data: { dataUrl, id }, loaders }) => {
     // utf8 encoding! Problem?
     // TODO delete old avatar if existing
     // TODO resizing serverside
-    if (user.thumbnail.indexOf('http') !== -1) {
+    if (user.thumbnail && user.thumbnail.indexOf('http') !== -1) {
       const publicId = getPublicIdFromUrl(user.thumbnail);
-      await deleteFileOnCloudinary(publicId).catch(e => {
-        console.error(`Cloudinary delete error: ${JSON.stringify(e)}`);
+      await deleteFileOnCloudinary(publicId).catch(err => {
+        log.error(
+          { err, viewer, data: { dataUrl, id } },
+          'Cloudinary delete error',
+        );
       });
     }
 
@@ -121,6 +142,56 @@ const saveToCloudinary = async ({ viewer, data: { dataUrl, id }, loaders }) => {
     .select('id', 'name', 'surname', 'email', 'thumbnail', 'groups'); // await User.gen(viewer, viewer.id, loaders);
   if (result[0]) {
     result[0].avatar = response.url;
+  }
+  return result[0] || null;
+};
+
+const deleteFiles = async (fPath, folder) => {
+  if (!fPath || !folder) return false;
+  if (fPath.indexOf('https') === -1) {
+    const pathToThumbnail = path.resolve(__dirname, folder, fPath);
+    await deleteFile(pathToThumbnail).catch(err => {
+      log.error({ err }, 'Deletion failed');
+      return false;
+    });
+    const st = fPath.indexOf('c_scale');
+    const pathToFile = path.resolve(
+      __dirname,
+      folder,
+      fPath.slice(0, st) + fPath.substring(st + 18),
+    );
+    await deleteFile(pathToFile).catch(err => {
+      log.error({ err }, 'Deletion failed');
+      return false;
+    });
+    return true;
+  }
+  return false;
+};
+
+const deleteLocal = async (
+  { viewer, data: { dataUrl, id }, loaders },
+  folder,
+) => {
+  if (!canMutate(viewer, { dataUrl, id }, Models.USER)) return null;
+  const userId = id || viewer.id;
+  const user = await User.gen(viewer, userId, loaders);
+  let result;
+  if (await deleteFiles(user.thumbnail, folder)) {
+    try {
+      await knex('users')
+        .where({
+          id: userId,
+        })
+        .update({ thumbnail: null, updated_at: new Date() })
+        .into('users')
+        .returning('id', 'name', 'surname', 'email', 'thumbnail', 'groups');
+    } catch (error) {
+      throw Error(error);
+    }
+    // invalidate cache
+    loaders.users.clear(userId);
+    //
   }
   return result[0] || null;
 };
@@ -164,23 +235,8 @@ const saveLocal = async (
   // update
   await knex.transaction(async trx => {
     // utf8 encoding! Problem?
-    // TODO delete old avatar if existing
-    // TODO resizing serverside
-    if (user.thumbnail.indexOf('https') === -1) {
-      const pathToThumbnail = path.resolve(__dirname, folder, user.thumbnail);
-      await deleteFile(pathToThumbnail).catch(err =>
-        log.error({ err }, 'Deletion failed'),
-      );
-      const st = user.thumbnail.indexOf('c_scale');
-      const pathToFile = path.resolve(
-        __dirname,
-        folder,
-        user.thumbnail.slice(0, st) + user.thumbnail.substring(st + 18),
-      );
-      await deleteFile(pathToFile).catch(err =>
-        log.error({ err }, 'Deletion failed'),
-      );
-    }
+    // delete old avatar if existing
+    await deleteFiles(user.thumbnail, folder);
     await writeFile(filepath, buffer);
 
     try {
@@ -210,12 +266,15 @@ const saveLocal = async (
 
 export const AvatarManager = ({ local }) => {
   if (local == null) throw Error('Please set local to true or false');
-  return local ? { save: saveLocal } : { save: saveToCloudinary };
+  return local
+    ? { save: saveLocal, delete: deleteLocal }
+    : { save: saveToCloudinary, delete: deleteFromCloudinary };
 };
 
 function FileStorage(manager) {
   return {
     save: manager.save,
+    delete: manager.delete,
   };
 }
 

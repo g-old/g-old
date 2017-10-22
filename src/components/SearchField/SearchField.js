@@ -15,16 +15,17 @@ function renderSuggestion(suggestion, { query }) {
   const suggestionText = `${suggestion.name} ${suggestion.surname}`;
   const matches = AutosuggestHighlightMatch(suggestionText, query);
   const parts = AutosuggestHighlightParse(suggestionText, matches);
-
-  return (
-    <span
-      className={s.suggestionContent}
-      style={{
+  const backgroundImage = suggestion.thumbnail
+    ? {
         backgroundImage: `url(${suggestion.thumbnail})`,
         backgroundSize: '3em 3em',
         backgroundRepeat: 'no-repeat',
-      }}
-    >
+      }
+    : {
+        backgroundColor: '#fff',
+      };
+  return (
+    <span className={s.suggestionContent} style={backgroundImage}>
       <span className={s.name}>
         {parts.map((part, index) => {
           const className = part.highlight ? 'highlight' : null;

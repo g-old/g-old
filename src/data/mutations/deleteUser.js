@@ -7,6 +7,9 @@ import {
 import UserType from '../types/UserType';
 import UserInput from '../types/UserInputType';
 import User from '../models/User';
+import FileStorage, { AvatarManager } from '../../core/FileStorage';
+
+const FileManager = FileStorage(AvatarManager({ local: !!__DEV__ }));
 
 const deleteUser = {
   type: new GraphQLNonNull(
@@ -27,7 +30,10 @@ const deleteUser = {
   },
   resolve: async (data, { user }, { viewer, loaders }) => {
     const deletedUser = await User.delete(viewer, user, loaders);
-    // TODO insert into activities
+    if (deletedUser) {
+      await FileManager.delete(deletedUser);
+      // TODO insert into activities
+    }
     return deletedUser;
   },
 };
