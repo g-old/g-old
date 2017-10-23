@@ -13,16 +13,12 @@ exports[`Layout renders children correctly 1`] = `
         disabled={false}
         onClick={[Function]}
       >
-        <span
-          style={
-            Object {
-              "fontSize": "2em",
-              "fontWeight": 600,
-            }
-          }
-        >
-          G
-        </span>
+        <img
+          alt="avatar"
+          height="42px"
+          src="/tile.png"
+          width="42px"
+        />
       </button>
       <span
         className="brand"

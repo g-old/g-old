@@ -29,12 +29,12 @@ const deleteUser = {
     },
   },
   resolve: async (data, { user }, { viewer, loaders }) => {
-    const deletedUser = await User.delete(viewer, user, loaders);
-    if (deletedUser) {
-      await FileManager.delete(deletedUser);
+    const deletedUserResult = await User.delete(viewer, user, loaders);
+    if (deletedUserResult.user) {
+      await FileManager.delete(deletedUserResult.user);
       // TODO insert into activities
     }
-    return deletedUser;
+    return deletedUserResult;
   },
 };
 

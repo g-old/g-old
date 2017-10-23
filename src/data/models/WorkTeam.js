@@ -1,6 +1,7 @@
 import knex from '../knex';
 import User from './User';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import { Groups } from '../../organization';
 
 async function validateCoordinator(viewer, id, loaders) {
   const coordinator = await User.gen(viewer, id, loaders);
@@ -10,7 +11,9 @@ async function validateCoordinator(viewer, id, loaders) {
 function canJoin(viewer, memberId) {
   // eslint-disable-next-line eqeqeq
   if (viewer.id == memberId) {
-    return true; // TODO specify rules;
+    if (viewer.groups !== Groups.GUEST) {
+      return true; // TODO specify rules;
+    }
   }
   return false;
 }

@@ -25,7 +25,7 @@ const composeMail = ({ lang, type, connection, token, address, name }) => {
       },
       verification: {
         subject: 'G-old - Bestätigungslink',
-        text: `Hallo ${name}! \n\n Vielen Dank, dass Sie sich auf der Plattform G-old mitmachen wollen. Um die Anmeldung zu vollenden, müssen Sie \n nur bestätigen, dass wir die korrekte Email-Adresse erhalten haben. \n \n
+        text: `Hallo ${name}! \n\n Wir freuen uns sehr, dass Sie sich hier auf der Plattform G-old angemeldet haben. Jetzt müssen Sie \n nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben. \n \n
         Bitte klicken Sie auf den folgenden Link, oder fügen Sie ihn in Ihrem Browser ein:\n\n ${connection.protocol}://${connection.host}${process
           .env.EPORT
           ? `:${process.env.EPORT}`

@@ -6,12 +6,17 @@ import {
   PermissionsSchema,
 } from '../src/organization';
 
-const uniqueMail = () => {
+const uniqueData = () => {
   let i = 0;
-  // eslint-disable-next-line no-plusplus
-  return () => `testemail${i++}@example.com`;
+  /* eslint-disable no-plusplus */
+  return {
+    email: () => `testemail${i++}@example.com`,
+    wt: () => `WorkTeam ${i++}`,
+  };
 };
-const getUniqueMail = uniqueMail();
+/* eslint-enable no-plusplus */
+
+const getUnique = uniqueData();
 
 export const clearDB = async () => {
   if (process.env.NODE_ENV !== 'test') {
@@ -31,7 +36,7 @@ export const clearDB = async () => {
 const createUser = args => ({
   name: args.name || 'Test',
   surname: args.surname || 'TestTest',
-  email: args.email || getUniqueMail(),
+  email: args.email || getUnique.email(),
   groups: args.groups || Groups.GUEST,
 });
 export const createTestUser = (args = { groups: Groups.GUEST }) => ({
@@ -128,5 +133,13 @@ export const createStatement = args => ({
   position: args.position || 'pro',
   deleted_at: args.deletedAt || null,
   created_at: args.createdAt || new Date(),
-  updated_at: args.createdAt || null,
+  updated_at: args.updatedAt || null,
+});
+
+export const createWorkTeam = args => ({
+  ...(args.id && { id: args.id }),
+  coordinator_id: args.coordinatorId || 1,
+  name: args.name || getUnique.wt(),
+  created_at: args.createdAt || new Date(),
+  updated_at: args.updatedAt || null,
 });

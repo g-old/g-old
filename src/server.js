@@ -44,7 +44,7 @@ import { user as userSchema } from './store/schema';
 import config from './config';
 import worker from './core/worker';
 import BWorker, { sendJob } from './core/childProcess';
-import { getProtocol } from './core/helpers';
+// import { getProtocol } from './core/helpers';
 import privateConfig from '../private_configs';
 import { checkToken } from './core/tokens';
 import log from './logger';
@@ -156,7 +156,10 @@ app.post('/signup', (req, res) => {
           mailType: 'verifyEmail',
           address: user.email,
           viewer: user,
-          connection: { host: req.hostname, protocol: getProtocol(req) },
+          connection: {
+            host: req.hostname,
+            protocol: req.protocol || 'https' /* getProtocol(req) */,
+          },
         },
       };
       if (!sendJob(job)) {
@@ -239,7 +242,10 @@ app.post('/forgot', (req, res) => {
             lang: req.cookies.lang,
             address: user.email,
             viewer: user,
-            connection: { host: req.hostname, protocol: getProtocol(req) },
+            connection: {
+              host: req.hostname,
+              protocol: req.protocol || 'https' /* getProtocol(req) */,
+            },
           },
         };
 
@@ -278,7 +284,10 @@ app.post('/reset/:token', (req, res) =>
             lang: req.cookies.lang,
             address: user.email,
             viewer: user,
-            connection: { host: req.hostname, protocol: getProtocol(req) },
+            connection: {
+              host: req.hostname,
+              protocol: req.protocol || 'https' /* getProtocol(req) */,
+            },
           },
         };
         if (!sendJob(job)) {
@@ -354,7 +363,10 @@ app.post('/verify', (req, res) =>
             verify: true,
             address: user.email,
             viewer: user,
-            connection: { host: req.hostname, protocol: getProtocol(req) },
+            connection: {
+              host: req.hostname,
+              protocol: req.protocol || 'https' /* getProtocol(req) */,
+            },
           },
         };
         if (!sendJob(job)) {

@@ -260,7 +260,7 @@ class User {
       name,
       surname,
       email,
-      thumbnail: '_',
+      thumbnail: null,
       email_verified: false,
       password_hash: hash,
       groups: Groups.GUEST,
@@ -325,16 +325,26 @@ class User {
     let deletedUserData;
     try {
       deletedUserData = await knex.transaction(async trx => {
-        const [deletedUserInDB] = await knex('users')
+        const [userData] = await knex('users')
           .transacting(trx)
           .forUpdate()
           .where({ id: data.id })
-          .del()
           .returning('*');
-        if (deletedUserInDB.groups !== Groups.GUEST) {
-          throw new Error('Permission denied');
+
+        if (!userData || userData.groups !== Groups.GUEST) {
+          throw new Error(userData ? 'Permission denied' : 'User not found');
         }
-        return deletedUserInDB;
+        const rowCount = await knex('users')
+          .transacting(trx)
+          .forUpdate()
+          .where({ id: data.id })
+          .del();
+
+        if (rowCount < 1) {
+          throw new Error('DB failure');
+        }
+
+        return userData;
       });
     } catch (err) {
       result.errors.push(err.message);

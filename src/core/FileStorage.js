@@ -58,13 +58,12 @@ const getPublicIdFromUrl = url => {
   return url.slice(del, p);
 };
 
-const deleteFromCloudinary = async ({ viewer, data: { id }, loaders }) => {
+const deleteFromCloudinary = async ({ viewer, data: { id, thumbnail } }) => {
   let result = false;
   if (!canMutate(viewer, { id }, Models.USER)) return null;
-  const userId = id || viewer.id;
-  const user = await User.gen(viewer, userId, loaders);
-  if (user.thumbnail && user.thumbnail.indexOf('http') !== -1) {
-    const publicId = getPublicIdFromUrl(user.thumbnail);
+
+  if (thumbnail && thumbnail.indexOf('http') !== -1) {
+    const publicId = getPublicIdFromUrl(thumbnail);
     result = await deleteFileOnCloudinary(publicId).catch(err => {
       log.error({ err, viewer, data: { id } }, 'Cloudinary delete error');
       return false;
@@ -169,31 +168,9 @@ const deleteFiles = async (fPath, folder) => {
   return false;
 };
 
-const deleteLocal = async (
-  { viewer, data: { dataUrl, id }, loaders },
-  folder,
-) => {
-  if (!canMutate(viewer, { dataUrl, id }, Models.USER)) return null;
-  const userId = id || viewer.id;
-  const user = await User.gen(viewer, userId, loaders);
-  let result;
-  if (await deleteFiles(user.thumbnail, folder)) {
-    try {
-      await knex('users')
-        .where({
-          id: userId,
-        })
-        .update({ thumbnail: null, updated_at: new Date() })
-        .into('users')
-        .returning('id', 'name', 'surname', 'email', 'thumbnail', 'groups');
-    } catch (error) {
-      throw Error(error);
-    }
-    // invalidate cache
-    loaders.users.clear(userId);
-    //
-  }
-  return result[0] || null;
+const deleteLocal = async ({ viewer, data: { id, thumbnail } }, folder) => {
+  if (!canMutate(viewer, { id }, Models.USER)) return false;
+  return deleteFiles(thumbnail, folder);
 };
 
 const saveLocal = async (
