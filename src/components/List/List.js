@@ -22,9 +22,12 @@ class List extends React.Component {
 
   componentDidMount() {
     const { onMore } = this.props;
-    this.setSelection();
+    // this.setSelection();
     if (onMore) {
-      this.scroll = InfiniteScroll.startListeningForScroll(this.moreRef, onMore);
+      this.scroll = InfiniteScroll.startListeningForScroll(
+        this.moreRef,
+        onMore,
+      );
     }
   }
   componentWillReceiveProps() {
@@ -37,7 +40,10 @@ class List extends React.Component {
     const { onMore } = this.props;
 
     if (onMore && !this.scroll) {
-      this.scroll = InfiniteScroll.startListeningForScroll(this.moreRef, onMore);
+      this.scroll = InfiniteScroll.startListeningForScroll(
+        this.moreRef,
+        onMore,
+      );
     }
   }
 
@@ -46,6 +52,7 @@ class List extends React.Component {
       InfiniteScroll.stopListeningForScroll(this.scroll);
     }
   }
+  /* eslint-disable no-return-assign */
 
   render() {
     const { children, onMore } = this.props;
@@ -66,4 +73,6 @@ class List extends React.Component {
     );
   }
 }
+/* eslint-enable no-return-assign */
+
 export default withStyles(s)(List);

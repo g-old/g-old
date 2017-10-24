@@ -122,6 +122,7 @@
     "message": "Azion faleda. Prova da nuef!",
     "files": [
       "src/components/ImageUpload/ImageUpload.js",
+      "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -133,6 +134,7 @@
     "files": [
       "src/components/ImageUpload/ImageUpload.js",
       "src/components/Poll/Poll.js",
+      "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -165,6 +167,7 @@
     "files": [
       "src/components/Login/Login.js",
       "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js",
       "src/routes/passwordRecovery/PasswordRecovery.js"
     ]
@@ -267,6 +270,7 @@
     "message": "mudé",
     "files": [
       "src/components/GroupManager/GroupManager.js",
+      "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -439,6 +443,7 @@
     "message": "Email bel en doura",
     "files": [
       "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -578,42 +583,60 @@
     "description": "Short success notification",
     "defaultMessage": "Success!",
     "message": "Suzés!",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "settings.email",
     "description": "Email label in settings",
     "defaultMessage": "Your current email address",
     "message": "Vosta adressa email atuala",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "settings.email.notVerified",
     "description": "Email not yet verified",
     "defaultMessage": "Email not verified",
     "message": "Email nia verificheda",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "settings.email.resend",
     "description": "Resend verification email",
     "defaultMessage": "Resend verification email",
     "message": "Ortié da nuef l'email de verifica",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "settings.email.verified",
     "description": "Email got verified",
     "defaultMessage": "Email verified!",
     "message": "Email verificheda!",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "settings.emailNew",
     "description": "Email label in settings for new address",
     "defaultMessage": "New email address",
     "message": "Nueva adressa email",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "settings.error.passwordOld",

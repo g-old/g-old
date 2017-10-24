@@ -1,4 +1,4 @@
-import { GraphQLInt, GraphQLString } from 'graphql';
+import { GraphQLInt, GraphQLString, GraphQLBoolean } from 'graphql';
 
 import PageType from '../types/PageType';
 import UserType from '../types/UserType';
@@ -17,10 +17,13 @@ const userConnection = {
     group: {
       type: GraphQLInt,
     },
+    union: {
+      type: GraphQLBoolean,
+    },
   },
   resolve: async (
     parent,
-    { first = 10, after = '', group },
+    { first = 10, after = '', group, union = false },
     { viewer, loaders },
   ) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
@@ -30,15 +33,24 @@ const userConnection = {
     let users = [];
 
     cursor = cursor ? new Date(cursor) : new Date();
-    users = await knex('users')
-      // .whereRaw('groups & ? > 0', [group]) TODO Later
-      .where({ groups: group })
-      .whereRaw('(users.created_at, users.id) < (?,?)', [cursor, id])
-      .limit(first)
-      .orderBy('users.created_at', 'desc')
-      .orderBy('users.id', 'desc')
-      .select('users.id as id', 'users.created_at as time');
-
+    if (union) {
+      users = await knex('users')
+        .whereRaw('groups & ? > 0', [group])
+        .whereRaw('(users.created_at, users.id) < (?,?)', [cursor, id])
+        .limit(first)
+        .orderBy('users.created_at', 'desc')
+        .orderBy('users.id', 'desc')
+        .select('users.id as id', 'users.created_at as time');
+    } else {
+      users = await knex('users')
+        // .whereRaw('groups & ? > 0', [group]) TODO Later
+        .where({ groups: group })
+        .whereRaw('(users.created_at, users.id) < (?,?)', [cursor, id])
+        .limit(first)
+        .orderBy('users.created_at', 'desc')
+        .orderBy('users.id', 'desc')
+        .select('users.id as id', 'users.created_at as time');
+    }
     const queries = users.map(u => User.gen(viewer, u.id, loaders));
     const usersSet = users.reduce((acc, curr) => {
       acc[curr.id] = curr;

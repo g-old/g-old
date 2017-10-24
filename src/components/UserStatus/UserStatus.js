@@ -18,6 +18,17 @@ const onVisitProfile = e => {
   e.preventDefault();
   history.push(`/account`);
 };
+const onVisitAccounts = e => {
+  if (e.button !== 0) {
+    // leftclick
+    return;
+  }
+  if (e.defaultPrevented === true) {
+    return;
+  }
+  e.preventDefault();
+  history.push(`/accounts`);
+};
 
 const goHome = e => {
   if (e.button !== 0) {
@@ -99,6 +110,7 @@ class UserStatus extends React.Component {
           >
             <Button plain onClick={onVisitProfile} label="Profile" />
             <Button plain onClick={this.onLogout} label="Logout" />
+            <Button plain onClick={onVisitAccounts} label="Users" />
           </Menu>
         </div>
       );

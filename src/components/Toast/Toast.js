@@ -54,7 +54,10 @@ class Toast extends React.Component {
       beforeElement = document.body.firstChild;
     }
     if (beforeElement) {
-      this.element = beforeElement.parentNode.insertBefore(element, beforeElement);
+      this.element = beforeElement.parentNode.insertBefore(
+        element,
+        beforeElement,
+      );
     }
   }
 
@@ -72,6 +75,7 @@ class Toast extends React.Component {
           intl={this.context.intl}
           store={this.context.store}
           insertCss={this.context.insertCss}
+          onClose={() => this.removeLayer()}
         />
       );
       ReactDOM.render(contents, this.element);

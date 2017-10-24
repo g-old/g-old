@@ -9,7 +9,7 @@ import { Groups } from '../organization';
 /* eslint-disable no-bitwise */
 const listByFilter = combineReducers({
   all: createList('all'),
-  user: createList('user'),
+  [Groups.VIEWER | Groups.VOTER]: createList(Groups.VIEWER | Groups.VOTER),
   [Groups.VIEWER | Groups.GUEST]: createList(Groups.VIEWER | Groups.GUEST),
   [Groups.GUEST]: createList(Groups.GUEST),
 });

@@ -338,6 +338,7 @@
     "files": [
       "src/components/Login/Login.js",
       "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js",
       "src/routes/passwordRecovery/PasswordRecovery.js"
     ]
@@ -356,6 +357,7 @@
     "message": "",
     "files": [
       "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -409,6 +411,7 @@
     "files": [
       "src/components/ImageUpload/ImageUpload.js",
       "src/components/Poll/Poll.js",
+      "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -419,6 +422,7 @@
     "message": "",
     "files": [
       "src/components/GroupManager/GroupManager.js",
+      "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -427,7 +431,10 @@
     "description": "Email label in settings",
     "defaultMessage": "Your current email address",
     "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "userSettings.oldPW",
@@ -450,6 +457,7 @@
     "message": "",
     "files": [
       "src/components/ImageUpload/ImageUpload.js",
+      "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -458,14 +466,20 @@
     "description": "Short success notification",
     "defaultMessage": "Success!",
     "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "settings.emailNew",
     "description": "Email label in settings for new address",
     "defaultMessage": "New email address",
     "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "settings.error.passwordOld",
@@ -622,21 +636,30 @@
     "description": "Email not yet verified",
     "defaultMessage": "Email not verified",
     "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "settings.email.resend",
     "description": "Resend verification email",
     "defaultMessage": "Resend verification email",
     "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "settings.email.verified",
     "description": "Email got verified",
     "defaultMessage": "Email verified!",
     "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "profile.followees",

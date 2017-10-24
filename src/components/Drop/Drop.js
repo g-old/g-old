@@ -24,7 +24,7 @@ class Drop {
     // prepend in body to avoid browser scroll issues
     document.body.insertBefore(container, document.body.firstChild);
 
-    render(<DropContents content={content} context={context} />, container);
+    /*  render(<DropContents content={content} context={context} />, container); */
 
     const scrollParents = findScrollParents(control);
 
@@ -48,6 +48,11 @@ class Drop {
       options: normalizedOptions,
       scrollParents,
     };
+    render(
+      <DropContents content={content} context={context} />,
+      container,
+      () => this.place(),
+    );
 
     this.listen();
 

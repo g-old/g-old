@@ -241,11 +241,11 @@ class UserPanel extends React.Component {
               {guestArrayStatus.pageInfo.hasNextPage && (
                 <Button
                   primary
-                  disabled={guestArray.pending}
+                  disabled={guestArrayStatus.pending}
                   onClick={() => {
                     this.props.loadUserList({
                       group: Groups.GUEST,
-                      after: guestArray.pageInfo.endCursor,
+                      after: guestArrayStatus.pageInfo.endCursor,
                     });
                   }}
                   label={<FormattedMessage {...messages.loadMore} />}
@@ -276,11 +276,11 @@ class UserPanel extends React.Component {
               {viewerArrayStatus.pageInfo.hasNextPage && (
                 <Button
                   primary
-                  disabled={viewerArray.pending}
+                  disabled={viewerArrayStatus.pending}
                   onClick={() => {
                     this.props.loadUserList({
                       group: VIEWERS,
-                      after: viewerArray.pageInfo.endCursor,
+                      after: viewerArrayStatus.pageInfo.endCursor,
                     });
                   }}
                   label={<FormattedMessage {...messages.loadMore} />}

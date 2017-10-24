@@ -219,6 +219,7 @@ const protectedViews = {
   NotificationPanel: { type: 'permissions', name: 'NOTIFICATION' },
   GroupsPanel: { type: 'privileges', name: 'GROUPS_MANAGER' },
   SSE: { type: 'permissions', name: 'LEVEL_1' },
+  AccountList: { type: 'permissions', name: 'LEVEL_1' },
 };
 export const canAccess = (user, name) => {
   if (user) {

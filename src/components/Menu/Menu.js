@@ -10,7 +10,7 @@ import Button from '../Button';
 import Drop from '../Drop';
 import MenuDrop from '../MenuDrop';
 
-const onSink = (event) => {
+const onSink = event => {
   event.stopPropagation();
   // need to go native to prevent closing via document
   event.nativeEvent.stopImmediatePropagation();
@@ -22,7 +22,10 @@ class Menu extends React.Component {
     icon: PropTypes.node,
     label: PropTypes.string,
     closeOnClick: PropTypes.bool,
-    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), React.node]),
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.node),
+      React.node,
+    ]),
     withControl: PropTypes.bool,
     primary: PropTypes.bool,
   };
@@ -60,14 +63,21 @@ class Menu extends React.Component {
           break;
         }
         case 'expanded': {
-          document.addEventListener('click', this.checkOnClose);
-          document.addEventListener('touchstart', this.checkOnClose);
-          this.drop = new Drop(findDOMNode(this.controlRef), this.renderMenuDrop(), {
-            align: this.props.dropAlign,
-            context: this.context,
-            /* responsive: false,*/
-            className: s.drop,
-          });
+          if (!this.drop) {
+            document.addEventListener('click', this.checkOnClose);
+            document.addEventListener('touchstart', this.checkOnClose);
+            this.drop = new Drop(
+              // eslint-disable-next-line react/no-find-dom-node
+              findDOMNode(this.controlRef),
+              this.renderMenuDrop(),
+              {
+                align: this.props.dropAlign,
+                context: this.context,
+                /* responsive: false, */
+                className: s.drop,
+              },
+            );
+          }
           break;
         }
         default:
@@ -94,8 +104,16 @@ class Menu extends React.Component {
   }
 
   checkOnClose(event) {
+    /* eslint-disable react/no-find-dom-node */
     const drop = findDOMNode(this.menuDrop);
-    if (drop && !drop.contains(event.target)) {
+    const control = findDOMNode(this.controlRef);
+    /* eslint-enable react/no-find-dom-node */
+
+    if (
+      drop &&
+      !drop.contains(event.target) &&
+      !control.contains(event.target)
+    ) {
       this.onClose();
     }
   }
@@ -112,6 +130,7 @@ class Menu extends React.Component {
         />
       );
     }
+    /* eslint-disable no-return-assign */
 
     const onClick = this.props.closeOnClick ? this.onClose : onSink;
     return (
@@ -130,12 +149,23 @@ class Menu extends React.Component {
   render() {
     const { icon, primary } = this.props;
     return (
-      <Box className={primary ? s.primary : null} ref={ref => (this.controlRef = ref)} column>
-        <Button plain reverse icon={icon} label={this.props.label} onClick={this.onOpen} />
+      <Box
+        className={primary ? s.primary : null}
+        ref={ref => (this.controlRef = ref)}
+        column
+      >
+        <Button
+          plain
+          reverse
+          icon={icon}
+          label={this.props.label}
+          onClick={this.onOpen}
+        />
       </Box>
     );
   }
 }
+/* eslint-enable no-return-assign */
 Menu.contextTypes = {
   intl: PropTypes.object,
   insertCss: PropTypes.any,

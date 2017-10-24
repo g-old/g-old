@@ -31,8 +31,8 @@ const userFields = `
   thumbnail,
     `;
 const userConnection = `
-query ($group:Int) {
-  userConnection (group:$group) {
+query ($group:Int $after:String $union:Boolean) {
+  userConnection (group:$group after:$after union:$union) {
     pageInfo{
       endCursor
       hasNextPage
@@ -133,13 +133,14 @@ query ($term:String) {
 }
 `;
 
-export function loadUserList({ group, first, after }) {
+export function loadUserList({ group, first, after, union = false }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
 
     if (getUsersStatus(getState(), group).pending) {
       return false;
     }
+
     dispatch({
       type: LOAD_USERS_START,
       payload: {
@@ -153,6 +154,7 @@ export function loadUserList({ group, first, after }) {
         group,
         first,
         after,
+        union,
       });
       const users = data.userConnection.edges.map(u => u.node);
       const normalizedData = normalize(users, userArray);
@@ -253,11 +255,6 @@ export function updateUser(user) {
       const { data } = await graphqlRequest(updateUserMutation, user);
       const errors = data.updateUser.errors;
       if (errors.length) {
-        /* eslint-disable no-return-assign */
-        /*  const standardError = errors.reduce(
-          (acc, curr) => (acc[curr] = { [curr]: { [curr]: true } }),
-          {},
-        ); */
         // TODO rewrite error handling
         const standardError = errors.reduce((acc, curr) => {
           if (curr in properties) {
@@ -267,7 +264,6 @@ export function updateUser(user) {
           acc.err = curr;
           return acc;
         }, {});
-        /* eslint-enable no-return-assign */
         let message;
         if (standardError.err) {
           message = standardError.err;

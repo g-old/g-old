@@ -70,7 +70,12 @@ class ToastContents extends React.Component {
               role="img"
               aria-label="close"
             >
-              <path fill="none" stroke="#000" strokeWidth="2" d="M3,3 L21,21 M3,21 L21,3" />
+              <path
+                fill="none"
+                stroke="#000"
+                strokeWidth="2"
+                d="M3,3 L21,21 M3,21 L21,3"
+              />
             </svg>
           }
         />
@@ -78,9 +83,7 @@ class ToastContents extends React.Component {
     }
     return (
       <div className={cn(s.toast, closing ? s.close : null)}>
-        <div className={s.contents}>
-          {children}
-        </div>
+        <div className={s.contents}>{children}</div>
         {closeControl}
       </div>
     );
