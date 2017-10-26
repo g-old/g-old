@@ -148,7 +148,10 @@ function stmtLikeWriteControl(viewer, data) {
 }
 
 function pollReadControl(viewer, data) {
-  if (viewer.permissions & AccessMasks.LEVEL_1) {
+  if (
+    viewer.permissions &
+    (AccessMasks.LEVEL_1 | Permissions.PUBLISH_PROPOSALS)
+  ) {
     return true;
   }
   return false;

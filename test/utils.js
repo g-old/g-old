@@ -1,10 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import knex from '../src/data/knex';
-import {
-  Groups,
-  PrivilegesSchema,
-  PermissionsSchema,
-} from '../src/organization';
+import { Groups, calcRights } from '../src/organization';
 
 const uniqueData = () => {
   let i = 0;
@@ -48,17 +44,23 @@ export const createTestUser = (args = { groups: Groups.GUEST }) => ({
   last_login_at: args.lastLogin || null,
 });
 
-export const createTestActor = (args = { groups: Groups.GUEST }) => ({
-  ...createUser(args),
-  id: args.id || 9999,
-  privileges: args.privileges || PrivilegesSchema[args.groups || Groups.GUEST],
-  permissions:
-    args.permissions || PermissionsSchema[args.groups || Groups.GUEST],
-  canVoteSince: args.canVoteSince || null,
-  emailVerified: args.emailVerified || false,
-  avatar: args.avatar || '',
-  lastLogin: args.lastLogin || null,
-});
+export const createTestActor = (args = { groups: Groups.GUEST }) => {
+  const rights = calcRights(args.groups);
+  /* eslint-disable no-bitwise */
+  return {
+    ...createUser(args),
+    id: args.id || 9999,
+    privileges: args.privileges ? rights.priv | args.privileges : rights.priv,
+    permissions: args.permissions
+      ? rights.perm | args.permissions
+      : rights.perm,
+    canVoteSince: args.canVoteSince || null,
+    emailVerified: args.emailVerified || false,
+    avatar: args.avatar || '',
+    lastLogin: args.lastLogin || null,
+  };
+  /* eslint-enable no-bitwise */
+};
 
 export const createPollingMode = (args = { mode: 'proposed' }) => {
   switch (args.mode) {

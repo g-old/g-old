@@ -751,6 +751,7 @@
     "message": "",
     "files": [
       "src/components/UserPanel/UserPanel.js",
+      "src/routes/accountList/AccountListContainer.js",
       "src/routes/proposals/ProposalsOverviewContainer.js",
       "src/routes/tagged/TaggedContainer.js"
     ]

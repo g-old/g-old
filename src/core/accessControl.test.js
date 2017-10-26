@@ -17,8 +17,14 @@ describe('userWriteControl', () => {
       permissions: Permissions.MUTATE_PROFILES,
       groups: Groups.GUEST,
     };
-    const testData = { groups: 0, id: 2 };
+    let testData = { groups: 0, id: 2 };
     expect(canMutate(testViewer, testData, Models.USER)).toBe(true);
+
+    const realTestViewer = createTestActor({
+      groups: Groups.MEMBER_MANAGER | Groups.ADMIN,
+    });
+    testData = { groups: Groups.VOTER, id: 2 };
+    expect(canMutate(realTestViewer, testData, Models.USER)).toBe(true);
   });
 
   it('Should allow to add a followee', () => {

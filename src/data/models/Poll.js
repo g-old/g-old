@@ -46,20 +46,23 @@ class Poll {
     const mode = await PollingMode.gen(viewer, this.pollingModeId, loaders);
     return mode.withStatements === true;
   }
-  /* eslint-disable class-methods-use-this*/
+  /* eslint-disable class-methods-use-this */
   // eslint-disable-next-line no-unused-vars
   async validate(viewer) {
     // TODO
     return true;
   }
-  /* eslint-enable class-methods-use-this*/
+  /* eslint-enable class-methods-use-this */
   static async create(viewer, data, loaders) {
     // authorize
+
     if (!canMutate(viewer, data, Models.POLL)) return null;
+
     // validate
     if (!data.polling_mode_id) return null;
     if (!data.threshold) return null;
     if (!data.end_time) return null;
+
     // create
     const newPollId = await knex.transaction(async trx => {
       const pollingMode = await PollingMode.gen(
@@ -79,6 +82,7 @@ class Poll {
         numVoter = Number(numVoter[0].count);
         if (numVoter < 1) throw Error('Not enough user');
       }
+
       const id = await trx
         .insert(
           {

@@ -95,8 +95,9 @@ class User {
     // throw Error('TESTERROR');
     const errors = [];
     if (!data.id) return { errors: ['Arguments missing'] };
-    if (!canMutate(viewer, data, Models.USER))
+    if (!canMutate(viewer, data, Models.USER)) {
       return { errors: ['Permission denied!'] };
+    }
     // validate - if something seems corrupted, return.
     if (data.email && !validateEmail(data.email))
       return { errors: ['Wrong argument'] };

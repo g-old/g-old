@@ -80,6 +80,26 @@ describe('User Model', () => {
       expect(followees).toBeDefined();
       expect(followees.length).toBe(0);
     });
+
+    it('Should set [users.can_vote_since] when [Groups.VOTER] is assigned ', async () => {
+      const testUser = createTestUser();
+      const [uID] = await knex('users')
+        .insert(testUser)
+        .returning('id');
+      await knex.schema.createTable('sessions', table => {
+        // eslint-disable-next-line no-unused-expressions
+        table.string('sid');
+        table.json('sess');
+      });
+      const testActor = createTestActor({
+        // eslint-disable-next-line no-bitwise
+        groups: Groups.MEMBER_MANAGER | Groups.ADMIN,
+      });
+      const update = { id: uID, groups: Groups.VOTER };
+      const result = await User.update(testActor, update, createLoaders());
+      expect(result.user).toBeDefined();
+      expect(result.user.canVoteSince).not.toBeNull();
+    });
   });
 
   describe('User.delete', () => {
