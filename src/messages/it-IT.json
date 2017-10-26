@@ -894,5 +894,19 @@
     "defaultMessage": "Surname",
     "message": "",
     "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "statements.collapse",
+    "description": "Btn to collapse statements",
+    "defaultMessage": "Show less",
+    "message": "Mostra meno",
+    "files": ["src/components/Statement/Statement.js"]
+  },
+  {
+    "id": "statements.expand",
+    "description": "Btn to expand statements",
+    "defaultMessage": "Read more",
+    "message": "Leggi tutto",
+    "files": ["src/components/Statement/Statement.js"]
   }
 ]

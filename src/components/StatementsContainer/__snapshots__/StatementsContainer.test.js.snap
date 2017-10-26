@@ -74,7 +74,11 @@ exports[`StatementsContainer Displays statements 1`] = `
       <div
         className="text"
       >
-        before
+        <div
+          className="expanded"
+        >
+          before
+        </div>
       </div>
     </div>
   </div>

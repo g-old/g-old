@@ -147,6 +147,7 @@ export const PrivilegesSchema = {
   [Groups.VOTER]: Privileges.NONE,
   [Groups.VIEWER]: Privileges.NONE,
   [Groups.GUEST]: Privileges.NONE,
+  [Groups.SYSTEM]: Privileges.NONE,
 };
 
 /* Permission schema */
@@ -160,6 +161,7 @@ export const PermissionsSchema = {
   [Groups.VOTER]: voterMask,
   [Groups.VIEWER]: viewerMask,
   [Groups.GUEST]: guestMask,
+  [Groups.SYSTEM]: Privileges.NONE,
 };
 
 export const AccessMasks = {
@@ -202,6 +204,7 @@ export const calcRights = userGroups =>
         acc.perm |= PermissionsSchema[r];
         acc.priv |= PrivilegesSchema[r];
       }
+
       return acc;
     },
     { perm: 0, priv: 0 },

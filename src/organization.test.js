@@ -68,12 +68,17 @@ describe('canChangeGroups', () => {
 
 describe('calcRights', () => {
   it('Should assign permissions and privileges', () => {
-    const testGroup = Groups.ADMIN;
-    const testPermissions = PermissionsSchema[Groups.ADMIN];
-    const testPrivileges = PrivilegesSchema[Groups.ADMIN];
-    expect(calcRights(testGroup)).toEqual({
-      priv: testPrivileges,
-      perm: testPermissions,
+    let testGroup;
+    let testPermissions;
+    let testPrivileges;
+    Object.keys(Groups).forEach(key => {
+      testGroup = Groups[key];
+      testPermissions = PermissionsSchema[testGroup];
+      testPrivileges = PrivilegesSchema[testGroup];
+      expect(calcRights(testGroup)).toEqual({
+        priv: testPrivileges,
+        perm: testPermissions,
+      });
     });
   });
 });

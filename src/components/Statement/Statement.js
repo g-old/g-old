@@ -30,6 +30,16 @@ const messages = defineMessages({
     defaultMessage: 'delete',
     description: 'Menu entry on statements to delete statement',
   },
+  expand: {
+    id: 'statements.expand',
+    defaultMessage: 'Read more',
+    description: 'Btn to expand statements',
+  },
+  collapse: {
+    id: 'statements.collapse',
+    defaultMessage: 'Show less',
+    description: 'Btn to collapse statements',
+  },
 });
 const EditMenu = props => <div>{props.children}</div>;
 EditMenu.propTypes = {
@@ -110,6 +120,7 @@ class Statement extends React.Component {
       textArea: { val: this.props.text || '' },
       edit: props.asInput === true,
       pending: false,
+      collapsed: false,
     };
     this.onDeleteStatement = this.onDeleteStatement.bind(this);
     this.onEditStatement = this.onEditStatement.bind(this);
@@ -120,6 +131,16 @@ class Statement extends React.Component {
     this.handleFollowing = this.handleFollowing.bind(this);
     this.handleLiking = this.handleLiking.bind(this);
     this.handleProfileClick = this.handleProfileClick.bind(this);
+  }
+
+  componentDidMount() {
+    if (!this.state.edit) {
+      // 3 * 1.3 em lineheight
+      if (this.textBox && this.textBox.clientHeight > 3.9 * 16) {
+        // eslint-disable-next-line react/no-did-mount-set-state
+        this.setState({ contentOverflows: true, collapsed: true });
+      }
+    }
   }
 
   componentWillReceiveProps({ updates }) {
@@ -430,6 +451,40 @@ class Statement extends React.Component {
       );
     }
 
+    const textBox = [];
+    if (this.state.edit) {
+      textBox.push(
+        <Textarea
+          useCacheForDOMMeasurements
+          placeholder="Leave a statement (optional)"
+          value={this.state.textArea.val}
+          onChange={this.onTextChange}
+          className={s.textEdit}
+          minRows={2}
+          disabled={this.state.pending}
+        />,
+      );
+    } else {
+      textBox.push(
+        <div className={this.state.collapsed ? s.collapsed : s.expanded}>
+          {text}
+        </div>,
+      );
+
+      if (this.state.contentOverflows) {
+        textBox.push(
+          <button
+            onClick={() => this.setState({ collapsed: !this.state.collapsed })}
+            className={s.contentToggle}
+          >
+            <FormattedMessage
+              {...messages[this.state.collapsed ? 'expand' : 'collapse']}
+            />
+          </button>,
+        );
+      }
+    }
+
     return (
       <div
         className={cn(
@@ -484,21 +539,11 @@ class Statement extends React.Component {
               {menu}
             </div>
           )}
-          <div className={s.text}>
-            {this.state.edit ? (
-              <Textarea
-                useCacheForDOMMeasurements
-                placeholder="Leave a statement (optional)"
-                value={this.state.textArea.val}
-                onChange={this.onTextChange}
-                className={s.textEdit}
-                minRows={2}
-                disabled={this.state.pending}
-              />
-            ) : (
-              text
-            )}
+          {/* eslint-disable no-return-assign */}
+          <div className={s.text} ref={ref => (this.textBox = ref)}>
+            {textBox}
           </div>
+          {/* eslint-enable no-return-assign */}
         </div>
       </div>
     );

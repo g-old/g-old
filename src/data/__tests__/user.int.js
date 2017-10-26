@@ -39,25 +39,25 @@ describe('User Model', () => {
 
   describe('User.update', () => {
     test('Should not update own users email if not valid', async () => {
-      const id = 1;
-
-      const testUser = createTestUser({ id });
-      await knex('users').insert(testUser);
-      const testActor = createTestActor({ id });
-      const update = { id: testUser.id, email: 'wrongmail' };
+      const testUser = createTestUser();
+      const [uID] = await knex('users')
+        .insert(testUser)
+        .returning('id');
+      const testActor = createTestActor({ id: uID });
+      const update = { id: uID, email: 'wrongmail' };
       const result = await User.update(testActor, update, createLoaders());
       expect(result.user).toBe(undefined);
       expect(result.errors).toContain('Wrong argument');
     });
     test('Should update both name and surname ', async () => {
-      const id = 2;
       const testName = 'newName';
       const testSurname = 'newSurname';
-
-      const testUser = createTestUser({ id });
-      await knex('users').insert(testUser);
-      const testActor = createTestActor({ id });
-      const update = { id: testUser.id, name: testName, surname: testSurname };
+      const testUser = createTestUser();
+      const [uID] = await knex('users')
+        .insert(testUser)
+        .returning('id');
+      const testActor = createTestActor({ id: uID });
+      const update = { id: uID, name: testName, surname: testSurname };
       const result = await User.update(testActor, update, createLoaders());
       expect(result.user).toBeDefined();
       expect(result.user).toEqual(
@@ -86,11 +86,14 @@ describe('User Model', () => {
       const [uID] = await knex('users')
         .insert(testUser)
         .returning('id');
-      await knex.schema.createTable('sessions', table => {
-        // eslint-disable-next-line no-unused-expressions
-        table.string('sid');
-        table.json('sess');
-      });
+      const exists = await knex.schema.hasTable('sessions');
+      if (!exists) {
+        await knex.schema.createTable('sessions', table => {
+          // eslint-disable-next-line no-unused-expressions
+          table.string('sid');
+          table.json('sess');
+        });
+      }
       const testActor = createTestActor({
         // eslint-disable-next-line no-bitwise
         groups: Groups.MEMBER_MANAGER | Groups.ADMIN,

@@ -63,7 +63,11 @@ exports[`FeedContainer Displays activity 1`] = `
             <div
               className="text"
             >
-              before
+              <div
+                className="expanded"
+              >
+                before
+              </div>
             </div>
           </div>
         </div>

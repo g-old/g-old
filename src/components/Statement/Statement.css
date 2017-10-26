@@ -1,4 +1,4 @@
-@import '../../components/variables.css';
+@import "../../components/variables.css";
 
 /*
 .root {
@@ -71,6 +71,35 @@
   line-height: 1.3em;
   width: 100%;
   display: inline-block;
+}
+
+.collapsed {
+  max-height: 3.9em;
+  overflow: hidden;
+}
+
+.expanded {
+  max-height: none;
+}
+
+.contentToggle {
+  margin: -8px 0 10px;
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  height: auto;
+  background: transparent;
+  color: #167ac6;
+  font-weight: normal;
+  font-size: inherit;
+  text-decoration: none;
+  box-shadow: none;
+  outline: 0;
+  display: inline-block;
+}
+
+.contentToggle:hover {
+  text-decoration: underline;
 }
 
 .textEdit {
