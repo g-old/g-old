@@ -87,8 +87,9 @@ const aggregateTimings = routeData =>
     let sum;
     let median;
     if (data.length) {
-      // eslint-disable-next-line no-param-reassign
+      /* eslint-disable*/
       sum = data.reduce((previous, current) => (current += previous));
+      /* eslint-enable */
       data.sort((a, b) => a - b);
       const lowMiddle = Math.floor((data.length - 1) / 2);
       const highMiddle = Math.ceil((data.length - 1) / 2);
@@ -104,54 +105,6 @@ const aggregateTimings = routeData =>
     return acc;
   }, []);
 
-/* function createLogParser(resolve, reject, logs) {
-  const parser = split('\n', input => {
-    if (!input) {
-      return undefined;
-    }
-    if (input[0] !== '{') {
-      return undefined;
-    }
-    // don't emit on trailing or keep alive new lines
-    try {
-      return JSON.parse(input);
-    } catch (e) {
-      return undefined;
-    }
-  });
-  parser.on('data', entry => {
-    if (entry.query) {
-      logs.push(entry);
-    }
-  });
-  parser.on('end', () => {
-    console.log('PARSER IS ENDING');
-    parser.destroy();
-    resolve(logs);
-  });
-  parser.on('error', () => {
-    console.log('PARSER Error');
-    parser.destroy();
-    reject(logs);
-  });
-  return parser;
-}
-*/
-/* function readLogFile(path) {
-  console.log('READING LOGILE....');
-  return new Promise((resolve, reject) => {
-    const readableLogs = [];
-
-    const logStream = fs.createReadStream(path);
-    pump(logStream, createLogParser(resolve, reject, readableLogs));
-    logStream.on('error', e => {
-      console.log('STREAM IS OPEN');
-      reject(e);
-    });
-    //  .pipe(parseLines)
-  });
-}
-*/
 const reduceLogs = (timingLogs = []) =>
   timingLogs.reduce(
     (acc, currLog) => {
@@ -253,93 +206,6 @@ const reduceLogs = (timingLogs = []) =>
     },
   );
 
-// TODO checkout reverse line reader
-/* function readLogFileReverse(path, numLines) {
-  return lastLines.read(path, numLines).then(data => {
-    let log;
-    const yesterday = new Date() - 1000 * 60 * 60 * 24;
-    return data.split('\n').reduce((acc, curr) => {
-      if (curr[0] !== '{') {
-        return acc;
-      }
-      try {
-        log = JSON.parse(curr);
-
-        if (log.query && new Date(log.time) > yesterday) {
-          switch (log.query) {
-            case 'proposalDL': {
-              acc.proposal.push(log.timing);
-              return acc;
-            }
-            case 'proposals': {
-              acc.proposals.push(log.timing);
-              return acc;
-            }
-            case 'feed': {
-              acc.feed.push(log.timing);
-              return acc;
-            }
-            case 'logs': {
-              acc.logs.push(log.timing);
-              return acc;
-            }
-            case 'user': {
-              acc.user.push(log.timing);
-              return acc;
-            }
-            case 'createVote':
-            case 'updateVote':
-            case 'deleteVote': {
-              acc.voting.push(log.timing);
-              return acc;
-            }
-            case 'createStatement':
-            case 'updateStatement':
-            case 'deleteStatement': {
-              acc.statements.push(log.timing);
-              return acc;
-            }
-
-            default: {
-              acc.assets.push(log.timing);
-              return acc;
-            }
-          }
-        } else if (log.path && new Date(log.time) > yesterday) {
-          switch (log.path) {
-            case '/feed': {
-              acc.feedPage.push(log.timing);
-              return acc;
-            }
-            case '/': {
-              acc.mainPage.push(log.timing);
-              return acc;
-            }
-
-            default: {
-              return acc;
-            }
-          }
-        }
-        return acc;
-      } catch (e) {
-        return acc;
-      }
-    }, {
-      mainPage: [],
-      feedPage: [],
-      proposal: [],
-      proposals: [],
-      feed: [],
-      logs: [],
-      user: [],
-      voting: [],
-      statements: [],
-      assets: [],
-    });
-  });
-}
-*/
 const statistics = {
   type: new GraphQLObjectType({
     name: 'Statistics',
@@ -358,24 +224,12 @@ const statistics = {
       performance: {
         type: new GraphQLList(RoutePerformance),
         async resolve() {
-          /*    return readLogBackwards(
-            `${os.homedir()}/goldtest.log`,
-            24,
-          ).then(data => {
-            console.log('DATA', data);
-            console.log('DATA LENGTH', data.length);
-            const d = reduceLogs(data);
-            console.log('REDUCED', d);
-            const f = aggregateTimings(d);
-            return f;
-          }); */
-
           if (lastCalcTask) {
             return lastCalcTask;
           }
           if (new Date() - lastCalcTime > 1000 * 60 * 60 * 1 /* 1h */) {
             lastCalcTime = new Date();
-            const path = process.env.LOGFILE || '/var/log/gold.log'; // `${os.homedir()}/goldtest.log`;
+            const path = process.env.LOGFILE || '/var/gold/gold.org'; // `${os.homedir()}/goldtest.log`;
             lastCalcTask = readLogBackwards(path, 24)
               .then(data => {
                 if (data) {
@@ -389,20 +243,6 @@ const statistics = {
                 lastCalcTask = null;
                 throw err;
               });
-
-            /*  lastCalcTask = readLogFileReverse(path, 1000)
-              .then(data => {
-                if (data) {
-                  const computed = aggregateTimings(data);
-                  performanceResult = computed;
-                  lastCalcTask = null;
-                }
-                return performanceResult;
-              })
-              .catch(err => {
-                lastCalcTask = null;
-                throw err;
-              }); */
 
             return lastCalcTask;
           }

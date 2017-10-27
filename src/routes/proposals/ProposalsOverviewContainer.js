@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import ProposalPreview from '../../components/ProposalPreview';
 import { loadProposalsList, loadProposal } from '../../actions/proposal';
 import history from '../../history';
 import {
@@ -11,17 +9,10 @@ import {
   getProposalsErrorMessage,
   getProposalsPage,
 } from '../../reducers/index';
-import Button from '../../components/Button';
 import FetchError from '../../components/FetchError';
 import ProposalsSubHeader from '../../components/ProposalsSubHeader';
+import ProposalListView from '../../components/ProposalListView';
 
-const messages = defineMessages({
-  loadMore: {
-    id: 'command.loadMore',
-    defaultMessage: 'Load more',
-    description: 'To get more data',
-  },
-});
 class ProposalsOverviewContainer extends React.Component {
   static propTypes = {
     proposals: PropTypes.arrayOf(
@@ -37,7 +28,6 @@ class ProposalsOverviewContainer extends React.Component {
       endCursor: PropTypes.string,
       hasNextPage: PropTypes.bool,
     }).isRequired,
-    state: PropTypes.string.isRequired,
   };
 
   constructor(props) {
@@ -84,37 +74,24 @@ class ProposalsOverviewContainer extends React.Component {
       <div>
         {/* <Navigation filter={filter} /> */}
         <ProposalsSubHeader filter={filter} />
-        {proposals.map(proposal => (
-          <ProposalPreview
-            key={proposal.id}
-            proposal={proposal}
-            onClick={this.onProposalClick}
-          />
-        ))}
-        {this.props.pageInfo.hasNextPage && (
-          <Button
-            primary
-            disabled={isFetching}
-            onClick={() => {
-              this.props.loadProposalsList({
-                state: this.props.state,
-                after: this.props.pageInfo.endCursor,
-              });
-            }}
-            label={<FormattedMessage {...messages.loadMore} />}
-          />
-        )}
+        <ProposalListView
+          proposals={proposals}
+          onProposalClick={this.onProposalClick}
+          pageInfo={this.props.pageInfo}
+          filter={filter}
+          onLoadMore={this.props.loadProposalsList}
+          isFetching={isFetching}
+        />
       </div>
     );
   }
 }
 // TODO implement memoiziation with reselect
 const mapStateToProps = (state, ownProps) => ({
-  proposals: getVisibleProposals(state, ownProps.state),
-  filter: ownProps.state,
-  isFetching: getProposalsIsFetching(state, ownProps.state),
-  errorMessage: getProposalsErrorMessage(state, ownProps.state),
-  pageInfo: getProposalsPage(state, ownProps.state),
+  proposals: getVisibleProposals(state, ownProps.filter),
+  isFetching: getProposalsIsFetching(state, ownProps.filter),
+  errorMessage: getProposalsErrorMessage(state, ownProps.filter),
+  pageInfo: getProposalsPage(state, ownProps.filter),
 });
 
 const mapDispatch = {

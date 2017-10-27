@@ -1,0 +1,6 @@
+{
+  "name": "ProposalListView",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./ProposalListView.js"
+}

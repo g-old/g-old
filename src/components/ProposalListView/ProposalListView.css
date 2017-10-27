@@ -1,0 +1,7 @@
+.list {
+  margin-bottom: 1em;
+}
+
+.list > div {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+}

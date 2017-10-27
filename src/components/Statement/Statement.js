@@ -194,9 +194,11 @@ class Statement extends React.Component {
       } else {
         this.props.onCreate({ pollId, text, voteId: vote.id });
       }
+    } else {
+      // nothing changed
+      this.onEndEditing();
     }
 
-    // this.onEndEditing();
     e.preventDefault();
   }
 
@@ -474,7 +476,11 @@ class Statement extends React.Component {
       if (this.state.contentOverflows) {
         textBox.push(
           <button
-            onClick={() => this.setState({ collapsed: !this.state.collapsed })}
+            onClick={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              return this.setState({ collapsed: !this.state.collapsed });
+            }}
             className={s.contentToggle}
           >
             <FormattedMessage

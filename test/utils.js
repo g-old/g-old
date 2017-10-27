@@ -45,7 +45,7 @@ export const createTestUser = (args = { groups: Groups.GUEST }) => ({
 });
 
 export const createTestActor = (args = { groups: Groups.GUEST }) => {
-  const rights = calcRights(args.groups);
+  const rights = calcRights(args.groups || Groups.GUEST);
   /* eslint-disable no-bitwise */
   return {
     ...createUser(args),

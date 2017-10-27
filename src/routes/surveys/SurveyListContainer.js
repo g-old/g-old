@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import ProposalPreview from '../../components/ProposalPreview';
+import ProposalListView from '../../components/ProposalListView';
+
 import { loadProposalsList } from '../../actions/proposal';
 import {
   getVisibleProposals,
   getProposalsIsFetching,
   getProposalsErrorMessage,
+  getProposalsPage,
 } from '../../reducers/index';
 import FetchError from '../../components/FetchError';
 import history from '../../history';
@@ -21,6 +23,10 @@ class SurveyListContainer extends React.Component {
     isFetching: PropTypes.bool.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
     errorMessage: PropTypes.string.isRequired,
+    pageInfo: PropTypes.shape({
+      endCursor: PropTypes.string,
+      hasNextPage: PropTypes.bool,
+    }).isRequired,
   };
   constructor(props) {
     super(props);
@@ -52,13 +58,14 @@ class SurveyListContainer extends React.Component {
 
     return (
       <div>
-        {proposals.map(proposal => (
-          <ProposalPreview
-            key={proposal.id}
-            proposal={proposal}
-            onClick={this.handleSurveyClick}
-          />
-        ))}
+        <ProposalListView
+          proposals={proposals}
+          onProposalClick={this.handleSurveyClick}
+          pageInfo={this.props.pageInfo}
+          filter={'survey'}
+          onLoadMore={this.props.loadProposalsList}
+          isFetching={isFetching}
+        />
       </div>
     );
   }
@@ -68,6 +75,7 @@ const mapStateToProps = state => ({
   proposals: getVisibleProposals(state, 'survey'),
   isFetching: getProposalsIsFetching(state, 'survey'),
   errorMessage: getProposalsErrorMessage(state, 'survey'),
+  pageInfo: getProposalsPage(state, 'survey'),
 });
 
 const mapDispatch = {

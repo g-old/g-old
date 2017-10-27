@@ -24,7 +24,7 @@ async function action({ store, path }) {
     title,
     component: (
       <Layout>
-        <SurveyListContainer />{' '}
+        <SurveyListContainer />
       </Layout>
     ),
   };

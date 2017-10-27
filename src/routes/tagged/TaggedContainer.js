@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import ProposalPreview from '../../components/ProposalPreview';
 import { loadProposalsList } from '../../actions/proposal';
 import {
   getProposalsByTag,
@@ -12,18 +10,13 @@ import {
   getProposalsErrorMessage,
   getPageInfo,
 } from '../../reducers/index';
-import Button from '../../components/Button';
+import ProposalListView from '../../components/ProposalListView';
+
 import FetchError from '../../components/FetchError';
 import Tag from '../../components/Tag';
 import Search from '../../components/Search';
+import history from '../../history';
 
-const messages = defineMessages({
-  loadMore: {
-    id: 'command.loadMore',
-    defaultMessage: 'Load more',
-    description: 'To get more data',
-  },
-});
 class ProposalContainer extends React.Component {
   static propTypes = {
     proposals: PropTypes.arrayOf(
@@ -46,6 +39,10 @@ class ProposalContainer extends React.Component {
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
     return this.props.proposals != null;
+  }
+  // eslint-disable-next-line class-methods-use-this
+  handleProposalClick({ proposalId, pollId }) {
+    history.push(`/proposal/${proposalId}/${pollId}`);
   }
 
   render() {
@@ -91,24 +88,15 @@ class ProposalContainer extends React.Component {
         <div style={{ display: 'flex', fontSize: '0.8em', paddingTop: '1em' }}>
           <Tag text={`${tag.text} (${tag.count})`} />
         </div>
-
-        {proposals.map(proposal => (
-          <ProposalPreview key={proposal.id} proposal={proposal} />
-        ))}
-        {this.props.pageInfo.hasNextPage && (
-          <Button
-            primary
-            disabled={isFetching}
-            onClick={() => {
-              this.props.loadProposalsList({
-                state: 'all',
-                after: this.props.pageInfo.endCursor,
-                tagId,
-              });
-            }}
-            label={<FormattedMessage {...messages.loadMore} />}
-          />
-        )}
+        <ProposalListView
+          proposals={proposals}
+          onProposalClick={this.handleSurveyClick}
+          pageInfo={this.props.pageInfo}
+          filter={'all'}
+          onLoadMore={this.props.loadProposalsList}
+          isFetching={isFetching}
+          tagId={this.props.tagId}
+        />
       </div>
     );
   }

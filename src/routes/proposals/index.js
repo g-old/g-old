@@ -25,7 +25,7 @@ async function action({ store, path }, { state }) {
     title,
     component: (
       <Layout>
-        <ProposalOverviewContainer state={state} />
+        <ProposalOverviewContainer filter={state} />
       </Layout>
     ),
   };

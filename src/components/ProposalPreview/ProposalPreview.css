@@ -61,7 +61,8 @@ a:visited {
 
   /*  border: solid 1px gray; */
   padding: 0.4em;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+
+  /* border-bottom: 1px solid rgba(0, 0, 0, 0.15); */
 
   /* border-bottom: solid 1px #666; */
 
