@@ -796,10 +796,9 @@
     "defaultMessage": "Load more",
     "message": "Mehr",
     "files": [
+      "src/components/ProposalListView/ProposalListView.js",
       "src/components/UserPanel/UserPanel.js",
-      "src/routes/accountList/AccountListContainer.js",
-      "src/routes/proposals/ProposalsOverviewContainer.js",
-      "src/routes/tagged/TaggedContainer.js"
+      "src/routes/accountList/AccountListContainer.js"
     ]
   },
   {

@@ -115,5 +115,5 @@ export const getWorkTeamsIsFetching = state =>
 export const getWorkTeamsErrorMessage = state =>
   fromWorkTeams.getErrorMessage(state.workTeams);
 
-export const getWorkTeam = state =>
-  fromWorkTeams.getWorkTeam(state.workTeams, state);
+export const getWorkTeam = (state, id) =>
+  fromWorkTeams.getWorkTeam(state.workTeams, id, state);

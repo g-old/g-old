@@ -4,6 +4,7 @@ import {
   GraphQLNonNull as NonNull,
   GraphQLID as ID,
   GraphQLList,
+  GraphQLInt,
 } from 'graphql';
 import UserType from './UserType';
 import DiscussionType from './DiscussionType';
@@ -35,6 +36,12 @@ const WorkTeamType = new ObjectType({
         }
         return null;
       },
+    },
+    numMembers: {
+      type: GraphQLInt,
+    },
+    numDiscussions: {
+      type: GraphQLInt,
     },
     discussions: {
       type: new GraphQLList(DiscussionType),

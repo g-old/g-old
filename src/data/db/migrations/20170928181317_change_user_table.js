@@ -18,10 +18,7 @@ exports.down = function(knex, Promise) {
     knex.schema.table('users', table => {
       table.dropColumn('can_vote_since');
       table.dropColumn('groups');
-      table
-        .integer('role_id')
-        .unsigned()
-        .notNullable();
+      table.integer('role_id').unsigned();
       table.foreign('role_id').references('roles.id');
       table.integer('privilege').defaultTo(1);
     }),

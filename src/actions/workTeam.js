@@ -26,6 +26,8 @@ import {
 const workTeam = `
   id
   name
+  numMembers
+  numDiscussions
   coordinator{
     name
     surname
@@ -48,10 +50,11 @@ const workTeamsWithMembers = `query{
       }
     }}`;
 
-const workTeamQuery = `query($id:ID){
+const workTeamQuery = `query($id:ID!){
   workTeam(id:$id){
     ${workTeam}
-  }`;
+  }
+}`;
 
 const createWorkTeamMutation = `mutation($name:String, $coordinatorId:ID){
   createWorkTeam (workTeam:{name:$name, coordinatorId:$coordinatorId}){

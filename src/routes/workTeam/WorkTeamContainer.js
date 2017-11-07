@@ -17,7 +17,7 @@ class WorkTeamContainer extends React.Component {
     workTeamData: null,
   };
   render() {
-    return <WorkTeam {...this.props.workTeamData || {}} />;
+    return <WorkTeam {...this.props.workTeamData} />;
   }
 }
 

@@ -1,0 +1,12 @@
+.logo {
+  width: 12rem;
+  height: 12rem;
+  border: 3px solid #fff;
+  border-radius: 6px;
+}
+
+.root {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}

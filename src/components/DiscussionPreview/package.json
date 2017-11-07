@@ -1,0 +1,6 @@
+{
+  "name": "DiscussionPreview",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./DiscussionPreview.js"
+}

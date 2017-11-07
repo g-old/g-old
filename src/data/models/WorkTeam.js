@@ -23,6 +23,8 @@ class WorkTeam {
     this.id = data.id;
     this.coordinatorId = data.coordinator_id;
     this.name = data.name;
+    this.numMembers = data.num_members;
+    this.numDiscussions = data.num_discussions;
   }
   canNotify(viewer) {
     // eslint-disable-next-line eqeqeq
@@ -31,27 +33,45 @@ class WorkTeam {
   async join(viewer, memberId, loaders) {
     // viewer is already checked
     if (!canJoin(viewer, memberId)) return null;
-    let wtId = await knex.transaction(async trx =>
-      trx
+    const wtId = await knex.transaction(async trx => {
+      let id = await trx
         .insert({ user_id: memberId, work_team_id: this.id })
         .into('user_work_teams')
-        .returning('id'),
-    );
-    wtId = wtId[0];
+        .returning('id');
+
+      id = id[0];
+      if (id) {
+        await knex('work_teams')
+          .transacting(trx)
+          .forUpdate()
+          .increment('num_members', 1)
+          .into('work_teams');
+      }
+      return id;
+    });
     return wtId ? User.gen(viewer, memberId, loaders) : null;
   }
 
   async leave(viewer, memberId, loaders) {
     // viewer is already checked
     if (!canJoin(viewer, memberId)) return null;
-    let wtId = await knex.transaction(async trx =>
-      trx
+    const wtId = await knex.transaction(async trx => {
+      let id = await trx
         .where({ user_id: memberId, work_team_id: this.id })
         .into('user_work_teams')
         .del()
-        .returning('id'),
-    );
-    wtId = wtId[0];
+        .returning('id');
+
+      id = id[0];
+      if (id) {
+        await knex('work_teams')
+          .transacting(trx)
+          .forUpdate()
+          .decrement('num_members', 1)
+          .into('work_teams');
+      }
+      return id;
+    });
     return wtId ? User.gen(viewer, memberId, loaders) : null;
   }
 
