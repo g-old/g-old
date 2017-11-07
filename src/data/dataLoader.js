@@ -191,6 +191,54 @@ const getActivitiesById = activityIds =>
       );
   });
 
+const getDiscussionsById = discussionIds =>
+  new Promise(resolve => {
+    knex('discussions')
+      .whereIn('id', discussionIds)
+      .select()
+      .then(data =>
+        resolve(
+          discussionIds.map(
+            id =>
+              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
+              new Error(`Row not found: ${id}`),
+          ),
+        ),
+      );
+  });
+
+const getWorkTeamsById = workTeamIds =>
+  new Promise(resolve => {
+    knex('work_teams')
+      .whereIn('id', workTeamIds)
+      .select()
+      .then(data =>
+        resolve(
+          workTeamIds.map(
+            id =>
+              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
+              new Error(`Row not found: ${id}`),
+          ),
+        ),
+      );
+  });
+
+const getCommentsById = commentIds =>
+  new Promise(resolve => {
+    knex('comments')
+      .whereIn('id', commentIds)
+      .select()
+      .then(data =>
+        resolve(
+          commentIds.map(
+            id =>
+              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
+              new Error(`Row not found: ${id}`),
+          ),
+        ),
+      );
+  });
+
 function createLoaders() {
   return {
     users: new DataLoader(ids => getUsersById(ids)),
@@ -204,6 +252,9 @@ function createLoaders() {
     tags: new DataLoader(ids => getTagsById(ids)),
     statementLikes: new DataLoader(ids => getStatementLikesById(ids)),
     activities: new DataLoader(ids => getActivitiesById(ids)),
+    comments: new DataLoader(ids => getCommentsById(ids)),
+    discussions: new DataLoader(ids => getDiscussionsById(ids)),
+    workTeams: new DataLoader(ids => getWorkTeamsById(ids)),
   };
 }
 

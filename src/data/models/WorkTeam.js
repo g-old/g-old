@@ -66,12 +66,9 @@ class WorkTeam {
     return Promise.all(promises);
   }
 
-  static async gen(viewer, id) {
+  static async gen(viewer, id, { workTeams }) {
     if (!id) return null;
-    let data = await knex('work_teams')
-      .where({ id })
-      .select();
-    data = data[0];
+    const data = await workTeams.load(id);
     if (!data) return null;
     if (!canSee(viewer, data, Models.WORKTEAM)) return null;
     return new WorkTeam(data);

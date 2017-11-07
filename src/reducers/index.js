@@ -125,6 +125,14 @@ export const getActivityCounter = state => fromUi.getActivityCounter(state.ui);
 
 export const getWorkTeams = state => fromEntity.getWorkTeams(state.entities);
 
+export const getWorkTeam = state => fromEntity.getWorkTeam(state.entities);
+
+export const getWorkTeamsIsFetching = state =>
+  fromEntity.getWorkTeamsIsFetching(state.entities);
+
+export const getWorkTeamsErrorMessage = state =>
+  fromEntity.getWorkTeamsErrorMessage(state.entities);
+
 export const getStatistics = state => state.statistics;
 
 export const getPageInfo = (state, queryStateTag) =>

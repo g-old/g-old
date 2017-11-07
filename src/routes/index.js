@@ -60,6 +60,14 @@ const routes = {
       load: () => import(/* webpackChunkName: 'admin' */ './admin'),
     },
     {
+      path: '/workteams',
+      load: () => import(/* webpackChunkName: 'workteam' */ './workTeamList'),
+    },
+    {
+      path: '/workteams/:id',
+      load: () => import(/* webpackChunkName: 'workteam' */ './workTeam'),
+    },
+    {
       path: '/signup',
       load: () => import(/* webpackChunkName: 'signup' */ './signup'),
     },

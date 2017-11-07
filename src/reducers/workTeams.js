@@ -3,7 +3,10 @@ import { denormalize } from 'normalizr';
 
 import byId, * as fromById from './workTeamById';
 import allIds, * as fromList from './workTeamList';
-import { workTeamList as workTeamListSchema } from './../store/schema';
+import {
+  workTeamList as workTeamListSchema,
+  workTeam as workTeamSchema,
+} from './../store/schema';
 
 export default combineReducers({
   byId,
@@ -22,5 +25,10 @@ export const getWorkTeams = (state, entities) => {
   return hydrateWorkTeams(state, data, entities);
 };
 
+export const getWorkTeam = (state, id, entities) =>
+  denormalize(fromById.getWorkTeam(state.byId, id), workTeamSchema, {
+    ...entities,
+    users: entities.users.byId,
+  });
 export const getIsFetching = state => fromList.getIsFetching(state.allIds);
 export const getErrorMessage = state => fromList.getErrorMessage(state.allIds);

@@ -108,3 +108,12 @@ export const getVisibibleStatementsByPoll = (state, id, filter) =>
 
 export const getWorkTeams = state =>
   fromWorkTeams.getWorkTeams(state.workTeams, state);
+
+export const getWorkTeamsIsFetching = state =>
+  fromWorkTeams.getIsFetching(state.workTeams);
+
+export const getWorkTeamsErrorMessage = state =>
+  fromWorkTeams.getErrorMessage(state.workTeams);
+
+export const getWorkTeam = state =>
+  fromWorkTeams.getWorkTeam(state.workTeams, state);

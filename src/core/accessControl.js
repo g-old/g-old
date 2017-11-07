@@ -18,6 +18,8 @@ export const Models = {
   NOTIFICATION: 128,
   WORKTEAM: 256,
   ACTIVITY: 512,
+  DISCUSSION: 1024,
+  COMMENT: 2048,
 };
 
 /* eslint-disable no-unused-vars */
@@ -232,6 +234,26 @@ function workTeamWriteControl(viewer, data) {
   }
   return false;
 }
+
+function discussionReadControl(viewer, data) {
+  if (viewer.permissions & AccessMasks.LEVEL_0) {
+    return true;
+  }
+  return false;
+}
+function discussionWriteControl(viewer, data) {
+  return true; // TODO change
+}
+function commentReadControl(viewer, data) {
+  if (viewer.permissions & AccessMasks.LEVEL_0) {
+    return true;
+  }
+  return false;
+}
+function commentWriteControl(viewer, data) {
+  return true; // TODO change
+}
+
 /* eslint-enable no-unused-vars */
 
 const ATypes = {
@@ -278,6 +300,14 @@ const accessFilter = {
   [Models.WORKTEAM]: {
     [ATypes.WRITE]: workTeamWriteControl,
     [ATypes.READ]: workTeamReadControl,
+  },
+  [Models.DISCUSSION]: {
+    [ATypes.WRITE]: discussionWriteControl,
+    [ATypes.READ]: discussionReadControl,
+  },
+  [Models.COMMENT]: {
+    [ATypes.WRITE]: commentWriteControl,
+    [ATypes.READ]: commentReadControl,
   },
 };
 

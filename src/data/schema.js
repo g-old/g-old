@@ -51,11 +51,14 @@ import createWorkTeam from './mutations/createWorkTeam';
 import joinWorkTeam from './mutations/joinWorkTeam';
 import leaveWorkTeam from './mutations/leaveWorkTeam';
 import workTeams from './queries/workTeams';
+import workTeam from './queries/workTeam';
 import createProposalSub from './mutations/createProposalSub';
 import deleteProposalSub from './mutations/deleteProposalSub';
 import logs from './queries/logs';
 import statistics from './queries/statistics';
 import userConnection from './queries/userConnection';
+import createComment from './mutations/createComment';
+import createDiscussion from './mutations/createDiscussion';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -78,6 +81,7 @@ const schema = new Schema({
       proposalConnection,
       flagConnection,
       workTeams,
+      workTeam,
       logs,
       statistics,
     },
@@ -109,6 +113,8 @@ const schema = new Schema({
       leaveWorkTeam,
       createProposalSub,
       deleteProposalSub,
+      createComment,
+      createDiscussion,
     },
   }),
   subscription: new ObjectType({

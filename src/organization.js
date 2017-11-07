@@ -223,6 +223,8 @@ const protectedViews = {
   GroupsPanel: { type: 'privileges', name: 'GROUPS_MANAGER' },
   SSE: { type: 'permissions', name: 'LEVEL_1' },
   AccountList: { type: 'permissions', name: 'LEVEL_1' },
+  WorkteamList: { type: 'permissions', name: 'LEVEL_1' },
+  Workteam: { type: 'permissions', name: 'LEVEL_1' },
 };
 export const canAccess = (user, name) => {
   if (user) {

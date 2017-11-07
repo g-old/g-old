@@ -6,6 +6,8 @@ import {
   GraphQLList,
 } from 'graphql';
 import UserType from './UserType';
+import DiscussionType from './DiscussionType';
+import Discussion from '../models/Discussion';
 import User from '../models/User';
 import knex from '../knex';
 
@@ -30,6 +32,18 @@ const WorkTeamType = new ObjectType({
             .where({ work_team_id: data.id })
             .pluck('user_id')
             .then(ids => ids.map(id => User.gen(viewer, id, loaders)));
+        }
+        return null;
+      },
+    },
+    discussions: {
+      type: new GraphQLList(DiscussionType),
+      resolve(data, args, { viewer, loaders }) {
+        if (viewer) {
+          return knex('discussions')
+            .where({ work_team_id: data.id })
+            .pluck('id')
+            .then(ids => ids.map(id => Discussion.gen(viewer, id, loaders)));
         }
         return null;
       },

@@ -4,6 +4,9 @@ import {
   LOAD_WORKTEAMS_START,
   LOAD_WORKTEAMS_ERROR,
   LOAD_WORKTEAMS_SUCCESS,
+  LOAD_WORKTEAM_START,
+  LOAD_WORKTEAM_ERROR,
+  LOAD_WORKTEAM_SUCCESS,
   CREATE_WORKTEAM_START,
   CREATE_WORKTEAM_SUCCESS,
   CREATE_WORKTEAM_ERROR,
@@ -44,6 +47,11 @@ const workTeamsWithMembers = `query{
         id
       }
     }}`;
+
+const workTeamQuery = `query($id:ID){
+  workTeam(id:$id){
+    ${workTeam}
+  }`;
 
 const createWorkTeamMutation = `mutation($name:String, $coordinatorId:ID){
   createWorkTeam (workTeam:{name:$name, coordinatorId:$coordinatorId}){
@@ -151,6 +159,26 @@ export function leaveWorkTeam(workTeamData) {
     } catch (e) {
       dispatch({
         type: LEAVE_WORKTEAM_ERROR,
+        message: e.message || 'Something went wrong',
+      });
+    }
+  };
+}
+
+export function loadWorkTeam({ id }) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: LOAD_WORKTEAM_START,
+    });
+
+    try {
+      const { data } = await graphqlRequest(workTeamQuery, { id });
+      const normalizedData = normalize(data.workTeam, workTeamSchema);
+
+      dispatch({ type: LOAD_WORKTEAM_SUCCESS, payload: normalizedData });
+    } catch (e) {
+      dispatch({
+        type: LOAD_WORKTEAM_ERROR,
         message: e.message || 'Something went wrong',
       });
     }
