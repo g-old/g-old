@@ -68,6 +68,14 @@ const routes = {
       load: () => import(/* webpackChunkName: 'workteam' */ './workTeam'),
     },
     {
+      path: '/workteams/:id/discussions/:id',
+      load: () => import(/* webpackChunkName: 'workteam' */ './discussion'),
+    },
+    {
+      path: '/workteams/:id/admin',
+      load: () => import(/* webpackChunkName: 'admin' */ './workTeamManager'),
+    },
+    {
       path: '/signup',
       load: () => import(/* webpackChunkName: 'signup' */ './signup'),
     },

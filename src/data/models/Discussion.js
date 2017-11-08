@@ -9,8 +9,8 @@ class Discussion {
     this.workTeamId = data.work_team_id;
     this.content = data.content;
     this.numComments = data.num_comments;
-    this.createdAt = data.createdAt;
-    this.updatedAt = data.updatedAt;
+    this.createdAt = data.created_at;
+    this.updatedAt = data.updated_at;
   }
 
   static async gen(viewer, id, { discussions }) {
@@ -26,21 +26,28 @@ class Discussion {
 
   static async create(viewer, data) {
     if (!data) return null;
-    if (!canMutate(viewer, data, Models.DISCUSSION)) return null;
 
-    let discussionInDB = await knex.transaction(async trx =>
-      knex('discussions')
+    if (!canMutate(viewer, data, Models.DISCUSSION)) return null;
+    const discussionInDB = await knex.transaction(async trx => {
+      let discussion = await knex('discussions')
         .transacting(trx)
         .insert({
           author_id: viewer.id,
           title: data.title.trim(),
           content: data.content.trim(),
           work_team_id: data.workTeamId,
+          created_at: new Date(),
         })
-        .returning('*'),
-    );
+        .returning('*');
 
-    discussionInDB = discussionInDB[0];
+      discussion = discussion[0];
+      if (discussion) {
+        await knex('work_teams')
+          .where({ id: data.workTeamId })
+          .increment('num_discussions', 1);
+      }
+      return discussion;
+    });
 
     return discussionInDB ? new Discussion(discussionInDB) : null;
   }

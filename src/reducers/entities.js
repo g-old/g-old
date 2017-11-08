@@ -14,6 +14,7 @@ import activities, * as fromActivities from './activities';
 import followees, * as fromFollowees from './followees';
 import workTeams, * as fromWorkTeams from './workTeams';
 import logs, * as fromLogs from './logs';
+import discussions, * as fromDiscussions from './discussions';
 
 export default combineReducers({
   users,
@@ -31,6 +32,7 @@ export default combineReducers({
   workTeams,
   notifications,
   logs,
+  discussions,
 });
 
 export const getVisibleProposals = (state, filter) =>
@@ -117,3 +119,12 @@ export const getWorkTeamsErrorMessage = state =>
 
 export const getWorkTeam = (state, id) =>
   fromWorkTeams.getWorkTeam(state.workTeams, id, state);
+
+export const getDiscussion = (state, id) =>
+  fromDiscussions.getDiscussion(state.discussions, id, state);
+
+export const getIsDiscussionFetching = state =>
+  fromDiscussions.getIsFetching(state.discussions);
+
+export const getDiscussionError = state =>
+  fromDiscussions.getErrorMessage(state.discussions);

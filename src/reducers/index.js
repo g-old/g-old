@@ -138,3 +138,12 @@ export const getStatistics = state => state.statistics;
 
 export const getPageInfo = (state, queryStateTag) =>
   fromUi.getPageInfo(state.ui, queryStateTag);
+
+export const getDiscussion = (state, id) =>
+  fromEntity.getDiscussion(state.entities, id, state);
+
+export const getIsDiscussionFetching = state =>
+  fromEntity.getIsDiscussionFetching(state.entities);
+
+export const getDiscussionError = state =>
+  fromEntity.getDiscussionError(state.entities);

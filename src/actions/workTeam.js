@@ -53,6 +53,12 @@ const workTeamsWithMembers = `query{
 const workTeamQuery = `query($id:ID!){
   workTeam(id:$id){
     ${workTeam}
+    discussions{
+      id
+      title
+      createdAt
+      numComments
+    }
   }
 }`;
 

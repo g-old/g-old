@@ -64,6 +64,15 @@ export const log = new schema.Entity('logs', {
   actor: user,
 });
 
+export const comment = new schema.Entity('comments', {
+  author: user,
+});
+
+export const discussion = new schema.Entity('discussions', {
+  author: user,
+  comments: [comment],
+});
+
 export const proposalList = [proposal];
 export const voteList = [vote];
 export const userList = [user];
@@ -73,3 +82,5 @@ export const tagArray = [tag];
 export const statementArray = [statement];
 export const workTeamList = [workTeam];
 export const logList = [log];
+export const discussionList = [discussion];
+export const commentList = [comment];

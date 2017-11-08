@@ -40,7 +40,7 @@ const DiscussionType = new ObjectType({
       type: new GraphQLList(CommentType),
       resolve: (data, args, { viewer, loaders }) =>
         knex('comments')
-          .where({ discussion_id: data.discussionId })
+          .where({ discussion_id: data.id })
           .where({ parent_id: null })
           .pluck('id')
           .then(ids => ids.map(id => Comment.gen(viewer, id, loaders))),

@@ -17,7 +17,7 @@ import {
   getCommentUpdates,
   getDiscussion,
   getIsDiscussionFetching,
-  getDiscussionErrorMessage,
+  getDiscussionError,
 } from "../../reducers";
 import FetchError from "../../components/FetchError";
 import CommentContainer from "../../components/CommentContainer";
@@ -225,7 +225,7 @@ DiscussionContainer.propTypes = {};
 const mapStateToProps = (state, { id }) => ({
   discussion: getDiscussion(state, id),
   isFetching: getIsDiscussionFetching(state, id),
-  errorMessage: getDiscussionErrorMessage(state, id),
+  errorMessage: getDiscussionError(state, id),
 });
 
 const mapDispatch = {

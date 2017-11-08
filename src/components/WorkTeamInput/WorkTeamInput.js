@@ -7,7 +7,11 @@ import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
 import Layer from '../Layer';
-import { nameValidation, selectValidation, createValidator } from '../../core/validation';
+import {
+  nameValidation,
+  selectValidation,
+  createValidator,
+} from '../../core/validation';
 
 const messages = defineMessages({
   empty: {
@@ -18,7 +22,8 @@ const messages = defineMessages({
   wrongSelect: {
     id: 'form.error-select',
     defaultMessage: 'You selection is not correct. Click on a suggestion',
-    description: 'Help for selection, when input does not match with a suggestion',
+    description:
+      'Help for selection, when input does not match with a suggestion',
   },
 });
 const formFields = ['teamName', 'coordinator'];
@@ -51,7 +56,10 @@ class WorkTeamInput extends React.Component {
     const testValues = {
       teamName: { fn: 'name' },
 
-      coordinator: { fn: 'coordinator', valuesResolver: obj => obj.state.coordinatorValue },
+      coordinator: {
+        fn: 'coordinator',
+        valuesResolver: obj => obj.state.coordinatorValue,
+      },
     };
     this.Validator = createValidator(
       testValues,
@@ -88,7 +96,9 @@ class WorkTeamInput extends React.Component {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
       if (this.state.errors[curr].touched) {
-        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+        acc[err] = (
+          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
+        );
       }
       return acc;
     }, {});
@@ -105,9 +115,7 @@ class WorkTeamInput extends React.Component {
       <Layer onClose={this.props.onClose}>
         <div style={{ height: '480px' }}>
           <Box pad column>
-            <h1>
-              {'Create Team'}
-            </h1>
+            <h1>{'Create Team'}</h1>
             <fieldset>
               <FormField label="Teamname" error={teamNameError}>
                 <input
@@ -126,8 +134,10 @@ class WorkTeamInput extends React.Component {
                     })}
                   data={this.props.users}
                   fetch={this.props.findUser}
-                  displaySelected={(data) => {
-                    this.handleValueChanges({ target: { name: 'coordinator', value: data } });
+                  displaySelected={data => {
+                    this.handleValueChanges({
+                      target: { name: 'coordinator', value: data },
+                    });
                   }}
                 />
               </FormField>

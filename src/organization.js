@@ -39,6 +39,7 @@ export const Permissions = {
   PUBLISH_SURVEYS: 8388608,
   CREATE_WORKTEAMS: 16777216,
   MANAGE_WORKTEAMS: 33554432,
+  PUBLISH_DISCUSSIONS: 67108864,
 };
 
 /* Add new groups here - DON'T FORGET TO UPDATE THE SCHEMA */
@@ -85,7 +86,8 @@ const relatorMask =
   Permissions.PUBLISH_PROPOSALS |
   Permissions.CLOSE_POLLS |
   Permissions.MODIFY_PROPOSALS |
-  Permissions.REVOKE_PROPOSALS;
+  Permissions.REVOKE_PROPOSALS |
+  Permissions.PUBLISH_DISCUSSIONS;
 
 /* District keepers */
 const districtKeeperMask =
@@ -225,6 +227,7 @@ const protectedViews = {
   AccountList: { type: 'permissions', name: 'LEVEL_1' },
   WorkteamList: { type: 'permissions', name: 'LEVEL_1' },
   Workteam: { type: 'permissions', name: 'LEVEL_1' },
+  WorkteamManager: { type: 'permissions', name: 'LEVEL_1' },
 };
 export const canAccess = (user, name) => {
   if (user) {

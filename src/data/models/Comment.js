@@ -9,8 +9,8 @@ class Comment {
     this.content = data.content;
     this.parentId = data.parent_id;
     this.numReplies = data.num_replies;
-    this.createdAt = data.createdAt;
-    this.updatedAt = data.updatedAt;
+    this.createdAt = data.createt_at;
+    this.updatedAt = data.updated_at;
   }
 
   static async gen(viewer, id, { comments }) {

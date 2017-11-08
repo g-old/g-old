@@ -1,4 +1,8 @@
-import { FormattedRelative } from 'react-intl';
+import {
+  FormattedRelative,
+  defineMessages,
+  FormattedMessage,
+} from 'react-intl';
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
@@ -6,12 +10,21 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './DiscussionPreview.css';
 // import history from '../../history';
 
+const messages = defineMessages({
+  numComments: {
+    id: 'numComments',
+    defaultMessage: '{cnt} comments',
+    description: 'Number of comments',
+  },
+});
+
 class DiscussionPreview extends React.Component {
   static propTypes = {
     discussion: PropTypes.shape({
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
       createdAt: PropTypes.string,
+      numComments: PropTypes.number.isRequired,
     }).isRequired,
     onClick: PropTypes.func.isRequired,
   };
@@ -47,6 +60,10 @@ class DiscussionPreview extends React.Component {
               >
                 {discussion.title}
               </div>
+              <FormattedMessage
+                {...messages.numComments}
+                values={{ cnt: discussion.numComments }}
+              />
             </div>
           </div>
         </div>

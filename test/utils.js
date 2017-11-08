@@ -138,10 +138,17 @@ export const createStatement = args => ({
   updated_at: args.updatedAt || null,
 });
 
-export const createWorkTeam = args => ({
+export const createWorkTeam = (args = {}) => ({
   ...(args.id && { id: args.id }),
-  coordinator_id: args.coordinatorId || 1,
+  ...(args.coordinatorId && { coordinator_id: args.coordinatorId }),
   name: args.name || getUnique.wt(),
   created_at: args.createdAt || new Date(),
   updated_at: args.updatedAt || null,
+});
+
+export const createDiscussion = args => ({
+  ...(args.id && { id: args.id }),
+  title: args.title || 'Title',
+  content: args.content || 'Content of a discussion',
+  work_team_id: args.workTeamId,
 });
