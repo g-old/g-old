@@ -20,7 +20,8 @@ exports.up = function(knex, Promise) {
           table
             .integer('num_replies')
             .unsigned()
-            .notNullable();
+            .notNullable()
+            .defaultsTo(0);
           table.timestamps();
         });
       }

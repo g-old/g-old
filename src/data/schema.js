@@ -59,6 +59,8 @@ import statistics from './queries/statistics';
 import userConnection from './queries/userConnection';
 import createComment from './mutations/createComment';
 import createDiscussion from './mutations/createDiscussion';
+import discussion from './queries/discussion';
+import comments from './queries/comments';
 
 const schema = new Schema({
   query: new ObjectType({
@@ -84,6 +86,8 @@ const schema = new Schema({
       workTeam,
       logs,
       statistics,
+      discussion,
+      comments,
     },
   }),
   mutation: new ObjectType({

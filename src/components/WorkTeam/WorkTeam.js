@@ -6,9 +6,11 @@ import Label from '../Label';
 import Value from '../Value';
 import Box from '../Box';
 import DiscussionPreview from '../DiscussionPreview';
+import history from '../../history';
 
 class WorkTeam extends React.Component {
   static propTypes = {
+    id: PropTypes.string.isRequired,
     logo: PropTypes.string,
     name: PropTypes.string.isRequired,
     numMembers: PropTypes.number.isRequired,
@@ -18,6 +20,15 @@ class WorkTeam extends React.Component {
   static defaultProps = {
     logo: null,
   };
+  constructor(props) {
+    super(props);
+    this.handleDiscussionClick = this.handleDiscussionClick.bind(this);
+  }
+  // eslint-disable-next-line class-methods-use-this
+  handleDiscussionClick({ discussionId }) {
+    history.push(`${this.props.id}/discussions/${discussionId}`);
+  }
+
   render() {
     const { logo, name, numMembers, numDiscussions, discussions } = this.props;
     let picture;
@@ -78,7 +89,12 @@ class WorkTeam extends React.Component {
           />
         </Box>
         {discussions &&
-          discussions.map(d => <DiscussionPreview discussion={d} />)}
+          discussions.map(d => (
+            <DiscussionPreview
+              discussion={d}
+              onClick={this.handleDiscussionClick}
+            />
+          ))}
       </div>
     );
   }

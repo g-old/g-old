@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from '../../components/Layout';
-import { loadWorkTeam } from '../../actions/workTeam';
+import { loadDiscussion } from '../../actions/discussion';
 import DiscussionContainer from './DiscussionContainer';
 import { getSessionUser } from '../../reducers';
 import { canAccess } from '../../organization';
@@ -15,9 +15,9 @@ async function action({ store, path }, { id }) {
     return { redirect: '/' };
   }
   if (!process.env.BROWSER) {
-    await store.dispatch(loadWorkTeam({ id }));
+    await store.dispatch(loadDiscussion({ id }));
   } else {
-    store.dispatch(loadWorkTeam({ id }));
+    store.dispatch(loadDiscussion({ id }));
   }
   return {
     chunks: ['workteam'],

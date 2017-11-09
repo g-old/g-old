@@ -39,7 +39,9 @@ const CommentType = new ObjectType({
               .then(ids => ids.map(id => Comment.gen(viewer, id, loaders)))
           : 0,
     },
-
+    parentId: {
+      type: ID,
+    },
     numReplies: {
       type: GraphQLInt,
     },

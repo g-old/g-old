@@ -15,6 +15,7 @@ import followees, * as fromFollowees from './followees';
 import workTeams, * as fromWorkTeams from './workTeams';
 import logs, * as fromLogs from './logs';
 import discussions, * as fromDiscussions from './discussions';
+import comments from './comments';
 
 export default combineReducers({
   users,
@@ -33,6 +34,7 @@ export default combineReducers({
   notifications,
   logs,
   discussions,
+  comments,
 });
 
 export const getVisibleProposals = (state, filter) =>

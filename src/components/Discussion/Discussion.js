@@ -8,7 +8,7 @@ class Discussion extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
     state: PropTypes.string.isRequired,
-    body: PropTypes.string.isRequired,
+    content: PropTypes.string.isRequired,
     publishedAt: PropTypes.string.isRequired,
     spokesman: PropTypes.shape({
       thumbnail: PropTypes.string,
@@ -30,7 +30,7 @@ class Discussion extends React.Component {
           </div>
           <div
             className={s.body}
-            dangerouslySetInnerHTML={{ __html: this.props.body }}
+            dangerouslySetInnerHTML={{ __html: this.props.content }}
           />
           {this.props.spokesman && (
             <span>

@@ -63,9 +63,10 @@ export const activity = new schema.Entity('activities', {
 export const log = new schema.Entity('logs', {
   actor: user,
 });
-
-export const comment = new schema.Entity('comments', {
+export const comment = new schema.Entity('comments');
+comment.define({
   author: user,
+  replies: [comment],
 });
 
 export const discussion = new schema.Entity('discussions', {

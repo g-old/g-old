@@ -16,6 +16,7 @@ const hydrateDiscussions = (state, data, entities) =>
     ...entities,
     discussions: state.byId,
     users: entities.users.byId,
+    comments: entities.comments.byId,
   });
 
 export const getIsFetching = state => fromList.getIsFetching(state.all);

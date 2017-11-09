@@ -18,9 +18,9 @@ const byWorkTeam = (state = {}, action) => {
   switch (action.type) {
     case LOAD_DISCUSSION_SUCCESS:
     case LOAD_DISCUSSIONS_SUCCESS: {
-      const proposals = action.payload.entities.proposals;
-      if (!proposals) return state;
-      const sorted = sort(state, proposals);
+      const discussions = action.payload.entities.discussions;
+      if (!discussions) return state;
+      const sorted = sort(state, discussions);
       return {
         ...sorted,
       };

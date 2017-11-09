@@ -38,7 +38,7 @@ const errorMessage = (state = null, action) => {
   switch (action.type) {
     case LOAD_DISCUSSION_ERROR:
     case LOAD_DISCUSSIONS_ERROR:
-      return action.message;
+      return action.message || null;
     case LOAD_DISCUSSION_START:
     case LOAD_DISCUSSIONS_START:
     case LOAD_DISCUSSIONS_SUCCESS:

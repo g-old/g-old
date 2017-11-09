@@ -30,6 +30,18 @@ const onVisitAccounts = e => {
   history.push(`/accounts`);
 };
 
+const onVisitWorkTeams = e => {
+  if (e.button !== 0) {
+    // leftclick
+    return;
+  }
+  if (e.defaultPrevented === true) {
+    return;
+  }
+  e.preventDefault();
+  history.push(`/workteams`);
+};
+
 const goHome = e => {
   if (e.button !== 0) {
     // leftclick
@@ -111,6 +123,7 @@ class UserStatus extends React.Component {
             <Button plain onClick={onVisitProfile} label="Profile" />
             <Button plain onClick={this.onLogout} label="Logout" />
             <Button plain onClick={onVisitAccounts} label="Users" />
+            <Button plain onClick={onVisitWorkTeams} label="Workteams" />
           </Menu>
         </div>
       );

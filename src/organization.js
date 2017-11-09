@@ -228,6 +228,7 @@ const protectedViews = {
   WorkteamList: { type: 'permissions', name: 'LEVEL_1' },
   Workteam: { type: 'permissions', name: 'LEVEL_1' },
   WorkteamManager: { type: 'permissions', name: 'LEVEL_1' },
+  Discussion: { type: 'permissions', name: 'LEVEL_1' },
 };
 export const canAccess = (user, name) => {
   if (user) {

@@ -1,0 +1,128 @@
+@import "../../components/variables.css";
+
+/*
+.root {
+  display: flex;
+  border: solid 1px gray;
+  padding: 0.4em;
+  margin: 0.1em 0.1em 0.4em;
+  font-size: 0.9em;
+  transition: margin 0.5s;
+}
+*/
+.rootAlt {
+  display: flex;
+  border-left: solid 4px gray;
+  border-right: solid 4px gray;
+  padding: 0.4em;
+  margin: 0.1em 0.1em 2em;
+  font-size: 0.9em;
+  transition: margin 0.5s;
+  color: #000;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.author {
+  font-weight: bold;
+}
+
+/*
+.menu {
+  font-style: italic;
+  font-size: 0.9em;
+} */
+
+/*
+.like {
+  border: none;
+  background: none;
+  outline: none;
+}
+*/
+.avatar {
+  margin-right: 0.4em;
+  width: 2.2em;
+  height: 2.2em;
+}
+
+.pro {
+  margin-right: 10%;
+  background-color: #fafffa;
+  border-right: 0;
+  border-color: var(--color-green);
+}
+
+.contra {
+  margin-left: 10%;
+  background-color: #fffafa;
+  border-left: 0;
+  border-color: var(--color-red);
+}
+
+.text {
+  -ms-word-break: break-all;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-line;
+  line-height: 1.3em;
+  width: 100%;
+  display: inline-block;
+}
+
+.collapsed {
+  max-height: 3.9em;
+  overflow: hidden;
+}
+
+.expanded {
+  max-height: none;
+}
+
+.contentToggle {
+  margin: -8px 0 10px;
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  height: auto;
+  background: transparent;
+  color: #167ac6;
+  font-weight: normal;
+  font-size: inherit;
+  text-decoration: none;
+  box-shadow: none;
+  outline: 0;
+  display: inline-block;
+}
+
+.contentToggle:hover {
+  text-decoration: underline;
+}
+
+.textEdit {
+  font-family: var(--font-family-base);
+  width: 99%;
+  line-height: 1.3em;
+  box-sizing: border-box;
+}
+
+.inactive {
+  .avatar {
+    opacity: 0.5;
+  }
+
+  .textEdit {
+    height: 1.2em;
+  }
+}
+
+.pro.inactive {
+  margin-right: 50%;
+}
+
+.contra.inactive {
+  margin-left: 50%;
+}

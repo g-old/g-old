@@ -50,12 +50,14 @@ ${discussionFields}
   comments{
     id
     content
+    numReplies
+    parentId
     author{
       ${authorFields}
     }
   }`;
-const discussionQuery = `query($workTeamId:ID){
-  discussion(workTeamId:$workTeamId){
+const discussionQuery = `query($id:ID){
+  discussion(id:$id){
   ${discussionFragment}
   }
 }`;

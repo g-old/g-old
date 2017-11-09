@@ -21,6 +21,6 @@ export const getCommentsByDiscussion = (state, wTDiscId, entities) =>
     state,
     fromByDiscussion
       .getIds(state.byDiscussion, wTDiscId)
-      .map(id => fromById.getDiscussion(state.byId, id)),
+      .map(id => fromById.getComment(state.byId, id)),
     entities,
   );
