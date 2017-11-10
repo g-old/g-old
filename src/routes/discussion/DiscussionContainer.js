@@ -78,7 +78,7 @@ class DiscussionContainer extends React.Component {
   }
 
   render() {
-    const { discussion, isFetching, errorMessage } = this.props;
+    const { discussion, isFetching, errorMessage, user } = this.props;
     if (isFetching && !discussion) {
       return <p>{'Loading...'} </p>;
     }
@@ -112,6 +112,9 @@ class DiscussionContainer extends React.Component {
                   loadReplies={this.handleCommentFetching}
                   onCreate={this.handleCommentCreation}
                   openInput={c.id === this.state.replying}
+                  // eslint-disable-next-line eqeqeq
+                  own={c.author.id == user.id}
+                  user={user}
                 >
                   {c.replies &&
                     c.replies.map(r => (
@@ -121,6 +124,9 @@ class DiscussionContainer extends React.Component {
                         reply
                         onCreate={this.handleCommentCreation}
                         openInput={r.id === this.state.replying}
+                        // eslint-disable-next-line eqeqeq
+                        own={r.author.id == user.id}
+                        user={user}
                       />
                     ))}
                 </Comment>

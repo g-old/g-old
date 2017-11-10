@@ -1,66 +1,53 @@
 @import "../../components/variables.css";
 
-/*
-.root {
-  display: flex;
-  border: solid 1px gray;
-  padding: 0.4em;
-  margin: 0.1em 0.1em 0.4em;
-  font-size: 0.9em;
-  transition: margin 0.5s;
-}
-*/
 .rootAlt {
-  display: flex;
-  border-left: solid 4px gray;
-  border-right: solid 4px gray;
-  padding: 0.4em;
-  margin: 0.1em 0.1em 2em;
-  font-size: 0.9em;
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
   transition: margin 0.5s;
   color: #000;
 }
 
+.details {
+  display: inline-block;
+}
+
 .header {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
 }
 
 .author {
-  font-weight: bold;
+  font-weight: 600;
 }
 
-/*
-.menu {
-  font-style: italic;
-  font-size: 0.9em;
-} */
-
-/*
-.like {
-  border: none;
-  background: none;
-  outline: none;
-}
-*/
 .avatar {
-  margin-right: 0.4em;
-  width: 2.2em;
-  height: 2.2em;
+  display: inline-block;
+  cursor: pointer;
 }
 
-.pro {
-  margin-right: 10%;
-  background-color: #fafffa;
-  border-right: 0;
-  border-color: var(--color-green);
+.replies {
+  margin-left: 3rem;
 }
 
-.contra {
-  margin-left: 10%;
-  background-color: #fffafa;
-  border-left: 0;
-  border-color: var(--color-red);
+.replies > div {
+  margin-top: 1rem;
+}
+
+.date {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.bar {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.avatar {
+  margin-right: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
 .text {
@@ -68,13 +55,13 @@
   overflow-wrap: break-word;
   word-break: break-word;
   white-space: pre-line;
-  line-height: 1.3em;
+  line-height: 1.3rem;
   width: 100%;
   display: inline-block;
 }
 
 .collapsed {
-  max-height: 3.9em;
+  max-height: 3.9rem;
   overflow: hidden;
 }
 
@@ -98,6 +85,21 @@
   display: inline-block;
 }
 
+.command {
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  height: auto;
+  background: transparent;
+  color: #167ac6;
+  font-weight: normal;
+  font-size: inherit;
+  text-decoration: none;
+  box-shadow: none;
+  outline: 0;
+  display: block;
+}
+
 .contentToggle:hover {
   text-decoration: underline;
 }
@@ -105,24 +107,16 @@
 .textEdit {
   font-family: var(--font-family-base);
   width: 99%;
-  line-height: 1.3em;
+  line-height: 1.3rem;
   box-sizing: border-box;
 }
 
-.inactive {
+/* .inactive {
   .avatar {
     opacity: 0.5;
   }
 
   .textEdit {
-    height: 1.2em;
+    height: 1.2rem;
   }
-}
-
-.pro.inactive {
-  margin-right: 50%;
-}
-
-.contra.inactive {
-  margin-left: 50%;
-}
+} */

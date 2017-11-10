@@ -3,7 +3,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import {
+  defineMessages,
+  FormattedMessage,
+  FormattedRelative,
+} from 'react-intl';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import cn from 'classnames';
 import s from './Comment.css';
@@ -50,6 +54,16 @@ const messages = defineMessages({
     defaultMessage: 'View all {cnt} replies',
     description: 'Show replies',
   },
+  collapseReplies: {
+    id: 'commands.collapseReplies',
+    defaultMessage: 'Hide replies',
+    description: 'Hide replies',
+  },
+  edit: {
+    id: 'commands.edit',
+    defaultMessage: 'Edit',
+    description: 'Edit',
+  },
 });
 const EditMenu = props => <div>{props.children}</div>;
 EditMenu.propTypes = {
@@ -62,10 +76,6 @@ EditMenu.defaultProps = {
 class Comment extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
-    vote: PropTypes.shape({
-      position: PropTypes.string.isRequired,
-      id: PropTypes.string.isRequired,
-    }).isRequired,
     content: PropTypes.string.isRequired,
     likes: PropTypes.number.isRequired,
     author: PropTypes.shape({
@@ -75,7 +85,8 @@ class Comment extends React.Component {
       id: PropTypes.string,
     }).isRequired,
     deletedAt: PropTypes.string,
-
+    createdAt: PropTypes.string,
+    parentId: PropTypes.string,
     followees: PropTypes.arrayOf(PropTypes.shape({})),
     ownLike: PropTypes.shape({ id: PropTypes.string }),
     ownStatement: PropTypes.bool,
@@ -105,6 +116,7 @@ class Comment extends React.Component {
     numReplies: PropTypes.number.isRequired,
     openInput: PropTypes.bool,
     children: PropTypes.arrayOf(PropTypes.element),
+    own: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -130,6 +142,9 @@ class Comment extends React.Component {
     onReply: null,
     openInput: null,
     children: null,
+    parentId: null,
+    createdAt: null,
+    own: null,
   };
 
   constructor(props) {
@@ -141,7 +156,7 @@ class Comment extends React.Component {
       collapsed: false,
     };
     this.onDeleteStatement = this.onDeleteStatement.bind(this);
-    this.onEditStatement = this.onEditStatement.bind(this);
+    this.handleEditing = this.handleEditing.bind(this);
     this.onTextChange = this.onTextChange.bind(this);
     this.onTextSubmit = this.onTextSubmit.bind(this);
     this.onEndEditing = this.onEndEditing.bind(this);
@@ -149,9 +164,10 @@ class Comment extends React.Component {
     this.handleFollowing = this.handleFollowing.bind(this);
     this.handleLiking = this.handleLiking.bind(this);
     this.handleProfileClick = this.handleProfileClick.bind(this);
-    this.handleReplies = this.handleReplies.bind(this);
     this.openTextInput = this.openTextInput.bind(this);
     this.handleReply = this.handleReply.bind(this);
+    this.toggleContent = this.toggleContent.bind(this);
+    this.toggleReplies = this.toggleReplies.bind(this);
   }
 
   componentDidMount() {
@@ -195,10 +211,6 @@ class Comment extends React.Component {
     }
   }
 
-  onEditStatement() {
-    this.setState({ textArea: { val: this.props.content }, edit: true });
-  }
-
   onTextChange(e) {
     this.setState({ ...this.state, textArea: { val: e.target.value } });
   }
@@ -213,7 +225,9 @@ class Comment extends React.Component {
       } else { */
       this.props.onCreate({
         content,
-        ...(this.state.reply && { parentId: this.props.id }),
+        ...(!this.props.asInput && {
+          parentId: this.props.parentId || this.props.id,
+        }),
       });
       //  }
     }
@@ -231,6 +245,24 @@ class Comment extends React.Component {
       edit: this.props.asInput === true,
     });
   }
+  handleEditing() {
+    this.handleReply();
+    this.setState({ textArea: { val: this.props.content }, edit: true });
+  }
+  toggleContent(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return this.setState({ collapsed: !this.state.collapsed });
+  }
+  toggleReplies(e) {
+    const { showReplies } = this.state;
+    e.preventDefault();
+    e.stopPropagation();
+    if (!showReplies) {
+      this.props.loadReplies({ parentId: this.props.id });
+    }
+    return this.setState({ showReplies: !showReplies });
+  }
   handleFlag() {
     const { id, content, onFlagging } = this.props;
     onFlagging({
@@ -240,13 +272,10 @@ class Comment extends React.Component {
   }
 
   handleFollowing() {
-    const { user, author, vote, onFollow } = this.props;
+    const { user, author, onFollow } = this.props;
     onFollow({
       id: user.id,
       followee: author.id,
-      info: {
-        voteId: vote.id,
-      },
     });
   }
 
@@ -272,26 +301,22 @@ class Comment extends React.Component {
     }
   }
 
-  handleReplies() {
-    this.props.loadReplies({ parentId: this.props.id });
-  }
-
   openTextInput() {
     this.setState({ reply: true });
   }
 
   handleReply() {
     this.props.onReply({ id: this.props.id });
+    this.setState({ edit: false });
   }
 
   render() {
     //  const { mutationIsPending, mutationSuccess, mutationError } = this.props;
     // TODO create authorization decorator
     const {
-      ownStatement,
-      vote,
+      own,
       content,
-      likes,
+      //      likes,
       author,
       asInput,
       user,
@@ -299,21 +324,22 @@ class Comment extends React.Component {
       isFollowee,
       deletedAt,
       updates,
-      onProfileClick,
     } = this.props;
-    let canLike;
+    //  let canLike;
     let canDelete;
     let canFollow;
     let canFlag;
+    let canEdit;
 
     /* eslint-disable no-bitwise */
     if (user) {
-      canLike =
-        !asInput && !ownStatement && (user.permissions & Permissions.LIKE) > 0;
+      // canLike = !asInput && !own && (user.permissions & Permissions.LIKE) > 0;
       canDelete =
-        !deletedAt && (user.permissions & Permissions.DELETE_STATEMENTS) > 0;
+        own ||
+        (!deletedAt && (user.permissions & Permissions.DELETE_STATEMENTS) > 0);
+      canEdit = own;
       canFlag =
-        !ownStatement &&
+        !own &&
         !deletedAt &&
         (user.permissions & Permissions.FLAG_STATEMENTS) > 0;
       if (followees) {
@@ -327,7 +353,8 @@ class Comment extends React.Component {
     const inactive = asInput && isEmpty;
 
     let menu = null;
-    if (ownStatement || asInput) {
+
+    /* if (asInput) {
       menu = (
         <EditMenu>
           {!deletedAt && (
@@ -379,7 +406,7 @@ class Comment extends React.Component {
               ) : (
                 <Button
                   plain
-                  onClick={this.onEditStatement}
+                  onClick={this.handleEditing}
                   icon={
                     <svg
                       version="1.1"
@@ -423,7 +450,9 @@ class Comment extends React.Component {
           )}
         </EditMenu>
       );
-    } else if (canFlag || canFollow || canDelete) {
+    */
+
+    if (!this.state.edit && (canFlag || canFollow || own)) {
       menu = (
         <Menu
           dropAlign={{ top: 'top', right: 'right' }}
@@ -459,7 +488,50 @@ class Comment extends React.Component {
               label={<FormattedMessage {...messages.delete} />}
             />
           )}
+          {canEdit && (
+            <Button
+              onClick={this.handleEditing}
+              plain
+              label={<FormattedMessage {...messages.edit} />}
+            />
+          )}
         </Menu>
+      );
+    } else if (this.state.edit) {
+      menu = (
+        <span>
+          <Button
+            plain
+            onClick={this.onTextSubmit}
+            disabled={!hasMinimumInput}
+            icon={
+              <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                <polyline
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth="2"
+                  points={ICONS.check}
+                />
+              </svg>
+            }
+          />
+
+          <Button
+            plain
+            onClick={this.onEndEditing}
+            disabled={this.props.asInput && !hasMinimumInput}
+            icon={
+              <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                <path
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth="2"
+                  d={ICONS.delete}
+                />
+              </svg>
+            }
+          />
+        </span>
       );
     }
 
@@ -484,7 +556,7 @@ class Comment extends React.Component {
     }
 
     const textBox = [];
-    if (this.state.edit) {
+    if (this.props.openInput && this.state.edit) {
       textBox.push(
         <Textarea
           useCacheForDOMMeasurements
@@ -505,14 +577,7 @@ class Comment extends React.Component {
 
       if (this.state.contentOverflows) {
         textBox.push(
-          <button
-            onClick={e => {
-              e.preventDefault();
-              e.stopPropagation();
-              return this.setState({ collapsed: !this.state.collapsed });
-            }}
-            className={s.contentToggle}
-          >
+          <button onClick={this.toggleContent} className={s.contentToggle}>
             <FormattedMessage
               {...messages[this.state.collapsed ? 'expand' : 'collapse']}
             />
@@ -522,76 +587,56 @@ class Comment extends React.Component {
     }
 
     return (
-      <div
-        className={cn(
-          s.rootAlt,
-          vote && vote.position === 'pro' ? s.pro : s.contra,
-          inactive && s.inactive,
-        )}
-      >
-        {/* eslint-disable jsx-a11y/interactive-supports-focus */}
-        {!inactive && (
-          <div
-            role="button"
-            style={{ cursor: onProfileClick ? 'pointer' : 'auto' }}
-            onClick={this.handleProfileClick}
-          >
-            <img
-              className={cn(s.avatar)}
-              src={author && author.thumbnail}
-              alt="IMG"
-            />
-          </div>
-        )}
-        {/* eslint-enable jsx-a11y/interactive-supports-focus */}
-        <div style={{ width: '100%' }}>
+      <div className={s.rootAlt}>
+        <div className={s.header}>
+          {/* eslint-disable jsx-a11y/interactive-supports-focus */}
           {!inactive && (
-            <div className={s.header}>
-              <div>
-                <span className={s.author}>
-                  {author && author.name} {author && author.surname}
-                </span>
-                <span>
-                  {likes ? ` (+${likes})` : ''}
-
-                  {canLike && (
-                    <Button
-                      onClick={this.handleLiking}
-                      plain
-                      icon={
-                        <svg viewBox="0 0 24 24" width="16px" height="16px">
-                          <path
-                            fill="none"
-                            stroke={this.props.ownLike ? '#8cc800' : '#666'}
-                            strokeWidth="1"
-                            d={ICONS.thumbUpAlt}
-                          />
-                        </svg>
-                      }
-                    />
-                  )}
-                </span>
-              </div>
-              {menu}
+            <div
+              role="button"
+              className={s.avatar}
+              onClick={this.handleProfileClick}
+            >
+              <img
+                className={cn(s.avatar)}
+                src={author && author.thumbnail}
+                alt="IMG"
+              />
             </div>
           )}
-          {/* eslint-disable no-return-assign */}
-          <div className={s.text} ref={ref => (this.textBox = ref)}>
+
+          {/* eslint-enable jsx-a11y/interactive-supports-focus */}
+          <div className={s.details}>
+            <div className={s.bar}>
+              {!inactive && (
+                <span className={s.author}>
+                  {`${author.name} ${author.surname}`}{' '}
+                </span>
+              )}
+              {menu}
+            </div>
+            <div className={s.date}>
+              <FormattedRelative value={this.props.createdAt} />
+            </div>
+          </div>
+        </div>
+        {/* eslint-disable no-return-assign */}
+
+        <div className={s.text} ref={ref => (this.textBox = ref)}>
+          {textBox}
+        </div>
+        <button onClick={this.handleReply} className={s.command}>
+          <FormattedMessage {...messages.reply} />
+        </button>
+        {/*  <div className={s.text} ref={ref => (this.textBox = ref)}>
             {textBox}
           </div>
-          <button onClick={this.handleReply}>
+          <button onClick={this.handleReply} className={s.command}>
             <FormattedMessage {...messages.reply} />
-          </button>
-          {this.props.numReplies !== 0 && (
-            <button onClick={this.handleReplies}>
-              <FormattedMessage
-                {...messages.expandReplies}
-                values={{ cnt: this.props.numReplies }}
-              />
-            </button>
-          )}
-          {/* eslint-enable no-return-assign */}
-          {this.props.openInput && (
+          </button> */}
+
+        {/* eslint-enable no-return-assign */}
+        {this.props.openInput &&
+          !this.state.edit && (
             <div>
               <span style={{ marginRight: '0.5em' }}>
                 <span>
@@ -649,8 +694,20 @@ class Comment extends React.Component {
               />
             </div>
           )}
-          {this.props.children}
-          {/* {' '}
+        {this.state.showReplies && (
+          <div className={s.replies}>{this.props.children} </div>
+        )}
+        {this.props.numReplies !== 0 && (
+          <button onClick={this.toggleReplies} className={s.command}>
+            <FormattedMessage
+              {...messages[
+                this.state.showReplies ? 'collapseReplies' : 'expandReplies'
+              ]}
+              values={{ cnt: this.props.numReplies }}
+            />
+          </button>
+        )}
+        {/* {' '}
           {this.props.replies &&
             this.props.replies.map(r => (
               <Comment
@@ -660,7 +717,6 @@ class Comment extends React.Component {
                 onCreate={this.props.onCreate}
               />
             ))} */}
-        </div>
       </div>
     );
   }

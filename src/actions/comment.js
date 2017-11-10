@@ -20,6 +20,8 @@ id
 parentId
 content
 numReplies
+discussionId
+createdAt
 author{
   id
   name

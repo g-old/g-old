@@ -24,7 +24,7 @@ async function action({ store, path }, { id }) {
     title,
     component: (
       <Layout>
-        <DiscussionContainer id={id} />
+        <DiscussionContainer id={id} user={user} />
       </Layout>
     ),
   };

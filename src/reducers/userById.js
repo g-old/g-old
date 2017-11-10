@@ -18,6 +18,9 @@ import {
   LOAD_WORKTEAMS_SUCCESS,
   JOIN_WORKTEAM_SUCCESS,
   LEAVE_WORKTEAM_SUCCESS,
+  LOAD_DISCUSSIONS_SUCCESS,
+  LOAD_DISCUSSION_SUCCESS,
+  LOAD_REPLIES_SUCCESS,
 } from '../constants';
 
 const handleUsers = (state, action) => {
@@ -47,6 +50,9 @@ export default function byId(state = {}, action) {
     case RESET_PASSWORD_SUCCESS:
     case FIND_USER_SUCCESS:
     case LOAD_FLAGGEDSTMTS_SUCCESS:
+    case LOAD_DISCUSSIONS_SUCCESS:
+    case LOAD_DISCUSSION_SUCCESS:
+    case LOAD_REPLIES_SUCCESS:
     case SESSION_LOGIN_SUCCESS: {
       return merge({}, state, action.payload.entities.users);
     }

@@ -52,6 +52,7 @@ ${discussionFields}
     content
     numReplies
     parentId
+    createdAt
     author{
       ${authorFields}
     }

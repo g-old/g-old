@@ -9,7 +9,7 @@ class Comment {
     this.content = data.content;
     this.parentId = data.parent_id;
     this.numReplies = data.num_replies;
-    this.createdAt = data.createt_at;
+    this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
   }
 
@@ -36,6 +36,7 @@ class Comment {
           content: data.content.trim(),
           discussion_id: data.discussionId,
           parent_id: data.parentId,
+          created_at: new Date(),
         })
         .returning('*');
 

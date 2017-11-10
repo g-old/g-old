@@ -3,25 +3,33 @@ import {
   LOAD_REPLIES_SUCCESS,
   LOAD_DISCUSSION_SUCCESS,
   LOAD_DISCUSSIONS_SUCCESS,
+  CREATE_COMMENT_SUCCESS,
 } from '../constants';
 
 const addToParents = (state, action) => {
-  if (action.payload.result.length) {
-    // ! Assumes only replies are loaded, and every reply is loaded!
-    const parentId =
-      action.payload.entities.comments[
-        Object.keys(action.payload.entities.comments)[0]
-      ].parentId;
+  // ! Assumes only replies are loaded, and every reply is loaded!
+  const cIds = Object.keys(action.payload.entities.comments);
+  const parentId = action.payload.entities.comments[cIds[0]].parentId;
+  if (parentId) {
+    const replies = state[parentId].replies || [];
+
     return {
       ...state,
       ...action.payload.entities.comments,
-      [parentId]: { ...state[parentId], replies: action.payload.result },
+      [parentId]: {
+        ...state[parentId],
+        ...(action.type === CREATE_COMMENT_SUCCESS && {
+          numReplies: state[parentId].numReplies + 1,
+        }),
+        replies: [...new Set([...replies, ...cIds])],
+      },
     };
   }
-  return state;
+  return { ...state, ...action.payload.entities.comments };
 };
 export default function byId(state = {}, action) {
   switch (action.type) {
+    case CREATE_COMMENT_SUCCESS:
     case LOAD_REPLIES_SUCCESS: {
       return addToParents(state, action);
     }
