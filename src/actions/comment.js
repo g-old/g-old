@@ -8,6 +8,12 @@ import {
   CREATE_COMMENT_START,
   CREATE_COMMENT_SUCCESS,
   CREATE_COMMENT_ERROR,
+  UPDATE_COMMENT_START,
+  UPDATE_COMMENT_SUCCESS,
+  UPDATE_COMMENT_ERROR,
+  DELETE_COMMENT_START,
+  DELETE_COMMENT_SUCCESS,
+  DELETE_COMMENT_ERROR,
 } from '../constants';
 import {
   comment as commentSchema,
@@ -22,6 +28,7 @@ content
 numReplies
 discussionId
 createdAt
+editedAt
 author{
   id
   name
@@ -33,6 +40,22 @@ author{
 const createCommentMutation = `
   mutation ($content:String $discussionId:ID $parentId:ID) {
     createComment (comment:{ content:$content discussionId:$discussionId parentId:$parentId}){
+      ${commentFields}
+    }
+  }
+`;
+
+const updateCommentMutation = `
+  mutation ($content:String $id:ID) {
+    updateComment (comment:{ content:$content id:$id}){
+      ${commentFields}
+    }
+  }
+`;
+
+const deleteCommentMutation = `
+  mutation ($id:ID) {
+    deleteComment (comment:{ id:$id}){
       ${commentFields}
     }
   }
@@ -74,6 +97,75 @@ export function createComment(comment) {
         id: virtualId,
         comment,
         properties,
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function updateComment(comment) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    const properties = genStatusIndicators(['updateCom']);
+    dispatch({
+      type: UPDATE_COMMENT_START,
+      id: comment.id,
+      properties,
+    });
+    try {
+      const { data } = await graphqlRequest(updateCommentMutation, comment);
+      const normalizedData = normalize(data.updateComment, commentSchema);
+      dispatch({
+        type: UPDATE_COMMENT_SUCCESS,
+        payload: normalizedData,
+        properties,
+        id: comment.id,
+      });
+    } catch (error) {
+      dispatch({
+        type: UPDATE_COMMENT_ERROR,
+        payload: {
+          error,
+        },
+        properties,
+        message: error.message || 'Something went wrong',
+        id: comment.id,
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function deleteComment(comment) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    const properties = genStatusIndicators(['deleteCom']);
+    dispatch({
+      type: DELETE_COMMENT_START,
+      id: comment.id,
+      properties,
+    });
+    try {
+      const { data } = await graphqlRequest(deleteCommentMutation, comment);
+      const normalizedData = normalize(data.deleteStatement, commentSchema);
+      dispatch({
+        type: DELETE_COMMENT_SUCCESS,
+        payload: normalizedData,
+        properties,
+        id: comment.id,
+      });
+    } catch (error) {
+      dispatch({
+        type: DELETE_COMMENT_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
+        id: comment.id,
+        properties,
+        comment: { delete: true },
       });
       return false;
     }

@@ -12,7 +12,7 @@ import Textarea from 'react-textarea-autosize'; // TODO replace with contentedit
 import cn from 'classnames';
 import s from './Comment.css';
 import { ICONS } from '../../constants';
-import Notification from '../Notification';
+// import Notification from '../Notification';
 import { Permissions } from '../../organization';
 
 import Menu from '../Menu';
@@ -89,7 +89,6 @@ class Comment extends React.Component {
     parentId: PropTypes.string,
     followees: PropTypes.arrayOf(PropTypes.shape({})),
     ownLike: PropTypes.shape({ id: PropTypes.string }),
-    ownStatement: PropTypes.bool,
     user: PropTypes.shape({
       id: PropTypes.string,
 
@@ -168,6 +167,7 @@ class Comment extends React.Component {
     this.handleReply = this.handleReply.bind(this);
     this.toggleContent = this.toggleContent.bind(this);
     this.toggleReplies = this.toggleReplies.bind(this);
+    this.renderHeader = this.renderHeader.bind(this);
   }
 
   componentDidMount() {
@@ -219,17 +219,17 @@ class Comment extends React.Component {
     const content = this.state.textArea.val.trim();
     if (content && content !== this.props.content) {
       // TODO validation
-      /*  if (this.props.content) {
+      if (!this.state.replying && this.props.content) {
         // update;
         this.props.onUpdate({ id: this.props.id, content });
-      } else { */
-      this.props.onCreate({
-        content,
-        ...(!this.props.asInput && {
-          parentId: this.props.parentId || this.props.id,
-        }),
-      });
-      //  }
+      } else {
+        this.props.onCreate({
+          content,
+          ...(this.props.id && {
+            parentId: this.props.parentId || this.props.id,
+          }),
+        });
+      }
     }
     // nothing changed
     this.onEndEditing();
@@ -310,194 +310,11 @@ class Comment extends React.Component {
     this.setState({ edit: false });
   }
 
-  render() {
-    //  const { mutationIsPending, mutationSuccess, mutationError } = this.props;
-    // TODO create authorization decorator
-    const {
-      own,
-      content,
-      //      likes,
-      author,
-      asInput,
-      user,
-      followees,
-      isFollowee,
-      deletedAt,
-      updates,
-    } = this.props;
-    //  let canLike;
-    let canDelete;
-    let canFollow;
-    let canFlag;
-    let canEdit;
-
-    /* eslint-disable no-bitwise */
-    if (user) {
-      // canLike = !asInput && !own && (user.permissions & Permissions.LIKE) > 0;
-      canDelete =
-        own ||
-        (!deletedAt && (user.permissions & Permissions.DELETE_STATEMENTS) > 0);
-      canEdit = own;
-      canFlag =
-        !own &&
-        !deletedAt &&
-        (user.permissions & Permissions.FLAG_STATEMENTS) > 0;
-      if (followees) {
-        canFollow = !isFollowee && followees.length < 5;
-      }
-    }
-    /* eslint-enable no-bitwise */
-
-    const isEmpty = this.state.textArea.val.length === 0;
+  renderHeader(actor, asInput) {
     const hasMinimumInput = this.state.textArea.val.length >= 5;
-    const inactive = asInput && isEmpty;
 
-    let menu = null;
-
-    /* if (asInput) {
-      menu = (
-        <EditMenu>
-          {!deletedAt && (
-            <span style={{ marginRight: '0.5em' }}>
-              {this.state.edit ? (
-                <span>
-                  <Button
-                    plain
-                    onClick={this.onTextSubmit}
-                    disabled={!hasMinimumInput}
-                    icon={
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="24px"
-                        height="24px"
-                        role="img"
-                      >
-                        <polyline
-                          fill="none"
-                          stroke="#000"
-                          strokeWidth="2"
-                          points={ICONS.check}
-                        />
-                      </svg>
-                    }
-                  />
-
-                  <Button
-                    plain
-                    onClick={this.onEndEditing}
-                    disabled={this.props.asInput && !hasMinimumInput}
-                    icon={
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="24px"
-                        height="24px"
-                        role="img"
-                      >
-                        <path
-                          fill="none"
-                          stroke="#000"
-                          strokeWidth="2"
-                          d={ICONS.delete}
-                        />
-                      </svg>
-                    }
-                  />
-                </span>
-              ) : (
-                <Button
-                  plain
-                  onClick={this.handleEditing}
-                  icon={
-                    <svg
-                      version="1.1"
-                      viewBox="0 0 24 24"
-                      width="24px"
-                      height="24px"
-                      role="img"
-                    >
-                      <path
-                        fill="none"
-                        stroke="#000"
-                        strokeWidth="2"
-                        d={ICONS.edit}
-                      />
-                    </svg>
-                  }
-                />
-              )}
-              {!asInput && (
-                <Button
-                  plain
-                  onClick={this.onDeleteStatement}
-                  icon={
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="24px"
-                      height="24px"
-                      role="img"
-                    >
-                      <path
-                        fill="none"
-                        stroke="#000"
-                        strokeWidth="2"
-                        d={ICONS.trash}
-                      />
-                    </svg>
-                  }
-                />
-              )}
-            </span>
-          )}
-        </EditMenu>
-      );
-    */
-
-    if (!this.state.edit && (canFlag || canFollow || own)) {
-      menu = (
-        <Menu
-          dropAlign={{ top: 'top', right: 'right' }}
-          icon={
-            <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-              <path
-                fill="none"
-                stroke="#666"
-                strokeWidth="2"
-                d="M3,13 L3,11 L5,11 L5,13 L3,13 Z M11,12.9995001 L11,11 L12.9995001,11 L12.9995001,12.9995001 L11,12.9995001 Z M19,12.9995001 L19,11 L20.9995001,11 L20.9995001,12.9995001 L19,12.9995001 Z"
-              />
-            </svg>
-          }
-        >
-          {canFollow && (
-            <Button
-              onClick={this.handleFollowing}
-              plain
-              label={<FormattedMessage {...messages.follow} />}
-            />
-          )}
-          {canFlag && (
-            <Button
-              onClick={this.handleFlag}
-              plain
-              label={<FormattedMessage {...messages.flag} />}
-            />
-          )}
-          {canDelete && (
-            <Button
-              onClick={this.onDeleteStatement}
-              plain
-              label={<FormattedMessage {...messages.delete} />}
-            />
-          )}
-          {canEdit && (
-            <Button
-              onClick={this.handleEditing}
-              plain
-              label={<FormattedMessage {...messages.edit} />}
-            />
-          )}
-        </Menu>
-      );
-    } else if (this.state.edit) {
+    let menu;
+    if (asInput || this.state.edit) {
       menu = (
         <span>
           <Button
@@ -515,7 +332,6 @@ class Comment extends React.Component {
               </svg>
             }
           />
-
           <Button
             plain
             onClick={this.onEndEditing}
@@ -533,31 +349,117 @@ class Comment extends React.Component {
           />
         </span>
       );
-    }
+    } else {
+      const { own, deletedAt, user } = this.props;
+      let canDelete;
+      let canFlag;
 
-    if (updates && updates.errorMessage) {
-      return (
-        <Notification
-          type="error"
-          message={updates.errorMessage}
-          action={
-            <Button
-              primary
-              label="Resend"
-              onClick={
-                updates.statement.delete
-                  ? this.onDeleteStatement
-                  : this.onTextSubmit
-              }
-            />
+      /* eslint-disable no-bitwise */
+      if (user) {
+        // canLike = !asInput && !own && (user.permissions & Permissions.LIKE) > 0;
+        canDelete =
+          own ||
+          (!deletedAt && (user.permissions & Permissions.DELETE_COMMENTS) > 0);
+        canFlag =
+          !own &&
+          !deletedAt &&
+          (user.permissions & Permissions.FLAG_STATEMENTS) > 0;
+      }
+      /* eslint-enable no-bitwise */
+      const menuFields = [];
+      if (canFlag) {
+        menuFields.push(
+          <Button
+            onClick={this.handleFlag}
+            plain
+            label={<FormattedMessage {...messages.flag} />}
+          />,
+        );
+      }
+      if (canDelete) {
+        menuFields.push(
+          <Button
+            onClick={this.onDeleteStatement}
+            plain
+            label={<FormattedMessage {...messages.delete} />}
+          />,
+        );
+      }
+
+      if (own) {
+        menuFields.push(
+          <Button
+            onClick={this.handleEditing}
+            plain
+            label={<FormattedMessage {...messages.edit} />}
+          />,
+        );
+      }
+      menu = (
+        <Menu
+          dropAlign={{ top: 'top', right: 'right' }}
+          icon={
+            <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+              <path
+                fill="none"
+                stroke="#666"
+                strokeWidth="2"
+                d="M3,13 L3,11 L5,11 L5,13 L3,13 Z M11,12.9995001 L11,11 L12.9995001,11 L12.9995001,12.9995001 L11,12.9995001 Z M19,12.9995001 L19,11 L20.9995001,11 L20.9995001,12.9995001 L19,12.9995001 Z"
+              />
+            </svg>
           }
-        />
+        >
+          {menuFields}
+        </Menu>
       );
     }
+    return (
+      <div className={s.header}>
+        {/* eslint-disable jsx-a11y/interactive-supports-focus */}
+        {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */}
+        <img
+          onClick={this.handleProfileClick}
+          className={cn(s.avatar)}
+          src={actor && actor.thumbnail}
+          alt="IMG"
+        />
 
-    const textBox = [];
-    if (this.props.openInput && this.state.edit) {
-      textBox.push(
+        {/* eslint-enable jsx-a11y/interactive-supports-focus */}
+        <div className={s.details}>
+          <div className={s.bar}>
+            <span className={s.author}>{`${actor.name} ${actor.surname}`}</span>
+            {menu}
+          </div>
+          {this.props.createdAt && (
+            <div className={s.date}>
+              <FormattedRelative value={this.props.createdAt} />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  render() {
+    //  const { mutationIsPending, mutationSuccess, mutationError } = this.props;
+    // TODO create authorization decorator
+    const {
+      content,
+      //      likes,
+      author,
+      asInput,
+      user,
+
+      //  updates,
+    } = this.props;
+    //  let canLik
+
+    let header;
+    const body = [];
+    const footer = [];
+    if (asInput) {
+      header = this.renderHeader(user, asInput);
+      body.push(
         <Textarea
           useCacheForDOMMeasurements
           placeholder="Leave a statement (optional)"
@@ -569,135 +471,59 @@ class Comment extends React.Component {
         />,
       );
     } else {
-      textBox.push(
-        <div className={this.state.collapsed ? s.collapsed : s.expanded}>
-          {content}
-        </div>,
-      );
-
-      if (this.state.contentOverflows) {
-        textBox.push(
-          <button onClick={this.toggleContent} className={s.contentToggle}>
-            <FormattedMessage
-              {...messages[this.state.collapsed ? 'expand' : 'collapse']}
-            />
-          </button>,
+      header = this.renderHeader(author, asInput);
+      if (!this.state.edit) {
+        body.push(
+          <div className={this.state.collapsed ? s.collapsed : s.expanded}>
+            {content}
+          </div>,
+        );
+        if (this.state.contentOverflows) {
+          body.push(
+            <button onClick={this.toggleContent} className={s.contentToggle}>
+              <FormattedMessage
+                {...messages[this.state.collapsed ? 'expand' : 'collapse']}
+              />
+            </button>,
+          );
+        }
+      } else if (this.props.openInput) {
+        body.push(
+          <Textarea
+            useCacheForDOMMeasurements
+            placeholder="Leave a statement (optional)"
+            value={this.state.textArea.val}
+            onChange={this.onTextChange}
+            className={s.textEdit}
+            minRows={2}
+            disabled={this.state.pending}
+          />,
         );
       }
-    }
-
-    return (
-      <div className={s.rootAlt}>
-        <div className={s.header}>
-          {/* eslint-disable jsx-a11y/interactive-supports-focus */}
-          {!inactive && (
-            <div
-              role="button"
-              className={s.avatar}
-              onClick={this.handleProfileClick}
-            >
-              <img
-                className={cn(s.avatar)}
-                src={author && author.thumbnail}
-                alt="IMG"
-              />
-            </div>
-          )}
-
-          {/* eslint-enable jsx-a11y/interactive-supports-focus */}
-          <div className={s.details}>
-            <div className={s.bar}>
-              {!inactive && (
-                <span className={s.author}>
-                  {`${author.name} ${author.surname}`}{' '}
-                </span>
-              )}
-              {menu}
-            </div>
-            <div className={s.date}>
-              <FormattedRelative value={this.props.createdAt} />
-            </div>
-          </div>
-        </div>
-        {/* eslint-disable no-return-assign */}
-
-        <div className={s.text} ref={ref => (this.textBox = ref)}>
-          {textBox}
-        </div>
+      footer.push(
         <button onClick={this.handleReply} className={s.command}>
           <FormattedMessage {...messages.reply} />
-        </button>
-        {/*  <div className={s.text} ref={ref => (this.textBox = ref)}>
-            {textBox}
-          </div>
-          <button onClick={this.handleReply} className={s.command}>
-            <FormattedMessage {...messages.reply} />
-          </button> */}
+        </button>,
+      );
+      if (this.props.openInput && !this.state.edit) {
+        footer.push(
+          <div style={{ marginLeft: '3rem' }}>
+            <Comment
+              id={this.props.id}
+              parentId={this.props.parentId}
+              onCreate={this.props.onCreate}
+              user={user}
+              asInput
+            />
+          </div>,
+        );
+      }
 
-        {/* eslint-enable no-return-assign */}
-        {this.props.openInput &&
-          !this.state.edit && (
-            <div>
-              <span style={{ marginRight: '0.5em' }}>
-                <span>
-                  <Button
-                    plain
-                    onClick={this.onTextSubmit}
-                    disabled={!hasMinimumInput}
-                    icon={
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="24px"
-                        height="24px"
-                        role="img"
-                      >
-                        <polyline
-                          fill="none"
-                          stroke="#000"
-                          strokeWidth="2"
-                          points={ICONS.check}
-                        />
-                      </svg>
-                    }
-                  />
-
-                  <Button
-                    plain
-                    onClick={this.onEndEditing}
-                    disabled={this.props.asInput && !hasMinimumInput}
-                    icon={
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="24px"
-                        height="24px"
-                        role="img"
-                      >
-                        <path
-                          fill="none"
-                          stroke="#000"
-                          strokeWidth="2"
-                          d={ICONS.delete}
-                        />
-                      </svg>
-                    }
-                  />
-                </span>
-              </span>
-              <Textarea
-                useCacheForDOMMeasurements
-                placeholder="Leave a statement (optional)"
-                value={this.state.textArea.val}
-                onChange={this.onTextChange}
-                className={s.textEdit}
-                minRows={2}
-                disabled={this.state.pending}
-              />
-            </div>
-          )}
-        {this.state.showReplies && (
-          <div className={s.replies}>{this.props.children} </div>
-        )}
-        {this.props.numReplies !== 0 && (
+      if (this.state.showReplies) {
+        footer.push(<div className={s.replies}>{this.props.children} </div>);
+      }
+      if (this.props.numReplies) {
+        footer.push(
           <button onClick={this.toggleReplies} className={s.command}>
             <FormattedMessage
               {...messages[
@@ -705,18 +531,18 @@ class Comment extends React.Component {
               ]}
               values={{ cnt: this.props.numReplies }}
             />
-          </button>
-        )}
-        {/* {' '}
-          {this.props.replies &&
-            this.props.replies.map(r => (
-              <Comment
-                {...r}
-                onReply={this.props.onReply}
-                reply
-                onCreate={this.props.onCreate}
-              />
-            ))} */}
+          </button>,
+        );
+      }
+    }
+    return (
+      <div className={s.root}>
+        {header}
+        {/* eslint-disable no-return-assign */}
+        <div className={s.text} ref={ref => (this.textBox = ref)}>
+          {body}
+        </div>
+        {footer}
       </div>
     );
   }

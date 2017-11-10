@@ -11,6 +11,7 @@ class Discussion {
     this.numComments = data.num_comments;
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
+    this.closedAt = data.closed_at;
   }
 
   static async gen(viewer, id, { discussions }) {

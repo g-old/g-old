@@ -56,6 +56,9 @@ const DiscussionType = new ObjectType({
     updatedAt: {
       type: GraphQLString,
     },
+    closedAt: {
+      type: GraphQLString,
+    },
   }),
 });
 

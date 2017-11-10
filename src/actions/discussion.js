@@ -19,7 +19,9 @@ const discussionFields = `
 id
 createdAt
 title
-numComments`;
+numComments
+closedAt
+`;
 
 const authorFields = `
 id
@@ -53,6 +55,7 @@ ${discussionFields}
     numReplies
     parentId
     createdAt
+    editedAt
     author{
       ${authorFields}
     }

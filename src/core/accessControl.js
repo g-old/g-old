@@ -251,7 +251,15 @@ function commentReadControl(viewer, data) {
   return false;
 }
 function commentWriteControl(viewer, data) {
-  return true; // TODO change
+  if (data.discussion.closedAt) {
+    return false;
+  }
+  if (data.creating) {
+    // TODO check group etc
+    return true;
+  }
+  // eslint-disable-next-line eqeqeq
+  return viewer.id && viewer.id == data.authorId;
 }
 
 /* eslint-enable no-unused-vars */

@@ -5,6 +5,7 @@ import s from './WorkTeam.css';
 import Label from '../Label';
 import Value from '../Value';
 import Box from '../Box';
+import Button from '../Button';
 import DiscussionPreview from '../DiscussionPreview';
 import history from '../../history';
 
@@ -30,7 +31,14 @@ class WorkTeam extends React.Component {
   }
 
   render() {
-    const { logo, name, numMembers, numDiscussions, discussions } = this.props;
+    const {
+      logo,
+      name,
+      numMembers,
+      numDiscussions,
+      discussions,
+      id,
+    } = this.props;
     let picture;
     if (logo) {
       picture = <img alt="Logo" className={s.logo} src={logo} />;
@@ -88,6 +96,13 @@ class WorkTeam extends React.Component {
             value={numDiscussions || 0}
           />
         </Box>
+        <Button
+          onClick={() => {
+            history.push(`/workteams/${id}/admin`);
+          }}
+          primary
+          label={'Add discussion'}
+        />
         {discussions &&
           discussions.map(d => (
             <DiscussionPreview

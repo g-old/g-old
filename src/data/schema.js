@@ -58,6 +58,8 @@ import logs from './queries/logs';
 import statistics from './queries/statistics';
 import userConnection from './queries/userConnection';
 import createComment from './mutations/createComment';
+import updateComment from './mutations/updateComment';
+import deleteComment from './mutations/deleteComment';
 import createDiscussion from './mutations/createDiscussion';
 import discussion from './queries/discussion';
 import comments from './queries/comments';
@@ -118,6 +120,8 @@ const schema = new Schema({
       createProposalSub,
       deleteProposalSub,
       createComment,
+      updateComment,
+      deleteComment,
       createDiscussion,
     },
   }),

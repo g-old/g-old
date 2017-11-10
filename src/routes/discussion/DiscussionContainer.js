@@ -4,7 +4,12 @@ import { connect } from 'react-redux';
 // import { defineMessages, FormattedMessage } from 'react-intl';
 // import history from '../../history';
 import { loadDiscussion } from '../../actions/discussion';
-import { createComment, loadComments } from '../../actions/comment';
+import {
+  createComment,
+  loadComments,
+  updateComment,
+  deleteComment,
+} from '../../actions/comment';
 import {
   // getCommentUpdates,
   getDiscussion,
@@ -42,6 +47,8 @@ class DiscussionContainer extends React.Component {
     loadDiscussion: PropTypes.func.isRequired,
     createComment: PropTypes.func.isRequired,
     loadComments: PropTypes.func.isRequired,
+    updateComment: PropTypes.func.isRequired,
+    deleteComment: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
   };
   static defaultProps = {
@@ -103,7 +110,12 @@ class DiscussionContainer extends React.Component {
               disabled={isFetching}
             />
             <Discussion {...discussion} />
-            <Comment asInput onCreate={this.handleCommentCreation} />
+            <Comment
+              asInput
+              user={user}
+              onCreate={this.handleCommentCreation}
+            />
+            {'TOP COMMENTS'}
             {this.props.discussion.comments &&
               this.props.discussion.comments.map(c => (
                 <Comment
@@ -111,6 +123,8 @@ class DiscussionContainer extends React.Component {
                   onReply={this.handleReply}
                   loadReplies={this.handleCommentFetching}
                   onCreate={this.handleCommentCreation}
+                  onUpdate={this.props.updateComment}
+                  onDelete={this.props.deleteComment}
                   openInput={c.id === this.state.replying}
                   // eslint-disable-next-line eqeqeq
                   own={c.author.id == user.id}
@@ -123,6 +137,8 @@ class DiscussionContainer extends React.Component {
                         onReply={this.handleReply}
                         reply
                         onCreate={this.handleCommentCreation}
+                        onUpdate={this.props.updateComment}
+                        onDelete={this.props.deleteComment}
                         openInput={r.id === this.state.replying}
                         // eslint-disable-next-line eqeqeq
                         own={r.author.id == user.id}
@@ -151,6 +167,8 @@ const mapDispatch = {
   loadDiscussion,
   createComment,
   loadComments,
+  updateComment,
+  deleteComment,
 };
 
 export default connect(mapStateToProps, mapDispatch)(DiscussionContainer);

@@ -52,6 +52,9 @@ const CommentType = new ObjectType({
     updatedAt: {
       type: GraphQLString,
     },
+    editedAt: {
+      type: GraphQLString,
+    },
   }),
 });
 

@@ -1,6 +1,6 @@
 @import "../../components/variables.css";
 
-.rootAlt {
+.root {
   margin-right: 0.5rem;
   font-size: 0.9rem;
   transition: margin 0.5s;

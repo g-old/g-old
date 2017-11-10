@@ -16,13 +16,17 @@ exports.up = function(knex, Promise) {
             .notNullable();
           table.foreign('author_id').references('users.id');
           table.integer('parent_id').unsigned();
-          table.foreign('parent_id').references('comments.id');
+          table
+            .foreign('parent_id')
+            .references('comments.id')
+            .onDelete('CASCADE');
           table
             .integer('num_replies')
             .unsigned()
             .notNullable()
             .defaultsTo(0);
           table.timestamps();
+          table.timestamp('edited_at');
         });
       }
       return null;

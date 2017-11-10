@@ -20,6 +20,7 @@ exports.up = function(knex, Promise) {
             .integer('num_comments')
             .unsigned()
             .defaultsTo(0);
+          table.timestamp('closed_at').defaultsTo(null);
           table.timestamps();
         });
       }
