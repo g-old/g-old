@@ -55,6 +55,11 @@ const messages = defineMessages({
     defaultMessage: 'View all {cnt} replies',
     description: 'Show replies',
   },
+  expandReply: {
+    id: 'commands.expandReply',
+    defaultMessage: 'View reply',
+    description: 'Show reply',
+  },
   collapseReplies: {
     id: 'commands.collapseReplies',
     defaultMessage: 'Hide replies',
@@ -200,7 +205,9 @@ class Comment extends React.Component {
       }
 
       if (updates.errorMessage) {
-        this.setState({ textArea: { val: updates.statement.content || '' } });
+        this.setState({
+          textArea: { val: (updates.comment && updates.comment.content) || '' },
+        });
       }
     }
     if (openInput !== this.props.openInput) {
@@ -261,7 +268,11 @@ class Comment extends React.Component {
   }
   handleEditing() {
     this.handleReply();
-    this.setState({ textArea: { val: this.props.content }, editing: true });
+
+    this.setState({
+      textArea: { val: this.props.content },
+      editing: true,
+    });
   }
   toggleContent(e) {
     e.preventDefault();
@@ -532,7 +543,7 @@ class Comment extends React.Component {
               onCreate={this.props.onCreate}
               user={user}
               asInput
-              updates={this.props.updates}
+              updates={this.props.updates || {}}
             />
           </div>,
         );
@@ -542,11 +553,17 @@ class Comment extends React.Component {
         footer.push(<div className={s.replies}>{this.props.children} </div>);
       }
       if (this.props.numReplies) {
+        const expandLabel =
+          this.props.numReplies === 1 ? 'expandReply' : 'expandReplies';
+
         footer.push(
-          <button onClick={this.toggleReplies} className={s.command}>
+          <button
+            onClick={this.toggleReplies}
+            className={cn(s.more, s.command)}
+          >
             <FormattedMessage
               {...messages[
-                this.state.showReplies ? 'collapseReplies' : 'expandReplies'
+                this.state.showReplies ? 'collapseReplies' : expandLabel
               ]}
               values={{ cnt: this.props.numReplies }}
             />

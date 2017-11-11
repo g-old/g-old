@@ -143,7 +143,7 @@ class Comment {
           .where({ id: oldComment.discussion_id })
           .transacting(trx)
           .forUpdate()
-          .decrement('num_comments', 1);
+          .decrement('num_comments', oldComment.num_replies + 1); // TODO check if correct
       }
 
       if (statusOK) {

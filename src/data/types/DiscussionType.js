@@ -36,12 +36,28 @@ const DiscussionType = new ObjectType({
       resolve: (data, args, { viewer, loaders }) =>
         WorkTeam.gen(viewer, data.workTeamId, loaders),
     },
+    // TODO or more
+    ownComment: {
+      type: CommentType,
+      resolve: (data, args, { viewer, loaders }) =>
+        knex('comments')
+          .where({ author_id: viewer.id })
+          .where({ parent_id: null })
+          .orderBy('num_replies', 'desc')
+          .orderBy('created_at', 'desc')
+          .limit(1)
+          .pluck('id')
+          .then(ids => ids.map(id => Comment.gen(viewer, id, loaders))),
+    },
+
     comments: {
       type: new GraphQLList(CommentType),
       resolve: (data, args, { viewer, loaders }) =>
         knex('comments')
           .where({ discussion_id: data.id })
           .where({ parent_id: null })
+          .orderBy('num_replies', 'desc')
+          .orderBy('created_at', 'desc')
           .pluck('id')
           .then(ids => ids.map(id => Comment.gen(viewer, id, loaders))),
     },

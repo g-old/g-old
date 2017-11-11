@@ -19,11 +19,18 @@ export default function byId(state = {}, action) {
     case CREATE_COMMENT_SUCCESS: {
       const comment = action.payload.entities.comments[action.payload.result];
       return comment.parentId
-        ? state
+        ? {
+            ...state,
+            [comment.discussionId]: {
+              ...state[comment.discussionId],
+              numComments: state[comment.discussionId].numComments + 1,
+            },
+          }
         : {
             ...state,
             [comment.discussionId]: {
               ...state[comment.discussionId],
+              numComments: state[comment.discussionId].numComments + 1,
               comments: [
                 comment.id,
                 ...(state[comment.discussionId].comments &&
@@ -39,7 +46,9 @@ export default function byId(state = {}, action) {
           ...state,
           [comment.discussionId]: {
             ...state[comment.discussionId],
-            numComments: state[comment.discussionId].numComments - 1,
+            numComments:
+              state[comment.discussionId].numComments -
+              (comment.numReplies + 1),
             comments: state[comment.discussionId].comments.filter(
               c => c !== comment.id,
             ),

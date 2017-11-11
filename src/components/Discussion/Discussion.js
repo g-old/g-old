@@ -9,7 +9,7 @@ class Discussion extends React.Component {
     title: PropTypes.string.isRequired,
     state: PropTypes.string.isRequired,
     content: PropTypes.string.isRequired,
-    publishedAt: PropTypes.string.isRequired,
+    createdAt: PropTypes.string.isRequired,
     spokesman: PropTypes.shape({
       thumbnail: PropTypes.string,
       name: PropTypes.string,
@@ -26,7 +26,7 @@ class Discussion extends React.Component {
           <div className={s.state}>{this.props.state}</div>
           <div className={s.headline}>{this.props.title}</div>
           <div className={s.date}>
-            <FormattedRelative value={this.props.publishedAt} />
+            <FormattedRelative value={this.props.createdAt} />
           </div>
           <div
             className={s.body}

@@ -103,13 +103,15 @@ class WorkTeam extends React.Component {
           primary
           label={'Add discussion'}
         />
-        {discussions &&
-          discussions.map(d => (
-            <DiscussionPreview
-              discussion={d}
-              onClick={this.handleDiscussionClick}
-            />
-          ))}
+        <div className={s.discussions}>
+          {discussions &&
+            discussions.map(d => (
+              <DiscussionPreview
+                discussion={d}
+                onClick={this.handleDiscussionClick}
+              />
+            ))}
+        </div>
       </div>
     );
   }

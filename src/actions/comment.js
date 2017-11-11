@@ -86,6 +86,7 @@ export function createComment(comment) {
         payload: normalizedData,
         id: virtualId,
         properties,
+        comment,
       });
     } catch (error) {
       dispatch({
@@ -131,6 +132,7 @@ export function updateComment(comment) {
         properties,
         message: error.message || 'Something went wrong',
         id: comment.id,
+        comment,
       });
       return false;
     }

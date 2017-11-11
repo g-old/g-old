@@ -112,11 +112,12 @@ class DiscussionContainer extends React.Component {
               disabled={isFetching}
             />
             <Discussion {...discussion} />
+            {`COMMENTS * ${discussion.numComments}`}
             <Comment
               asInput
               user={user}
               onCreate={this.handleCommentCreation}
-              updates={this.props.updates['0000']}
+              updates={this.props.updates['0000'] || {}}
             />
             {'TOP COMMENTS'}
             {this.props.discussion.comments &&

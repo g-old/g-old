@@ -35,9 +35,21 @@
   margin-top: 1rem;
 }
 
+.replies .avatar {
+  margin-right: 0.5em;
+  width: 2.5em;
+  height: 2.5em;
+}
+
 .date {
   color: #666;
   font-size: 0.9rem;
+}
+
+.more {
+  margin-top: 0.5rem;
+  color: #167ac6;
+  font-weight: 500;
 }
 
 .bar {
@@ -95,7 +107,6 @@
   height: auto;
   background: transparent;
   color: #167ac6;
-  font-weight: normal;
   font-size: inherit;
   text-decoration: none;
   box-shadow: none;

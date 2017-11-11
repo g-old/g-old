@@ -16,6 +16,7 @@ const comments = {
     //  throw Error('TESTERROR');
     knex('comments')
       .where({ parent_id: parentId })
+      .orderBy('created_at', 'desc')
       .pluck('id')
       .then(ids => ids.map(id => Comment.gen(viewer, id, loaders))),
 };

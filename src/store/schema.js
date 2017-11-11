@@ -72,6 +72,7 @@ comment.define({
 export const discussion = new schema.Entity('discussions', {
   author: user,
   comments: [comment],
+  ownComment: comment,
 });
 
 export const proposalList = [proposal];
