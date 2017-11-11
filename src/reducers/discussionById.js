@@ -5,6 +5,7 @@ import {
   LOAD_FEED_SUCCESS,
   SSE_UPDATE_SUCCESS,
   CREATE_COMMENT_SUCCESS,
+  DELETE_COMMENT_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -24,12 +25,28 @@ export default function byId(state = {}, action) {
             [comment.discussionId]: {
               ...state[comment.discussionId],
               comments: [
+                comment.id,
                 ...(state[comment.discussionId].comments &&
                   state[comment.discussionId].comments),
-                comment.id,
               ],
             },
           };
+    }
+    case DELETE_COMMENT_SUCCESS: {
+      const comment = action.payload.entities.comments[action.payload.result];
+      if (!comment.parentId) {
+        return {
+          ...state,
+          [comment.discussionId]: {
+            ...state[comment.discussionId],
+            numComments: state[comment.discussionId].numComments - 1,
+            comments: state[comment.discussionId].comments.filter(
+              c => c !== comment.id,
+            ),
+          },
+        };
+      }
+      return state;
     }
     default:
       return state;

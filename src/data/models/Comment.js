@@ -110,13 +110,15 @@ class Comment {
     return commentInDB ? new Comment(commentInDB) : null;
   }
 
-  static async delete(viewer, data, { comments }) {
-    if (!data || !data.id || !data.content) return null;
+  static async delete(viewer, data, { comments, discussions }) {
+    if (!data || !data.id) return null;
     const oldComment = await comments.load(data.id);
+    const discussion = await discussions.load(oldComment.discussion_id);
+
     if (
       !canMutate(
         viewer,
-        { ...data, authorId: oldComment.author_id },
+        { ...data, authorId: oldComment.author_id, discussion },
         Models.COMMENT,
       )
     ) {
@@ -129,6 +131,20 @@ class Comment {
         .transacting(trx)
         .forUpdate()
         .del();
+
+      if (oldComment.parentId) {
+        await knex('comments')
+          .where({ id: oldComment.parent_id })
+          .transacting(trx)
+          .forUpdate()
+          .decrement('num_replies', 1);
+      } else {
+        await knex('discussions')
+          .where({ id: oldComment.discussion_id })
+          .transacting(trx)
+          .forUpdate()
+          .decrement('num_comments', 1);
+      }
 
       if (statusOK) {
         comments.clear(data.id);

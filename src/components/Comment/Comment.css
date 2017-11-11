@@ -9,6 +9,7 @@
 
 .details {
   display: inline-block;
+  width: 100%;
 }
 
 .header {
@@ -27,6 +28,7 @@
 
 .replies {
   margin-left: 3rem;
+  margin-bottom: 0.5rem;
 }
 
 .replies > div {
@@ -42,6 +44,7 @@
   display: inline-flex;
   justify-content: space-between;
   align-items: baseline;
+  width: 100%;
 }
 
 .avatar {

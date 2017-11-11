@@ -71,7 +71,7 @@ query($parentId:ID){
 
 export function createComment(comment) {
   return async (dispatch, getState, { graphqlRequest }) => {
-    const virtualId = '0000';
+    const virtualId = comment.parentId || '0000';
     const properties = genStatusIndicators(['createCom']);
     dispatch({
       type: CREATE_COMMENT_START,
@@ -149,7 +149,7 @@ export function deleteComment(comment) {
     });
     try {
       const { data } = await graphqlRequest(deleteCommentMutation, comment);
-      const normalizedData = normalize(data.deleteStatement, commentSchema);
+      const normalizedData = normalize(data.deleteComment, commentSchema);
       dispatch({
         type: DELETE_COMMENT_SUCCESS,
         payload: normalizedData,

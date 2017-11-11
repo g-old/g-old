@@ -5,6 +5,7 @@ import {
   LOAD_DISCUSSIONS_SUCCESS,
   CREATE_COMMENT_SUCCESS,
   UPDATE_COMMENT_SUCCESS,
+  DELETE_COMMENT_SUCCESS,
 } from '../constants';
 
 const addToParents = (state, action) => {
@@ -32,13 +33,31 @@ export default function byId(state = {}, action) {
   switch (action.type) {
     case CREATE_COMMENT_SUCCESS:
     case LOAD_REPLIES_SUCCESS: {
-      return addToParents(state, action);
+      return action.payload.entities.comments
+        ? addToParents(state, action)
+        : state;
     }
     case LOAD_DISCUSSIONS_SUCCESS:
     case LOAD_DISCUSSION_SUCCESS:
     case UPDATE_COMMENT_SUCCESS:
       return merge({}, state, action.payload.entities.comments);
 
+    case DELETE_COMMENT_SUCCESS: {
+      const comment = action.payload.entities.comments[action.payload.result];
+      if (comment.parentId) {
+        return {
+          ...state,
+          [comment.parentId]: {
+            ...state[comment.parentId],
+            numReplies: state[comment.parentId].numReplies - 1,
+            replies: state[comment.parentId].replies.filter(
+              r => r !== comment.id,
+            ),
+          },
+        };
+      }
+      return state;
+    }
     default:
       return state;
   }

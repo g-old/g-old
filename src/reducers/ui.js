@@ -8,7 +8,7 @@ import activityCounter, * as fromActivityCounter from './ui/activities';
 import loading from './ui/loading';
 import pageInfo, * as fromPageInfo from './ui/pageInfo';
 import { SESSION_LOGOUT_SUCCESS } from '../constants';
-
+import comments, * as fromComment from './ui/comments';
 /* export default combineReducers({
   proposals,
   polls,
@@ -24,6 +24,7 @@ const uiReducer = combineReducers({
   activityCounter,
   loading,
   pageInfo,
+  comments,
 });
 export default (state, action) => {
   if (action.type === SESSION_LOGOUT_SUCCESS) {
@@ -107,3 +108,6 @@ export const getActivityCounter = state =>
 
 export const getPageInfo = (state, queryStateTag) =>
   fromPageInfo.getPageInfo(state.pageInfo, queryStateTag);
+
+export const getCommentUpdates = state =>
+  fromComment.getUpdates(state.comments);

@@ -15,6 +15,7 @@ import {
   getDiscussion,
   getIsDiscussionFetching,
   getDiscussionError,
+  getCommentUpdates,
 } from '../../reducers';
 import FetchError from '../../components/FetchError';
 import Discussion from '../../components/Discussion';
@@ -50,6 +51,7 @@ class DiscussionContainer extends React.Component {
     updateComment: PropTypes.func.isRequired,
     deleteComment: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
+    updates: PropTypes.shape({ '0000': PropTypes.shape({}) }).isRequired,
   };
   static defaultProps = {
     errorMessage: null,
@@ -81,7 +83,7 @@ class DiscussionContainer extends React.Component {
   }
 
   handleReply({ id }) {
-    this.setState({ replying: id });
+    this.setState({ replying: id || '0000' }); // for main input
   }
 
   render() {
@@ -114,6 +116,7 @@ class DiscussionContainer extends React.Component {
               asInput
               user={user}
               onCreate={this.handleCommentCreation}
+              updates={this.props.updates['0000']}
             />
             {'TOP COMMENTS'}
             {this.props.discussion.comments &&
@@ -129,6 +132,7 @@ class DiscussionContainer extends React.Component {
                   // eslint-disable-next-line eqeqeq
                   own={c.author.id == user.id}
                   user={user}
+                  updates={this.props.updates[c.id]}
                 >
                   {c.replies &&
                     c.replies.map(r => (
@@ -142,6 +146,7 @@ class DiscussionContainer extends React.Component {
                         openInput={r.id === this.state.replying}
                         // eslint-disable-next-line eqeqeq
                         own={r.author.id == user.id}
+                        updates={this.props.updates[c.id]}
                         user={user}
                       />
                     ))}
@@ -161,6 +166,7 @@ const mapStateToProps = (state, { id }) => ({
   discussion: getDiscussion(state, id),
   isFetching: getIsDiscussionFetching(state, id),
   errorMessage: getDiscussionError(state, id),
+  updates: getCommentUpdates(state),
 });
 
 const mapDispatch = {

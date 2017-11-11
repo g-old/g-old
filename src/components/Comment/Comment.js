@@ -7,6 +7,7 @@ import {
   defineMessages,
   FormattedMessage,
   FormattedRelative,
+  injectIntl,
 } from 'react-intl';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import cn from 'classnames';
@@ -64,6 +65,11 @@ const messages = defineMessages({
     defaultMessage: 'Edit',
     description: 'Edit',
   },
+  edited: {
+    id: 'label.edited',
+    defaultMessage: 'edited {time}',
+    description: 'Comment edited',
+  },
 });
 const EditMenu = props => <div>{props.children}</div>;
 EditMenu.propTypes = {
@@ -107,7 +113,8 @@ class Comment extends React.Component {
     onLike: PropTypes.func,
     onDeleteLike: PropTypes.func,
     updates: PropTypes.shape({
-      updateStmt: PropTypes.shape({ pending: PropTypes.bool }),
+      updateCom: PropTypes.shape({ pending: PropTypes.bool }),
+      success: PropTypes.bool,
     }),
     onProfileClick: PropTypes.func,
     loadReplies: PropTypes.func,
@@ -116,6 +123,8 @@ class Comment extends React.Component {
     openInput: PropTypes.bool,
     children: PropTypes.arrayOf(PropTypes.element),
     own: PropTypes.bool,
+    editedAt: PropTypes.string,
+    intl: PropTypes.shape({ formatRelative: PropTypes.func }).isRequired,
   };
 
   static defaultProps = {
@@ -144,15 +153,17 @@ class Comment extends React.Component {
     parentId: null,
     createdAt: null,
     own: null,
+    editedAt: null,
   };
 
   constructor(props) {
     super(props);
     this.state = {
       textArea: { val: this.props.content || '' },
-      edit: props.asInput === true,
+      editing: props.asInput === true,
       pending: false,
       collapsed: false,
+      open: props.openInput,
     };
     this.onDeleteStatement = this.onDeleteStatement.bind(this);
     this.handleEditing = this.handleEditing.bind(this);
@@ -163,7 +174,6 @@ class Comment extends React.Component {
     this.handleFollowing = this.handleFollowing.bind(this);
     this.handleLiking = this.handleLiking.bind(this);
     this.handleProfileClick = this.handleProfileClick.bind(this);
-    this.openTextInput = this.openTextInput.bind(this);
     this.handleReply = this.handleReply.bind(this);
     this.toggleContent = this.toggleContent.bind(this);
     this.toggleReplies = this.toggleReplies.bind(this);
@@ -171,7 +181,7 @@ class Comment extends React.Component {
   }
 
   componentDidMount() {
-    if (!this.state.edit) {
+    if (!this.state.editing) {
       // 3 * 1.3 em lineheight
       if (this.textBox && this.textBox.clientHeight > 3.9 * 16) {
         // eslint-disable-next-line react/no-did-mount-set-state
@@ -180,9 +190,9 @@ class Comment extends React.Component {
     }
   }
 
-  componentWillReceiveProps({ updates }) {
+  componentWillReceiveProps({ updates, openInput }) {
     if (updates) {
-      if (updates.success) {
+      if (updates.success && !this.props.updates.success) {
         this.onEndEditing();
       }
       if (updates.pending !== this.state.pending) {
@@ -192,6 +202,9 @@ class Comment extends React.Component {
       if (updates.errorMessage) {
         this.setState({ textArea: { val: updates.statement.content || '' } });
       }
+    }
+    if (openInput !== this.props.openInput) {
+      this.setState({ open: openInput });
     }
   }
 
@@ -219,7 +232,7 @@ class Comment extends React.Component {
     const content = this.state.textArea.val.trim();
     if (content && content !== this.props.content) {
       // TODO validation
-      if (!this.state.replying && this.props.content) {
+      if (this.props.content) {
         // update;
         this.props.onUpdate({ id: this.props.id, content });
       } else {
@@ -242,12 +255,13 @@ class Comment extends React.Component {
     this.setState({
       ...this.state,
       textArea: { ...this.state.textArea, val: asInput ? '' : content },
-      edit: this.props.asInput === true,
+      editing: false,
+      open: false,
     });
   }
   handleEditing() {
     this.handleReply();
-    this.setState({ textArea: { val: this.props.content }, edit: true });
+    this.setState({ textArea: { val: this.props.content }, editing: true });
   }
   toggleContent(e) {
     e.preventDefault();
@@ -301,20 +315,16 @@ class Comment extends React.Component {
     }
   }
 
-  openTextInput() {
-    this.setState({ reply: true });
-  }
-
   handleReply() {
     this.props.onReply({ id: this.props.id });
-    this.setState({ edit: false });
+    this.setState({ editing: false });
   }
 
   renderHeader(actor, asInput) {
     const hasMinimumInput = this.state.textArea.val.length >= 5;
 
     let menu;
-    if (asInput || this.state.edit) {
+    if (asInput || this.state.editing) {
       menu = (
         <span>
           <Button
@@ -432,7 +442,16 @@ class Comment extends React.Component {
           </div>
           {this.props.createdAt && (
             <div className={s.date}>
-              <FormattedRelative value={this.props.createdAt} />
+              {this.props.editedAt ? (
+                <FormattedMessage
+                  {...messages.edited}
+                  values={{
+                    time: this.props.intl.formatRelative(this.props.editedAt),
+                  }}
+                />
+              ) : (
+                <FormattedRelative value={this.props.createdAt} />
+              )}
             </div>
           )}
         </div>
@@ -462,7 +481,7 @@ class Comment extends React.Component {
       body.push(
         <Textarea
           useCacheForDOMMeasurements
-          placeholder="Leave a statement (optional)"
+          placeholder="Add a comment"
           value={this.state.textArea.val}
           onChange={this.onTextChange}
           className={s.textEdit}
@@ -472,7 +491,7 @@ class Comment extends React.Component {
       );
     } else {
       header = this.renderHeader(author, asInput);
-      if (!this.state.edit) {
+      if (!this.state.editing) {
         body.push(
           <div className={this.state.collapsed ? s.collapsed : s.expanded}>
             {content}
@@ -487,11 +506,10 @@ class Comment extends React.Component {
             </button>,
           );
         }
-      } else if (this.props.openInput) {
+      } else if (this.state.open) {
         body.push(
           <Textarea
             useCacheForDOMMeasurements
-            placeholder="Leave a statement (optional)"
             value={this.state.textArea.val}
             onChange={this.onTextChange}
             className={s.textEdit}
@@ -505,7 +523,7 @@ class Comment extends React.Component {
           <FormattedMessage {...messages.reply} />
         </button>,
       );
-      if (this.props.openInput && !this.state.edit) {
+      if (this.state.open && !this.state.editing) {
         footer.push(
           <div style={{ marginLeft: '3rem' }}>
             <Comment
@@ -514,6 +532,7 @@ class Comment extends React.Component {
               onCreate={this.props.onCreate}
               user={user}
               asInput
+              updates={this.props.updates}
             />
           </div>,
         );
@@ -548,4 +567,4 @@ class Comment extends React.Component {
   }
 }
 
-export default withStyles(s)(Comment);
+export default withStyles(s)(injectIntl(Comment));
