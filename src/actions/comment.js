@@ -179,8 +179,12 @@ export function deleteComment(comment) {
 // TODO rename in Replies, add ispending check
 export function loadComments(comment) {
   return async (dispatch, getState, { graphqlRequest }) => {
+    const properties = genStatusIndicators(['deleteCom']);
+
     dispatch({
       type: LOAD_REPLIES_START,
+      properties,
+      id: comment.parentId,
     });
     try {
       const { data } = await graphqlRequest(commentsQuery, comment);
@@ -188,6 +192,8 @@ export function loadComments(comment) {
       dispatch({
         type: LOAD_REPLIES_SUCCESS,
         payload: normalizedData,
+        properties,
+        id: comment.parentId,
       });
     } catch (error) {
       dispatch({
@@ -196,6 +202,8 @@ export function loadComments(comment) {
           error,
         },
         message: error.message || 'Something went wrong',
+        properties,
+        id: comment.parentId,
       });
       return false;
     }

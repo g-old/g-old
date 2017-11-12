@@ -8,12 +8,16 @@ import {
   DELETE_COMMENT_START,
   DELETE_COMMENT_SUCCESS,
   DELETE_COMMENT_ERROR,
+  LOAD_REPLIES_START,
+  LOAD_REPLIES_SUCCESS,
+  LOAD_REPLIES_ERROR,
 } from '../../constants';
 
 const comments = (state = {}, action) => {
   switch (action.type) {
     case UPDATE_COMMENT_START:
     case DELETE_COMMENT_START:
+    case LOAD_REPLIES_START:
     case CREATE_COMMENT_START: {
       const id = action.id; // Is initial id!
       return {
@@ -27,6 +31,7 @@ const comments = (state = {}, action) => {
     }
     case CREATE_COMMENT_SUCCESS:
     case UPDATE_COMMENT_SUCCESS:
+    case LOAD_REPLIES_SUCCESS:
     case DELETE_COMMENT_SUCCESS: {
       const id = action.id; // Is initial id!
       return {
@@ -41,6 +46,7 @@ const comments = (state = {}, action) => {
 
     case UPDATE_COMMENT_ERROR:
     case DELETE_COMMENT_ERROR:
+    case LOAD_REPLIES_ERROR:
     case CREATE_COMMENT_ERROR: {
       const id = action.id; // Is initial id!
       return {

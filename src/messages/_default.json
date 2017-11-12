@@ -320,6 +320,7 @@
     "message": "",
     "files": [
       "src/components/AccountDetails/AccountDetails.js",
+      "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/Login/Login.js",
       "src/components/NotificationInput/NotificationInput.js",
       "src/components/ProposalDetails/ProposalDetails.js",
@@ -327,6 +328,7 @@
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js",
       "src/components/WorkTeamInput/WorkTeamInput.js",
+      "src/components/WorkTeamManager/WorkTeamManager.js",
       "src/routes/passwordRecovery/PasswordRecovery.js"
     ]
   },
@@ -564,6 +566,7 @@
     "defaultMessage": "Time already passed",
     "message": "",
     "files": [
+      "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/ProposalDetails/ProposalDetails.js",
       "src/components/ProposalInput/ProposalInput.js"
     ]
@@ -580,7 +583,10 @@
     "description": "Should notify a successful action",
     "defaultMessage": "Success!",
     "message": "",
-    "files": ["src/components/ProposalInput/ProposalInput.js"]
+    "files": [
+      "src/components/DiscussionInput/DiscussionInput.js",
+      "src/components/ProposalInput/ProposalInput.js"
+    ]
   },
   {
     "id": "poll.notify",
@@ -629,7 +635,10 @@
     "description": "Short command for sending data to the server",
     "defaultMessage": "Submit",
     "message": "",
-    "files": ["src/components/ProposalInput/ProposalInput.js"]
+    "files": [
+      "src/components/DiscussionInput/DiscussionInput.js",
+      "src/components/ProposalInput/ProposalInput.js"
+    ]
   },
   {
     "id": "settings.email.notVerified",
@@ -700,8 +709,10 @@
     "defaultMessage": "You selection is not correct. Click on a suggestion",
     "message": "",
     "files": [
+      "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/ProposalInput/ProposalInput.js",
-      "src/components/WorkTeamInput/WorkTeamInput.js"
+      "src/components/WorkTeamInput/WorkTeamInput.js",
+      "src/components/WorkTeamManager/WorkTeamManager.js"
     ]
   },
   {
@@ -772,21 +783,30 @@
     "description": "Menu entry on statements to delete statement",
     "defaultMessage": "delete",
     "message": "",
-    "files": ["src/components/Statement/Statement.js"]
+    "files": [
+      "src/components/Comment/Comment.js",
+      "src/components/Statement/Statement.js"
+    ]
   },
   {
     "id": "statements.flag",
     "description": "Menu entry on statements to flag statement",
     "defaultMessage": "flag",
     "message": "",
-    "files": ["src/components/Statement/Statement.js"]
+    "files": [
+      "src/components/Comment/Comment.js",
+      "src/components/Statement/Statement.js"
+    ]
   },
   {
     "id": "statements.follow",
     "description": "Menu entry on statements to follow author",
     "defaultMessage": "follow",
     "message": "",
-    "files": ["src/components/Statement/Statement.js"]
+    "files": [
+      "src/components/Comment/Comment.js",
+      "src/components/Statement/Statement.js"
+    ]
   },
   {
     "id": "settings.email.heading",
@@ -856,13 +876,68 @@
     "description": "Btn to collapse statements",
     "defaultMessage": "Show less",
     "message": "",
-    "files": ["src/components/Statement/Statement.js"]
+    "files": [
+      "src/components/Comment/Comment.js",
+      "src/components/Statement/Statement.js"
+    ]
   },
   {
     "id": "statements.expand",
     "description": "Btn to expand statements",
     "defaultMessage": "Read more",
     "message": "",
-    "files": ["src/components/Statement/Statement.js"]
+    "files": [
+      "src/components/Comment/Comment.js",
+      "src/components/Statement/Statement.js"
+    ]
+  },
+  {
+    "id": "commands.collapseReplies",
+    "description": "Hide replies",
+    "defaultMessage": "Hide replies",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "commands.edit",
+    "description": "Edit",
+    "defaultMessage": "Edit",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "commands.expandReplies",
+    "description": "Show replies",
+    "defaultMessage": "View all {cnt} replies",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "commands.expandReply",
+    "description": "Show reply",
+    "defaultMessage": "View reply",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "commands.reply",
+    "description": "Btn to reply",
+    "defaultMessage": "Reply",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "label.edited",
+    "description": "Comment edited",
+    "defaultMessage": "edited {time}",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "numComments",
+    "description": "Number of comments",
+    "defaultMessage": "{cnt} comments",
+    "message": "",
+    "files": ["src/components/DiscussionPreview/DiscussionPreview.js"]
   }
 ]

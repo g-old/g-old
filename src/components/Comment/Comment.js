@@ -120,6 +120,7 @@ class Comment extends React.Component {
     updates: PropTypes.shape({
       updateCom: PropTypes.shape({ pending: PropTypes.bool }),
       success: PropTypes.bool,
+      pending: PropTypes.bool,
     }),
     onProfileClick: PropTypes.func,
     loadReplies: PropTypes.func,
@@ -549,26 +550,69 @@ class Comment extends React.Component {
         );
       }
 
-      if (this.state.showReplies) {
-        footer.push(<div className={s.replies}>{this.props.children} </div>);
-      }
       if (this.props.numReplies) {
         const expandLabel =
           this.props.numReplies === 1 ? 'expandReply' : 'expandReplies';
-
+        const pending =
+          !this.props.children &&
+          this.props.updates &&
+          this.props.updates.pending;
         footer.push(
           <button
+            disabled={this.props.updates && this.props.updates.pending}
             onClick={this.toggleReplies}
             className={cn(s.more, s.command)}
           >
             <FormattedMessage
               {...messages[
-                this.state.showReplies ? 'collapseReplies' : expandLabel
+                this.state.showReplies && this.props.children
+                  ? 'collapseReplies'
+                  : expandLabel
               ]}
               values={{ cnt: this.props.numReplies }}
             />
+            {pending ? (
+              <svg
+                className={s.spinning}
+                viewBox="0 0 48 48"
+                version="1.1"
+                role="img"
+                aria-label="Spinning"
+              >
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="12"
+                  stroke="#167ac6"
+                  strokeWidth="3"
+                  fill="none"
+                />
+              </svg>
+            ) : (
+              <svg
+                version="1.1"
+                viewBox="0 0 24 24"
+                width="24px"
+                height="24px"
+                role="img"
+                aria-label="form-down"
+              >
+                <polyline
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth="2"
+                  points="18 9 12 15 6 9"
+                  transform={
+                    this.state.showReplies ? 'matrix(1 0 0 -1 0 24)' : ''
+                  }
+                />
+              </svg>
+            )}
           </button>,
         );
+      }
+      if (this.state.showReplies) {
+        footer.push(<div className={s.replies}>{this.props.children} </div>);
       }
     }
     return (

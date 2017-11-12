@@ -112,10 +112,29 @@
   box-shadow: none;
   outline: 0;
   display: block;
+  min-height: 1.5rem;
 }
 
 .contentToggle:hover {
   text-decoration: underline;
+}
+
+.spinning {
+  width: 24px;
+  height: 24px;
+  stroke-dasharray: 60px 60px;
+  stroke-dashoffset: 0;
+  animation: rotate 0.8s infinite linear;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .textEdit {
