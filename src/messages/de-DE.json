@@ -335,7 +335,7 @@
     "id": "poll.closed",
     "description": "Poll closing time",
     "defaultMessage": "Closed at",
-    "message": "Geschlossen seit",
+    "message": "Endete",
     "files": ["src/components/Poll/Poll.js"]
   },
   {

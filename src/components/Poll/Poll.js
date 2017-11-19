@@ -18,12 +18,12 @@ import Notification from '../Notification';
 const messages = defineMessages({
   closed: {
     id: 'poll.closed',
-    defaultMessage: 'Closed at',
+    defaultMessage: 'Ended',
     description: 'Poll closing time',
   },
   closing: {
     id: 'poll.closing',
-    defaultMessage: 'Closing at',
+    defaultMessage: 'Closing',
     description: 'Poll ending time',
   },
   retract: {
@@ -293,7 +293,7 @@ class Poll extends React.Component {
           ) : (
             <FormattedMessage {...messages.closing} />
           )}
-          <FormattedRelative value={closedAt || endTime} />
+          &nbsp;<FormattedRelative value={closedAt || endTime} />
         </p>
         <div className={s.pollState}>
           <PollState
