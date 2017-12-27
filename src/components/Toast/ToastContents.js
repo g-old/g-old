@@ -5,7 +5,6 @@ import Button from '../Button';
 // eslint-disable-next-line css-modules/no-unused-class
 import s from './Toast.css';
 
-const DURATION = 10000;
 const ANIMATION_DURATION = 1000;
 class ToastContents extends React.Component {
   static propTypes = {
@@ -13,9 +12,11 @@ class ToastContents extends React.Component {
     intl: PropTypes.shape({}).isRequired,
     children: PropTypes.node.isRequired,
     insertCss: PropTypes.func.isRequired,
+    duration: PropTypes.number,
   };
   static defaultProps = {
     onClose: null,
+    duration: 0,
   };
   static childContextTypes = {
     intl: PropTypes.shape({}),
@@ -34,7 +35,10 @@ class ToastContents extends React.Component {
     };
   }
   componentDidMount() {
-    this.timer = setTimeout(this.onClose, DURATION);
+    const { duration } = this.props;
+    if (duration) {
+      this.timer = setTimeout(this.onClose, duration);
+    }
   }
 
   componentWillUnmount() {
@@ -60,6 +64,7 @@ class ToastContents extends React.Component {
     if (onClose) {
       closeControl = (
         <Button
+          plain
           onClick={this.onClose}
           icon={
             <svg

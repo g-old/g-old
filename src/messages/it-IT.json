@@ -268,14 +268,14 @@
   {
     "id": "poll.closed",
     "description": "Poll closing time",
-    "defaultMessage": "Closed at",
+    "defaultMessage": "Ended",
     "message": "Terminato",
     "files": ["src/components/Poll/Poll.js"]
   },
   {
     "id": "poll.closing",
     "description": "Poll ending time",
-    "defaultMessage": "Closing at",
+    "defaultMessage": "Closing",
     "message": "Termina",
     "files": ["src/components/Poll/Poll.js"]
   },

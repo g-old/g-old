@@ -16,8 +16,8 @@ import { createSSESub, closeSSE } from './sseSubs';
 // import fetch from '../core/fetch';
 
 export function allowCookies() {
-  return async (dispatch) => {
-    dispatch({ type: SET_COOKIE_CONSENT, payload: 'YES' });
+  return async dispatch => {
+    dispatch({ type: SET_COOKIE_CONSENT, payload: true });
     if (process.env.BROWSER) {
       const maxAge = 3650 * 24 * 3600; // 10 years in seconds
       document.cookie = `consent=YES;path=/;max-age=${maxAge}`;
@@ -80,7 +80,10 @@ export function login(data) {
       return acc;
     }, {});
     let redirect = null;
-    if (history.location.search && history.location.search.indexOf('=') !== -1) {
+    if (
+      history.location.search &&
+      history.location.search.indexOf('=') !== -1
+    ) {
       redirect = history.location.search.split('=')[1];
     }
     dispatch({

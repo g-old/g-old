@@ -149,3 +149,5 @@ export const getDiscussionError = state =>
   fromEntity.getDiscussionError(state.entities);
 
 export const getCommentUpdates = state => fromUi.getCommentUpdates(state.ui);
+
+export const getConsent = state => state.consent;

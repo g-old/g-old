@@ -334,14 +334,14 @@
   {
     "id": "poll.closed",
     "description": "Poll closing time",
-    "defaultMessage": "Closed at",
+    "defaultMessage": "Ended",
     "message": "Endete",
     "files": ["src/components/Poll/Poll.js"]
   },
   {
     "id": "poll.closing",
     "description": "Poll ending time",
-    "defaultMessage": "Closing at",
+    "defaultMessage": "Closing",
     "message": "Endet",
     "files": ["src/components/Poll/Poll.js"]
   },

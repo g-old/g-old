@@ -9,9 +9,11 @@ import ToastContents from './ToastContents';
 class Toast extends React.Component {
   static propTypes = {
     id: PropTypes.string,
+    onClose: PropTypes.func,
   };
   static defaultProps = {
     id: null,
+    onClose: null,
   };
   static contextTypes = {
     intl: PropTypes.object,
@@ -38,6 +40,13 @@ class Toast extends React.Component {
     this.removeLayer();
   }
 
+  onClose() {
+    const { onClose } = this.props;
+    this.removeLayer();
+    if (onClose) {
+      onClose();
+    }
+  }
   addLayer() {
     const { id } = this.props;
 
@@ -62,10 +71,13 @@ class Toast extends React.Component {
   }
 
   removeLayer() {
-    ReactDOM.unmountComponentAtNode(this.element);
-    this.element.parentNode.removeChild(this.element);
-    this.element = undefined;
+    if (this.element) {
+      ReactDOM.unmountComponentAtNode(this.element);
+      this.element.parentNode.removeChild(this.element);
+      this.element = undefined;
+    }
   }
+
   renderLayer() {
     if (this.element) {
       this.element.className = s.container;
@@ -75,7 +87,7 @@ class Toast extends React.Component {
           intl={this.context.intl}
           store={this.context.store}
           insertCss={this.context.insertCss}
-          onClose={() => this.removeLayer()}
+          onClose={() => this.onClose()}
         />
       );
       ReactDOM.render(contents, this.element);
