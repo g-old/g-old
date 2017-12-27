@@ -240,3 +240,14 @@ textarea {
     left: 100%;
   }
 }
+
+.banner {
+  display: flex;
+  justify-content: center;
+
+  img {
+    max-width: 100%;
+    align-self: center;
+    height: auto;
+  }
+}

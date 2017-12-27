@@ -1065,8 +1065,7 @@
   {
     "id": "cookieBanner",
     "description": "Cookie banner, should comply to EU regulations",
-    "defaultMessage":
-      "If you continue to use this site, you accept our privacy policy.",
+    "defaultMessage": "By using this site you accept our privacy policy.",
     "message": "",
     "files": ["src/components/Layout/Layout.js"]
   }

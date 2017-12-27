@@ -59,10 +59,20 @@ class Layout extends React.Component {
         </Toast>
       );
     }
+
+    const logo = (
+      <div className={s.banner}>
+        <img
+          alt="banner"
+          src="https://www.altoadige5stelle.it/wp-content/uploads/2017/07/banner-nuovo-m5s-5sb-1-2.jpg"
+        />
+      </div>
+    );
     return (
       <div>
         {this.props.loading && <div className={s.loader} />}
         {toast}
+        {logo}
         <Header />
         <div className={s.content}>{this.props.children}</div>
         <Footer />
