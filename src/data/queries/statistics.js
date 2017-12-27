@@ -229,7 +229,7 @@ const statistics = {
           }
           if (new Date() - lastCalcTime > 1000 * 60 * 60 * 1 /* 1h */) {
             lastCalcTime = new Date();
-            const path = process.env.LOGFILE || '/var/gold/gold.org'; // `${os.homedir()}/goldtest.log`;
+            const path = process.env.LOGFILE || '/var/gold/g-old.org'; // `${os.homedir()}/goldtest.log`;
             lastCalcTask = readLogBackwards(path, 24)
               .then(data => {
                 if (data) {
