@@ -1,9 +1,12 @@
+@import "../variables.css";
+
 .container {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
+  stroke: #000;
 }
 
 .toast {
@@ -13,6 +16,13 @@
   min-height: 72px;
   background-color: rgba(238, 238, 238, 0.9);
   animation: toast-lower 1s;
+  padding: 0 1rem;
+}
+
+.alert {
+  background-color: var(--color-red);
+  color: #fff;
+  stroke: #fff;
 }
 
 @keyframes toast-lower {
@@ -42,5 +52,5 @@
 
 .contents {
   flex: 1;
-  padding: 12px;
+  padding-right: 1rem;
 }

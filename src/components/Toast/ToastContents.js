@@ -13,10 +13,12 @@ class ToastContents extends React.Component {
     children: PropTypes.node.isRequired,
     insertCss: PropTypes.func.isRequired,
     duration: PropTypes.number,
+    alert: PropTypes.bool,
   };
   static defaultProps = {
     onClose: null,
     duration: 0,
+    alert: false,
   };
   static childContextTypes = {
     intl: PropTypes.shape({}),
@@ -57,10 +59,14 @@ class ToastContents extends React.Component {
   }
 
   render() {
-    const { onClose, children } = this.props;
+    const { onClose, children, alert } = this.props;
     const { closing } = this.state;
 
     let closeControl;
+    const classes = cn(s.toast, {
+      [s.alert]: alert,
+      [s.close]: closing,
+    });
     if (onClose) {
       closeControl = (
         <Button
@@ -75,19 +81,14 @@ class ToastContents extends React.Component {
               role="img"
               aria-label="close"
             >
-              <path
-                fill="none"
-                stroke="#000"
-                strokeWidth="2"
-                d="M3,3 L21,21 M3,21 L21,3"
-              />
+              <path fill="none" strokeWidth="2" d="M3,3 L21,21 M3,21 L21,3" />
             </svg>
           }
         />
       );
     }
     return (
-      <div className={cn(s.toast, closing ? s.close : null)}>
+      <div className={classes}>
         <div className={s.contents}>{children}</div>
         {closeControl}
       </div>

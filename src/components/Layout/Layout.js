@@ -25,8 +25,7 @@ import Footer from '../Footer';
 const messages = defineMessages({
   cookieBanner: {
     id: 'cookieBanner',
-    defaultMessage:
-      'If you continue to use this site, you accept our privacy policy.',
+    defaultMessage: 'By using this site you accept our privacy policy.',
     description: 'Cookie banner, should comply to EU regulations',
   },
 });
@@ -55,7 +54,7 @@ class Layout extends React.Component {
     let toast;
     if (!consent) {
       toast = (
-        <Toast onClose={this.consent}>
+        <Toast alert onClose={this.consent}>
           <FormattedMessage {...messages.cookieBanner} />
         </Toast>
       );
