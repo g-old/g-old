@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import withstyles from 'isomorphic-style-loader/lib/withStyles';
+import cn from 'classnames';
 import { connect } from 'react-redux';
 import { loadFeed } from '../../actions/feed';
 import {
@@ -7,6 +9,7 @@ import {
   getFeedIsFetching,
   getFeedErrorMessage,
 } from '../../reducers/index';
+import s from './FeedContainer.css';
 import FetchError from '../../components/FetchError';
 import Activity from '../../components/Activity';
 
@@ -49,8 +52,7 @@ class FeedContainer extends React.Component {
     const polls = {};
     const proposals = {};
     return (
-      <div>
-        <h1>feed</h1>
+      <div className={cn(s.container)}>
         {activities.map(activity => {
           if (!activity.object) return null; // hotfix - problem is ondelete cascade for votes
           if (activity.type === 'statement') {
@@ -125,4 +127,6 @@ const mapDispatch = {
   loadFeed,
 };
 
-export default connect(mapStateToProps, mapDispatch)(FeedContainer);
+export default connect(mapStateToProps, mapDispatch)(
+  withstyles(s)(FeedContainer),
+);
