@@ -1,0 +1,7 @@
+.container {
+  padding: 40px 0 0;
+
+  > div:not(:last-child) {
+    margin-bottom: 2rem;
+  }
+}

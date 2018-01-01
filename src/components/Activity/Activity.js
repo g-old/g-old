@@ -115,8 +115,10 @@ class Activity extends React.Component {
 
     return (
       <div className={s.container}>
-        <FormattedRelative value={this.props.date} />
-        <h3>{header}</h3>
+        <div className={s.date}>
+          <FormattedRelative value={this.props.date} />
+        </div>
+        <div className={s.header}>{header}</div>
 
         <div>{content}</div>
       </div>
