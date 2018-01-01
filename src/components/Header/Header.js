@@ -42,7 +42,7 @@ class Header extends React.Component {
               <FormattedMessage {...messages.bannerTitle} />
             </h1>
             {'Government by OnLine Democracy'}
-          </div>*/}
+          </div> */}
         </div>
       </div>
     );

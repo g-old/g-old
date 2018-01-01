@@ -24,21 +24,6 @@ const fork = async file => {
         }
       });
       initialized = true;
-
-      process.on('exit', exitCode => {
-        log.error({ exitCode }, 'Server closing down, stopping worker');
-        worker.kill(exitCode);
-        initialized = false;
-      });
-      process.on('SIGTERM', exitCode => {
-        log.error({ exitCode }, 'SIGTERM received');
-        process.exit(exitCode);
-      });
-
-      process.on('SIGINT', exitCode => {
-        log.error({ exitCode }, 'SIGINT received');
-        process.exit(exitCode);
-      });
     } else {
       log.fatal('Worker could not been forked');
       throw Error('Worker could not been forked');
@@ -46,6 +31,28 @@ const fork = async file => {
   } else {
     log.info({ worker }, 'Worker already initialized');
   }
+};
+
+const init = async file => {
+  /* when the process exits, we need to stop the worker */
+  process.on('exit', exitCode => {
+    log.error({ exitCode }, 'Server closing down, stopping worker');
+    if (worker) worker.kill(exitCode);
+    initialized = false;
+  });
+
+  /* to make sure we get the 'exit' signal when the process dies */
+  process.on('SIGTERM', exitCode => {
+    log.error({ exitCode }, 'SIGTERM received');
+    process.exit(exitCode);
+  });
+  process.on('SIGINT', exitCode => {
+    log.error({ exitCode }, 'SIGINT received');
+    process.exit(exitCode);
+  });
+
+  /* start the actual worker */
+  await fork(file);
 };
 
 export const sendJob = ({ type, data, viewer }) => {
@@ -63,4 +70,4 @@ export const sendJob = ({ type, data, viewer }) => {
   return result;
 };
 
-export default { start: path => fork(path) };
+export default { start: path => init(path) };
