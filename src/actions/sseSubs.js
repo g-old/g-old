@@ -16,6 +16,7 @@ subscription{
   activities {
   id
   type
+  info
   objectId
   verb
   createdAt

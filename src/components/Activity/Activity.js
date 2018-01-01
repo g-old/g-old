@@ -22,6 +22,7 @@ class Activity extends React.Component {
       state: PropTypes.string,
       pollId: PropTypes.string,
     }),
+    info: PropTypes.string.isRequired,
     verb: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
   };
@@ -39,12 +40,16 @@ class Activity extends React.Component {
     let header = null;
     /* eslint-disable no-underscore-dangle */
     if (this.props.content && this.props.content.__typename === 'StatementDL') {
+      const info = JSON.parse(this.props.info || '{}');
       content = (
-        <Link to={`/proposal/xxx/${this.props.content.pollId}`}>
+        <Link
+          to={`/proposal/${info.proposalId || 'xxx'}/${this.props.content
+            .pollId}`}
+        >
           <Statement {...this.props.content} />
         </Link>
       );
-      header = 'Look at that statement!';
+      header = info.proposalTitle || ':(';
     } else if (
       this.props.content &&
       this.props.content.__typename === 'ProposalDL'
@@ -82,8 +87,12 @@ class Activity extends React.Component {
       this.props.content &&
       this.props.content.__typename === 'VoteDL'
     ) {
+      const info = JSON.parse(this.props.info || '{}');
       content = (
-        <Link to={`/proposal/xxx/${this.props.content.pollId}`}>
+        <Link
+          to={`/proposal/${info.proposalId || 'xxx'}/${this.props.content
+            .pollId}`}
+        >
           <div>
             <Avatar user={this.props.content.voter} isFollowee />
             {`${this.props.content.voter.name} ${this.props.content.voter
@@ -97,7 +106,7 @@ class Activity extends React.Component {
           </div>
         </Link>
       );
-      header = 'Just voted!';
+      header = info.proposalTitle || ':(';
     } else {
       content = JSON.stringify(this.props.content);
       header = 'Nobody knows ...';
@@ -107,7 +116,7 @@ class Activity extends React.Component {
     return (
       <div className={s.container}>
         <FormattedRelative value={this.props.date} />
-        <h1>{header}</h1>
+        <h3>{header}</h3>
 
         <div>{content}</div>
       </div>

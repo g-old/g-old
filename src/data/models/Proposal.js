@@ -106,7 +106,7 @@ const validatePoll = async (viewer, poll, loaders) => {
 
 const validateStateChange = async (
   viewer,
-  { id, state, proposalInDB },
+  { state, proposalInDB },
   loaders,
 ) => {
   const pollId =
@@ -207,7 +207,7 @@ class Proposal {
     if (data.state) {
       const isValid = await validateStateChange(
         viewer,
-        { id: data.id, state: data.state, proposalInDB },
+        { state: data.state, proposalInDB },
         loaders,
       );
       if (isValid) {
@@ -280,6 +280,7 @@ class Proposal {
     // throw Error('TestError');
     // authorize
     if (!canMutate(viewer, data, Models.PROPOSAL)) return null;
+
     // validate
     if (!data.text) return null;
     if (!data.title) return null;

@@ -12,6 +12,49 @@ import Proposal from '../models/Proposal';
 import Statement from '../models/Statement';
 import Vote from '../models/Vote';
 
+const addProposalInfo = async (viewer, loaders, pollId) => {
+  if (!pollId) {
+    return JSON.stringify({});
+  }
+  const { id, title } = await Proposal.genByPoll(viewer, pollId, loaders);
+
+  return JSON.stringify({ proposalId: id, proposalTitle: title });
+};
+
+const getVote = async (viewer, parent, loaders) => {
+  let vote;
+  if (parent.verb === 'delete') {
+    vote = new Vote({
+      id: parent.content.id,
+      user_id: parent.content.userId,
+      position: parent.content.position,
+      poll_id: parent.content.pollId,
+    });
+  } else {
+    vote = await Vote.gen(viewer, parent.objectId, loaders);
+  }
+  return vote;
+};
+
+const getStatement = async (viewer, parent, loaders) => {
+  let statement;
+  if (parent.verb === 'delete') {
+    statement = new Statement({
+      id: parent.content.id,
+      poll_id: parent.content.pollId,
+    });
+  } else {
+    if (parent.verb === 'update') {
+      loaders.statements.clear(parent.objectId);
+    }
+    // clear votes loader, bc if user changed vote, it will return wrong values
+    loaders.votes.clear(parent.content.voteId);
+
+    statement = await Statement.gen(viewer, parent.objectId, loaders);
+  }
+  return statement;
+};
+
 const ActivityType = new GraphQLObjectType({
   name: 'Activity',
 
@@ -37,7 +80,7 @@ const ActivityType = new GraphQLObjectType({
     },
     object: {
       type: ObjectType,
-      resolve: (parent, args, { viewer, loaders }) => {
+      resolve: async (parent, args, { viewer, loaders }) => {
         if (parent.type === 'proposal') {
           if (parent.verb === 'update') {
             loaders.proposals.clear(parent.objectId);
@@ -46,29 +89,10 @@ const ActivityType = new GraphQLObjectType({
           return Proposal.gen(viewer, parent.objectId, loaders);
         }
         if (parent.type === 'statement') {
-          if (parent.verb === 'delete') {
-            return new Statement({
-              id: parent.content.id,
-              poll_id: parent.content.pollId,
-            });
-          }
-          if (parent.verb === 'update') {
-            loaders.statements.clear(parent.objectId);
-          }
-          // clear votes loader, bc if user changed vote, it will return wrong values
-          loaders.votes.clear(parent.content.voteId);
-          return Statement.gen(viewer, parent.objectId, loaders);
+          return getStatement(viewer, parent, loaders);
         }
         if (parent.type === 'vote') {
-          if (parent.verb === 'delete') {
-            return new Vote({
-              id: parent.content.id,
-              user_id: parent.content.userId,
-              position: parent.content.position,
-              poll_id: parent.content.pollId,
-            });
-          }
-          return Vote.gen(viewer, parent.objectId, loaders);
+          return getVote(viewer, parent, loaders);
         }
         if (parent.type === 'notification') {
           return Notification.gen(viewer, parent.objectId, loaders);
@@ -78,6 +102,32 @@ const ActivityType = new GraphQLObjectType({
     },
     createdAt: {
       type: GraphQLString,
+    },
+    info: {
+      type: GraphQLString,
+      resolve: async (parent, args, { viewer, loaders }) => {
+        switch (parent.type) {
+          case 'statement': {
+            const statement = await getStatement(viewer, parent, loaders);
+
+            return addProposalInfo(
+              viewer,
+              loaders,
+              statement.pollId,
+              statement,
+            );
+          }
+          case 'vote': {
+            const vote = await getVote(viewer, parent, loaders);
+
+            return addProposalInfo(viewer, loaders, vote.pollId, vote);
+          }
+
+          default: {
+            return JSON.stringify({});
+          }
+        }
+      },
     },
   },
 });

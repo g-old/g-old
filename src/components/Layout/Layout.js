@@ -62,10 +62,7 @@ class Layout extends React.Component {
 
     const logo = (
       <div className={s.banner}>
-        <img
-          alt="banner"
-          src="https://www.altoadige5stelle.it/wp-content/uploads/2017/07/banner-nuovo-m5s-5sb-1-2.jpg"
-        />
+        <img alt="banner" src="/banner01.png" />
       </div>
     );
     return (

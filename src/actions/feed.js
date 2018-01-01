@@ -16,6 +16,7 @@ query($userId:ID){
   type
   objectId
   verb
+  info
   createdAt
   actor {
     id

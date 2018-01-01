@@ -15,7 +15,7 @@ class FeedContainer extends React.Component {
     activities: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,
-      })
+      }),
     ).isRequired,
     isFetching: PropTypes.bool.isRequired,
     loadFeed: PropTypes.func.isRequired,
@@ -106,6 +106,7 @@ class FeedContainer extends React.Component {
               date={activity.createdAt}
               verb={activity.verb}
               content={activity.object}
+              info={activity.info}
             />
           );
         })}
