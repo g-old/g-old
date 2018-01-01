@@ -1,8 +1,10 @@
 .container {
-  margin: 0 auto;
-  border: solid 1px gray;
-  padding: 1em;
+  margin: 0.5em 1em;
+
+  /* border: solid 1px gray; */
+  padding: 1em 0.5em;
   max-width: 480px;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.11);
 }
 
 .header {

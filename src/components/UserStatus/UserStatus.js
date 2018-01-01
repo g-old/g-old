@@ -84,10 +84,11 @@ class UserStatus extends React.Component {
         avatar = (
           <img
             style={{
+              marginLeft: '0.15rem',
               boxShadow: '0 0 0 2px white',
               borderRadius: '2px',
-              height: '2em',
-              width: '2em',
+              height: '2.2rem',
+              width: '2.2rem',
               verticalAlign: 'bottom',
             }}
             src={this.props.user.avatar}
