@@ -122,9 +122,9 @@ class UserStatus extends React.Component {
             icon={avatar}
           >
             <Button plain onClick={onVisitProfile} label="Profile" />
-            <Button plain onClick={this.onLogout} label="Logout" />
             <Button plain onClick={onVisitAccounts} label="Users" />
             <Button plain onClick={onVisitWorkTeams} label="Workteams" />
+            <Button plain onClick={this.onLogout} label="Logout" />
           </Menu>
         </div>
       );
