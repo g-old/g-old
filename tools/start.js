@@ -24,7 +24,7 @@ const isDebug = !process.argv.includes('--release');
 const watchOptions = {
   // Watching may not work with NFS and machines in VirtualBox
   // Uncomment next line if it is your case (use true or interval in milliseconds)
-  // poll: true,
+  poll: 2000,
   // Decrease CPU or memory usage in some file systems
   // ignored: /node_modules/,
 };

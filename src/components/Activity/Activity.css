@@ -5,6 +5,17 @@
   max-width: 480px;
 }
 
+.follower {
+  color: #000;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+
+  > span span {
+    margin-left: 0.5rem;
+  }
+}
+
 .header {
   font-size: 1.5rem;
 }

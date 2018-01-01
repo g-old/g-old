@@ -6,9 +6,9 @@ import s from './Activity.css';
 import Avatar from '../Avatar';
 import Statement from '../Statement';
 import ProposalPreview from '../ProposalPreview';
-import Icon from '../Icon';
 import Link from '../Link';
 import history from '../../history';
+import { ICONS } from '../../constants';
 
 class Activity extends React.Component {
   static propTypes = {
@@ -21,6 +21,7 @@ class Activity extends React.Component {
       }),
       state: PropTypes.string,
       pollId: PropTypes.string,
+      position: PropTypes.string,
     }),
     info: PropTypes.string.isRequired,
     verb: PropTypes.string.isRequired,
@@ -30,11 +31,54 @@ class Activity extends React.Component {
     content: {},
   };
 
+  constructor(props) {
+    super(props);
+    this.renderVote = this.renderVote.bind(this);
+  }
+
   // eslint-disable-next-line class-methods-use-this
   onProposalClick({ proposalId, pollId }) {
     history.push(`/proposal/${proposalId}/${pollId}`);
   }
 
+  renderVote(info) {
+    const { position } = this.props.content;
+    const thumb = (
+      <svg
+        viewBox="0 0 24 24"
+        width="60px"
+        height="24px"
+        role="img"
+        aria-label="halt"
+      >
+        <path
+          fill="none"
+          stroke={this.props.content.position === 'pro' ? '#8cc800' : '#ff324d'}
+          strokeWidth="1"
+          d={ICONS.thumbUpAlt}
+          transform={position === 'pro' ? '' : 'scale(1,-1) translate(0,-24)'}
+        />
+      </svg>
+    );
+    return (
+      <Link
+        to={`/proposal/${info.proposalId || 'xxx'}/${this.props.content
+          .pollId}`}
+      >
+        <div className={s.follower}>
+          <span>
+            <Avatar user={this.props.content.voter} isFollowee />
+            <span>
+              {`${this.props.content.voter.name} ${this.props.content.voter
+                .surname}`}
+            </span>
+          </span>
+
+          {thumb}
+        </div>
+      </Link>
+    );
+  }
   render() {
     let content = null;
     let header = null;
@@ -88,24 +132,9 @@ class Activity extends React.Component {
       this.props.content.__typename === 'VoteDL'
     ) {
       const info = JSON.parse(this.props.info || '{}');
-      content = (
-        <Link
-          to={`/proposal/${info.proposalId || 'xxx'}/${this.props.content
-            .pollId}`}
-        >
-          <div>
-            <Avatar user={this.props.content.voter} isFollowee />
-            {`${this.props.content.voter.name} ${this.props.content.voter
-              .surname}`}
-            <br />
-            <Icon
-              icon={'M27 4l-15 15-7-7-5 5 12 12 20-20z'}
-              color={'green'}
-              size={'64'}
-            />
-          </div>
-        </Link>
-      );
+
+      content = this.renderVote(info);
+
       header = info.proposalTitle || ':(';
     } else {
       content = JSON.stringify(this.props.content);
