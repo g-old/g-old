@@ -1,7 +1,11 @@
 .list {
   margin-bottom: 1em;
-}
 
-.list > div {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  > div {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  }
+
+  > div:not(:last-child) {
+    margin-bottom: 1.5rem;
+  }
 }

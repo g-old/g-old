@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import cn from 'classnames';
+import css from './StatementsContainer.css';
 import Statement from '../Statement';
 import {
   deleteStatement,
@@ -144,9 +147,9 @@ class StatementsContainer extends React.Component {
 
     toRender.sort((a, b) => b.likes - a.likes);
     return (
-      <div>
+      <div className={cn(css.list)}>
         {ownStatementsNode}
-        {toRender.map(s =>
+        {toRender.map(s => (
           <Statement
             {...s}
             user={user}
@@ -164,8 +167,8 @@ class StatementsContainer extends React.Component {
             onFlagging={this.props.flag}
             followees={followees}
             isFollowee={followees.some(f => f.id === s.author.id)}
-          />,
-        )}
+          />
+        ))}
       </div>
     );
   }
@@ -189,4 +192,6 @@ const mapDispatch = {
   updateUser,
 };
 
-export default connect(mapStateToProps, mapDispatch)(StatementsContainer);
+export default connect(mapStateToProps, mapDispatch)(
+  withStyles(css)(StatementsContainer),
+);

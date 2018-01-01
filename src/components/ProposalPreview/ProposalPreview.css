@@ -4,7 +4,6 @@
 
 .root {
   margin: auto;
-  margin-bottom: 1.5em;
   max-width: var(--max-content-width);
 }
 
