@@ -15,13 +15,20 @@ class Comment {
     this.editedAt = data.edited_at;
   }
 
-  static async gen(viewer, id, { comments }) {
+  static async gen(viewer, id, { comments, discussions }) {
     if (!id) return null;
     const data = await comments.load(id);
-
     if (data == null) return null;
     if (viewer.id == null) return null;
-    if (!canSee(viewer, data, Models.COMMENT)) return null;
+    const discussion = await discussions.load(data.discussion_id);
+    if (
+      !canSee(
+        viewer,
+        { ...data, discussion: { workTeamId: discussion.work_team_id } },
+        Models.COMMENT,
+      )
+    )
+      return null;
 
     return new Comment(data);
   }
@@ -29,10 +36,18 @@ class Comment {
   static async create(viewer, data, loaders) {
     if (!data || !data.discussionId) return null;
     const discussion = await loaders.discussions.load(data.discussionId);
+    if (!discussion) {
+      return null;
+    }
+
     if (
       !canMutate(
         viewer,
-        { ...data, discussion, creating: true },
+        {
+          ...data,
+          discussion: { workTeamId: discussion.work_team_id },
+          creating: true,
+        },
         Models.COMMENT,
       )
     ) {

@@ -101,6 +101,7 @@ class DiscussionContainer extends React.Component {
     }
     if (this.isReady()) {
       // return proposal, poll, statementslist
+      if (!discussion.comments) return <span>{'NOTHING TO SEE'}</span>;
       return (
         <div>
           <Box column pad>
@@ -120,8 +121,8 @@ class DiscussionContainer extends React.Component {
               updates={this.props.updates['0000'] || {}}
             />
             {'TOP COMMENTS'}
-            {this.props.discussion.comments &&
-              this.props.discussion.comments.map(c => (
+            {discussion.comments &&
+              discussion.comments.map(c => (
                 <Comment
                   {...c}
                   onReply={this.handleReply}

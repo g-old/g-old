@@ -78,7 +78,29 @@ passport.serializeUser((user, done) => {
       const endIndex = stIndex + 18; // (!)
       avatar = avatar.slice(0, stIndex) + avatar.substring(endIndex);
     }
-    const sessionUser = {
+    return knex('user_work_teams')
+      .where({ user_id: user.id })
+      .select('work_team_id')
+      .then(ids => {
+        const wtMemberships = ids.map(data => data.work_team_id);
+        const sessionUser = {
+          id: user.id,
+          name: user.name,
+          surname: user.surname,
+          email: user.email,
+          avatar,
+          thumbnail: user.thumbnail,
+          permissions: rights.perm,
+          privileges: rights.priv,
+          groups: user.groups,
+          wtMemberships,
+          canVoteSince: user.can_vote_since || user.canVoteSince,
+          emailVerified,
+        };
+        done(null, sessionUser);
+        return null;
+      });
+    /*  const sessionUser = {
       id: user.id,
       name: user.name,
       surname: user.surname,
@@ -90,9 +112,9 @@ passport.serializeUser((user, done) => {
       groups: user.groups,
       canVoteSince: user.can_vote_since || user.canVoteSince,
       emailVerified,
-    };
-    done(null, sessionUser);
-    return null;
+    }; */
+    // done(null, sessionUser);
+    // return null;
   } catch (error) {
     log.error({ user }, 'Serializing failed');
     done({ message: 'Serializing failed', name: 'SerializeError' });

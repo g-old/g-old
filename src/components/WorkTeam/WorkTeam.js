@@ -103,6 +103,13 @@ class WorkTeam extends React.Component {
           primary
           label={'Add discussion'}
         />
+        <Button
+          onClick={() => {
+            alert('TO IMPLEMENT');
+          }}
+          primary
+          label={'°Join'}
+        />
         <div className={s.discussions}>
           {discussions &&
             discussions.map(d => (

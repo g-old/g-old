@@ -236,19 +236,20 @@ function workTeamWriteControl(viewer, data) {
 }
 
 function discussionReadControl(viewer, data) {
-  if (viewer.permissions & AccessMasks.LEVEL_0) {
+  if (viewer.wtMemberships.includes(data.discussion.workTeamId)) {
     return true;
   }
   return false;
 }
 function discussionWriteControl(viewer, data) {
   if (viewer.permissions & Permissions.PUBLISH_DISCUSSIONS) {
-    return true; // TODO change
+    return true;
   }
   return false;
 }
 function commentReadControl(viewer, data) {
-  if (viewer.permissions & AccessMasks.LEVEL_0) {
+  if (viewer.wtMemberships.includes(data.discussion.workTeamId)) {
+    // eslint-disable-line
     return true;
   }
   return false;
@@ -259,7 +260,10 @@ function commentWriteControl(viewer, data) {
   }
   if (data.creating) {
     // TODO check group etc
-    return true;
+    if (viewer.wtMemberships.includes(data.discussion.workTeamId)) {
+      // eslint-disable-line
+      return true;
+    }
   }
   // eslint-disable-next-line eqeqeq
   return viewer.id && viewer.id == data.authorId;

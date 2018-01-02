@@ -52,14 +52,19 @@ const DiscussionType = new ObjectType({
 
     comments: {
       type: new GraphQLList(CommentType),
-      resolve: (data, args, { viewer, loaders }) =>
-        knex('comments')
-          .where({ discussion_id: data.id })
-          .where({ parent_id: null })
-          .orderBy('num_replies', 'desc')
-          .orderBy('created_at', 'desc')
-          .pluck('id')
-          .then(ids => ids.map(id => Comment.gen(viewer, id, loaders))),
+      resolve: (data, args, { viewer, loaders }) => {
+        // experimental
+        if (viewer && viewer.wtMemberships.includes(data.workTeamId)) {
+          return knex('comments')
+            .where({ discussion_id: data.id })
+            .where({ parent_id: null })
+            .orderBy('num_replies', 'desc')
+            .orderBy('created_at', 'desc')
+            .pluck('id')
+            .then(ids => ids.map(id => Comment.gen(viewer, id, loaders)));
+        }
+        return [];
+      },
     },
 
     numComments: {

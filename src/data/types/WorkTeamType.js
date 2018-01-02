@@ -46,7 +46,7 @@ const WorkTeamType = new ObjectType({
     discussions: {
       type: new GraphQLList(DiscussionType),
       resolve(data, args, { viewer, loaders }) {
-        if (viewer) {
+        if (viewer && viewer.wtMemberships.includes(data.id)) {
           return knex('discussions')
             .where({ work_team_id: data.id })
             .pluck('id')
