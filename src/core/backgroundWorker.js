@@ -174,9 +174,9 @@ const push = async (subscriptionData, msg) => {
   return result;
 };
 
-const notifyNewStatements = async (viewer, data) => {
+const notifyNewStatements = async (viewer, data, loaders) => {
   // check proposal
-  const proposal = await Proposal.genByPoll(viewer, data.pollId);
+  const proposal = await Proposal.genByPoll(viewer, data.pollId, loaders);
   if (!proposal) return null;
   if (proposal.notifiedAt) {
     if (
@@ -246,7 +246,7 @@ async function handleMessages(data) {
       }
       case 'webpushforstatementsTEST': {
         log.info('Starting webpush');
-        result = notifyNewStatements(data.viewer, data.data);
+        result = notifyNewStatements(data.viewer, data.data, createLoaders());
 
         break;
       }

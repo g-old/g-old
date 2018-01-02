@@ -242,7 +242,10 @@ function discussionReadControl(viewer, data) {
   return false;
 }
 function discussionWriteControl(viewer, data) {
-  return true; // TODO change
+  if (viewer.permissions & Permissions.PUBLISH_DISCUSSIONS) {
+    return true; // TODO change
+  }
+  return false;
 }
 function commentReadControl(viewer, data) {
   if (viewer.permissions & AccessMasks.LEVEL_0) {

@@ -80,6 +80,24 @@ const getProposalsById = proposalIds =>
       );
   });
 
+const getProposalsByPollId = pollIds =>
+  new Promise(resolve => {
+    knex('proposals')
+      .whereIn('poll_one_id', pollIds)
+      .orWhereIn('poll_two_id', pollIds)
+      .select()
+      .then(data =>
+        resolve(
+          pollIds.map(
+            id =>
+              data.find(
+                row => row.poll_one_id == id || row.poll_two_id == id, // eslint-disable-line eqeqeq
+              ) || new Error(`Row not found: ${id}`),
+          ),
+        ),
+      );
+  });
+
 const getPollsById = pollIds =>
   new Promise(resolve => {
     knex('polls')
@@ -245,6 +263,7 @@ function createLoaders() {
     followees: new DataLoader(ids => getFolloweeIds(ids)),
     roles: new DataLoader(ids => getRolesById(ids)),
     proposals: new DataLoader(ids => getProposalsById(ids)),
+    proposalsByPoll: new DataLoader(ids => getProposalsByPollId(ids)),
     polls: new DataLoader(ids => getPollsById(ids)),
     votes: new DataLoader(ids => getVotesById(ids)),
     statements: new DataLoader(ids => getStatementsById(ids)),

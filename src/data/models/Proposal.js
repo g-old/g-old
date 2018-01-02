@@ -165,15 +165,16 @@ class Proposal {
     // return canSee ? new Proposal(data) : new Proposal(data.email = null);
   }
 
-  static async genByPoll(viewer, pollId) {
-    const data = await knex('proposals')
+  static async genByPoll(viewer, pollId, { proposalsByPoll }) {
+    const data = await proposalsByPoll.load(pollId);
+    /*  const data = await knex('proposals')
       .where({ poll_one_id: pollId })
       .orWhere({ poll_two_id: pollId })
-      .select();
+      .select(); */
 
-    if (!data[0]) return null;
+    if (!data) return null;
     if (viewer == null) return null;
-    return new Proposal(data[0]);
+    return new Proposal(data);
   }
 
   static async followees(id, { followees }) {

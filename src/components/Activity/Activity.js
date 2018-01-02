@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedRelative } from 'react-intl';
+import {
+  FormattedRelative,
+  FormattedMessage,
+  defineMessages,
+} from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Activity.css';
 import Avatar from '../Avatar';
@@ -9,6 +13,83 @@ import ProposalPreview from '../ProposalPreview';
 import Link from '../Link';
 import history from '../../history';
 import { ICONS } from '../../constants';
+
+const messages = defineMessages({
+  newSurvey: {
+    id: 'survey.new',
+    defaultMessage: 'New survey',
+    description: 'Title for activity',
+  },
+  newProposal: {
+    id: 'proposal.new',
+    defaultMessage: 'New proposal',
+    description: 'Title for activity',
+  },
+  proposalFailed: {
+    id: 'proposal.failed',
+    defaultMessage: 'Failed!',
+    description: 'Votation against proposal',
+  },
+  proposalValid: {
+    id: 'proposal.valid',
+    defaultMessage: 'Proposal accepted!',
+    description: 'Proposal turned valid',
+  },
+  voting: {
+    id: 'proposal.voting',
+    defaultMessage: 'Voting open',
+    description: 'Proposal can be voted from now on',
+  },
+  rejected: {
+    id: 'proposal.rejected',
+    defaultMessage: 'Voting open',
+    description: 'Proposal can be voted from now on',
+  },
+  revoked: {
+    id: 'proposal.revoked',
+    defaultMessage: 'Revoked',
+    description: 'Proposal was revoked',
+  },
+});
+
+function getProposalHeader(verb, proposal) {
+  let state = verb;
+  let identifier;
+
+  if (proposal.state === 'update') {
+    state = proposal.state;
+  }
+  switch (state) {
+    case 'create': {
+      const isSurvey = proposal.state === 'survey';
+      identifier = isSurvey ? 'newSurvey' : 'newProposal';
+      break;
+    }
+    case 'accepted':
+    case 'accept': {
+      identifier = 'proposalFailed';
+      break;
+    }
+    case 'rejected':
+    case 'reject': {
+      identifier = 'proposalValid';
+      break;
+    }
+    case 'voting': {
+      identifier = 'voting';
+      break;
+    }
+    case 'revoked': {
+      identifier = 'revoked';
+      break;
+    }
+
+    default:
+      identifier = undefined;
+  }
+
+  return identifier ? <FormattedMessage {...messages[identifier]} /> : '';
+}
 
 class Activity extends React.Component {
   static propTypes = {
@@ -34,6 +115,7 @@ class Activity extends React.Component {
   constructor(props) {
     super(props);
     this.renderVote = this.renderVote.bind(this);
+    this.renderContent = this.renderContent.bind(this);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -54,7 +136,7 @@ class Activity extends React.Component {
         <path
           fill="none"
           stroke={this.props.content.position === 'pro' ? '#8cc800' : '#ff324d'}
-          strokeWidth="1"
+          strokeWidth="2"
           d={ICONS.thumbUpAlt}
           transform={position === 'pro' ? '' : 'scale(1,-1) translate(0,-24)'}
         />
@@ -79,68 +161,48 @@ class Activity extends React.Component {
       </Link>
     );
   }
-  render() {
-    let content = null;
-    let header = null;
-    /* eslint-disable no-underscore-dangle */
-    if (this.props.content && this.props.content.__typename === 'StatementDL') {
-      const info = JSON.parse(this.props.info || '{}');
-      content = (
-        <Link
-          to={`/proposal/${info.proposalId || 'xxx'}/${this.props.content
-            .pollId}`}
-        >
-          <Statement {...this.props.content} />
-        </Link>
-      );
-      header = info.proposalTitle || ':(';
-    } else if (
-      this.props.content &&
-      this.props.content.__typename === 'ProposalDL'
-    ) {
-      content = (
-        <ProposalPreview
-          proposal={this.props.content}
-          onClick={this.onProposalClick}
-        />
-      );
-      if (this.props.verb === 'create') {
-        if (this.props.content.state === 'survey') {
-          header = 'New Survey';
-        } else {
-          header = 'NEW Proposal!';
-        }
-      } else if (this.props.verb === 'close') {
-        header = 'Soon closing!';
-      } else if (this.props.verb === 'accept') {
-        header = 'This voting has been accepted!';
-      } else if (this.props.verb === 'reject') {
-        header = 'This proposal is now valid!';
-      } else if (this.props.verb === 'update') {
-        if (this.props.content.state === 'voting') {
-          header = 'Voting open!';
-        } else if (this.props.content.state === 'revoked') {
-          header = 'Proposal has been revoked';
-        } else if (this.props.content.state === 'accepted') {
-          header = 'This proposal has been accepted!';
-        } else if (this.props.content.state === 'rejected') {
-          header = 'This proposal has been rejected!';
-        }
+
+  renderContent() {
+    const { content, verb } = this.props;
+    if (!content) return { header: 'No content' };
+    const result = {};
+    switch (content.__typename) { // eslint-disable-line
+      case 'StatementDL': {
+        const info = JSON.parse(this.props.info || '{}');
+
+        result.content = (
+          <Link to={`/proposal/${info.proposalId || 'xxx'}/${content.pollId}`}>
+            <Statement {...content} />
+          </Link>
+        );
+
+        result.header = info.proposalTitle || ':(';
+        break;
       }
-    } else if (
-      this.props.content &&
-      this.props.content.__typename === 'VoteDL'
-    ) {
-      const info = JSON.parse(this.props.info || '{}');
+      case 'ProposalDL': {
+        result.content = (
+          <ProposalPreview proposal={content} onClick={this.onProposalClick} />
+        );
+        result.header = getProposalHeader(verb, content);
+        break;
+      }
+      case 'VoteDL': {
+        const info = JSON.parse(this.props.info || '{}');
 
-      content = this.renderVote(info);
+        result.content = this.renderVote(info);
+        result.header = info.proposalTitle || ':(';
+        break;
+      }
 
-      header = info.proposalTitle || ':(';
-    } else {
-      content = JSON.stringify(this.props.content);
-      header = 'Nobody knows ...';
+      default: {
+        return { header: 'Unknown error' };
+      }
     }
-    /* eslint-enable no-underscore-dangle */
+    return result;
+  }
+
+  render() {
+    const { header, content } = this.renderContent();
 
     return (
       <div className={s.container}>
