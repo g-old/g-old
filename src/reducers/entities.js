@@ -16,8 +16,10 @@ import workTeams, * as fromWorkTeams from './workTeams';
 import logs, * as fromLogs from './logs';
 import discussions, * as fromDiscussions from './discussions';
 import comments from './comments';
+/* GENERATOR */
 
 export default combineReducers({
+  /* GENERATOR_COMBINED */
   users,
   statements,
   polls,
@@ -36,6 +38,8 @@ export default combineReducers({
   discussions,
   comments,
 });
+
+/* GENERATOR_EXPORTS */
 
 export const getVisibleProposals = (state, filter) =>
   fromProposals.getVisibleProposals(state.proposals, filter, state);

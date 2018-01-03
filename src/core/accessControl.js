@@ -22,6 +22,8 @@ export const Models = {
   COMMENT: 2048,
 };
 
+/* GENERATOR_FN */
+
 /* eslint-disable no-unused-vars */
 
 function userWriteControl(viewer, data) {
@@ -276,6 +278,7 @@ const ATypes = {
   READ: 2,
 };
 const accessFilter = {
+  /* GENERATOR_FILTER */
   [Models.USER]: {
     [ATypes.WRITE]: userWriteControl,
     [ATypes.READ]: userReadControl,

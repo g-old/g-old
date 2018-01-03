@@ -9,13 +9,10 @@ import loading from './ui/loading';
 import pageInfo, * as fromPageInfo from './ui/pageInfo';
 import { SESSION_LOGOUT_SUCCESS } from '../constants';
 import comments, * as fromComment from './ui/comments';
-/* export default combineReducers({
-  proposals,
-  polls,
-  statements,
-  users,
-}); */
+/* GENERATOR_IMPORTS */
+
 const uiReducer = combineReducers({
+  /* GENERATOR_COMBINE */
   proposals,
   polls,
   statements,
@@ -33,6 +30,8 @@ export default (state, action) => {
   }
   return uiReducer(state, action);
 };
+
+/* GENERATOR_EXPORTS */
 
 // TODO Different design
 const getMutationPending = state => {

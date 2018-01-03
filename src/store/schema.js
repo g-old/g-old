@@ -86,3 +86,6 @@ export const workTeamList = [workTeam];
 export const logList = [log];
 export const discussionList = [discussion];
 export const commentList = [comment];
+export const request = new schema.Entity('requests', {});
+export const requestList = [request];
+/* GENERATOR */

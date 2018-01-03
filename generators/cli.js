@@ -1,10 +1,12 @@
 const componentGenerator = require('./component/index.js');
+const resourceGenerator = require('./resource/index.js');
+
 const SafeString = require('./utils/safeString').SafeString;
 // const containerGenerator = require('./container/index.js');
 
 module.exports = plop => {
   plop.setGenerator('component', componentGenerator);
-  //  plop.setGenerator('container', containerGenerator);
+  plop.setGenerator('resource', resourceGenerator);
   plop.addHelper('uppercase', text => text.toUpperCase());
   plop.addHelper('getPath', (p, itemName) => {
     const pathParts = p.split('/');
@@ -19,4 +21,5 @@ module.exports = plop => {
     return new SafeString(items);
   });
   plop.addHelper('curly', (object, open) => (open ? '{' : '}'));
+  plop.addHelper('brackets', object => `{${object}}`);
 };

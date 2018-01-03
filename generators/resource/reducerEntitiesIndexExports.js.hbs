@@ -1,0 +1,8 @@
+$1
+export const get{{properCase name}} = (state, id) => from{{properCase name}}s.getEntity(state.{{camelCase name}}s, id, state);
+
+export const getVisible{{properCase name}}s = (state, filter) =>
+  from{{properCase name}}s.getVisibles(state.{{camelCase name}}s, filter, state);
+
+export const get{{properCase name}}sStatus = (state, filter) =>
+  from{{properCase name}}s.getStatus(state.{{camelCase name}}s, filter);

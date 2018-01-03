@@ -62,7 +62,7 @@ class Layout extends React.Component {
 
     const logo = (
       <div className={s.banner}>
-        <img alt="banner" src="/banner01.png" />
+        <img alt="banner" src="/banner01.jpg" />
       </div>
     );
     return (

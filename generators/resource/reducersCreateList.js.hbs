@@ -1,0 +1,95 @@
+import { combineReducers } from 'redux';
+import {
+  LOAD_{{constantCase name}}S_SUCCESS,
+  LOAD_{{constantCase name}}S_START,
+  FIND_{{constantCase name}}_SUCCESS,
+  UPDATE_{{constantCase name}}_SUCCESS,
+  DELETE_{{constantCase name}}_SUCCESS,
+} from '../constants';
+
+const handlePageInfo = (state, action) => {
+  if (state.endCursor && !action.savePageInfo) {
+    return state;
+  }
+  return { ...state, ...action.pagination };
+};
+
+const createList = filter => {
+
+  const ids = (state = [], action) => {
+    switch (action.type) {
+      case LOAD_{{constantCase name}}S_SUCCESS: {
+        return filter === action.filter || filter === 'all'
+          ? [...new Set([...state, ...action.payload.result])]
+          : state;
+      }
+      case UPDATE_{{constantCase name}}_SUCCESS: {
+        return action.properties.groups && filter !== 'all'
+          ? /* handleChange(state, action) */
+          : state;
+      }
+      case DELETE_{{constantCase name}}_SUCCESS: {
+        return state.filter(uId => uId !== action.payload.result);
+      }
+
+      default:
+        return state;
+    }
+  };
+  const isFetching = (state = false, action) => {
+    if (action.filter !== filter) {
+      return state;
+    }
+    switch (action.type) {
+      case LOAD_{{constantCase name}}S_START:
+        return true;
+      case LOAD_{{constantCase name}}S_SUCCESS:
+      case LOAD_{{constantCase name}}S_ERROR:
+        return false;
+      default:
+        return state;
+    }
+  };
+
+  const errorMessage = (state = null, action) => {
+    if (action.filter !== filter) {
+      return state;
+    }
+    switch (action.type) {
+      case LOAD_{{constantCase name}}S_ERROR:
+        return action.message;
+      case LOAD_{{constantCase name}}S_START:
+      case LOAD_{{constantCase name}}S_SUCCESS:
+        return null;
+
+      default:
+        return state;
+    }
+  };
+  const pageInfo = (state = { endCursor: '', hasNextPage: false }, action) => {
+    if (action.filter !== filter) {
+      return state;
+    }
+    switch (action.type) {
+      case LOAD_{{constantCase name}}S_SUCCESS:
+        return handlePageInfo(state, action);
+
+      default:
+        return state;
+    }
+  };
+  return combineReducers({
+    ids,
+    isFetching,
+    errorMessage,
+    pageInfo,
+  });
+};
+
+export default createList;
+export const getIds = state => state.ids;
+export const getStatus = state => ({
+  ...state.pageInfo,
+  pending: state.isFetching,
+  error: state.errorMessage,
+});

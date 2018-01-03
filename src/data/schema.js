@@ -63,6 +63,11 @@ import deleteComment from './mutations/deleteComment';
 import createDiscussion from './mutations/createDiscussion';
 import discussion from './queries/discussion';
 import comments from './queries/comments';
+import createRequest from './mutations/createRequest';
+import updateRequest from './mutations/updateRequest';
+import deleteRequest from './mutations/deleteRequest';
+import requestConnection from './queries/requestConnection';
+/* GENERATOR */
 
 const schema = new Schema({
   query: new ObjectType({
@@ -90,6 +95,8 @@ const schema = new Schema({
       statistics,
       discussion,
       comments,
+      requestConnection,
+      /* GENERATOR_QUERIES */
     },
   }),
   mutation: new ObjectType({
@@ -123,6 +130,10 @@ const schema = new Schema({
       updateComment,
       deleteComment,
       createDiscussion,
+      createRequest,
+      updateRequest,
+      deleteRequest,
+      /* GENERATOR_MUTATIONS */
     },
   }),
   subscription: new ObjectType({

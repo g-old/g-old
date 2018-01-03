@@ -18,6 +18,8 @@ export default combineReducers({
   statistics,
 });
 
+/* GENERATOR */
+
 export const getVisibleProposals = (state, filter) =>
   fromEntity.getVisibleProposals(state.entities, filter);
 
