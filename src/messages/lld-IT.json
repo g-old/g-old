@@ -1022,5 +1022,54 @@
     "defaultMessage": "By using this site you accept our privacy policy.",
     "message": "",
     "files": ["src/components/Layout/Layout.js"]
+  },
+  {
+    "id": "proposal.failed",
+    "description": "Votation against proposal",
+    "defaultMessage": "Failed!",
+    "message": "",
+    "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "proposal.new",
+    "description": "Title for activity",
+    "defaultMessage": "New proposal",
+    "message": "",
+    "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "proposal.rejected",
+    "description": "Proposal can be voted from now on",
+    "defaultMessage": "Voting open",
+    "message": "",
+    "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "proposal.revoked",
+    "description": "Proposal was revoked",
+    "defaultMessage": "Revoked",
+    "message": "",
+    "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "proposal.valid",
+    "description": "Proposal turned valid",
+    "defaultMessage": "Proposal accepted!",
+    "message": "",
+    "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "proposal.voting",
+    "description": "Proposal can be voted from now on",
+    "defaultMessage": "Voting open",
+    "message": "",
+    "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "survey.new",
+    "description": "Title for activity",
+    "defaultMessage": "New survey",
+    "message": "",
+    "files": ["src/components/Activity/Activity.js"]
   }
 ]

@@ -107,10 +107,7 @@ module.exports = {
     );
 
     const actions = [];
-    if (data.assets.includes('ListQuery')) {
-      // Don't know how to pass variable to hbs otherwise
-      data.list = true; // eslint-disable-line
-    }
+
     if (data.assets.includes('Model')) {
       actions.push({
         type: 'add',
@@ -143,6 +140,8 @@ module.exports = {
     }
 
     if (data.assets.includes('ListQuery')) {
+      // Don't know how to pass variable to hbs otherwise
+      data.list = true; // eslint-disable-line
       actions.push({
         type: 'add',
         path: `${graphQLQueriesPath}/{{camelCase name}}Connection.js`,
@@ -215,13 +214,13 @@ module.exports = {
       });
       actions.push({
         type: 'add',
-        path: `${reducerPath}/{{camelCase name}}byId.js`,
+        path: `${reducerPath}/{{camelCase name}}ById.js`,
         templateFile: './resource/reducersbyId.js.hbs',
         abortOnFail: true,
       });
       actions.push({
         type: 'add',
-        path: `${reducerUiPath}/{{camelCase name}}.js`,
+        path: `${reducerUiPath}/{{camelCase name}}s.js`,
         templateFile: './resource/reducerUi.js.hbs',
         abortOnFail: true,
       });

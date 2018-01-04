@@ -3,6 +3,7 @@ import { canSee, canMutate, Models } from '../../core/accessControl';
 
 class {{properCase name}} {
   constructor(data) {
+    this.id = data.id
   }
 
   static async gen(viewer, id, { {{camelCase name}} }) {
@@ -15,12 +16,13 @@ class {{properCase name}} {
     if (!data) return null;
     if (!canMutate(viewer, data, Models.{{constantCase name}})) return null;
 
+    const newData = {
+      created_at: new Date(),
+    };
     const {{camelCase name}}InDB = await knex.transaction(async trx => {
-      let [{{camelCase name}}] = await knex('{{snakeCase name}}')
+      const  [{{camelCase name}} = null] = await knex('{{snakeCase name}}s')
         .transacting(trx)
-        .insert({
-          created_at: new Date(),
-        })
+        .insert(newData)
         .returning('*');
 
       return {{camelCase name}};
@@ -34,7 +36,7 @@ class {{properCase name}} {
     if (!canMutate(viewer, data, Models.{{constantCase name}})) return null;
     const newData = { updated_at: new Date() };
     const updated{{properCase name}} = await knex.transaction(async trx => {
-      let [{{camelCase name}}] = await knex('{{snakeCase name}}')
+      let [{{camelCase name}} = null] = await knex('{{snakeCase name}}s')
         .where({id: data.id})
         .transacting(trx)
         .forUpdate()
@@ -44,21 +46,21 @@ class {{properCase name}} {
       return {{camelCase name}};
     });
 
-    return updated{{properCase name}} ? new {{properCase name}}({{camelCase name}}) : null;
+    return updated{{properCase name}} ? new {{properCase name}}(updated{{properCase name}}) : null;
   }
 
   static async delete(viewer, data, loaders) {
     if (!data || !data.id) return null;
     if (!canMutate(viewer, data, Models.{{constantCase name}})) return null;
     const deleted{{properCase name}} = await knex.transaction(async trx => {
-      await knex('{{snakeCase name}}')
+      await knex('{{snakeCase name}}s')
         .where({id: data.id})
         .transacting(trx)
         .forUpdate()
         .del()
     });
 
-    return deleted{{properCase name}} ? new {{properCase name}}({{camelCase name}}) : null;
+    return deleted{{properCase name}} ? new {{properCase name}}(deleted{{properCase name}}) : null;
   }
 }
 

@@ -20,11 +20,19 @@ export const Models = {
   ACTIVITY: 512,
   DISCUSSION: 1024,
   COMMENT: 2048,
+  REQUEST: 4096,
 };
 
 /* GENERATOR_FN */
-
 /* eslint-disable no-unused-vars */
+function requestReadControl(viewer, data) {
+  console.error('Access control not implemented');
+  return true;
+}
+function requestWriteControl(viewer, data) {
+  console.error('Access control not implemented');
+  return true;
+}
 
 function userWriteControl(viewer, data) {
   if (data.id && Object.keys(data).length === 1) {
@@ -238,9 +246,10 @@ function workTeamWriteControl(viewer, data) {
 }
 
 function discussionReadControl(viewer, data) {
-  if (viewer.wtMemberships.includes(data.discussion.workTeamId)) {
+  if (viewer.wtMemberships.includes(data.work_team_id)) {
     return true;
   }
+
   return false;
 }
 function discussionWriteControl(viewer, data) {
@@ -279,6 +288,10 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
+  [Models.REQUEST]: {
+    [ATypes.WRITE]: requestWriteControl,
+    [ATypes.READ]: requestReadControl,
+  },
   [Models.USER]: {
     [ATypes.WRITE]: userWriteControl,
     [ATypes.READ]: userReadControl,

@@ -24,7 +24,7 @@ const request = {
     { viewer, loaders },
   ) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
-    let [cursor = null, id = 0] = pagination ? pagination.split('$') : []; //eslint-disable-line
+    let [cursor = new Date(), id = 0] = pagination ? pagination.split('$') : []; //eslint-disable-line
     id = Number(id);
     let requestIds;
     if (type) {
@@ -33,7 +33,7 @@ const request = {
       if (pos === -1) {
         throw new Error(`Invalid type: ${type}`);
       }
-      requestIds = knex('requests')
+      requestIds = await knex('requests')
         .where({ type: types[pos] })
         .whereRaw('(requests.created_at, requests.id) < (?,?)', [cursor, id])
         .limit(first)
@@ -41,7 +41,7 @@ const request = {
         .orderBy('requests.id', 'desc')
         .select('requests.id as id', 'requests.created_at as time');
     } else {
-      requestIds = knex('requests')
+      requestIds = await knex('requests')
         .whereRaw('(requests.created_at, requests.id) < (?,?)', [cursor, id])
         .limit(first)
         .orderBy('requests.created_at', 'desc')
@@ -55,6 +55,7 @@ const request = {
       acc[curr.id] = curr;
       return acc;
     }, {});
+
     const data = await Promise.all(queries);
     const edges = data.map(p => ({ node: p }));
     const endCursor =

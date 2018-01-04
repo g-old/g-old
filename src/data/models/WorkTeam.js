@@ -8,16 +8,6 @@ async function validateCoordinator(viewer, id, loaders) {
   return coordinator; // TODO val rules
 }
 
-function canJoin(viewer, memberId) {
-  // eslint-disable-next-line eqeqeq
-  if (viewer.id == memberId) {
-    if (viewer.groups !== Groups.GUEST) {
-      return true; // TODO specify rules;
-    }
-  }
-  return false;
-}
-
 class WorkTeam {
   constructor(data) {
     this.id = data.id;
@@ -25,17 +15,72 @@ class WorkTeam {
     this.name = data.name;
     this.numMembers = data.num_members;
     this.numDiscussions = data.num_discussions;
+    this.restricted = data.restricted;
   }
   canNotify(viewer) {
     // eslint-disable-next-line eqeqeq
     return viewer.id == this.coordinatorId || viewer.role.type === 'admin';
   }
+  canJoin(viewer, requester) {
+    // eslint-disable-next-line eqeqeq
+    if (this.restricted && viewer.id == this.coordinatorId) {
+      if (requester.groups !== Groups.GUEST) {
+        return true; // TODO specify rules;
+      }
+      return true;
+    }
+    // eslint-disable-next-line eqeqeq
+
+    if (requester.groups !== Groups.GUEST) {
+      return true; // TODO specify rules;
+    }
+
+    return false;
+  }
+  async modifySessions() {
+    const oldSessions = await knex('sessions')
+      .whereRaw("sess->'passport'->'user'->>'id'=?", [this.id])
+      .select('sess', 'sid');
+    const updates = oldSessions.map(data => {
+      const session = data.sess;
+      const wtMemberships = [...session.passport.user.wtMemberships, this.id];
+      const newSession = {
+        ...session,
+        passport: {
+          ...session.passport,
+          user: {
+            ...session.passport.user,
+            wtMemberships,
+          },
+        },
+      };
+      return knex('sessions')
+        .where({ sid: data.sid })
+        .update({ sess: JSON.stringify(newSession) });
+    });
+    // TODO UPDATE TO POSTGRES 9.6!!
+    await Promise.all(updates);
+    /* await knex.raw(
+      "update sessions set sess = jsonb_set(sess::jsonb, '{passport}',?) where sess->'passport'->'user'->>'id'=?",
+      [serializedUser, this.id],
+    ); */
+  }
   async join(viewer, memberId, loaders) {
-    // viewer is already checked
-    if (!canJoin(viewer, memberId)) return null;
+    let requester;
+    // eslint-disable-next-line eqeqeq
+    if (viewer && viewer.id != memberId) {
+      requester = await User.gen(viewer, memberId, loaders);
+    } else {
+      requester = viewer;
+    }
+    if (!this.canJoin(viewer, requester)) return null;
     const wtId = await knex.transaction(async trx => {
       let id = await trx
-        .insert({ user_id: memberId, work_team_id: this.id })
+        .insert({
+          user_id: requester.id,
+          work_team_id: this.id,
+          ...(this.restricted && { authorizer_id: viewer.id }),
+        })
         .into('user_work_teams')
         .returning('id');
 
@@ -46,15 +91,19 @@ class WorkTeam {
           .forUpdate()
           .increment('num_members', 1)
           .into('work_teams');
+
+        // insert into sessions;
+        await this.modifySessions();
+        // TODO  should be sent via sse too in case viewer != requester.
       }
       return id;
     });
-    return wtId ? User.gen(viewer, memberId, loaders) : null;
+    return wtId ? requester : null;
   }
 
   async leave(viewer, memberId, loaders) {
     // viewer is already checked
-    if (!canJoin(viewer, memberId)) return null;
+    if (!this.canJoin(viewer, memberId)) return null;
     const wtId = await knex.transaction(async trx => {
       let id = await trx
         .where({ user_id: memberId, work_team_id: this.id })

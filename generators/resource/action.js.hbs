@@ -30,7 +30,7 @@ id
 `;
 
 const create{{properCase name}}Mutation = `
-  mutation (${{camelCase name}}:{{camelCase name}}Input) {
+  mutation (${{camelCase name}}:{{properCase name}}Input) {
     create{{properCase name}} ({{camelCase name}}:${{camelCase name}}){
       ${ {{camelCase name}}Fields}
     }
@@ -38,7 +38,7 @@ const create{{properCase name}}Mutation = `
 `;
 
 const update{{properCase name}}Mutation = `
-  mutation (${{camelCase name}}:{{camelCase name}}Input) {
+  mutation (${{camelCase name}}:{{properCase name}}Input) {
     update{{properCase name}} ({{camelCase name}}:${{camelCase name}}){
       ${ {{camelCase name}}Fields}
     }
@@ -46,7 +46,7 @@ const update{{properCase name}}Mutation = `
 `;
 
 const delete{{properCase name}}Mutation = `
-  mutation (${{camelCase name}}:{{camelCase name}}Input) {
+  mutation (${{camelCase name}}:{{properCase name}}Input) {
     delete{{properCase name}} ({{camelCase name}}:${{camelCase name}}){
       ${ {{camelCase name}}Fields}
     }
@@ -55,7 +55,7 @@ const delete{{properCase name}}Mutation = `
 
 {{#if list }}
 const {{camelCase name}}Connection = `
-query ($first:Number $after:String) {
+query ($first:Int $after:String) {
   {{camelCase name}}Connection (first:$first after:$after) {
     pageInfo{
       endCursor
@@ -73,7 +73,7 @@ query ($first:Number $after:String) {
 
 export function create{{properCase name}}({{camelCase name}}) {
   return async (dispatch, getState, { graphqlRequest }) => {
-    const virtualId = {{camelCase name}}.parentId || '0000';
+    const virtualId = '0000';
     const properties = genStatusIndicators(['create{{properCase name}}']);
     dispatch({
       type: CREATE_{{constantCase name}}_START,
@@ -81,7 +81,7 @@ export function create{{properCase name}}({{camelCase name}}) {
       properties,
     });
     try {
-      const { data } = await graphqlRequest(create{{properCase name}}Mutation, {{{camelCase name}}});
+      const { data } = await graphqlRequest(create{{properCase name}}Mutation, { {{camelCase name}} });
       const normalizedData = normalize(data.create{{properCase name}}, {{camelCase name}}Schema);
       dispatch({
         type: CREATE_{{constantCase name}}_SUCCESS,
@@ -117,7 +117,7 @@ export function update{{properCase name}}({{camelCase name}}) {
       properties,
     });
     try {
-      const { data } = await graphqlRequest(update{{properCase name}}Mutation, {{{camelCase name}}});
+      const { data } = await graphqlRequest(update{{properCase name}}Mutation, { {{camelCase name}} });
       const normalizedData = normalize(data.update{{properCase name}}, {{camelCase name}}Schema);
       dispatch({
         type: UPDATE_{{constantCase name}}_SUCCESS,
@@ -152,7 +152,7 @@ export function delete{{properCase name}}({{camelCase name}}) {
       properties,
     });
     try {
-      const { data } = await graphqlRequest(delete{{properCase name}}Mutation, {{{camelCase name}}});
+      const { data } = await graphqlRequest(delete{{properCase name}}Mutation, { {{camelCase name}} });
       const normalizedData = normalize(data.delete{{properCase name}}, {{camelCase name}}Schema);
       dispatch({
         type: DELETE_{{constantCase name}}_SUCCESS,

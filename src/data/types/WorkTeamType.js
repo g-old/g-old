@@ -37,6 +37,36 @@ const WorkTeamType = new ObjectType({
         return null;
       },
     },
+    ownStatus: {
+      type: GraphQLString,
+      async resolve(parent, args, { viewer }) {
+        let result = 'pending';
+        if (viewer.wtMemberships.includes(parent.id)) {
+          result = 'member';
+        } else {
+          const requests = await knex('requests')
+            .where({ requester_id: viewer.id, type: 'joinWT' })
+            .select(['content', 'denied_at']);
+          const ownRequest = requests.find(r => {
+            const c = JSON.parse(r.content);
+            // eslint-disable-next-line
+            if (c.id == parent.id) {
+              return true;
+            }
+            return false;
+          });
+
+          if (ownRequest) {
+            if (ownRequest.deniedAt) {
+              result = 'denied';
+            }
+          } else {
+            result = 'none';
+          }
+        }
+        return result;
+      },
+    },
     numMembers: {
       type: GraphQLInt,
     },

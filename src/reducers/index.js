@@ -19,6 +19,17 @@ export default combineReducers({
 });
 
 /* GENERATOR */
+export const getVisibleRequests = (state, filter) =>
+  fromEntity.getVisibleRequests(state.entities, filter);
+
+export const getRequest = (state, filter) =>
+  fromEntity.getRequest(state.entities, filter);
+
+export const getRequestsStatus = (state, filter) =>
+  fromEntity.getRequestsStatus(state.entities, filter);
+
+export const getRequestUpdates = (state, filter) =>
+  fromUi.getRequestUpdates(state.ui, filter);
 
 export const getVisibleProposals = (state, filter) =>
   fromEntity.getVisibleProposals(state.entities, filter);

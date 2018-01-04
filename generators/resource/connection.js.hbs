@@ -17,7 +17,7 @@ const {{camelCase name}} = {
   },
   resolve: async (parent, { first = 10, after = '' }, { viewer, loaders }) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
-    let [cursor = null, id = 0] = pagination ? pagination.split('$') : [];
+    let [cursor = new Date(), id = 0] = pagination ? pagination.split('$') : [];
     id = Number(id);
     let {{camelCase name}}s = [];
 

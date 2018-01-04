@@ -1,16 +1,12 @@
 {{#if wantFlowTypes}}
 /* @flow */
 {{/if}}
-{{#if wantPropTypes}}
 import React from 'react';
 import PropTypes from 'prop-types';
-{{else}}
-import React from 'react';
-{{/if}}
 {{#if wantCss}}
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './{{properCase name}}.css';
 import cn from 'classnames';
+import s from './{{properCase name}}.css';
 {{/if}}
 import Box from '../Box';
 {{#if imports}}

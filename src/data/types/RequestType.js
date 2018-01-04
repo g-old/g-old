@@ -28,7 +28,7 @@ const Request = new ObjectType({
     requester: {
       type: UserType,
       resolve(parent, args, { viewer, loaders }) {
-        return User.gen(viewer, parent.processorId, loaders);
+        return User.gen(viewer, parent.requesterId, loaders);
       },
     },
     deniedAt: {

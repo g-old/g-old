@@ -53,6 +53,7 @@ const workTeamsWithMembers = `query{
 const workTeamQuery = `query($id:ID!){
   workTeam(id:$id){
     ${workTeam}
+    ownStatus
     discussions{
       id
       title

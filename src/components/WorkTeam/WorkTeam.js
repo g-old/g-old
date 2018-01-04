@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import s from './WorkTeam.css';
 import Label from '../Label';
 import Value from '../Value';
@@ -8,6 +9,19 @@ import Box from '../Box';
 import Button from '../Button';
 import DiscussionPreview from '../DiscussionPreview';
 import history from '../../history';
+
+const messages = defineMessages({
+  join: {
+    id: 'join',
+    defaultMessage: 'Join',
+    description: 'Button label',
+  },
+  pending: {
+    id: 'join.pending',
+    defaultMessage: 'Join request under evaluation',
+    description: 'Join request pending',
+  },
+});
 
 class WorkTeam extends React.Component {
   static propTypes = {
@@ -17,6 +31,9 @@ class WorkTeam extends React.Component {
     numMembers: PropTypes.number.isRequired,
     numDiscussions: PropTypes.number.isRequired,
     discussions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    ownStatus: PropTypes.string.isRequired,
+    onJoinRequest: PropTypes.func.isRequired,
+    updates: PropTypes.shape({ pending: PropTypes.bool }).isRequired,
   };
   static defaultProps = {
     logo: null,
@@ -24,10 +41,19 @@ class WorkTeam extends React.Component {
   constructor(props) {
     super(props);
     this.handleDiscussionClick = this.handleDiscussionClick.bind(this);
+    this.handleJoining = this.handleJoining.bind(this);
   }
   // eslint-disable-next-line class-methods-use-this
   handleDiscussionClick({ discussionId }) {
     history.push(`${this.props.id}/discussions/${discussionId}`);
+  }
+
+  handleJoining() {
+    const { ownStatus, onJoinRequest, id } = this.props;
+    if (ownStatus === 'none') {
+      const content = { id };
+      onJoinRequest({ type: 'joinWT', content: JSON.stringify(content) });
+    }
   }
 
   render() {
@@ -38,6 +64,8 @@ class WorkTeam extends React.Component {
       numDiscussions,
       discussions,
       id,
+      ownStatus,
+      updates,
     } = this.props;
     let picture;
     if (logo) {
@@ -61,6 +89,20 @@ class WorkTeam extends React.Component {
           />
         </svg>
       );
+    }
+
+    let joinBtn;
+    if (ownStatus === 'none') {
+      joinBtn = (
+        <Button
+          onClick={this.handleJoining}
+          disabled={updates && updates.pending}
+          primary
+          label={<FormattedMessage {...messages.join} />}
+        />
+      );
+    } else if (ownStatus === 'pending') {
+      joinBtn = <FormattedMessage {...messages.pending} />;
     }
     return (
       <div className={s.root}>
@@ -101,23 +143,20 @@ class WorkTeam extends React.Component {
             history.push(`/workteams/${id}/admin`);
           }}
           primary
-          label={'Add discussion'}
+          label={'Management'}
         />
-        <Button
-          onClick={() => {
-            alert('TO IMPLEMENT');
-          }}
-          primary
-          label={'°Join'}
-        />
+        {joinBtn}
         <div className={s.discussions}>
           {discussions &&
-            discussions.map(d => (
-              <DiscussionPreview
-                discussion={d}
-                onClick={this.handleDiscussionClick}
-              />
-            ))}
+            discussions.map(
+              d =>
+                d && (
+                  <DiscussionPreview
+                    discussion={d}
+                    onClick={this.handleDiscussionClick}
+                  />
+                ),
+            )}
         </div>
       </div>
     );

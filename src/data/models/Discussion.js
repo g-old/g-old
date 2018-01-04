@@ -21,7 +21,6 @@ class Discussion {
     if (data == null) return null;
     if (viewer.id == null) return null;
     if (!canSee(viewer, data, Models.DISCUSSION)) return null;
-
     return new Discussion(data);
   }
 

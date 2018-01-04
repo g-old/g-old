@@ -11,9 +11,9 @@ import {
   DELETE_REQUEST_START,
   DELETE_REQUEST_SUCCESS,
   DELETE_REQUEST_ERROR,
-  LOAD_REQUEST_START,
-  LOAD_REQUEST_SUCCESS,
-  LOAD_REQUEST_ERROR,
+  LOAD_REQUESTS_START,
+  LOAD_REQUESTS_SUCCESS,
+  LOAD_REQUESTS_ERROR,
 } from '../constants';
 import {
   request as requestSchema,
@@ -21,12 +21,29 @@ import {
 } from '../store/schema';
 import { genStatusIndicators } from '../core/helpers';
 
+const userFields = `
+id
+thumbnail
+name
+surname
+`;
 const requestFields = `
 id
+processor{
+  ${userFields}
+}
+requester{
+  ${userFields}
+}
+type
+content
+deniedAt
+updatedAt
+createdAt
 `;
 
 const createRequestMutation = `
-  mutation ($request:requestInput) {
+  mutation ($request:RequestInput) {
     createRequest (request:$request){
       ${requestFields}
     }
@@ -34,7 +51,7 @@ const createRequestMutation = `
 `;
 
 const updateRequestMutation = `
-  mutation ($request:requestInput) {
+  mutation ($request:RequestInput) {
     updateRequest (request:$request){
       ${requestFields}
     }
@@ -42,7 +59,7 @@ const updateRequestMutation = `
 `;
 
 const deleteRequestMutation = `
-  mutation ($request:requestInput) {
+  mutation ($request:RequestInput) {
     deleteRequest (request:$request){
       ${requestFields}
     }
@@ -50,7 +67,7 @@ const deleteRequestMutation = `
 `;
 
 const requestConnection = `
-query ($first:Number $after:String) {
+query ($first:Int $after:String) {
   requestConnection (first:$first after:$after) {
     pageInfo{
       endCursor
@@ -67,7 +84,7 @@ query ($first:Number $after:String) {
 
 export function createRequest(request) {
   return async (dispatch, getState, { graphqlRequest }) => {
-    const virtualId = request.parentId || '0000';
+    const virtualId = '0000';
     const properties = genStatusIndicators(['createRequest']);
     dispatch({
       type: CREATE_REQUEST_START,
@@ -75,7 +92,7 @@ export function createRequest(request) {
       properties,
     });
     try {
-      const { data } = await graphqlRequest(createRequestMutation, request);
+      const { data } = await graphqlRequest(createRequestMutation, { request });
       const normalizedData = normalize(data.createRequest, requestSchema);
       dispatch({
         type: CREATE_REQUEST_SUCCESS,
@@ -111,7 +128,7 @@ export function updateRequest(request) {
       properties,
     });
     try {
-      const { data } = await graphqlRequest(updateRequestMutation, request);
+      const { data } = await graphqlRequest(updateRequestMutation, { request });
       const normalizedData = normalize(data.updateRequest, requestSchema);
       dispatch({
         type: UPDATE_REQUEST_SUCCESS,
@@ -146,7 +163,7 @@ export function deleteRequest(request) {
       properties,
     });
     try {
-      const { data } = await graphqlRequest(deleteRequestMutation, request);
+      const { data } = await graphqlRequest(deleteRequestMutation, { request });
       const normalizedData = normalize(data.deleteRequest, requestSchema);
       dispatch({
         type: DELETE_REQUEST_SUCCESS,
@@ -177,7 +194,7 @@ export function loadRequestList({ first, after }) {
     // TODO caching!
 
     dispatch({
-      type: LOAD_REQUEST_START,
+      type: LOAD_REQUESTS_START,
     });
 
     try {
@@ -188,14 +205,14 @@ export function loadRequestList({ first, after }) {
       const requests = data.requestConnection.edges.map(u => u.node);
       const normalizedData = normalize(requests, requestListSchema);
       dispatch({
-        type: LOAD_REQUEST_SUCCESS,
+        type: LOAD_REQUESTS_SUCCESS,
         payload: normalizedData,
         pagination: data.requestConnection.pageInfo,
         savePageInfo: after != null,
       });
     } catch (error) {
       dispatch({
-        type: LOAD_REQUEST_ERROR,
+        type: LOAD_REQUESTS_ERROR,
         payload: {
           error,
         },

@@ -16,10 +16,12 @@ import workTeams, * as fromWorkTeams from './workTeams';
 import logs, * as fromLogs from './logs';
 import discussions, * as fromDiscussions from './discussions';
 import comments from './comments';
+import requests, * as fromRequests from './requests';
 /* GENERATOR */
 
 export default combineReducers({
   /* GENERATOR_COMBINED */
+  requests,
   users,
   statements,
   polls,
@@ -40,6 +42,14 @@ export default combineReducers({
 });
 
 /* GENERATOR_EXPORTS */
+export const getRequest = (state, id) =>
+  fromRequests.getEntity(state.requests, id, state);
+
+export const getVisibleRequests = (state, filter) =>
+  fromRequests.getVisible(state.requests, filter, state);
+
+export const getRequestsStatus = (state, filter) =>
+  fromRequests.getStatus(state.requests, filter);
 
 export const getVisibleProposals = (state, filter) =>
   fromProposals.getVisibleProposals(state.proposals, filter, state);

@@ -1,24 +1,29 @@
 import { combineReducers } from 'redux';
 import {
-  LOAD_{{constantCase name}}S_START,
-  LOAD_{{constantCase name}}S_SUCCESS,
-  LOAD_{{constantCase name}}S_ERROR,
-  CREATE_{{constantCase name}}_SUCCESS,
-  DELETE_{{constantCase name}}_SUCCESS,
+  LOAD_REQUESTS_START,
+  LOAD_REQUESTS_SUCCESS,
+  LOAD_REQUESTS_ERROR,
+  CREATE_REQUEST_SUCCESS,
+  DELETE_REQUEST_SUCCESS,
 } from '../constants';
+
+const handlePageInfo = (state, action) => {
+  if (state.endCursor && !action.savePageInfo) {
+    return state;
+  }
+  return { ...state, ...action.pagination };
+};
 
 const createList = filter => {
   const ids = (state = [], action) => {
     switch (action.type) {
-      
-      case CREATE_{{constantCase name}}_SUCCESS:
-      case LOAD_{{constantCase name}}S_SUCCESS: {
+      case CREATE_REQUEST_SUCCESS:
+      case LOAD_REQUESTS_SUCCESS: {
         return filter === action.filter || filter === 'all'
           ? [...new Set([...state, ...action.payload.result])]
           : state;
       }
-
-      case DELETE_{{constantCase name}}_SUCCESS: {
+      case DELETE_REQUEST_SUCCESS: {
         return state.filter(uId => uId !== action.payload.result);
       }
 
@@ -31,10 +36,10 @@ const createList = filter => {
       return state;
     }
     switch (action.type) {
-      case LOAD_{{constantCase name}}S_START:
+      case LOAD_REQUESTS_START:
         return true;
-      case LOAD_{{constantCase name}}S_SUCCESS:
-      case LOAD_{{constantCase name}}S_ERROR:
+      case LOAD_REQUESTS_SUCCESS:
+      case LOAD_REQUESTS_ERROR:
         return false;
       default:
         return state;
@@ -46,10 +51,10 @@ const createList = filter => {
       return state;
     }
     switch (action.type) {
-      case LOAD_{{constantCase name}}S_ERROR:
+      case LOAD_REQUESTS_ERROR:
         return action.message;
-      case LOAD_{{constantCase name}}S_START:
-      case LOAD_{{constantCase name}}S_SUCCESS:
+      case LOAD_REQUESTS_START:
+      case LOAD_REQUESTS_SUCCESS:
         return null;
 
       default:
@@ -61,7 +66,7 @@ const createList = filter => {
       return state;
     }
     switch (action.type) {
-      case LOAD_{{constantCase name}}S_SUCCESS:
+      case LOAD_REQUESTS_SUCCESS:
         return handlePageInfo(state, action);
 
       default:
