@@ -8,6 +8,7 @@ import WorkTeamsList from '../WorkTeamsList';
 import { loadWorkTeams } from '../../actions/workTeam';
 import { getWorkTeams } from '../../reducers';
 import history from '../../history';
+import Button from '../Button';
 
 class WorkTeamPanel extends React.Component {
   static propTypes = {
@@ -31,10 +32,20 @@ class WorkTeamPanel extends React.Component {
       history.push(`/workteams/${data.id}/edit`);
     }
   }
+  // eslint-disable-next-line class-methods-use-this
+  onAdd() {
+    history.push('/admin/workteam/create');
+  }
   render() {
     const { workTeams = [] } = this.props;
+
     return (
-      <Box>
+      <Box column>
+        <Box>
+          <Button icon={'+'} onClick={this.onAdd}>
+            {'Add Workteam'}
+          </Button>
+        </Box>
         <WorkTeamsList
           workTeams={workTeams}
           onClickMenu={this.onMenuClick}

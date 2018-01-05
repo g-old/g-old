@@ -48,6 +48,12 @@ export function selectValidation(selection, inputField) {
   const result = {
     touched: false,
   };
+  if (!selection) {
+    return {
+      touched: true,
+      errorName: 'empty',
+    };
+  }
   if (inputField) {
     if (!selection) {
       return {

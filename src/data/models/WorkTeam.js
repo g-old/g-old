@@ -171,29 +171,43 @@ class WorkTeam {
   }
 
   static async update(viewer, data, loaders) {
+    if (!data || !data.id) return null;
     if (!canMutate(viewer, data, Models.WORKTEAM)) return null;
-    if (!data) return null;
-    if (!data.id) return null;
-    const newData = {};
-    if (data.name) {
-      newData.name = data.name;
+    const newData = {
+      ...(data.name && { name: data.name }),
+      ...(data.deName && { de_name: data.deName }),
+      ...(data.itName && { it_name: data.itName }),
+      ...(data.lldName && { lld_name: data.lldName }),
+      ...(data.restricted && { restricted: data.restricted }),
+    };
+    if (data.logo || data.logoAssetId) {
+      throw new Error('Not implemented yet: LOGO');
     }
+    if (data.background || data.backgroundAssetId) {
+      throw new Error('Not implemented yet: BACKGROUND');
+    }
+    if (typeof data.main === 'boolean') {
+      throw new Error('Not implemented yet: MAIN');
+    }
+
     if (data.coordinatorId) {
       if (!validateCoordinator(viewer, data.coordinatorId, loaders))
         return null;
       newData.coordinator_id = data.coordinatorId;
     }
-    newData.updated_at = new Date();
-    let wtId = await knex.transaction(async trx =>
+
+    if (Object.keys(newData).length) {
+      newData.updated_at = new Date();
+    }
+    const [workTeam = null] = await knex.transaction(async trx =>
       // eslint-disable-next-line newline-per-chained-call
       knex('work_teams')
         .transacting(trx)
         .forUpdate()
         .update(newData)
-        .returning('id'),
+        .returning('*'),
     );
-    wtId = wtId[0];
-    return wtId ? WorkTeam.gen(viewer, wtId, loaders) : null;
+    return workTeam ? new WorkTeam(workTeam) : null;
   }
 }
 

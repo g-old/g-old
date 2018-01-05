@@ -26,7 +26,7 @@ import {
   user as userSchema,
 } from '../store/schema';
 
-const workTeam = `
+const workTeamFields = `
   id
   name
   numMembers
@@ -39,12 +39,12 @@ const workTeam = `
   }`;
 const workTeams = `query{
   workTeams {
-    ${workTeam}
+    ${workTeamFields}
   }}`;
 
 const workTeamsWithMembers = `query{
     workTeams {
-      ${workTeam}
+      ${workTeamFields}
       members{
         name
         surname
@@ -55,7 +55,7 @@ const workTeamsWithMembers = `query{
 
 const workTeamQuery = `query($id:ID!){
   workTeam(id:$id){
-    ${workTeam}
+    ${workTeamFields}
     ownStatus
     discussions{
       id
@@ -68,13 +68,13 @@ const workTeamQuery = `query($id:ID!){
 
 const createWorkTeamMutation = `mutation($name:String, $coordinatorId:ID){
   createWorkTeam (workTeam:{name:$name, coordinatorId:$coordinatorId}){
-    ${workTeam}
+    ${workTeamFields}
   }
 }`;
 
 const updateWorkTeamMutation = `mutation($workTeam:WorkTeamInput){
   updateWorkTeam (workTeam:$workTeam){
-    ${workTeam}
+    ${workTeamFields}
   }
 }`;
 
@@ -82,7 +82,7 @@ const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID){
   joinWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     id
     workTeams{
-      ${workTeam}
+      ${workTeamFields}
     }
   }
 }`;
@@ -91,7 +91,7 @@ const leaveWorkTeamMutation = `mutation($id:ID, $memberId:ID){
   leaveWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     id
     workTeams{
-      ${workTeam}
+      ${workTeamFields}
     }
   }
 }`;
@@ -204,14 +204,16 @@ export function loadWorkTeam({ id }) {
   };
 }
 
-export function updateWorkTeam({ id }) {
+export function updateWorkTeam(workTeam) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: UPDATE_WORKTEAM_START,
     });
 
     try {
-      const { data } = await graphqlRequest(updateWorkTeamMutation, { id });
+      const { data } = await graphqlRequest(updateWorkTeamMutation, {
+        workTeam,
+      });
       const normalizedData = normalize(data.updateWorkTeam, workTeamSchema);
 
       dispatch({ type: UPDATE_WORKTEAM_SUCCESS, payload: normalizedData });
