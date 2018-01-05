@@ -106,8 +106,7 @@ class WorkTeam extends React.Component {
     }
     return (
       <div className={s.root}>
-        {picture}
-        <Label big>{name}</Label>
+        <div className={s.background} />
         <Box>
           <Value
             icon={
@@ -123,6 +122,10 @@ class WorkTeam extends React.Component {
             label="Members"
             value={numMembers || 0}
           />
+          <Box column align className={s.header}>
+            {picture}
+            <Label big>{name}</Label>
+          </Box>
           <Value
             icon={
               <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
@@ -137,6 +140,7 @@ class WorkTeam extends React.Component {
             label="Discussions"
             value={numDiscussions || 0}
           />
+          <Box />
         </Box>
         <Button
           onClick={() => {

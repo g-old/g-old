@@ -16,6 +16,10 @@ class WorkTeam {
     this.numMembers = data.num_members;
     this.numDiscussions = data.num_discussions;
     this.restricted = data.restricted;
+    this.deName = data.de_name;
+    this.itName = data.it_name;
+    this.lldName = data.lld_name;
+    this.mainTeam = data.main;
   }
   canNotify(viewer) {
     // eslint-disable-next-line eqeqeq
@@ -37,9 +41,9 @@ class WorkTeam {
 
     return false;
   }
-  async modifySessions() {
+  async modifySessions(userId) {
     const oldSessions = await knex('sessions')
-      .whereRaw("sess->'passport'->'user'->>'id'=?", [this.id])
+      .whereRaw("sess->'passport'->'user'->>'id'=?", [userId])
       .select('sess', 'sid');
     const updates = oldSessions.map(data => {
       const session = data.sess;
@@ -80,6 +84,7 @@ class WorkTeam {
           user_id: requester.id,
           work_team_id: this.id,
           ...(this.restricted && { authorizer_id: viewer.id }),
+          created_at: new Date(),
         })
         .into('user_work_teams')
         .returning('id');
@@ -93,7 +98,7 @@ class WorkTeam {
           .into('work_teams');
 
         // insert into sessions;
-        await this.modifySessions();
+        await this.modifySessions(requester.id);
         // TODO  should be sent via sse too in case viewer != requester.
       }
       return id;

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './Box.css';
+import s from './Box.css'; // eslint-disable-line
 
 class Box extends React.Component {
   static propTypes = {
@@ -18,6 +18,8 @@ class Box extends React.Component {
     justify: PropTypes.bool,
     wrap: PropTypes.bool,
     flex: PropTypes.bool,
+    between: PropTypes.bool,
+    padding: PropTypes.string,
   };
 
   static defaultProps = {
@@ -32,6 +34,8 @@ class Box extends React.Component {
     justify: false,
     wrap: false,
     flex: false,
+    between: false,
+    padding: null,
   };
 
   render() {
@@ -48,8 +52,11 @@ class Box extends React.Component {
       justify,
       wrap,
       flex,
+      between,
+      padding,
     } = this.props;
-    /* eslint-disable jsx-a11y/no-static-element-interactions*/
+
+    /* eslint-disable jsx-a11y/no-static-element-interactions */
     const Component = tag;
 
     return (
@@ -65,6 +72,10 @@ class Box extends React.Component {
           justify ? s.justify : null,
           wrap ? s.wrap : null,
           flex ? s.flex : null,
+          between ? s.between : null,
+          {
+            [s[padding]]: padding,
+          },
         )}
         onClick={onClick}
       >

@@ -48,11 +48,15 @@ class ImageUpload extends React.Component {
     uploadPending: PropTypes.bool.isRequired,
     uploadError: PropTypes.shape({}),
     onClose: PropTypes.func,
+    ratio: PropTypes.number,
+    serverResizing: PropTypes.bool,
   };
   static defaultProps = {
     uploadError: null,
     uploadSuccess: false,
     onClose: null,
+    ratio: null,
+    serverResizing: null,
   };
   constructor(props) {
     super(props);
@@ -91,7 +95,12 @@ class ImageUpload extends React.Component {
   }
 
   handleSave() {
-    const img = this.editor.getImageScaledToCanvas().toDataURL('image/jpeg', 0.5); // this.editor.getImage().toDataURL();
+    if (this.props.serverResizing) {
+      alert('TO IMPLEMENT');
+    }
+    const img = this.editor
+      .getImageScaledToCanvas()
+      .toDataURL('image/jpeg', 0.5); // this.editor.getImage().toDataURL();
     const rect = this.editor.getCroppingRect();
     this.setState({
       preview: img,
@@ -116,7 +125,7 @@ class ImageUpload extends React.Component {
 
   render() {
     let editor = null;
-    const { uploadPending, uploadError, onClose } = this.props;
+    const { uploadPending, uploadError, onClose, ratio = 1 } = this.props;
     const disableControls = !this.state.src;
 
     editor = (
@@ -126,17 +135,17 @@ class ImageUpload extends React.Component {
           image={this.state.src}
           onSave={this.handleSave}
           borderRadius={10}
-          width={256}
+          width={256 * ratio}
           height={256}
           border={50}
           color={[255, 255, 255, 0.6]} // RGBA
           scale={this.state.scale}
           rotate={this.state.rotate || 0}
-          onLoadFailure={() => alert('Image could not been loaded -> load another one')}
+          onLoadFailure={() =>
+            alert('Image could not been loaded -> load another one')}
           onLoadSuccess={() => this.setState({ loaded: true })}
         />
         <Box pad column justify>
-
           <Box pad justify>
             <Label>{'Zoom:'}</Label>
 
@@ -147,8 +156,19 @@ class ImageUpload extends React.Component {
                 this.setState({ scale: this.state.scale + 0.1 });
               }}
               icon={
-                <svg viewBox="0 0 24 24" width="24px" height="24px" role="img" aria-label="add">
-                  <path fill="none" stroke="#000" strokeWidth="2" d="M12,22 L12,2 M2,12 L22,12" />
+                <svg
+                  viewBox="0 0 24 24"
+                  width="24px"
+                  height="24px"
+                  role="img"
+                  aria-label="add"
+                >
+                  <path
+                    fill="none"
+                    stroke="#000"
+                    strokeWidth="2"
+                    d="M12,22 L12,2 M2,12 L22,12"
+                  />
                 </svg>
               }
             />
@@ -167,7 +187,12 @@ class ImageUpload extends React.Component {
                   role="img"
                   aria-label="subtract"
                 >
-                  <path fill="none" stroke="#000" strokeWidth="2" d="M2,12 L22,12" />
+                  <path
+                    fill="none"
+                    stroke="#000"
+                    strokeWidth="2"
+                    d="M2,12 L22,12"
+                  />
                 </svg>
               }
             />
@@ -180,12 +205,16 @@ class ImageUpload extends React.Component {
               onClick={this.handleLeftRotation}
             >
               <svg viewBox={'0 0 24 24'} width={24} height={24}>
-                <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.retry} />
+                <path
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth="2"
+                  d={ICONS.retry}
+                />
               </svg>
             </Button>
           </Box>
         </Box>
-
       </Box>
     );
 
@@ -194,16 +223,13 @@ class ImageUpload extends React.Component {
         <div className={s.article}>
           <FormField label="File">
             <input
-              ref={input => (this.input = input)}
+              ref={input => (this.input = input)} // eslint-disable-line
               onChange={this.onChange}
               accept="image/*"
               type="file"
             />
           </FormField>
-          <FormField label="Image">
-            {editor}
-
-          </FormField>
+          <FormField label="Image">{editor}</FormField>
           <div className={s.footer}>
             <Button
               primary
@@ -213,10 +239,11 @@ class ImageUpload extends React.Component {
             />
           </div>
           {uploadPending && 'Uploading...'}
-          {uploadError &&
+          {uploadError && (
             <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
               <FormattedMessage {...messages.error} />
-            </div>}
+            </div>
+          )}
         </div>
       </Layer>
     );

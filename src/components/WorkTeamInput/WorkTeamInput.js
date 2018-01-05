@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
-
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import s from './WorkTeamInput.css';
 import SearchField from '../../components/SearchField';
 import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
-import Layer from '../Layer';
 import {
   nameValidation,
   selectValidation,
@@ -41,7 +41,6 @@ class WorkTeamInput extends React.Component {
     this.handleValidation = this.handleValidation.bind(this);
     this.visibleErrors = this.visibleErrors.bind(this);
     this.handleValueChanges = this.handleValueChanges.bind(this);
-
     this.state = {
       teamName: '',
       errors: {
@@ -108,46 +107,72 @@ class WorkTeamInput extends React.Component {
     this.setState({ [e.target.name]: value });
   }
 
+  openLogoUploader() {
+    this.setState({ showLogoUploader: true });
+  }
   render() {
+    const langs = [
+      { code: 'de', name: 'german' },
+      { code: 'it', name: 'italian' },
+      { code: 'lld', name: 'ladin' },
+    ];
     const { teamName } = this.state;
     const { teamNameError, coordinatorError } = this.visibleErrors(formFields);
     return (
-      <Layer onClose={this.props.onClose}>
-        <div style={{ height: '480px' }}>
-          <Box pad column>
-            <h1>{'Create Team'}</h1>
-            <fieldset>
-              <FormField label="Teamname" error={teamNameError}>
+      //  <Layer onClose={this.props.onClose}>
+      <Box justify>
+        <Box pad column className={s.form}>
+          <h1>{'Create Team'}</h1>
+
+          <fieldset>
+            <FormField label="Teamname" error={teamNameError}>
+              <input
+                name="teamName"
+                onBlur={this.handleBlur}
+                type="text"
+                value={teamName}
+                onChange={this.handleValueChanges}
+              />
+            </FormField>
+
+            {langs.map(language => (
+              <FormField label={`Teamname${language.name}`}>
                 <input
-                  name="teamName"
+                  name={`teamName${language.code}`}
                   onBlur={this.handleBlur}
                   type="text"
-                  value={teamName}
+                  value={this.state[`teamName${language.code}`]}
                   onChange={this.handleValueChanges}
                 />
               </FormField>
-              <FormField overflow label="Coordinator" error={coordinatorError}>
-                <SearchField
-                  onChange={e =>
-                    this.handleValueChanges({
-                      target: { name: 'coordinatorValue', value: e.value },
-                    })}
-                  data={this.props.users}
-                  fetch={this.props.findUser}
-                  displaySelected={data => {
-                    this.handleValueChanges({
-                      target: { name: 'coordinator', value: data },
-                    });
-                  }}
-                />
-              </FormField>
-            </fieldset>
-            <Button primary fill label="Create Team" onClick={this.onSubmit} />
-          </Box>
-        </div>
-      </Layer>
+            ))}
+
+            <FormField overflow label="Coordinator" error={coordinatorError}>
+              <SearchField
+                onChange={e =>
+                  this.handleValueChanges({
+                    target: { name: 'coordinatorValue', value: e.value },
+                  })}
+                data={this.props.users}
+                fetch={this.props.findUser}
+                displaySelected={data => {
+                  this.handleValueChanges({
+                    target: { name: 'coordinator', value: data },
+                  });
+                }}
+              />
+            </FormField>
+            <FormField label="Logo" />
+            <FormField label="Background">
+              <input type="file" />
+            </FormField>
+          </fieldset>
+          <Button primary fill label="Create Team" onClick={this.onSubmit} />
+        </Box>
+      </Box>
+      // </Layer>
     );
   }
 }
 
-export default WorkTeamInput;
+export default withStyles(s)(WorkTeamInput);

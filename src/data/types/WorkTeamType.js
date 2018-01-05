@@ -5,6 +5,7 @@ import {
   GraphQLID as ID,
   GraphQLList,
   GraphQLInt,
+  GraphQLBoolean,
 } from 'graphql';
 import UserType from './UserType';
 import DiscussionType from './DiscussionType';
@@ -24,6 +25,31 @@ const WorkTeamType = new ObjectType({
     },
     name: {
       type: GraphQLString,
+      resolve(parent, args, params, { rootValue }) {
+        switch (rootValue.language) {
+          case 'de-DE': {
+            return parent.deName || parent.name;
+          }
+          case 'it-IT': {
+            return parent.itName || parent.name;
+          }
+          case 'lld-IT': {
+            return parent.lldName || parent.name;
+          }
+
+          default:
+            return parent.name;
+        }
+      },
+    },
+    deName: {
+      type: GraphQLString,
+    },
+    itName: {
+      type: GraphQLString,
+    },
+    lldName: {
+      type: GraphQLString,
     },
     members: {
       type: new GraphQLList(UserType),
@@ -36,6 +62,12 @@ const WorkTeamType = new ObjectType({
         }
         return null;
       },
+    },
+    restricted: {
+      type: GraphQLBoolean,
+    },
+    main: {
+      type: GraphQLBoolean,
     },
     ownStatus: {
       type: GraphQLString,

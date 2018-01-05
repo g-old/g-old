@@ -16,6 +16,9 @@ import {
   LEAVE_WORKTEAM_START,
   LEAVE_WORKTEAM_SUCCESS,
   LEAVE_WORKTEAM_ERROR,
+  UPDATE_WORKTEAM_START,
+  UPDATE_WORKTEAM_SUCCESS,
+  UPDATE_WORKTEAM_ERROR,
 } from '../constants';
 import {
   workTeamList as workTeamListSchema,
@@ -65,6 +68,12 @@ const workTeamQuery = `query($id:ID!){
 
 const createWorkTeamMutation = `mutation($name:String, $coordinatorId:ID){
   createWorkTeam (workTeam:{name:$name, coordinatorId:$coordinatorId}){
+    ${workTeam}
+  }
+}`;
+
+const updateWorkTeamMutation = `mutation($workTeam:WorkTeamInput){
+  updateWorkTeam (workTeam:$workTeam){
     ${workTeam}
   }
 }`;
@@ -189,6 +198,26 @@ export function loadWorkTeam({ id }) {
     } catch (e) {
       dispatch({
         type: LOAD_WORKTEAM_ERROR,
+        message: e.message || 'Something went wrong',
+      });
+    }
+  };
+}
+
+export function updateWorkTeam({ id }) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: UPDATE_WORKTEAM_START,
+    });
+
+    try {
+      const { data } = await graphqlRequest(updateWorkTeamMutation, { id });
+      const normalizedData = normalize(data.updateWorkTeam, workTeamSchema);
+
+      dispatch({ type: UPDATE_WORKTEAM_SUCCESS, payload: normalizedData });
+    } catch (e) {
+      dispatch({
+        type: UPDATE_WORKTEAM_ERROR,
         message: e.message || 'Something went wrong',
       });
     }

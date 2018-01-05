@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 // import { highlightContent, uuid } from '../../core/utils';
-import RequestTableRow from './Row';
+import WorkTeamTableRow from './Row';
 
 /* eslint-disable */
 function uuid() {
@@ -22,35 +22,35 @@ function uuid() {
 
 /* eslint-enable */
 
-export default function RequestTableRows({
-  requests,
+export default function WorkTeamTableRows({
+  workTeams,
   onClickCheckbox,
   onClickMenu,
   allowMultiSelect,
   children,
   checkedIndices,
 }) {
-  if (!requests.length && children) {
+  if (!workTeams.length && children) {
     return React.cloneElement(children);
   }
   return (
     <tbody style={{ minHeight: '500px' }}>
-      {requests.map((request, index) => (
-        <RequestTableRow
+      {workTeams.map((workTeam, index) => (
+        <WorkTeamTableRow
           checked={checkedIndices.indexOf(index) >= 0}
           key={uuid()}
           onClickCheckbox={checked => onClickCheckbox(index, checked)}
-          onClickMenu={action => onClickMenu(action, request)}
+          onClickMenu={action => onClickMenu(action, workTeam)}
           allowMultiSelect={allowMultiSelect}
-          {...request}
+          {...workTeam}
         />
       ))}
     </tbody>
   );
 }
 
-RequestTableRows.propTypes = {
-  requests: PropTypes.arrayOf(PropTypes.shape({})),
+WorkTeamTableRows.propTypes = {
+  workTeams: PropTypes.arrayOf(PropTypes.shape({})),
   onClickCheckbox: PropTypes.func.isRequired,
   onClickMenu: PropTypes.func.isRequired,
   allowMultiSelect: PropTypes.bool.isRequired,
@@ -58,8 +58,8 @@ RequestTableRows.propTypes = {
   checkedIndices: PropTypes.arrayOf(PropTypes.number),
 };
 
-RequestTableRows.defaultProps = {
-  requests: null,
+WorkTeamTableRows.defaultProps = {
+  workTeams: null,
   searchTerm: null,
   requiresSearch: null,
 

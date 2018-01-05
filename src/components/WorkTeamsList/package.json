@@ -1,0 +1,6 @@
+{
+  "name": "WorkTeamsList",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./WorkTeamsList.js"
+}

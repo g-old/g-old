@@ -12,8 +12,8 @@ const deleteRequest = {
     },
   },
   resolve: async (data, { request }, { viewer, loaders }) => {
-    const newRequest = await Request.delete(viewer, request, loaders);
-    return newRequest;
+    const deletedRequest = await Request.delete(viewer, request, loaders);
+    return deletedRequest;
   },
 };
 

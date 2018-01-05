@@ -8,7 +8,6 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Admin.css';
 import Tab from '../../components/Tab';
@@ -17,11 +16,10 @@ import UserPanel from '../../components/UserPanel';
 import ProposalPanel from '../../components/ProposalPanel';
 import SupervisionPanel from '../../components/SupervisionPanel';
 import TechPanel from '../../components/TechPanel';
+import WorkTeamPanel from '../../components/WorkTeamPanel';
 
 class Admin extends React.Component {
-  static propTypes = {
-    title: PropTypes.string.isRequired,
-  };
+  static propTypes = {};
 
   render() {
     return (
@@ -30,14 +28,17 @@ class Admin extends React.Component {
           <Tab title="USERMANAGEMENT">
             <UserPanel />
           </Tab>
-          <Tab title="PROPOSALPANEL">
+          <Tab title="PROPOSALS">
             <ProposalPanel />
           </Tab>
-          <Tab title="TECHPANEL">
+          <Tab title="TECH">
             <TechPanel />
           </Tab>
-          <Tab title="SUPERVISIONPANEL">
+          <Tab title="SUPERVISION">
             <SupervisionPanel />
+          </Tab>
+          <Tab title="WORKTEAMS">
+            <WorkTeamPanel />
           </Tab>
         </Tabs>
       </div>

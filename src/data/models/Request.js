@@ -71,20 +71,28 @@ class Request {
     if (!data || !data.id) return null;
     if (!canMutate(viewer, data, Models.REQUEST)) return null;
     const deletedRequest = await knex.transaction(async trx => {
-      const [request = null] = await knex('requests')
-        .where({ id: data.id })
-        .select('*');
+      const request = await Request.gen(viewer, data.id, loaders);
 
       if (request.type === 'joinWT') {
-        const workTeam = await WorkTeam.gen(viewer, data, loaders);
-        await workTeam.join(viewer, request.requester_id, loaders);
+        const wt = JSON.parse(request.content);
+        if (!wt.id) {
+          throw new Error('No team given');
+        }
+        const workTeam = await WorkTeam.gen(viewer, wt.id, loaders);
+        const res = await workTeam.join(viewer, request.requester_id, loaders);
+        if (!res) {
+          throw new Error('Joining Workteam failed');
+        }
+      } else {
+        throw new Error('Type not recognized');
       }
-
       await knex('requests')
         .where({ id: data.id })
         .transacting(trx)
         .forUpdate()
         .del();
+
+      return request;
     });
 
     return deletedRequest ? new Request(deletedRequest) : null;
