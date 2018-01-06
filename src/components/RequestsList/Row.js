@@ -6,6 +6,7 @@ import { FormattedRelative } from 'react-intl';
 import s from './RequestsList.css';
 import TableRow from '../TableRow';
 import Avatar from '../Avatar';
+import Box from '../Box';
 
 function RequestTableRow({
   requester,
@@ -21,21 +22,16 @@ function RequestTableRow({
   return (
     <TableRow className={s.row} onClick={() => onClickMenu('EDIT')}>
       <td style={{ minWidth: '84px' }}>
-        <Avatar user={requester} />
-      </td>
-
-      <td>
-        <span>{`${requester.name} ${requester.surname}`}</span>
+        <Box pad align>
+          {requester && <Avatar user={requester} />}
+          {requester && ` ${requester.name} ${requester.surname}`}
+        </Box>
       </td>
       <td>
         <span>{type}</span>
       </td>
-      <td>
-        {processor && <span>{`${processor.name} ${processor.surname}`}</span>}
-      </td>
-      <td>
-        <FormattedRelative value={createdAt} />
-      </td>
+      <td>{processor && `${processor.name} ${processor.surname}`}</td>
+      <td>{createdAt && <FormattedRelative value={createdAt} />}</td>
       <td>{deniedAt && <FormattedRelative value={deniedAt} />}</td>
     </TableRow>
   );

@@ -16,6 +16,7 @@ import {
   SESSION_LOGIN_SUCCESS,
   SSE_UPDATE_SUCCESS,
   LOAD_WORKTEAMS_SUCCESS,
+  LOAD_WORKTEAM_SUCCESS,
   JOIN_WORKTEAM_SUCCESS,
   LEAVE_WORKTEAM_SUCCESS,
   LOAD_DISCUSSIONS_SUCCESS,
@@ -56,6 +57,7 @@ export default function byId(state = {}, action) {
     case LOAD_DISCUSSION_SUCCESS:
     case LOAD_REPLIES_SUCCESS:
     case LOAD_REQUESTS_SUCCESS:
+    case LOAD_WORKTEAM_SUCCESS:
     case CREATE_REQUEST_SUCCESS:
     case SESSION_LOGIN_SUCCESS: {
       return merge({}, state, action.payload.entities.users);

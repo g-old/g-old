@@ -16,10 +16,15 @@ const messages = defineMessages({
     defaultMessage: 'Join',
     description: 'Button label',
   },
-  pending: {
-    id: 'join.pending',
-    defaultMessage: 'Join request under evaluation',
-    description: 'Join request pending',
+  withdraw: {
+    id: 'join.withdraw',
+    defaultMessage: 'Dismiss request',
+    description: 'Cancel join request',
+  },
+  leave: {
+    id: 'leave',
+    defaultMessage: 'Leave',
+    description: 'Leave team',
   },
 });
 
@@ -27,13 +32,15 @@ class WorkTeam extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
     logo: PropTypes.string,
-    name: PropTypes.string.isRequired,
+    displayName: PropTypes.string.isRequired,
     numMembers: PropTypes.number.isRequired,
     numDiscussions: PropTypes.number.isRequired,
     discussions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     ownStatus: PropTypes.string.isRequired,
     onJoinRequest: PropTypes.func.isRequired,
     updates: PropTypes.shape({ pending: PropTypes.bool }).isRequired,
+    restricted: PropTypes.bool.isRequired,
+    onJoin: PropTypes.func.isRequired,
   };
   static defaultProps = {
     logo: null,
@@ -49,17 +56,24 @@ class WorkTeam extends React.Component {
   }
 
   handleJoining() {
-    const { ownStatus, onJoinRequest, id } = this.props;
+    const { ownStatus, onJoinRequest, id, restricted, onJoin } = this.props;
     if (ownStatus === 'none') {
       const content = { id };
-      onJoinRequest({ type: 'joinWT', content: JSON.stringify(content) });
+      if (restricted) {
+        onJoinRequest({ type: 'joinWT', content: JSON.stringify(content) });
+      } else {
+        onJoin({ id });
+      }
     }
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  cancelJoining() {}
 
   render() {
     const {
       logo,
-      name,
+      displayName,
       numMembers,
       numDiscussions,
       discussions,
@@ -77,8 +91,8 @@ class WorkTeam extends React.Component {
           version="1.1"
           viewBox="0 0 24 24"
           role="img"
-          width="192px"
-          height="192px"
+          width="100px"
+          height="100px"
           aria-label="cloud"
         >
           <path
@@ -102,7 +116,19 @@ class WorkTeam extends React.Component {
         />
       );
     } else if (ownStatus === 'pending') {
-      joinBtn = <FormattedMessage {...messages.pending} />;
+      joinBtn = (
+        <Button
+          onClick={this.cancelJoining}
+          label={<FormattedMessage {...messages.withdraw} />}
+        />
+      );
+    } else if (ownStatus === 'member') {
+      joinBtn = (
+        <Button
+          onClick={this.cancelJoining}
+          label={<FormattedMessage {...messages.leave} />}
+        />
+      );
     }
     return (
       <div className={s.root}>
@@ -124,7 +150,7 @@ class WorkTeam extends React.Component {
           />
           <Box column align className={s.header}>
             {picture}
-            <Label big>{name}</Label>
+            <Label big>{displayName}</Label>
           </Box>
           <Value
             icon={

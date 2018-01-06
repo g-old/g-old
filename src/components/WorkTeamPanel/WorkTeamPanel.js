@@ -52,7 +52,7 @@ class WorkTeamPanel extends React.Component {
           allowMultiSelect
           searchTerm=""
           checkedIndices={[]}
-          tableHeaders={['name', 'members', 'discussions', '']}
+          tableHeaders={['name', 'coordinator', 'members', 'discussions', '']}
         />
       </Box>
     );

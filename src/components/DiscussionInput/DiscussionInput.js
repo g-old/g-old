@@ -92,7 +92,7 @@ const standardValues = {
   },
 };
 
-const formFields = ['title', 'body', 'dateTo', 'timeTo', 'spokesman'];
+const formFields = ['title', 'body', 'spokesman'];
 class DiscussionInput extends React.Component {
   static propTypes = {
     createDiscussion: PropTypes.func.isRequired,
@@ -150,8 +150,6 @@ class DiscussionInput extends React.Component {
     const testValues = {
       title: { fn: 'name' },
       body: { fn: 'name' },
-      dateTo: { fn: 'date' },
-      timeTo: { fn: 'time' },
       spokesman: {
         fn: 'spokesman',
         valuesResolver: obj => obj.state.spokesmanValue,
@@ -238,6 +236,7 @@ class DiscussionInput extends React.Component {
 
   onSubmit() {
     // TODO validate
+    alert('NOT WORKING');
     if (this.handleValidation(formFields)) {
       const { body, title } = this.state.settings;
 

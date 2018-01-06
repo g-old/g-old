@@ -1,8 +1,10 @@
 .logo {
-  width: 12rem;
-  height: 12rem;
+  width: 9rem;
+  height: 9rem;
   border: 3px solid #fff;
   border-radius: 6px;
+  background-color: #fff;
+  padding: 2rem;
 }
 
 .root {
@@ -22,5 +24,5 @@
 .background {
   width: 1000px;
   height: 300px;
-  background-image: url(https://www.planwallpaper.com/static/images/violet-vector-leaves-circles-backgrounds-for-powerpoint_PdfkI4q.jpg);
+  background-color: rgba(23, 43, 199, 0.4);
 }

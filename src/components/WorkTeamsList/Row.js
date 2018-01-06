@@ -7,13 +7,15 @@ import TableRow from '../TableRow';
 import Image from '../Image';
 import Button from '../Button';
 import Box from '../Box';
+import Avatar from '../Avatar';
 
 function WorkTeamTableRow({
-  name,
+  displayName,
   numMembers,
   numDiscussions,
   logo,
   onClickMenu,
+  coordinator,
 }) {
   /* eslint-disable react/no-danger */
   /* eslint-disable jsx-a11y/click-events-have-key-events */
@@ -22,10 +24,11 @@ function WorkTeamTableRow({
     <TableRow className={s.row} onClick={() => onClickMenu('SHOW')}>
       <td style={{ minWidth: '84px' }}>
         <Box pad wrap>
-          <Image src={logo} thumb />
-          <span>{`${name}`}</span>
+          {logo && <Image src={logo} thumb />}
+          <span>{`${displayName}`}</span>
         </Box>
       </td>
+      <td>{coordinator ? <Avatar user={coordinator} /> : 'No coordinator'}</td>
       <td>
         <span>{numMembers}</span>
       </td>
@@ -65,10 +68,11 @@ function WorkTeamTableRow({
 
 WorkTeamTableRow.propTypes = {
   onClickMenu: PropTypes.func.isRequired,
-  name: PropTypes.string.isRequired,
+  displayName: PropTypes.string.isRequired,
   numMembers: PropTypes.number.isRequired,
   numDiscussions: PropTypes.number.isRequired,
   logo: PropTypes.string.isRequired,
+  coordinator: PropTypes.shape({}).isRequired,
 };
 
 WorkTeamTableRow.defaultProps = {

@@ -93,7 +93,7 @@ const messages = defineMessages({
   },
 });
 
-const renderFollowee = (data, fn, del) =>
+const renderFollowee = (data, fn, del) => (
   <li key={data.followee.id}>
     <Button
       disabled={!del}
@@ -109,12 +109,14 @@ const renderFollowee = (data, fn, del) =>
       plain
     >
       <Avatar user={data.followee} isFollowee />
-      {del &&
+      {del && (
         <svg viewBox="0 0 24 24" width="24px" height="24px">
           <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.delete} />
-        </svg>}
+        </svg>
+      )}
     </Button>
-  </li>;
+  </li>
+);
 
 /* const workTeams = [
   {
@@ -204,6 +206,7 @@ class AccountContainer extends React.Component {
   static defaultProps = {
     logs: null,
     logError: null,
+    workTeams: null,
   };
   constructor(props) {
     super(props);
@@ -335,15 +338,15 @@ class AccountContainer extends React.Component {
 
     let displayLog;
     if (logs && logs.length) {
-      displayLog = logs.map(a =>
+      displayLog = logs.map(a => (
         <ActivityLog
           key={a.id}
           actor={a.actor}
           date={a.createdAt}
           verb={a.verb}
           content={a.object}
-        />,
-      );
+        />
+      ));
     } else if (logPending) {
       displayLog = 'Loading...';
     } else if (logError) {
@@ -368,7 +371,7 @@ class AccountContainer extends React.Component {
 
     return (
       <Box flex justify wrap className={s.account}>
-        {this.state.showUpload &&
+        {this.state.showUpload && (
           <ImageUpload
             uploadAvatar={data => {
               this.props.uploadAvatar({ ...data, id: this.props.user.id });
@@ -379,7 +382,8 @@ class AccountContainer extends React.Component {
             onClose={() => {
               this.setState({ showUpload: false });
             }}
-          />}
+          />
+        )}
         {profile}
 
         <Box column flex className={s.details}>

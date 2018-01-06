@@ -68,7 +68,6 @@ class WorkTeamManagement extends React.Component {
           checkedIndices={[]}
           requests={this.props.requests || []}
           tableHeaders={[
-            '',
             'name',
             'request',
             'processor',

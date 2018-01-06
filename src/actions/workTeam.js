@@ -28,9 +28,13 @@ import {
 
 const workTeamFields = `
   id
-  name
+  displayName
   numMembers
   numDiscussions
+  restricted
+  mainTeam
+  logo
+  background
   coordinator{
     name
     surname
@@ -53,6 +57,18 @@ const workTeamsWithMembers = `query{
       }
     }}`;
 
+const wtDetails = `
+name
+lldName,
+deName,
+itName,
+`;
+const workTeamWithDetails = `query{
+    workTeams {
+      ${workTeamFields}
+      ${wtDetails}
+    }}`;
+
 const workTeamQuery = `query($id:ID!){
   workTeam(id:$id){
     ${workTeamFields}
@@ -66,15 +82,17 @@ const workTeamQuery = `query($id:ID!){
   }
 }`;
 
-const createWorkTeamMutation = `mutation($name:String, $coordinatorId:ID){
-  createWorkTeam (workTeam:{name:$name, coordinatorId:$coordinatorId}){
+const createWorkTeamMutation = `mutation($workTeam:WorkTeamInput){
+  createWorkTeam (workTeam:$workTeam){
     ${workTeamFields}
+    ${wtDetails}
   }
 }`;
 
 const updateWorkTeamMutation = `mutation($workTeam:WorkTeamInput){
   updateWorkTeam (workTeam:$workTeam){
     ${workTeamFields}
+    ${wtDetails}
   }
 }`;
 
@@ -118,17 +136,16 @@ export function loadWorkTeams(withMembers) {
   };
 }
 
-export function createWorkTeam(workTeamData) {
+export function createWorkTeam(workTeam) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: CREATE_WORKTEAM_START,
     });
 
     try {
-      const { data } = await graphqlRequest(
-        createWorkTeamMutation,
-        workTeamData,
-      );
+      const { data } = await graphqlRequest(createWorkTeamMutation, {
+        workTeam,
+      });
       const normalizedData = normalize(data.createWorkTeam, workTeamSchema);
 
       dispatch({ type: CREATE_WORKTEAM_SUCCESS, payload: normalizedData });
@@ -184,14 +201,14 @@ export function leaveWorkTeam(workTeamData) {
   };
 }
 
-export function loadWorkTeam({ id }) {
+export function loadWorkTeam({ id }, details) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: LOAD_WORKTEAM_START,
     });
-
+    const query = details ? workTeamWithDetails : workTeamQuery;
     try {
-      const { data } = await graphqlRequest(workTeamQuery, { id });
+      const { data } = await graphqlRequest(query, { id });
       const normalizedData = normalize(data.workTeam, workTeamSchema);
 
       dispatch({ type: LOAD_WORKTEAM_SUCCESS, payload: normalizedData });

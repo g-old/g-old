@@ -53,9 +53,7 @@ class WorkTeamListContainer extends React.Component {
         <List>
           {workTeams.map(u => (
             <ListItem onClick={() => handleItemClick(u.id)}>
-              <span>
-                {u.name} {} {u.surname}
-              </span>
+              <span>{u.displayName}</span>
             </ListItem>
           ))}
         </List>

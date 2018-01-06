@@ -10,6 +10,8 @@ import pageInfo, * as fromPageInfo from './ui/pageInfo';
 import { SESSION_LOGOUT_SUCCESS } from '../constants';
 import comments, * as fromComment from './ui/comments';
 import requests, * as fromRequest from './ui/requests';
+import workTeams, * as fromWorkTeam from './ui/workTeams';
+
 /* GENERATOR_IMPORTS */
 
 const uiReducer = combineReducers({
@@ -24,6 +26,7 @@ const uiReducer = combineReducers({
   loading,
   pageInfo,
   comments,
+  workTeams,
 });
 export default (state, action) => {
   if (action.type === SESSION_LOGOUT_SUCCESS) {
@@ -35,6 +38,8 @@ export default (state, action) => {
 
 /* GENERATOR_EXPORTS */
 export const getRequestUpdates = state => fromRequest.getStatus(state.requests);
+export const getWorkTeamUpdates = state =>
+  fromWorkTeam.getStatus(state.workTeams);
 
 // TODO Different design
 const getMutationPending = state => {

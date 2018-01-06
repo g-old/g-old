@@ -51,25 +51,31 @@ class SearchField extends React.Component {
     displaySelected: PropTypes.func.isRequired,
     onChange: PropTypes.func,
     clear: PropTypes.bool,
+    value: PropTypes.string,
   };
   static defaultProps = {
     onChange: null,
     clear: false,
     data: null,
+    value: null,
   };
-  constructor() {
+  constructor(props) {
     super();
     this.state = {
-      value: '',
+      value: props.value || '',
       suggestions: [],
     };
     this.getSuggestions = this.getSuggestions.bind(this);
     this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
   }
 
-  componentWillReceiveProps({ clear }) {
+  componentWillReceiveProps({ clear, value }) {
     if (clear && !this.props.clear) {
       this.setState({ value: '' });
+    }
+
+    if (value && !this.props.value) {
+      this.setState({ value });
     }
   }
 

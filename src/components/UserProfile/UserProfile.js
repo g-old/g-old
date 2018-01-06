@@ -131,7 +131,7 @@ class UserProfile extends React.Component {
                 </svg>
               }
               label={'Workteam'}
-              value={t.name}
+              value={t.displayName}
             />
           ))}
       </Box>

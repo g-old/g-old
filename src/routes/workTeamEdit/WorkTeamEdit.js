@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import { defineMessages, FormattedMessage } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { loadWorkTeam, updateWorkTeam } from '../../actions/workTeam';
+import {
+  loadWorkTeam,
+  updateWorkTeam,
+  createWorkTeam,
+} from '../../actions/workTeam';
 import { loadRequestList, deleteRequest } from '../../actions/request';
 import { findUser } from '../../actions/user';
 
@@ -69,10 +73,12 @@ const genInitalState = (fields, values) =>
 // TODO EDIT + CREATE should be the same form
 class WorkTeamManagement extends React.Component {
   static propTypes = {
+    id: PropTypes.string.isRequired,
     users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     workTeam: PropTypes.shape({ id: PropTypes.string }).isRequired,
     findUser: PropTypes.func.isRequired,
     updateWorkTeam: PropTypes.func.isRequired,
+    createWorkTeam: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -86,6 +92,7 @@ class WorkTeamManagement extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.state = {
+      ...props.workTeam,
       ...genInitalState(formFields, props.workTeam),
     };
     const testValues = {
@@ -111,6 +118,10 @@ class WorkTeamManagement extends React.Component {
     );
   }
 
+  componentWillReceiveProps({ workTeam }) {
+    this.setState({ ...workTeam });
+  }
+
   onCancel(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -120,14 +131,15 @@ class WorkTeamManagement extends React.Component {
   onSubmit(e) {
     // TODO checks
     e.preventDefault();
+    const { workTeam } = this.props;
+    const { coordinator } = this.state;
     if (this.handleValidation(formFields)) {
-      // const coordinatorId = coordinator ? coordinator.id : undefined;
       const inputFields = [
         'id',
         'deName',
         'itName',
         'lldName',
-        'main',
+        'mainTeam',
         'restricted',
         'name',
         'coordinatorId',
@@ -137,7 +149,20 @@ class WorkTeamManagement extends React.Component {
         this.state,
         this.props.workTeam,
       );
-      this.props.updateWorkTeam({ id: this.state.id, ...inputValues });
+      // check coordinator
+      if (workTeam.coordinator) {
+        // eslint-disable-next-line
+        if (coordinator && coordinator.id != workTeam.coordinator.id) {
+          inputFields.coordinatorId = coordinator.id;
+        }
+      } else if (coordinator && coordinator.id) {
+        inputValues.coordinatorId = coordinator.id;
+      }
+      if (this.props.id === 'create') {
+        this.props.createWorkTeam({ ...inputValues });
+      } else {
+        this.props.updateWorkTeam({ id: this.state.id, ...inputValues });
+      }
     }
   }
 
@@ -177,15 +202,17 @@ class WorkTeamManagement extends React.Component {
 
   render() {
     const { lldName, name, deName, itName, restricted, main } = this.state;
+    const { workTeam } = this.props;
     const errors = this.visibleErrors(formFields);
     const { users } = this.props;
+
     return (
       <Box column padding="medium">
         <Box type="section" align column pad>
           <Form onSubmit={this.onSubmit}>
             <Label>{'Workteam names'}</Label>
             <fieldset>
-              <FormField label="Name">
+              <FormField label="Name" error={errors.nameError}>
                 <input
                   type="text"
                   name="name"
@@ -226,6 +253,12 @@ class WorkTeamManagement extends React.Component {
                 error={errors.coordinatorError}
               >
                 <SearchField
+                  value={
+                    workTeam.coordinator
+                      ? `${workTeam.coordinator.name} ${workTeam.coordinator
+                          .surname}`
+                      : ''
+                  }
                   onChange={e =>
                     this.handleValueChanges({
                       target: { name: 'coordinatorValue', value: e.value },
@@ -259,8 +292,8 @@ class WorkTeamManagement extends React.Component {
             <fieldset>
               <FormField>
                 <CheckBox
-                  label="main"
-                  name="main"
+                  label="mainTeam"
+                  name="mainTeam"
                   checked={main}
                   onChange={this.handleValueChanges}
                   toggle
@@ -289,6 +322,7 @@ const mapDispatch = {
   deleteRequest,
   updateWorkTeam,
   findUser,
+  createWorkTeam,
 };
 
 export default connect(mapStateToProps, mapDispatch)(WorkTeamManagement);

@@ -25,8 +25,11 @@ const WorkTeamType = new ObjectType({
     },
     name: {
       type: GraphQLString,
+    },
+    displayName: {
+      type: GraphQLString,
       resolve(parent, args, params, { rootValue }) {
-        switch (rootValue.language) {
+        switch (rootValue.request.language) {
           case 'de-DE': {
             return parent.deName || parent.name;
           }
@@ -66,8 +69,14 @@ const WorkTeamType = new ObjectType({
     restricted: {
       type: GraphQLBoolean,
     },
-    main: {
+    mainTeam: {
       type: GraphQLBoolean,
+    },
+    logo: {
+      type: GraphQLString,
+    },
+    background: {
+      type: GraphQLString,
     },
     ownStatus: {
       type: GraphQLString,

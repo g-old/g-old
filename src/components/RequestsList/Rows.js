@@ -35,16 +35,19 @@ export default function RequestTableRows({
   }
   return (
     <tbody style={{ minHeight: '500px' }}>
-      {requests.map((request, index) => (
-        <RequestTableRow
-          checked={checkedIndices.indexOf(index) >= 0}
-          key={uuid()}
-          onClickCheckbox={checked => onClickCheckbox(index, checked)}
-          onClickMenu={action => onClickMenu(action, request)}
-          allowMultiSelect={allowMultiSelect}
-          {...request}
-        />
-      ))}
+      {requests.map(
+        (request, index) =>
+          request && (
+            <RequestTableRow
+              checked={checkedIndices.indexOf(index) >= 0}
+              key={uuid()}
+              onClickCheckbox={checked => onClickCheckbox(index, checked)}
+              onClickMenu={action => onClickMenu(action, request)}
+              allowMultiSelect={allowMultiSelect}
+              {...request}
+            />
+          ),
+      )}
     </tbody>
   );
 }
