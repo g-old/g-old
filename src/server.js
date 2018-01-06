@@ -68,6 +68,25 @@ EventManager.subscribe('onProposalCreated', ({ proposal, viewer }) => {
   }
 });
 
+EventManager.subscribe('onStatementCreated', ({ statement, viewer }) => {
+  if (
+    !sendJob({
+      type: 'webpushforstatementsTEST',
+      viewer,
+      data: statement,
+      service: 'subs',
+    })
+  ) {
+    log.error(
+      {
+        viewer,
+        job: { type: 'webpush', data: statement },
+      },
+      'Could not send job to worker',
+    );
+  }
+});
+
 const app = express();
 
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the

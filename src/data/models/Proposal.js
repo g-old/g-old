@@ -6,6 +6,7 @@ import { dedup } from '../../core/helpers';
 import { computeNextState } from '../../core/worker';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
+import log from '../../logger';
 
 const validateTags = async tags => {
   let existingTags;
@@ -275,7 +276,11 @@ class Proposal {
     if (!proposalId) return null;
     loaders.proposals.clear(proposalId);
 
-    return Proposal.gen(viewer, proposalId, loaders);
+    const proposal = await Proposal.gen(viewer, proposalId, loaders);
+    if (proposal) {
+      EventManager.publish('onProposalUpdated', { viewer, proposal });
+    }
+    return proposal;
   }
 
   static async create(viewer, data, loaders) {
@@ -431,3 +436,15 @@ class Proposal {
 }
 
 export default Proposal;
+
+EventManager.subscribe('onProposalUpdated', async ({ proposal }) => {
+  if (['accepted', 'rejected', 'revoked'].includes(proposal.state)) {
+    try {
+      await knex('proposal_user_subscriptions')
+        .where({ proposal_id: proposal.id })
+        .del();
+    } catch (err) {
+      log.error({ err }, 'Subscription deletion failed');
+    }
+  }
+});

@@ -3,6 +3,7 @@ import Poll from './Poll';
 import Proposal from './Proposal';
 import Statement from './Statement';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import EventManager from '../../core/EventManager';
 
 class Vote {
   constructor(data) {
@@ -95,7 +96,17 @@ class Vote {
     } catch (e) {
       return { deletedVote: null, deletedStatement: null };
     }
-    return { deletedVote: new Vote(deletedVote) || null, deletedStatement };
+    const delVote = new Vote(deletedVote);
+    if (deletedVote) {
+      EventManager.publish('onVoteDeleted', { viewer, vote: delVote });
+    }
+    if (deletedStatement) {
+      EventManager.publish('onStatementDeleted', {
+        viewer,
+        statemente: deletedStatement,
+      });
+    }
+    return { deletedVote: delVote || null, deletedStatement };
   }
 
   static async update(viewer, data, loaders) {
@@ -173,8 +184,18 @@ class Vote {
     } catch (e) {
       return { updatedVote: null, deletedStatement: null };
     }
+    const vote = await Vote.gen(viewer, data.id, loaders);
+    if (vote) {
+      EventManager.publish('onVoteUpdated', { viewer, vote });
+    }
+    if (deletedStatement) {
+      EventManager.publish('onStatementDeleted', {
+        viewer,
+        statemente: deletedStatement,
+      });
+    }
     return {
-      updatedVote: await Vote.gen(viewer, data.id, loaders),
+      updatedVote: vote,
       deletedStatement,
     };
   }
@@ -238,6 +259,9 @@ class Vote {
     }
     if (!newVoteId) return null;
     const newVote = await Vote.gen(viewer, newVoteId, loaders);
+    if (newVote) {
+      EventManager.publish('onVoteCreated', { viewer, vote: newVote });
+    }
     return newVote;
   }
 }

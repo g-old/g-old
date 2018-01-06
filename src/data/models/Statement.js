@@ -3,6 +3,7 @@ import Vote from './Vote';
 import knex from '../knex';
 import User from './User';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import EventManager from '../../core/EventManager';
 
 class Statement {
   constructor(data) {
@@ -57,6 +58,13 @@ class Statement {
 
       return statementInDB;
     });
+
+    if (deletedStatement) {
+      EventManager.publish('onStatementDeleted', {
+        viewer,
+        statement: deletedStatement,
+      });
+    }
     return deletedStatement || null;
   }
 
@@ -93,7 +101,14 @@ class Statement {
       return data.id;
     });
     if (!updatedId) return null;
-    return Statement.gen(viewer, updatedId, loaders);
+    const statement = await Statement.gen(viewer, updatedId, loaders);
+    if (statement) {
+      EventManager.publish('onStatementUpdated', {
+        viewer,
+        statement,
+      });
+    }
+    return statement;
   }
 
   static async create(viewer, data, loaders) {
@@ -142,7 +157,11 @@ class Statement {
       return id[0];
     });
     if (!newStatementId) return null;
-    return Statement.gen(viewer, newStatementId, loaders);
+    const statement = await Statement.gen(viewer, newStatementId, loaders);
+    if (statement) {
+      EventManager.publish('onStatementCreated', { viewer, statement });
+    }
+    return statement;
   }
 
   static async flag(viewer, data, loaders) {

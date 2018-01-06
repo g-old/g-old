@@ -72,7 +72,7 @@ class WorkTeam {
   async join(viewer, memberId, loaders) {
     let requester;
     // eslint-disable-next-line eqeqeq
-    if (viewer && viewer.id != memberId) {
+    if (memberId) {
       requester = await User.gen(viewer, memberId, loaders);
     } else {
       requester = viewer;
@@ -92,6 +92,7 @@ class WorkTeam {
       id = id[0];
       if (id) {
         await knex('work_teams')
+          .where({ id: this.id })
           .transacting(trx)
           .forUpdate()
           .increment('num_members', 1)
@@ -119,6 +120,7 @@ class WorkTeam {
       id = id[0];
       if (id) {
         await knex('work_teams')
+          .where({ id: this.id })
           .transacting(trx)
           .forUpdate()
           .decrement('num_members', 1)
@@ -152,8 +154,19 @@ class WorkTeam {
     if (!canMutate(viewer, data, Models.WORKTEAM)) return null;
     if (!data) return null;
     if (!data.name) return null;
-    const newData = {};
-    newData.name = data.name;
+    const newData = {
+      ...(data.name && { name: data.name }),
+      ...(data.deName && { de_name: data.deName }),
+      ...(data.itName && { it_name: data.itName }),
+      ...(data.lldName && { lld_name: data.lldName }),
+      ...(data.restricted && { restricted: data.restricted }),
+    };
+    if (!data.restricted) {
+      newData.restricted = false;
+    }
+    if (typeof data.main === 'boolean') {
+      throw new Error('Not implemented yet: MAIN');
+    }
     if (data.coordinatorId) {
       if (!validateCoordinator(viewer, data.coordinatorId, loaders))
         return null;
@@ -202,6 +215,7 @@ class WorkTeam {
     const [workTeam = null] = await knex.transaction(async trx =>
       // eslint-disable-next-line newline-per-chained-call
       knex('work_teams')
+        .where({ id: data.id })
         .transacting(trx)
         .forUpdate()
         .update(newData)

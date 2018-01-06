@@ -25,16 +25,30 @@ class Request {
   static async create(viewer, data) {
     if (!data || !data.content) return null;
     if (!canMutate(viewer, data, Models.REQUEST)) return null;
-
+    if (data.content.length > 300) return null;
+    const parsed = JSON.parse(data.content);
+    const content = { id: parsed.id };
+    if (!content.id) return null;
     const newData = {
       requester_id: viewer.id,
       type: data.type,
-      content: JSON.stringify(data.content),
+      content,
       created_at: new Date(),
     };
+    if (data.type !== 'joinWT') {
+      throw Error('Selectors and validators for other types to implement');
+    }
     const requestInDB = await knex.transaction(async trx => {
+      const res = await knex('requests')
+        .where({ requester_id: viewer.id, type: data.type })
+        .whereRaw("content->>'id' = ?", [content.id])
+        .pluck('id');
+      if (res[0]) {
+        throw new Error('Already requested!');
+      }
       const [request = null] = await knex('requests')
         .transacting(trx)
+        .forUpdate()
         .insert(newData)
         .returning('*');
 
@@ -79,7 +93,7 @@ class Request {
           throw new Error('No team given');
         }
         const workTeam = await WorkTeam.gen(viewer, wt.id, loaders);
-        const res = await workTeam.join(viewer, request.requester_id, loaders);
+        const res = await workTeam.join(viewer, request.requesterId, loaders);
         if (!res) {
           throw new Error('Joining Workteam failed');
         }

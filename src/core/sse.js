@@ -25,7 +25,7 @@ export class SubscriptionManager {
     this.pubsub = options.pubsub;
     this.maxSubscriptionId = 0;
     EventManager.subscribe('onActivityCreated', payload => {
-      if (['proposal'].includes(payload.activity.type)) {
+      if (['proposal', 'statement'].includes(payload.activity.type)) {
         this.pubsub.publish('activities', { id: payload.activity.id });
       }
     });

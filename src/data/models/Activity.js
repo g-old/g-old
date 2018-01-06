@@ -63,3 +63,87 @@ EventManager.subscribe('onProposalCreated', async payload =>
     true,
   ),
 );
+
+EventManager.subscribe('onVoteCreated', async ({ viewer, vote }) =>
+  insertIntoFeed({
+    viewer,
+    data: { type: 'vote', content: vote, objectId: vote.id },
+    verb: 'create',
+  }),
+);
+
+EventManager.subscribe('onStatementCreated', async ({ viewer, statement }) =>
+  insertIntoFeed(
+    {
+      viewer,
+      data: {
+        type: 'statement',
+        objectId: statement.id,
+        content: statement,
+      },
+      verb: 'create',
+    },
+    true,
+  ),
+);
+
+EventManager.subscribe('onStatementDeleted', async ({ viewer, statement }) =>
+  insertIntoFeed(
+    {
+      viewer,
+      data: {
+        type: 'statement',
+        objectId: statement.id,
+        content: statement,
+      },
+      verb: 'delete',
+    },
+    true,
+  ),
+);
+
+EventManager.subscribe('onVoteDeleted', async ({ viewer, vote }) =>
+  insertIntoFeed({
+    viewer,
+    data: { type: 'vote', content: vote, objectId: vote.id },
+    verb: 'delete',
+  }),
+);
+
+EventManager.subscribe('onProposalUpdated', async ({ viewer, proposal }) =>
+  insertIntoFeed(
+    {
+      viewer,
+      data: {
+        type: 'proposal',
+        objectId: proposal,
+        content: proposal,
+      },
+      verb: 'update',
+    },
+    true,
+  ),
+);
+
+EventManager.subscribe('onStatementUpdated', async ({ viewer, statement }) =>
+  insertIntoFeed(
+    {
+      viewer,
+      data: {
+        type: 'statement',
+        objectId: statement.id,
+        content: statement,
+      },
+      verb: 'update',
+    },
+    false, // dont insert updates into system feed
+  ),
+);
+
+EventManager.subscribe('onVoteUpdated', async ({ viewer, vote }) =>
+  insertIntoFeed({
+    viewer,
+    data: { type: 'vote', content: vote, objectId: vote.id },
+    verb: 'update',
+  }),
+);
