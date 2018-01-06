@@ -50,6 +50,7 @@ const aggregateActivities = activities =>
         return agg;
       }
       if (curr.type === 'statement') {
+        // get only newest update
         if (curr.verb === 'update') {
           if (curr.objectId in agg.updatedStatements) {
             return agg; // dont' push, as it is an old update
@@ -128,6 +129,8 @@ class Feed {
     let sIds = await knex('system_feeds')
       .where({ user_id: 2 })
       .select('activity_ids');
+
+    // TODO check if join is better
     let fIds = await User.followees(viewer, viewer.id, loaders)
       .then(data =>
         Promise.all(

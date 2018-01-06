@@ -52,11 +52,21 @@ import { SubscriptionManager, SubscriptionServer } from './core/sse';
 import PubSub from './core/pubsub';
 import responseTiming from './core/timing';
 import { Groups } from './organization';
+import EventManager from './core/EventManager';
 
 const pubsub = new PubSub();
 
 worker(pubsub);
 BWorker.start(path.resolve(__dirname, 'backgroundWorker.js'));
+
+EventManager.subscribe('onProposalCreated', ({ proposal, viewer }) => {
+  if (!sendJob({ type: 'webpush', data: proposal })) {
+    log.error(
+      { viewer, job: { type: 'webpush', data: proposal } },
+      'Could not send job to worker',
+    );
+  }
+});
 
 const app = express();
 

@@ -90,7 +90,7 @@ exports.seed = function (knex, Promise) {
     const testAdmin = Promise.resolve(
       bcrypt
         .hash('password', 10)
-        .then(hash => createUser('admin', 'admin', hash, 'admin@example.com', Groups.GUEST|Groups.VIEWER|Groups.VOTER| Groups.RELATOR|Groups.MEMBER_MANAGER| GGroups.ADMIN, time, true))
+        .then(hash => createUser('admin', 'admin', hash, 'admin@example.com', Groups.GUEST|Groups.VIEWER|Groups.VOTER| Groups.RELATOR|Groups.MEMBER_MANAGER| Groups.ADMIN, time, true))
     );
     users.push(testAdmin);
     const testMods = [];

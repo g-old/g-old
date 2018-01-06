@@ -1,5 +1,7 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import EventManager from '../../core/EventManager';
+import { insertIntoFeed } from '../../core/feed';
 
 class Activity {
   constructor(data) {
@@ -35,8 +37,29 @@ class Activity {
       .returning('id');
     id = id[0];
     if (id == null) return null;
-    return new Activity({ ...activity, id });
+    const newActivity = await new Activity({ ...activity, id });
+    if (newActivity) {
+      EventManager.publish('onActivityCreated', {
+        viewer,
+        activity: newActivity,
+      });
+    }
+    return newActivity;
   }
 }
-
 export default Activity;
+
+EventManager.subscribe('onProposalCreated', async payload =>
+  insertIntoFeed(
+    {
+      viewer: payload.viewer,
+      data: {
+        type: 'proposal',
+        content: payload.proposal,
+        objectId: payload.proposal.id,
+      },
+      verb: 'create',
+    },
+    true,
+  ),
+);

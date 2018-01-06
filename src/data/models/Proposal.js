@@ -5,6 +5,7 @@ import PollingMode from './PollingMode';
 import { dedup } from '../../core/helpers';
 import { computeNextState } from '../../core/worker';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import EventManager from '../../core/EventManager';
 
 const validateTags = async tags => {
   let existingTags;
@@ -390,8 +391,14 @@ class Proposal {
       //
       return id;
     });
+
     if (!newProposalId) return null;
-    return Proposal.gen(viewer, newProposalId, loaders);
+    const proposal = await Proposal.gen(viewer, newProposalId, loaders);
+
+    if (proposal) {
+      EventManager.publish('onProposalCreated', { viewer, proposal });
+    }
+    return proposal;
   }
 
   async subscribe(viewer) {

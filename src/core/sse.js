@@ -2,6 +2,7 @@ import { validate, execute, parse } from 'graphql';
 import { EventEmitter } from 'events';
 import log from '../logger';
 import { canAccess } from '../organization';
+import EventManager from './EventManager';
 // import { getArgumentValues } from 'graphql/execution/values';
 // import { createAsyncIterator, forAwaitEach, isAsyncIterable } from 'iterall';
 
@@ -23,6 +24,11 @@ export class SubscriptionManager {
     this.subscriptions = {};
     this.pubsub = options.pubsub;
     this.maxSubscriptionId = 0;
+    EventManager.subscribe('onActivityCreated', payload => {
+      if (['proposal'].includes(payload.activity.type)) {
+        this.pubsub.publish('activities', { id: payload.activity.id });
+      }
+    });
   }
 
   publish(triggerName, payload) {
