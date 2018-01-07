@@ -242,12 +242,10 @@ textarea {
 }
 
 .banner {
-  display: flex;
-  justify-content: center;
-
   img {
+    min-width: 32rem;
     max-width: 100%;
-    align-self: center;
-    height: auto;
+    display: block;
+    margin: 0 auto;
   }
 }
