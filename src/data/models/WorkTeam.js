@@ -25,7 +25,7 @@ class WorkTeam {
     // eslint-disable-next-line eqeqeq
     return viewer.id == this.coordinatorId || viewer.role.type === 'admin';
   }
-  canJoin(viewer, requester) {
+  canModifyMemberShips(viewer, requester) {
     // eslint-disable-next-line eqeqeq
     if (this.restricted && viewer.id == this.coordinatorId) {
       if (requester.groups !== Groups.GUEST) {
@@ -41,13 +41,23 @@ class WorkTeam {
 
     return false;
   }
-  async modifySessions(userId) {
+  async addMembershipToSessions(userId) {
+    return this.modifySessions(userId, true);
+  }
+
+  async removeMembershipFromSessions(userId) {
+    return this.modifySessions(userId, false);
+  }
+
+  async modifySessions(userId, add) {
     const oldSessions = await knex('sessions')
       .whereRaw("sess->'passport'->'user'->>'id'=?", [userId])
       .select('sess', 'sid');
     const updates = oldSessions.map(data => {
       const session = data.sess;
-      const wtMemberships = [...session.passport.user.wtMemberships, this.id];
+      const wtMemberships = add
+        ? [...session.passport.user.wtMemberships, this.id]
+        : session.passport.user.wtMemberships.filter(id => id != this.id); // eslint-disable-line
       const newSession = {
         ...session,
         passport: {
@@ -77,9 +87,9 @@ class WorkTeam {
     } else {
       requester = viewer;
     }
-    if (!this.canJoin(viewer, requester)) return null;
-    const wtId = await knex.transaction(async trx => {
-      let id = await trx
+    if (!this.canModifyMemberShips(viewer, requester)) return null;
+    const workTeam = await knex.transaction(async trx => {
+      const [id = null] = await trx
         .insert({
           user_id: requester.id,
           work_team_id: this.id,
@@ -89,46 +99,71 @@ class WorkTeam {
         .into('user_work_teams')
         .returning('id');
 
-      id = id[0];
       if (id) {
-        await knex('work_teams')
+        const [workTeaminDB = null] = await knex('work_teams')
           .where({ id: this.id })
           .transacting(trx)
           .forUpdate()
           .increment('num_members', 1)
-          .into('work_teams');
-
+          .into('work_teams')
+          .returning('*');
+        loaders.workTeams.clear(this.id);
         // insert into sessions;
-        await this.modifySessions(requester.id);
+        if (workTeaminDB) {
+          await this.addMembershipToSessions(requester.id);
+          // eslint-disable-next-line no-param-reassign
+          viewer.wtMemberships = viewer.wtMemberships
+            ? [...viewer.wtMemberships, this.id]
+            : [this.id];
+        }
         // TODO  should be sent via sse too in case viewer != requester.
+        return workTeaminDB;
       }
       return id;
     });
-    return wtId ? requester : null;
+    return workTeam ? new WorkTeam(workTeam) : null;
   }
 
   async leave(viewer, memberId, loaders) {
     // viewer is already checked
-    if (!this.canJoin(viewer, memberId)) return null;
-    const wtId = await knex.transaction(async trx => {
-      let id = await trx
-        .where({ user_id: memberId, work_team_id: this.id })
+
+    let requester;
+    if (memberId) {
+      requester = await User.gen(viewer, memberId, loaders);
+    } else {
+      requester = viewer;
+    }
+    if (!this.canModifyMemberShips(viewer, requester)) return null;
+    const workTeam = await knex.transaction(async trx => {
+      const [id = null] = await trx
+        .where({ user_id: requester.id, work_team_id: this.id })
         .into('user_work_teams')
         .del()
         .returning('id');
 
-      id = id[0];
       if (id) {
-        await knex('work_teams')
+        const [workTeaminDB = null] = await knex('work_teams')
           .where({ id: this.id })
           .transacting(trx)
           .forUpdate()
           .decrement('num_members', 1)
-          .into('work_teams');
+          .into('work_teams')
+          .returning('*');
+
+        loaders.workTeams.clear(this.id);
+
+        if (workTeaminDB) {
+          await this.removeMembershipFromSessions(requester.id);
+          // eslint-disable-next-line no-param-reassign
+          viewer.wtMemberships =
+            viewer.wtMemberships &&
+            viewer.wtMemberships.filter(id => id != this.id); // eslint-disable-line
+        }
+        return workTeaminDB;
       }
-      return id;
+      return null;
     });
-    return wtId ? User.gen(viewer, memberId, loaders) : null;
+    return workTeam ? new WorkTeam(workTeam) : null;
   }
 
   async circularFeedNotification(viewer, activity, pushFn) {

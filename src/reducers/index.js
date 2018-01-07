@@ -147,9 +147,8 @@ export const getWorkTeamsIsFetching = state =>
 export const getWorkTeamsErrorMessage = state =>
   fromEntity.getWorkTeamsErrorMessage(state.entities);
 
-export const getWorkTeamStatus = (state, id) => {
+export const getWorkTeamStatus = (state, id) =>
   fromUi.getWorkTeamUpdates(state.ui, id);
-};
 
 export const getStatistics = state => state.statistics;
 

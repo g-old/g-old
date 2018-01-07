@@ -6,12 +6,14 @@ import {
   SSE_UPDATE_SUCCESS,
   CREATE_COMMENT_SUCCESS,
   DELETE_COMMENT_SUCCESS,
+  JOIN_WORKTEAM_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
   switch (action.type) {
     case LOAD_DISCUSSION_SUCCESS:
     case LOAD_DISCUSSIONS_SUCCESS:
+    case JOIN_WORKTEAM_SUCCESS:
     case SSE_UPDATE_SUCCESS:
     case LOAD_FEED_SUCCESS: {
       return merge({}, state, action.payload.entities.discussions);

@@ -18,7 +18,6 @@ import {
   LOAD_WORKTEAMS_SUCCESS,
   LOAD_WORKTEAM_SUCCESS,
   JOIN_WORKTEAM_SUCCESS,
-  LEAVE_WORKTEAM_SUCCESS,
   LOAD_DISCUSSIONS_SUCCESS,
   LOAD_DISCUSSION_SUCCESS,
   LOAD_REPLIES_SUCCESS,
@@ -63,16 +62,6 @@ export default function byId(state = {}, action) {
       return merge({}, state, action.payload.entities.users);
     }
 
-    case LEAVE_WORKTEAM_SUCCESS: {
-      return {
-        ...state,
-        [action.payload.result]: {
-          ...state[action.payload.result],
-          workTeams:
-            action.payload.entities.users[action.payload.result].workTeams,
-        },
-      };
-    }
     case SSE_UPDATE_SUCCESS: {
       return action.payload.entities.users
         ? merge({}, state, action.payload.entities.users)

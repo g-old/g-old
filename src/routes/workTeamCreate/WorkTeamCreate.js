@@ -1,14 +1,21 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getWorkTeamStatus } from '../../reducers';
 import WorkTeamForm from '../workTeamEdit/WorkTeamEdit';
 import Box from '../../components/Box';
 
 class WorkTeamCreate extends React.Component {
+  static propTypes = {
+    status: PropTypes.shape({ success: PropTypes.bool }).isRequired,
+  };
   render() {
     return (
-      <Box>
-        <h1>{'CREATE'}</h1> <WorkTeamForm id="create" workTeam={{}} />
+      <Box column>
+        {this.props.status.success && 'SUCCESS'}
+        <h1>{'CREATE'}</h1>
+        {JSON.stringify(this.props.status)}
+        <WorkTeamForm id="create" workTeam={{}} />
       </Box>
     );
   }

@@ -41,6 +41,8 @@ class WorkTeam extends React.Component {
     updates: PropTypes.shape({ pending: PropTypes.bool }).isRequired,
     restricted: PropTypes.bool.isRequired,
     onJoin: PropTypes.func.isRequired,
+    onLeave: PropTypes.func.isRequired,
+    onDeleteRequest: PropTypes.func.isRequired,
   };
   static defaultProps = {
     logo: null,
@@ -49,6 +51,7 @@ class WorkTeam extends React.Component {
     super(props);
     this.handleDiscussionClick = this.handleDiscussionClick.bind(this);
     this.handleJoining = this.handleJoining.bind(this);
+    this.cancelJoining = this.cancelJoining.bind(this);
   }
   // eslint-disable-next-line class-methods-use-this
   handleDiscussionClick({ discussionId }) {
@@ -68,7 +71,14 @@ class WorkTeam extends React.Component {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  cancelJoining() {}
+  cancelJoining() {
+    const { ownStatus, id } = this.props;
+    if (ownStatus === 'member') {
+      this.props.onLeave({ id });
+    } else if (ownStatus === 'pending') {
+      this.props.onDeleteRequest({ type: 'joinWT' });
+    }
+  }
 
   render() {
     const {

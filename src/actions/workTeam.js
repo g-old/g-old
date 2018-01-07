@@ -23,7 +23,6 @@ import {
 import {
   workTeamList as workTeamListSchema,
   workTeam as workTeamSchema,
-  user as userSchema,
 } from '../store/schema';
 
 const workTeamFields = `
@@ -98,19 +97,21 @@ const updateWorkTeamMutation = `mutation($workTeam:WorkTeamInput){
 
 const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID){
   joinWorkTeam (workTeam:{id:$id, memberId:$memberId}){
-    id
-    workTeams{
-      ${workTeamFields}
+    ${workTeamFields}
+    ownStatus
+    discussions{
+      id
+      title
+      createdAt
+      numComments
     }
   }
 }`;
 
 const leaveWorkTeamMutation = `mutation($id:ID, $memberId:ID){
   leaveWorkTeam (workTeam:{id:$id, memberId:$memberId}){
-    id
-    workTeams{
-      ${workTeamFields}
-    }
+    ${workTeamFields}
+    ownStatus
   }
 }`;
 
@@ -140,6 +141,7 @@ export function createWorkTeam(workTeam) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: CREATE_WORKTEAM_START,
+      id: 'create',
     });
 
     try {
@@ -148,10 +150,15 @@ export function createWorkTeam(workTeam) {
       });
       const normalizedData = normalize(data.createWorkTeam, workTeamSchema);
 
-      dispatch({ type: CREATE_WORKTEAM_SUCCESS, payload: normalizedData });
+      dispatch({
+        type: CREATE_WORKTEAM_SUCCESS,
+        id: 'create',
+        payload: normalizedData,
+      });
     } catch (e) {
       dispatch({
         type: CREATE_WORKTEAM_ERROR,
+        id: 'create',
         message: e.message || 'Something went wrong',
       });
     }
@@ -166,7 +173,7 @@ export function joinWorkTeam(workTeamData) {
 
     try {
       const { data } = await graphqlRequest(joinWorkTeamMutation, workTeamData);
-      const normalizedData = normalize(data.joinWorkTeam, userSchema);
+      const normalizedData = normalize(data.joinWorkTeam, workTeamSchema);
 
       dispatch({ type: JOIN_WORKTEAM_SUCCESS, payload: normalizedData });
     } catch (e) {
@@ -189,7 +196,7 @@ export function leaveWorkTeam(workTeamData) {
         leaveWorkTeamMutation,
         workTeamData,
       );
-      const normalizedData = normalize(data.leaveWorkTeam, userSchema);
+      const normalizedData = normalize(data.leaveWorkTeam, workTeamSchema);
 
       dispatch({ type: LEAVE_WORKTEAM_SUCCESS, payload: normalizedData });
     } catch (e) {

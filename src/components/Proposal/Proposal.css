@@ -19,6 +19,7 @@
   font-size: 2rem;
   font-weight: 300;
   padding-top: 0;
+  word-break: break-word;
 }
 
 .avatar {

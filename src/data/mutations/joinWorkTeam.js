@@ -1,10 +1,10 @@
 import { GraphQLNonNull } from 'graphql';
 import WorkTeamInputType from '../types/WorkTeamInputType';
 import WorkTeam from '../models/WorkTeam';
-import UserType from '../types/UserType';
+import WorkTeamType from '../types/WorkTeamType';
 
 const joinWorkTeam = {
-  type: new GraphQLNonNull(UserType),
+  type: new GraphQLNonNull(WorkTeamType),
   args: {
     workTeam: {
       type: WorkTeamInputType,

@@ -82,26 +82,45 @@ class Request {
   }
 
   static async delete(viewer, data, loaders) {
-    if (!data || !data.id) return null;
-    if (!canMutate(viewer, data, Models.REQUEST)) return null;
-    const deletedRequest = await knex.transaction(async trx => {
-      const request = await Request.gen(viewer, data.id, loaders);
+    if (!data || (!data.id && !data.type)) return null;
 
+    if (!canMutate(viewer, data, Models.REQUEST)) return null;
+
+    const deletedRequest = await knex.transaction(async trx => {
+      let request;
+      if (data.type) {
+        if (data.type === 'joinWT') {
+          const [requestData = null] = await knex('requests')
+            .where({ requester_id: viewer.id, type: data.type })
+            .select('*');
+          request = requestData ? new Request(requestData) : null;
+        } else {
+          throw new Error('Type not recognized');
+        }
+      } else {
+        request = await Request.gen(viewer, data.id, loaders);
+      }
       if (request.type === 'joinWT') {
-        const wt = JSON.parse(request.content);
+        const wt = request.content;
         if (!wt.id) {
           throw new Error('No team given');
         }
         const workTeam = await WorkTeam.gen(viewer, wt.id, loaders);
-        const res = await workTeam.join(viewer, request.requesterId, loaders);
-        if (!res) {
-          throw new Error('Joining Workteam failed');
+        if (request.deniedAt) {
+          // eslint-disable-next-line eqeqeq
+          if (viewer.id != workTeam.coordinatorId) {
+            throw new Error('Cannot cancel a denied request');
+          }
+        }
+        // eslint-disable-next-line eqeqeq
+        if (viewer.id != request.requesterId) {
+          await workTeam.join(viewer, wt.id, loaders);
         }
       } else {
         throw new Error('Type not recognized');
       }
       await knex('requests')
-        .where({ id: data.id })
+        .where({ id: request.id })
         .transacting(trx)
         .forUpdate()
         .del();

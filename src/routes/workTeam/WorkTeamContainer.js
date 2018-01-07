@@ -2,8 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import { defineMessages, FormattedMessage } from 'react-intl';
-import { loadWorkTeam, joinWorkTeam } from '../../actions/workTeam';
-import { createRequest } from '../../actions/request';
+import {
+  loadWorkTeam,
+  joinWorkTeam,
+  leaveWorkTeam,
+} from '../../actions/workTeam';
+import { createRequest, deleteRequest } from '../../actions/request';
 import { getWorkTeam, getRequestUpdates } from '../../reducers';
 import WorkTeam from '../../components/WorkTeam';
 
@@ -14,7 +18,9 @@ class WorkTeamContainer extends React.Component {
     workTeamData: PropTypes.shape({}),
     requestUpdates: PropTypes.shape({}),
     createRequest: PropTypes.func.isRequired,
+    deleteRequest: PropTypes.func.isRequired,
     joinWorkTeam: PropTypes.func.isRequired,
+    leaveWorkTeam: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -28,6 +34,8 @@ class WorkTeamContainer extends React.Component {
         onJoinRequest={this.props.createRequest}
         updates={this.props.requestUpdates || {}}
         onJoin={this.props.joinWorkTeam}
+        onLeave={this.props.leaveWorkTeam}
+        onDeleteRequest={this.props.deleteRequest}
       />
     );
   }
@@ -42,6 +50,8 @@ const mapDispatch = {
   loadWorkTeam,
   createRequest,
   joinWorkTeam,
+  leaveWorkTeam,
+  deleteRequest,
 };
 
 export default connect(mapStateToProps, mapDispatch)(WorkTeamContainer);

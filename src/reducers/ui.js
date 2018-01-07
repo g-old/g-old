@@ -38,8 +38,8 @@ export default (state, action) => {
 
 /* GENERATOR_EXPORTS */
 export const getRequestUpdates = state => fromRequest.getStatus(state.requests);
-export const getWorkTeamUpdates = state =>
-  fromWorkTeam.getStatus(state.workTeams);
+export const getWorkTeamUpdates = (state, id) =>
+  fromWorkTeam.getStatus(state.workTeams, id);
 
 // TODO Different design
 const getMutationPending = state => {
