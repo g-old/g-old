@@ -140,11 +140,11 @@ class ProposalPreview extends React.Component {
     );
 
     const pollPreview = [
-      <svg viewBox="0 0 24 24" width="16px" height="16px" role="img">
+      <svg key="0" viewBox="0 0 24 24" width="16px" height="16px" role="img">
         <path fill="none" stroke="#666" strokeWidth="2" d={ICONS.up} />
       </svg>,
       poll.upvotes,
-      <div className={s.pollState}>
+      <div key="2" className={s.pollState}>
         <PollState
           compact
           pollId={poll.id}
@@ -161,7 +161,7 @@ class ProposalPreview extends React.Component {
     if (!poll.mode.unipolar) {
       pollPreview.push(poll.downvotes);
       pollPreview.push(
-        <svg viewBox="0 0 24 24" width="16px" height="16px" role="img">
+        <svg key="4" viewBox="0 0 24 24" width="16px" height="16px" role="img">
           <path
             fill="none"
             stroke="#666"

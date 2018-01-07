@@ -22,12 +22,17 @@ class SurveyListContainer extends React.Component {
     ).isRequired,
     isFetching: PropTypes.bool.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
-    errorMessage: PropTypes.string.isRequired,
+    errorMessage: PropTypes.string,
     pageInfo: PropTypes.shape({
       endCursor: PropTypes.string,
       hasNextPage: PropTypes.bool,
     }).isRequired,
   };
+
+  static defaultProps = {
+    errorMessage: '',
+  };
+
   constructor(props) {
     super(props);
     this.handleSurveyClick = this.handleSurveyClick.bind(this);

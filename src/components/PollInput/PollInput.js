@@ -35,7 +35,7 @@ const messages = defineMessages({
     description: 'Threshold reference of poll',
   },
 });
-const DateInput = props =>
+const DateInput = props => (
   <div>
     {/*  <p>
       <label htmlFor="dateFrom">DATE FROM</label>
@@ -101,7 +101,8 @@ const DateInput = props =>
         onChange={props.handleChange}
       />
   </p> */}
-  </div>;
+  </div>
+);
 
 DateInput.propTypes = {
   handleChange: PropTypes.func.isRequired,
@@ -114,7 +115,7 @@ DateInput.defaultProps = {
   timeToError: null,
 };
 
-const PollSettings = props =>
+const PollSettings = props => (
   <div>
     <FormField>
       <CheckBox
@@ -170,7 +171,8 @@ const PollSettings = props =>
         }}
       />
     </FormField>
-  </div>;
+  </div>
+);
 
 PollSettings.propTypes = {
   withStatements: PropTypes.bool.isRequired,
@@ -234,7 +236,7 @@ const PollInput = props => {
         plain
         onClick={props.toggleSettings}
         icon={
-          <svg v viewBox="0 0 24 24" width="24px" height="24px" role="img">
+          <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
             <path
               fill="none"
               stroke="#000"
@@ -245,7 +247,7 @@ const PollInput = props => {
         }
       />
 
-      {props.displaySettings &&
+      {props.displaySettings && (
         <PollSettings
           onValueChange={props.onValueChange}
           withStatements={settings.withStatements}
@@ -253,7 +255,8 @@ const PollInput = props => {
           unipolar={settings.unipolar}
           threshold={settings.threshold}
           thresholdRef={settings.thresholdRef}
-        />}
+        />
+      )}
     </div>
   );
 };

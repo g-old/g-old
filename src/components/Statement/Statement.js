@@ -457,6 +457,7 @@ class Statement extends React.Component {
     if (this.state.edit) {
       textBox.push(
         <Textarea
+          key="0"
           useCacheForDOMMeasurements
           placeholder="Leave a statement (optional)"
           value={this.state.textArea.val}
@@ -468,7 +469,10 @@ class Statement extends React.Component {
       );
     } else {
       textBox.push(
-        <div className={this.state.collapsed ? s.collapsed : s.expanded}>
+        <div
+          key="1"
+          className={this.state.collapsed ? s.collapsed : s.expanded}
+        >
           {text}
         </div>,
       );
@@ -476,6 +480,7 @@ class Statement extends React.Component {
       if (this.state.contentOverflows) {
         textBox.push(
           <button
+            key="2"
             onClick={e => {
               e.preventDefault();
               e.stopPropagation();

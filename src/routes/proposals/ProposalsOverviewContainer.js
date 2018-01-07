@@ -23,11 +23,15 @@ class ProposalsOverviewContainer extends React.Component {
     filter: PropTypes.string.isRequired,
     isFetching: PropTypes.bool.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
-    errorMessage: PropTypes.string.isRequired,
+    errorMessage: PropTypes.string,
     pageInfo: PropTypes.shape({
       endCursor: PropTypes.string,
       hasNextPage: PropTypes.bool,
     }).isRequired,
+  };
+
+  static defaultProps = {
+    errorMessage: '',
   };
 
   constructor(props) {

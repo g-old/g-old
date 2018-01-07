@@ -36,7 +36,7 @@ class Layout extends React.Component {
     createSSESub: PropTypes.func.isRequired,
     loading: PropTypes.bool.isRequired,
     allowCookies: PropTypes.func.isRequired,
-    consent: PropTypes.bool.isRequired,
+    consent: PropTypes.string.isRequired,
   };
   constructor(props) {
     super(props);

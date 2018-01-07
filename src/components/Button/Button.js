@@ -6,8 +6,8 @@ import s from './Button.css';
 
 class Button extends React.Component {
   static propTypes = {
-    label: PropTypes.element,
-    onClick: PropTypes.func.isRequired,
+    label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+    onClick: PropTypes.func,
     disabled: PropTypes.bool,
     primary: PropTypes.bool,
     accent: PropTypes.bool,
@@ -21,6 +21,7 @@ class Button extends React.Component {
 
   static defaultProps = {
     label: null,
+    onClick: null,
     disabled: false,
     primary: false,
     accent: false,
@@ -48,20 +49,12 @@ class Button extends React.Component {
     } = this.props;
     let buttonIcon;
     if (icon) {
-      buttonIcon = (
-        <span className={s.icon}>
-          {icon}
-        </span>
-      );
+      buttonIcon = <span className={s.icon}>{icon}</span>;
     }
     let buttonLabel;
     if (label) {
       // eslint-disable-next-line css-modules/no-undef-class
-      buttonLabel = (
-        <span className={s.label}>
-          {label}
-        </span>
-      );
+      buttonLabel = <span className={s.label}>{label}</span>;
     }
     const first = reverse ? buttonLabel : buttonIcon;
     const second = reverse ? buttonIcon : buttonLabel;
