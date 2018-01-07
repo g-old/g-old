@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './Box.css'; // eslint-disable-line
+import s from './Box.css';
 
 class Box extends React.Component {
   static propTypes = {
-    children: PropTypes.node.isRequired,
+    children: PropTypes.node,
     onClick: PropTypes.func,
     clickable: PropTypes.bool,
     column: PropTypes.bool,
@@ -23,6 +23,7 @@ class Box extends React.Component {
   };
 
   static defaultProps = {
+    children: null,
     onClick: null,
     clickable: false,
     column: false,

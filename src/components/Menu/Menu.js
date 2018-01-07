@@ -24,7 +24,7 @@ class Menu extends React.Component {
     closeOnClick: PropTypes.bool,
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.node),
-      React.node,
+      PropTypes.node,
     ]),
     withControl: PropTypes.bool,
     primary: PropTypes.bool,

@@ -27,8 +27,12 @@ class ProposalListView extends React.Component {
       hasNextPage: PropTypes.bool,
     }).isRequired,
     filter: PropTypes.string.isRequired,
-    tagId: PropTypes.string.isRequired,
+    tagId: PropTypes.string,
     onProposalClick: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    tagId: '',
   };
 
   constructor(props) {

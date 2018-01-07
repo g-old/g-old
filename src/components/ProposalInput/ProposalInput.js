@@ -105,7 +105,7 @@ class ProposalInput extends React.Component {
     //  intl: PropTypes.shape({}).isRequired,
     //  locale: PropTypes.string.isRequired,
     maxTags: PropTypes.number.isRequired,
-    isPending: PropTypes.bool.isRequired,
+    isPending: PropTypes.bool,
     errorMessage: PropTypes.string,
     success: PropTypes.string,
     tags: PropTypes.arrayOf(
@@ -121,6 +121,7 @@ class ProposalInput extends React.Component {
   };
 
   static defaultProps = {
+    isPending: false,
     errorMessage: null,
     success: null,
   };
@@ -193,7 +194,7 @@ class ProposalInput extends React.Component {
           success: false,
           clearSpokesman: false,
         });
-      }*/
+      } */
     }
     if (errorMessage) {
       this.setState({ error: !this.props.errorMessage });
@@ -544,7 +545,7 @@ class ProposalInput extends React.Component {
               /> */}
             </FormField>
           </div>
-          {this.state.showPreview &&
+          {this.state.showPreview && (
             <Layer
               onClose={() => {
                 this.setState({ showPreview: false });
@@ -569,7 +570,8 @@ class ProposalInput extends React.Component {
                   spokesman,
                 }}
               />
-            </Layer>}
+            </Layer>
+          )}
 
           <Box pad>
             <Button
@@ -585,13 +587,11 @@ class ProposalInput extends React.Component {
               }}
             />
           </Box>
-          {this.props.isPending &&
-            <span>
-              {'...submitting'}
-            </span>}
-          {this.state.error &&
-            <Notification type="error" message={this.props.errorMessage} />}
-          {this.state.success &&
+          {this.props.isPending && <span>{'...submitting'}</span>}
+          {this.state.error && (
+            <Notification type="error" message={this.props.errorMessage} />
+          )}
+          {this.state.success && (
             <Notification
               type="success"
               message={<FormattedMessage {...messages.success} />}
@@ -620,7 +620,8 @@ class ProposalInput extends React.Component {
                   label="Visit"
                 />
               }
-            />}
+            />
+          )}
         </Box>
       </div>
     );
