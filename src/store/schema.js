@@ -2,9 +2,16 @@ import { schema } from 'normalizr';
 
 export const role = new schema.Entity('roles');
 export const user = new schema.Entity('users');
+export const request = new schema.Entity('requests', {
+  requester: user,
+  processor: user,
+});
 export const workTeam = new schema.Entity('workTeams', {
   coordinator: user,
   members: [user],
+  ownStatus: {
+    request,
+  },
 });
 user.define({
   role,
@@ -86,9 +93,6 @@ export const workTeamList = [workTeam];
 export const logList = [log];
 export const discussionList = [discussion];
 export const commentList = [comment];
-export const request = new schema.Entity('requests', {
-  requester: user,
-  processor: user,
-});
+
 export const requestList = [request];
 /* GENERATOR */

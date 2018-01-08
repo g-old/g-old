@@ -11,9 +11,9 @@ class WorkTeamCreate extends React.Component {
   };
   render() {
     return (
-      <Box column>
+      <Box align column>
         {this.props.status.success && 'SUCCESS'}
-        <h1>{'CREATE'}</h1>
+        <h1>{'Create workteam'}</h1>
         {JSON.stringify(this.props.status)}
         <WorkTeamForm id="create" workTeam={{}} />
       </Box>

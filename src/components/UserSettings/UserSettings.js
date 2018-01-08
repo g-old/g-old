@@ -5,7 +5,7 @@ import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
 import Notification from '../Notification';
-import Select from '../Select';
+// import Select from '../Select';
 import {
   createValidator,
   passwordValidation,
@@ -429,7 +429,7 @@ class UserSettings extends React.Component {
 
     return (
       <Box column pad>
-        <legend>{<FormattedMessage {...messages.workteams} />}</legend>
+        {/*  <legend>{<FormattedMessage {...messages.workteams} />}</legend>
         <FormField label="Workteams">
           <Select
             inField
@@ -456,12 +456,13 @@ class UserSettings extends React.Component {
               } else {
                 this.props.onJoinWorkTeam({
                   id: e.value.value,
-                  /* e.value[0].value, */ memberId: this.props.user.id,
+                  /* e.value[0].value, */
+        /* memberId: this.props.user.id,
                 });
               }
             }}
           />
-        </FormField>
+        </FormField> */}
         <legend>{<FormattedMessage {...messages.nameHeading} />}</legend>
         <fieldset>
           <FormField

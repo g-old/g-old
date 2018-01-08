@@ -116,7 +116,7 @@ export function timeToValidation(time, { dateTo }) {
 }
 
 export function nameValidation(name) {
-  const n = name.trim();
+  const n = name.toString().trim();
   let result = {
     touched: false,
   };

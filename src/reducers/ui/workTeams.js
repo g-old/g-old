@@ -8,6 +8,12 @@ import {
   DELETE_WORKTEAM_START,
   DELETE_WORKTEAM_ERROR,
   DELETE_WORKTEAM_SUCCESS,
+  JOIN_WORKTEAM_START,
+  JOIN_WORKTEAM_SUCCESS,
+  JOIN_WORKTEAM_ERROR,
+  LEAVE_WORKTEAM_START,
+  LEAVE_WORKTEAM_SUCCESS,
+  LEAVE_WORKTEAM_ERROR,
 } from '../../constants';
 
 // import { getErrors, getSuccessState } from '../../core/helpers';
@@ -21,6 +27,8 @@ const initState = {
 };
 const workTeams = (state = initState, action) => {
   switch (action.type) {
+    case JOIN_WORKTEAM_START:
+    case LEAVE_WORKTEAM_START:
     case CREATE_WORKTEAM_START:
     case UPDATE_WORKTEAM_START:
     case DELETE_WORKTEAM_START: {
@@ -33,7 +41,8 @@ const workTeams = (state = initState, action) => {
         },
       };
     }
-
+    case JOIN_WORKTEAM_ERROR:
+    case LEAVE_WORKTEAM_ERROR:
     case CREATE_WORKTEAM_ERROR:
     case UPDATE_WORKTEAM_ERROR:
     case DELETE_WORKTEAM_ERROR: {
@@ -48,6 +57,8 @@ const workTeams = (state = initState, action) => {
         },
       };
     }
+    case JOIN_WORKTEAM_SUCCESS:
+    case LEAVE_WORKTEAM_SUCCESS:
     case CREATE_WORKTEAM_SUCCESS:
     case UPDATE_WORKTEAM_SUCCESS:
     case DELETE_WORKTEAM_SUCCESS: {

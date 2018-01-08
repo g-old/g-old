@@ -8,7 +8,7 @@ import {
   leaveWorkTeam,
 } from '../../actions/workTeam';
 import { createRequest, deleteRequest } from '../../actions/request';
-import { getWorkTeam, getRequestUpdates } from '../../reducers';
+import { getWorkTeam, getWorkTeamStatus } from '../../reducers';
 import WorkTeam from '../../components/WorkTeam';
 
 // import FetchError from '../../components/FetchError';
@@ -21,18 +21,20 @@ class WorkTeamContainer extends React.Component {
     deleteRequest: PropTypes.func.isRequired,
     joinWorkTeam: PropTypes.func.isRequired,
     leaveWorkTeam: PropTypes.func.isRequired,
+    workTeamUpdates: PropTypes.shape({}),
   };
 
   static defaultProps = {
     workTeamData: null,
     requestUpdates: null,
+    workTeamUpdates: null,
   };
   render() {
     return (
       <WorkTeam
         {...this.props.workTeamData}
         onJoinRequest={this.props.createRequest}
-        updates={this.props.requestUpdates || {}}
+        updates={this.props.workTeamUpdates}
         onJoin={this.props.joinWorkTeam}
         onLeave={this.props.leaveWorkTeam}
         onDeleteRequest={this.props.deleteRequest}
@@ -43,7 +45,7 @@ class WorkTeamContainer extends React.Component {
 
 const mapStateToProps = (state, { id }) => ({
   workTeamData: getWorkTeam(state, id),
-  requestUpdates: getRequestUpdates(state, '0000'),
+  workTeamUpdates: getWorkTeamStatus(state),
 });
 
 const mapDispatch = {

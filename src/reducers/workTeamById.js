@@ -7,6 +7,8 @@ import {
   FETCH_USER_SUCCESS,
   JOIN_WORKTEAM_SUCCESS,
   LEAVE_WORKTEAM_SUCCESS,
+  //  CREATE_REQUEST_SUCCESS,
+  //  DELETE_REQUEST_SUCCESS,
 } from '../constants';
 
 export default function workTeams(state = {}, action) {
@@ -20,6 +22,45 @@ export default function workTeams(state = {}, action) {
       return merge({}, state, action.payload.entities.workTeams);
     }
 
+    /* case CREATE_REQUEST_SUCCESS: {
+      const request = action.payload.entities.requests[action.payload.result];
+      if (request.type === 'joinWT') {
+        console.log('JOSN CONTENT', request);
+
+        const content = JSON.parse(request.content);
+
+        return {
+          ...state,
+          [content.id]: {
+            ...state[content.id],
+            ownStatus: {
+              ...state[content.id].ownStatus,
+              request: request.id,
+            },
+          },
+        };
+      }
+      return state;
+    }
+    case DELETE_REQUEST_SUCCESS: {
+      const request = action.payload.entities.requests[action.payload.result];
+      if (request.type === 'joinWT') {
+        console.log('JOSN CONTENT', request);
+        const content = JSON.parse(request.content);
+        return {
+          ...state,
+          [content.id]: {
+            ...state[content.id],
+            ownStatus: {
+              ...state[content.id].ownStatus,
+              request: null,
+            },
+          },
+        };
+      }
+      return state;
+    }
+*/
     default: {
       return state;
     }

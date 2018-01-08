@@ -13,20 +13,13 @@ import {
   getIsDiscussionFetching,
   getDiscussionError,
 } from '../../reducers';
-import TagInput from '../TagInput';
 import Button from '../Button';
 import FormField from '../FormField';
 import Box from '../Box';
 import Layer from '../Layer';
 import Discussion from '../Discussion';
 import { ICONS } from '../../constants';
-import {
-  nameValidation,
-  createValidator,
-  dateToValidation,
-  timeToValidation,
-  selectValidation,
-} from '../../core/validation';
+import { nameValidation, createValidator } from '../../core/validation';
 import Notification from '../Notification';
 import history from '../../history';
 
@@ -92,7 +85,7 @@ const standardValues = {
   },
 };
 
-const formFields = ['title', 'body', 'spokesman'];
+const formFields = ['title', 'body'];
 class DiscussionInput extends React.Component {
   static propTypes = {
     createDiscussion: PropTypes.func.isRequired,
@@ -138,9 +131,6 @@ class DiscussionInput extends React.Component {
     this.handleValidation = this.handleValidation.bind(this);
     this.visibleErrors = this.visibleErrors.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
-    this.handleSpokesmanValueChange = this.handleSpokesmanValueChange.bind(
-      this,
-    );
 
     this.md = new MarkdownIt({
       // html: true,
@@ -150,18 +140,11 @@ class DiscussionInput extends React.Component {
     const testValues = {
       title: { fn: 'name' },
       body: { fn: 'name' },
-      spokesman: {
-        fn: 'spokesman',
-        valuesResolver: obj => obj.state.spokesmanValue,
-      },
     };
     this.Validator = createValidator(
       testValues,
       {
         name: nameValidation,
-        date: dateToValidation,
-        time: timeToValidation,
-        spokesman: selectValidation,
       },
       this,
       obj => obj.state.settings,
@@ -236,7 +219,6 @@ class DiscussionInput extends React.Component {
 
   onSubmit() {
     // TODO validate
-    alert('NOT WORKING');
     if (this.handleValidation(formFields)) {
       const { body, title } = this.state.settings;
 
@@ -405,43 +387,6 @@ class DiscussionInput extends React.Component {
                 onChange={this.handleValueChanges}
                 onSelect={this.onTextSelect}
                 onBlur={this.handleBlur}
-              />
-            </FormField>
-
-            <FormField label="Tags">
-              <TagInput
-                name={'tagInput'}
-                tags={this.state.currentTagIds.map(t => this.state.tags[t])}
-                availableTags={Object.keys(this.props.tags).map(
-                  t => this.props.tags[t],
-                )}
-                handleAddition={t => {
-                  if (this.state.currentTagIds.length < this.props.maxTags) {
-                    let tag = t;
-                    const duplicate = Object.keys(this.props.tags).find(
-                      id =>
-                        this.props.tags[id].text.toLowerCase() ===
-                        t.text.toLowerCase(),
-                    );
-                    if (duplicate) {
-                      tag = this.props.tags[duplicate];
-                    }
-
-                    this.setState({
-                      tags: { ...this.state.tags, [tag.id]: tag },
-                      currentTagIds: [
-                        ...new Set([...this.state.currentTagIds, tag.id]),
-                      ],
-                    });
-                  }
-                }}
-                handleDelete={id => {
-                  this.setState({
-                    currentTagIds: this.state.currentTagIds.filter(
-                      tId => tId !== id,
-                    ),
-                  });
-                }}
               />
             </FormField>
           </div>

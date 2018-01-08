@@ -9,6 +9,9 @@ import {
 } from 'graphql';
 import UserType from './UserType';
 import DiscussionType from './DiscussionType';
+import GroupStatusType from './GroupStatusType';
+import Request from '../models/Request';
+
 import Discussion from '../models/Discussion';
 import User from '../models/User';
 import knex from '../knex';
@@ -79,28 +82,29 @@ const WorkTeamType = new ObjectType({
       type: GraphQLString,
     },
     ownStatus: {
-      type: GraphQLString,
+      type: GroupStatusType,
       async resolve(parent, args, { viewer }) {
         if (viewer.wtMemberships.includes(parent.id)) {
-          return 'member';
+          return { status: 1 };
         }
-
-        const [isMember = false] = await knex('user_work_teams')
+        const [membership = null] = await knex('user_work_teams')
           .where({ work_team_id: parent.id, user_id: viewer.id })
           .pluck('id');
-        if (!isMember) {
+        if (!membership) {
           const requests = await knex('requests')
             .where({ requester_id: viewer.id, type: 'joinWT' })
             .whereRaw("content->>'id' = ?", [parent.id])
-            .select('id', 'denied_at');
+            .select('*');
           if (requests.length) {
-            if (requests.find(r => r.denied_at)) {
-              return 'denied';
+            const req = requests.find(r => r.denied_at);
+
+            if (req) {
+              return { status: 2, request: new Request(req) };
             }
-            return 'pending';
+            return { status: 2, request: new Request(requests[0]) };
           }
         }
-        return 'none';
+        return { status: 0 };
       },
     },
     numMembers: {

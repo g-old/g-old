@@ -46,12 +46,14 @@ class WorkTeam extends React.Component {
   };
   static defaultProps = {
     logo: null,
+    updates: null,
   };
   constructor(props) {
     super(props);
     this.handleDiscussionClick = this.handleDiscussionClick.bind(this);
     this.handleJoining = this.handleJoining.bind(this);
     this.cancelJoining = this.cancelJoining.bind(this);
+    this.renderActionButton = this.renderActionButton.bind(this);
   }
   // eslint-disable-next-line class-methods-use-this
   handleDiscussionClick({ discussionId }) {
@@ -59,25 +61,55 @@ class WorkTeam extends React.Component {
   }
 
   handleJoining() {
-    const { ownStatus, onJoinRequest, id, restricted, onJoin } = this.props;
-    if (ownStatus === 'none') {
-      const content = { id };
-      if (restricted) {
-        onJoinRequest({ type: 'joinWT', content: JSON.stringify(content) });
-      } else {
-        onJoin({ id });
-      }
+    const { ownStatus = {}, id, onJoin } = this.props;
+    if (ownStatus.status === 'NONE') {
+      onJoin({ id });
     }
   }
 
   // eslint-disable-next-line class-methods-use-this
   cancelJoining() {
-    const { ownStatus, id } = this.props;
-    if (ownStatus === 'member') {
+    const { ownStatus = {}, id } = this.props;
+    if (ownStatus.status !== 'NONE') {
       this.props.onLeave({ id });
-    } else if (ownStatus === 'pending') {
-      this.props.onDeleteRequest({ type: 'joinWT' });
     }
+  }
+
+  renderActionButton(status, updates) {
+    let label;
+    let action;
+    const props = {};
+    switch (status) {
+      case 'NONE': {
+        label = 'join';
+        props.primary = true;
+        action = this.handleJoining;
+        break;
+      }
+      case 'PENDING': {
+        label = 'withdraw';
+        action = this.cancelJoining;
+        break;
+      }
+      case 'MEMBER': {
+        label = 'leave';
+        action = this.cancelJoining;
+        break;
+      }
+
+      default: {
+        console.error(`Status not recognized: ${status}`);
+      }
+    }
+
+    return (
+      <Button
+        disabled={updates.pending}
+        onClick={action}
+        {...props}
+        label={<FormattedMessage {...messages[label]} />}
+      />
+    );
   }
 
   render() {
@@ -86,10 +118,9 @@ class WorkTeam extends React.Component {
       displayName,
       numMembers,
       numDiscussions,
-      discussions,
-      id,
-      ownStatus,
-      updates,
+      discussions = [],
+      ownStatus = {},
+      updates = {},
     } = this.props;
     let picture;
     if (logo) {
@@ -115,29 +146,25 @@ class WorkTeam extends React.Component {
       );
     }
 
-    let joinBtn;
-    if (ownStatus === 'none') {
-      joinBtn = (
-        <Button
-          onClick={this.handleJoining}
-          disabled={updates && updates.pending}
-          primary
-          label={<FormattedMessage {...messages.join} />}
-        />
-      );
-    } else if (ownStatus === 'pending') {
-      joinBtn = (
-        <Button
-          onClick={this.cancelJoining}
-          label={<FormattedMessage {...messages.withdraw} />}
-        />
-      );
-    } else if (ownStatus === 'member') {
-      joinBtn = (
-        <Button
-          onClick={this.cancelJoining}
-          label={<FormattedMessage {...messages.leave} />}
-        />
+    let actionBtn;
+    if (ownStatus.status) {
+      actionBtn = this.renderActionButton(ownStatus.status, updates);
+    }
+
+    let discussionSection;
+    if (ownStatus.status === 'MEMBER') {
+      discussionSection = (
+        <div className={s.discussions}>
+          {discussions.map(
+            d =>
+              d && (
+                <DiscussionPreview
+                  discussion={d}
+                  onClick={this.handleDiscussionClick}
+                />
+              ),
+          )}
+        </div>
       );
     }
     return (
@@ -178,26 +205,15 @@ class WorkTeam extends React.Component {
           />
           <Box />
         </Box>
-        <Button
+        {/* <Button
           onClick={() => {
             history.push(`/workteams/${id}/admin`);
           }}
           primary
           label={'Management'}
-        />
-        {joinBtn}
-        <div className={s.discussions}>
-          {discussions &&
-            discussions.map(
-              d =>
-                d && (
-                  <DiscussionPreview
-                    discussion={d}
-                    onClick={this.handleDiscussionClick}
-                  />
-                ),
-            )}
-        </div>
+        /> */}
+        {actionBtn}
+        {discussionSection}
       </div>
     );
   }

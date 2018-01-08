@@ -17,6 +17,7 @@ const hydrateWorkTeams = (state, data, entities) =>
   denormalize(data, workTeamListSchema, {
     ...entities,
     users: entities.users.byId,
+    requests: entities.requests.byId,
   });
 
 export const getWorkTeams = (state, entities) => {
@@ -29,6 +30,8 @@ export const getWorkTeam = (state, id, entities) =>
   denormalize(fromById.getWorkTeam(state.byId, id), workTeamSchema, {
     ...entities,
     users: entities.users.byId,
+    requests: entities.requests.byId,
   });
+
 export const getIsFetching = state => fromList.getIsFetching(state.allIds);
 export const getErrorMessage = state => fromList.getErrorMessage(state.allIds);

@@ -1,6 +1,5 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
-import WorkTeam from './WorkTeam';
 
 class Request {
   constructor(data) {
@@ -100,25 +99,7 @@ class Request {
       } else {
         request = await Request.gen(viewer, data.id, loaders);
       }
-      if (request.type === 'joinWT') {
-        const wt = request.content;
-        if (!wt.id) {
-          throw new Error('No team given');
-        }
-        const workTeam = await WorkTeam.gen(viewer, wt.id, loaders);
-        if (request.deniedAt) {
-          // eslint-disable-next-line eqeqeq
-          if (viewer.id != workTeam.coordinatorId) {
-            throw new Error('Cannot cancel a denied request');
-          }
-        }
-        // eslint-disable-next-line eqeqeq
-        if (viewer.id != request.requesterId) {
-          await workTeam.join(viewer, wt.id, loaders);
-        }
-      } else {
-        throw new Error('Type not recognized');
-      }
+
       await knex('requests')
         .where({ id: request.id })
         .transacting(trx)

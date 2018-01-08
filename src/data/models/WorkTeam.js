@@ -1,5 +1,6 @@
 import knex from '../knex';
 import User from './User';
+import Request from './Request';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import { Groups } from '../../organization';
 
@@ -27,13 +28,17 @@ class WorkTeam {
   }
   canModifyMemberShips(viewer, requester) {
     // eslint-disable-next-line eqeqeq
-    if (this.restricted && viewer.id == this.coordinatorId) {
-      if (requester.groups !== Groups.GUEST) {
-        return true; // TODO specify rules;
+    if (this.restricted) {
+      /* eslint-disable eqeqeq */
+      if (
+        requester.id == this.coordinatorId ||
+        viewer.id == this.coordinatorId
+      ) {
+        return true;
       }
-      return true;
+      return false;
     }
-    // eslint-disable-next-line eqeqeq
+    /* eslint-enable eqeqeq */
 
     if (requester.groups !== Groups.GUEST) {
       return true; // TODO specify rules;
@@ -70,6 +75,7 @@ class WorkTeam {
       };
       return knex('sessions')
         .where({ sid: data.sid })
+        .forUpdate()
         .update({ sess: JSON.stringify(newSession) });
     });
     // TODO UPDATE TO POSTGRES 9.6!!
@@ -87,7 +93,24 @@ class WorkTeam {
     } else {
       requester = viewer;
     }
-    if (!this.canModifyMemberShips(viewer, requester)) return null;
+    // eslint-disable-next-line eqeqeq
+    if (this.restricted && requester.id != this.coordinatorId) {
+      if (!this.canModifyMemberShips(viewer, requester)) {
+        // make request
+        const request = await Request.create(
+          viewer,
+          {
+            content: JSON.stringify({ id: this.id }),
+            type: 'joinWT',
+          },
+          loaders,
+        );
+        if (!request) {
+          throw new Error('Could not create request');
+        }
+      }
+      return WorkTeam.gen(viewer, this.id, loaders);
+    }
     const workTeam = await knex.transaction(async trx => {
       const [id = null] = await trx
         .insert({
@@ -96,6 +119,7 @@ class WorkTeam {
           ...(this.restricted && { authorizer_id: viewer.id }),
           created_at: new Date(),
         })
+        .forUpdate()
         .into('user_work_teams')
         .returning('id');
 
@@ -133,14 +157,21 @@ class WorkTeam {
     } else {
       requester = viewer;
     }
-    if (!this.canModifyMemberShips(viewer, requester)) return null;
+    /* eslint-disable eqeqeq */
+    if (requester.id != viewer.id) {
+      if (viewer.id != this.coordinatorId) {
+        return null;
+      }
+    }
+    /* eslint-enable eqeqeq */
+
     const workTeam = await knex.transaction(async trx => {
       const [id = null] = await trx
         .where({ user_id: requester.id, work_team_id: this.id })
+        .forUpdate()
         .into('user_work_teams')
         .del()
         .returning('id');
-
       if (id) {
         const [workTeaminDB = null] = await knex('work_teams')
           .where({ id: this.id })
@@ -159,11 +190,24 @@ class WorkTeam {
             viewer.wtMemberships &&
             viewer.wtMemberships.filter(id => id != this.id); // eslint-disable-line
         }
-        return workTeaminDB;
+        return workTeaminDB ? new WorkTeam(workTeaminDB) : null;
       }
-      return null;
+
+      // delete request ;
+
+      const deletedRequest = await Request.delete(
+        viewer,
+        { type: 'joinWT' },
+        loaders,
+      );
+      if (!deletedRequest) {
+        throw new Error('Could not delete request');
+      }
+      loaders.workTeams.clear(this.id);
+
+      return WorkTeam.gen(viewer, this.id, loaders);
     });
-    return workTeam ? new WorkTeam(workTeam) : null;
+    return workTeam;
   }
 
   async circularFeedNotification(viewer, activity, pushFn) {

@@ -71,7 +71,15 @@ const workTeamWithDetails = `query{
 const workTeamQuery = `query($id:ID!){
   workTeam(id:$id){
     ${workTeamFields}
-    ownStatus
+    ownStatus{
+      status
+      request{
+        id
+        type
+        content
+        deniedAt
+      }
+    }
     discussions{
       id
       title
@@ -98,7 +106,15 @@ const updateWorkTeamMutation = `mutation($workTeam:WorkTeamInput){
 const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID){
   joinWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     ${workTeamFields}
-    ownStatus
+    ownStatus{
+      status
+      request{
+        id
+        type
+        content
+        deniedAt
+      }
+    }
     discussions{
       id
       title
@@ -111,7 +127,15 @@ const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID){
 const leaveWorkTeamMutation = `mutation($id:ID, $memberId:ID){
   leaveWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     ${workTeamFields}
-    ownStatus
+    ownStatus{
+      status
+      request{
+        id
+        type
+        content
+        deniedAt
+      }
+    }
   }
 }`;
 

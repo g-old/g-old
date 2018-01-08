@@ -8,7 +8,7 @@ import User from '../models/User';
 
 const Request = new ObjectType({
   name: 'Request',
-  fields: {
+  fields: () => ({
     id: {
       type: ID,
     },
@@ -18,6 +18,8 @@ const Request = new ObjectType({
 
     content: {
       type: String,
+      resolve: parent =>
+        parent.content ? JSON.stringify(parent.content) : null,
     },
     processor: {
       type: UserType,
@@ -40,7 +42,7 @@ const Request = new ObjectType({
     updatedAt: {
       type: String,
     },
-  },
+  }),
 });
 
 export default Request;
