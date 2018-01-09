@@ -67,8 +67,8 @@ const deleteRequestMutation = `
 `;
 
 const requestConnection = `
-query ($first:Int $after:String) {
-  requestConnection (first:$first after:$after) {
+query ($first:Int $after:String $type:String $contentId:ID) {
+  requestConnection (first:$first after:$after type:$type contentId:$contentId ) {
     pageInfo{
       endCursor
       hasNextPage
@@ -189,7 +189,7 @@ export function deleteRequest(request) {
   };
 }
 
-export function loadRequestList({ first, after }) {
+export function loadRequestList({ first, after, type, contentId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
 
@@ -201,6 +201,8 @@ export function loadRequestList({ first, after }) {
       const { data } = await graphqlRequest(requestConnection, {
         first,
         after,
+        type,
+        contentId,
       });
       const requests = data.requestConnection.edges.map(u => u.node);
       const normalizedData = normalize(requests, requestListSchema);

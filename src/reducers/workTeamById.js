@@ -15,11 +15,17 @@ export default function workTeams(state = {}, action) {
   switch (action.type) {
     case LOAD_WORKTEAMS_SUCCESS:
     case FETCH_USER_SUCCESS:
-    case JOIN_WORKTEAM_SUCCESS:
     case LOAD_WORKTEAM_SUCCESS:
     case LEAVE_WORKTEAM_SUCCESS:
     case CREATE_WORKTEAM_SUCCESS: {
       return merge({}, state, action.payload.entities.workTeams);
+    }
+
+    case JOIN_WORKTEAM_SUCCESS: {
+      return {
+        ...state,
+        ...action.payload.entities.workTeams,
+      };
     }
 
     /* case CREATE_REQUEST_SUCCESS: {

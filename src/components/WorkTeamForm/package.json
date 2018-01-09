@@ -1,0 +1,6 @@
+{
+  "name": "WorkTeamForm",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./WorkTeamForm.js"
+}

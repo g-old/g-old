@@ -1,4 +1,4 @@
-import { GraphQLInt, GraphQLString } from 'graphql';
+import { GraphQLInt, GraphQLString, GraphQLID } from 'graphql';
 
 import PageType from '../types/PageType';
 import RequestType from '../types/RequestType';
@@ -17,10 +17,13 @@ const request = {
     type: {
       type: GraphQLString,
     },
+    contentId: {
+      type: GraphQLID,
+    },
   },
   resolve: async (
     parent,
-    { first = 10, after = '', type },
+    { first = 10, after = '', type, contentId },
     { viewer, loaders },
   ) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
@@ -34,6 +37,11 @@ const request = {
         throw new Error(`Invalid type: ${type}`);
       }
       requestIds = await knex('requests')
+        .modify(queryBuilder => {
+          if (type === 'joinWT' && contentId) {
+            queryBuilder.whereRaw("content->>'id' = ?", [contentId]);
+          }
+        })
         .where({ type: types[pos] })
         .whereRaw('(requests.created_at, requests.id) < (?,?)', [cursor, id])
         .limit(first)

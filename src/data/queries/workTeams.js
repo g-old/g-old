@@ -8,7 +8,10 @@ const workTeams = {
   type: new GraphQLList(WorkTeamType),
 
   resolve: (root, args, { viewer, loaders }) =>
-    knex('work_teams').pluck('id').then(ids => ids.map(id => WorkTeam.gen(viewer, id, loaders))),
+    knex('work_teams')
+      .orderBy('created_at', 'desc')
+      .pluck('id')
+      .then(ids => ids.map(id => WorkTeam.gen(viewer, id, loaders))),
 };
 
 export default workTeams;

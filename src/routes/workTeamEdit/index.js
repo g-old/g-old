@@ -17,7 +17,7 @@ async function action({ store, path }, { id }) {
   if (!process.env.BROWSER) {
     await store.dispatch(loadWorkTeam({ id }, true));
   } else {
-    store.dispatch(loadWorkTeam({ id }));
+    store.dispatch(loadWorkTeam({ id }, true));
   }
   return {
     chunks: ['admin'],

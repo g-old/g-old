@@ -1,10 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-// import { defineMessages, FormattedMessage } from 'react-intl';
-import { loadWorkTeam } from '../../actions/workTeam';
-import { loadRequestList, deleteRequest } from '../../actions/request';
-import { getWorkTeam, getVisibleRequests } from '../../reducers';
+import Accordion from '../../components/Accordion';
+import AccordionPanel from '../../components/AccordionPanel';
+import { loadWorkTeam, joinWorkTeam } from '../../actions/workTeam';
+import {
+  loadRequestList,
+  deleteRequest,
+  updateRequest,
+} from '../../actions/request';
+
+import {
+  getWorkTeam,
+  getVisibleRequests,
+  getDiscussionUpdates,
+  getRequestUpdates,
+  getWorkTeamStatus,
+} from '../../reducers';
 import DiscussionInput from '../../components/DiscussionInput';
 import Tabs from '../../components/Tabs';
 import Tab from '../../components/Tab';
@@ -19,10 +31,19 @@ class WorkTeamManagement extends React.Component {
     loadRequestList: PropTypes.func.isRequired,
     deleteRequest: PropTypes.func.isRequired,
     requests: PropTypes.arrayOf(PropTypes.shape({})),
+    workTeamUpdates: PropTypes.arrayOf(PropTypes.shape({})),
+    requestUpdates: PropTypes.arrayOf(PropTypes.shape({})),
+    discussionUpdates: PropTypes.arrayOf(PropTypes.shape({})),
+    workTeam: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    joinWorkTeam: PropTypes.func.isRequired,
+    updateRequest: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     requests: null,
+    workTeamUpdates: null,
+    requestUpdates: null,
+    discussionUpdates: null,
   };
   constructor(props) {
     super(props);
@@ -30,43 +51,72 @@ class WorkTeamManagement extends React.Component {
     this.onRequestClick = this.onRequestClick.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.onAllowRequest = this.onAllowRequest.bind(this);
+    this.onDenyRequest = this.onDenyRequest.bind(this);
   }
   componentDidMount() {
-    this.props.loadRequestList({ first: 10 });
+    this.props.loadRequestList({
+      first: 10,
+      type: 'joinWT',
+      contentId: this.props.workTeam.id,
+    });
   }
 
   onRequestClick(action, data) {
     this.setState({ showRequest: true, currentRequest: data });
   }
   onAllowRequest() {
-    const { type, id } = this.state.currentRequest;
+    const { type, requester } = this.state.currentRequest;
     if (type === 'joinWT') {
-      this.props.deleteRequest({ id });
+      this.props.joinWorkTeam(
+        {
+          id: this.props.workTeam.id,
+          memberId: requester.id,
+        },
+        true,
+      );
+      this.setState({ joining: true });
     }
+  }
+
+  onDenyRequest() {
+    const { id } = this.state.currentRequest;
+
+    alert('TO IMPLEMENT');
+    this.props.updateRequest({ id, deny: true });
+    this.setState({ joining: false });
   }
 
   onCancel() {
     this.setState({ showRequest: false });
   }
   render() {
-    let userTab;
+    const {
+      workTeamUpdates = {},
+      requestUpdates = {},
+      discussionUpdates = {},
+    } = this.props;
+    let content;
     if (this.state.showRequest) {
-      userTab = (
+      const updates = this.state.joining ? workTeamUpdates : requestUpdates;
+      content = (
         <Request
           onAllow={this.onAllowRequest}
+          onDeny={this.onDenyRequest}
           onCancel={this.onCancel}
           {...this.state.currentRequest}
+          updates={updates}
         />
       );
     } else {
-      userTab = (
+      content = (
         <RequestsList
           onClickCheckbox={this.onClickCheckbox}
           onClickMenu={this.onRequestClick}
           allowMultiSelect
           searchTerm=""
+          noRequestsFound={'No requests found'}
           checkedIndices={[]}
-          requests={this.props.requests || []}
+          requests={this.props.workTeam.requests || []}
           tableHeaders={[
             'name',
             'request',
@@ -82,25 +132,35 @@ class WorkTeamManagement extends React.Component {
     return (
       <Tabs>
         <Tab title="Discussions">
-          <div>
-            <DiscussionInput workTeamId={this.props.id} />
-          </div>
+          <Accordion>
+            <AccordionPanel heading="Create discussion">
+              <DiscussionInput
+                workTeamId={this.props.id}
+                updates={discussionUpdates}
+              />
+            </AccordionPanel>
+          </Accordion>
         </Tab>
-        <Tab title="User">{userTab}</Tab>
+        <Tab title="Requests">{content}</Tab>
       </Tabs>
     );
   }
 }
 
 const mapStateToProps = (state, { id }) => ({
-  workTeamData: getWorkTeam(state, id),
+  workTeam: getWorkTeam(state, id),
   requests: getVisibleRequests(state, 'all'),
+  discussionUpdates: getDiscussionUpdates(state),
+  requestUpdates: getRequestUpdates(state),
+  workTeamUpdates: getWorkTeamStatus(state),
 });
 
 const mapDispatch = {
   loadWorkTeam,
   loadRequestList,
   deleteRequest,
+  joinWorkTeam,
+  updateRequest,
 };
 
 export default connect(mapStateToProps, mapDispatch)(WorkTeamManagement);

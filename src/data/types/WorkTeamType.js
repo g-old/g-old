@@ -11,7 +11,7 @@ import UserType from './UserType';
 import DiscussionType from './DiscussionType';
 import GroupStatusType from './GroupStatusType';
 import Request from '../models/Request';
-
+import RequestType from '../types/RequestType';
 import Discussion from '../models/Discussion';
 import User from '../models/User';
 import knex from '../knex';
@@ -105,6 +105,16 @@ const WorkTeamType = new ObjectType({
           }
         }
         return { status: 0 };
+      },
+    },
+    requests: {
+      type: new GraphQLList(RequestType),
+      async resolve(parent, args, { viewer, loaders }) {
+        const requests = await knex('requests')
+          .where({ type: 'joinWT' })
+          .whereRaw("content->>'id' = ?", [parent.id])
+          .pluck('id');
+        return requests.map(id => Request.gen(viewer, id, loaders));
       },
     },
     numMembers: {

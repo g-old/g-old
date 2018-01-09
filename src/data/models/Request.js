@@ -63,7 +63,7 @@ class Request {
 
     const newData = {
       processor_id: viewer.id,
-      denied_at: new Date(),
+      denied_at: data.deny ? new Date() : null,
       updated_at: new Date(),
     };
     const updatedRequest = await knex.transaction(async trx => {

@@ -2,6 +2,7 @@ import {
   GraphQLString as String,
   GraphQLInputObjectType,
   GraphQLID as ID,
+  GraphQLBoolean,
 } from 'graphql';
 
 const RequestInputType = new GraphQLInputObjectType({
@@ -21,6 +22,9 @@ const RequestInputType = new GraphQLInputObjectType({
     },
     requesterId: {
       type: ID,
+    },
+    deny: {
+      type: GraphQLBoolean,
     },
   },
 });

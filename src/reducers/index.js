@@ -166,4 +166,7 @@ export const getDiscussionError = state =>
 
 export const getCommentUpdates = state => fromUi.getCommentUpdates(state.ui);
 
+export const getDiscussionUpdates = state =>
+  fromUi.getDiscussionUpdates(state.ui);
+
 export const getConsent = state => state.consent;

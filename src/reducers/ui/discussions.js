@@ -1,13 +1,13 @@
 import {
-  CREATE_REQUEST_START,
-  CREATE_REQUEST_SUCCESS,
-  CREATE_REQUEST_ERROR,
-  UPDATE_REQUEST_START,
-  UPDATE_REQUEST_ERROR,
-  UPDATE_REQUEST_SUCCESS,
-  DELETE_REQUEST_START,
-  DELETE_REQUEST_ERROR,
-  DELETE_REQUEST_SUCCESS,
+  CREATE_DISCUSSION_START,
+  CREATE_DISCUSSION_SUCCESS,
+  CREATE_DISCUSSION_ERROR,
+  UPDATE_DISCUSSION_START,
+  UPDATE_DISCUSSION_ERROR,
+  UPDATE_DISCUSSION_SUCCESS,
+  DELETE_DISCUSSION_START,
+  DELETE_DISCUSSION_ERROR,
+  DELETE_DISCUSSION_SUCCESS,
 } from '../../constants';
 
 // import { getErrors, getSuccessState } from '../../core/helpers';
@@ -21,9 +21,9 @@ const initState = {
 };
 const discussions = (state = initState, action) => {
   switch (action.type) {
-    case CREATE_REQUEST_START:
-    case UPDATE_REQUEST_START:
-    case DELETE_REQUEST_START: {
+    case CREATE_DISCUSSION_START:
+    case UPDATE_DISCUSSION_START:
+    case DELETE_DISCUSSION_START: {
       return {
         ...state,
         mutation: {
@@ -34,9 +34,9 @@ const discussions = (state = initState, action) => {
       };
     }
 
-    case CREATE_REQUEST_ERROR:
-    case UPDATE_REQUEST_ERROR:
-    case DELETE_REQUEST_ERROR: {
+    case CREATE_DISCUSSION_ERROR:
+    case UPDATE_DISCUSSION_ERROR:
+    case DELETE_DISCUSSION_ERROR: {
       return {
         ...state,
         mutation: {
@@ -47,9 +47,9 @@ const discussions = (state = initState, action) => {
       };
     }
 
-    case CREATE_REQUEST_SUCCESS:
-    case UPDATE_REQUEST_SUCCESS:
-    case DELETE_REQUEST_SUCCESS: {
+    case CREATE_DISCUSSION_SUCCESS:
+    case UPDATE_DISCUSSION_SUCCESS:
+    case DELETE_DISCUSSION_SUCCESS: {
       return {
         ...state,
         mutation: {

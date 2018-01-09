@@ -11,7 +11,7 @@ import { SESSION_LOGOUT_SUCCESS } from '../constants';
 import comments, * as fromComment from './ui/comments';
 import requests, * as fromRequest from './ui/requests';
 import workTeams, * as fromWorkTeam from './ui/workTeams';
-
+import discussions, * as fromDiscussion from './ui/discussions';
 /* GENERATOR_IMPORTS */
 
 const uiReducer = combineReducers({
@@ -27,6 +27,7 @@ const uiReducer = combineReducers({
   pageInfo,
   comments,
   workTeams,
+  discussions,
 });
 export default (state, action) => {
   if (action.type === SESSION_LOGOUT_SUCCESS) {
@@ -118,3 +119,6 @@ export const getPageInfo = (state, queryStateTag) =>
 
 export const getCommentUpdates = state =>
   fromComment.getUpdates(state.comments);
+
+export const getDiscussionUpdates = (state, id) =>
+  fromDiscussion.getStatus(state.discussions, id);

@@ -25,6 +25,27 @@ import {
   workTeam as workTeamSchema,
 } from '../store/schema';
 
+const userFields = `
+id
+thumbnail
+name
+surname
+`;
+const requestFields = `
+id
+processor{
+  ${userFields}
+}
+requester{
+  ${userFields}
+}
+type
+content
+deniedAt
+updatedAt
+createdAt
+`;
+
 const workTeamFields = `
   id
   displayName
@@ -58,12 +79,15 @@ const workTeamsWithMembers = `query{
 
 const wtDetails = `
 name
-lldName,
-deName,
-itName,
+lldName
+deName
+itName
+requests{
+${requestFields}
+}
 `;
-const workTeamWithDetails = `query{
-    workTeams {
+const workTeamWithDetails = `query($id:ID!){
+    workTeam(id:$id) {
       ${workTeamFields}
       ${wtDetails}
     }}`;
@@ -98,6 +122,13 @@ const createWorkTeamMutation = `mutation($workTeam:WorkTeamInput){
 
 const updateWorkTeamMutation = `mutation($workTeam:WorkTeamInput){
   updateWorkTeam (workTeam:$workTeam){
+    ${workTeamFields}
+    ${wtDetails}
+  }
+}`;
+
+const joinWorkTeamMutationWithDetails = `mutation($id:ID, $memberId:ID){
+  joinWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     ${workTeamFields}
     ${wtDetails}
   }
@@ -189,14 +220,17 @@ export function createWorkTeam(workTeam) {
   };
 }
 
-export function joinWorkTeam(workTeamData) {
+export function joinWorkTeam(workTeamData, details) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: JOIN_WORKTEAM_START,
     });
 
     try {
-      const { data } = await graphqlRequest(joinWorkTeamMutation, workTeamData);
+      const { data } = await graphqlRequest(
+        details ? joinWorkTeamMutationWithDetails : joinWorkTeamMutation,
+        workTeamData,
+      );
       const normalizedData = normalize(data.joinWorkTeam, workTeamSchema);
 
       dispatch({ type: JOIN_WORKTEAM_SUCCESS, payload: normalizedData });

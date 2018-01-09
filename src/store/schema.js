@@ -12,6 +12,7 @@ export const workTeam = new schema.Entity('workTeams', {
   ownStatus: {
     request,
   },
+  requests: [request],
 });
 user.define({
   role,

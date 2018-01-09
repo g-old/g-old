@@ -49,6 +49,10 @@
   font-weight: 600;
 }
 
-/* .medium {
+.medium {
   padding: 3rem;
-} */
+}
+
+.small {
+  padding: 1rem;
+}

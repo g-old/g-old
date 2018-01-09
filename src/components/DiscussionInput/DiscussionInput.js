@@ -102,11 +102,16 @@ class DiscussionInput extends React.Component {
       }),
     ).isRequired,
     workTeamId: PropTypes.string.isRequired,
+    updates: PropTypes.shape({
+      success: PropTypes.bool,
+      error: PropTypes.bool,
+    }),
   };
 
   static defaultProps = {
     errorMessage: null,
     success: null,
+    updates: null,
   };
 
   constructor(props) {
@@ -151,25 +156,17 @@ class DiscussionInput extends React.Component {
     );
   }
 
-  componentWillReceiveProps({ success, errorMessage }) {
-    if (success) {
-      if (!this.props.success) {
-        this.setState({
-          ...standardValues,
-          success: true,
-          clearSpokesman: true,
-        });
-      } /* else if (!this.state.success) {
-        this.setState({
-          ...standardValues,
-          success: false,
-          clearSpokesman: false,
-        });
-      } */
+  componentWillReceiveProps({ workTeam, updates = {} }) {
+    const newUpdates = {};
+    if (updates.success && !this.props.updates.success) {
+      // h istory.push(`/workteams/${this.props.workTeamId}/admin`);
+      this.setState({ ...standardValues });
     }
-    if (errorMessage) {
-      this.setState({ error: !this.props.errorMessage });
+    if (updates.error && !this.props.updates.error) {
+      newUpdates.error = true;
     }
+
+    this.setState({ ...workTeam, ...newUpdates });
   }
 
   onTextChange(e) {
@@ -331,139 +328,134 @@ class DiscussionInput extends React.Component {
   render() {
     const { title, body } = this.state.settings;
     const { titleError, bodyError } = this.visibleErrors(formFields);
+    const { error } = this.state;
+    const { updates = {} } = this.props;
     return (
-      <div className={s.root}>
-        <Box column pad>
-          {/* <Calendar lang={this.props.locale} /> */}
+      <Box column pad className={s.root}>
+        {/* <Calendar lang={this.props.locale} /> */}
 
-          <div>
-            <FormField label={'Title'} error={titleError}>
-              <input
-                name="title"
-                onBlur={this.handleBlur}
-                type="text"
-                value={title}
-                onChange={this.handleValueChanges}
-              />
-            </FormField>
-            <FormField
-              error={bodyError}
-              label={'Body'}
-              help={
-                <Box pad>
-                  <Button
-                    onClick={this.onStrong}
-                    plain
-                    icon={<strong>A</strong>}
-                  />
-                  <Button onClick={this.onItalic} plain icon={<i>A</i>} />
-                  <Button
-                    plain
-                    onClick={this.onAddLink}
-                    icon={
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="24px"
-                        height="24px"
-                        role="img"
-                        aria-label="link"
-                      >
-                        <path
-                          fill="none"
-                          stroke="#000"
-                          strokeWidth="2"
-                          d={ICONS.link}
-                        />
-                      </svg>
-                    }
-                  />
-                </Box>
-              }
-            >
-              <textarea
-                className={s.textInput}
-                name="body"
-                value={body}
-                onChange={this.handleValueChanges}
-                onSelect={this.onTextSelect}
-                onBlur={this.handleBlur}
-              />
-            </FormField>
-          </div>
-          {this.state.showPreview && (
-            <Layer
-              onClose={() => {
-                this.setState({ showPreview: false });
-              }}
-            >
-              <Discussion
-                {...{
-                  id: '0000',
-
-                  title:
-                    title.trim().length < 3
-                      ? 'Title is missing!'
-                      : title.trim(),
-                  body:
-                    this.md.render(body).length < 3
-                      ? 'Body is missing'
-                      : this.md.render(body),
-                }}
-              />
-            </Layer>
-          )}
-
-          <Box pad>
-            <Button
-              primary
-              label={<FormattedMessage {...messages.submit} />}
-              onClick={this.onSubmit}
-              disabled={this.isPending}
+        <div>
+          <FormField label={'Title'} error={titleError}>
+            <input
+              name="title"
+              onBlur={this.handleBlur}
+              type="text"
+              value={title}
+              onChange={this.handleValueChanges}
             />
-            <Button
-              label="Preview"
-              onClick={() => {
-                this.setState({ showPreview: true });
-              }}
-            />
-          </Box>
-          {this.props.isPending && <span>{'...submitting'}</span>}
-          {this.state.error && (
-            <Notification type="error" message={this.props.errorMessage} />
-          )}
-          {this.state.success && (
-            <Notification
-              type="success"
-              message={<FormattedMessage {...messages.success} />}
-              action={
+          </FormField>
+          <FormField
+            error={bodyError}
+            label={'Body'}
+            help={
+              <Box pad>
+                <Button
+                  onClick={this.onStrong}
+                  plain
+                  icon={<strong>A</strong>}
+                />
+                <Button onClick={this.onItalic} plain icon={<i>A</i>} />
                 <Button
                   plain
-                  reverse
+                  onClick={this.onAddLink}
                   icon={
                     <svg
                       viewBox="0 0 24 24"
                       width="24px"
                       height="24px"
                       role="img"
+                      aria-label="link"
                     >
                       <path
                         fill="none"
                         stroke="#000"
                         strokeWidth="2"
-                        d="M2,12 L22,12 M13,3 L22,12 L13,21"
+                        d={ICONS.link}
                       />
                     </svg>
                   }
-                  onClick={() => {
-                    history.push(`/proposal/${this.props.success}`);
-                  }}
-                  label="Visit"
                 />
-              }
+              </Box>
+            }
+          >
+            <textarea
+              className={s.textInput}
+              name="body"
+              value={body}
+              onChange={this.handleValueChanges}
+              onSelect={this.onTextSelect}
+              onBlur={this.handleBlur}
             />
-          )}
+          </FormField>
+        </div>
+        {this.state.showPreview && (
+          <Layer
+            onClose={() => {
+              this.setState({ showPreview: false });
+            }}
+          >
+            <Discussion
+              {...{
+                id: '0000',
+
+                title:
+                  title.trim().length < 3 ? 'Title is missing!' : title.trim(),
+                body:
+                  this.md.render(body).length < 3
+                    ? 'Body is missing'
+                    : this.md.render(body),
+              }}
+            />
+          </Layer>
+        )}
+
+        <Box pad>
+          <Button
+            primary
+            label={<FormattedMessage {...messages.submit} />}
+            onClick={this.onSubmit}
+            disabled={this.isPending}
+          />
+          <Button
+            label="Preview"
+            onClick={() => {
+              this.setState({ showPreview: true });
+            }}
+          />
         </Box>
-      </div>
+        <p>{error && <Notification type="error" message={updates.error} />}</p>
+        {this.state.success && (
+          <Notification
+            type="success"
+            message={<FormattedMessage {...messages.success} />}
+            action={
+              <Button
+                plain
+                reverse
+                icon={
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24px"
+                    height="24px"
+                    role="img"
+                  >
+                    <path
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      d="M2,12 L22,12 M13,3 L22,12 L13,21"
+                    />
+                  </svg>
+                }
+                onClick={() => {
+                  history.push(`/proposal/${this.props.success}`);
+                }}
+                label="Visit"
+              />
+            }
+          />
+        )}
+      </Box>
     );
   }
 }

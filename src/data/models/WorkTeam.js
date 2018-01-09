@@ -93,9 +93,9 @@ class WorkTeam {
     } else {
       requester = viewer;
     }
-    // eslint-disable-next-line eqeqeq
-    if (this.restricted && requester.id != this.coordinatorId) {
-      if (!this.canModifyMemberShips(viewer, requester)) {
+    if (!this.canModifyMemberShips(viewer, requester)) {
+      // eslint-disable-next-line eqeqeq
+      if (this.restricted && requester.id != this.coordinatorId) {
         // make request
         const request = await Request.create(
           viewer,
@@ -111,7 +111,23 @@ class WorkTeam {
       }
       return WorkTeam.gen(viewer, this.id, loaders);
     }
+
     const workTeam = await knex.transaction(async trx => {
+      // check for request
+      // eslint-disable-next-line eqeqeq
+      if (this.restricted && requester.id != this.coordinatorId) {
+        const [requestId = null] = await knex('requests')
+          .transacting(trx)
+          .forUpdate()
+          .where({ type: 'joinWT', requester_id: requester.id })
+          .whereRaw("content->>'id' = ?", [this.id])
+          .del()
+          .returning('id');
+
+        if (!requestId) {
+          throw new Error('No request found');
+        }
+      }
       const [id = null] = await trx
         .insert({
           user_id: requester.id,
