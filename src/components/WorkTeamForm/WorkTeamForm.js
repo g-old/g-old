@@ -14,6 +14,7 @@ import {
   getWorkTeam,
   getVisibleUsers,
   getWorkTeamStatus,
+  getSessionUser,
 } from '../../reducers';
 import Box from '../Box';
 import FormField from '../FormField';
@@ -80,6 +81,7 @@ class WorkTeamManagement extends React.Component {
     id: PropTypes.string.isRequired,
     users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     workTeam: PropTypes.shape({ id: PropTypes.string }).isRequired,
+    user: PropTypes.shape({ id: PropTypes.string }).isRequired,
     findUser: PropTypes.func.isRequired,
     updateWorkTeam: PropTypes.func.isRequired,
     createWorkTeam: PropTypes.func.isRequired,
@@ -154,8 +156,12 @@ class WorkTeamManagement extends React.Component {
   onSubmit(e) {
     // TODO checks
     e.preventDefault();
-    const { workTeam } = this.props;
+    const { workTeam, user } = this.props;
     const { coordinator } = this.state;
+    // eslint-disable-next-line
+    if (user.id != this.props.coordinator.id) {
+      return;
+    }
     if (this.handleValidation(formFields)) {
       const inputFields = [
         'id',
@@ -348,6 +354,7 @@ const mapStateToProps = (state, { id }) => ({
   workTeam: getWorkTeam(state, id),
   users: getVisibleUsers(state, 'all'),
   updates: getWorkTeamStatus(state),
+  user: getSessionUser(state),
 });
 
 const mapDispatch = {

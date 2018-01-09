@@ -13,11 +13,11 @@ class Form extends React.Component {
   static defaultProps = { className: null };
 
   render() {
-    const { className, ...props } = this.props;
+    const { className, ...otherProps } = this.props;
     const classes = classnames(s.form, className);
 
     return (
-      <form {...props} className={classes} onSubmit={this.props.onSubmit}>
+      <form {...otherProps} className={classes} onSubmit={this.props.onSubmit}>
         {this.props.children}
       </form>
     );

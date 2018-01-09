@@ -19,7 +19,7 @@ class Image extends React.Component {
   };
 
   render() {
-    const { className, full, size, fit, ...props } = this.props;
+    const { className, full, size, fit, ...otherProps } = this.props;
     const classes = classnames(
       s.image,
       {
@@ -30,7 +30,7 @@ class Image extends React.Component {
       className,
     );
 
-    const imgNode = <img alt="asset" {...props} className={classes} />;
+    const imgNode = <img alt="asset" {...otherProps} className={classes} />;
 
     return imgNode;
   }

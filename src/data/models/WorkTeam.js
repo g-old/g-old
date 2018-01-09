@@ -286,7 +286,9 @@ class WorkTeam {
       ...(data.deName && { de_name: data.deName }),
       ...(data.itName && { it_name: data.itName }),
       ...(data.lldName && { lld_name: data.lldName }),
-      ...(data.restricted && { restricted: data.restricted }),
+      ...(typeof data.restricted === 'boolean' && {
+        restricted: data.restricted,
+      }),
     };
     if (data.logo || data.logoAssetId) {
       throw new Error('Not implemented yet: LOGO');

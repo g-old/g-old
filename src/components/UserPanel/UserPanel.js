@@ -6,7 +6,6 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './UserPanel.css';
 import { notifyUser } from '../../actions/notifications';
 import { updateUser, loadUserList, findUser } from '../../actions/user';
-import { loadWorkTeams, createWorkTeam } from '../../actions/workTeam';
 import FetchError from '../FetchError';
 import AccountDetails from '../AccountDetails';
 import Accordion from '../../components/Accordion';
@@ -15,9 +14,7 @@ import SearchField from '../../components/SearchField';
 import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
-import WorkTeamInput from '../WorkTeamInput';
 import Layer from '../Layer';
-import NotificationInput from '../NotificationInput';
 import UserListEntry from './UserListEntry';
 import { Permissions, Groups } from '../../organization';
 
@@ -192,7 +189,6 @@ class UserPanel extends React.Component {
       viewerArrayStatus,
       viewerArray,
       guestArray,
-      workTeams,
     } = this.props;
     if (!this.props.user) return null;
     return (
@@ -287,45 +283,6 @@ class UserPanel extends React.Component {
                 />
               )}
             </AccordionPanel>
-            <AccordionPanel
-              heading="Workteams"
-              onActive={() => this.props.loadWorkTeams(true)}
-            >
-              {this.renderWorkTeams(workTeams)}
-              {/* eslint-disable no-bitwise */}
-              <Button
-                primary
-                disabled={
-                  (this.props.user.permissions &
-                    Permissions.CREATE_WORKTEAMS) ===
-                  0
-                }
-                label={'ADD Workteam'}
-                onClick={() => this.setState({ showCreateWG: true })}
-              />
-              {/* eslint-enable no-bitwise */}
-
-              {this.state.showNotify && (
-                <Layer onClose={() => this.setState({ showNotify: false })}>
-                  <NotificationInput
-                    notifyGroup
-                    updates={{}}
-                    notifyUser={this.props.notifyUser}
-                    types={['notification']}
-                    receiverId={this.state.showNotify}
-                  />
-                </Layer>
-              )}
-
-              {this.state.showCreateWG && (
-                <WorkTeamInput
-                  createWorkTeam={this.props.createWorkTeam}
-                  findUser={this.props.findUser}
-                  users={this.props.userArray}
-                  onClose={() => this.setState({ showCreateWG: false })}
-                />
-              )}
-            </AccordionPanel>
           </Accordion>
         </div>
       </Box>
@@ -347,8 +304,6 @@ const mapDispatch = {
   updateUser,
   loadUserList,
   findUser,
-  loadWorkTeams,
-  createWorkTeam,
   notifyUser,
 };
 

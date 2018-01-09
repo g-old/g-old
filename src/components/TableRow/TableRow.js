@@ -17,7 +17,7 @@ class TableRow extends React.Component {
   };
 
   render() {
-    const { children, className, onClick, ...props } = this.props;
+    const { children, className, onClick, ...otherProps } = this.props;
 
     const classes = classnames(
       {
@@ -27,7 +27,7 @@ class TableRow extends React.Component {
     );
 
     return (
-      <tr {...props} className={classes} onClick={onClick}>
+      <tr {...otherProps} className={classes} onClick={onClick}>
         {children}
       </tr>
     );

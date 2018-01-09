@@ -16,6 +16,7 @@ function WorkTeamTableRow({
   logo,
   onClickMenu,
   coordinator,
+  restricted,
 }) {
   /* eslint-disable react/no-danger */
   /* eslint-disable jsx-a11y/click-events-have-key-events */
@@ -28,7 +29,17 @@ function WorkTeamTableRow({
           <span>{`${displayName}`}</span>
         </Box>
       </td>
-      <td>{coordinator ? <Avatar user={coordinator} /> : 'No coordinator'}</td>
+      <td>
+        {coordinator ? (
+          <Box align>
+            <Avatar user={coordinator} />
+            <span>{`${coordinator.name[0]}. ${coordinator.surname}`}</span>
+          </Box>
+        ) : (
+          'No coordinator'
+        )}
+      </td>
+      <td>{restricted ? 'true' : 'false'}</td>
       <td>
         <span>{numMembers}</span>
       </td>
@@ -73,11 +84,11 @@ WorkTeamTableRow.propTypes = {
   numDiscussions: PropTypes.number.isRequired,
   logo: PropTypes.string.isRequired,
   coordinator: PropTypes.shape({}).isRequired,
+  restricted: PropTypes.bool.isRequired,
 };
 
 WorkTeamTableRow.defaultProps = {
   checked: null,
-  processor: null,
 };
 
 export default withStyles(s)(WorkTeamTableRow);
