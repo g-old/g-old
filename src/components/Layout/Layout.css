@@ -242,6 +242,8 @@ textarea {
 }
 
 .banner {
+  overflow: hidden;
+
   img {
     min-width: 32rem;
     max-width: 100%;
