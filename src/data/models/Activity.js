@@ -1,7 +1,7 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
-import { insertIntoFeed } from '../../core/feed';
+import { insertIntoFeed, insertIntoWorkTeamFeeds } from '../../core/feed';
 
 class Activity {
   constructor(data) {
@@ -146,4 +146,37 @@ EventManager.subscribe('onVoteUpdated', async ({ viewer, vote }) =>
     data: { type: 'vote', content: vote, objectId: vote.id },
     verb: 'update',
   }),
+);
+
+EventManager.subscribe('onDiscussionCreated', async ({ viewer, discussion }) =>
+  insertIntoWorkTeamFeeds(
+    {
+      viewer,
+      data: {
+        type: 'discussion',
+        objectId: discussion.id,
+        content: discussion,
+      },
+      verb: 'create',
+      type: 'WT',
+      groupId: discussion.workTeamId,
+    },
+    true,
+  ),
+);
+
+EventManager.subscribe(
+  'onCommentCreated',
+  async ({ viewer, comment, info: { workTeamId } }) =>
+    insertIntoWorkTeamFeeds({
+      viewer,
+      data: {
+        type: 'comment',
+        objectId: comment.id,
+        content: { ...comment, workTeamId },
+      },
+      verb: 'create',
+      type: 'WT',
+      groupId: workTeamId,
+    }),
 );

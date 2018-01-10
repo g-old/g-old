@@ -4,6 +4,7 @@ import {
   GraphQLID as ID,
   GraphQLList,
   GraphQLInt,
+  GraphQLNonNull,
 } from 'graphql';
 import knex from '../knex';
 
@@ -18,7 +19,7 @@ const DiscussionType = new ObjectType({
   name: 'Discussion',
   fields: () => ({
     id: {
-      type: ID,
+      type: new GraphQLNonNull(ID),
     },
     title: {
       type: GraphQLString,

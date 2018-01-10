@@ -268,14 +268,26 @@ class WorkTeam {
       newData.coordinator_id = data.coordinatorId;
     }
     newData.created_at = new Date();
-    let wtId = await knex.transaction(async trx =>
-      trx
+    const workTeam = await knex.transaction(async trx => {
+      const [workTeamData = null] = await trx
         .insert(newData)
         .into('work_teams')
-        .returning('id'),
-    );
-    wtId = wtId[0];
-    return wtId ? WorkTeam.gen(viewer, wtId, loaders) : null;
+        .returning('*');
+
+      if (!workTeamData) {
+        throw new Error('Could not create workTeam');
+      }
+      // make feed;
+      await knex('system_feeds')
+        .transacting(trx)
+        .insert({
+          group_id: workTeamData.id,
+          type: 'WT',
+          main_activities: JSON.stringify([]),
+        });
+      return workTeamData;
+    });
+    return workTeam ? new WorkTeam(workTeam) : null;
   }
 
   static async update(viewer, data, loaders) {

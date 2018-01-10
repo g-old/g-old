@@ -11,6 +11,9 @@ import Notification from '../models/Notification';
 import Proposal from '../models/Proposal';
 import Statement from '../models/Statement';
 import Vote from '../models/Vote';
+import Discussion from '../models/Discussion';
+import Comment from '../models/Comment';
+import WorkTeam from '../models/WorkTeam';
 
 const addProposalInfo = async (viewer, loaders, pollId) => {
   if (!pollId) {
@@ -19,6 +22,26 @@ const addProposalInfo = async (viewer, loaders, pollId) => {
   const { id, title } = await Proposal.genByPoll(viewer, pollId, loaders);
 
   return JSON.stringify({ proposalId: id, proposalTitle: title });
+};
+
+const addWorkTeamInfo = async (viewer, loaders, workTeamId) => {
+  if (!workTeamId) {
+    return JSON.stringify({});
+  }
+  const { id, name, deName, itName, lldName, logo } = await WorkTeam.gen(
+    viewer,
+    workTeamId,
+    loaders,
+  );
+
+  return JSON.stringify({
+    workTeamId: id,
+    name,
+    logo,
+    itName,
+    deName,
+    lldName,
+  });
 };
 
 const getVote = async (viewer, parent, loaders) => {
@@ -97,6 +120,12 @@ const ActivityType = new GraphQLObjectType({
         if (parent.type === 'notification') {
           return Notification.gen(viewer, parent.objectId, loaders);
         }
+        if (parent.type === 'discussion') {
+          return Discussion.gen(viewer, parent.objectId, loaders);
+        }
+        if (parent.type === 'comment') {
+          return Comment.gen(viewer, parent.objectId, loaders);
+        }
         return null;
       },
     },
@@ -121,6 +150,10 @@ const ActivityType = new GraphQLObjectType({
             const vote = await getVote(viewer, parent, loaders);
 
             return addProposalInfo(viewer, loaders, vote.pollId, vote);
+          }
+
+          case 'discussion': {
+            return addWorkTeamInfo(viewer, loaders, parent.content.workTeamId);
           }
 
           default: {

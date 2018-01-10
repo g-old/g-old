@@ -13,10 +13,12 @@ function randomNumber(max) {
 exports.seed = function (knex, Promise) {
   function createSystemFeeds() {
     return Promise.resolve(
-      knex('system_feeds').insert([
-        { user_id: proposalFeedID, activity_ids: JSON.stringify([]) },
-        { user_id: statementFeedID, activity_ids: JSON.stringify([]) },
-      ])
+      knex('system_feeds').insert({
+        group_id: 1,
+        type: 'GROUP',
+        main_activities:JSON.stringify([]),
+        activities: JSON.stringify([]),
+      })
     );
   }
   function createActivity(object) {
@@ -113,15 +115,15 @@ exports.seed = function (knex, Promise) {
       knex('activities').insert(data).returning('id').then(id => resolve(id));
     });
   }
-  function genActivitiesFromProposals(data, feedId) {
+  function genActivitiesFromProposals(data, feedId, field) {
     return Promise.all([
       Promise.all(data[0].map(p => createActivity(p))),
       Promise.all(data[1].map(p => createActivity(p))),
       Promise.all(data[2].map(p => createActivity(p))),
     ]).then((allIds) => {
       const pIds = allIds.reduce((acc, curr) => acc.concat(curr), []);
-      return knex('system_feeds').where({ user_id: feedId }).update({
-        activity_ids: JSON.stringify(pIds.reduce((acc, curr) => acc.concat(curr), []))
+      return knex('system_feeds').where({ group_id: 1, type: 'GROUP' }).update({
+        [field]: JSON.stringify(pIds.reduce((acc, curr) => acc.concat(curr), []))
       });
     });
   }
@@ -144,13 +146,13 @@ exports.seed = function (knex, Promise) {
         .limit(numActivities / 3)
         .select(),
     ])
-      .then(data => genActivitiesFromProposals(data, feedId));
+      .then(data => genActivitiesFromProposals(data, feedId, 'main_activities'));
   }
 
   function genActivitiesFromStatements(data, feedId) {
     return Promise.all(data.map(p => createActivity(p))).then(ids =>
-      knex('system_feeds').where({ user_id: feedId }).update({
-        activity_ids: JSON.stringify(ids.reduce((acc, curr) => acc.concat(curr), [])),
+      knex('system_feeds').where({ group_id: 1, type:'GROUP' }).update({
+        activities: JSON.stringify(ids.reduce((acc, curr) => acc.concat(curr), [])),
       })
     );
   }
@@ -160,7 +162,7 @@ exports.seed = function (knex, Promise) {
     return knex('statements')
       .limit(numActivities)
       .select()
-      .then(data => genActivitiesFromStatements(data, feedId));
+      .then(data => genActivitiesFromStatements(data, feedId, 'activities'));
   }
 
   function fillUserFeed(userId) {

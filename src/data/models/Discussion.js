@@ -1,5 +1,6 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import EventManager from '../../core/EventManager';
 
 class Discussion {
   constructor(data) {
@@ -48,8 +49,11 @@ class Discussion {
       }
       return discussion;
     });
-
-    return discussionInDB ? new Discussion(discussionInDB) : null;
+    const discussion = discussionInDB ? new Discussion(discussionInDB) : null;
+    if (discussion) {
+      EventManager.publish('onDiscussionCreated', { viewer, discussion });
+    }
+    return discussion;
   }
 }
 

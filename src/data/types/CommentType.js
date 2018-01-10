@@ -4,6 +4,7 @@ import {
   GraphQLID as ID,
   GraphQLList,
   GraphQLInt,
+  GraphQLNonNull,
 } from 'graphql';
 import knex from '../knex';
 
@@ -14,7 +15,7 @@ const CommentType = new ObjectType({
   name: 'Comment',
   fields: () => ({
     id: {
-      type: ID,
+      type: new GraphQLNonNull(ID),
     },
 
     content: {

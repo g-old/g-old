@@ -9,6 +9,25 @@ import {
 import { activityArray as activitiesSchema } from '../store/schema';
 import { getFeedIsFetching, getSessionUser } from '../reducers';
 
+const userFields = `
+id
+name
+surname
+thumbnail`;
+
+const commentFields = `
+id
+parentId
+content
+numReplies
+discussionId
+createdAt
+editedAt
+author{
+${userFields}
+}
+`;
+
 const feed = `
 query($userId:ID){
   feed (userId:$userId) {
@@ -26,6 +45,22 @@ query($userId:ID){
   }
   object {
     __typename
+    ... on Discussion {
+      id
+      createdAt
+      title
+      numComments
+      closedAt
+      content
+      author{
+        ${userFields}
+      }
+
+    }
+
+    ... on Comment {
+      ${commentFields}
+    }
     ... on ProposalDL {
       id
       title

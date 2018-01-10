@@ -107,6 +107,7 @@ class Comment extends React.Component {
         type: PropTypes.string,
       }),
     }),
+    preview: PropTypes.bool,
     isFollowee: PropTypes.bool,
     asInput: PropTypes.bool,
     onFlagging: PropTypes.func,
@@ -160,6 +161,7 @@ class Comment extends React.Component {
     createdAt: null,
     own: null,
     editedAt: null,
+    preview: null,
   };
 
   constructor(props) {
@@ -171,7 +173,7 @@ class Comment extends React.Component {
       collapsed: false,
       open: props.openInput,
     };
-    this.onDeleteStatement = this.onDeleteStatement.bind(this);
+    this.onDeleteComment = this.onDeleteComment.bind(this);
     this.handleEditing = this.handleEditing.bind(this);
     this.onTextChange = this.onTextChange.bind(this);
     this.onTextSubmit = this.onTextSubmit.bind(this);
@@ -184,6 +186,7 @@ class Comment extends React.Component {
     this.toggleContent = this.toggleContent.bind(this);
     this.toggleReplies = this.toggleReplies.bind(this);
     this.renderHeader = this.renderHeader.bind(this);
+    this.renderMenu = this.renderMenu.bind(this);
   }
 
   componentDidMount() {
@@ -216,7 +219,7 @@ class Comment extends React.Component {
     }
   }
 
-  onDeleteStatement() {
+  onDeleteComment() {
     const { id, author, user, onDelete, onModeration } = this.props;
     // eslint-disable-next-line eqeqeq
     if (user.id == author.id) {
@@ -226,7 +229,7 @@ class Comment extends React.Component {
     } else {
       // TODO authorize
       onModeration({
-        statementId: id,
+        commentId: id,
         action: 'delete',
       });
     }
@@ -331,11 +334,10 @@ class Comment extends React.Component {
     this.props.onReply({ id: this.props.id });
     this.setState({ editing: false });
   }
-
-  renderHeader(actor, asInput) {
+  renderMenu(asInput) {
+    let menu;
     const hasMinimumInput = this.state.textArea.val.length >= 5;
 
-    let menu;
     if (asInput || this.state.editing) {
       menu = (
         <span>
@@ -401,7 +403,7 @@ class Comment extends React.Component {
       if (canDelete) {
         menuFields.push(
           <Button
-            onClick={this.onDeleteStatement}
+            onClick={this.onDeleteComment}
             plain
             label={<FormattedMessage {...messages.delete} />}
           />,
@@ -435,6 +437,12 @@ class Comment extends React.Component {
         </Menu>
       );
     }
+    return menu;
+  }
+
+  renderHeader(actor, asInput) {
+    const menu = this.props.preview ? null : this.renderMenu(asInput);
+
     return (
       <div className={s.header}>
         {/* eslint-disable jsx-a11y/interactive-supports-focus */}
@@ -471,6 +479,95 @@ class Comment extends React.Component {
     );
   }
 
+  renderFooter(user) {
+    const footer = [];
+    footer.push(
+      <button onClick={this.handleReply} className={s.command}>
+        <FormattedMessage {...messages.reply} />
+      </button>,
+    );
+    if (this.state.open && !this.state.editing) {
+      footer.push(
+        <div style={{ marginLeft: '3rem' }}>
+          <Comment
+            id={this.props.id}
+            parentId={this.props.parentId}
+            onCreate={this.props.onCreate}
+            user={user}
+            asInput
+            updates={this.props.updates || {}}
+          />
+        </div>,
+      );
+    }
+
+    if (this.props.numReplies) {
+      const expandLabel =
+        this.props.numReplies === 1 ? 'expandReply' : 'expandReplies';
+      const pending =
+        !this.props.children &&
+        this.props.updates &&
+        this.props.updates.pending;
+      footer.push(
+        <button
+          disabled={this.props.updates && this.props.updates.pending}
+          onClick={this.toggleReplies}
+          className={cn(s.more, s.command)}
+        >
+          <FormattedMessage
+            {...messages[
+              this.state.showReplies && this.props.children
+                ? 'collapseReplies'
+                : expandLabel
+            ]}
+            values={{ cnt: this.props.numReplies }}
+          />
+          {pending ? (
+            <svg
+              className={s.spinning}
+              viewBox="0 0 48 48"
+              version="1.1"
+              role="img"
+              aria-label="Spinning"
+            >
+              <circle
+                cx="24"
+                cy="24"
+                r="12"
+                stroke="#167ac6"
+                strokeWidth="3"
+                fill="none"
+              />
+            </svg>
+          ) : (
+            <svg
+              version="1.1"
+              viewBox="0 0 24 24"
+              width="24px"
+              height="24px"
+              role="img"
+              aria-label="form-down"
+            >
+              <polyline
+                fill="none"
+                stroke="#000"
+                strokeWidth="2"
+                points="18 9 12 15 6 9"
+                transform={
+                  this.state.showReplies ? 'matrix(1 0 0 -1 0 24)' : ''
+                }
+              />
+            </svg>
+          )}
+        </button>,
+      );
+    }
+    if (this.state.showReplies) {
+      footer.push(<div className={s.replies}>{this.props.children} </div>);
+    }
+    return footer;
+  }
+
   render() {
     //  const { mutationIsPending, mutationSuccess, mutationError } = this.props;
     // TODO create authorization decorator
@@ -487,7 +584,7 @@ class Comment extends React.Component {
 
     let header;
     const body = [];
-    const footer = [];
+    let footer;
     if (asInput) {
       header = this.renderHeader(user, asInput);
       body.push(
@@ -530,90 +627,7 @@ class Comment extends React.Component {
           />,
         );
       }
-      footer.push(
-        <button onClick={this.handleReply} className={s.command}>
-          <FormattedMessage {...messages.reply} />
-        </button>,
-      );
-      if (this.state.open && !this.state.editing) {
-        footer.push(
-          <div style={{ marginLeft: '3rem' }}>
-            <Comment
-              id={this.props.id}
-              parentId={this.props.parentId}
-              onCreate={this.props.onCreate}
-              user={user}
-              asInput
-              updates={this.props.updates || {}}
-            />
-          </div>,
-        );
-      }
-
-      if (this.props.numReplies) {
-        const expandLabel =
-          this.props.numReplies === 1 ? 'expandReply' : 'expandReplies';
-        const pending =
-          !this.props.children &&
-          this.props.updates &&
-          this.props.updates.pending;
-        footer.push(
-          <button
-            disabled={this.props.updates && this.props.updates.pending}
-            onClick={this.toggleReplies}
-            className={cn(s.more, s.command)}
-          >
-            <FormattedMessage
-              {...messages[
-                this.state.showReplies && this.props.children
-                  ? 'collapseReplies'
-                  : expandLabel
-              ]}
-              values={{ cnt: this.props.numReplies }}
-            />
-            {pending ? (
-              <svg
-                className={s.spinning}
-                viewBox="0 0 48 48"
-                version="1.1"
-                role="img"
-                aria-label="Spinning"
-              >
-                <circle
-                  cx="24"
-                  cy="24"
-                  r="12"
-                  stroke="#167ac6"
-                  strokeWidth="3"
-                  fill="none"
-                />
-              </svg>
-            ) : (
-              <svg
-                version="1.1"
-                viewBox="0 0 24 24"
-                width="24px"
-                height="24px"
-                role="img"
-                aria-label="form-down"
-              >
-                <polyline
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  points="18 9 12 15 6 9"
-                  transform={
-                    this.state.showReplies ? 'matrix(1 0 0 -1 0 24)' : ''
-                  }
-                />
-              </svg>
-            )}
-          </button>,
-        );
-      }
-      if (this.state.showReplies) {
-        footer.push(<div className={s.replies}>{this.props.children} </div>);
-      }
+      footer = this.props.preview ? null : this.renderFooter(user);
     }
     return (
       <div className={s.root}>

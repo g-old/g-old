@@ -156,10 +156,10 @@ class WorkTeamManagement extends React.Component {
   onSubmit(e) {
     // TODO checks
     e.preventDefault();
-    const { workTeam, user } = this.props;
+    const { id, workTeam, user } = this.props;
     const { coordinator } = this.state;
     // eslint-disable-next-line
-    if (user.id != this.props.coordinator.id) {
+    if (id && user.id != workTeam.coordinator.id) {
       return;
     }
     if (this.handleValidation(formFields)) {

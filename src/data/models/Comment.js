@@ -1,5 +1,6 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import EventManager from '../../core/EventManager';
 
 const MAX_CONTENT_LENGTH = 10000;
 class Comment {
@@ -53,7 +54,7 @@ class Comment {
     ) {
       return null;
     }
-
+    let workTeamId;
     const commentInDB = await knex.transaction(async trx => {
       const content = data.content.substring(0, MAX_CONTENT_LENGTH);
 
@@ -70,10 +71,12 @@ class Comment {
 
       comment = comment[0];
       if (comment) {
-        await knex('discussions')
+        [workTeamId] = await knex('discussions')
+          .where({ id: data.discussionId })
           .transacting(trx)
           .forUpdate()
-          .increment('num_comments', 1);
+          .increment('num_comments', 1)
+          .returning('work_team_id');
 
         if (comment.parent_id) {
           await knex('comments')
@@ -86,7 +89,16 @@ class Comment {
       return comment;
     });
 
-    return commentInDB ? new Comment(commentInDB) : null;
+    const comment = commentInDB ? new Comment(commentInDB) : null;
+    if (comment && workTeamId) {
+      EventManager.publish('onCommentCreated', {
+        viewer,
+        comment,
+        info: { workTeamId },
+      });
+    }
+
+    return comment;
   }
 
   static async update(viewer, data, { comments, discussions }) {

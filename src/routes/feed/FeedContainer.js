@@ -23,6 +23,7 @@ class FeedContainer extends React.Component {
     isFetching: PropTypes.bool.isRequired,
     loadFeed: PropTypes.func.isRequired,
     errorMessage: PropTypes.string,
+    locale: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
@@ -34,7 +35,7 @@ class FeedContainer extends React.Component {
   }
 
   render() {
-    const { activities, isFetching, errorMessage } = this.props;
+    const { activities, isFetching, errorMessage, locale } = this.props;
     if (isFetching && !activities.length) {
       return <p> Loading ... </p>;
     }
@@ -109,6 +110,7 @@ class FeedContainer extends React.Component {
               verb={activity.verb}
               content={activity.object}
               info={activity.info}
+              locale={locale}
             />
           );
         })}
@@ -121,6 +123,7 @@ const mapStateToProps = state => ({
   activities: getActivities(state, 'all'),
   isFetching: getFeedIsFetching(state, 'all'),
   errorMessage: getFeedErrorMessage(state, 'all'),
+  locale: state.intl.locale,
 });
 
 const mapDispatch = {

@@ -123,12 +123,9 @@ class Feed {
       return logs ? logs.reverse() : null;
     }
 
-    let aIds = await knex('system_feeds')
-      .where({ user_id: 1 })
-      .select('activity_ids');
-    let sIds = await knex('system_feeds')
-      .where({ user_id: 2 })
-      .select('activity_ids');
+    const aIds = await knex('system_feeds')
+      .where({ group_id: 1, type: 'GROUP' })
+      .select('main_activities', 'activities');
 
     // TODO check if join is better
     let fIds = await User.followees(viewer, viewer.id, loaders)
@@ -142,15 +139,33 @@ class Feed {
         ),
       )
       .then(data => data);
+    let workTeamMainIds = [];
+    if (viewer.wtMemberships.length) {
+      workTeamMainIds = await knex('system_feeds')
+        .where({ type: 'WT' })
+        .whereIn('group_id', viewer.wtMemberships)
+        .select('main_activities', 'activities');
+    }
     // TODO flatten arrays
     // fetch all activities
     fIds = fIds.reduce((acc, curr) => acc.concat(curr), []);
     fIds = fIds.reduce((acc, curr) => acc.concat(curr.activity_ids), []);
+    workTeamMainIds = workTeamMainIds.reduce(
+      (acc, curr) => acc.concat(curr.main_activities.concat(curr.activities)),
+      [],
+    );
+
     //  fIds = fIds[0].activity_ids,
-    aIds = aIds[0].activity_ids;
-    sIds = sIds[0].activity_ids;
     // deduplicate Ids
-    const allIds = [...new Set([...aIds, ...sIds, ...fIds])];
+
+    const allIds = [
+      ...new Set([
+        ...aIds[0].activities,
+        ...aIds[0].main_activities,
+        ...fIds,
+        ...workTeamMainIds,
+      ]),
+    ];
     const allActivities = await loadActivities(viewer, allIds, loaders);
     // process them
     // deduplicate

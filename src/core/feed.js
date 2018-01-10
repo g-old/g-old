@@ -8,6 +8,16 @@ import User from '../data/models/User';
 
 const maxFeedLength = 30;
 
+/*
+class FeedManager{
+  constructor(){
+    this.maxFeedLength = 30;
+  }
+  insertActivity({groupId, activityId}){
+
+  }
+}
+*/
 async function pushToLog(userId, activityId) {
   try {
     let userActivities = await knex('feeds')
@@ -41,9 +51,11 @@ async function pushToLog(userId, activityId) {
     return Promise.resolve();
   }
 }
+// TODO complete rewrite
 export async function insertIntoFeed({ viewer, data, verb }, mainFeed) {
   let result = null;
   let userId = 2;
+  let field = 'activities';
   try {
     const activity = await Activity.create(viewer, {
       verb,
@@ -57,19 +69,20 @@ export async function insertIntoFeed({ viewer, data, verb }, mainFeed) {
     if (mainFeed) {
       if (data.type === 'proposal') {
         userId = 1; // in systemfeed 1
+        field = 'main_activities';
       }
       let systemActivities = await knex('system_feeds')
-        .where({ user_id: userId })
-        .select('activity_ids');
-      systemActivities = systemActivities[0].activity_ids || [];
+        .where({ group_id: userId, type: 'GROUP' })
+        .select(field);
+      systemActivities = systemActivities[0][field] || [];
       while (systemActivities.length >= maxFeedLength) {
         systemActivities.shift();
       }
       systemActivities.push(activity.id);
       await knex('system_feeds')
-        .where({ user_id: userId })
+        .where({ group_id: userId, type: 'GROUP' })
         .update({
-          activity_ids: JSON.stringify(systemActivities),
+          [field]: JSON.stringify(systemActivities),
           updated_at: new Date(),
         });
 
@@ -77,28 +90,52 @@ export async function insertIntoFeed({ viewer, data, verb }, mainFeed) {
     }
     // insert also in own feed to for followers
     await pushToLog(viewer.id, activity.id);
-    /*  let userActivities = await knex('feeds')
-      .where({ user_id: viewer.id })
-      .select('activity_ids');
 
-    userActivities = userActivities[0];
-    if (!userActivities) {
-      await knex('feeds').insert({
-        user_id: viewer.id,
-        activity_ids: JSON.stringify([activity.id]),
-        created_at: new Date(),
-      });
-    } else {
-      userActivities = userActivities.activity_ids || [];
-      while (userActivities.length >= maxFeedLength) {
-        userActivities.shift();
-      }
-      userActivities.push(activity.id);
-      await knex('feeds').where({ user_id: viewer.id }).update({
-        activity_ids: JSON.stringify(userActivities),
+    result = activity.id; // or whole data?
+  } catch (err) {
+    log.error({ err, viewer, data, verb }, 'Insertion failed!');
+    return result;
+  }
+  return result;
+}
+
+export async function insertIntoWorkTeamFeeds(
+  { viewer, data, verb, type, groupId },
+  mainFeed,
+) {
+  let result = null;
+  const field = mainFeed ? 'main_activities' : 'activities';
+  try {
+    const activity = await Activity.create(viewer, {
+      verb,
+      type: data.type,
+      objectId: data.objectId,
+      content: data.content,
+    });
+    if (!activity) {
+      return result;
+    }
+
+    let [activityIds = []] = await knex('system_feeds')
+      .where({ group_id: groupId, type })
+      .select(field);
+    activityIds = activityIds[field];
+    while (activityIds.length >= maxFeedLength) {
+      activityIds.shift();
+    }
+    activityIds.push(activity.id);
+    await knex('system_feeds')
+      .where({ group_id: groupId, type })
+      .update({
+        [field]: JSON.stringify(activityIds),
         updated_at: new Date(),
       });
-    }*/
+
+    if (['comments', 'statements', 'votes'].includes(type)) {
+      // insert also in own feed to for followers
+      await pushToLog(viewer.id, activity.id);
+    }
+
     result = activity.id; // or whole data?
   } catch (err) {
     log.error({ err, viewer, data, verb }, 'Insertion failed!');
