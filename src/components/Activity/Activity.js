@@ -230,6 +230,7 @@ class Activity extends React.Component {
               )}
           />
         );
+
         result.header = (
           <div>
             {info.logo ? (
@@ -252,7 +253,7 @@ class Activity extends React.Component {
                 />
               </svg>
             )}
-            {[langSchema[this.props.locale]] || info.name || ':('}
+            {info[langSchema[this.props.locale]] || info.name || ':('}
           </div>
         );
         break;

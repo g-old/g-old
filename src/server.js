@@ -53,6 +53,7 @@ import PubSub from './core/pubsub';
 import responseTiming from './core/timing';
 import { Groups } from './organization';
 import EventManager from './core/EventManager';
+import './compositionRoot';
 
 const pubsub = new PubSub();
 

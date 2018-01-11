@@ -51,7 +51,11 @@ class Discussion {
     });
     const discussion = discussionInDB ? new Discussion(discussionInDB) : null;
     if (discussion) {
-      EventManager.publish('onDiscussionCreated', { viewer, discussion });
+      EventManager.publish('onDiscussionCreated', {
+        viewer,
+        discussion,
+        groupId: discussion.id,
+      });
     }
     return discussion;
   }

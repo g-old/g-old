@@ -94,6 +94,7 @@ class Comment {
       EventManager.publish('onCommentCreated', {
         viewer,
         comment,
+        groupId: workTeamId,
         info: { workTeamId },
       });
     }
