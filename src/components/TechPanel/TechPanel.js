@@ -7,85 +7,60 @@ import { loadStatistics } from '../../actions/statistics';
 import { getStatistics } from '../../reducers';
 import s from './TechPanel.css';
 
-const renderStats = stats =>
+const renderStats = stats => (
   <table className={s.tables}>
     <thead>
       <tr>
-        <th>
-          {'Resource'}
-        </th>
-        <th>
-          {'Average time'}
-        </th>
-        <th>
-          {'Median time'}
-        </th>
-        <th>
-          {'Requests'}
-        </th>
+        <th>{'Resource'}</th>
+        <th>{'Average time'}</th>
+        <th>{'Median time'}</th>
+        <th>{'Requests'}</th>
       </tr>
     </thead>
     <tbody>
       {stats &&
-        stats.map(t =>
-          <tr>
-            <td>
-              {t.resource}
-            </td>
-            <td>
-              {`${Math.round(t.avgTime * 10) / 10} ms`}
-            </td>
-            <td>
-              {`${Math.round(t.medianTime * 10) / 10} ms`}
-            </td>
-            <td>
-              {t.numRequests}
-            </td>
-          </tr>,
-        )}
+        stats.map(t => (
+          <tr key={t.id}>
+            <td>{t.resource}</td>
+            <td>{`${Math.round(t.avgTime * 10) / 10} ms`}</td>
+            <td>{`${Math.round(t.medianTime * 10) / 10} ms`}</td>
+            <td>{t.numRequests}</td>
+          </tr>
+        ))}
     </tbody>
-  </table>;
+  </table>
+);
 
-const renderTables = tables =>
+const renderTables = tables => (
   <table className={s.tables}>
     <thead>
       <tr>
-        <th>
-          {'Tablename'}
-        </th>
-        <th>
-          {'Index usage'}
-        </th>
-        <th>
-          {'Rows'}
-        </th>
+        <th>{'Tablename'}</th>
+        <th>{'Index usage'}</th>
+        <th>{'Rows'}</th>
       </tr>
     </thead>
     <tbody>
       {tables &&
-        tables.map(t =>
-          <tr>
-            <td>
-              {t.table}
-            </td>
-            <td>
-              {t.indexUsage}
-            </td>
-            <td>
-              {t.numRows}
-            </td>
-          </tr>,
-        )}
+        tables.map(t => (
+          <tr key={t.id}>
+            <td>{t.table}</td>
+            <td>{t.indexUsage}</td>
+            <td>{t.numRows}</td>
+          </tr>
+        ))}
     </tbody>
-  </table>;
+  </table>
+);
 
 const renderStatus = data =>
-  data &&
-  <div className={s.status}>
-    <span>{`Actual: ${data.usage}`}</span>
-    <span>{`Limit: ${data.limit}`}</span>
-    <span>{`Used: ${data.usedPercent} %`}</span>
-  </div>;
+  data && (
+    <div className={s.status}>
+      <span>{`Actual: ${data.usage}`}</span>
+      <span>{`Limit: ${data.limit}`}</span>
+      <span>{`Used: ${data.usedPercent} %`}</span>
+    </div>
+  );
 class TechPanel extends React.Component {
   static propTypes = {
     loadStatistics: PropTypes.func.isRequired,
@@ -117,12 +92,8 @@ class TechPanel extends React.Component {
       const { size, cacheHitRate, indexUsage } = statistics.db;
       dbInfo = (
         <div className={s.db}>
-          <span>
-            {`Size: ${size}`}
-          </span>
-          <span>
-            {`Cache Hit Rate: ${cacheHitRate.toFixed(2)}`}
-          </span>
+          <span>{`Size: ${size}`}</span>
+          <span>{`Cache Hit Rate: ${cacheHitRate.toFixed(2)}`}</span>
           {'Index Usage'}
           {renderTables(indexUsage)}
         </div>
@@ -135,12 +106,8 @@ class TechPanel extends React.Component {
 
       serverInfo = (
         <div className={s.db}>
-          <span>
-            {`CPUs: ${numCpus}`}
-          </span>
-          <span>
-            {`Uptime: ${Math.round(uptime / 3600 * 10) / 10} h`}
-          </span>
+          <span>{`CPUs: ${numCpus}`}</span>
+          <span>{`Uptime: ${Math.round(uptime / 3600 * 10) / 10} h`}</span>
           <span>
             {`Memory: ${Number(memory[1]) / 1024} FREE ${Number(memory[0]) /
               1024} TOTAL`}
@@ -170,7 +137,7 @@ class TechPanel extends React.Component {
         stats => stats.type === 'gQL',
       );
       const numReqs = statistics.performance.reduce(
-        // eslint-disable-next-line no-param-reassign
+        // eslint-disable-next-line
         (acc, curr) => (acc += curr.numRequests),
         0,
       );
@@ -194,34 +161,24 @@ class TechPanel extends React.Component {
     return (
       <div>
         <div>
-          <h3>
-            {'Usage'}
-          </h3>
+          <h3>{'Usage'}</h3>
           {statistics.usersOnline &&
             `User online in the last 24h: ${statistics.usersOnline}`}
         </div>
         <div>
-          <h3>
-            {'Performance Data - over last 24h'}
-          </h3>
+          <h3>{'Performance Data - over last 24h'}</h3>
           {performanceInfo}
         </div>
         <div>
-          <h3>
-            {'Server'}
-          </h3>
+          <h3>{'Server'}</h3>
           {serverInfo}
         </div>
         <div>
-          <h3>
-            {'Online Hosting (Imagestore - Cloudinary)'}
-          </h3>
+          <h3>{'Online Hosting (Imagestore - Cloudinary)'}</h3>
           {bucketInfo}
         </div>
         <div>
-          <h3>
-            {'Database'}
-          </h3>
+          <h3>{'Database'}</h3>
           {dbInfo}
         </div>
       </div>
