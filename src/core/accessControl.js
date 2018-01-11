@@ -21,10 +21,19 @@ export const Models = {
   DISCUSSION: 1024,
   COMMENT: 2048,
   REQUEST: 4096,
+  TAG: 8192,
 };
 
 /* GENERATOR_FN */
 /* eslint-disable no-unused-vars */
+function tagReadControl(viewer, data) {
+  console.error('Access control for Tag not implemented');
+  return true;
+}
+function tagWriteControl(viewer, data) {
+  console.error('Access control for Tag not implemented');
+  return true;
+}
 function requestReadControl(viewer, data) {
   console.error('Access control not implemented');
   return true;
@@ -288,6 +297,10 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
+  [Models.TAG]: {
+    [ATypes.WRITE]: tagWriteControl,
+    [ATypes.READ]: tagReadControl,
+  },
   [Models.REQUEST]: {
     [ATypes.WRITE]: requestWriteControl,
     [ATypes.READ]: requestReadControl,

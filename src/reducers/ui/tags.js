@@ -1,13 +1,13 @@
 import {
-  CREATE_REQUEST_START,
-  CREATE_REQUEST_SUCCESS,
-  CREATE_REQUEST_ERROR,
-  UPDATE_REQUEST_START,
-  UPDATE_REQUEST_ERROR,
-  UPDATE_REQUEST_SUCCESS,
-  DELETE_REQUEST_START,
-  DELETE_REQUEST_ERROR,
-  DELETE_REQUEST_SUCCESS,
+  CREATE_TAG_START,
+  CREATE_TAG_SUCCESS,
+  CREATE_TAG_ERROR,
+  UPDATE_TAG_START,
+  UPDATE_TAG_ERROR,
+  UPDATE_TAG_SUCCESS,
+  DELETE_TAG_START,
+  DELETE_TAG_ERROR,
+  DELETE_TAG_SUCCESS,
 } from '../../constants';
 
 // import { getErrors, getSuccessState } from '../../core/helpers';
@@ -19,11 +19,11 @@ const initState = {
     pending: false,
   },
 };
-const requests = (state = initState, action) => {
+const tags = (state = initState, action) => {
   switch (action.type) {
-    case CREATE_REQUEST_START:
-    case UPDATE_REQUEST_START:
-    case DELETE_REQUEST_START: {
+    case CREATE_TAG_START:
+    case UPDATE_TAG_START:
+    case DELETE_TAG_START: {
       return {
         ...state,
         mutation: {
@@ -34,9 +34,9 @@ const requests = (state = initState, action) => {
       };
     }
 
-    case CREATE_REQUEST_ERROR:
-    case UPDATE_REQUEST_ERROR:
-    case DELETE_REQUEST_ERROR: {
+    case CREATE_TAG_ERROR:
+    case UPDATE_TAG_ERROR:
+    case DELETE_TAG_ERROR: {
       return {
         ...state,
         mutation: {
@@ -47,9 +47,9 @@ const requests = (state = initState, action) => {
       };
     }
 
-    case CREATE_REQUEST_SUCCESS:
-    case UPDATE_REQUEST_SUCCESS:
-    case DELETE_REQUEST_SUCCESS: {
+    case CREATE_TAG_SUCCESS:
+    case UPDATE_TAG_SUCCESS:
+    case DELETE_TAG_SUCCESS: {
       return {
         ...state,
         mutation: {
@@ -64,6 +64,6 @@ const requests = (state = initState, action) => {
       return state;
   }
 };
-export default requests;
+export default tags;
 
 export const getStatus = state => state.mutation || {};

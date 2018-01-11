@@ -68,6 +68,9 @@ import updateRequest from './mutations/updateRequest';
 import deleteRequest from './mutations/deleteRequest';
 import requestConnection from './queries/requestConnection';
 import updateWorkTeam from './mutations/updateWorkTeam';
+import createTag from './mutations/createTag';
+import updateTag from './mutations/updateTag';
+import deleteTag from './mutations/deleteTag';
 /* GENERATOR */
 
 const schema = new Schema({
@@ -135,6 +138,9 @@ const schema = new Schema({
       updateRequest,
       deleteRequest,
       updateWorkTeam,
+      createTag,
+      updateTag,
+      deleteTag,
       /* GENERATOR_MUTATIONS */
     },
   }),

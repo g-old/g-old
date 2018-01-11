@@ -152,6 +152,10 @@ query{
   tags{
     id
     text
+    count
+    deName
+    itName
+    lldName
   }
 }
 `;
@@ -171,8 +175,8 @@ query ($state:String $first:Int, $after:String, $tagId:ID) {
         state
         body
         tags{
+          displayName
           id
-          text
           count
         }
         pollOne ${pollFieldsForList}
@@ -190,7 +194,7 @@ mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $ta
     ${proposal}
     tags{
       id
-      text
+      displayName
       count
     }
   }
@@ -203,7 +207,7 @@ mutation($id:ID  $poll:PollInput $state:ProposalState ){
     ${proposal}
     tags{
       id
-      text
+      displayName
       count
     }
   }

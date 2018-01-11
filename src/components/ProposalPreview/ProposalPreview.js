@@ -231,7 +231,7 @@ class ProposalPreview extends React.Component {
                         history.push(`/proposals/tagged/${tag.id}`)}
                       key={tag.id}
                       className={s.tag}
-                    >{`${tag.text}`}</span>
+                    >{`${tag.displayName}`}</span>
                   ))}
               </div>
             </div>

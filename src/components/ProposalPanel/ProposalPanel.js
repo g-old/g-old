@@ -7,6 +7,7 @@ import ProposalsManager from '../ProposalsManager';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
 import { loadTags, loadProposalsList } from '../../actions/proposal';
+import TagManager from '../TagManager';
 
 const messages = defineMessages({
   proposalInput: {
@@ -33,6 +34,11 @@ const messages = defineMessages({
     id: 'proposalManager.survey',
     defaultMessage: 'Survey',
     description: 'Survey presets',
+  },
+  tags: {
+    id: 'tags',
+    defaultMessage: 'Tags',
+    description: 'Tags',
   },
 });
 const defaultPollValues = {
@@ -109,6 +115,14 @@ class ProposalPanel extends React.Component {
               pollOptions={pollOptions}
               defaultPollValues={defaultPollValues}
             />
+          </AccordionPanel>
+          <AccordionPanel
+            heading={<FormattedMessage {...messages.tags} />}
+            onActive={() => {
+              this.props.loadTags();
+            }}
+          >
+            <TagManager />
           </AccordionPanel>
         </Accordion>
       </div>

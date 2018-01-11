@@ -119,6 +119,8 @@ export const getFeedErrorMessage = (state, filter) =>
 
 export const getTags = state => fromEntity.getTags(state.entities);
 
+export const getTagStatus = state => fromUi.getTagUpdates(state.ui);
+
 export const getTag = (state, id) => fromEntity.getTag(state.entities, id);
 
 export const getFolloweeVotesByPoll = (state, id) =>

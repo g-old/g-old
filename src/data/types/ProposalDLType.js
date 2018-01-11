@@ -12,6 +12,8 @@ import PollType from './PollDLType';
 import User from '../models/User';
 import UserType from './UserType';
 import Poll from '../models/Poll';
+import Tag from '../models/Tag';
+
 import knex from '../knex';
 
 const ProposalType = new ObjectType({
@@ -21,12 +23,12 @@ const ProposalType = new ObjectType({
       description: 'The proposals ID number',
       type: GraphQLInt,
     },
-  },*/
+  }, */
   fields: {
     id: { type: new NonNull(ID) },
     author: {
       type: UserType,
-      resolve: (parent, { id }, { viewer, loaders }) =>
+      resolve: (parent, args, { viewer, loaders }) =>
         User.gen(viewer, parent.author_id, loaders),
     },
 
@@ -38,28 +40,28 @@ const ProposalType = new ObjectType({
     },
     tags: {
       type: new GraphQLList(TagType),
-      resolve: (data, { id }, { loaders }) =>
+      resolve: (data, args, { loaders, viewer }) =>
         Promise.resolve(
           knex('proposal_tags')
             .where({ proposal_id: data.id })
             .pluck('tag_id')
-            .then(tagIds => tagIds.map(tId => loaders.tags.load(tId))),
+            .then(tagIds => tagIds.map(tId => Tag.gen(viewer, tId, loaders))),
         ),
     },
     pollOne: {
       type: PollType,
-      resolve: (parent, { id }, { viewer, loaders }) =>
+      resolve: (parent, args, { viewer, loaders }) =>
         Poll.gen(viewer, parent.pollOne_id, loaders),
     },
     pollTwo: {
       type: PollType,
-      resolve: (parent, { id }, { viewer, loaders }) =>
+      resolve: (parent, args, { viewer, loaders }) =>
         Poll.gen(viewer, parent.pollTwo_id, loaders),
     },
 
     spokesman: {
       type: UserType,
-      resolve: (parent, { id }, { viewer, loaders }) =>
+      resolve: (parent, args, { viewer, loaders }) =>
         User.gen(viewer, parent.spokesmanId, loaders),
     },
 
@@ -77,7 +79,7 @@ const ProposalType = new ObjectType({
 
     subscribed: {
       type: GraphQLBoolean,
-      resolve: async (parent, { id }, { viewer }) => {
+      resolve: async (parent, args, { viewer }) => {
         const count = await knex('proposal_user_subscriptions')
           .where({
             user_id: viewer.id,
@@ -89,7 +91,7 @@ const ProposalType = new ObjectType({
     },
     canVote: {
       type: GraphQLBoolean,
-      resolve: async (parent, { id }, { viewer }) => parent.isVotable(viewer),
+      resolve: async (parent, args, { viewer }) => parent.isVotable(viewer),
     },
   },
 });

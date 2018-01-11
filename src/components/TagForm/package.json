@@ -1,0 +1,6 @@
+{
+  "name": "TagForm",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./TagForm.js"
+}

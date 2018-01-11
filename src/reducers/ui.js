@@ -12,6 +12,7 @@ import comments, * as fromComment from './ui/comments';
 import requests, * as fromRequest from './ui/requests';
 import workTeams, * as fromWorkTeam from './ui/workTeams';
 import discussions, * as fromDiscussion from './ui/discussions';
+import tags, * as fromTag from './ui/tags';
 /* GENERATOR_IMPORTS */
 
 const uiReducer = combineReducers({
@@ -28,6 +29,7 @@ const uiReducer = combineReducers({
   comments,
   workTeams,
   discussions,
+  tags,
 });
 export default (state, action) => {
   if (action.type === SESSION_LOGOUT_SUCCESS) {
@@ -38,6 +40,7 @@ export default (state, action) => {
 };
 
 /* GENERATOR_EXPORTS */
+export const getTagUpdates = state => fromTag.getStatus(state.tags);
 export const getRequestUpdates = state => fromRequest.getStatus(state.requests);
 export const getWorkTeamUpdates = (state, id) =>
   fromWorkTeam.getStatus(state.workTeams, id);

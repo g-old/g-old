@@ -14,7 +14,7 @@ import ProposalListView from '../../components/ProposalListView';
 
 import FetchError from '../../components/FetchError';
 import Tag from '../../components/Tag';
-import Search from '../../components/Search';
+// import Search from '../../components/Search';
 import history from '../../history';
 
 class ProposalContainer extends React.Component {
@@ -32,8 +32,8 @@ class ProposalContainer extends React.Component {
       hasNextPage: PropTypes.bool,
     }).isRequired,
     tag: PropTypes.shape({ text: PropTypes.string }).isRequired,
-    tags: PropTypes.arrayOf(PropTypes.shape({ text: PropTypes.string }))
-      .isRequired,
+    /* tags: PropTypes.arrayOf(PropTypes.shape({ displayName: PropTypes.string }))
+      .isRequired, */
     tagId: PropTypes.string.isRequired,
   };
   isReady() {
@@ -51,7 +51,7 @@ class ProposalContainer extends React.Component {
       isFetching,
       errorMessage,
       tag,
-      tags,
+      // tags,
       tagId,
     } = this.props;
     if (isFetching && !proposals.length) {
@@ -80,13 +80,13 @@ class ProposalContainer extends React.Component {
     return (
       <div>
         <h1> Tagged proposals</h1>
-        <Search
+        {/* <Search
           value={tag.text}
-          suggestions={tags && tags.map(t => t.text)}
+          suggestions={tags && tags.map(t => t.displayName)}
           onSelect={() => alert('TO IMPLEMENT')}
-        />
+        /> */}
         <div style={{ display: 'flex', fontSize: '0.8em', paddingTop: '1em' }}>
-          <Tag text={`${tag.text} (${tag.count})`} />
+          <Tag text={`${tag.displayName} (${tag.count})`} />
         </div>
         <ProposalListView
           proposals={proposals}

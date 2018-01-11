@@ -1,10 +1,23 @@
-import { GraphQLID as ID, GraphQLInputObjectType, GraphQLString } from 'graphql';
+import {
+  GraphQLID as ID,
+  GraphQLInputObjectType,
+  GraphQLString,
+} from 'graphql';
 
 const TagInputType = new GraphQLInputObjectType({
   name: 'TagInput',
 
   fields: {
     text: {
+      type: GraphQLString,
+    },
+    deName: {
+      type: GraphQLString,
+    },
+    itName: {
+      type: GraphQLString,
+    },
+    lldName: {
       type: GraphQLString,
     },
     id: {
