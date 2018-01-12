@@ -1,0 +1,17 @@
+{{#extend "layout"}}
+
+  {{#content "main"}}
+    <p>
+      <strong>{{ `Hello ${name}!}}</strong>
+    </p>
+    <p>
+      {{ "Thank you for signing up. If you have any questions please don't hesitate to contact our support team at"}}
+      <a href="{{link}}">Verify me</a>.
+    </p>
+    <p>
+      <strong>{{ "Best regards,"}}</strong><br>
+      Company Name
+    </p>
+  {{/content}}
+
+{{/extend}}
