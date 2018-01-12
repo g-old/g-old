@@ -41,13 +41,19 @@ class Tag {
   static async update(viewer, data) {
     if (!data || !data.id) return null;
     if (!canMutate(viewer, data, Models.TAG)) return null;
-
-    const newData = {
-      ...(data.text && { text: data.text }),
-      ...(data.deName && { de_name: data.deName }),
-      ...(data.itName && { it_name: data.itName }),
-      ...(data.lldName && { lld_name: data.lldName }),
-    };
+    const newData = {};
+    if ('text' in data) {
+      newData.text = data.text;
+    }
+    if ('deName' in data) {
+      newData.de_name = data.deName;
+    }
+    if ('itName' in data) {
+      newData.it_name = data.itName;
+    }
+    if ('lldName' in data) {
+      newData.lld_name = data.lldName;
+    }
 
     const updatedTag = await knex.transaction(async trx => {
       const [tag = null] = await knex('tags')
@@ -66,15 +72,21 @@ class Tag {
   static async delete(viewer, data) {
     if (!data || !data.id) return null;
     if (!canMutate(viewer, data, Models.TAG)) return null;
-    const deletedTag = await knex.transaction(async trx => {
+    await knex.transaction(async trx => {
       await knex('tags')
         .where({ id: data.id })
         .transacting(trx)
         .forUpdate()
         .del();
+
+      await knex('proposal_tags')
+        .where({ tag_id: data.id })
+        .transacting(trx)
+        .forUpdate()
+        .del();
     });
 
-    return deletedTag ? new Tag(deletedTag) : null;
+    return new Tag({ id: data.id });
   }
 }
 

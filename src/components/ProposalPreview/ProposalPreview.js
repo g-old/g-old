@@ -195,7 +195,6 @@ class ProposalPreview extends React.Component {
       }
       default:
     }
-
     return (
       <div className={s.root}>
         <div className={s.container}>
@@ -225,14 +224,17 @@ class ProposalPreview extends React.Component {
               {/* eslint-disable jsx-a11y/no-static-element-interactions */}
               <div className={s.tags}>
                 {this.props.proposal.tags &&
-                  this.props.proposal.tags.map(tag => (
-                    <span
-                      onClick={() =>
-                        history.push(`/proposals/tagged/${tag.id}`)}
-                      key={tag.id}
-                      className={s.tag}
-                    >{`${tag.displayName}`}</span>
-                  ))}
+                  this.props.proposal.tags.map(
+                    tag =>
+                      tag && (
+                        <span
+                          onClick={() =>
+                            history.push(`/proposals/tagged/${tag.id}`)}
+                          key={tag.id}
+                          className={s.tag}
+                        >{`${tag.displayName}`}</span>
+                      ),
+                  )}
               </div>
             </div>
           </div>

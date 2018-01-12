@@ -95,34 +95,36 @@ class Layer extends React.Component {
   }
 
   handleAriaHidden(hideOverlay) {
-    const hidden = hideOverlay || false;
-    const apps = document.querySelectorAll('#app');
-    const visibleLayers = document.querySelectorAll(
-      `.${s.layer}:not(.${s.hidden})`,
-    );
+    setTimeout(() => {
+      const hidden = hideOverlay || false;
+      const apps = document.querySelectorAll('#app');
+      const visibleLayers = document.querySelectorAll(
+        `.${s.layer}:not(.${s.hidden})`,
+      );
 
-    if (apps) {
-      /* eslint-disable no-param-reassign */
-      Array.prototype.slice.call(apps).forEach(app => {
-        if (hidden && visibleLayers.length === 0) {
-          // make sure to only show grommet apps if there is no other layer
-          app.setAttribute('aria-hidden', false);
-          app.classList.remove(s.hidden);
-          // scroll body content to the original position
-          app.style.top = `-${this.originalScrollPosition.top}px`;
-          app.style.left = `-${this.originalScrollPosition.left}px`;
-        } else {
-          app.setAttribute('aria-hidden', true);
-          app.classList.add(s.hidden);
-          // this must be null to work
-          app.style.top = null;
-          app.style.left = null;
-          //  app.style.top = `-${this.originalScrollPosition.top}px`;
-          //  app.style.left = `-${this.originalScrollPosition.left}px`;
-        }
-      }, this);
-      /* eslint-enable no-param-reassign */
-    }
+      if (apps) {
+        /* eslint-disable no-param-reassign */
+        Array.prototype.slice.call(apps).forEach(app => {
+          if (hidden && visibleLayers.length === 0) {
+            // make sure to only show grommet apps if there is no other layer
+            app.setAttribute('aria-hidden', false);
+            app.classList.remove(s.hidden);
+            // scroll body content to the original position
+            app.style.top = `-${this.originalScrollPosition.top}px`;
+            app.style.left = `-${this.originalScrollPosition.left}px`;
+          } else {
+            app.setAttribute('aria-hidden', true);
+            app.classList.add(s.hidden);
+            // this must be null to work
+            app.style.top = null;
+            app.style.left = null;
+            //  app.style.top = `-${this.originalScrollPosition.top}px`;
+            //  app.style.left = `-${this.originalScrollPosition.left}px`;
+          }
+        }, this);
+        /* eslint-enable no-param-reassign */
+      }
+    }, 0);
   }
 
   renderLayer() {

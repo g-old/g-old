@@ -293,15 +293,23 @@ class WorkTeam {
   static async update(viewer, data, loaders) {
     if (!data || !data.id) return null;
     if (!canMutate(viewer, data, Models.WORKTEAM)) return null;
-    const newData = {
-      ...(data.name && { name: data.name }),
-      ...(data.deName && { de_name: data.deName }),
-      ...(data.itName && { it_name: data.itName }),
-      ...(data.lldName && { lld_name: data.lldName }),
-      ...(typeof data.restricted === 'boolean' && {
-        restricted: data.restricted,
-      }),
-    };
+    const newData = {};
+
+    if ('name' in data) {
+      newData.name = data.name;
+    }
+    if ('deName' in data) {
+      newData.de_name = data.deName;
+    }
+    if ('itName' in data) {
+      newData.it_name = data.itName;
+    }
+    if ('lldName' in data) {
+      newData.lld_name = data.lldName;
+    }
+    if ('restricted' in data) {
+      newData.restricted = data.restricted;
+    }
     if (data.logo || data.logoAssetId) {
       throw new Error('Not implemented yet: LOGO');
     }

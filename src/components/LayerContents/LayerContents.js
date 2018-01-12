@@ -10,10 +10,15 @@ class LayerContents extends React.Component {
     intl: PropTypes.shape({}).isRequired,
     insertCss: PropTypes.func.isRequired,
     store: PropTypes.func.isRequired,
+    overlayClose: PropTypes.bool,
+  };
+  static defaultProps = {
+    overlayClose: null,
   };
   constructor(props, context) {
     super(props, context);
     this.state = {};
+    this.onClickOverlay = this.onClickOverlay.bind(this);
   }
   getChildContext() {
     return {
@@ -22,12 +27,32 @@ class LayerContents extends React.Component {
       store: this.props.store,
     };
   }
+  componentDidMount() {
+    if (this.props.onClose && this.props.overlayClose) {
+      const layerParent = this.containerRef.parentNode;
+      layerParent.addEventListener('click', this.onClickOverlay);
+    }
+  }
+
+  onClickOverlay(event) {
+    const { dropActive } = this.state;
+    if (!dropActive) {
+      const { onClose } = this.props;
+      const layerContents = this.containerRef;
+
+      if (layerContents && !layerContents.contains(event.target)) {
+        onClose();
+      }
+    }
+  }
+
   render() {
     const { onClose, children, className } = this.props;
     let closeNode = null;
     if (onClose) {
       closeNode = (
         <div
+          ref={ref => (this.containerRef = ref)} // eslint-disable-line
           style={{
             position: 'absolute',
             top: 0,

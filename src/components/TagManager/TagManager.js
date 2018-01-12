@@ -7,12 +7,17 @@ import Button from '../Button';
 import Box from '../Box';
 import TagForm from '../TagForm';
 import TagTable from '../TagTable';
+import ConfirmLayer from '../ConfirmLayer';
 
 class TagManager extends React.Component {
   static propTypes = {
-    tagUpdates: PropTypes.shape({}),
+    tagUpdates: PropTypes.shape({
+      success: PropTypes.bool,
+      pending: PropTypes.bool,
+    }),
     updateTag: PropTypes.func.isRequired,
     createTag: PropTypes.func.isRequired,
+    deleteTag: PropTypes.func.isRequired,
     tags: PropTypes.arrayOf(PropTypes.shape({})),
   };
   static defaultProps = {
@@ -25,17 +30,35 @@ class TagManager extends React.Component {
     this.onTagClick = this.onTagClick.bind(this);
     this.onCancelClick = this.onCancelClick.bind(this);
     this.onCreateTagClick = this.onCreateTagClick.bind(this);
+    this.onDeleteClick = this.onDeleteClick.bind(this);
+    this.onLayerClose = this.onLayerClose.bind(this);
+    this.onDelete = this.onDelete.bind(this);
   }
 
   onTagClick(action, data) {
-    this.setState({ showTag: true, currentTag: data });
+    if (action === 'DELETE') {
+      this.onDeleteClick(data);
+    } else {
+      this.setState({ showTag: true, currentTag: data });
+    }
   }
   onCancelClick() {
     this.setState({ showTag: false });
   }
 
+  onDeleteClick(data) {
+    this.setState({ showLayer: true, currentTag: data });
+  }
+
   onCreateTagClick() {
     this.setState({ showTag: true, currentTag: {} });
+  }
+
+  onLayerClose() {
+    this.setState({ showLayer: false, showTag: false });
+  }
+  onDelete() {
+    this.props.deleteTag({ id: this.state.currentTag.id });
   }
 
   render() {
@@ -50,8 +73,17 @@ class TagManager extends React.Component {
         />
       );
     }
+
     return (
       <Box column>
+        {this.state.showLayer && (
+          <ConfirmLayer
+            success={this.props.tagUpdates.success}
+            pending={this.props.tagUpdates.pending}
+            onSubmit={this.onDelete}
+            onClose={this.onLayerClose}
+          />
+        )}
         <Button icon={'+'} label={'Add Tag'} onClick={this.onCreateTagClick} />
         <TagTable
           onClickCheckbox={this.onClickCheckbox}

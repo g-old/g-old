@@ -447,6 +447,7 @@
       "src/components/ProposalDetails/ProposalDetails.js",
       "src/components/ProposalInput/ProposalInput.js",
       "src/components/SignUp/SignUp.js",
+      "src/components/TagForm/TagForm.js",
       "src/components/UserSettings/UserSettings.js",
       "src/components/WorkTeamForm/WorkTeamForm.js",
       "src/components/WorkTeamInput/WorkTeamInput.js",
@@ -834,6 +835,7 @@
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/ProposalInput/ProposalInput.js",
+      "src/components/TagForm/TagForm.js",
       "src/components/WorkTeamForm/WorkTeamForm.js",
       "src/components/WorkTeamInput/WorkTeamInput.js",
       "src/components/WorkTeamManager/WorkTeamManager.js"
@@ -1140,5 +1142,12 @@
     "defaultMessage": "Leave",
     "message": "",
     "files": ["src/components/WorkTeam/WorkTeam.js"]
+  },
+  {
+    "id": "tags",
+    "description": "Tags",
+    "defaultMessage": "Tags",
+    "message": "",
+    "files": ["src/components/ProposalPanel/ProposalPanel.js"]
   }
 ]
