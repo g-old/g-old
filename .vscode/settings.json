@@ -1,5 +1,17 @@
 {
   "editor.formatOnPaste": true,
   "editor.minimap.enabled": true,
-  "editor.snippetSuggestions": "top"
+  "editor.snippetSuggestions": "top",
+  "editor.formatOnSave": true,
+  "flow.useNPMPackagedFlow": true,
+  "javascript.format.enable": false,
+  "javascript.validate.enable": false,
+  "vsicons.presets.angular": false,
+  "search.exclude": {
+    "**/.idea": true,
+    "**/build": true,
+    "**/node_modules": true,
+    "**/yarn-error.log": true,
+    "**/yarn.lock": true
+  }
 }

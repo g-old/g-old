@@ -17,6 +17,7 @@ import createLaunchEditorMiddleware from 'react-error-overlay/middleware';
 import webpackConfig from './webpack.config';
 import run, { format } from './run';
 import clean from './clean';
+import compileEmails from './compileEmails';
 
 const isDebug = !process.argv.includes('--release');
 
@@ -131,6 +132,8 @@ async function start() {
 
   // Configure compilation
   await run(clean);
+  await run(compileEmails);
+
   const multiCompiler = webpack(webpackConfig);
   const clientCompiler = multiCompiler.compilers.find(
     compiler => compiler.name === 'client',

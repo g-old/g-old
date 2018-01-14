@@ -37,8 +37,8 @@ class MailService {
       errors.push('Only one message allowed!');
       return errors;
     }
-    if ('content' in message) {
-      if (!this.validateContent(message.content)) {
+    if ('html' in message || 'text' in message) {
+      if (!this.validateContent(message.html || message.text)) {
         errors.push(`Content is invalid!`);
       }
     } else {
@@ -68,12 +68,16 @@ class MailService {
     if (notOkay) {
       return { success: false, errors: notOkay };
     }
+    let content = 'text';
+    if (message.html) {
+      content = 'html';
+    }
     try {
       await this.send({
         from: message.sender || this.DEFAULT_SENDER,
         to: message.recipient,
         subject: message.subject || '',
-        text: message.content,
+        [content]: message[content],
       });
     } catch (err) {
       const errorMessage = 'Email sending failed';

@@ -53,7 +53,7 @@ import PubSub from './core/pubsub';
 import responseTiming from './core/timing';
 import { Groups } from './organization';
 import EventManager from './core/EventManager';
-import './compositionRoot';
+import root from './compositionRoot';
 
 const pubsub = new PubSub();
 
@@ -148,6 +148,64 @@ app.use(passport.session());
 // if (__DEV__) {
 app.enable('trust proxy');
 // }
+
+if (__DEV__) {
+  // A route for testing email templates
+  app.get('/:email(email|emails)/:template', (req, res) => {
+    let message;
+    switch (req.params.template) {
+      case 'welcome': {
+        message = root.MailComposer.getWelcomeMail(
+          req.user,
+          'a link',
+          req.language,
+        );
+
+        break;
+      }
+      case 'resetRequest': {
+        message = root.MailComposer.getResetRequestMail(
+          req.user,
+          'a link',
+          req.language,
+        );
+
+        break;
+      }
+      case 'emailVerification': {
+        message = root.MailComposer.getEmailVerificationMail(
+          req.user,
+          'a link',
+          req.language,
+        );
+
+        break;
+      }
+      case 'resetNotification': {
+        message = root.MailComposer.getResetNotificationMail(
+          req.user,
+          req.language,
+        );
+
+        break;
+      }
+      case 'message': {
+        message = root.MailComposer.getMessageMail(
+          req.user,
+          { content: 'This is a message' },
+          req.user,
+          req.language,
+        );
+
+        break;
+      }
+      default: {
+        message = { html: '<h1>No template found</h1>' };
+      }
+    }
+    res.send(message.html);
+  });
+}
 
 app.post(
   '/',

@@ -1,62 +1,87 @@
 import path from 'path';
 import fs from 'fs';
+import Module from 'module';
 import { throwIfMissing } from './utils';
+import translations from '../emails/translations.json';
 
 // taken from https://github.com/kriasoft/nodejs-api-starter/blob/master/src/email.js
+function loadTemplate(filename, renderer) {
+  const m = new Module(filename);
+  // eslint-disable-next-line no-underscore-dangle
+  m._compile(fs.readFileSync(filename, 'utf8'), filename);
+  return renderer.template(m.exports);
+}
 
 class MailComposer {
   constructor(
     renderEngine = throwIfMissing('Template render engine'),
-    cssInliner = throwIfMissing('Css Inliner '),
+    templateDir,
   ) {
     this.templates = new Map();
-    this.baseDir = path.resolve(__dirname, '../emails');
+    this.baseDir = path.resolve(__dirname, templateDir || '../build/emails');
     this.renderer = renderEngine;
-    this.css = cssInliner;
+    this.translations = MailComposer.loadTranslations();
+    this.getWelcomeMail = this.getWelcomeMail.bind(this);
+
+    this.renderer.registerHelper('t', (key, options) =>
+      options.data.root.t(key),
+    );
   }
-  getWelcomeMail(user, link) {
+
+  static loadTranslations() {
+    return translations;
+  }
+  getWelcomeMail(user, link, locale = 'de-DE') {
     return this.render('welcome', {
       name: user.name,
       link,
+      t: key => this.translations[key][locale],
     });
   }
-  compileEmail(filename) {
-    fs.readdirSync('src/emails').forEach(file => {
-      if (file.endsWith('.hbs')) {
-        const partial = fs
-          .readFileSync(`src/emails/${file}`, 'utf8')
-          .replace(/{{/g, '\\{{')
-          .replace(/\\{{(#block|\/block)/g, '{{$1');
-        this.renderer.registerPartial(file.substr(0, file.length - 4), partial);
-      }
+  getResetRequestMail(user, link, locale = 'de-DE') {
+    return this.render('resetRequest', {
+      name: user.name,
+      link,
+      t: key => this.translations[key][locale],
     });
-    const template = fs
-      .readFileSync(filename, 'utf8')
-      .replace(/{{/g, '\\{{')
-      .replace(/\\{{(#extend|\/extend|#content|\/content)/g, '{{$1');
-    return this.renderer.precompile(
-      this.css(this.renderer.compile(template)({})),
-    );
   }
-  /*
-  getEmailVerificationLink(link, locale, html) {}
 
-  getVerifyEmailMail(user) {}
-  */
-  loadTemplate(filename) {
-    const m = new module.constructor();
-    //  console.log('M', m);
-    // eslint-disable-next-line no-underscore-dangle
-    m._compile(fs.readFileSync(filename, 'utf8'), filename);
-    return this.renderer.template(m.exports);
+  getEmailVerificationMail(user, link, locale = 'de-DE') {
+    return this.render('emailVerification', {
+      name: user.name,
+      link,
+      t: key => this.translations[key][locale],
+    });
+  }
+
+  getResetNotificationMail(user, locale = 'de-DE') {
+    return this.render('resetNotification', {
+      name: user.name,
+      t: key => this.translations[key][locale],
+    });
+  }
+  getMessageMail(user, message, sender, locale = 'de-DE') {
+    return this.render('message', {
+      name: user.name,
+      sender: `${sender.name} ${sender.surname}`,
+      ...(message.subject && { subject: message.subject }),
+      message: message.content,
+      t: key => this.translations[key][locale],
+    });
   }
 
   loadAllTemplates() {
     fs.readdirSync(this.baseDir).forEach(template => {
       if (fs.statSync(`${this.baseDir}/${template}`).isDirectory()) {
         this.templates.set(template, {
-          subject: this.loadTemplate(`${this.baseDir}/${template}/subject.hbs`),
-          html: this.loadTemplate(`${this.baseDir}/${template}/html.hbs`),
+          subject: loadTemplate(
+            `${this.baseDir}/${template}/subject.js`,
+            this.renderer,
+          ),
+          html: loadTemplate(
+            `${this.baseDir}/${template}/html.js`,
+            this.renderer,
+          ),
         });
       }
     });

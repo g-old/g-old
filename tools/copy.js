@@ -47,6 +47,10 @@ async function copy() {
   ]);
 
   await copyFile('src/knexfile.js', 'build/db/knexfile.js');
+  await copyFile(
+    'src/emails/translations.json',
+    'build/emails/translations.json',
+  );
 
   if (process.argv.includes('--watch')) {
     const watcher = chokidar.watch(['src/messages/**/*', 'public/**/*'], {
