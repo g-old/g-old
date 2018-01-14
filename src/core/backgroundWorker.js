@@ -1,81 +1,11 @@
 import knex from '../data/knex';
 import webPush from '../webPush';
 import log from '../logger';
-import { createToken } from './tokens';
-import {
-  emailVerificationMail,
-  emailChangedMail,
-  resetLinkMail,
-  resetSuccessMail,
-  notificationMail,
-} from './mailer';
-import Mailer from '../email';
 import Proposal from '../data/models/Proposal';
 import { circularFeedNotification } from './feed';
 import createLoaders from '../data/dataLoader';
-
-const mailWithToken = async ({
-  address,
-  viewer,
-  connection,
-  template,
-  type,
-  lang,
-  ...options
-}) => {
-  const result = false;
-  try {
-    let token = null;
-    switch (type) {
-      case 'reset': {
-        token = await createToken({
-          email: address,
-          table: 'reset_tokens',
-          hoursValid: 2,
-        });
-        break;
-      }
-      case 'verify': {
-        token = await createToken({
-          email: address,
-          table: 'verify_tokens',
-          hoursValid: 48,
-          withEmail: true,
-        });
-        break;
-      }
-
-      default: {
-        throw Error(`Token type not recognized: ${type}`);
-      }
-    }
-
-    if (token) {
-      const mail = template(address, connection, token, viewer.name, lang);
-
-      return Mailer.send({ ...mail, ...options }).catch(err => {
-        log.error({ err }, 'Sendgrid failed');
-      });
-    }
-    throw Error('Token generation failed');
-  } catch (err) {
-    log.error({ err }, 'Sending token email failed');
-  }
-  return result;
-};
-
-const mailNotification = async mailData => {
-  try {
-    const { viewer, template, ...data } = mailData;
-    const mail = template({ ...data, name: viewer.name });
-    return Mailer.send({ ...mail, ...data }).catch(err => {
-      log.error({ err }, 'Sendgrid failed');
-    });
-  } catch (err) {
-    log.error({ err }, 'Sending email failed');
-  }
-  return null;
-};
+import root from '../compositionRoot';
+import { TransportTypes } from './MessageService';
 
 const handleNotifications = async (viewer, notificationData, receiver) =>
   circularFeedNotification({
@@ -86,41 +16,54 @@ const handleNotifications = async (viewer, notificationData, receiver) =>
     loaders: createLoaders(),
   });
 
-const handleMails = mailData => {
+const handleMails = async mailData => {
   let result = null;
+  // return;
   switch (mailData.mailType) {
     case 'verifyEmail': {
-      result = mailWithToken({
-        ...mailData,
-        template: emailVerificationMail,
-        type: 'verify',
-      });
+      result = await root.MessageService.sendWelcomeMessage(
+        mailData.viewer,
+        TransportTypes.EMAIL,
+        mailData.lang,
+      );
+
       break;
     }
     case 'mailChanged': {
-      result = mailWithToken({
-        ...mailData,
-        template: emailChangedMail,
-        type: 'verify',
-      });
+      result = await root.MessageService.sendVerificationMessage(
+        mailData.viewer,
+        TransportTypes.EMAIL,
+        mailData.lang,
+      );
       break;
     }
     case 'resetPassword': {
-      result = mailWithToken({
-        ...mailData,
-        template: resetLinkMail,
-        type: 'reset',
-      });
+      result = await root.MessageService.sendResetRequestMessage(
+        mailData.viewer,
+        TransportTypes.EMAIL,
+        mailData.lang,
+      );
+
       break;
     }
 
     case 'resetSuccess': {
-      result = mailNotification({ ...mailData, template: resetSuccessMail });
+      result = await root.MessageService.sendResetNotificationMessage(
+        mailData.viewer,
+        TransportTypes.EMAIL,
+        mailData.lang,
+      );
       break;
     }
 
     case 'notification': {
-      result = mailNotification({ ...mailData, template: notificationMail });
+      result = await root.MessageService.sendMessage(
+        mailData.recipient,
+        { content: mailData.message, subject: mailData.subject },
+        mailData.viewer,
+        TransportTypes.EMAIL,
+      );
+
       break;
     }
     default: {
@@ -254,7 +197,6 @@ async function handleMessages(data) {
         log.info('Starting mail');
         const mailData = data.data;
         result = await handleMails(mailData);
-        // console.log('MAIL RES', result);
         break;
       }
 

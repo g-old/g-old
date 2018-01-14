@@ -35,7 +35,7 @@ const sendNotification = {
             mailType: 'notification',
             message: msg.msg,
             subject: notification.subject || 'Info from GOLD',
-            address: receiver.email,
+            recipient: receiver,
             viewer,
           },
         };

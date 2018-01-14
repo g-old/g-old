@@ -19,6 +19,10 @@ const mockMailComposer = () => ({
     html: 'mockHtml',
   }),
   getMessageMail: () => ({ subject: 'mockSubject', html: 'mockHtml' }),
+  getEmailVerificationMail: () => ({
+    subject: 'mockSubject',
+    html: 'mockHtml',
+  }),
 });
 const mockTokenService = () => ({
   createAndStoreEmailToken: async () => 'mock-verify-token',
@@ -70,7 +74,18 @@ describe('MessageService', () => {
     expect(result.success).toBe(true);
   });
 
-  it.only('Should sent message mail', async () => {
+  it('Should verification mail', async () => {
+    const messageService = initMessageService();
+    const user = createTestUser();
+    const result = await messageService.sendVerificationMessage(
+      user,
+      TransportTypes.EMAIL,
+      'de-DE',
+    );
+    expect(result.success).toBe(true);
+  });
+
+  it('Should sent message mail', async () => {
     const messageService = initMessageService();
     const user = createTestUser();
     const sender = createTestUser();

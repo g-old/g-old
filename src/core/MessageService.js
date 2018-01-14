@@ -140,6 +140,46 @@ class MessageService {
       return { success: false, errors: [err.message] };
     }
   }
+  async sendVerificationMessage(user, transportTypes = [], locale) {
+    const types = this.getTransportTypes(transportTypes);
+    try {
+      const promises = types.map(async type => {
+        switch (type) {
+          case TransportTypes.EMAIL: {
+            if (!user.email) {
+              throw new Error('Email address needed');
+            }
+
+            const token = await this.tokens.createAndStoreEmailToken(
+              user.email,
+            );
+            const link = this.createVerificationLink(token);
+            const personalizedMail = this.mailComposer.getEmailVerificationMail(
+              user,
+              link,
+              locale,
+            );
+            const finalMessage = MessageService.createHTMLMessage(
+              personalizedMail,
+              user.email,
+            );
+            return this.send(finalMessage, user.email, type);
+          }
+          case TransportTypes.DATABASE: {
+            throw new Error('To implement');
+          }
+
+          default:
+            throw new Error('Type not recognizes');
+        }
+      });
+      const results = await Promise.all(promises);
+      return MessageService.combineResults(results);
+    } catch (err) {
+      log.error({ err, user }, 'Verification mail error');
+      return { success: false, errors: [err.message] };
+    }
+  }
   async sendResetRequestMessage(user, transportTypes = [], locale) {
     const types = this.getTransportTypes(transportTypes);
     try {

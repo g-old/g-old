@@ -53,12 +53,12 @@ describe('Mail composer', () => {
     const composer = new MailComposer(handlebars, templateDir);
     const testName = 'name';
     const testSender = createTestUser();
-    const testMessage = 'test-message';
+    const testMessage = { content: 'test-message' };
     const result = composer.getMessageMail(
       { name: testName },
       testMessage,
       testSender,
     );
-    expect(result.html).toContain(testMessage);
+    expect(result.html).toContain(testMessage.content);
   });
 });

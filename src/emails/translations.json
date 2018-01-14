@@ -1,59 +1,88 @@
 {
-  "greeting": { "de-DE": "Hallo", "it-IT": "Ciao" },
+  "greeting": { "de-DE": "Hallo", "it-IT": "Ciao", "lld-IT": "" },
   "signup": {
     "de-DE":
       " Wir freuen uns sehr, Sie  hier auf unserer Plattform G-old begrüßen zu dürfen!",
-    "it-IT": ""
+    "it-IT": "",
+    "lld-IT": ""
   },
   "explainConfirmation": {
     "de-DE":
       "Jetzt müssen Sie nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
-    "it-IT": ""
+    "it-IT": "",
+    "lld-IT": ""
   },
   "ctAConfirmation": {
     "de-DE": "Bitte klicken Sie dazu auf den folgenden Knopf",
-    "it-IT": ""
+    "it-IT": "",
+    "lld-IT": ""
   },
   "clickLink": { "de-DE": "Email-Adresse bestätigen", "it-IT": "" },
   "bestRegards": { "de-DE": "Viele Grüße!", "it-IT": "" },
-  "G-old password reset requested": { "de-DE": "G-old Passwortänderung" },
+  "G-old password reset requested": {
+    "de-DE": "G-old Passwortänderung",
+    "it-IT": "",
+    "lld-IT": ""
+  },
   "resetRequest": {
     "de-DE":
-      "Wir schicken Ihnen diese Email, da Sie (oder jemand anderes) das Passwort für ihr Konto zurücksetzen möchten."
+      "Wir schicken Ihnen diese Email, da Sie (oder jemand anderes) das Passwort für ihr Konto zurücksetzen möchten.",
+    "it-IT": "",
+    "lld-IT": ""
   },
   "clickReset": {
-    "de-DE": "Mein Password zurücksetzen"
+    "de-DE": "Mein Password zurücksetzen",
+    "it-IT": "",
+    "lld-IT": ""
   },
   "resetDisclaimer": {
     "de-DE":
-      "Wenn Sie das nicht angefragt haben, ignorieren Sie bitte diese Email, ihr Passwort bleibt dann unverändert."
+      "Wenn die Anfrage nicht von ihnen kommt, ignorieren Sie bitte diese Email. Ihr Passwort bleibt dann unverändert.",
+    "it-IT": "",
+    "lld-IT": ""
   },
   "emailVerification": {
     "de-DE":
-      "Sie haben Ihre Email-Adresse auf der Plattform G-old geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben."
+      "Sie haben Ihre Email-Adresse auf der Plattform G-old geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
+    "it-IT": "",
+    "lld-IT": ""
   },
 
   "G-old email changed": {
-    "de-DE": "G-old - Änderung ihrer Email-Adresse"
+    "de-DE": "G-old - Änderung ihrer Email-Adresse",
+    "it-IT": "",
+    "lld-IT": ""
   },
   "resetNotification": {
     "de-DE":
-      "Wir möchten Ihnen mitteilen, dass Sie das Passwort für ihr Konto gerade erfolgreich geändert haben."
+      "Wir möchten Ihnen mitteilen, dass Sie das Passwort für ihr Konto gerade erfolgreich geändert haben.",
+    "it-IT": "",
+    "lld-IT": ""
   },
   "G-old password changed": {
-    "de-DE": "G-old - Password geändert"
+    "de-DE": "G-old - Password geändert",
+    "it-IT": "",
+    "lld-IT": ""
   },
   "Visit our site?": {
-    "de-DE": "Möchten sie uns besuchen?"
+    "de-DE": "Möchten sie uns besuchen?",
+    "it-IT": "",
+    "lld-IT": ""
   },
   "Click here": {
-    "de-DE": "Hier klicken"
+    "de-DE": "Hier klicken",
+    "it-IT": "",
+    "lld-IT": ""
   },
   "Welcome on G-old": {
-    "de-DE": "Herzlich willkommen auf g-old.org"
+    "de-DE": "Herzlich willkommen auf g-old.org",
+    "it-IT": "",
+    "lld-IT": ""
   },
 
   "messageSubject": {
-    "de-DE": "Persönliche Nachricht für Sie von g-old.org"
+    "de-DE": "Persönliche Nachricht für Sie von g-old.org",
+    "it-IT": "",
+    "lld-IT": ""
   }
 }

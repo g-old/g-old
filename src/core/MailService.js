@@ -4,7 +4,7 @@ import log from '../logger';
 class MailService {
   constructor(transporter = throwIfMissing('Transport layer'), options = {}) {
     this.mailer = transporter;
-    this.MAX_CONTENT_LENGTH = options.maxContentLength || 5000;
+    this.MAX_CONTENT_LENGTH = options.maxContentLength || 10000;
     this.DEFAULT_SENDER = options.defaultSender || 'info@g-old.org';
     this.MAX_RECEIVERS = options.maxReceivers || 200; // check if realistic
   }
@@ -73,12 +73,19 @@ class MailService {
       content = 'html';
     }
     try {
-      await this.send({
+      const data = await this.send({
         from: message.sender || this.DEFAULT_SENDER,
         to: message.recipient,
         subject: message.subject || '',
         [content]: message[content],
       });
+
+      // TODO notify success
+      // TODO bulk mails
+
+      if (__DEV__) {
+        console.info(data);
+      }
     } catch (err) {
       const errorMessage = 'Email sending failed';
       log.error({ err, message }, errorMessage);
