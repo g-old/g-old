@@ -20,6 +20,8 @@ import { format } from './run';
 async function copy() {
   await makeDir('build');
   await makeDir('build/avatars');
+  await copyDir('public', 'build/public');
+
   await Promise.all([
     writeFile(
       'build/package.json',
@@ -38,7 +40,6 @@ async function copy() {
     ),
     copyFile('LICENSE.txt', 'build/LICENSE.txt'),
     copyFile('yarn.lock', 'build/yarn.lock'),
-    copyDir('public', 'build/public'),
     copyDir('src/messages', 'build/messages'),
     // TODO If node env is production
     copyDir('src/data/db', 'build/db'),
