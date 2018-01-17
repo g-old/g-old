@@ -85,7 +85,7 @@ class MessageService {
     };
   }
   createLink(token, route) {
-    return ` ${this.protocol}://${this.host}}/${route}/${token}`;
+    return ` ${this.protocol}://${this.host}/${route}/${token}`;
   }
   createVerificationLink(token) {
     return this.createLink(token, 'verify');

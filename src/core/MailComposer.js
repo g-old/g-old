@@ -17,8 +17,15 @@ class MailComposer {
     renderEngine = throwIfMissing('Template render engine'),
     templateDir,
   ) {
+    // TODO change!!!
+    const devDir = '../build/emails';
+    const productionDir = './emails';
+    let dir = productionDir;
+    if (__DEV__) {
+      dir = devDir;
+    }
     this.templates = new Map();
-    this.baseDir = path.resolve(__dirname, templateDir || '../build/emails');
+    this.baseDir = path.resolve(__dirname, templateDir || dir);
     this.renderer = renderEngine;
     this.translations = MailComposer.loadTranslations();
     this.getWelcomeMail = this.getWelcomeMail.bind(this);

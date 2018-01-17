@@ -379,6 +379,7 @@ class AccountContainer extends React.Component {
             uploadPending={updates.dataUrl && updates.dataUrl.pending}
             uploadError={updates.dataUrl && updates.dataUrl.error}
             uploadSuccess={updates.dataUrl && updates.dataUrl.success}
+            ratio={1}
             onClose={() => {
               this.setState({ showUpload: false });
             }}

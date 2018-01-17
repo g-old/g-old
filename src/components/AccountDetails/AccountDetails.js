@@ -240,6 +240,7 @@ class AccountDetails extends React.Component {
               onClose={() => {
                 this.setState({ showUpload: false });
               }}
+              ratio={1}
             />
           )}
           <ProfilePicture

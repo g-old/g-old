@@ -146,7 +146,7 @@ class ImageUpload extends React.Component {
           onLoadSuccess={() => this.setState({ loaded: true })}
         />
         <Box pad column justify>
-          <Box pad justify>
+          <Box pad justify align>
             <Label>{'Zoom:'}</Label>
 
             <Button

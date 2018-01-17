@@ -2,87 +2,102 @@
   "greeting": { "de-DE": "Hallo", "it-IT": "Ciao", "lld-IT": "" },
   "signup": {
     "de-DE":
-      " Wir freuen uns sehr, Sie  hier auf unserer Plattform G-old begrüßen zu dürfen!",
-    "it-IT": "",
-    "lld-IT": ""
+      " Wir freuen uns sehr, Sie hier auf unserer Plattform G-OLD begrüßen zu dürfen!",
+    "it-IT": "Siamo lieti di accogliervi sulla Piattaforma  G-OLD!",
+    "lld-IT": "Con plajei Ves saludun sun la plataforma G-OLD"
   },
   "explainConfirmation": {
     "de-DE":
       "Jetzt müssen Sie nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
-    "it-IT": "",
-    "lld-IT": ""
+    "it-IT": "Attendiamo ancora la conferma del suo indirizzo e-mail?",
+    "lld-IT": "Al mancia ma plu la conferma de vosta miscion e-mail."
   },
   "ctAConfirmation": {
     "de-DE": "Bitte klicken Sie dazu auf den folgenden Knopf",
+    "it-IT": "Per cortesia premere il seguente pulsante",
+    "lld-IT": "Preibel druché l botun chilò de sot"
+  },
+  "clickLink": {
+    "de-DE": "Email-Adresse bestätigen",
+    "it-IT": "Confermare l'indirizzo e-mail",
+    "lld-IT": ""
+  },
+  "bestRegards": {
+    "de-DE": "Viele Grüße",
     "it-IT": "",
     "lld-IT": ""
   },
-  "clickLink": { "de-DE": "Email-Adresse bestätigen", "it-IT": "" },
-  "bestRegards": { "de-DE": "Viele Grüße!", "it-IT": "" },
-  "G-old password reset requested": {
-    "de-DE": "G-old Passwortänderung",
-    "it-IT": "",
-    "lld-IT": ""
+  "G-OLD password reset requested": {
+    "de-DE": "G-OLD Passwortänderung",
+    "it-IT": "Modifica della password di G-OLD",
+    "lld-IT": "Mudament dla password de G-OLD"
   },
   "resetRequest": {
     "de-DE":
       "Wir schicken Ihnen diese Email, da Sie (oder jemand anderes) das Passwort für ihr Konto zurücksetzen möchten.",
-    "it-IT": "",
-    "lld-IT": ""
+    "it-IT":
+      "Le mandiamo questa mail perchè Lei (o qualcun altro) ha chiesto di modificare la password del suo account",
+    "lld-IT":
+      "Ves manun chesta mail, ajache valgungn à damandé de mudé la password de vost account"
   },
   "clickReset": {
     "de-DE": "Mein Password zurücksetzen",
-    "it-IT": "",
-    "lld-IT": ""
+    "it-IT": "Resettare la password",
+    "lld-IT": "Reseté la password"
   },
   "resetDisclaimer": {
     "de-DE":
       "Wenn die Anfrage nicht von ihnen kommt, ignorieren Sie bitte diese Email. Ihr Passwort bleibt dann unverändert.",
-    "it-IT": "",
-    "lld-IT": ""
+    "it-IT":
+      "Se non ha mandato Lei la richiesta, ignori questa mail. La sua password non verrà modificata",
+    "lld-IT":
+      "Sce ne eis nia Vos damané le mudament dla password, no Ves cruziede. La password restarà la medema"
   },
   "emailVerification": {
     "de-DE":
-      "Sie haben Ihre Email-Adresse auf der Plattform G-old geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
-    "it-IT": "",
-    "lld-IT": ""
+      "Sie haben Ihre Email-Adresse auf der Plattform G-OLD geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
+    "it-IT":
+      "Lei ha appena modificato l'indirizzo e-mail della piattaforma G-OLD. Per cortesia può confermare la correttezza dell'indirizzo e-mail?",
+    "lld-IT":
+      "Vos eis mudé la miscion e-mail dla paltaforma G-OLD. Preibel podeis confermé la nueva miscion e-mail?"
   },
 
-  "G-old email changed": {
-    "de-DE": "G-old - Änderung ihrer Email-Adresse",
-    "it-IT": "",
-    "lld-IT": ""
+  "G-OLD email changed": {
+    "de-DE": "G-OLD - Änderung ihrer Email-Adresse",
+    "it-IT": "G-OLD - modifica dell'indirizzo e-mail",
+    "lld-IT": "G-OLD - mudament dla mission e-mail"
   },
   "resetNotification": {
     "de-DE":
       "Wir möchten Ihnen mitteilen, dass Sie das Passwort für ihr Konto gerade erfolgreich geändert haben.",
-    "it-IT": "",
-    "lld-IT": ""
+    "it-IT":
+      "Le confermiamo che il suo indirizzo e-mail è appena stato modificato correttamente.",
+    "lld-IT": "Vosta miscion e-mail é vegnuda mudeda coretamenter."
   },
-  "G-old password changed": {
-    "de-DE": "G-old - Password geändert",
-    "it-IT": "",
-    "lld-IT": ""
+  "G-OLD password changed": {
+    "de-DE": "G-OLD - Password geändert",
+    "it-IT": "G-OLD - password modificata",
+    "lld-IT": "G-OLD - password mudeda"
   },
   "Visit our site?": {
     "de-DE": "Möchten sie uns besuchen?",
-    "it-IT": "",
-    "lld-IT": ""
+    "it-IT": "Vuole visitare la nostra piattaforma",
+    "lld-IT": "Voleis cialé ite te nosta plataforma?"
   },
   "Click here": {
     "de-DE": "Hier klicken",
-    "it-IT": "",
-    "lld-IT": ""
+    "it-IT": "cliccare qui",
+    "lld-IT": "cliché chilò"
   },
   "Welcome on G-old": {
     "de-DE": "Herzlich willkommen auf g-old.org",
-    "it-IT": "",
-    "lld-IT": ""
+    "it-IT": "Benvenuti su g-old.org",
+    "lld-IT": "Benvegnus sun g-old.org"
   },
 
   "messageSubject": {
     "de-DE": "Persönliche Nachricht für Sie von g-old.org",
-    "it-IT": "",
-    "lld-IT": ""
+    "it-IT": "Messaggio personale per Lei da g-old.org",
+    "lld-IT": "Messaje personal per Vos da g-old.org"
   }
 }
