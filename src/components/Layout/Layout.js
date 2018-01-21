@@ -66,13 +66,15 @@ class Layout extends React.Component {
       </div>
     );
     return (
-      <div>
+      <div className={s.layout}>
         {this.props.loading && <div className={s.loader} />}
         {toast}
         {logo}
         <Header />
         <div className={s.content}>{this.props.children}</div>
-        <Footer />
+        <div className={s.footer}>
+          <Footer />
+        </div>
       </div>
     );
   }
