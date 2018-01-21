@@ -55,7 +55,6 @@ class Poll {
   /* eslint-enable class-methods-use-this */
   static async create(viewer, data, loaders) {
     // authorize
-
     if (!canMutate(viewer, data, Models.POLL)) return null;
 
     // validate
@@ -74,15 +73,24 @@ class Poll {
       let numVoter = 0;
 
       if (pollingMode.thresholdRef === 'all') {
-        // TODO check vote privilege for count of numVoter
-        numVoter = await trx
-          .whereRaw('groups & ? > 0', [Permissions.VOTE]) // TODO whitelist
-          .count('id')
-          .into('users');
+        // TODO change completely in case of group model
+        if (data.workTeamId) {
+          numVoter = await knex('user_work_teams')
+            .transacting(trx)
+            .where({ work_team_id: data.workTeamId })
+            .count('id');
+        } else {
+          numVoter = await trx
+            .whereRaw('groups & ? > 0', [Permissions.VOTE]) // TODO whitelist
+            .count('id')
+            .into('users');
+        }
         numVoter = Number(numVoter[0].count);
         if (numVoter < 1) throw Error('Not enough user');
       }
-
+      if (data.workTeamId) {
+        delete data.workTeamId; // eslint-disable-line
+      }
       const id = await trx
         .insert(
           {

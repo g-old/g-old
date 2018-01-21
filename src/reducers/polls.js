@@ -13,6 +13,8 @@ import {
   LOAD_FEED_SUCCESS,
   CREATE_PROPOSAL_SUCCESS,
   UPDATE_PROPOSAL_SUCCESS,
+  JOIN_WORKTEAM_SUCCESS,
+  LOAD_WORKTEAM_SUCCESS,
   SSE_UPDATE_SUCCESS,
 } from '../constants';
 
@@ -48,6 +50,8 @@ export default function polls(state = {}, action) {
       };
     case UPDATE_PROPOSAL_SUCCESS:
     case CREATE_PROPOSAL_SUCCESS:
+    case JOIN_WORKTEAM_SUCCESS:
+    case LOAD_WORKTEAM_SUCCESS:
     case LOAD_PROPOSAL_SUCCESS:
       return merge({}, state, action.payload.entities.polls);
     case SSE_UPDATE_SUCCESS: {
@@ -62,7 +66,9 @@ export default function polls(state = {}, action) {
       return merge({}, state, action.payload.entities.polls);
     }
     case UPDATE_VOTE_SUCCESS: {
-      const { pollId, position } = action.payload.entities.votes[action.payload.result];
+      const { pollId, position } = action.payload.entities.votes[
+        action.payload.result
+      ];
       const poll = state[pollId];
       const voteColumns = ['upvotes', 'downvotes'];
       const index = position === 'pro' ? 0 : 1;
@@ -106,7 +112,8 @@ export default function polls(state = {}, action) {
       };
     }
     case CREATE_STATEMENT_SUCCESS: {
-      const statement = action.payload.entities.statements[action.payload.result];
+      const statement =
+        action.payload.entities.statements[action.payload.result];
       return {
         ...state,
         [statement.pollId]: {
@@ -116,14 +123,16 @@ export default function polls(state = {}, action) {
       };
     }
     case DELETE_STATEMENT_SUCCESS: {
-      const statement = action.payload.entities.statements[action.payload.result];
+      const statement =
+        action.payload.entities.statements[action.payload.result];
       return {
         ...state,
         [statement.pollId]: {
           ...state[statement.pollId],
           ownStatement: null,
-          // eslint-disable-next-line eqeqeq
-          statements: state[statement.pollId].statements.filter(id => id != statement.id),
+          statements: state[statement.pollId].statements.filter(
+            id => id != statement.id, // eslint-disable-line eqeqeq
+          ),
         },
       };
     }
@@ -142,8 +151,9 @@ export default function polls(state = {}, action) {
 
     case DELETE_LIKE_SUCCESS: {
       let likedStatements = state[action.pollId].likedStatements || [];
-      // eslint-disable-next-line eqeqeq
-      likedStatements = likedStatements.filter(id => id != action.payload.result);
+      likedStatements = likedStatements.filter(
+        id => id != action.payload.result, // eslint-disable-line eqeqeq
+      );
       return {
         ...state,
         [action.pollId]: {

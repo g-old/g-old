@@ -8,6 +8,8 @@ import {
   CREATE_PROPOSALSUB_SUCCESS,
   DELETE_PROPOSALSUB_SUCCESS,
   SSE_UPDATE_SUCCESS,
+  LOAD_WORKTEAM_SUCCESS,
+  JOIN_WORKTEAM_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -19,6 +21,10 @@ export default function byId(state = {}, action) {
   } */
   switch (action.type) {
     case LOAD_FEED_SUCCESS: {
+      return merge({}, state, action.payload.entities.proposals);
+    }
+    case JOIN_WORKTEAM_SUCCESS:
+    case LOAD_WORKTEAM_SUCCESS: {
       return merge({}, state, action.payload.entities.proposals);
     }
     case LOAD_PROPOSAL_SUCCESS: {

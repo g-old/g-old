@@ -129,7 +129,7 @@ const query = `
   }
 `;
 
-const pollFieldsForList = `{
+export const pollFieldsForList = `{
   id
   upvotes
   downvotes
@@ -189,8 +189,8 @@ query ($state:String $first:Int, $after:String, $tagId:ID) {
 `;
 
 const createProposalMutation = `
-mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput] $spokesmanId:ID){
-  createProposal (proposal:{title:$title text:$text state:$state poll:$poll tags:$tags spokesmanId:$spokesmanId}){
+mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput] $spokesmanId:ID $workTeamId:ID){
+  createProposal (proposal:{title:$title workTeamId:$workTeamId text:$text state:$state poll:$poll tags:$tags spokesmanId:$spokesmanId}){
     ${proposal}
     tags{
       id

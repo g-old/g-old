@@ -40,6 +40,9 @@ class ProposalPreview extends React.Component {
   }
 
   render() {
+    if (!this.props.proposal) {
+      return <div />;
+    }
     // TODO move to state
     const poll = getLastActivePoll(
       this.props.proposal.state,

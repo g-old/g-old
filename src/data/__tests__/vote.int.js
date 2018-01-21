@@ -64,13 +64,13 @@ const setup = async () => {
 };
 
 describe('Vote Model', () => {
+  const VOTE_GROUPS = Groups.VIEWER | Groups.VOTER; // eslint-disable-line no-bitwise
   beforeEach(() => clearDB());
-
   describe('Vote.create', () => {
     test('Should allow to vote if conditions are met', async () => {
       const ids = await setup();
       const testActor = createTestActor({
-        groups: Groups.VOTER,
+        groups: VOTE_GROUPS,
         id: ids.voterId,
         canVoteSince: new Date(null),
       });
@@ -127,7 +127,7 @@ describe('Vote Model', () => {
       expect(vp1).toBeDefined();
       expect(vp2).toBeDefined();
       const testActor = createTestActor({
-        groups: Groups.VOTER,
+        groups: VOTE_GROUPS,
         id: ids.voterId,
         canVoteSince: new Date(null),
       });
@@ -174,7 +174,7 @@ describe('Vote Model', () => {
       expect(vp2).toBeDefined();
 
       const testActor = createTestActor({
-        groups: Groups.VOTER,
+        groups: VOTE_GROUPS,
         id: ids.voterId,
         canVoteSince: new Date(null),
       });

@@ -6,19 +6,7 @@ export const request = new schema.Entity('requests', {
   requester: user,
   processor: user,
 });
-export const workTeam = new schema.Entity('workTeams', {
-  coordinator: user,
-  members: [user],
-  ownStatus: {
-    request,
-  },
-  requests: [request],
-});
-user.define({
-  role,
-  followees: [user],
-  workTeams: [workTeam],
-});
+
 export const pollingMode = new schema.Entity('pollingModes');
 export const vote = new schema.Entity('votes', {
   voter: user,
@@ -51,6 +39,20 @@ export const proposal = new schema.Entity('proposals', {
   pollOne: poll,
   pollTwo: poll,
   tags: [tag],
+});
+export const workTeam = new schema.Entity('workTeams', {
+  coordinator: user,
+  members: [user],
+  ownStatus: {
+    request,
+  },
+  requests: [request],
+  proposals: [proposal],
+});
+user.define({
+  role,
+  followees: [user],
+  workTeams: [workTeam],
 });
 export const notification = new schema.Entity('notifications', {
   sender: user,

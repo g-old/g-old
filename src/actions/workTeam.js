@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { normalize } from 'normalizr';
+import { pollFieldsForList } from './proposal';
 import {
   LOAD_WORKTEAMS_START,
   LOAD_WORKTEAMS_ERROR,
@@ -92,6 +93,19 @@ const workTeamWithDetails = `query($id:ID!){
       ${wtDetails}
     }}`;
 
+const proposalFields = `
+    id
+    title
+    state
+    body
+    tags{
+      displayName
+      id
+      count
+    }
+    pollOne ${pollFieldsForList}
+    pollTwo ${pollFieldsForList}`;
+
 const workTeamQuery = `query($id:ID!){
   workTeam(id:$id){
     ${workTeamFields}
@@ -109,6 +123,9 @@ const workTeamQuery = `query($id:ID!){
       title
       createdAt
       numComments
+    }
+    proposals{
+      ${proposalFields}
     }
   }
 }`;
@@ -151,6 +168,9 @@ const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID){
       title
       createdAt
       numComments
+    }
+    proposals{
+      ${proposalFields}
     }
   }
 }`;

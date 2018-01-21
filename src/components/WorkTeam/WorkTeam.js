@@ -8,6 +8,7 @@ import Value from '../Value';
 import Box from '../Box';
 import Button from '../Button';
 import DiscussionPreview from '../DiscussionPreview';
+import ProposalPreview from '../ProposalPreview';
 import history from '../../history';
 
 const messages = defineMessages({
@@ -35,7 +36,8 @@ class WorkTeam extends React.Component {
     displayName: PropTypes.string.isRequired,
     numMembers: PropTypes.number.isRequired,
     numDiscussions: PropTypes.number.isRequired,
-    discussions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    discussions: PropTypes.arrayOf(PropTypes.shape({})),
+    proposals: PropTypes.arrayOf(PropTypes.shape({})),
     ownStatus: PropTypes.string.isRequired,
     onJoinRequest: PropTypes.func.isRequired,
     updates: PropTypes.shape({ pending: PropTypes.bool }).isRequired,
@@ -47,6 +49,8 @@ class WorkTeam extends React.Component {
   static defaultProps = {
     logo: null,
     updates: null,
+    discussions: null,
+    proposals: null,
   };
   constructor(props) {
     super(props);
@@ -118,6 +122,7 @@ class WorkTeam extends React.Component {
       displayName,
       numMembers,
       numDiscussions,
+      proposals = [],
       discussions = [],
       ownStatus = {},
       updates = {},
@@ -152,6 +157,7 @@ class WorkTeam extends React.Component {
     }
 
     let discussionSection;
+    let proposalsSection;
     if (ownStatus.status === 'MEMBER') {
       discussionSection = (
         <div className={s.discussions}>
@@ -165,6 +171,9 @@ class WorkTeam extends React.Component {
               ),
           )}
         </div>
+      );
+      proposalsSection = (
+        <div>{proposals.map(p => p && <ProposalPreview proposal={p} />)}</div>
       );
     }
     return (
@@ -214,6 +223,7 @@ class WorkTeam extends React.Component {
         /> */}
         {actionBtn}
         {discussionSection}
+        {proposalsSection}
       </div>
     );
   }

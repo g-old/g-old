@@ -2,6 +2,8 @@ import Poll from './Poll';
 import Vote from './Vote';
 import knex from '../knex';
 import User from './User';
+import Proposal from './Proposal';
+
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
 
@@ -19,9 +21,11 @@ class Statement {
     this.deletedAt = data.deleted_at;
   }
 
-  static async gen(viewer, id, { statements }) {
-    const data = await statements.load(id);
+  static async gen(viewer, id, loaders) {
+    const data = await loaders.statements.load(id);
     if (data === null) return null;
+    const proposal = await Proposal.genByPoll(viewer, data.poll_id, loaders);
+    data.proposal = proposal;
     return canSee(viewer, data, Models.STATEMENT) ? new Statement(data) : null;
   }
 
@@ -118,10 +122,13 @@ class Statement {
       throw new Error('TESTERROR');
     } */
     // authorize
-    if (!canMutate(viewer, data, Models.STATEMENT)) return null;
+    if (!data.pollId || !data.voteId) return null;
+    const proposal = await Proposal.genByPoll(viewer, data.pollId, loaders);
+
+    if (!canMutate(viewer, { ...data, proposal }, Models.STATEMENT))
+      return null;
     // validate
 
-    if (!data.pollId || !data.voteId) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders);
     if (!poll) return null;
     const statementsAllowed = await poll.isCommentable(viewer, loaders);
@@ -159,7 +166,11 @@ class Statement {
     if (!newStatementId) return null;
     const statement = await Statement.gen(viewer, newStatementId, loaders);
     if (statement) {
-      EventManager.publish('onStatementCreated', { viewer, statement });
+      EventManager.publish('onStatementCreated', {
+        viewer,
+        statement,
+        ...(proposal.workTeamId && { groupId: proposal.workTeamId }),
+      });
     }
     return statement;
   }

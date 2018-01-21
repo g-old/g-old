@@ -1,9 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import Accordion from '../../components/Accordion';
 import AccordionPanel from '../../components/AccordionPanel';
 import { loadWorkTeam, joinWorkTeam } from '../../actions/workTeam';
+import { createProposal } from '../../actions/proposal';
+import { findUser } from '../../actions/user';
+
 import {
   loadRequestList,
   deleteRequest,
@@ -18,13 +22,86 @@ import {
   getWorkTeamStatus,
 } from '../../reducers';
 import DiscussionInput from '../../components/DiscussionInput';
+import ProposalInput from '../../components/ProposalInput';
 import Tabs from '../../components/Tabs';
 import Tab from '../../components/Tab';
 import RequestsList from '../../components/RequestsList';
 import Request from '../../components/Request';
 
 // import FetchError from '../../components/FetchError';
+const messages = defineMessages({
+  proposalInput: {
+    id: 'proposalInput',
+    defaultMessage: 'Create a new proposal',
+    description: 'Creating new proposal',
+  },
+  proposalManager: {
+    id: 'proposalManager',
+    defaultMessage: 'Manage proposals',
+    description: 'Manage proposals',
+  },
+  phaseOnePoll: {
+    id: 'proposalManager.phaseOnePoll',
+    defaultMessage: 'TR: 25 - PHASE ONE - NO STATEMENTS',
+    description: 'PhaseOnePoll presets',
+  },
+  phaseTwoPoll: {
+    id: 'proposalManager.phaseTwoPoll',
+    defaultMessage: 'TR: 50 - PHASE TWO - WITH STATEMENTS',
+    description: 'PhaseTwoPoll presets',
+  },
+  survey: {
+    id: 'proposalManager.survey',
+    defaultMessage: 'Survey',
+    description: 'Survey presets',
+  },
+  tags: {
+    id: 'tags',
+    defaultMessage: 'Tags',
+    description: 'Tags',
+  },
+});
+const defaultPollValues = {
+  1: {
+    withStatements: true,
+    unipolar: true,
+    threshold: 25,
+    secret: false,
+    thresholdRef: 'all',
+  },
+  2: {
+    withStatements: true,
+    unipolar: false,
+    threshold: 50,
+    secret: false,
+    thresholdRef: 'voters',
+  },
+  3: {
+    withStatements: false,
+    unipolar: false,
+    threshold: 100,
+    secret: false,
+    thresholdRef: 'voters',
+  },
+};
 
+const pollOptions = [
+  {
+    value: '1',
+    label: <FormattedMessage {...messages.phaseOnePoll} />,
+    mId: messages.phaseOnePoll.id,
+  },
+  {
+    value: '2',
+    label: <FormattedMessage {...messages.phaseTwoPoll} />,
+    mId: messages.phaseTwoPoll.id,
+  },
+  {
+    value: '3',
+    label: <FormattedMessage {...messages.survey} />,
+    mId: messages.survey.id,
+  },
+];
 class WorkTeamManagement extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
@@ -44,6 +121,7 @@ class WorkTeamManagement extends React.Component {
     workTeamUpdates: null,
     requestUpdates: null,
     discussionUpdates: null,
+    proposalUpdates: null,
   };
   constructor(props) {
     super(props);
@@ -141,6 +219,18 @@ class WorkTeamManagement extends React.Component {
             </AccordionPanel>
           </Accordion>
         </Tab>
+        <Tab title="Proposals">
+          <Accordion>
+            <AccordionPanel heading="Create proposal">
+              <ProposalInput
+                workTeamId={this.props.id}
+                maxTags={8}
+                pollOptions={pollOptions}
+                defaultPollValues={defaultPollValues}
+              />
+            </AccordionPanel>
+          </Accordion>
+        </Tab>
         <Tab title="Requests">{content}</Tab>
       </Tabs>
     );
@@ -161,6 +251,8 @@ const mapDispatch = {
   deleteRequest,
   joinWorkTeam,
   updateRequest,
+  createProposal,
+  findUser,
 };
 
 export default connect(mapStateToProps, mapDispatch)(WorkTeamManagement);

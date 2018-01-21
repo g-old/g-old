@@ -20,7 +20,7 @@ import PollingMode from '../models/PollingMode';
 
 const PollType = new ObjectType({
   name: 'PollDL',
-  fields: {
+  fields: () => ({
     id: { type: new NonNull(ID) },
     secret: {
       type: GraphQLBoolean,
@@ -60,7 +60,12 @@ const PollType = new ObjectType({
         return Promise.resolve(
           knex('statement_likes')
             .where('statement_likes.user_id', '=', viewer.id)
-            .join('statements', 'statements.id', '=', 'statement_likes.statement_id')
+            .join(
+              'statements',
+              'statements.id',
+              '=',
+              'statement_likes.statement_id',
+            )
             .where('statements.poll_id', '=', data.id)
             .pluck('statement_likes.id')
             .then(ids => ids.map(id => StatementLike.gen(viewer, id, loaders))),
@@ -113,7 +118,8 @@ const PollType = new ObjectType({
     },
     statements: {
       type: new GraphQLList(StatementType),
-      resolve: (data, args, { viewer, loaders }) => Promise.resolve(
+      resolve: (data, args, { viewer, loaders }) =>
+        Promise.resolve(
           knex('statements')
             .where({ poll_id: data.id })
             .pluck('id')
@@ -135,6 +141,6 @@ const PollType = new ObjectType({
     createdAt: {
       type: GraphQLString,
     },
-  },
+  }),
 });
 export default PollType;

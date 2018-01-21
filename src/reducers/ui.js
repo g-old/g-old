@@ -45,6 +45,9 @@ export const getRequestUpdates = state => fromRequest.getStatus(state.requests);
 export const getWorkTeamUpdates = (state, id) =>
   fromWorkTeam.getStatus(state.workTeams, id);
 
+export const getProposalUpdates = (state, id) =>
+  fromProposal.getStatus(state.proposals, id);
+
 // TODO Different design
 const getMutationPending = state => {
   if (state && state.mutations) {

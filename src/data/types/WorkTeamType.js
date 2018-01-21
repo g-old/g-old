@@ -12,6 +12,8 @@ import DiscussionType from './DiscussionType';
 import GroupStatusType from './GroupStatusType';
 import Request from '../models/Request';
 import RequestType from '../types/RequestType';
+import ProposalType from '../types/ProposalDLType';
+import Proposal from '../models/Proposal';
 import Discussion from '../models/Discussion';
 import User from '../models/User';
 import knex from '../knex';
@@ -131,6 +133,19 @@ const WorkTeamType = new ObjectType({
             .where({ work_team_id: data.id })
             .pluck('id')
             .then(ids => ids.map(id => Discussion.gen(viewer, id, loaders)));
+        }
+        return null;
+      },
+    },
+    proposals: {
+      type: new GraphQLList(ProposalType),
+      resolve(data, args, { viewer, loaders }) {
+        if (viewer && viewer.wtMemberships.includes(data.id)) {
+          return knex('proposals')
+            .where({ work_team_id: data.id })
+            .orderBy('created_at', 'DESC')
+            .pluck('id')
+            .then(ids => ids.map(id => Proposal.gen(viewer, id, loaders)));
         }
         return null;
       },

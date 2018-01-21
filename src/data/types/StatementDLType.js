@@ -14,18 +14,18 @@ import UserType from './UserType';
 const StatementType = new ObjectType({
   name: 'StatementDL',
   description: 'Statement on proposal',
-  fields: {
+  fields: () => ({
     id: {
       type: new NonNull(ID),
     },
     author: {
       type: UserType,
-      resolve: (data, { id }, { viewer, loaders }) =>
+      resolve: (data, args, { viewer, loaders }) =>
         User.gen(viewer, data.author_id, loaders),
     },
     vote: {
       type: VoteType,
-      resolve: (data, { id }, { viewer, loaders }) =>
+      resolve: (data, args, { viewer, loaders }) =>
         Vote.gen(viewer, data.voteId, loaders),
     },
 
@@ -56,7 +56,7 @@ const StatementType = new ObjectType({
         },
       }),
       resolve: (data, { id }, { viewer, loaders }) => Poll.gen(viewer, data.pollId, loaders),
-    },*/
+    }, */
 
     createdAt: {
       type: GraphQLString,
@@ -67,6 +67,6 @@ const StatementType = new ObjectType({
     deletedAt: {
       type: GraphQLString,
     },
-  },
+  }),
 });
 export default StatementType;

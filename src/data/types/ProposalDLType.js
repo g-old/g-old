@@ -24,7 +24,7 @@ const ProposalType = new ObjectType({
       type: GraphQLInt,
     },
   }, */
-  fields: {
+  fields: () => ({
     id: { type: new NonNull(ID) },
     author: {
       type: UserType,
@@ -47,6 +47,9 @@ const ProposalType = new ObjectType({
             .pluck('tag_id')
             .then(tagIds => tagIds.map(tId => Tag.gen(viewer, tId, loaders))),
         ),
+    },
+    workTeamId: {
+      type: GraphQLString,
     },
     pollOne: {
       type: PollType,
@@ -93,6 +96,6 @@ const ProposalType = new ObjectType({
       type: GraphQLBoolean,
       resolve: async (parent, args, { viewer }) => parent.isVotable(viewer),
     },
-  },
+  }),
 });
 export default ProposalType;

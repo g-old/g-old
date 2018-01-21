@@ -29,6 +29,17 @@ export const clearDB = async () => {
   return Promise.all(promises);
 };
 
+const getMemberships = args => {
+  const result = [];
+  if (args && args.memberships) {
+    if (args.memberships.constructor === Array) {
+      return args.memberships;
+    }
+    result.push(args.memberships);
+  }
+  return result;
+};
+
 const createUser = args => ({
   name: args.name || 'Test',
   surname: args.surname || 'TestTest',
@@ -58,6 +69,7 @@ export const createTestActor = (args = { groups: Groups.GUEST }) => {
     emailVerified: args.emailVerified || false,
     avatar: args.avatar || '',
     lastLogin: args.lastLogin || null,
+    wtMemberships: getMemberships(args),
   };
   /* eslint-enable no-bitwise */
 };

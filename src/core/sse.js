@@ -17,6 +17,16 @@ class ValidationError extends Error {
 }
 
 const HEART_BEAT = 30000;
+// TODO try channels per group - no filtering
+function groupFilter(rootValue, context) {
+  if (rootValue.workTeamId) {
+    return (
+      context.viewer.wtMemberships &&
+      context.viewer.wtMemberships.includes(rootValue.workTeamId)
+    );
+  }
+  return true;
+}
 
 export class SubscriptionManager {
   constructor(options) {
@@ -26,7 +36,10 @@ export class SubscriptionManager {
     this.maxSubscriptionId = 0;
     EventManager.subscribe('onActivityCreated', payload => {
       if (['proposal', 'statement'].includes(payload.activity.type)) {
-        this.pubsub.publish('activities', { id: payload.activity.id });
+        this.pubsub.publish('activities', {
+          id: payload.activity.id,
+          ...(payload.workTeamId && { workTeamId: payload.workTeamId }),
+        });
       }
     });
   }
@@ -56,10 +69,27 @@ export class SubscriptionManager {
         //  args = getArgumentValues(fields[subscriptionName], rootField, options.variables);
       }
     });
+    /*
+.then(context => {
+  return Promise.all([context, filter(rootValue, context)]);
+})
+.then(([context, doExecute]) => {
+  if (!doExecute) {
+    return;
+  }
+
+
+*/
 
     const onMessage = rootValue =>
       Promise.resolve(options.context)
-        .then(context => {
+        .then(context =>
+          Promise.all([context, groupFilter(rootValue, context)]),
+        )
+        .then(([context, doExecute]) => {
+          if (!doExecute) {
+            return;
+          }
           execute(
             this.schema,
             parsedQuery,

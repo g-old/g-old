@@ -41,6 +41,7 @@ class Activity {
       EventManager.publish('onActivityCreated', {
         viewer,
         activity: newActivity,
+        ...(data.workTeamId && { workTeamId: data.workTeamId }),
       });
     }
     return newActivity;

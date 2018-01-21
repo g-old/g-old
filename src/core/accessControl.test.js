@@ -1,6 +1,6 @@
 /* eslint-env jest */
 /* eslint-disable no-bitwise */
-import { canMutate, Models } from './accessControl';
+import { canMutate, canSee, Models } from './accessControl';
 import {
   Groups,
   Privileges,
@@ -150,5 +150,32 @@ describe('activityWriteControl', () => {
       content: 'CONTENT',
     };
     expect(canMutate(testViewer, testData, Models.ACTIVITY)).toBe(true);
+  });
+});
+
+describe('proposalReadControl', () => {
+  it('Should allow to get unprotected proposals', () => {
+    const testViewer = createTestActor({ groups: Groups.VIEWER });
+    const testData = {
+      id: 1,
+    };
+    expect(canSee(testViewer, testData, Models.PROPOSAL)).toBe(true);
+  });
+  it('Should deny access to protected proposals', () => {
+    const testViewer = createTestActor({ groups: Groups.VIEWER });
+    const testData = {
+      workTeamId: 1,
+    };
+    expect(canSee(testViewer, testData, Models.PROPOSAL)).toBe(false);
+  });
+  it('Should allow access to members for protected proposals', () => {
+    const testViewer = createTestActor({
+      groups: Groups.VIEWER,
+      memberships: 1,
+    });
+    const testData = {
+      workTeamId: 1,
+    };
+    expect(canSee(testViewer, testData, Models.PROPOSAL)).toBe(true);
   });
 });

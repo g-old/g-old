@@ -101,6 +101,7 @@ const validatePoll = async (viewer, poll, loaders) => {
     start_time: startTime,
     end_time: endTime,
     threshold: threshold || 50,
+    ...(poll.workTeamId && { workTeamId: poll.workTeamId }),
   };
 
   return { pollData, pollingModeData, createPollingMode };
@@ -158,12 +159,14 @@ class Proposal {
     this.createdAt = data.created_at;
     this.spokesmanId = data.spokesman_id;
     this.notifiedAt = data.notified_at;
+    this.workTeamId = data.work_team_id;
   }
   static async gen(viewer, id, { proposals }) {
     const data = await proposals.load(id);
     if (data == null) return null;
-    if (!canSee(viewer, data, Models.PROPOSAL)) return null;
-    return new Proposal(data);
+    const result = new Proposal(data); // for isMember check in accessControl;
+    if (!canSee(viewer, result, Models.PROPOSAL)) return null;
+    return result;
     // return canSee ? new Proposal(data) : new Proposal(data.email = null);
   }
 
@@ -175,8 +178,9 @@ class Proposal {
       .select(); */
 
     if (!data) return null;
-    if (viewer == null) return null;
-    return new Proposal(data);
+    const result = new Proposal(data); // for isMember check in accessControl;
+    if (!canSee(viewer, result, Models.PROPOSAL)) return null;
+    return result;
   }
 
   static async followees(id, { followees }) {
@@ -286,6 +290,7 @@ class Proposal {
   static async create(viewer, data, loaders) {
     // throw Error('TestError');
     // authorize
+
     if (!canMutate(viewer, data, Models.PROPOSAL)) return null;
 
     // validate
@@ -293,7 +298,7 @@ class Proposal {
     if (!data.title) return null;
     const { pollData, pollingModeData, createPollingMode } = await validatePoll(
       viewer,
-      data.poll,
+      { ...data.poll, ...(data.workTeamId && { workTeamId: data.workTeamId }) },
       loaders,
     );
     const additionalData = {};
@@ -326,14 +331,21 @@ class Proposal {
       };
       const pollOne = await Poll.create(viewer, pollOneData, loaders);
       if (!pollOne) throw Error('No pollOne provided');
-      const state = data.state === 'survey' ? 'survey' : 'proposed';
+
+      if (!['survey', 'proposed', 'voting'].includes(data.state)) {
+        throw new Error('State is missing');
+      }
+      const state = data.state;
+
+      const pollField = state === 'voting' ? 'poll_two_id' : 'poll_one_id';
       let id = await trx
         .insert(
           {
             author_id: viewer.id,
             title: data.title,
             body: data.text,
-            poll_one_id: pollOne.id,
+            [pollField]: pollOne.id,
+            ...(data.workTeamId && { work_team_id: data.workTeamId }),
             state,
             ...additionalData,
             created_at: new Date(),
@@ -401,7 +413,11 @@ class Proposal {
     const proposal = await Proposal.gen(viewer, newProposalId, loaders);
 
     if (proposal) {
-      EventManager.publish('onProposalCreated', { viewer, proposal });
+      EventManager.publish('onProposalCreated', {
+        viewer,
+        proposal,
+        ...(data.workTeamId && { groupId: data.workTeamId }),
+      });
     }
     return proposal;
   }
@@ -422,8 +438,19 @@ class Proposal {
       .del();
   }
 
-  isVotable(viewer) {
+  async isVotable(viewer) {
     if (['proposed', 'voting', 'survey'].indexOf(this.state) !== -1 && viewer) {
+      if (this.workTeamId) {
+        // TODO try to find a better way since it cannot be cached easily and voting isF common
+        const [data = null] = await knex('user_work_teams')
+          .where({ user_id: viewer.id, work_team_id: this.workTeamId })
+          .select('created_at');
+
+        if (data && data.created_at) {
+          return new Date(data.created_at) < new Date(this.createdAt);
+        }
+        return false;
+      }
       if (
         viewer.canVoteSince &&
         new Date(viewer.canVoteSince) < new Date(this.createdAt)

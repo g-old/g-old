@@ -36,6 +36,14 @@ const ProposalInputType = new GraphQLInputObjectType({
             value: 'survey',
             description: 'Open survey',
           },
+          voting: {
+            value: 'voting',
+            description: 'Open voting',
+          },
+          proposed: {
+            value: 'proposed',
+            description: 'Open std phase 1 voting',
+          },
         },
       }),
     },
@@ -48,6 +56,9 @@ const ProposalInputType = new GraphQLInputObjectType({
     id: {
       type: ID,
       description: 'Must be provided for mutations',
+    },
+    workTeamId: {
+      type: ID,
     },
   },
 });

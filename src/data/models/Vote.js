@@ -12,10 +12,12 @@ class Vote {
     this.position = data.position;
     this.pollId = data.poll_id;
   }
-  static async gen(viewer, id, { votes }) {
+  static async gen(viewer, id, loaders) {
     if (!id) return null;
-    const data = await votes.load(id);
+    const data = await loaders.votes.load(id);
     if (data === null) return null;
+    const proposal = await Proposal.genByPoll(viewer, data.poll_id, loaders);
+    data.proposal = proposal;
     if (!canSee(viewer, data, Models.VOTE)) return null;
     return new Vote(data);
   }
@@ -24,8 +26,7 @@ class Vote {
     if (!poll || !poll.isVotable()) return null;
 
     const proposal = await Proposal.genByPoll(viewer, poll.id, loaders);
-
-    if (!proposal || !proposal.isVotable(viewer)) return null;
+    if (!proposal || !await proposal.isVotable(viewer)) return null;
 
     const voteInDB = await knex('votes')
       .transacting(trx)
@@ -205,15 +206,14 @@ class Vote {
     // throw Error('TESTERROR');
     // validate
     if (!data.pollId) return null;
+    const proposal = await Proposal.genByPoll(viewer, data.pollId, loaders);
 
-    if (!canMutate(viewer, data, Models.VOTE)) return null;
-
+    if (!canMutate(viewer, { ...data, proposal }, Models.VOTE)) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
 
     if (!poll || !poll.isVotable()) return null;
 
-    const proposal = await Proposal.genByPoll(viewer, poll.id, loaders);
-    if (!proposal || !proposal.isVotable(viewer)) return null;
+    if (!proposal || !await proposal.isVotable(viewer)) return null;
     //
 
     let position = data.position === 1 ? 'pro' : 'con';

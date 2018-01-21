@@ -145,10 +145,15 @@ class ProposalContainer extends React.Component {
       );
     }
     if (this.isReady()) {
-      const poll =
-        proposal.pollOne.id === this.props.pollId
-          ? proposal.pollOne
-          : proposal.pollTwo;
+      let poll;
+      if (proposal.pollOne) {
+        poll =
+          proposal.pollOne.id === this.props.pollId
+            ? proposal.pollOne
+            : proposal.pollTwo;
+      } else {
+        poll = proposal.pollTwo;
+      }
       const canSwitchPolls = !!(proposal.pollOne && proposal.pollTwo);
       if (!poll) {
         return <div>SOMETHING GOT REALLY WRONG</div>;

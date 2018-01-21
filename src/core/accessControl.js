@@ -43,6 +43,16 @@ function requestWriteControl(viewer, data) {
   return true;
 }
 
+function checkIfMember(viewer, resource) {
+  if (resource && resource.workTeamId) {
+    // assumes there exits only workteams
+    return (
+      viewer.wtMemberships && viewer.wtMemberships.includes(resource.workTeamId)
+    );
+  }
+  return true; // since no membership is required
+}
+
 function userWriteControl(viewer, data) {
   if (data.id && Object.keys(data).length === 1) {
     if ((viewer.permissions & Permissions.DELETE_ACCOUNTS) > 0) {
@@ -99,7 +109,7 @@ function userReadControl(viewer, data) {
 
 function proposalReadControl(viewer, data) {
   if (viewer.permissions & Permissions.VIEW_PROPOSALS) {
-    return true;
+    return checkIfMember(viewer, data);
   }
   return false;
 }
@@ -124,14 +134,14 @@ function proposalWriteControl(viewer, data) {
 
 function statementReadControl(viewer, data) {
   if (viewer.permissions & Permissions.VIEW_STATEMENTS) {
-    return true;
+    return checkIfMember(viewer, data.proposal);
   }
   return false;
 }
 
 function statementWriteControl(viewer, data) {
   if (viewer.permissions & Permissions.MODIFY_OWN_STATEMENTS) {
-    return true;
+    return checkIfMember(viewer, data.proposal);
   }
   return false;
 }
@@ -198,7 +208,7 @@ function voteReadControl(viewer, data) {
 }
 function voteWriteControl(viewer, data) {
   if (viewer.permissions & Permissions.VOTE) {
-    return true;
+    return checkIfMember(viewer, data.proposal);
   }
   return false;
 }

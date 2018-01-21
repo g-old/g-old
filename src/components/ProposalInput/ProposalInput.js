@@ -118,6 +118,7 @@ class ProposalInput extends React.Component {
     pollOptions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     userArray: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     findUser: PropTypes.func.isRequired,
+    workTeamId: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
@@ -283,11 +284,19 @@ class ProposalInput extends React.Component {
               : { id: this.state.tags[id].id },
         ) || null;
       /* eslint-enable no-confusing-arrow */
+      let state;
+      if (pollOption.value === '3') {
+        state = 'survey';
+      } else {
+        state = pollOption.value === '2' ? 'voting' : 'proposed';
+      }
+
       const spokesmanId = spokesman ? spokesman.id : null;
       this.props.createProposal({
+        ...(this.props.workTeamId && { workTeamId: this.props.workTeamId }),
         title: title.trim(),
         text: this.md.render(body),
-        state: pollOption.value === '3' ? 'survey' : null,
+        state,
         poll: {
           startTime,
           endTime,
