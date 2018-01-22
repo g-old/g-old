@@ -20,6 +20,7 @@ import { format } from './run';
 async function copy() {
   await makeDir('build');
   await makeDir('build/avatars');
+  await makeDir('build/emails');
   await copyDir('public', 'build/public');
 
   await Promise.all([
