@@ -3,10 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import Accordion from '../../components/Accordion';
+import Button from '../../components/Button';
+
 import AccordionPanel from '../../components/AccordionPanel';
 import { loadWorkTeam, joinWorkTeam } from '../../actions/workTeam';
-import { createProposal } from '../../actions/proposal';
+import { createProposal, loadTags } from '../../actions/proposal';
 import { findUser } from '../../actions/user';
+import ProposalsManager from '../../components/ProposalsManager';
 
 import {
   loadRequestList,
@@ -114,6 +117,7 @@ class WorkTeamManagement extends React.Component {
     workTeam: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     joinWorkTeam: PropTypes.func.isRequired,
     updateRequest: PropTypes.func.isRequired,
+    loadTags: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -221,7 +225,12 @@ class WorkTeamManagement extends React.Component {
         </Tab>
         <Tab title="Proposals">
           <Accordion>
-            <AccordionPanel heading="Create proposal">
+            <AccordionPanel
+              heading="Create proposal"
+              onActive={() => {
+                this.props.loadTags();
+              }}
+            >
               <ProposalInput
                 workTeamId={this.props.id}
                 maxTags={8}
@@ -229,9 +238,21 @@ class WorkTeamManagement extends React.Component {
                 defaultPollValues={defaultPollValues}
               />
             </AccordionPanel>
+            <AccordionPanel heading="Manage proposals">
+              <ProposalsManager
+                proposals={this.props.workTeam.proposals || []}
+                workTeamId={this.props.id}
+                pollOptions={pollOptions}
+                defaultPollValues={defaultPollValues}
+              />
+            </AccordionPanel>
           </Accordion>
         </Tab>
         <Tab title="Requests">{content}</Tab>
+        <Tab title="Settings">
+          <Button label="Edit" />
+          {'TODO WORKTEAMEDIT'}
+        </Tab>
       </Tabs>
     );
   }
@@ -253,6 +274,7 @@ const mapDispatch = {
   updateRequest,
   createProposal,
   findUser,
+  loadTags,
 };
 
 export default connect(mapStateToProps, mapDispatch)(WorkTeamManagement);

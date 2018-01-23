@@ -16,6 +16,7 @@ class WorkTeam {
     this.name = data.name;
     this.numMembers = data.num_members;
     this.numDiscussions = data.num_discussions;
+    this.numProposals = data.num_proposals;
     this.restricted = data.restricted;
     this.deName = data.de_name;
     this.itName = data.it_name;

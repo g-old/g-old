@@ -384,6 +384,12 @@ class Proposal {
         );
         //
       }
+
+      if (data.workTeamId) {
+        await knex('work_teams')
+          .where({ id: data.workTeamId })
+          .increment('num_proposals', 1);
+      }
       // get all  possible voters;
       /*
       let voters;

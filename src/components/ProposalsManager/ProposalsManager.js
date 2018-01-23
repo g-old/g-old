@@ -4,12 +4,12 @@ import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './ProposalManager.css';
 import {
-  getVisibleProposals,
+  // getVisibleProposals,
   getProposalsIsFetching,
   getProposalsErrorMessage,
   getProposalsPage,
 } from '../../reducers';
-import { updateProposal, loadProposalsList } from '../../actions/proposal';
+import { updateProposal } from '../../actions/proposal';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 import PollState from '../PollState';
 import Button from '../Button';
@@ -20,11 +20,9 @@ import Label from '../Label';
 import ProposalListEntry from './ProposalListEntry';
 import Layer from '../Layer';
 
-const ProposalInfo = props =>
+const ProposalInfo = props => (
   <Box clickable column onClick={props.onClick}>
-    <Label>
-      {props.title}
-    </Label>
+    <Label>{props.title}</Label>
     <div style={{ marginTop: '1em' }}>
       <PollState
         compact
@@ -38,7 +36,8 @@ const ProposalInfo = props =>
     </div>
 
     {props.children}
-  </Box>;
+  </Box>
+);
 
 ProposalInfo.propTypes = {
   title: PropTypes.string.isRequired,
@@ -181,38 +180,28 @@ class ProposalsManager extends React.Component {
       <table className={s.proposalList}>
         <thead>
           <tr>
-            <th className={s.title}>
-              {'Title'}
-            </th>
-            <th>
-              {'Poll'}
-            </th>
-            <th className={s.date}>
-              {'Endtime'}
-            </th>
+            <th className={s.title}>{'Title'}</th>
+            <th>{'Poll'}</th>
+            <th className={s.date}>{'Endtime'}</th>
           </tr>
         </thead>
         <tbody>
           {proposals &&
-            proposals.map(p =>
+            proposals.map(p => (
               <ProposalListEntry
                 key={p.id}
                 proposal={p}
                 onProposalClick={this.handleProposalClick}
-              />,
-            )}
+              />
+            ))}
         </tbody>
       </table>
     );
   }
   render() {
-    const { pageInfo, proposals, isFetching, errorMessage } = this.props;
+    const { pageInfo, proposals = [], isFetching, errorMessage } = this.props;
     if (isFetching && !proposals.length) {
-      return (
-        <p>
-          {'Loading...'}{' '}
-        </p>
-      );
+      return <p>{'Loading...'} </p>;
     }
     if (errorMessage && !proposals.length) {
       return (
@@ -229,7 +218,7 @@ class ProposalsManager extends React.Component {
 
     return (
       <Box column pad>
-        {this.state.showDetails &&
+        {this.state.showDetails && (
           <Layer onClose={this.handleLayerClosing}>
             <ProposalDetails
               pollOptions={this.props.pollOptions}
@@ -239,7 +228,8 @@ class ProposalsManager extends React.Component {
               id={this.state.activeProposal}
               onFinish={this.handleLayerClosing}
             />
-          </Layer>}
+          </Layer>
+        )}
 
         {this.renderProposalList(toRender)}
         {/* toRender.map(
@@ -279,7 +269,7 @@ class ProposalsManager extends React.Component {
               </span>
             </ProposalInfo>,
         ) */}
-        {pageInfo.hasNextPage &&
+        {pageInfo.hasNextPage && (
           <Button
             disabled={this.props.isFetching}
             label="LOAD MORE"
@@ -289,21 +279,22 @@ class ProposalsManager extends React.Component {
                 after: pageInfo.endCursor,
               });
             }}
-          />}
+          />
+        )}
       </Box>
     );
   }
 }
 
 const mapPropsToState = state => ({
-  proposals: getVisibleProposals(state, 'active'),
+  // proposals: getVisibleProposals(state, 'active'),
   isFetching: getProposalsIsFetching(state, 'active'),
   errorMessage: getProposalsErrorMessage(state, 'active'),
   pageInfo: getProposalsPage(state, 'active'),
 });
 const mapDispatch = {
   updateProposal,
-  loadProposalsList,
+  // loadProposalsList,
 };
 ProposalsManager.contextTypes = {
   intl: PropTypes.object,

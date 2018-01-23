@@ -8,6 +8,7 @@ import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
 import { loadTags, loadProposalsList } from '../../actions/proposal';
 import TagManager from '../TagManager';
+import { getVisibleProposals } from '../../reducers';
 
 const messages = defineMessages({
   proposalInput: {
@@ -87,6 +88,11 @@ class ProposalPanel extends React.Component {
   static propTypes = {
     loadProposalsList: PropTypes.func.isRequired,
     loadTags: PropTypes.func.isRequired,
+    proposals: PropTypes.arrayOf(PropTypes.shape({})),
+  };
+
+  static defaultProps = {
+    proposals: null,
   };
 
   render() {
@@ -114,6 +120,7 @@ class ProposalPanel extends React.Component {
             <ProposalsManager
               pollOptions={pollOptions}
               defaultPollValues={defaultPollValues}
+              proposals={this.props.proposals || []}
             />
           </AccordionPanel>
           <AccordionPanel
@@ -130,9 +137,12 @@ class ProposalPanel extends React.Component {
   }
 }
 
+const mapStateToProps = state => ({
+  proposals: getVisibleProposals(state, 'active'),
+});
 const mapDispatch = {
   loadTags,
   loadProposalsList,
 };
 
-export default connect(null, mapDispatch)(ProposalPanel);
+export default connect(mapStateToProps, mapDispatch)(ProposalPanel);

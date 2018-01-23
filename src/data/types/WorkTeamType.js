@@ -125,6 +125,9 @@ const WorkTeamType = new ObjectType({
     numDiscussions: {
       type: GraphQLInt,
     },
+    numProposals: {
+      type: GraphQLInt,
+    },
     discussions: {
       type: new GraphQLList(DiscussionType),
       resolve(data, args, { viewer, loaders }) {

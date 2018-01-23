@@ -15,9 +15,9 @@ async function action({ store, path }, { id }) {
     return { redirect: '/' };
   }
   if (!process.env.BROWSER) {
-    await store.dispatch(loadWorkTeam({ id }, true));
+    await store.dispatch(loadWorkTeam({ id }));
   } else {
-    store.dispatch(loadWorkTeam({ id }, true));
+    store.dispatch(loadWorkTeam({ id }));
   }
   return {
     chunks: ['admin'],

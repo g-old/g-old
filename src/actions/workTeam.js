@@ -52,6 +52,7 @@ const workTeamFields = `
   displayName
   numMembers
   numDiscussions
+  numProposals
   restricted
   mainTeam
   logo
