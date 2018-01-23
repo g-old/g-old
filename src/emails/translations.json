@@ -2,9 +2,9 @@
   "greeting": { "de-DE": "Hallo", "it-IT": "Ciao", "lld-IT": "" },
   "signup": {
     "de-DE":
-      " Wir freuen uns sehr, Sie hier auf unserer Plattform G-OLD begrüßen zu dürfen!",
-    "it-IT": "Siamo lieti di accogliervi sulla Piattaforma  G-OLD!",
-    "lld-IT": "Con plajei Ves saludun sun la plataforma G-OLD"
+      " Wir freuen uns sehr, Sie hier auf unserer Plattform GOLD begrüßen zu dürfen!",
+    "it-IT": "Siamo lieti di accogliervi sulla Piattaforma  GOLD!",
+    "lld-IT": "Con plajei Ves saludun sun la plataforma GOLD"
   },
   "explainConfirmation": {
     "de-DE":
@@ -27,10 +27,10 @@
     "it-IT": "",
     "lld-IT": ""
   },
-  "G-OLD password reset requested": {
-    "de-DE": "G-OLD Passwortänderung",
-    "it-IT": "Modifica della password di G-OLD",
-    "lld-IT": "Mudament dla password de G-OLD"
+  "GOLD password reset requested": {
+    "de-DE": "GOLD Passwortänderung",
+    "it-IT": "Modifica della password di GOLD",
+    "lld-IT": "Mudament dla password de GOLD"
   },
   "resetRequest": {
     "de-DE":
@@ -55,17 +55,17 @@
   },
   "emailVerification": {
     "de-DE":
-      "Sie haben Ihre Email-Adresse auf der Plattform G-OLD geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
+      "Sie haben Ihre Email-Adresse auf der Plattform GOLD geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
     "it-IT":
-      "Lei ha appena modificato l'indirizzo e-mail della piattaforma G-OLD. Per cortesia può confermare la correttezza dell'indirizzo e-mail?",
+      "Lei ha appena modificato l'indirizzo e-mail della piattaforma GOLD. Per cortesia può confermare la correttezza dell'indirizzo e-mail?",
     "lld-IT":
-      "Vos eis mudé la miscion e-mail dla paltaforma G-OLD. Preibel podeis confermé la nueva miscion e-mail?"
+      "Vos eis mudé la miscion e-mail dla paltaforma GOLD. Preibel podeis confermé la nueva miscion e-mail?"
   },
 
-  "G-OLD email changed": {
-    "de-DE": "G-OLD - Änderung ihrer Email-Adresse",
-    "it-IT": "G-OLD - modifica dell'indirizzo e-mail",
-    "lld-IT": "G-OLD - mudament dla mission e-mail"
+  "GOLD email changed": {
+    "de-DE": "GOLD - Änderung ihrer Email-Adresse",
+    "it-IT": "GOLD - modifica dell'indirizzo e-mail",
+    "lld-IT": "GOLD - mudament dla mission e-mail"
   },
   "resetNotification": {
     "de-DE":
@@ -74,10 +74,10 @@
       "Le confermiamo che il suo indirizzo e-mail è appena stato modificato correttamente.",
     "lld-IT": "Vosta miscion e-mail é vegnuda mudeda coretamenter."
   },
-  "G-OLD password changed": {
-    "de-DE": "G-OLD - Password geändert",
-    "it-IT": "G-OLD - password modificata",
-    "lld-IT": "G-OLD - password mudeda"
+  "GOLD password changed": {
+    "de-DE": "GOLD - Password geändert",
+    "it-IT": "GOLD - password modificata",
+    "lld-IT": "GOLD - password mudeda"
   },
   "Visit our site?": {
     "de-DE": "Möchten sie uns besuchen?",
@@ -89,7 +89,7 @@
     "it-IT": "cliccare qui",
     "lld-IT": "cliché chilò"
   },
-  "Welcome on G-old": {
+  "Welcome on GOLD": {
     "de-DE": "Herzlich willkommen auf g-old.org",
     "it-IT": "Benvenuti su g-old.org",
     "lld-IT": "Benvegnus sun g-old.org"
