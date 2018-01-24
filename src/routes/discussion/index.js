@@ -7,7 +7,7 @@ import { canAccess } from '../../organization';
 
 const title = 'Discussion';
 
-async function action({ store, path }, { id }) {
+async function action({ store, path, query: { comment, child } }, { id }) {
   const user = getSessionUser(store.getState());
   if (!user) {
     return { redirect: `/?redirect=${path}` };
@@ -15,16 +15,21 @@ async function action({ store, path }, { id }) {
     return { redirect: '/' };
   }
   if (!process.env.BROWSER) {
-    await store.dispatch(loadDiscussion({ id }));
+    await store.dispatch(loadDiscussion({ id, parentId: comment }));
   } else {
-    store.dispatch(loadDiscussion({ id }));
+    await store.dispatch(loadDiscussion({ id, parentId: comment }));
   }
   return {
     chunks: ['workteam'],
     title,
     component: (
       <Layout>
-        <DiscussionContainer id={id} user={user} />
+        <DiscussionContainer
+          id={id}
+          user={user}
+          commentId={comment}
+          childId={child}
+        />
       </Layout>
     ),
   };

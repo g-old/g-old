@@ -22,6 +22,7 @@ const hydrateActivities = (state, data, entities) =>
     users: entities.users.byId,
     proposals: entities.proposals.byId,
     statements: entities.statements.byId,
+    comments: entities.comments.byId,
   });
 
 export const getActivities = (state, filter, entities) => {
@@ -30,6 +31,7 @@ export const getActivities = (state, filter, entities) => {
   return hydrateActivities(state, data, entities);
 };
 
-export const getIsFetching = (state, filter) => fromList.getIsFetching(state.listByFilter[filter]);
+export const getIsFetching = (state, filter) =>
+  fromList.getIsFetching(state.listByFilter[filter]);
 export const getErrorMessage = (state, filter) =>
   fromList.getErrorMessage(state.listByFilter[filter]);

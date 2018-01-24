@@ -15,7 +15,7 @@ import followees, * as fromFollowees from './followees';
 import workTeams, * as fromWorkTeams from './workTeams';
 import logs, * as fromLogs from './logs';
 import discussions, * as fromDiscussions from './discussions';
-import comments from './comments';
+import comments, * as fromComments from './comments';
 import requests, * as fromRequests from './requests';
 /* GENERATOR */
 
@@ -62,6 +62,9 @@ export const getProposalsErrorMessage = (state, filter) =>
 
 export const getProposalsPage = (state, filter) =>
   fromProposals.getPageInfo(state.proposals, filter);
+
+export const getComment = (state, id) =>
+  fromComments.getComment(state.comments, id, state);
 
 export const getUser = (state, id) => fromUsers.getUser(state.users, id, state);
 

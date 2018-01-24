@@ -6,6 +6,7 @@ import {
   CREATE_COMMENT_SUCCESS,
   UPDATE_COMMENT_SUCCESS,
   DELETE_COMMENT_SUCCESS,
+  LOAD_FEED_SUCCESS,
 } from '../constants';
 
 const addToParents = (state, action) => {
@@ -40,6 +41,7 @@ export default function byId(state = {}, action) {
     case LOAD_DISCUSSIONS_SUCCESS:
     case LOAD_DISCUSSION_SUCCESS:
     case UPDATE_COMMENT_SUCCESS:
+    case LOAD_FEED_SUCCESS:
       return merge({}, state, action.payload.entities.comments);
 
     case DELETE_COMMENT_SUCCESS: {

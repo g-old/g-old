@@ -1,8 +1,7 @@
-@import "../../components/variables.css";
+@import '../../components/variables.css';
 
 .root {
   margin-right: 0.5rem;
-  font-size: 0.9rem;
   transition: margin 0.5s;
   color: #000;
 }
@@ -15,6 +14,7 @@
 .header {
   display: flex;
   align-items: center;
+  font-size: 1em;
 }
 
 .author {
@@ -24,6 +24,9 @@
 .avatar {
   display: inline-block;
   cursor: pointer;
+  margin-right: 0.5em;
+  width: 2.5em;
+  height: 2.5em;
 }
 
 .replies {
@@ -32,13 +35,14 @@
 }
 
 .replies > div {
-  margin-top: 1rem;
+  margin-top: 1em;
+  line-height: 1em;
 }
 
 .replies .avatar {
   margin-right: 0.5em;
-  width: 2.5em;
-  height: 2.5em;
+  width: 2em;
+  height: auto;
 }
 
 .date {
@@ -59,18 +63,13 @@
   width: 100%;
 }
 
-.avatar {
-  margin-right: 0.5rem;
-  width: 2.5rem;
-  height: 2.5rem;
-}
-
 .text {
   -ms-word-break: break-all;
   overflow-wrap: break-word;
   word-break: break-word;
   white-space: pre-line;
   line-height: 1.3rem;
+  max-width: 35rem;
   width: 100%;
   display: inline-block;
 }
@@ -91,7 +90,7 @@
   border: none;
   height: auto;
   background: transparent;
-  color: #167ac6;
+  color: #666;
   font-weight: normal;
   font-size: inherit;
   text-decoration: none;
@@ -106,13 +105,14 @@
   border: none;
   height: auto;
   background: transparent;
-  color: #167ac6;
+  color: var(--color-accent-1);
   font-size: inherit;
   text-decoration: none;
   box-shadow: none;
   outline: 0;
   display: block;
   min-height: 1.5rem;
+  font-weight: 600;
 }
 
 .contentToggle:hover {
@@ -135,6 +135,20 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+@keyframes highlight {
+  0% {
+    background: var(--color-accent-3);
+  }
+
+  100% {
+    background: inherit;
+  }
+}
+
+.active {
+  animation: highlight 3s;
 }
 
 .textEdit {

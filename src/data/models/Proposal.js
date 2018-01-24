@@ -201,7 +201,6 @@ class Proposal {
     const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
     if (!proposalInDB) return null;
     // if (data.state && ['revoked', 'accepted'].indexOf(data.state) === -1) return null;
-
     const { pollData, pollingModeData, createPollingMode } = await validatePoll(
       viewer,
       data.poll,

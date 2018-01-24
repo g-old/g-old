@@ -45,7 +45,10 @@ function requestWriteControl(viewer, data) {
 
 function checkIfMember(viewer, resource) {
   if (resource && resource.workTeamId) {
-    // assumes there exits only workteams
+    // assumes there exist only workteams
+    if (viewer.groups & Groups.SYSTEM) {
+      return true;
+    }
     return (
       viewer.wtMemberships && viewer.wtMemberships.includes(resource.workTeamId)
     );

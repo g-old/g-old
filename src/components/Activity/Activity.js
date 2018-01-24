@@ -175,11 +175,17 @@ class Activity extends React.Component {
     );
   }
 
-  renderComment() {
+  renderComment(workTeamId) {
+    const { content } = this.props;
+    const parent = content.parentId;
+    const child = parent ? content.id : null;
+
     return (
       <Link
-        to={`/workteams/${this.props.content.workTeamId}/discussions/${this
-          .props.content.discussionId}`}
+        to={`/workteams/${workTeamId}/discussions/${this.props.content
+          .discussionId}?comment=${parent || content.id}${child
+          ? `&child=${child}`
+          : ''}`}
       >
         <Comment preview {...this.props.content} />
       </Link>
@@ -260,8 +266,10 @@ class Activity extends React.Component {
       }
 
       case 'Comment': {
-        result.content = this.renderComment();
-        result.header = 'New comment';
+        const info = JSON.parse(this.props.info || '{}');
+
+        result.content = this.renderComment(info.workTeamId);
+        result.header = info.title;
         break;
       }
 

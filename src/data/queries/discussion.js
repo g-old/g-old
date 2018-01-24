@@ -9,9 +9,15 @@ const discussion = {
     id: {
       type: GraphQLID,
     },
+    parentId: {
+      type: GraphQLID,
+    },
   },
-  resolve: (parent, { id }, { viewer, loaders }) =>
-    Discussion.gen(viewer, id, loaders),
+  resolve: async (parent, { id, parentId }, { viewer, loaders }) => {
+    const result = await Discussion.gen(viewer, id, loaders);
+    result.parentId = parentId; // to pass args to subresolver
+    return result;
+  },
 };
 
 export default discussion;

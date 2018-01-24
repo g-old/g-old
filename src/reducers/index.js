@@ -49,6 +49,9 @@ export const getSessionUser = state =>
 export const getProposal = (state, id) =>
   fromEntity.getProposal(state.entities, id);
 
+export const getComment = (state, id) =>
+  fromEntity.getComment(state.entities, id);
+
 export const getProposalsByTag = (state, tagId) =>
   fromEntity.getProposalsByTag(state.entities, tagId);
 

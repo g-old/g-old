@@ -44,6 +44,22 @@ const addWorkTeamInfo = async (viewer, loaders, workTeamId) => {
   });
 };
 
+// TODO store this in activity - would not be a problem
+const addDiscussionInfo = async (viewer, loaders, discussionId) => {
+  if (!discussionId) {
+    return JSON.stringify({});
+  }
+  const { workTeamId, title } = await Discussion.gen(
+    viewer,
+    discussionId,
+    loaders,
+  );
+  return JSON.stringify({
+    workTeamId,
+    title,
+  });
+};
+
 const getVote = async (viewer, parent, loaders) => {
   let vote;
   if (parent.verb === 'delete') {
@@ -154,6 +170,13 @@ const ActivityType = new GraphQLObjectType({
 
           case 'discussion': {
             return addWorkTeamInfo(viewer, loaders, parent.content.workTeamId);
+          }
+          case 'comment': {
+            return addDiscussionInfo(
+              viewer,
+              loaders,
+              parent.content.discussionId,
+            );
           }
 
           default: {

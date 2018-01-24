@@ -201,7 +201,11 @@ class ProposalPreview extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <div style={{ display: 'flex' }}>
+          <div
+            style={{ display: 'flex', cursor: 'pointer' }}
+            role="link"
+            onClick={this.handleClick}
+          >
             {/* <PollPreview poll={poll} /> */}
             {
               <div className={s.pollPreview}>
@@ -213,14 +217,7 @@ class ProposalPreview extends React.Component {
               <div className={s.date}>
                 <FormattedRelative value={poll.endTime} />
               </div>
-              <div
-                role="link"
-                style={{ cursor: 'pointer' }}
-                onClick={this.handleClick}
-                className={s.header}
-              >
-                {this.props.proposal.title}
-              </div>
+              <div className={s.header}>{this.props.proposal.title}</div>
               {/* <div className={s.body}>
                 {body}
               </div> */}

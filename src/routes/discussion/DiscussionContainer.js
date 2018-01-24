@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { findDOMNode } from 'react-dom';
 // import { defineMessages, FormattedMessage } from 'react-intl';
 // import history from '../../history';
 import { loadDiscussion } from '../../actions/discussion';
@@ -52,17 +53,37 @@ class DiscussionContainer extends React.Component {
     deleteComment: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
     updates: PropTypes.shape({ '0000': PropTypes.shape({}) }).isRequired,
+    childId: PropTypes.string,
+    commentId: PropTypes.string.isRequired,
   };
   static defaultProps = {
     errorMessage: null,
+    childId: null,
   };
   constructor(props) {
     super(props);
     this.state = { filter: 'all' };
+    this.scrollToId = props.childId || props.commentId;
     //  this.handleSubscription = this.handleSubscription.bind(this);
     this.handleCommentCreation = this.handleCommentCreation.bind(this);
     this.handleCommentFetching = this.handleCommentFetching.bind(this);
     this.handleReply = this.handleReply.bind(this);
+  }
+
+  componentDidMount() {
+    if (this.commentTo) {
+      // TODO let comment handle scrollto and focus
+      // eslint-disable-next-line
+      const node = findDOMNode(this.commentTo);
+      if (node) {
+        setTimeout(
+          () =>
+            // or use window.scrollTo(0, node.offsetTop);
+            node.scrollIntoView({ block: 'center', behavior: 'smooth' }),
+          100,
+        );
+      }
+    }
   }
 
   isReady() {
@@ -87,7 +108,14 @@ class DiscussionContainer extends React.Component {
   }
 
   render() {
-    const { discussion, isFetching, errorMessage, user } = this.props;
+    const {
+      discussion,
+      isFetching,
+      errorMessage,
+      user,
+      commentId,
+      childId,
+    } = this.props;
     if (isFetching && !discussion) {
       return <p>{'Loading...'} </p>;
     }
@@ -104,7 +132,7 @@ class DiscussionContainer extends React.Component {
       if (!discussion.comments) return <span>{'NOTHING TO SEE'}</span>;
       return (
         <div>
-          <Box column pad>
+          <Box column pad align padding="medium">
             <CheckBox
               toggle
               checked={discussion.subscribed}
@@ -114,46 +142,61 @@ class DiscussionContainer extends React.Component {
             />
             <Discussion {...discussion} />
             {`COMMENTS * ${discussion.numComments}`}
-            <Comment
-              asInput
-              user={user}
-              onCreate={this.handleCommentCreation}
-              updates={this.props.updates['0000'] || {}}
-            />
-            {'TOP COMMENTS'}
-            {discussion.comments &&
-              discussion.comments.map(c => (
-                <Comment
-                  {...c}
-                  onReply={this.handleReply}
-                  loadReplies={this.handleCommentFetching}
-                  onCreate={this.handleCommentCreation}
-                  onUpdate={this.props.updateComment}
-                  onDelete={this.props.deleteComment}
-                  openInput={c.id === this.state.replying}
-                  // eslint-disable-next-line eqeqeq
-                  own={c.author.id == user.id}
-                  user={user}
-                  updates={this.props.updates[c.id]}
-                >
-                  {c.replies &&
-                    c.replies.map(r => (
-                      <Comment
-                        {...r}
-                        onReply={this.handleReply}
-                        reply
-                        onCreate={this.handleCommentCreation}
-                        onUpdate={this.props.updateComment}
-                        onDelete={this.props.deleteComment}
-                        openInput={r.id === this.state.replying}
-                        // eslint-disable-next-line eqeqeq
-                        own={r.author.id == user.id}
-                        updates={this.props.updates[c.id]}
-                        user={user}
-                      />
-                    ))}
-                </Comment>
-              ))}
+            <Box column pad>
+              <Comment
+                asInput
+                user={user}
+                onCreate={this.handleCommentCreation}
+                updates={this.props.updates['0000'] || {}}
+              />
+              {'TOP COMMENTS'}
+              {discussion.comments &&
+                discussion.comments.map(c => (
+                  <Comment
+                    {...c}
+                    showReplies={c.id === commentId && childId}
+                    onReply={this.handleReply}
+                    loadReplies={this.handleCommentFetching}
+                    onCreate={this.handleCommentCreation}
+                    onUpdate={this.props.updateComment}
+                    onDelete={this.props.deleteComment}
+                    openInput={c.id === this.state.replying}
+                    // eslint-disable-next-line eqeqeq
+                    own={c.author.id == user.id}
+                    user={user}
+                    updates={this.props.updates[c.id]}
+                    ref={
+                      c.id === this.scrollToId
+                        ? node => (this.commentTo = node) // eslint-disable-line
+                        : null
+                    }
+                    active={c.id === this.scrollToId}
+                  >
+                    {c.replies &&
+                      c.replies.map(r => (
+                        <Comment
+                          {...r}
+                          onReply={this.handleReply}
+                          reply
+                          onCreate={this.handleCommentCreation}
+                          onUpdate={this.props.updateComment}
+                          onDelete={this.props.deleteComment}
+                          openInput={r.id === this.state.replying}
+                          // eslint-disable-next-line eqeqeq
+                          own={r.author.id == user.id}
+                          updates={this.props.updates[c.id]}
+                          user={user}
+                          ref={
+                            r.id === this.scrollToId
+                              ? node => (this.commentTo = node) // eslint-disable-line
+                              : null
+                          }
+                          active={r.id === this.scrollToId}
+                        />
+                      ))}
+                  </Comment>
+                ))}
+            </Box>
           </Box>
         </div>
       ); // <TestProposal user={this.props.user} proposal={this.props.proposal} />;

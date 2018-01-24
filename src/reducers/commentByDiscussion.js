@@ -1,18 +1,23 @@
-import { LOAD_REPLIES_SUCCESS } from '../constants';
+import { LOAD_REPLIES_SUCCESS /* LOAD_FEED_SUCCESS */ } from '../constants';
 
-const sort = (state, discussions) =>
-  Object.keys(discussions).reduce((acc, curr) => {
-    const discussion = discussions[curr];
-    if (!discussion.workTeamId) return acc;
-    acc[discussion.workTeamId] = [
-      ...new Set([curr, ...acc[discussion.workTeamId]]),
-    ];
+const sort = (state, comments) =>
+  Object.keys(comments).reduce((acc, curr) => {
+    const comment = comments[curr];
+    if (!comment.discussionId) return acc;
+    if (acc[comment.discussionId]) {
+      acc[comment.discussionId] = [
+        ...new Set([curr, ...acc[comment.discussionId]]),
+      ];
+    } else {
+      acc[comment.discussionId] = [...new Set([curr])];
+    }
 
     return acc;
   }, state);
 
 const byDiscussion = (state = {}, action) => {
   switch (action.type) {
+    //  case LOAD_FEED_SUCCESS:
     case LOAD_REPLIES_SUCCESS: {
       const comments = action.payload.entities.comments;
       if (!comments) return state;

@@ -132,6 +132,8 @@ class Comment extends React.Component {
     own: PropTypes.bool,
     editedAt: PropTypes.string,
     intl: PropTypes.shape({ formatRelative: PropTypes.func }).isRequired,
+    showReplies: PropTypes.bool,
+    active: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -162,6 +164,8 @@ class Comment extends React.Component {
     own: null,
     editedAt: null,
     preview: null,
+    showReplies: null,
+    active: null,
   };
 
   constructor(props) {
@@ -172,6 +176,7 @@ class Comment extends React.Component {
       pending: false,
       collapsed: false,
       open: props.openInput,
+      showReplies: props.showReplies,
     };
     this.onDeleteComment = this.onDeleteComment.bind(this);
     this.handleEditing = this.handleEditing.bind(this);
@@ -199,7 +204,7 @@ class Comment extends React.Component {
     }
   }
 
-  componentWillReceiveProps({ updates, openInput }) {
+  componentWillReceiveProps({ updates = {}, openInput }) {
     if (updates) {
       if (updates.success && !this.props.updates.success) {
         this.onEndEditing();
@@ -630,7 +635,7 @@ class Comment extends React.Component {
       footer = this.props.preview ? null : this.renderFooter(user);
     }
     return (
-      <div className={s.root}>
+      <div className={cn(s.root, this.props.active ? s.active : null)}>
         {header}
         {/* eslint-disable no-return-assign */}
         <div className={s.text} ref={ref => (this.textBox = ref)}>

@@ -60,8 +60,8 @@ ${discussionFields}
       ${authorFields}
     }
   }`;
-const discussionQuery = `query($id:ID){
-  discussion(id:$id){
+const discussionQuery = `query($id:ID $parentId:ID){
+  discussion(id:$id parentId:$parentId){
   ${discussionFragment}
   }
 }`;
@@ -72,7 +72,30 @@ const createDiscussionMutation = `mutation($workTeamId:ID $content:String $title
   }
 }`;
 
-export function loadDiscussion({ id }) {
+const mergeRepliesInotParent = (parentId, comments) => {
+  const replies = comments
+    .filter(c => c.parentId)
+    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  const parentIds = comments.reduce((acc, curr) => {
+    if (curr.id !== parentId) {
+      if (!curr.parentId) {
+        acc[curr.id] = curr.id;
+      }
+    }
+    return acc;
+  }, {});
+
+  return comments.reduce((acc, curr) => {
+    if (curr.id in parentIds) {
+      acc.push(curr);
+    } else if (curr.id === parentId) {
+      curr.replies = replies; // eslint-disable-line
+      acc.push(curr);
+    }
+    return acc;
+  }, []);
+};
+export function loadDiscussion({ id, parentId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // Dont fetch if pending
     const state = await getState();
@@ -88,7 +111,13 @@ export function loadDiscussion({ id }) {
     });
 
     try {
-      const { data } = await graphqlRequest(discussionQuery, { id });
+      const { data } = await graphqlRequest(discussionQuery, { id, parentId });
+      if (parentId) {
+        data.discussion.comments = mergeRepliesInotParent(
+          parentId,
+          data.discussion.comments,
+        );
+      }
       const normalizedData = normalize(data.discussion, discussionSchema);
       dispatch({
         type: LOAD_DISCUSSION_SUCCESS,

@@ -375,35 +375,50 @@
     "description": "Creating new proposal",
     "defaultMessage": "Create a new proposal",
     "message": "Crié na nueva proposta",
-    "files": ["src/components/ProposalPanel/ProposalPanel.js"]
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
   },
   {
     "id": "proposalManager",
     "description": "Manage proposals",
     "defaultMessage": "Manage proposals",
     "message": "???",
-    "files": ["src/components/ProposalPanel/ProposalPanel.js"]
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
   },
   {
     "id": "proposalManager.phaseOnePoll",
     "description": "PhaseOnePoll presets",
     "defaultMessage": "TR: 25 - PHASE ONE - NO STATEMENTS",
     "message": "TR: 20 - FASA UN - DEGUGN CONTRIBUC",
-    "files": ["src/components/ProposalPanel/ProposalPanel.js"]
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
   },
   {
     "id": "proposalManager.phaseTwoPoll",
     "description": "PhaseTwoPoll presets",
     "defaultMessage": "TR: 50 - PHASE TWO - WITH STATEMENTS",
     "message": "TR: 50 -FASA DOI - CON CONTRIBUC",
-    "files": ["src/components/ProposalPanel/ProposalPanel.js"]
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
   },
   {
     "id": "proposalManager.survey",
     "description": "Survey presets",
     "defaultMessage": "Survey",
     "message": "enrescida",
-    "files": ["src/components/ProposalPanel/ProposalPanel.js"]
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
   },
   {
     "id": "confirmation",
@@ -1102,6 +1117,9 @@
     "description": "Tags",
     "defaultMessage": "Tags",
     "message": "",
-    "files": ["src/components/ProposalPanel/ProposalPanel.js"]
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
   }
 ]

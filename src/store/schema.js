@@ -57,22 +57,6 @@ user.define({
 export const notification = new schema.Entity('notifications', {
   sender: user,
 });
-export const unionSchema = new schema.Union(
-  {
-    ProposalDL: proposal,
-    VoteDL: vote,
-    StatementDL: statement,
-    Notification: notification,
-  },
-  '__typename',
-);
-export const activity = new schema.Entity('activities', {
-  actor: user,
-  object: unionSchema,
-});
-export const log = new schema.Entity('logs', {
-  actor: user,
-});
 export const comment = new schema.Entity('comments');
 comment.define({
   author: user,
@@ -83,6 +67,25 @@ export const discussion = new schema.Entity('discussions', {
   author: user,
   comments: [comment],
   ownComment: comment,
+});
+
+export const unionSchema = new schema.Union(
+  {
+    ProposalDL: proposal,
+    VoteDL: vote,
+    StatementDL: statement,
+    Notification: notification,
+    Comment: comment,
+    Discussion: discussion,
+  },
+  '__typename',
+);
+export const activity = new schema.Entity('activities', {
+  actor: user,
+  object: unionSchema,
+});
+export const log = new schema.Entity('logs', {
+  actor: user,
 });
 
 export const proposalList = [proposal];

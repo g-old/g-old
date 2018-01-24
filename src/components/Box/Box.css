@@ -50,7 +50,11 @@
 }
 
 .medium {
-  padding: 3rem;
+  padding: 3em;
+
+  @media only screen and (max-width: 30em) {
+    padding: 1em;
+  }
 }
 
 .small {
