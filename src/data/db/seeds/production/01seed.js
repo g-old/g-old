@@ -5,10 +5,12 @@ exports.seed = function (knex, Promise) {
 
   function createSystemFeeds({proposalFeedID, statementFeedID}) {
     return Promise.resolve(
-      knex('system_feeds').insert([
-        { user_id: proposalFeedID, activity_ids: JSON.stringify([]) },
-        { user_id: statementFeedID, activity_ids: JSON.stringify([]) },
-      ])
+      knex('system_feeds').insert({
+        group_id: 1,
+        type: 'GROUP',
+        main_activities:JSON.stringify([]),
+        activities: JSON.stringify([]),
+      })
     );
   }
 
