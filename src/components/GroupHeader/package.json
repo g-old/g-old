@@ -1,0 +1,6 @@
+{
+  "name": "GroupHeader",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./GroupHeader.js"
+}

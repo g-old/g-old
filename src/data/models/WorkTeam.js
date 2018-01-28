@@ -1,6 +1,8 @@
 import knex from '../knex';
 import User from './User';
 import Request from './Request';
+import Proposal from './Proposal';
+
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import { Groups } from '../../organization';
 
@@ -152,6 +154,7 @@ class WorkTeam {
         // insert into sessions;
         if (workTeaminDB) {
           await this.addMembershipToSessions(requester.id);
+          // update viewer
           // eslint-disable-next-line no-param-reassign
           viewer.wtMemberships = viewer.wtMemberships
             ? [...viewer.wtMemberships, this.id]
@@ -227,6 +230,19 @@ class WorkTeam {
     return workTeam;
   }
 
+  static async checkForMainTeam(newTeamStatus, transaction) {
+    if (newTeamStatus) {
+      const res = await knex('work_teams')
+        .transacting(transaction)
+        .where({ main: true })
+        .pluck('id');
+      if (res && res.length) {
+        throw new Error('Main team already set');
+      }
+    }
+    return true;
+  }
+
   async circularFeedNotification(viewer, activity, pushFn) {
     if (!this.canNotify(viewer)) return null;
 
@@ -260,8 +276,8 @@ class WorkTeam {
     if (!data.restricted) {
       newData.restricted = false;
     }
-    if (typeof data.main === 'boolean') {
-      throw new Error('Not implemented yet: MAIN');
+    if (typeof data.mainTeam === 'boolean') {
+      newData.main = data.mainTeam;
     }
     if (data.coordinatorId) {
       if (!validateCoordinator(viewer, data.coordinatorId, loaders))
@@ -270,6 +286,7 @@ class WorkTeam {
     }
     newData.created_at = new Date();
     const workTeam = await knex.transaction(async trx => {
+      await WorkTeam.checkForMainTeam(newData.main, trx);
       const [workTeamData = null] = await trx
         .insert(newData)
         .into('work_teams')
@@ -317,8 +334,8 @@ class WorkTeam {
     if (data.background || data.backgroundAssetId) {
       throw new Error('Not implemented yet: BACKGROUND');
     }
-    if (typeof data.main === 'boolean') {
-      throw new Error('Not implemented yet: MAIN');
+    if (typeof data.mainTeam === 'boolean') {
+      newData.main = data.mainTeam;
     }
 
     if (data.coordinatorId) {
@@ -330,16 +347,29 @@ class WorkTeam {
     if (Object.keys(newData).length) {
       newData.updated_at = new Date();
     }
-    const [workTeam = null] = await knex.transaction(async trx =>
+    const [workTeam = null] = await knex.transaction(async trx => {
+      await WorkTeam.checkForMainTeam(newData.main, trx);
       // eslint-disable-next-line newline-per-chained-call
-      knex('work_teams')
+      return knex('work_teams')
         .where({ id: data.id })
         .transacting(trx)
         .forUpdate()
         .update(newData)
-        .returning('*'),
-    );
+        .returning('*');
+    });
     return workTeam ? new WorkTeam(workTeam) : null;
+  }
+
+  async getLinkedProposals(viewer, loaders) {
+    if (!this.mainTeam || !this.args) return [];
+    const proposalIds = await knex('proposal_groups')
+      .where({
+        state: this.args.proposalState,
+        group_id: this.id,
+        group_type: 'WT',
+      })
+      .pluck('proposal_id');
+    return proposalIds.map(pId => Proposal.gen(viewer, pId, loaders));
   }
 }
 

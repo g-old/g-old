@@ -1,4 +1,4 @@
-import { GraphQLID, GraphQLNonNull } from 'graphql';
+import { GraphQLID, GraphQLNonNull, GraphQLString } from 'graphql';
 
 import WorkTeamType from '../types/WorkTeamType';
 import WorkTeam from '../models/WorkTeam';
@@ -9,10 +9,18 @@ const workTeam = {
     id: {
       type: new GraphQLNonNull(GraphQLID),
     },
+    proposalState: {
+      type: GraphQLString,
+    },
   },
 
-  resolve: (root, { id }, { viewer, loaders }) =>
-    WorkTeam.gen(viewer, id, loaders),
+  resolve: async (root, args, { viewer, loaders }) => {
+    const workTeamResult = await WorkTeam.gen(viewer, args.id, loaders);
+    if (workTeamResult) {
+      workTeamResult.args = args; // TODO change query
+    }
+    return workTeam;
+  },
 };
 
 export default workTeam;

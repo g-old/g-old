@@ -41,7 +41,7 @@
       "Ves manun chesta mail, ajache valgungn à damandé de mudé la password de vost account"
   },
   "clickReset": {
-    "de-DE": "Mein Password zurücksetzen",
+    "de-DE": "Mein Passwort zurücksetzen",
     "it-IT": "Resettare la password",
     "lld-IT": "Reseté la password"
   },
@@ -75,7 +75,7 @@
     "lld-IT": "Vosta miscion e-mail é vegnuda mudeda coretamenter."
   },
   "GOLD password changed": {
-    "de-DE": "GOLD - Password geändert",
+    "de-DE": "GOLD - Passwort geändert",
     "it-IT": "GOLD - password modificata",
     "lld-IT": "GOLD - password mudeda"
   },

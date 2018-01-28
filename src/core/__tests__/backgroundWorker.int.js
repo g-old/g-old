@@ -4,6 +4,7 @@ import backgroundWorker from '../backgroundWorker';
 import { createTestActor, createTestUser, clearDB } from '../../../test/utils';
 import { Permissions } from '../../organization';
 import knex from '../../data/knex';
+import { EmailTypes } from '../BackgroundService';
 
 /*
 const FILE_PATH = './backgroundWorker';
@@ -16,17 +17,23 @@ const setupWorker = async handleMessages => {
   worker = await cp.fork(FILE_PATH);
   worker.on('message', handleMessages);
 }; */
+
+const VALID_TEST_EMAIL = 'testg@byom.de';
 jest.setTimeout(10000);
 describe('Background Worker Integration', () => {
+  // eslint-disable-next-line no-underscore-dangle
+  const handleMessages = backgroundWorker.__get__('handleMessages');
+
   it('Should send emails via sendgrid', async () => {
     const testActor = createTestActor({ permissions: Permissions.NOTIFY_ALL });
-    const messageData = {
+    const testRecipient = createTestUser({ email: VALID_TEST_EMAIL });
+    const notificationMessageData = {
       type: 'mail',
       data: {
-        mailType: 'notification',
+        mailType: EmailTypes.MESSAGE,
         message: `Integration @ ${new Date()}`,
         subject: 'Info from GOLD',
-        address: 'testg@byom.de',
+        address: VALID_TEST_EMAIL,
         viewer: testActor,
         mail_settings: {
           // for testing - counts for the limit -email ist NOT delivered
@@ -35,25 +42,20 @@ describe('Background Worker Integration', () => {
             enable: true,
           },
         },
+        recipient: testRecipient,
       },
       viewer: testActor,
     };
-    // eslint-disable-next-line no-underscore-dangle
-    const handleMessages = backgroundWorker.__get__('handleMessages');
-    const res = await handleMessages(messageData);
+    const res = await handleMessages(notificationMessageData);
     expect(res).toBeDefined();
-    expect(res[0].statusCode).toBeGreaterThanOrEqual(200);
-    expect(res[0].statusCode).toBeLessThan(300);
+    expect(res.success).toBe(true);
   });
 
-  it('Should generate a email with link to reset the password', async () => {
+  it.only('Should generate a email with link to reset the password', async () => {
     await clearDB();
-    const mockMailer = {
-      send: data => Promise.resolve(data),
-    };
+
     /* eslint-disable no-underscore-dangle */
-    backgroundWorker.__set__('Mailer', mockMailer);
-    const testUser = createTestUser();
+    const testUser = createTestUser({ email: VALID_TEST_EMAIL });
     const [uID] = await knex('users')
       .insert(testUser)
       .returning('id');
@@ -63,10 +65,11 @@ describe('Background Worker Integration', () => {
       email: testUser.email,
     });
     const connection = { host: '127.0.0.1', protocol: 'https' };
-    const messageData = {
+    const resetMessageData = {
       type: 'mail',
       data: {
-        mailType: 'resetPassword',
+        mailType: EmailTypes.RESET_REQUEST,
+
         address: testUser.email,
         viewer: testActor,
         lang: 'de-DE',
@@ -75,9 +78,8 @@ describe('Background Worker Integration', () => {
       viewer: testActor,
     };
     // eslint-disable-next-line no-underscore-dangle
-    const handleMessages = backgroundWorker.__get__('handleMessages');
-    const res = await handleMessages(messageData);
+    const res = await handleMessages(resetMessageData);
     expect(res).toBeDefined();
-    expect(res.text).toMatch(connection.host);
+    expect(res.success).toBe(true);
   });
 });

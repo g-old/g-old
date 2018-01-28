@@ -236,7 +236,7 @@ class WorkTeamManagement extends React.Component {
       deName,
       itName,
       restricted,
-      main,
+      mainTeam,
       error,
     } = this.state;
     const { workTeam, users = [], updates = {} } = this.props;
@@ -323,14 +323,14 @@ class WorkTeamManagement extends React.Component {
             </fieldset>
 
             <Label>
-              {main ? 'Current main team (Rat)' : 'Set as main team (Rat)'}
+              {mainTeam ? 'Current main team (Rat)' : 'Set as main team (Rat)'}
             </Label>
             <fieldset>
               <FormField>
                 <CheckBox
                   label="mainTeam"
                   name="mainTeam"
-                  checked={main}
+                  checked={mainTeam}
                   onChange={this.handleValueChanges}
                   toggle
                 />

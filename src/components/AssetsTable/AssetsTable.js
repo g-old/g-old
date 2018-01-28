@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './AssetsList.css'; // eslint-disable-line
+import s from './AssetsTable.css'; // eslint-disable-line
 import Box from '../Box';
 import Table from '../Table';
 import AssetTableRows from './Rows';
 import TableHeader from '../TableHeader';
 
-class AssetsList extends React.Component {
+class AssetsTable extends React.Component {
   static propTypes = {
-    requests: PropTypes.arrayOf(PropTypes.shape({})),
+    assets: PropTypes.arrayOf(PropTypes.shape({})),
     sortIndex: PropTypes.string,
     requiresSearch: PropTypes.bool,
     searchTerm: PropTypes.string,
@@ -22,9 +22,10 @@ class AssetsList extends React.Component {
     allowMultiSelect: PropTypes.bool,
     noAssetsFound: PropTypes.node,
     checkedIndices: PropTypes.arrayOf(PropTypes.number),
+    row: PropTypes.node.isRequired,
   };
   static defaultProps = {
-    requests: null,
+    assets: null,
     sortIndex: null,
     requiresSearch: null,
     searchTerm: null,
@@ -40,7 +41,7 @@ class AssetsList extends React.Component {
 
   render() {
     const {
-      requests,
+      assets,
       sortIndex,
       requiresSearch,
       searchTerm,
@@ -53,11 +54,12 @@ class AssetsList extends React.Component {
       allowMultiSelect,
       noAssetsFound,
       checkedIndices,
+      row: Row,
     } = this.props;
     return (
       <div className={s.table}>
         <Box>
-          {!requests.length && noAssetsFound !== null ? (
+          {!assets.length && noAssetsFound !== null ? (
             noAssetsFound
           ) : (
             <Table responsive scrollable={false}>
@@ -72,8 +74,9 @@ class AssetsList extends React.Component {
                 }
               />
               <AssetTableRows
+                row={Row}
                 checkedIndices={checkedIndices}
-                requests={requests}
+                assets={assets}
                 searchTerm={searchTerm}
                 requiresSearch={requiresSearch}
                 onClickCheckbox={onClickCheckbox}
@@ -90,4 +93,4 @@ class AssetsList extends React.Component {
   }
 }
 
-export default withStyles(s)(AssetsList);
+export default withStyles(s)(AssetsTable);

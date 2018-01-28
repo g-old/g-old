@@ -54,6 +54,7 @@ import responseTiming from './core/timing';
 import { Groups } from './organization';
 import EventManager from './core/EventManager';
 import root from './compositionRoot';
+import { EmailTypes } from './core/BackgroundService';
 
 const pubsub = new PubSub();
 
@@ -241,7 +242,7 @@ app.post('/signup', (req, res) => {
         type: 'mail',
         data: {
           lang: req.cookies.lang,
-          mailType: 'verifyEmail',
+          mailType: EmailTypes.WELCOME,
           address: user.email,
           viewer: user,
           connection: {
@@ -326,7 +327,7 @@ app.post('/forgot', (req, res) => {
         const job = {
           type: 'mail',
           data: {
-            mailType: 'resetPassword',
+            mailType: EmailTypes.RESET_REQUEST,
             lang: req.cookies.lang,
             address: user.email,
             viewer: user,
@@ -368,7 +369,7 @@ app.post('/reset/:token', (req, res) =>
         const job = {
           type: 'mail',
           data: {
-            mailType: 'resetSuccess',
+            mailType: EmailTypes.RESET_SUCCESS,
             lang: req.cookies.lang,
             address: user.email,
             viewer: user,
@@ -446,7 +447,9 @@ app.post('/verify', (req, res) =>
         const job = {
           type: 'mail',
           data: {
-            mailType: req.user.emailVerified ? 'mailChanged' : 'verifyEmail',
+            mailType: req.user.emailVerified
+              ? EmailTypes.VERIFICATION
+              : EmailTypes.WELCOME,
             lang: req.cookies.lang,
             verify: true,
             address: user.email,

@@ -5,7 +5,6 @@ import Proposal from '../data/models/Proposal';
 import { circularFeedNotification } from './feed';
 import createLoaders from '../data/dataLoader';
 import root from '../compositionRoot';
-import { TransportTypes } from './MessageService';
 
 const handleNotifications = async (viewer, notificationData, receiver) =>
   circularFeedNotification({
@@ -15,63 +14,6 @@ const handleNotifications = async (viewer, notificationData, receiver) =>
     receiver,
     loaders: createLoaders(),
   });
-
-const handleMails = async mailData => {
-  let result = null;
-  // return;
-  switch (mailData.mailType) {
-    case 'verifyEmail': {
-      result = await root.MessageService.sendWelcomeMessage(
-        mailData.viewer,
-        TransportTypes.EMAIL,
-        mailData.lang,
-      );
-
-      break;
-    }
-    case 'mailChanged': {
-      result = await root.MessageService.sendVerificationMessage(
-        mailData.viewer,
-        TransportTypes.EMAIL,
-        mailData.lang,
-      );
-      break;
-    }
-    case 'resetPassword': {
-      result = await root.MessageService.sendResetRequestMessage(
-        mailData.viewer,
-        TransportTypes.EMAIL,
-        mailData.lang,
-      );
-
-      break;
-    }
-
-    case 'resetSuccess': {
-      result = await root.MessageService.sendResetNotificationMessage(
-        mailData.viewer,
-        TransportTypes.EMAIL,
-        mailData.lang,
-      );
-      break;
-    }
-
-    case 'notification': {
-      result = await root.MessageService.sendMessage(
-        mailData.recipient,
-        { content: mailData.message, subject: mailData.subject },
-        mailData.viewer,
-        TransportTypes.EMAIL,
-      );
-
-      break;
-    }
-    default: {
-      throw Error(`Mail type not recognized: ${mailData.mailType}`);
-    }
-  }
-  return result;
-};
 
 const push = async (subscriptionData, msg) => {
   let result;
@@ -196,7 +138,10 @@ async function handleMessages(data) {
       case 'mail': {
         log.info('Starting mail');
         const mailData = data.data;
-        result = await handleMails(mailData);
+        result = await root.BackgroundService.handleEmails(
+          mailData.mailType,
+          mailData,
+        );
         break;
       }
 

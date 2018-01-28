@@ -23,6 +23,7 @@ const hydrateActivities = (state, data, entities) =>
     proposals: entities.proposals.byId,
     statements: entities.statements.byId,
     comments: entities.comments.byId,
+    discussions: entities.discussions.byId,
   });
 
 export const getActivities = (state, filter, entities) => {

@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import s from './WorkTeam.css';
-import Label from '../Label';
+import Heading from '../Heading';
 import Value from '../Value';
+// import Menu from '../Menu';
+
 import Box from '../Box';
 import Button from '../Button';
 import DiscussionPreview from '../DiscussionPreview';
@@ -53,6 +55,10 @@ class WorkTeam extends React.Component {
     discussions: null,
     proposals: null,
   };
+  static onProposalClick({ proposalId, pollId }) {
+    history.push(`/proposal/${proposalId}/${pollId}`);
+  }
+
   constructor(props) {
     super(props);
     this.handleDiscussionClick = this.handleDiscussionClick.bind(this);
@@ -175,12 +181,23 @@ class WorkTeam extends React.Component {
         </div>
       );
       proposalsSection = (
-        <div>{proposals.map(p => p && <ProposalPreview proposal={p} />)}</div>
+        <div>
+          {proposals.map(
+            p =>
+              p && (
+                <ProposalPreview
+                  proposal={p}
+                  onClick={WorkTeam.onProposalClick}
+                />
+              ),
+          )}
+        </div>
       );
     }
     return (
-      <div className={s.root}>
-        <div className={s.background} />
+      <Box align column padding="medium" pad>
+        {picture}
+        <Heading tag="h2">{displayName}</Heading>
         <Box>
           <Value
             icon={
@@ -196,10 +213,7 @@ class WorkTeam extends React.Component {
             label="Members"
             value={numMembers || 0}
           />
-          <Box column align className={s.header}>
-            {picture}
-            <Label big>{displayName}</Label>
-          </Box>
+
           <Value
             icon={
               <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
@@ -216,12 +230,19 @@ class WorkTeam extends React.Component {
           />
           <Value
             icon={
-              <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+              <svg
+                version="1.1"
+                viewBox="0 0 24 24"
+                width="24px"
+                height="24px"
+                role="img"
+                aria-label="proposal"
+              >
                 <path
                   fill="none"
                   stroke="#000"
                   strokeWidth="2"
-                  d="M12,13 C14.209139,13 16,11.209139 16,9 C16,6.790861 14.209139,5 12,5 C9.790861,5 8,6.790861 8,9 C8,11.209139 9.790861,13 12,13 Z M6,22 L6,19 C6,15.6862915 8.6862915,13 12,13 C15.3137085,13 18,15.6862915 18,19 L18,22 M13,5 C13.4037285,3.33566165 15.0151447,2 17,2 C19.172216,2 20.98052,3.790861 21,6 C20.98052,8.209139 19.172216,10 17,10 L16,10 L17,10 C20.287544,10 23,12.6862915 23,16 L23,18 M11,5 C10.5962715,3.33566165 8.98485529,2 7,2 C4.82778404,2 3.01948003,3.790861 3,6 C3.01948003,8.209139 4.82778404,10 7,10 L8,10 L7,10 C3.71245602,10 1,12.6862915 1,16 L1,18"
+                  d="M16,7 L19,7 L19,11 L16,11 L16,7 Z M9,15 L20,15 M9,11 L13,11 M9,7 L13,7 M6,18.5 C6,19.8807119 4.88071187,21 3.5,21 C2.11928813,21 1,19.8807119 1,18.5 L1,7 L6.02493781,7 M6,18.5 L6,3 L23,3 L23,18.5 C23,19.8807119 21.8807119,21 20.5,21 L3.5,21"
                 />
               </svg>
             }
@@ -238,9 +259,21 @@ class WorkTeam extends React.Component {
           label={'Management'}
         /> */}
         {actionBtn}
-        {discussionSection}
-        {proposalsSection}
-      </div>
+        <section>
+          <Box between align>
+            <Heading tag="h3"> OPEN VOTINGS</Heading>
+            {/* <Menu label="FILTER">
+              <div>Currently</div>
+              <div>Not</div>
+              <div>Working</div>
+            </Menu> */}
+          </Box>
+
+          <div>{proposalsSection}</div>
+          <Heading tag="h3"> OPEN DISCUSSIONS</Heading>
+          <div>{discussionSection}</div>
+        </section>
+      </Box>
     );
   }
 }

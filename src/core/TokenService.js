@@ -17,7 +17,7 @@ class TokenService {
       email: emailAdress,
       table: 'reset_tokens',
       hoursValid: 2,
-      withEmail: true,
+      withEmail: false,
     });
   }
 }

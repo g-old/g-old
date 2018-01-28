@@ -34,11 +34,15 @@ export const poll = new schema.Entity('polls', {
   likedStatements: [statementLike],
 });
 export const tag = new schema.Entity('tags');
+
 export const proposal = new schema.Entity('proposals', {
   author: user,
   pollOne: poll,
   pollTwo: poll,
   tags: [tag],
+});
+export const proposalStatus = new schema.Entity('proposalStatus', {
+  proposal,
 });
 export const workTeam = new schema.Entity('workTeams', {
   coordinator: user,
@@ -48,6 +52,7 @@ export const workTeam = new schema.Entity('workTeams', {
   },
   requests: [request],
   proposals: [proposal],
+  linkedProposals: [proposalStatus],
 });
 user.define({
   role,

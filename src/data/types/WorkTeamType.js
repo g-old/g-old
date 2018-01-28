@@ -10,13 +10,16 @@ import {
 import UserType from './UserType';
 import DiscussionType from './DiscussionType';
 import GroupStatusType from './GroupStatusType';
+import PageType from './PageType';
+
 import Request from '../models/Request';
 import RequestType from '../types/RequestType';
-import ProposalType from '../types/ProposalDLType';
-import Proposal from '../models/Proposal';
+import ProposalStatusType from '../types/ProposalStatusType';
+
 import Discussion from '../models/Discussion';
 import User from '../models/User';
 import knex from '../knex';
+import proposalConnection from '../queries/proposalConnection';
 
 const WorkTeamType = new ObjectType({
   name: 'WorkTeam',
@@ -140,7 +143,7 @@ const WorkTeamType = new ObjectType({
         return null;
       },
     },
-    proposals: {
+    proposalConnection /* {
       type: new GraphQLList(ProposalType),
       resolve(data, args, { viewer, loaders }) {
         if (viewer && viewer.wtMemberships.includes(data.id)) {
@@ -151,6 +154,75 @@ const WorkTeamType = new ObjectType({
             .then(ids => ids.map(id => Proposal.gen(viewer, id, loaders)));
         }
         return null;
+      },
+    }, */,
+
+    // TODO see https://github.com/graphql/swapi-graphql/blob/master/src/schema/connections.js
+    // make own query and link here
+    linkedProposalConnection: {
+      type: PageType(ProposalStatusType),
+      args: {
+        first: {
+          type: GraphQLInt,
+        },
+        after: {
+          type: GraphQLString,
+        },
+        state: {
+          type: GraphQLString,
+        },
+      },
+      async resolve(parent, { first = 10, after = '', state }) {
+        const pagination = Buffer.from(after, 'base64').toString('ascii');
+        // cursor = cursor ? new Date(cursor) : new Date();
+        let [cursor = null, id = 0] = pagination ? pagination.split('$') : [];
+        id = Number(id);
+        let proposalStates = [];
+        cursor = cursor ? new Date(cursor) : new Date(null);
+
+        proposalStates = await knex('proposal_groups')
+          .where({
+            group_id: parent.id,
+            group_type: 'WT',
+          })
+          .modify(queryBuilder => {
+            if (state) {
+              queryBuilder.where({ state });
+            }
+          })
+          .whereRaw(
+            '(proposal_groups.created_at, proposal_groups.id) > (?,?)',
+            [cursor, id],
+          )
+          .limit(first)
+          .orderBy('proposal_groups.created_at', 'asc')
+          .orderBy('proposal_groups.id', 'asc')
+          .select();
+
+        const proposalsSet = proposalStates.reduce((acc, curr) => {
+          acc[curr.id] = curr;
+          return acc;
+        }, {});
+        const data = proposalStates;
+        const edges = data.map(p => ({ node: p }));
+        const endCursor =
+          edges.length > 0
+            ? Buffer.from(
+                `${new Date(
+                  proposalsSet[edges[edges.length - 1].node.id].time,
+                ).toJSON()}$${edges[edges.length - 1].node.id}`,
+              ).toString('base64')
+            : null;
+
+        const hasNextPage = edges.length === first;
+        return {
+          edges,
+          pageInfo: {
+            startCursor: null,
+            endCursor,
+            hasNextPage,
+          },
+        };
       },
     },
   }),

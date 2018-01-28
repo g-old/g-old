@@ -15,7 +15,7 @@ import PollState from '../PollState';
 import Button from '../Button';
 import FetchError from '../FetchError';
 import Box from '../Box';
-import ProposalDetails from '../ProposalDetails';
+import ProposalActions from '../ProposalActions';
 import Label from '../Label';
 import ProposalListEntry from './ProposalListEntry';
 import Layer from '../Layer';
@@ -220,7 +220,7 @@ class ProposalsManager extends React.Component {
       <Box column pad>
         {this.state.showDetails && (
           <Layer onClose={this.handleLayerClosing}>
-            <ProposalDetails
+            <ProposalActions
               pollOptions={this.props.pollOptions}
               defaultPollValues={this.props.defaultPollValues}
               intl={this.context.intl}
@@ -232,43 +232,7 @@ class ProposalsManager extends React.Component {
         )}
 
         {this.renderProposalList(toRender)}
-        {/* toRender.map(
-          p =>
-            p.state === 'proposed' &&
-            <ProposalInfo
-              title={p.title}
-              poll={p.pollOne}
-              onClick={() => {
-                this.setState({ showDetails: true, activeProposal: p });
-              }}
-            >
-              <span
-                style={{
-                  height: '1em',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                }}
-              >
-                {p.state}
-                <span>
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    height="24px"
-                    role="img"
-                  >
-                    <path
-                      fill="none"
-                      stroke="#000"
-                      strokeWidth="2"
-                      d="M12,18 C15.3137085,18 18,15.3137085 18,12 C18,8.6862915 15.3137085,6 12,6 C8.6862915,6 6,8.6862915 6,12 C6,15.3137085 8.6862915,18 12,18 Z M12,8 L12,12 L15,13"
-                    />
-                  </svg>
-                  <FormattedRelative value={p.pollOne.endTime} />
-                </span>
-              </span>
-            </ProposalInfo>,
-        ) */}
+
         {pageInfo.hasNextPage && (
           <Button
             disabled={this.props.isFetching}

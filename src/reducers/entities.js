@@ -17,6 +17,8 @@ import logs, * as fromLogs from './logs';
 import discussions, * as fromDiscussions from './discussions';
 import comments, * as fromComments from './comments';
 import requests, * as fromRequests from './requests';
+import proposalStatus from './proposalStatus';
+
 /* GENERATOR */
 
 export default combineReducers({
@@ -39,6 +41,7 @@ export default combineReducers({
   logs,
   discussions,
   comments,
+  proposalStatus,
 });
 
 /* GENERATOR_EXPORTS */

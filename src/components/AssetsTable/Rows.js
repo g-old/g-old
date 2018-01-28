@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 // import { highlightContent, uuid } from '../../core/utils';
-import RequestTableRow from './Row';
 
 /* eslint-disable */
 function uuid() {
@@ -22,44 +21,46 @@ function uuid() {
 
 /* eslint-enable */
 
-export default function RequestTableRows({
-  requests,
+export default function AssetTableRows({
+  assets,
   onClickCheckbox,
   onClickMenu,
   allowMultiSelect,
   children,
   checkedIndices,
+  row: Row,
 }) {
-  if (!requests.length && children) {
+  if (!assets.length && children) {
     return React.cloneElement(children);
   }
   return (
     <tbody style={{ minHeight: '500px' }}>
-      {requests.map((request, index) => (
-        <RequestTableRow
+      {assets.map((asset, index) => (
+        <Row
           checked={checkedIndices.indexOf(index) >= 0}
           key={uuid()}
           onClickCheckbox={checked => onClickCheckbox(index, checked)}
-          onClickMenu={action => onClickMenu(action, request)}
+          onClickMenu={action => onClickMenu(action, asset)}
           allowMultiSelect={allowMultiSelect}
-          {...request}
+          {...asset}
         />
       ))}
     </tbody>
   );
 }
 
-RequestTableRows.propTypes = {
-  requests: PropTypes.arrayOf(PropTypes.shape({})),
+AssetTableRows.propTypes = {
+  assets: PropTypes.arrayOf(PropTypes.shape({})),
   onClickCheckbox: PropTypes.func.isRequired,
   onClickMenu: PropTypes.func.isRequired,
   allowMultiSelect: PropTypes.bool.isRequired,
   children: PropTypes.element,
   checkedIndices: PropTypes.arrayOf(PropTypes.number),
+  row: PropTypes.node.isRequired,
 };
 
-RequestTableRows.defaultProps = {
-  requests: null,
+AssetTableRows.defaultProps = {
+  assets: null,
   searchTerm: null,
   requiresSearch: null,
 

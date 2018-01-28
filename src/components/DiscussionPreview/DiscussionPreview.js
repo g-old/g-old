@@ -52,7 +52,7 @@ class DiscussionPreview extends React.Component {
       <div className={s.root}>
         <div className={s.container}>
           <div style={{ display: 'flex' }}>
-            <div style={{ paddingLeft: '1em' }}>
+            <div>
               <div className={s.date}>
                 <FormattedRelative value={discussion.createdAt} />
               </div>

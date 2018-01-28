@@ -13,6 +13,7 @@ const listByFilter = combineReducers({
   accepted: createList('accepted'),
   repelled: createList('repelled'),
   survey: createList('survey'),
+  pending: createList('pending'),
 });
 
 export default combineReducers({

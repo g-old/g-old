@@ -41,7 +41,7 @@ function rankInPlace(activity) {
 const loadActivities = (viewer, ids, loaders) =>
   Promise.all(ids.map(id => Activity.gen(viewer, id, loaders)));
 
-const aggregateActivities = activities =>
+const aggregateActivities = (activities, viewer) =>
   activities.reduce(
     (agg, curr) => {
       if (curr.verb === 'delete') {
@@ -49,7 +49,15 @@ const aggregateActivities = activities =>
         agg.del[curr.id] = curr.objectId;
         return agg;
       }
+      if (curr.type === 'comment') {
+        if (curr.actorId === viewer.id) {
+          return agg; // Dont show own comments
+        }
+      }
       if (curr.type === 'statement') {
+        if (curr.actorId === viewer.id) {
+          return agg; // Dont show own statements
+        }
         // get only newest update
         if (curr.verb === 'update') {
           if (curr.objectId in agg.updatedStatements) {
@@ -176,7 +184,7 @@ class Feed {
     // reverse so newest are in front BUT: not sorted by time
 
     allActivities.reverse();
-    const sorted = aggregateActivities(allActivities);
+    const sorted = aggregateActivities(allActivities, viewer);
     const aggregated = sorted.all.filter(e => {
       if (e.id in sorted.del) {
         return false;

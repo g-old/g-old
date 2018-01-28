@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 /* eslint-disable css-modules/no-unused-class */
 import { FormattedRelative } from 'react-intl';
-import s from './AssetsList.css';
+import s from './AssetsTable.css';
 import TableRow from '../TableRow';
 import Avatar from '../Avatar';
 

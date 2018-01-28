@@ -32,6 +32,7 @@ export const getWorkTeam = (state, id, entities) =>
     users: entities.users.byId,
     requests: entities.requests.byId,
     proposals: entities.proposals.byId,
+    proposalStatus: entities.proposalStatus,
   });
 
 export const getIsFetching = state => fromList.getIsFetching(state.allIds);

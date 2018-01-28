@@ -8,6 +8,7 @@ import Avatar from '../Avatar';
 import Statement from '../Statement';
 import { ICONS } from '../../constants';
 import Link from '../Link';
+import Comment from '../Comment';
 
 class ActivityLog extends React.Component {
   static propTypes = {
@@ -36,11 +37,7 @@ class ActivityLog extends React.Component {
     const { content, verb, date } = this.props;
     const type = content && content.__typename;
     if (!type) {
-      return (
-        <div>
-          {'FAILURE'}
-        </div>
-      );
+      return <div>{'FAILURE'}</div>;
     }
     let activity = null;
     switch (type) {
@@ -151,21 +148,20 @@ class ActivityLog extends React.Component {
       case 'Notification': {
         activity = (
           <div>
-            <h3>
-              {content.title}
-            </h3>
+            <h3>{content.title}</h3>
             {content.msg}
           </div>
         );
         break;
       }
 
+      case 'Comment': {
+        activity = <Comment preview {...content} />;
+        break;
+      }
+
       default: {
-        activity = (
-          <div>
-            {'TYPE NOT RECOGNIZED'}
-          </div>
-        );
+        activity = <div>{'TYPE NOT RECOGNIZED'}</div>;
       }
     }
 
@@ -181,9 +177,7 @@ class ActivityLog extends React.Component {
       >
         <FormattedRelative value={date} />
 
-        <div>
-          {activity}
-        </div>
+        <div>{activity}</div>
       </div>
     );
   }

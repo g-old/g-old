@@ -60,3 +60,7 @@
 .small {
   padding: 1rem;
 }
+
+.fill {
+  width: 100%;
+}

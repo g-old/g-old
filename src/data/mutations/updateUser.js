@@ -11,6 +11,7 @@ import { sendJob } from '../../core/childProcess';
 import log from '../../logger';
 import { getProtocol } from '../../core/helpers';
 import { Groups } from '../../organization';
+import { EmailTypes } from '../../core/BackgroundService';
 
 const updateSession = (req, user) =>
   new Promise((resolve, reject) =>
@@ -86,9 +87,9 @@ const updateUser = {
           type: 'mail',
           data: {
             lang: data.request.cookies.lang,
-            mailType: 'mailChanged',
+            mailType: EmailTypes.VERIFICATION,
             address: result.user.email,
-            viewer,
+            viewer: { ...viewer, email: result.user.email },
             connection: {
               host: data.request.hostname,
               protocol: getProtocol(data.request),

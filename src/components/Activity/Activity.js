@@ -13,6 +13,7 @@ import Comment from '../Comment';
 
 import ProposalPreview from '../ProposalPreview';
 import DiscussionPreview from '../DiscussionPreview';
+import Box from '../Box';
 
 import Link from '../Link';
 import history from '../../history';
@@ -27,6 +28,11 @@ const messages = defineMessages({
   newProposal: {
     id: 'proposal.new',
     defaultMessage: 'New proposal',
+    description: 'Title for activity',
+  },
+  newDiscussion: {
+    id: 'discussion.new',
+    defaultMessage: 'New discussion',
     description: 'Title for activity',
   },
   proposalFailed: {
@@ -226,7 +232,6 @@ class Activity extends React.Component {
 
       case 'Discussion': {
         const info = JSON.parse(this.props.info || '{}');
-
         result.content = (
           <DiscussionPreview
             discussion={content}
@@ -238,7 +243,7 @@ class Activity extends React.Component {
         );
 
         result.header = (
-          <div>
+          <Box align pad>
             {info.logo ? (
               'IMPLEMENT LOGO'
             ) : (
@@ -259,8 +264,11 @@ class Activity extends React.Component {
                 />
               </svg>
             )}
-            {info[langSchema[this.props.locale]] || info.name || ':('}
-          </div>
+            <span>
+              {info[langSchema[this.props.locale]] || info.name || ':('}
+            </span>
+            <FormattedMessage {...messages.newDiscussion} />
+          </Box>
         );
         break;
       }

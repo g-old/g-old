@@ -1,7 +1,7 @@
 import { GraphQLNonNull, GraphQLBoolean } from 'graphql';
 import NotificationInput from '../types/NotificationInputType';
 import { canAccess } from '../../organization';
-
+import { EmailTypes } from '../../core/BackgroundService';
 import { sendJob } from '../../core/childProcess';
 import User from '../models/User';
 
@@ -32,7 +32,7 @@ const sendNotification = {
         const job = {
           type: 'mail',
           data: {
-            mailType: 'notification',
+            mailType: EmailTypes.MESSAGE,
             message: msg.msg,
             subject: notification.subject || 'Info from GOLD',
             recipient: receiver,

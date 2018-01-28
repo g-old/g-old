@@ -131,6 +131,29 @@ const proposal = {
             .select('proposals.id as id', 'polls.end_time as time');
           break;
         }
+        case 'pending': {
+          // Hack to load relevant proposals for mainteam - all accepted proposals of other workteams
+          cursor = cursor ? new Date(cursor) : new Date();
+
+          proposals = await knex('proposals')
+            .innerJoin('polls', function() {
+              this.on(function() {
+                this.on(
+                  knex.raw(
+                    'coalesce (proposals.poll_two_id, proposals.poll_one_id) = polls.id',
+                  ),
+                );
+              });
+            })
+            .whereNot({ work_team_id: workTeamId })
+            .whereNotNull('work_team_id')
+            .where('proposals.state', '=', 'accepted')
+            .whereRaw('(polls.end_time, polls.id) < (?,?)', [cursor, id])
+            .limit(first)
+            .orderBy('polls.end_time', 'desc')
+            .select('proposals.id as id', 'polls.closed_at as time');
+          break;
+        }
         default:
           throw Error(`State not recognized: ${state}`);
       }

@@ -11,6 +11,7 @@ import Notification from '../models/Notification';
 // import Proposal from '../models/Proposal';
 import Statement from '../models/Statement';
 import Vote from '../models/Vote';
+import Comment from '../models/Comment';
 
 const LogType = new GraphQLObjectType({
   name: 'Log',
@@ -63,6 +64,20 @@ const LogType = new GraphQLObjectType({
         }
         if (parent.type === 'notification') {
           return Notification.gen(viewer, parent.objectId, loaders);
+        }
+        if (parent.type === 'comment') {
+          const c = parent.content;
+          return new Comment({
+            id: c.id,
+            author_id: c.authorId,
+            discussion_id: c.discussionId,
+            content: c.content,
+            parent_id: c.parentId,
+            num_replies: c.numReplies,
+            created_at: c.createdAt,
+            updated_at: c.updatedAt,
+            edited_At: c.editedAt,
+          });
         }
         return null;
       },

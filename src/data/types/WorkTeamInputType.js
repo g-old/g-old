@@ -34,7 +34,7 @@ const WorkTeamInputType = new GraphQLInputObjectType({
     restricted: {
       type: GraphQLBoolean,
     },
-    main: {
+    mainTeam: {
       type: GraphQLBoolean,
     },
     logoAssetId: {

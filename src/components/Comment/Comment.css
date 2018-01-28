@@ -1,9 +1,9 @@
 @import '../../components/variables.css';
 
 .root {
-  margin-right: 0.5rem;
   transition: margin 0.5s;
   color: #000;
+  max-width: 35em;
 }
 
 .details {
@@ -69,7 +69,6 @@
   word-break: break-word;
   white-space: pre-line;
   line-height: 1.3rem;
-  max-width: 35rem;
   width: 100%;
   display: inline-block;
 }

@@ -6,10 +6,20 @@ import Accordion from '../../components/Accordion';
 import Button from '../../components/Button';
 
 import AccordionPanel from '../../components/AccordionPanel';
-import { loadWorkTeam, joinWorkTeam } from '../../actions/workTeam';
-import { createProposal, loadTags } from '../../actions/proposal';
+import {
+  loadWorkTeam,
+  joinWorkTeam,
+  loadProposalStatus,
+} from '../../actions/workTeam';
+import {
+  createProposal,
+  loadTags,
+  loadProposalsList,
+} from '../../actions/proposal';
 import { findUser } from '../../actions/user';
 import ProposalsManager from '../../components/ProposalsManager';
+import ProposalListView from '../../components/ProposalListView';
+import ProposalStatusRow from './ProposalStatusRow';
 
 import {
   loadRequestList,
@@ -23,6 +33,10 @@ import {
   getDiscussionUpdates,
   getRequestUpdates,
   getWorkTeamStatus,
+  getProposalsIsFetching,
+  getProposalsErrorMessage,
+  getProposalsPage,
+  getVisibleProposals,
 } from '../../reducers';
 import DiscussionInput from '../../components/DiscussionInput';
 import ProposalInput from '../../components/ProposalInput';
@@ -30,6 +44,7 @@ import Tabs from '../../components/Tabs';
 import Tab from '../../components/Tab';
 import RequestsList from '../../components/RequestsList';
 import Request from '../../components/Request';
+import AssetsTable from '../../components/AssetsTable';
 
 // import FetchError from '../../components/FetchError';
 const messages = defineMessages({
@@ -111,6 +126,7 @@ class WorkTeamManagement extends React.Component {
     loadRequestList: PropTypes.func.isRequired,
     deleteRequest: PropTypes.func.isRequired,
     requests: PropTypes.arrayOf(PropTypes.shape({})),
+    proposals: PropTypes.arrayOf(PropTypes.shape({})),
     workTeamUpdates: PropTypes.arrayOf(PropTypes.shape({})),
     requestUpdates: PropTypes.arrayOf(PropTypes.shape({})),
     discussionUpdates: PropTypes.arrayOf(PropTypes.shape({})),
@@ -118,6 +134,11 @@ class WorkTeamManagement extends React.Component {
     joinWorkTeam: PropTypes.func.isRequired,
     updateRequest: PropTypes.func.isRequired,
     loadTags: PropTypes.func.isRequired,
+    isFetching: PropTypes.bool,
+    loadProposalsList: PropTypes.func.isRequired,
+    loadProposalStatus: PropTypes.func.isRequired,
+    errorMessage: PropTypes.string,
+    pageInfo: PropTypes.shape({}),
   };
 
   static defaultProps = {
@@ -126,6 +147,10 @@ class WorkTeamManagement extends React.Component {
     requestUpdates: null,
     discussionUpdates: null,
     proposalUpdates: null,
+    isFetching: null,
+    errorMessage: null,
+    proposals: null,
+    pageInfo: null,
   };
   constructor(props) {
     super(props);
@@ -134,6 +159,7 @@ class WorkTeamManagement extends React.Component {
     this.onCancel = this.onCancel.bind(this);
     this.onAllowRequest = this.onAllowRequest.bind(this);
     this.onDenyRequest = this.onDenyRequest.bind(this);
+    this.onProposalClick = this.onProposalClick.bind(this);
   }
   componentDidMount() {
     this.props.loadRequestList({
@@ -171,11 +197,23 @@ class WorkTeamManagement extends React.Component {
   onCancel() {
     this.setState({ showRequest: false });
   }
+
+  // eslint-disable-next-line
+  onProposalClick() {
+    alert('TO IMPLEMENT');
+    // should open proposalManager
+    // then you can handle actions from there
+  }
   render() {
     const {
       workTeamUpdates = {},
       requestUpdates = {},
       discussionUpdates = {},
+      workTeam = {},
+      isFetching,
+      errorMessage,
+      pageInfo = {},
+      proposals = [],
     } = this.props;
     let content;
     if (this.state.showRequest) {
@@ -210,6 +248,49 @@ class WorkTeamManagement extends React.Component {
           ]}
         />
       );
+    }
+    let mainTeamView = <div />;
+    if (workTeam.mainTeam) {
+      mainTeamView = [
+        <AccordionPanel
+          heading="Accepted proposals from WTs"
+          onActive={() =>
+            this.props.loadProposalsList({
+              state: 'pending',
+              workTeamId: workTeam.id,
+            })}
+        >
+          <ProposalListView
+            proposals={proposals}
+            onProposalClick={this.onProposalClick}
+            pageInfo={pageInfo}
+            filter={'pending'}
+            onLoadMore={this.props.loadProposalsList}
+            isFetching={isFetching}
+            error={errorMessage}
+          />
+        </AccordionPanel>,
+        <AccordionPanel
+          heading="State of Proposals"
+          onActive={() =>
+            this.props.loadProposalStatus({
+              state: 'pending',
+              id: workTeam.id,
+            })}
+        >
+          <AssetsTable
+            onClickCheckbox={this.onClickCheckbox}
+            onClickMenu={this.onProposalClick}
+            allowMultiSelect
+            searchTerm=""
+            noRequestsFound={'No requests found'}
+            checkedIndices={[]}
+            assets={this.props.workTeam.linkedProposals || []}
+            row={ProposalStatusRow}
+            tableHeaders={['title', 'lastPoll', 'state', 'created_at', '', '']}
+          />
+        </AccordionPanel>,
+      ];
     }
     return (
       <Tabs>
@@ -246,6 +327,7 @@ class WorkTeamManagement extends React.Component {
                 defaultPollValues={defaultPollValues}
               />
             </AccordionPanel>
+            {mainTeamView}
           </Accordion>
         </Tab>
         <Tab title="Requests">{content}</Tab>
@@ -264,6 +346,10 @@ const mapStateToProps = (state, { id }) => ({
   discussionUpdates: getDiscussionUpdates(state),
   requestUpdates: getRequestUpdates(state),
   workTeamUpdates: getWorkTeamStatus(state),
+  isFetching: getProposalsIsFetching(state, 'pending'),
+  errorMessage: getProposalsErrorMessage(state, 'pending'),
+  pageInfo: getProposalsPage(state, 'pending'),
+  proposals: getVisibleProposals(state, 'pending'),
 });
 
 const mapDispatch = {
@@ -275,6 +361,8 @@ const mapDispatch = {
   createProposal,
   findUser,
   loadTags,
+  loadProposalsList,
+  loadProposalStatus,
 };
 
 export default connect(mapStateToProps, mapDispatch)(WorkTeamManagement);

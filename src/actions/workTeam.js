@@ -107,7 +107,7 @@ const proposalFields = `
     pollOne ${pollFieldsForList}
     pollTwo ${pollFieldsForList}`;
 
-const workTeamQuery = `query($id:ID!){
+const workTeamQuery = `query($id:ID! $state:String){
   workTeam(id:$id){
     ${workTeamFields}
     ownStatus{
@@ -125,8 +125,37 @@ const workTeamQuery = `query($id:ID!){
       createdAt
       numComments
     }
-    proposals{
-      ${proposalFields}
+    proposalConnection(state:$state workTeamId:$id){
+      pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          ${proposalFields}
+        }
+      }
+    }
+  }
+}`;
+
+const proposalStatusQuery = `query($id:ID!){
+  workTeam(id:$id){
+    id
+    linkedProposalConnection{
+      pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          id
+          proposal{
+            ${proposalFields}
+          }
+          state
+        }
+      }
     }
   }
 }`;
@@ -152,7 +181,7 @@ const joinWorkTeamMutationWithDetails = `mutation($id:ID, $memberId:ID){
   }
 }`;
 
-const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID){
+const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID $state:String){
   joinWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     ${workTeamFields}
     ownStatus{
@@ -170,8 +199,16 @@ const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID){
       createdAt
       numComments
     }
-    proposals{
-      ${proposalFields}
+    proposalConnection(state:$state workTeamId:$id){
+      pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          ${proposalFields}
+        }
+      }
     }
   }
 }`;
@@ -250,8 +287,14 @@ export function joinWorkTeam(workTeamData, details) {
     try {
       const { data } = await graphqlRequest(
         details ? joinWorkTeamMutationWithDetails : joinWorkTeamMutation,
-        workTeamData,
+        { ...workTeamData, state: 'active' },
       );
+      // TODO make paginable
+      let proposals = [];
+      if (data.joinWorkTeam.proposalConnection) {
+        proposals = data.joinWorkTeam.proposalConnection.edges.map(p => p.node);
+      }
+      data.joinWorkTeam.proposals = proposals;
       const normalizedData = normalize(data.joinWorkTeam, workTeamSchema);
 
       dispatch({ type: JOIN_WORKTEAM_SUCCESS, payload: normalizedData });
@@ -287,15 +330,44 @@ export function leaveWorkTeam(workTeamData) {
   };
 }
 
-export function loadWorkTeam({ id }, details) {
+export function loadWorkTeam({ id, state }, details) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: LOAD_WORKTEAM_START,
     });
     const query = details ? workTeamWithDetails : workTeamQuery;
     try {
-      const { data } = await graphqlRequest(query, { id });
+      const { data } = await graphqlRequest(query, { id, state });
+
+      // TODO make paginable
+      let proposals = [];
+      if (data.workTeam.proposalConnection) {
+        proposals = data.workTeam.proposalConnection.edges.map(p => p.node);
+      }
+      data.workTeam.proposals = proposals;
       const normalizedData = normalize(data.workTeam, workTeamSchema);
+
+      dispatch({ type: LOAD_WORKTEAM_SUCCESS, payload: normalizedData });
+    } catch (e) {
+      dispatch({
+        type: LOAD_WORKTEAM_ERROR,
+        message: e.message || 'Something went wrong',
+      });
+    }
+  };
+}
+export function loadProposalStatus({ id }) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: LOAD_WORKTEAM_START,
+    });
+    try {
+      const { data } = await graphqlRequest(proposalStatusQuery, { id });
+      const proposals = data.workTeam.linkedProposalConnection.edges.map(
+        p => p.node,
+      );
+      const allData = { id: data.workTeam.id, linkedProposals: proposals };
+      const normalizedData = normalize(allData, workTeamSchema);
 
       dispatch({ type: LOAD_WORKTEAM_SUCCESS, payload: normalizedData });
     } catch (e) {

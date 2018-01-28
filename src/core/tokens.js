@@ -54,7 +54,6 @@ export const createToken = async ({ email, table, hoursValid, withEmail }) => {
   if (!table || typeof table !== 'string') return null;
   if (!hoursValid || hoursValid < 1 || hoursValid > 72) return null;
   if (!validateEmail(email)) return null;
-
   const validToken = await knex.transaction(async trx => {
     let userId = await trx
       .where({ email })

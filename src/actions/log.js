@@ -9,6 +9,25 @@ import {
 import { logList as logsSchema } from '../store/schema';
 import { getLogIsFetching, getSessionUser } from '../reducers';
 
+const userFields = `
+id
+name
+surname
+thumbnail`;
+
+const commentFields = `
+id
+parentId
+content
+numReplies
+discussionId
+createdAt
+editedAt
+author{
+${userFields}
+}
+`;
+
 const logs = `
 query($userId:ID){
   logs (userId:$userId) {
@@ -91,6 +110,9 @@ query($userId:ID){
         surname
         thumbnail
       }
+    }
+    ... on Comment {
+      ${commentFields}
     }
     ... on Notification {
       id

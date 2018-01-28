@@ -142,7 +142,7 @@ class DiscussionContainer extends React.Component {
             />
             <Discussion {...discussion} />
             {`COMMENTS * ${discussion.numComments}`}
-            <Box column pad>
+            <Box column pad fill>
               <Comment
                 asInput
                 user={user}

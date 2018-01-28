@@ -14,10 +14,11 @@ async function action({ store, path }, { id }) {
   } else if (!canAccess(user, title)) {
     return { redirect: '/' };
   }
+  const state = 'active';
   if (!process.env.BROWSER) {
-    await store.dispatch(loadWorkTeam({ id }));
+    await store.dispatch(loadWorkTeam({ id, state }));
   } else {
-    store.dispatch(loadWorkTeam({ id }));
+    store.dispatch(loadWorkTeam({ id, state }));
   }
   return {
     chunks: ['workteam'],

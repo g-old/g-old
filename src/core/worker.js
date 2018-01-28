@@ -115,7 +115,28 @@ async function proposalPolling(pubsub) {
     )
       .then(proposalData => {
         if (proposalData) {
-          return insertIntoFeed(
+          // TODO refactor later
+          let upliftPromise;
+          if (proposalData.workTeamId) {
+            upliftPromise = knex('work_teams')
+              .where({ main: true })
+              .pluck('id')
+              .then(([id]) => {
+                // eslint-disable-next-line eqeqeq
+                if (id && id != proposalData.workTeamId) {
+                  return knex('proposal_groups').insert({
+                    group_id: id,
+                    group_type: 'WT',
+                    state: 'WAITING',
+                    proposal_id: proposalData.id,
+                    created_at: new Date(),
+                  });
+                }
+                return null;
+              });
+          }
+          // should be solved  by events??
+          const insertionPromise = insertIntoFeed(
             {
               viewer: { id: 0, role: { type: 'system' } },
               data: {
@@ -136,6 +157,8 @@ async function proposalPolling(pubsub) {
             .catch(err => {
               log.error({ err }, 'Feed insertion failed -worker- ');
             });
+
+          return Promise.all([upliftPromise, insertionPromise]);
         }
         return Promise.reject('Proposal update failed');
       })

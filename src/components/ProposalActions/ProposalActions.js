@@ -7,7 +7,7 @@ import {
   FormattedMessage,
   FormattedRelative,
 } from 'react-intl';
-import s from './ProposalDetails.css';
+import s from './ProposalActions.css';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 import {
   getProposal,
@@ -86,7 +86,7 @@ const isThresholdPassed = poll => {
   ref *= poll.threshold / 100;
   return poll.upvotes >= ref;
 };
-class ProposalDetails extends React.Component {
+class ProposalActions extends React.Component {
   static propTypes = {
     updateProposal: PropTypes.func.isRequired,
     defaultPollValues: PropTypes.shape({}).isRequired,
@@ -263,13 +263,9 @@ class ProposalDetails extends React.Component {
       <Box className={s.root} flex wrap>
         <Box flex column pad className={s.proposal}>
           {this.state.error && <Notification type="error" message={error} />}
-          <Label>
-            {proposal.title}
-          </Label>
-          <Label>
-            {'Poll One'}
-          </Label>
-          {pollOne &&
+          <Label>{proposal.title}</Label>
+          <Label>{'Poll One'}</Label>
+          {pollOne && (
             <div>
               <PollState
                 compact
@@ -280,7 +276,8 @@ class ProposalDetails extends React.Component {
                 threshold={pollOne.threshold}
                 unipolar={pollOne.mode.unipolar}
               />
-            </div>}
+            </div>
+          )}
           <span>
             {'Upvotes:'} {pollOne.upvotes}
           </span>
@@ -288,18 +285,21 @@ class ProposalDetails extends React.Component {
             {'Threshold (votes): '}
             {numVotersForThreshold}
           </span>
-          {!thresholdPassed &&
+          {!thresholdPassed && (
             <span>
               {'Votes left for threshold: '}{' '}
               {numVotersForThreshold - pollOne.upvotes}
-            </span>}
-          {!pollOne.closedAt &&
+            </span>
+          )}
+          {!pollOne.closedAt && (
             <span>
               {'Endtime: '}
               {<FormattedRelative value={pollOne.endTime} />}
-            </span>}
-          {(pollOne.closedAt || thresholdPassed) &&
-            <Notification type="alert" message="Ready for voting" />}
+            </span>
+          )}
+          {(pollOne.closedAt || thresholdPassed) && (
+            <Notification type="alert" message="Ready for voting" />
+          )}
         </Box>
         <Box flex className={s.details}>
           <Accordion>
@@ -334,7 +334,7 @@ class ProposalDetails extends React.Component {
                   primary
                   onClick={this.handleOnSubmit}
                 />
-                {/* <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '}*/}
+                {/* <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '} */}
               </Box>
             </AccordionPanel>
           </Accordion>
@@ -351,4 +351,4 @@ const mapStateToProps = (state, { id }) => ({
   proposal: getProposal(state, id),
 });
 
-export default connect(mapStateToProps)(withStyles(s)(ProposalDetails));
+export default connect(mapStateToProps)(withStyles(s)(ProposalActions));

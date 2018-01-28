@@ -74,6 +74,12 @@ class MessageService {
   }
 
   static combineResults(results) {
+    if (!results || results.constructor !== Array) {
+      return {
+        success: false,
+        errors: ['No result returned'],
+      };
+    }
     return {
       success: results.every(res => res.success),
       errors: results.reduce((acc, curr) => {
@@ -279,13 +285,12 @@ class MessageService {
   }
   async sendMessage(user, message, sender, transportTypes, locale) {
     const types = this.getTransportTypes(transportTypes);
-
     const msg = MessageService.validateMessage(message);
     try {
       const promises = types.map(async type => {
         switch (type) {
           case TransportTypes.EMAIL: {
-            if (!user.email) {
+            if (!user || !user.email) {
               throw new Error('Email address needed');
             }
             return this.sendEmailMessage(user, msg, sender, locale);
