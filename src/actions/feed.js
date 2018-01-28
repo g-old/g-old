@@ -68,6 +68,7 @@ query($userId:ID){
       state
       body
       votes
+      workTeamId
       pollOne {
         id
         upvotes

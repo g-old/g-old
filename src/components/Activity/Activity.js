@@ -67,6 +67,7 @@ const langSchema = {
   'it-IT': 'itName',
   'lld-IT': 'lldName',
 };
+
 function getProposalHeader(verb, proposal) {
   let state = verb;
   let identifier;
@@ -141,7 +142,37 @@ class Activity extends React.Component {
   onProposalClick({ proposalId, pollId }) {
     history.push(`/proposal/${proposalId}/${pollId}`);
   }
-
+  renderGroupHeader(info, title) {
+    return (
+      <Box align pad>
+        <div>
+          {info.logo ? (
+            'IMPLEMENT LOGO'
+          ) : (
+            <svg
+              version="1.1"
+              viewBox="0 0 24 24"
+              role="img"
+              width="48px"
+              height="48px"
+              aria-label="cloud"
+            >
+              <path
+                fill="none"
+                stroke="#000"
+                strokeWidth="2"
+                d="M18,17 L18,18 C18,21 16,22 13,22 L11,22 C8,22 6,21 6,18 L6,17 C3.23857625,17 1,14.7614237 1,12 C1,9.23857625 3.23857625,7 6,7 L12,7 M6,7 L6,6 C6,3 8,2 11,2 L13,2 C16,2 18,3 18,6 L18,7 C20.7614237,7 23,9.23857625 23,12 C23,14.7614237 20.7614237,17 18,17 L12,17"
+              />
+            </svg>
+          )}{' '}
+          <span>
+            {info[langSchema[this.props.locale]] || info.name || ':('}
+          </span>
+        </div>
+        {title}
+      </Box>
+    );
+  }
   renderVote(info) {
     const { position } = this.props.content;
     const thumb = (
@@ -219,7 +250,12 @@ class Activity extends React.Component {
         result.content = (
           <ProposalPreview proposal={content} onClick={this.onProposalClick} />
         );
-        result.header = getProposalHeader(verb, content);
+        let header = getProposalHeader(verb, content);
+        if (content.workTeamId) {
+          const info = JSON.parse(this.props.info || '{}');
+          header = this.renderGroupHeader(info, header);
+        }
+        result.header = header;
         break;
       }
       case 'VoteDL': {
@@ -242,33 +278,9 @@ class Activity extends React.Component {
           />
         );
 
-        result.header = (
-          <Box align pad>
-            {info.logo ? (
-              'IMPLEMENT LOGO'
-            ) : (
-              <svg
-                version="1.1"
-                viewBox="0 0 24 24"
-                role="img"
-                width="48px"
-                height="48px"
-                aria-label="cloud"
-                style={{ marginRight: '1rem' }}
-              >
-                <path
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  d="M18,17 L18,18 C18,21 16,22 13,22 L11,22 C8,22 6,21 6,18 L6,17 C3.23857625,17 1,14.7614237 1,12 C1,9.23857625 3.23857625,7 6,7 L12,7 M6,7 L6,6 C6,3 8,2 11,2 L13,2 C16,2 18,3 18,6 L18,7 C20.7614237,7 23,9.23857625 23,12 C23,14.7614237 20.7614237,17 18,17 L12,17"
-                />
-              </svg>
-            )}
-            <span>
-              {info[langSchema[this.props.locale]] || info.name || ':('}
-            </span>
-            <FormattedMessage {...messages.newDiscussion} />
-          </Box>
+        result.header = this.renderGroupHeader(
+          info,
+          <FormattedMessage {...messages.newDiscussion} />,
         );
         break;
       }

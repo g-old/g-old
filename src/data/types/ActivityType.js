@@ -167,6 +167,9 @@ const ActivityType = new GraphQLObjectType({
 
             return addProposalInfo(viewer, loaders, vote.pollId, vote);
           }
+          case 'proposal': {
+            return addWorkTeamInfo(viewer, loaders, parent.content.workTeamId);
+          }
 
           case 'discussion': {
             return addWorkTeamInfo(viewer, loaders, parent.content.workTeamId);

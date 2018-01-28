@@ -19,7 +19,7 @@ const workTeam = {
     if (workTeamResult) {
       workTeamResult.args = args; // TODO change query
     }
-    return workTeam;
+    return workTeamResult;
   },
 };
 
