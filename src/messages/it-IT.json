@@ -290,28 +290,28 @@
     "description": "Ask for confirmation",
     "defaultMessage": "Are you sure?",
     "message": "",
-    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
+    "files": ["src/components/ProposalActions/ProposalActions.js"]
   },
   {
     "id": "manager.open",
     "description": "Starts the voting process",
     "defaultMessage": "Open voting",
     "message": "",
-    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
+    "files": ["src/components/ProposalActions/ProposalActions.js"]
   },
   {
     "id": "manager.revoke",
     "description": "Revoke proposal",
     "defaultMessage": "Revoke proposal",
     "message": "",
-    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
+    "files": ["src/components/ProposalActions/ProposalActions.js"]
   },
   {
     "id": "manager.revokeShort",
     "description": "Revoke proposal, short",
     "defaultMessage": "Revoke",
     "message": "",
-    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
+    "files": ["src/components/ProposalActions/ProposalActions.js"]
   },
   {
     "id": "proposalManager.phaseOnePoll",
@@ -381,7 +381,7 @@
       "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/Login/Login.js",
       "src/components/NotificationInput/NotificationInput.js",
-      "src/components/ProposalDetails/ProposalDetails.js",
+      "src/components/ProposalActions/ProposalActions.js",
       "src/components/ProposalInput/ProposalInput.js",
       "src/components/SignUp/SignUp.js",
       "src/components/TagForm/TagForm.js",
@@ -583,7 +583,7 @@
     "description": "Close the proposal",
     "defaultMessage": "Close proposal",
     "message": "",
-    "files": ["src/components/ProposalDetails/ProposalDetails.js"]
+    "files": ["src/components/ProposalActions/ProposalActions.js"]
   },
   {
     "id": "date.to",
@@ -627,7 +627,7 @@
     "message": "",
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
-      "src/components/ProposalDetails/ProposalDetails.js",
+      "src/components/ProposalActions/ProposalActions.js",
       "src/components/ProposalInput/ProposalInput.js"
     ]
   },
@@ -1088,5 +1088,12 @@
       "src/components/ProposalPanel/ProposalPanel.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
     ]
+  },
+  {
+    "id": "discussion.new",
+    "description": "Title for activity",
+    "defaultMessage": "New discussion",
+    "message": "",
+    "files": ["src/components/Activity/Activity.js"]
   }
 ]

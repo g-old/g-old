@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import knex from '../data/knex';
 import { validateEmail } from './helpers';
+import { throwIfMissing } from './utils';
 
 const genToken = () =>
   new Promise((resolve, reject) => {
@@ -49,11 +50,18 @@ export const checkToken = async ({ token, table }) => {
   return new Token(dbData);
 };
 
-export const createToken = async ({ email, table, hoursValid, withEmail }) => {
-  if (!email || typeof email !== 'string') return null;
-  if (!table || typeof table !== 'string') return null;
-  if (!hoursValid || hoursValid < 1 || hoursValid > 72) return null;
-  if (!validateEmail(email)) return null;
+export const createToken = async ({
+  email = throwIfMissing('Email'),
+  table = throwIfMissing('Table'),
+  hoursValid = throwIfMissing('Hours'),
+  withEmail,
+}) => {
+  if (hoursValid < 1 || hoursValid > 72) {
+    throw new Error('Hours not in range 1 - 72');
+  }
+  if (!validateEmail(email)) {
+    throw new Error('Email not valid');
+  }
   const validToken = await knex.transaction(async trx => {
     let userId = await trx
       .where({ email })
@@ -74,22 +82,20 @@ export const createToken = async ({ email, table, hoursValid, withEmail }) => {
     if (withEmail) {
       newData.email = email;
     }
-    let oldToken = await knex(table)
+    const [oldToken = null] = await knex(table)
       .transacting(trx)
       .forUpdate()
       .where({ user_id: userId })
       .select('id', 'created_at', 'updated_at');
-
-    oldToken = oldToken[0];
     if (oldToken) {
       // cancel if token sent within last hour
       const lastTime = oldToken.updated_at
         ? oldToken.updated_at
         : oldToken.created_at;
-      const limit = new Date().getTime() - 30 * 60 * 1000;
+      const limit = new Date().getTime() - 10 * 60 * 1000;
       if (new Date(lastTime) > limit) {
         // TODO return error message
-        return null;
+        throw new Error('Token rate limit reached');
       }
       // eslint-disable-next-line newline-per-chained-call
       await knex(table)
@@ -111,7 +117,7 @@ export const createToken = async ({ email, table, hoursValid, withEmail }) => {
         });
     }
 
-    return token || null;
+    return token;
   });
   return validToken;
 };

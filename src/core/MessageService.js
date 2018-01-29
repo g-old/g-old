@@ -20,7 +20,7 @@ class MessageService {
     this.tokens = tokenService;
     //  this.events = eventSrc;
     this.protocol = 'https';
-    this.host = 'g-old.org';
+    this.host = process.env.HOST || 'localhost:3000';
   }
 
   async notify(
