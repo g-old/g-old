@@ -42,11 +42,11 @@ class Statement {
       console.log('ERROR');
       throw new Error('TESTERROR');
     } */
+    if (!data || !data.id || !data.pollId) return null;
+    const proposal = await Proposal.genByPoll(viewer, data.pollId, loaders);
 
-    if (!canMutate(viewer, data, Models.STATEMENT)) return null;
-
+    if (!canMutate(viewer, { data, proposal }, Models.STATEMENT)) return null;
     // validate
-    if (!data.id) return null;
     // eslint-disable-next-line prefer-arrow-callback
     const deletedStatement = await knex.transaction(async function(trx) {
       const statementInDB = await Statement.gen(viewer, data.id, loaders);
@@ -78,18 +78,25 @@ class Statement {
       console.log('ERROR');
       throw new Error('TESTERROR');
     } */
-    if (!canMutate(viewer, data, Models.STATEMENT)) return null;
-
     // validate
     if (!data.id) return null;
-    if (data.text && data.text.length < 1 && data.text !== 'string')
+    if (data.text && data.text.length < 1 && data.text.length) {
       return null;
+    }
+    const statementInDB = await Statement.gen(viewer, data.id, loaders);
+    if (!statementInDB) throw Error('Statement does not exist!');
+    const proposal = await Proposal.genByPoll(
+      viewer,
+      statementInDB.pollId,
+      loaders,
+    );
+
+    if (!canMutate(viewer, { ...data, proposal }, Models.STATEMENT))
+      return null;
+
     // update
     // eslint-disable-next-line prefer-arrow-callback
     const updatedId = await knex.transaction(async function(trx) {
-      const statementInDB = await Statement.gen(viewer, data.id, loaders);
-      if (!statementInDB) throw Error('Statement does not exist!');
-
       // eslint-disable-next-line eqeqeq
       if (statementInDB.author_id != viewer.id)
         throw Error('Permission denied!');
@@ -169,7 +176,10 @@ class Statement {
       EventManager.publish('onStatementCreated', {
         viewer,
         statement,
-        ...(proposal.workTeamId && { groupId: proposal.workTeamId }),
+        ...(proposal.workTeamId && {
+          groupId: proposal.workTeamId,
+          info: { workTeamId: proposal.workTeamId },
+        }),
       });
     }
     return statement;

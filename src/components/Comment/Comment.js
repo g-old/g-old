@@ -206,7 +206,10 @@ class Comment extends React.Component {
 
   componentWillReceiveProps({ updates = {}, openInput }) {
     if (updates) {
-      if (updates.success && !this.props.updates.success) {
+      if (
+        updates.success &&
+        (!this.props.updates || !this.props.updates.success)
+      ) {
         this.onEndEditing();
       }
       if (updates.pending !== this.state.pending) {

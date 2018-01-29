@@ -9,6 +9,13 @@ export const EmailTypes = {
   MESSAGE: 5,
 };
 
+export const ContentTypes = {
+  PROPOSAL: 1,
+  STATEMENT: 2,
+  COMMENT: 3,
+  MESSAGE: 4,
+};
+
 class BackgroundService {
   constructor(messageService = throwIfMissing('MessageService')) {
     this.messager = messageService;
@@ -59,6 +66,15 @@ class BackgroundService {
       }
     }
   }
+  /* handleWebpushNotification(contentType, data) {
+    switch (contentType) {
+      case ContentTypes.PROPOSAL:{
+        this.messageService.sendPushNotification()
+      }
+        break;
+      default:
+    }
+  } */
 }
 
 export default BackgroundService;

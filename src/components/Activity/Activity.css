@@ -1,3 +1,5 @@
+@import '../variables.css';
+
 .container {
   margin: 0.5em 1em;
 
@@ -19,8 +21,14 @@
   }
 }
 
-.header {
-  font-size: 1.5rem;
+.groupHeader {
+  padding: 0.5em;
+  border-bottom: 3px solid #eee;
+
+  label {
+    color: var(--color-accent-3);
+    font-weight: 600;
+  }
 }
 
 .date {

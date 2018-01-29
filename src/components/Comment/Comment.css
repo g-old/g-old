@@ -4,6 +4,7 @@
   transition: margin 0.5s;
   color: #000;
   max-width: 35em;
+  margin: auto;
 }
 
 .details {

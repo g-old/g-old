@@ -44,16 +44,20 @@ function requestWriteControl(viewer, data) {
 }
 
 function checkIfMember(viewer, resource) {
-  if (resource && resource.workTeamId) {
-    // assumes there exist only workteams
-    if (viewer.groups & Groups.SYSTEM) {
-      return true;
+  if (resource) {
+    if (resource.workTeamId) {
+      // assumes there exist only workteams
+      if (viewer.groups & Groups.SYSTEM) {
+        return true;
+      }
+      return (
+        viewer.wtMemberships &&
+        viewer.wtMemberships.includes(resource.workTeamId)
+      );
     }
-    return (
-      viewer.wtMemberships && viewer.wtMemberships.includes(resource.workTeamId)
-    );
+    return true; // is not owned by wt/group
   }
-  return true; // since no membership is required
+  return false; // since no membership is required
 }
 
 function userWriteControl(viewer, data) {
@@ -205,7 +209,7 @@ function pollWriteControl(viewer, data) {
 
 function voteReadControl(viewer, data) {
   if (viewer.permissions & AccessMasks.LEVEL_1) {
-    return true;
+    return checkIfMember(viewer, data.proposal);
   }
   return false;
 }

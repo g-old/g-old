@@ -10,7 +10,7 @@ import s from './Activity.css';
 import Avatar from '../Avatar';
 import Statement from '../Statement';
 import Comment from '../Comment';
-
+import Label from '../Label';
 import ProposalPreview from '../ProposalPreview';
 import DiscussionPreview from '../DiscussionPreview';
 import Box from '../Box';
@@ -144,7 +144,7 @@ class Activity extends React.Component {
   }
   renderGroupHeader(info, title) {
     return (
-      <Box align pad>
+      <Box align between className={s.groupHeader}>
         <div>
           {info.logo ? (
             'IMPLEMENT LOGO'
@@ -169,7 +169,7 @@ class Activity extends React.Component {
             {info[langSchema[this.props.locale]] || info.name || ':('}
           </span>
         </div>
-        {title}
+        <Label>{title}</Label>
       </Box>
     );
   }
@@ -308,7 +308,7 @@ class Activity extends React.Component {
         <div className={s.date}>
           <FormattedRelative value={this.props.date} />
         </div>
-        <div className={s.header}>{header}</div>
+        <div>{header}</div>
 
         <div>{content}</div>
       </div>

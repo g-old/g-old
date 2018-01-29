@@ -42,7 +42,8 @@ class Vote {
   static async delete(viewer, data, loaders) {
     if (!data.id) return null;
     if (!data.pollId) return null;
-    if (!canMutate(viewer, data, Models.VOTE)) return null;
+    const proposal = await Proposal.genByPoll(viewer, data.pollId, loaders);
+    if (!canMutate(viewer, { ...data, proposal }, Models.VOTE)) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
     let deletedStatement;
     let deletedVote;
@@ -115,7 +116,8 @@ class Vote {
 
     if (!data.id) return null;
     if (!data.pollId) return null;
-    if (!canMutate(viewer, data, Models.VOTE)) return null;
+    const proposal = await Proposal.genByPoll(viewer, data.pollId, loaders);
+    if (!canMutate(viewer, { ...data, proposal }, Models.VOTE)) return null;
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
     if (await poll.isUnipolar(viewer, loaders)) {
       return null; // delete is the right method
@@ -260,7 +262,14 @@ class Vote {
     if (!newVoteId) return null;
     const newVote = await Vote.gen(viewer, newVoteId, loaders);
     if (newVote) {
-      EventManager.publish('onVoteCreated', { viewer, vote: newVote });
+      EventManager.publish('onVoteCreated', {
+        viewer,
+        vote: newVote,
+        ...(proposal.workTeamId && {
+          groupId: proposal.workTeamId,
+          info: { workTeamId: proposal.workTeamId },
+        }),
+      });
     }
     return newVote;
   }

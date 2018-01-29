@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { findDOMNode } from 'react-dom';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import s from './DiscussionContainer.css';
 // import { defineMessages, FormattedMessage } from 'react-intl';
 // import history from '../../history';
 import { loadDiscussion } from '../../actions/discussion';
@@ -132,7 +134,7 @@ class DiscussionContainer extends React.Component {
       if (!discussion.comments) return <span>{'NOTHING TO SEE'}</span>;
       return (
         <div>
-          <Box column pad align padding="medium">
+          <Box tag="article" column pad align padding="medium">
             <CheckBox
               toggle
               checked={discussion.subscribed}
@@ -142,14 +144,16 @@ class DiscussionContainer extends React.Component {
             />
             <Discussion {...discussion} />
             {`COMMENTS * ${discussion.numComments}`}
-            <Box column pad fill>
+            <Box tag="section" column pad fill className={s.commentsSection}>
               <Comment
                 asInput
                 user={user}
                 onCreate={this.handleCommentCreation}
                 updates={this.props.updates['0000'] || {}}
               />
-              {'TOP COMMENTS'}
+              <Box justify>
+                <span>{'TOP COMMENTS'} </span>
+              </Box>
               {discussion.comments &&
                 discussion.comments.map(c => (
                   <Comment
@@ -222,4 +226,6 @@ const mapDispatch = {
   deleteComment,
 };
 
-export default connect(mapStateToProps, mapDispatch)(DiscussionContainer);
+export default connect(mapStateToProps, mapDispatch)(
+  withStyles(s)(DiscussionContainer),
+);

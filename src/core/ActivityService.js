@@ -15,6 +15,10 @@ export const feedOptions = [
       { eventType: 'update', personalFeed: true },
       { eventType: 'delete', personalFeed: true },
     ],
+    contentModyfier: (resource, info) => ({
+      ...resource,
+      workTeamId: info.workTeamId,
+    }),
   },
   {
     resourceName: 'statement',
@@ -23,6 +27,10 @@ export const feedOptions = [
       { eventType: 'update', personalFeed: true },
       { eventType: 'delete', systemFeed: true, personalFeed: true },
     ],
+    contentModyfier: (resource, info) => ({
+      ...resource,
+      workTeamId: info.workTeamId,
+    }),
   },
   {
     resourceName: 'discussion',

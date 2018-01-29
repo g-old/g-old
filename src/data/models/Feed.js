@@ -44,6 +44,16 @@ const loadActivities = (viewer, ids, loaders) =>
 const aggregateActivities = (activities, viewer) =>
   activities.reduce(
     (agg, curr) => {
+      // filter content from wt out
+      // TODO make groupId field on activities?
+      if (
+        curr.content &&
+        curr.content.workTeamId &&
+        !viewer.wtMemberships.includes(curr.content.workTeamId)
+      ) {
+        return agg;
+      }
+
       if (curr.verb === 'delete') {
         // eslint-disable-next-line no-param-reassign
         agg.del[curr.id] = curr.objectId;
