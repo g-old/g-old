@@ -118,6 +118,9 @@ class User {
     if (data.surname) {
       newData.surname = data.surname.trim();
     }
+    if (data.thumbnail) {
+      newData.thumbnail = data.thumbnail;
+    }
     if (data.password) {
       if (data.passwordOld) {
         let passwordHash = await knex('users')

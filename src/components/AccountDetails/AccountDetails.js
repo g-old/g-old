@@ -70,7 +70,7 @@ const messages = defineMessages({
     description: 'Help for empty fields',
   },
 });
-const checkAvatar = url => (url ? url.indexOf('http') !== -1 : false);
+const checkAvatar = url => (url ? url.indexOf('http') === -1 : false);
 
 /* const renderGroups = groups =>
   Object.keys(Groups).reduce((acc, curr) => {
@@ -173,6 +173,7 @@ class AccountDetails extends React.Component {
       emailVerified,
       lastLogin,
       groups,
+      thumbnail,
     } = accountData;
 
     let RightsPanel = <div />;
@@ -224,7 +225,7 @@ class AccountDetails extends React.Component {
       );
     }
 
-    const avatarSet = checkAvatar(avatar);
+    const avatarSet = checkAvatar(avatar || thumbnail);
 
     return (
       <Box className={s.root} flex wrap>

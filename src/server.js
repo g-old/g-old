@@ -294,24 +294,21 @@ app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
       if (!user) {
         throw Error('User update failed');
       }
+      // eslint-disable-next-line eqeqeq
+      if (req.user.id != user.id) {
+        // mod, etc
+        return res.json(user);
+      }
       return new Promise((resolve, reject) => {
-        // eslint-disable-next-line eqeqeq
-        if (req.user.id != user.id) {
-          // mod, etc
-          resolve();
-        }
         // eslint-disable-next-line no-confusing-arrow
-        req.login(user, err => (err ? reject(err) : resolve(user)));
-      });
-    })
-    .then(
-      () =>
+        req.login(user, err => (err ? reject(err) : resolve()));
+      }).then(() =>
         new Promise((resolve, reject) => {
           // eslint-disable-next-line no-confusing-arrow
           req.session.save(err => (err ? reject(err) : resolve()));
-        }),
-    )
-    .then(() => res.json(req.session.passport.user))
+        }).then(() => res.json(req.session.passport.user)),
+      );
+    })
     .catch(e => res.status(500).json({ message: e.message }));
 });
 

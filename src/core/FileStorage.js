@@ -91,48 +91,48 @@ const saveToCloudinary = async ({ viewer, data: { dataUrl, id }, loaders }) => {
   const buffer = new Buffer(img, 'base64');
 
   // update
-  let response;
-  await knex.transaction(async trx => {
-    // utf8 encoding! Problem?
-    // TODO delete old avatar if existing
-    // TODO resizing serverside
-    if (user.thumbnail && user.thumbnail.indexOf('http') !== -1) {
-      const publicId = getPublicIdFromUrl(user.thumbnail);
-      await deleteFileOnCloudinary(publicId).catch(err => {
-        log.error(
-          { err, viewer, data: { dataUrl, id } },
-          'Cloudinary delete error',
-        );
-      });
-    }
-
-    response = await uploadToCloudinaryStream(buffer, {
-      eager: [
-        {
-          width: 32,
-          height: 32,
-          crop: 'scale',
-        },
-      ],
-    }).catch(err => {
-      log.error({ err }`Cloudinary upload error`);
+  // utf8 encoding! Problem?
+  // TODO delete old avatar if existing
+  // TODO resizing serverside
+  // delete image if it is not an adorable fake pic.
+  if (user.thumbnail && user.thumbnail.indexOf('adorable') === -1) {
+    const publicId = getPublicIdFromUrl(user.thumbnail);
+    await deleteFileOnCloudinary(publicId).catch(err => {
+      log.error(
+        { err, viewer, data: { dataUrl, id } },
+        'Cloudinary delete error',
+      );
     });
+  }
 
-    if (!response || !response.url || !response.eager) {
-      throw Error('Cloudinary failed');
-    }
-    try {
-      await trx
-        .where({
-          id: userId,
-        })
-        .update({ thumbnail: response.eager[0].url, updated_at: new Date() })
-        .into('users');
-    } catch (error) {
-      await deleteFileOnCloudinary(getPublicIdFromUrl(response.url));
-      throw Error(error);
-    }
+  const response = await uploadToCloudinaryStream(buffer, {
+    eager: [
+      {
+        width: 32,
+        height: 32,
+        crop: 'scale',
+      },
+    ],
+  }).catch(err => {
+    log.error({ err }`Cloudinary upload error`);
   });
+
+  if (!response || !response.url || !response.eager) {
+    throw Error('Cloudinary failed');
+  }
+  try {
+    const updateResult = await User.update(
+      viewer,
+      { id: userId, thumbnail: response.eager[0].url },
+      loaders,
+    );
+    if (!updateResult.user) {
+      throw new Error('User update failed');
+    }
+  } catch (error) {
+    await deleteFileOnCloudinary(getPublicIdFromUrl(response.url));
+    throw Error(error);
+  }
   // invalidate cache
   loaders.users.clear(userId);
   //
@@ -188,7 +188,7 @@ const saveLocal = async (
     }
   }
   // eslint-disable-next-line
-  const sharp = require("sharp");
+  const sharp = require('sharp');
 
   const regex = /^data:.+\/(.+);base64,(.*)$/;
   const matches = dataUrl.match(regex);
@@ -210,24 +210,25 @@ const saveLocal = async (
   const avatarLocation = path.join('/', name);
   const thumbnailLocation = path.join('/c_scale,w_32,h_32/', name);
   // update
-  await knex.transaction(async trx => {
-    // utf8 encoding! Problem?
-    // delete old avatar if existing
-    await deleteFiles(user.thumbnail, folder);
-    await writeFile(filepath, buffer);
+  // utf8 encoding! Problem?
+  // delete old avatar if existing
+  await deleteFiles(user.thumbnail, folder);
 
-    try {
-      await trx
-        .where({
-          id: userId,
-        })
-        .update({ thumbnail: thumbnailLocation, updated_at: new Date() })
-        .into('users');
-    } catch (error) {
-      await deleteFile(filepath);
-      throw Error(error);
+  try {
+    await writeFile(filepath, buffer);
+    const updateResult = await User.update(
+      viewer,
+      { id: userId, thumbnail: thumbnailLocation },
+      loaders,
+    );
+    if (!updateResult.user) {
+      throw new Error('User update failed');
     }
-  });
+  } catch (error) {
+    await deleteFile(filepath);
+    throw Error(error);
+  }
+
   // invalidate cache
   loaders.users.clear(userId);
   //

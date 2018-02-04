@@ -89,7 +89,7 @@ function userWriteControl(viewer, data) {
     }
   }
   if (viewer.permissions & Permissions.MUTATE_PROFILES) {
-    if (data.dataUrl || data.name || data.surname) {
+    if (data.thumbnail || data.dataUrl || data.name || data.surname) {
       return true;
     }
     if (data.groups != null) {
