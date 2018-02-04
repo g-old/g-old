@@ -127,6 +127,7 @@ class Menu extends React.Component {
           reverse
           label={this.props.label}
           icon={this.props.icon}
+          onClick={this.onClose}
         />
       );
     }

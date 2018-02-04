@@ -302,10 +302,12 @@ class Comment extends React.Component {
   }
   handleFlag() {
     const { id, content, onFlagging } = this.props;
-    onFlagging({
-      statementId: id,
-      content,
-    });
+    if (onFlagging) {
+      onFlagging({
+        statementId: id,
+        content,
+      });
+    }
   }
 
   handleFollowing() {

@@ -1,0 +1,6 @@
+{
+  "name": "MainNav",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./MainNav.js"
+}

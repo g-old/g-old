@@ -44,6 +44,21 @@ const messages = defineMessages({
     defaultMessage: 'Surveys',
     description: 'Surveys link in header',
   },
+  profile: {
+    id: 'navigation.profile',
+    defaultMessage: 'Profile',
+    description: 'Profile link in header',
+  },
+  /* users: {
+    id: 'navigation.users',
+    defaultMessage: 'All users',
+    description: 'User list link in header',
+  }, */
+  workTeams: {
+    id: 'navigation.users',
+    defaultMessage: 'All workteams',
+    description: 'Workteam list link in header',
+  },
 });
 
 const contents = [
@@ -56,7 +71,7 @@ const contents = [
 
 const getMenu = (counter, path) =>
   contents.map(p => {
-    const children = [<FormattedMessage key={0} {...messages[p.name]} />];
+    const children = [<FormattedMessage key={p.id} {...messages[p.name]} />];
     if (p.name === 'feed' && counter.feed > 0) {
       children.unshift(<span className={s.news}>{`(${counter.feed}) `}</span>);
     }
