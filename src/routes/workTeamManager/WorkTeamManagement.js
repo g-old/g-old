@@ -287,7 +287,7 @@ class WorkTeamManagement extends React.Component {
             checkedIndices={[]}
             assets={this.props.workTeam.linkedProposals || []}
             row={ProposalStatusRow}
-            tableHeaders={['title', 'lastPoll', 'state', 'created_at', '', '']}
+            tableHeaders={['title', 'lastPoll', 'state', 'closed at', '', '']}
           />
         </AccordionPanel>,
       ];

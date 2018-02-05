@@ -4,56 +4,48 @@ import PropTypes from 'prop-types';
 import Layer from '../Layer';
 import Box from '..//Box';
 // import Footer from 'grommet/components/Footer';
-import Header from '../Header2';
+import Form from '../Form';
+import Header from '../Header';
+import Heading from '../Heading';
 import Button from '../Button';
 
-class ConfirmLayer extends React.Component {
-  componentWillReceiveProps({ success }) {
-    if (success && !this.props.success) {
-      this.props.onClose();
-    }
-  }
-  render() {
-    const action = this.props.action || 'delete';
-
-    return (
-      <Layer onClose={this.props.onClose} closer>
-        <Box padding="medium" column align>
-          <Header padding="medium">
-            <h1>Please confirm</h1>
-          </Header>
-          <Box tag="footer" justify pad>
-            <div>
-              <Button
-                label={action}
-                plain={false}
-                disabled={this.props.pending}
-                onClick={this.props.onSubmit}
-              />{' '}
-              <Button
-                label="cancel"
-                plain={false}
-                disabled={this.props.pending}
-                onClick={this.props.onClose}
-              />
-            </div>
+export default function ConfirmLayer(props) {
+  const action = props.action || 'Löschen';
+  return (
+    <Layer onClose={props.onClose}>
+      <Form>
+        <Header pad="medium" direction="column">
+          <Heading tag="h2" margin="none">
+            Bitte bestätigen
+          </Heading>
+        </Header>
+        <Box pad="medium">
+          <Heading tag="h4" align="center">
+            Sind Sie sicher, dass sie das löschen wollen?
+          </Heading>
+          <Box align="center" justify="center">
+            {props.note}
           </Box>
         </Box>
-      </Layer>
-    );
-  }
+        <Box tag="footer" justify padding="medium">
+          <div>
+            <Button label={action} onClick={props.onSubmit} />{' '}
+            <Button label="Abbrechen" primary onClick={props.onClose} />
+          </div>
+        </Box>
+      </Form>
+    </Layer>
+  );
 }
-export default ConfirmLayer;
 
 ConfirmLayer.propTypes = {
   action: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  pending: PropTypes.bool,
-  success: PropTypes.bool,
+  note: PropTypes.string,
 };
 
 ConfirmLayer.defaultProps = {
-  pending: null,
-  success: null,
+  name: null,
+  note: null,
 };

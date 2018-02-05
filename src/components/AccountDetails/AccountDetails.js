@@ -70,7 +70,7 @@ const messages = defineMessages({
     description: 'Help for empty fields',
   },
 });
-const checkAvatar = url => (url ? url.indexOf('http') === -1 : false);
+const checkAvatar = url => (url ? url.indexOf('cloudinary') !== -1 : false);
 
 /* const renderGroups = groups =>
   Object.keys(Groups).reduce((acc, curr) => {

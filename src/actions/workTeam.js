@@ -99,11 +99,6 @@ const proposalFields = `
     title
     state
     body
-    tags{
-      displayName
-      id
-      count
-    }
     pollOne ${pollFieldsForList}
     pollTwo ${pollFieldsForList}`;
 

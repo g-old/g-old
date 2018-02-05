@@ -31,7 +31,10 @@ const deleteUser = {
   resolve: async (data, { user }, { viewer, loaders }) => {
     const deletedUserResult = await User.delete(viewer, user, loaders);
     if (deletedUserResult.user) {
-      await FileManager.delete(deletedUserResult.user);
+      await FileManager.delete(
+        { viewer, data: deletedUserResult.user },
+        'images',
+      );
       // TODO insert into activities
     }
     return deletedUserResult;

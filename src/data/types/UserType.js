@@ -16,7 +16,7 @@ import { Permissions } from '../../organization';
 
 /* eslint-disable */
 const canSee = (viewer, data) =>
-  data.id == viewer.id || (viewer & Permissions.VIEW_USER_INFO) > 0;
+  data.id == viewer.id || (viewer.permissions & Permissions.VIEW_USER_INFO) > 0;
 /* eslint-enable */
 
 const UserType = new ObjectType({

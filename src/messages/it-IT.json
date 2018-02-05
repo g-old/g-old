@@ -1095,5 +1095,19 @@
     "defaultMessage": "New discussion",
     "message": "",
     "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "navigation.profile",
+    "description": "Profile link in header",
+    "defaultMessage": "Profile",
+    "message": "",
+    "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "navigation.users",
+    "description": "Workteam list link in header",
+    "defaultMessage": "All workteams",
+    "message": "",
+    "files": ["src/components/Navigation/Navigation.js"]
   }
 ]

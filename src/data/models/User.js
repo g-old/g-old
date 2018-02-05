@@ -329,7 +329,7 @@ class User {
     let deletedUserData;
     try {
       deletedUserData = await knex.transaction(async trx => {
-        const [userData] = await knex('users')
+        const [userData = null] = await knex('users')
           .transacting(trx)
           .forUpdate()
           .where({ id: data.id })
@@ -343,7 +343,6 @@ class User {
           .forUpdate()
           .where({ id: data.id })
           .del();
-
         if (rowCount < 1) {
           throw new Error('DB failure');
         }
@@ -351,7 +350,7 @@ class User {
         return userData;
       });
     } catch (err) {
-      result.errors.push(err.message);
+      result.errors.push(err.message ? err.message : err);
       log.error({ err, viewer, data }, 'Deletion failed');
     }
 

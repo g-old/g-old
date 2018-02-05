@@ -134,13 +134,6 @@ const validateStateChange = async (
     state !==
     computeNextState(proposalInDB.state, pollInDB, pollingModeinDB.thresholdRef)
   ) {
-    /* console.log('State change not valid', {
-      state,
-      oldState: proposalInDB.state,
-      pollInDB,
-      tref: pollingModeinDB.thresholdRef,
-      nextState: computeNextState(proposalInDB.state, pollInDB, pollingModeinDB.thresholdRef),
-    }); */
     return false;
   }
   return true;
@@ -389,28 +382,6 @@ class Proposal {
           .where({ id: data.workTeamId })
           .increment('num_proposals', 1);
       }
-      // get all  possible voters;
-      /*
-      let voters;
-      if (state === 'survey') {
-        voters = await trx
-          .whereIn('role_id', [1, 2, 3, 4])
-          .into('users')
-          .pluck('id');
-      } else {
-        voters = await trx
-          .whereIn('role_id', [1, 2, 3])
-          .into('users')
-          .pluck('id');
-      }
-      const voteData = voters.map(vId => ({
-        proposal_id: id,
-        user_id: vId,
-      }));
-      // await trx.insert(voteData).into('proposal_voters');
-      await trx.batchInsert('proposal_voters', voteData, 100);
-*/
-      //
       return id;
     });
 
@@ -457,8 +428,9 @@ class Proposal {
         return false;
       }
       if (
-        viewer.canVoteSince &&
-        new Date(viewer.canVoteSince) < new Date(this.createdAt)
+        this.state === 'survey' ||
+        (viewer.canVoteSince &&
+          new Date(viewer.canVoteSince) < new Date(this.createdAt))
       ) {
         return true;
       }
@@ -469,6 +441,7 @@ class Proposal {
 
 export default Proposal;
 
+// Unsub all subscriptions when proposal ended
 EventManager.subscribe('onProposalUpdated', async ({ proposal }) => {
   if (['accepted', 'rejected', 'revoked'].includes(proposal.state)) {
     try {

@@ -5,7 +5,7 @@ import {
   GraphQLNonNull,
 } from 'graphql';
 import Proposal from '../models/Proposal';
-import ProposalType from './ProposalType';
+import ProposalType from './ProposalDLType';
 
 const ProposalStatusType = new ObjectType({
   name: 'ProposalStatus',
