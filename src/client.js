@@ -130,6 +130,7 @@ async function onLocationChange(location, action) {
     delete scrollPositionsHistory[location.key];
   }
   currentLocation = location;
+  const isInitialRender = !action;
 
   context.intl = store.dispatch(getIntl());
 
@@ -137,13 +138,15 @@ async function onLocationChange(location, action) {
     // Traverses the list of routes in the order they are defined until
     // it finds the first route that matches provided URL path string
     // and whose action method returns anything other than `undefined`.
+
+    // Show loading indicator
     store.dispatch({ type: LOADING_START, payload: location.pathname });
-    const route = await router.resolve({
-      ...context,
-      path: location.pathname,
-      query: queryString.parse(location.search),
-      locale: store.getState().intl.locale,
-    });
+
+    context.pathname = location.pathname;
+    context.query = queryString.parse(location.search);
+    context.locale = store.getState().intl.locale;
+
+    const route = await router.resolve(context);
 
     // Prevent multiple page renders during the routing process
     if (currentLocation.key !== location.key) {
@@ -155,10 +158,61 @@ async function onLocationChange(location, action) {
       return;
     }
 
-    appInstance = ReactDOM.render(
+    const renderReactApp = ReactDOM.render; //isInitialRender ? ReactDOM.hydrate : ReactDOM.render;
+
+    appInstance = renderReactApp(
       <App context={context}>{route.component}</App>,
       container,
-      () => onRenderComplete(route, location),
+      () => {
+        if (isInitialRender) {
+          // Switch off the native scroll restoration behavior and handle it manually
+          // https://developers.google.com/web/updates/2015/09/history-api-scroll-restoration
+          if (window.history && 'scrollRestoration' in window.history) {
+            window.history.scrollRestoration = 'manual';
+          }
+
+          const elem = document.getElementById('css');
+          if (elem) elem.parentNode.removeChild(elem);
+          return;
+        }
+
+        document.title = route.title;
+
+        updateMeta('description', route.description);
+        // Update necessary tags in <head> at runtime here, ie:
+        // updateMeta('keywords', route.keywords);
+        // updateCustomMeta('og:url', route.canonicalUrl);
+        // updateCustomMeta('og:image', route.imageUrl);
+        // updateLink('canonical', route.canonicalUrl);
+        // etc.
+
+        let scrollX = 0;
+        let scrollY = 0;
+        const pos = scrollPositionsHistory[location.key];
+        if (pos) {
+          scrollX = pos.scrollX;
+          scrollY = pos.scrollY;
+        } else {
+          const targetHash = location.hash.substr(1);
+          if (targetHash) {
+            const target = document.getElementById(targetHash);
+            if (target) {
+              scrollY = window.pageYOffset + target.getBoundingClientRect().top;
+            }
+          }
+        }
+
+        // Restore the scroll position if it was saved into the state
+        // or scroll to the given #hash anchor
+        // or scroll to top of the page
+        window.scrollTo(scrollX, scrollY);
+
+        // Google Analytics tracking. Don't send 'pageview' event after
+        // the initial rendering, as it was already sent
+        if (window.ga) {
+          window.ga('send', 'pageview', createPath(location));
+        }
+      },
     );
     store.dispatch({ type: LOADING_SUCCESS });
   } catch (error) {
@@ -197,6 +251,7 @@ if (module.hot) {
       // Force-update the whole tree, including components that refuse to update
       deepForceUpdate(appInstance);
     }
+
     onLocationChange(currentLocation);
   });
 }

@@ -325,7 +325,7 @@ export function leaveWorkTeam(workTeamData) {
   };
 }
 
-export function loadWorkTeam({ id, state }, details) {
+export function loadWorkTeam({ id, state = 'active' }, details) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: LOAD_WORKTEAM_START,

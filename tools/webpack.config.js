@@ -66,7 +66,10 @@ const config = {
       // Rules for JS / JSX
       {
         test: reScript,
-        include: path.resolve(__dirname, '../src'),
+        include: [
+          path.resolve(__dirname, '../src'),
+          path.resolve(__dirname, '../tools'),
+        ],
         loader: 'babel-loader',
         options: {
           // https://github.com/babel/babel-loader#options
@@ -78,11 +81,11 @@ const config = {
             // A Babel preset that can automatically determine the Babel plugins and polyfills
             // https://github.com/babel/babel-preset-env
             [
-              'env',
+              '@babel/preset-env',
               {
                 targets: {
                   browsers: pkg.browserslist,
-                  uglify: true,
+                  forceAllTransforms: !isDebug, // for UglifyJS
                 },
                 modules: false,
                 useBuiltIns: false,
@@ -91,21 +94,24 @@ const config = {
             ],
             // Experimental ECMAScript proposals
             // https://babeljs.io/docs/plugins/#presets-stage-x-experimental-presets-
-            'stage-0',
-            // JSX, Flow
+            '@babel/preset-stage-2',
+            // Flow
+            // https://github.com/babel/babel/tree/master/packages/babel-preset-flow
+            '@babel/preset-flow',
+            // JSX
             // https://github.com/babel/babel/tree/master/packages/babel-preset-react
-            'react',
-            // Optimize React code for the production build
-            // https://github.com/thejameskyle/babel-react-optimize
-            ...(isDebug ? [] : ['react-optimize']),
+            ['@babel/preset-react', { development: isDebug }],
           ],
           plugins: [
-            // Adds component stack to warning messages
-            // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source
-            ...(isDebug ? ['transform-react-jsx-source'] : []),
-            // Adds __self attribute to JSX which React will use for some warnings
-            // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-self
-            ...(isDebug ? ['transform-react-jsx-self'] : []),
+            // Treat React JSX elements as value types and hoist them to the highest scope
+            // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-constant-elements
+            ...(isDebug ? [] : ['@babel/transform-react-constant-elements']),
+            // Replaces the React.createElement function with one that is more optimized for production
+            // https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-inline-elements
+            ...(isDebug ? [] : ['@babel/transform-react-inline-elements']),
+            // Remove unnecessary React propTypes from the production build
+            // https://github.com/oliviertassinari/babel-plugin-transform-react-remove-prop-types
+            ...(isDebug ? [] : ['transform-react-remove-prop-types']),
             [
               'react-intl',
               {
@@ -316,7 +322,7 @@ const clientConfig = {
   target: 'web',
 
   entry: {
-    client: ['babel-polyfill', './src/clientLoader.js'],
+    client: ['@babel/polyfill', './src/clientLoader.js'],
   },
 
   plugins: [
@@ -397,7 +403,7 @@ const serverConfig = {
   target: 'node',
 
   entry: {
-    server: ['babel-polyfill', './src/server.js'],
+    server: ['@babel/polyfill', './src/server.js'],
   },
 
   output: {
@@ -426,10 +432,10 @@ const serverConfig = {
             ...rule.options,
             presets: rule.options.presets.map(
               preset =>
-                preset[0] !== 'env'
+                preset[0] !== '@babel/preset-env'
                   ? preset
                   : [
-                      'env',
+                      '@babel/preset-env',
                       {
                         targets: {
                           node: pkg.engines.node.match(/(\d+\.?)+/)[0],
@@ -512,7 +518,7 @@ const workerConfig = {
   target: 'node',
 
   entry: {
-    backgroundWorker: ['babel-polyfill', './src/core/backgroundWorker.js'],
+    backgroundWorker: ['@babel/polyfill', './src/core/backgroundWorker.js'],
   },
 
   output: {
@@ -541,10 +547,10 @@ const workerConfig = {
             ...rule.options,
             presets: rule.options.presets.map(
               preset =>
-                preset[0] !== 'env'
+                preset[0] !== '@babel/preset-env'
                   ? preset
                   : [
-                      'env',
+                      '@babel/preset-env',
                       {
                         targets: {
                           node: pkg.engines.node.match(/(\d+\.?)+/)[0],
@@ -615,94 +621,5 @@ const workerConfig = {
     __dirname: false,
   },
 };
-/*
-const workerConfig = {
-  ...config,
 
-  name: 'backgroundWorker',
-  target: 'node',
-
-  entry: {
-    backgroundWorker: ['babel-polyfill', './src/core/backgroundWorker.js'],
-  },
-
-  output: {
-    ...config.output,
-    filename: '../../backgroundWorker.js',
-    libraryTarget: 'commonjs2',
-  },
-
-  module: {
-    ...config.module,
-
-    // Override babel-preset-env configuration for Node.js
-    rules: config.module.rules.map(
-      rule =>
-        rule.loader !== 'babel-loader'
-          ? rule
-          : {
-            ...rule,
-            query: {
-              ...rule.query,
-              presets: rule.query.presets.map(
-                  preset =>
-                    preset[0] !== 'env'
-                      ? preset
-                      : [
-                        'env',
-                        {
-                          targets: {
-                            node: pkg.engines.node.match(/(\d+\.?)+/)[0],
-                          },
-                          modules: false,
-                          useBuiltIns: false,
-                          debug: false,
-                        },
-                      ],
-                ),
-            },
-          },
-    ),
-  },
-  externals: [
-    /^\.\/assets\.json$/,
-    (context, request, callback) => {
-      const isExternal =
-        request.match(/^[@a-z][a-z/.\-0-9]*$/i) && !request.match(/\.(css|less|scss|sss)$/i);
-      callback(null, Boolean(isExternal));
-    },
-  ],
-  plugins: [
-    // Define free variables
-    // https://webpack.github.io/docs/list-of-plugins.html#defineplugin
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': isDebug ? '"development"' : '"production"',
-      'process.env.BROWSER': false,
-      __DEV__: isDebug,
-    }),
-
-    // Do not create separate chunks of the server bundle
-    // https://webpack.github.io/docs/list-of-plugins.html#limitchunkcountplugin
-    new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
-
-    // Adds a banner to the top of each generated chunk
-    // https://webpack.github.io/docs/list-of-plugins.html#bannerplugin
-    new webpack.BannerPlugin({
-      banner: 'require("source-map-support").install();',
-      raw: true,
-      entryOnly: false,
-    }),
-  ],
-  node: {
-    console: false,
-    global: false,
-    process: false,
-    Buffer: false,
-    __filename: false,
-    __dirname: false,
-  },
-
-  devtool: isDebug ? 'cheap-module-source-map' : 'source-map',
-};
-*/
 export default [clientConfig, serverConfig, workerConfig];

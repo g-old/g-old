@@ -52,6 +52,7 @@ class FeedContainer extends React.Component {
     const outDated = {};
     const polls = {};
     const proposals = {};
+    console.log('ALL ACTIVITIES', this.props.activities);
     return (
       <div className={cn(s.container)}>
         {activities.map(activity => {

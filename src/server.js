@@ -589,14 +589,12 @@ app.get('*', async (req, res, next) => {
       // You can access redux through react-redux connect
       store,
       intl,
-    };
-
-    const route = await router.resolve({
-      ...context,
-      path: req.path,
+      pathname: req.path,
       query: req.query,
       locale,
-    });
+    };
+
+    const route = await router.resolve(context);
     if (route.redirect) {
       res.redirect(route.status || 302, route.redirect);
       return;
