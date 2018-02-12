@@ -1,5 +1,36 @@
 version: "3"
 services:
+  db:
+    image: postgres:9.6.6-alpine
+    read_only: true
+    #tmpfs:
+    #  - /tmp
+    #  - /var/run/postgresql
+    volumes:
+      - db:/var/lib/postgresql/data
+      - /var/run/possgresql:/var/run/postgresql
+      - ./initdb.sh:/docker-entrypoint-initdb.d/initdb.sh
+    #networks:
+    #  - webnet
+    #ports:
+    #  - "127.0.0.1:5435:5432" # you can override it via docker-compose.override.yml
+    environment:
+      - POSTGRES_DB=dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    #networks:
+    #  - webnet
+
   web:
     # replace username/repo:tag with your name and image details
     image: tobiasmayr/gold:dev
@@ -7,28 +38,24 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "0.5"
-          memory: 100M
-      restart_policy:
-        condition: on-failure
+          cpus: "1.0"
+          memory: 300M
+      #restart_policy:
+      #  condition: on-failure
     ports:
       - "4000:80"
-    networks:
-      - webnet
+    #networks:
+    #  - webnet
+    depends_on:
+      - db
     environment:
-      - DATABASE_URL=postgres://postgres@db:5432/dev
+      - PORT=80
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/dev
+      #- DATABASE_URL=postgresql://gold:gold@localhost/g-old.org
 
+#networks:
+#  webnet:
+
+volumes:
   db:
-    image: postgres:9.6.6-alpine
-    read_only: true
-    tmpfs:
-      - /tmp
-      - /var/run/postgresql
-    volumes:
-      - db:/var/lib/postgresql/data
-    #  - ./postgres-initdb.sh:/docker-entrypoint-initdb.d/initdb.sh
-    ports:
-      #- "127.0.0.1:5432:5432" # you can override it via docker-compose.override.yml
-
-networks:
-  webnet:
