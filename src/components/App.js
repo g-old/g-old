@@ -113,7 +113,7 @@ class App extends React.PureComponent {
     this.intl = (state && state.intl) || {};
     const { initialNow, locale, messages } = this.intl;
     const localeMessages = (messages && messages[locale]) || {};
-    return (
+   return (
       <IntlProvider
         initialNow={initialNow}
         locale={locale}

@@ -33,7 +33,11 @@ const hydrateProposals = (state, data, entities) =>
 export const getVisibleProposals = (state, filter, entities) => {
   const ids = fromList.getIds(state.listByFilter[filter]);
   const data = ids.map(id => fromById.getProposal(state.byId, id));
-  return hydrateProposals(state, data, entities);
+  console.log('PROPOSAL FILTERED', {data})
+  const hydrated= hydrateProposals(state, data, entities);
+    console.log('PROPOSAL FILTERED', {hydrated})
+
+  return hydrated;
 };
 
 export const getIsFetching = (state, filter) =>

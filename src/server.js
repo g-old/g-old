@@ -523,6 +523,21 @@ app.use('/graphql', graphqlMiddleware);
 // -----------------------------------------------------------------------------
 app.get('*', async (req, res, next) => {
   try {
+    const css = new Set();
+
+    // Enables critical path CSS rendering
+    // https://github.com/kriasoft/isomorphic-style-loader
+    const insertCss = (...styles) => {
+      // eslint-disable-next-line no-underscore-dangle
+      styles.forEach(style => css.add(style._getCss()));
+    };
+
+        // Universal HTTP client
+    const fetch = createFetch(nodeFetch, {
+      baseUrl: config.api.serverUrl,
+      cookie: req.headers.cookie,
+    });
+
     let normalizedData = { entities: {}, result: null };
     if (req.user) {
       normalizedData = normalize(req.user, userSchema);
@@ -542,18 +557,13 @@ app.get('*', async (req, res, next) => {
       webPushKey: privateConfig.webpush.publicKey,
       consent: cookieConsent,
     };
-    // Universal HTTP client
-    const fetch = createFetch(nodeFetch, {
-      baseUrl: config.api.serverUrl,
-      cookie: req.headers.cookie,
-    });
-
     const store = configureStore(initialState, {
+      // cookie: req.headers.cookie,
       fetch,
       history: null,
     });
 
-    store.dispatch(
+       store.dispatch(
       setRuntimeVariable({
         name: 'initialNow',
         value: Date.now(),
@@ -567,30 +577,23 @@ app.get('*', async (req, res, next) => {
       }),
     );
 
-    const locale = req.language;
+       const locale = req.language;
     const intl = await store.dispatch(
       setLocale({
         locale,
       }),
     );
 
-    const css = new Set();
-
     // Global (context) variables that can be easily accessed from any React component
     // https://facebook.github.io/react/docs/context.html
     const context = {
-      // Enables critical path CSS rendering
-      // https://github.com/kriasoft/isomorphic-style-loader
-      insertCss: (...styles) => {
-        // eslint-disable-next-line no-underscore-dangle
-        styles.forEach(style => css.add(style._getCss()));
-      },
+      insertCss,
       fetch,
       // You can access redux through react-redux connect
       store,
-      intl,
       pathname: req.path,
       query: req.query,
+      intl,
       locale,
     };
 
@@ -601,14 +604,11 @@ app.get('*', async (req, res, next) => {
     }
 
     const data = { ...route };
-
-    const rootComponent = (
-      <App context={context} store={store}>
+    data.children = ReactDOM.renderToString(
+      <App context={context} /*store={store}*/>
         {route.component}
-      </App>
-    );
-
-    data.children = await ReactDOM.renderToString(rootComponent);
+      </App>,
+    );   
     data.styles = [{ id: 'css', cssText: [...css].join('') }];
 
     data.scripts = [assets.vendor.js];

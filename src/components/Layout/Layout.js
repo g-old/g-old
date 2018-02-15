@@ -65,10 +65,9 @@ class Layout extends React.Component {
         <img alt="banner" src="/banner01.jpg" />
       </div>
     );
-    console.log('LAYOUT CHILDREN', this.props.children);
     return (
       <div className={s.layout}>
-        {this.props.loading && <div className={s.loader} />}
+        <div className={this.props.loading ? s.loader : null} />
         {toast}
         {logo}
         <Header />

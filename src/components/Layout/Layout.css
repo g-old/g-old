@@ -52,6 +52,10 @@ html {
   right: 0;
 }
 
+body {
+  margin: 0;
+}
+
 a {
   color: #0074c2;
   text-decoration: none;

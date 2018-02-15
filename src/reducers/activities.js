@@ -19,20 +19,17 @@ export default combineReducers({
 const hydrateActivities = (state, data, entities) =>
   denormalize(data, activityArraySchema, {
     ...entities,
-    /*  users: entities.users.byId,
+    users: entities.users.byId,
     proposals: entities.proposals.byId,
     statements: entities.statements.byId,
     comments: entities.comments.byId,
-    discussions: entities.discussions.byId, */
+    discussions: entities.discussions.byId,
   });
 
 export const getActivities = (state, filter, entities) => {
   const ids = fromList.getIds(state.listByFilter[filter]);
   const data = ids.map(id => fromById.getActivity(state.byId, id));
-  console.log('DATA ACTIVITIES REDUCER', { data, entities });
-  const hyED = hydrateActivities(state, data, entities);
-  console.log('HYDDD ED', { hyED });
-  return hyED;
+  return hydrateActivities(state, data, entities);
 };
 
 export const getIsFetching = (state, filter) =>
