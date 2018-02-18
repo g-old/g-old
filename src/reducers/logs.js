@@ -12,15 +12,22 @@ export default combineReducers({
 });
 
 const hydrateActivities = (state, data, entities) =>
-  denormalize(data, logsSchema, {
-    ...entities,
-    users: entities.users.byId,
-  });
+  denormalize(
+    { logs: data },
+    { logs: logsSchema },
+    {
+      ...entities,
+      logs: entities.logs.byId,
+      users: entities.users.byId,
+    },
+  );
 
 export const getLogs = (state, entities) => {
   const ids = fromList.getIds(state.allIds);
-  const data = ids.map(id => fromById.getLog(state.byId, id));
-  return hydrateActivities(state, data, entities);
+  console.log({ ids: ids });
+  const hydrated = hydrateActivities(state, ids, entities);
+  console.log('hydrated', hydrated);
+  return hydrated.logs || [];
 };
 
 export const getIsFetching = state => fromList.getIsFetching(state.allIds);

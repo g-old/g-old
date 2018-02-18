@@ -41,11 +41,6 @@ class WorkTeam {
       }
       return false;
     }
-    /* eslint-enable eqeqeq */
-
-    if (requester.groups !== Groups.GUEST) {
-      return true; // TODO specify rules;
-    }
 
     return false;
   }
@@ -97,6 +92,10 @@ class WorkTeam {
       requester = viewer;
     }
     if (!this.canModifyMemberShips(viewer, requester)) {
+      // Guests not allowed
+      if (requester.groups === Groups.GUEST) {
+        return null; // TODO specify rules;
+      }
       // eslint-disable-next-line eqeqeq
       if (this.restricted && requester.id != this.coordinatorId) {
         // make request

@@ -1,7 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Layout renders children correctly 1`] = `
-<div>
+<div
+  className="layout"
+>
+  <div
+    className={null}
+  />
+  <span
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  />
+  <div
+    className="banner"
+  >
+    <img
+      alt="banner"
+      src="/banner01.jpg"
+    />
+  </div>
   <div
     className="root"
   >
@@ -124,35 +144,39 @@ exports[`Layout renders children correctly 1`] = `
     />
   </div>
   <div
-    className="root"
+    className="footer"
   >
     <div
-      className="container"
+      className="root"
     >
-      <span
-        className="text"
+      <div
+        className="container"
       >
-        © G O L D
-      </span>
-      <span
-        className="spacer"
-      >
-        ·
-      </span>
-      <a
-        className="link"
-        href="/"
-        onClick={[Function]}
-      >
-        Home
-      </a>
-      <div>
-        <span>
-          <span>
-            Deutsch
-          </span>
-           
+        <span
+          className="text"
+        >
+          © G O L D
         </span>
+        <span
+          className="spacer"
+        >
+          ·
+        </span>
+        <a
+          className="link"
+          href="/"
+          onClick={[Function]}
+        >
+          Home
+        </a>
+        <div>
+          <span>
+            <span>
+              Deutsch
+            </span>
+             
+          </span>
+        </div>
       </div>
     </div>
   </div>

@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 
 import { denormalize } from 'normalizr';
-import byId, * as fromById from './activityById';
+import byId from './activityById';
 // import allIds, * as fromList from './activityList';
 import createList, * as fromList from './createActivityList';
 import { activityArray as activityArraySchema } from './../store/schema';
@@ -17,19 +17,24 @@ export default combineReducers({
 });
 
 const hydrateActivities = (state, data, entities) =>
-  denormalize(data, activityArraySchema, {
-    ...entities,
-    users: entities.users.byId,
-    proposals: entities.proposals.byId,
-    statements: entities.statements.byId,
-    comments: entities.comments.byId,
-    discussions: entities.discussions.byId,
-  });
+  denormalize(
+    { activities: data },
+    { activities: activityArraySchema },
+    {
+      ...entities,
+      activities: entities.activities.byId,
+      users: entities.users.byId,
+      proposals: entities.proposals.byId,
+      statements: entities.statements.byId,
+      comments: entities.comments.byId,
+      discussions: entities.discussions.byId,
+    },
+  );
 
 export const getActivities = (state, filter, entities) => {
   const ids = fromList.getIds(state.listByFilter[filter]);
-  const data = ids.map(id => fromById.getActivity(state.byId, id));
-  return hydrateActivities(state, data, entities);
+  const hydrated = hydrateActivities(state, ids, entities);
+  return hydrated.activities || [];
 };
 
 export const getIsFetching = (state, filter) =>

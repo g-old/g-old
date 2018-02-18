@@ -23,10 +23,5 @@ module.exports = {
     '@babel/preset-flow',
     '@babel/preset-react',
   ],
-  env: {
-    test: {
-      plugins: ['rewire'],
-    },
-  },
   ignore: ['node_modules', 'build'],
 };

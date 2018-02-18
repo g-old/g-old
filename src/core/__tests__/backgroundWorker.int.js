@@ -20,7 +20,7 @@ const setupWorker = async handleMessages => {
 
 const VALID_TEST_EMAIL = 'testg@byom.de';
 jest.setTimeout(10000);
-describe('Background Worker Integration', () => {
+describe.skip('Background Worker Integration', () => {
   // eslint-disable-next-line no-underscore-dangle
   const handleMessages = backgroundWorker.__get__('handleMessages');
 

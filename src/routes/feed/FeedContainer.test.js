@@ -60,6 +60,8 @@ const initialState = {
     locale: 'de-DE',
   },
   entities: {
+    discussions: {},
+    comments: {},
     users: {
       byId: {
         1: {
@@ -122,6 +124,8 @@ const initialState = {
 
 const updatedEntities = {
   entities: {
+    discussions: {},
+    comments: {},
     users: {
       byId: {
         1: {

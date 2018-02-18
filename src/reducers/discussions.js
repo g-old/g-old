@@ -12,26 +12,32 @@ export default combineReducers({
 });
 
 const hydrateDiscussions = (state, data, entities) =>
-  denormalize(data, discussionListSchema, {
-    ...entities,
-    discussions: state.byId,
-    users: entities.users.byId,
-    comments: entities.comments.byId,
-  });
+  denormalize(
+    { discussions: data },
+    { discussions: discussionListSchema },
+    {
+      ...entities,
+      discussions: state.byId,
+      users: entities.users.byId,
+      comments: entities.comments.byId,
+    },
+  );
 
 export const getIsFetching = state => fromList.getIsFetching(state.all);
 export const getErrorMessage = state => fromList.getErrorMessage(state.all);
 
 export const getDiscussion = (state, id, entities) => {
   const discussion = fromById.getDiscussion(state.byId, id);
-  return hydrateDiscussions(state, [discussion], entities)[0];
+  const hydrated = hydrateDiscussions(state, [discussion], entities);
+  return hydrated.discussions || [];
 };
 
-export const getDiscussionsByWT = (state, tagId, entities) =>
-  hydrateDiscussions(
+export const getDiscussionsByWT = (state, tagId, entities) => {
+  const hydrated = hydrateDiscussions(
     state,
-    fromByWorkTeam
-      .getIds(state.byWT, tagId)
-      .map(id => fromById.getDiscussion(state.byId, id)),
+    fromByWorkTeam.getIds(state.byWT, tagId),
     entities,
   );
+
+  return hydrated.discussions || [];
+};

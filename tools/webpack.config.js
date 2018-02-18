@@ -32,6 +32,10 @@ const staticAssetName = isDebug
   ? '[path][name].[ext]?[hash:8]'
   : '[hash:8].[ext]';
 
+// CSS Nano options http://cssnano.co/
+const minimizeCssOptions = {
+  discardComments: { removeAll: true },
+};
 //
 // Common configuration chunk to be used for both
 // client-side (client.js) and server-side (server.js) bundles
@@ -48,6 +52,7 @@ const config = {
     chunkFilename: isDebug
       ? '[name].chunk.js'
       : '[name].[chunkhash:8].chunk.js',
+    // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info =>
       path.resolve(info.absoluteResourcePath),
   },
@@ -169,7 +174,7 @@ const config = {
                 ? '[name]-[local]-[hash:base64:5]'
                 : '[hash:base64:5]',
               // CSS Nano http://cssnano.co/options/
-              minimize: !isDebug,
+              minimize: isDebug ? false : minimizeCssOptions,
               discardComments: { removeAll: true },
             },
           },

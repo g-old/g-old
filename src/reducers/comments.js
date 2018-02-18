@@ -13,20 +13,24 @@ export default combineReducers({
 });
 
 const hydrateComments = (state, data, entities) =>
-  denormalize(data, commentListSchema, {
-    ...entities,
-    comments: state.byId,
-    users: entities.users.byId,
-  });
+  denormalize(
+    { comments: data },
+    { comments: commentListSchema },
+    {
+      ...entities,
+      comments: state.byId,
+      users: entities.users.byId,
+    },
+  );
 
-export const getCommentsByDiscussion = (state, wTDiscId, entities) =>
-  hydrateComments(
+export const getCommentsByDiscussion = (state, wTDiscId, entities) => {
+  const hydrated = hydrateComments(
     state,
-    fromByDiscussion
-      .getIds(state.byDiscussion, wTDiscId)
-      .map(id => fromById.getComment(state.byId, id)),
+    fromByDiscussion.getIds(state.byDiscussion, wTDiscId),
     entities,
   );
+  return hydrated.comments || [];
+};
 
 export const getComment = (state, id, entities) => {
   const comment = fromById.getComment(state.byId, id);

@@ -21,7 +21,7 @@ const tUrlToUrl = tUrl => {
 };
 
 describe('FileStorage', () => {
-  it('Should generate a thumbnail', async () => {
+  it.skip('Should generate a thumbnail', async () => {
     await clearDB();
     const FileStore = FileStorage(AvatarManager({ local: false }));
     const mockPublicIds = ['iamapublicid'];

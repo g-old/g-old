@@ -22,7 +22,11 @@ export default combineReducers({
 
 const hydrateUser = (data, entities) => denormalize(data, userSchema, entities);
 const hydrateUsers = (state, data, entities) =>
-  denormalize(data, userArray, { ...entities, users: state.byId });
+  denormalize(
+    { users: data },
+    { users: userArray },
+    { ...entities, users: state.byId },
+  );
 
 export const getUser = (state, id, entities) => {
   const user = fromById.getUser(state.byId, id);
@@ -35,8 +39,8 @@ export const getUser = (state, id, entities) => {
 
 export const getVisibleUsers = (state, filter, entities) => {
   const ids = fromList.getIds(state.listByFilter[filter]);
-  const data = ids.map(id => fromById.getUser(state.byId, id));
-  return hydrateUsers(state, data, entities);
+  const hydrated = hydrateUsers(state, ids, entities);
+  return hydrated.users || [];
 };
 
 export const getStatus = (state, filter) =>

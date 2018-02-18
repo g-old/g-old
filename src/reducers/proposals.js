@@ -23,21 +23,21 @@ export default combineReducers({
 });
 
 const hydrateProposals = (state, data, entities) =>
-  denormalize(data, proposalListSchema, {
-    ...entities,
-    proposals: state.byId,
-    users: entities.users.byId,
-    statements: entities.statements.byId,
-  });
+  denormalize(
+    { proposals: data },
+    { proposals: proposalListSchema },
+    {
+      ...entities,
+      proposals: state.byId,
+      users: entities.users.byId,
+      statements: entities.statements.byId,
+    },
+  );
 
 export const getVisibleProposals = (state, filter, entities) => {
   const ids = fromList.getIds(state.listByFilter[filter]);
-  const data = ids.map(id => fromById.getProposal(state.byId, id));
-  console.log('PROPOSAL FILTERED', {data})
-  const hydrated= hydrateProposals(state, data, entities);
-    console.log('PROPOSAL FILTERED', {hydrated})
-
-  return hydrated;
+  const hydrated = hydrateProposals(state, ids, entities);
+  return hydrated.proposals || [];
 };
 
 export const getIsFetching = (state, filter) =>
@@ -47,17 +47,18 @@ export const getErrorMessage = (state, filter) =>
 
 export const getProposal = (state, id, entities) => {
   const proposal = fromById.getProposal(state.byId, id);
-  return hydrateProposals(state, [proposal], entities)[0];
+  const hydrated = hydrateProposals(state, [proposal], entities);
+  return hydrated.proposals[0] || {};
 };
 
-export const getProposalsByTag = (state, tagId, entities) =>
-  hydrateProposals(
+export const getProposalsByTag = (state, tagId, entities) => {
+  const hydrated = hydrateProposals(
     state,
-    fromByTag
-      .getIds(state.byTag, tagId)
-      .map(id => fromById.getProposal(state.byId, id)),
+    fromByTag.getIds(state.byTag, tagId),
     entities,
   );
+  return hydrated.proposals || [];
+};
 
 export const getPageInfo = (state, filter) => ({
   ...fromList.getPageInfo(state.listByFilter[filter]),

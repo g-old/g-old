@@ -14,16 +14,21 @@ export default combineReducers({
 });
 
 const hydrateWorkTeams = (state, data, entities) =>
-  denormalize(data, workTeamListSchema, {
-    ...entities,
-    users: entities.users.byId,
-    requests: entities.requests.byId,
-  });
+  denormalize(
+    { workTeams: data },
+    { workTeams: workTeamListSchema },
+    {
+      ...entities,
+      workTeams: entities.workTeams.byId,
+      users: entities.users.byId,
+      requests: entities.requests.byId,
+    },
+  );
 
 export const getWorkTeams = (state, entities) => {
   const ids = fromList.getIds(state.allIds);
-  const data = ids.map(id => fromById.getWorkTeam(state.byId, id));
-  return hydrateWorkTeams(state, data, entities);
+  const hydrated = hydrateWorkTeams(state, ids, entities);
+  return hydrated.workTeams || [];
 };
 
 export const getWorkTeam = (state, id, entities) =>

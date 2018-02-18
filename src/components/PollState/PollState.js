@@ -14,11 +14,14 @@ class PollState extends React.Component {
     allVoters: PropTypes.number.isRequired,
     upvotes: PropTypes.number.isRequired,
     downvotes: PropTypes.number,
-    threshold: PropTypes.number.isRequired,
+    threshold: PropTypes.number,
     unipolar: PropTypes.bool.isRequired,
     votes: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.string })),
     getVotes: PropTypes.func,
-    updates: PropTypes.shape({ isPending: PropTypes.bool, error: PropTypes.node }),
+    updates: PropTypes.shape({
+      isPending: PropTypes.bool,
+      error: PropTypes.node,
+    }),
   };
 
   static defaultProps = {
@@ -59,7 +62,9 @@ class PollState extends React.Component {
       : this.props.upvotes + this.props.downvotes;
 
     const upPercent = sum > 0 ? 100 * (this.props.upvotes / sum) : 0;
-    const voteBar = <div className={cn(s.bar)} style={{ width: `${upPercent}%` }} />;
+    const voteBar = (
+      <div className={cn(s.bar)} style={{ width: `${upPercent}%` }} />
+    );
 
     let numUpVotes = null;
     let numDownVotes = null;
@@ -95,10 +100,12 @@ class PollState extends React.Component {
     }
     /* eslint-disable jsx-a11y/no-static-element-interactions */
     /* eslint-disable jsx-a11y/interactive-supports-focus */
+    /* eslint-disable jsx-a11y/click-events-have-key-events */
+
     return (
       <div
         className={cn(s.root, this.props.compact && s.compact, voteClass)}
-        onClick={!this.props.compact && this.onToggleExpand}
+        onClick={this.props.compact ? null : this.onToggleExpand}
         role="button"
       >
         <div className={s.header}>
@@ -114,7 +121,7 @@ class PollState extends React.Component {
           </div>
           {numDownVotes}
         </div>
-        {this.state.expand &&
+        {this.state.expand && (
           <div className={s.votesList}>
             <VotesList
               autoLoadVotes
@@ -124,8 +131,11 @@ class PollState extends React.Component {
               errorMessage={updates && updates.error}
               getVotes={this.props.getVotes}
             />
-            {!this.props.unipolar && this.props.threshold < 50 ? ' (IMPOSSIBLE)' : ''}
-          </div>}
+            {!this.props.unipolar && this.props.threshold < 50
+              ? ' (IMPOSSIBLE)'
+              : ''}
+          </div>
+        )}
       </div>
     );
     /* eslint-enable jsx-a11y/no-static-element-interactions */

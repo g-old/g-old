@@ -16,10 +16,15 @@ export default combineReducers({
 });
 
 const hydrateList = (state, data, entities) =>
-  denormalize(data, requestListSchema, {
-    ...entities,
-    users: entities.users.byId,
-  });
+  denormalize(
+    { requests: data },
+    { requests: requestListSchema },
+    {
+      ...entities,
+      requests: entities.requests.byId,
+      users: entities.users.byId,
+    },
+  );
 
 export const getStatus = (state, filter) =>
   fromList.getStatus(state.listByFilter[filter]);
@@ -33,6 +38,6 @@ export const getEntity = (state, id, entities) => {
 
 export const getVisible = (state, filter, entities) => {
   const ids = fromList.getIds(state.listByFilter[filter]);
-  const data = ids.map(id => fromById.getEntity(state.byId, id));
-  return hydrateList(state, data, entities);
+  const hydrated = hydrateList(state, ids, entities);
+  return hydrated.requests || [];
 };
