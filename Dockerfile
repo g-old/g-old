@@ -1,9 +1,9 @@
-FROM node:7.9.0-alpine
+FROM node:8-alpine
 
 # Set a working directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY ./build/package.json .
+COPY ./build/package*.json .
 COPY ./build/yarn.lock .
 
 # Install Node.js dependencies
