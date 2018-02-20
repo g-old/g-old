@@ -40,5 +40,33 @@ describe('WorkTeam', () => {
         .returning('work_team_id');
       expect(maybeFailId).not.toBeDefined();
     });
+
+    it('Should  allow  members of [Groups.VOTER] to join a WT', async () => {
+      const testCoordinator = createTestUser();
+      const testUser = createTestUser({ groups: Groups.VOTER });
+      const [uID, cID] = await knex('users')
+        .insert([testUser, testCoordinator])
+        .returning('id');
+      const testViewer = createTestActor({
+        id: uID,
+        groups: Groups.VOTER,
+      });
+      const [testWorkTeamData] = await knex('work_teams')
+        .insert(createWorkTeam({ coordinatorId: cID }))
+        .returning('*');
+      const testWorkTeam = new WorkTeam(testWorkTeamData);
+      const maybeFailJoinResult = await testWorkTeam.join(
+        testViewer,
+        testViewer.id,
+        createLoaders(),
+      );
+
+      expect(maybeFailJoinResult).toBeDefined();
+
+      const [maybeFailId] = await knex('user_work_teams')
+        .where({ user_id: testViewer.id })
+        .pluck('work_team_id');
+      expect(maybeFailId).toBe(testWorkTeamData.id);
+    });
   });
 });

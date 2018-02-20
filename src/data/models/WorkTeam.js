@@ -110,8 +110,8 @@ class WorkTeam {
         if (!request) {
           throw new Error('Could not create request');
         }
+        return WorkTeam.gen(viewer, this.id, loaders);
       }
-      return WorkTeam.gen(viewer, this.id, loaders);
     }
 
     const workTeam = await knex.transaction(async trx => {

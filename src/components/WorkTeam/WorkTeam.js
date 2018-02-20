@@ -6,7 +6,7 @@ import s from './WorkTeam.css';
 import Heading from '../Heading';
 import Value from '../Value';
 // import Menu from '../Menu';
-
+import ConfirmLayer from '../ConfirmLayer';
 import Box from '../Box';
 import Button from '../Button';
 import DiscussionPreview from '../DiscussionPreview';
@@ -41,7 +41,9 @@ class WorkTeam extends React.Component {
     numProposals: PropTypes.number.isRequired,
     discussions: PropTypes.arrayOf(PropTypes.shape({})),
     proposals: PropTypes.arrayOf(PropTypes.shape({})),
-    ownStatus: PropTypes.string.isRequired,
+    ownStatus: PropTypes.shape({
+      status: PropTypes.oneOf(['NONE', 'MEMBER', 'PENDING']),
+    }).isRequired,
     onJoinRequest: PropTypes.func.isRequired,
     updates: PropTypes.shape({ pending: PropTypes.bool }).isRequired,
     restricted: PropTypes.bool.isRequired,
@@ -51,7 +53,6 @@ class WorkTeam extends React.Component {
   };
   static defaultProps = {
     logo: null,
-    updates: null,
     discussions: null,
     proposals: null,
   };
@@ -65,7 +66,31 @@ class WorkTeam extends React.Component {
     this.handleJoining = this.handleJoining.bind(this);
     this.cancelJoining = this.cancelJoining.bind(this);
     this.renderActionButton = this.renderActionButton.bind(this);
+    this.onOpenLayer = this.onOpenLayer.bind(this);
+    this.onCloseLayer = this.onCloseLayer.bind(this);
+    this.onLeave = this.onLeave.bind(this);
+    this.state = { showLayer: false };
   }
+
+  onOpenLayer() {
+    this.setState({ showLayer: true });
+  }
+
+  onCloseLayer() {
+    this.setState({ showLayer: false });
+  }
+
+  onLeave(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const { ownStatus = {}, id } = this.props;
+    if (ownStatus !== 'NONE') {
+      this.props.onLeave({ id }).then(() => this.onCloseLayer());
+    }
+  }
+
   // eslint-disable-next-line class-methods-use-this
   handleDiscussionClick({ discussionId }) {
     history.push(`${this.props.id}/discussions/${discussionId}`);
@@ -80,9 +105,10 @@ class WorkTeam extends React.Component {
 
   // eslint-disable-next-line class-methods-use-this
   cancelJoining() {
-    const { ownStatus = {}, id } = this.props;
+    const { ownStatus = {} } = this.props;
     if (ownStatus.status !== 'NONE') {
-      this.props.onLeave({ id });
+      this.onOpenLayer();
+      // this.props.onLeave({ id });
     }
   }
 
@@ -194,6 +220,16 @@ class WorkTeam extends React.Component {
         </div>
       );
     }
+    let layer;
+    if (this.state.showLayer) {
+      layer = (
+        <ConfirmLayer
+          onClose={this.onCloseLayer}
+          onSubmit={this.onLeave}
+          action="leave"
+        />
+      );
+    }
     return (
       <Box align column padding="medium" pad>
         {picture}
@@ -273,6 +309,7 @@ class WorkTeam extends React.Component {
           <Heading tag="h3"> OPEN DISCUSSIONS</Heading>
           <div>{discussionSection}</div>
         </section>
+        {layer}
       </Box>
     );
   }

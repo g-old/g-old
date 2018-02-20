@@ -156,6 +156,7 @@ export const createWorkTeam = (args = {}) => ({
   name: args.name || getUnique.wt(),
   created_at: args.createdAt || new Date(),
   updated_at: args.updatedAt || null,
+  restricted: args.restricted || false,
 });
 
 export const createDiscussion = args => ({
