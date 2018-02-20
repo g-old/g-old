@@ -86,7 +86,6 @@ async function onLocationChange(location, action) {
   context.intl = store.dispatch(getIntl());
   const isInitialRender = !action;
   try {
-    
     // Show loading indicator
     store.dispatch({ type: LOADING_START, payload: location.pathname });
 
@@ -141,8 +140,10 @@ async function onLocationChange(location, action) {
         let scrollY = 0;
         const pos = scrollPositionsHistory[location.key];
         if (pos) {
+          /* eslint-disable prefer-destructuring */
           scrollX = pos.scrollX;
           scrollY = pos.scrollY;
+          /* eslint-enable prefer-destructuring */
         } else {
           const targetHash = location.hash.substr(1);
           if (targetHash) {

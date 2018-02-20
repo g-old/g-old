@@ -11,10 +11,10 @@ const renderStats = stats => (
   <table className={s.tables}>
     <thead>
       <tr>
-        <th>{'Resource'}</th>
-        <th>{'Average time'}</th>
-        <th>{'Median time'}</th>
-        <th>{'Requests'}</th>
+        <th>Resource</th>
+        <th>Average time</th>
+        <th>Median time</th>
+        <th>Requests</th>
       </tr>
     </thead>
     <tbody>
@@ -35,9 +35,9 @@ const renderTables = tables => (
   <table className={s.tables}>
     <thead>
       <tr>
-        <th>{'Tablename'}</th>
-        <th>{'Index usage'}</th>
-        <th>{'Rows'}</th>
+        <th>Tablename</th>
+        <th>Index usage</th>
+        <th>Rows</th>
       </tr>
     </thead>
     <tbody>
@@ -93,7 +93,9 @@ class TechPanel extends React.Component {
       dbInfo = (
         <div className={s.db}>
           <span>{`Size: ${size}`}</span>
-          <span>{`Cache Hit Rate: ${cacheHitRate.toFixed(2)}`}</span>
+          {cacheHitRate && (
+            <span>{`Cache Hit Rate: ${cacheHitRate.toFixed(2)}`}</span>
+          )}
           {'Index Usage'}
           {renderTables(indexUsage)}
         </div>
@@ -161,24 +163,24 @@ class TechPanel extends React.Component {
     return (
       <div>
         <div>
-          <h3>{'Usage'}</h3>
+          <h3>Usage</h3>
           {statistics.usersOnline &&
             `User online in the last 24h: ${statistics.usersOnline}`}
         </div>
         <div>
-          <h3>{'Performance Data - over last 24h'}</h3>
+          <h3>Performance Data - over last 24h</h3>
           {performanceInfo}
         </div>
         <div>
-          <h3>{'Server'}</h3>
+          <h3>Server</h3>
           {serverInfo}
         </div>
         <div>
-          <h3>{'Online Hosting (Imagestore - Cloudinary)'}</h3>
+          <h3>Online Hosting (Imagestore - Cloudinary)</h3>
           {bucketInfo}
         </div>
         <div>
-          <h3>{'Database'}</h3>
+          <h3>Database</h3>
           {dbInfo}
         </div>
       </div>

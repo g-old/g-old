@@ -56,41 +56,6 @@ const messages = defineMessages({
     defaultMessage: 'Followees',
     description: 'Followees',
   },
-  economy: {
-    id: 'workTeams.economy',
-    defaultMessage: 'Economy',
-    description: 'Economy',
-  },
-  environment: {
-    id: 'workTeams.environment',
-    defaultMessage: 'Environment',
-    description: 'Environment',
-  },
-  urbanism: {
-    id: 'workTeams.urbanism',
-    defaultMessage: 'Urbanism',
-    description: 'Urbanism',
-  },
-  mobility: {
-    id: 'workTeams.mobility',
-    defaultMessage: 'Mobilty and transport',
-    description: 'Mobility',
-  },
-  health: {
-    id: 'workTeams.health',
-    defaultMessage: 'Public health systems and welfare',
-    description: 'Health',
-  },
-  education: {
-    id: 'workTeams.education',
-    defaultMessage: 'Education, youth, sport',
-    description: 'Education',
-  },
-  events: {
-    id: 'workTeams.events',
-    defaultMessage: 'Event organization, admission',
-    description: 'Event',
-  },
 });
 
 const renderFollowee = (data, fn, del) => (
@@ -117,44 +82,6 @@ const renderFollowee = (data, fn, del) => (
     </Button>
   </li>
 );
-
-/* const workTeams = [
-  {
-    value: '1',
-    label: <FormattedMessage {...messages.economy} />,
-    mId: messages.economy.id,
-  },
-  {
-    value: '2',
-    label: <FormattedMessage {...messages.environment} />,
-    mId: messages.environment.id,
-  },
-  {
-    value: '3',
-    label: <FormattedMessage {...messages.urbanism} />,
-    mId: messages.urbanism.id,
-  },
-  {
-    value: '4',
-    label: <FormattedMessage {...messages.mobility} />,
-    mId: messages.mobility.id,
-  },
-  {
-    value: '5',
-    label: <FormattedMessage {...messages.health} />,
-    mId: messages.health.id,
-  },
-  {
-    value: '6',
-    label: <FormattedMessage {...messages.education} />,
-    mId: messages.education.id,
-  },
-  {
-    value: '7',
-    label: <FormattedMessage {...messages.events} />,
-    mId: messages.events.id,
-  },
-]; */
 
 class AccountContainer extends React.Component {
   static propTypes = {
@@ -390,7 +317,7 @@ class AccountContainer extends React.Component {
         <Box column flex className={s.details}>
           {followeeContainer}
 
-          <FormField label={'WebPush'} error={subscription.error}>
+          <FormField label="WebPush" error={subscription.error}>
             <CheckBox
               toggle
               checked={subscription.isPushEnabled}

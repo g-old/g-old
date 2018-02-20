@@ -16,7 +16,6 @@ import { canAccess } from '../../organization';
 const title = 'Admin';
 
 async function action({ store, path }) {
-  console.log('PPPATH', path);
   const user = getSessionUser(store.getState());
   if (!user) {
     return { redirect: `/?redirect=${path}` };

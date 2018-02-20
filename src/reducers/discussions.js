@@ -29,7 +29,7 @@ export const getErrorMessage = state => fromList.getErrorMessage(state.all);
 export const getDiscussion = (state, id, entities) => {
   const discussion = fromById.getDiscussion(state.byId, id);
   const hydrated = hydrateDiscussions(state, [discussion], entities);
-  return hydrated.discussions || [];
+  return hydrated.discussions ? hydrated.discussions[0] : {};
 };
 
 export const getDiscussionsByWT = (state, tagId, entities) => {
