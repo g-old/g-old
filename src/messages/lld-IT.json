@@ -771,172 +771,11 @@
     "message": "???"
   },
   {
-    "id": "command.loadMore",
-    "description": "To get more data",
-    "defaultMessage": "Load more",
-    "message": "",
-    "files": [
-      "src/components/ProposalListView/ProposalListView.js",
-      "src/components/UserPanel/UserPanel.js",
-      "src/routes/accountList/AccountListContainer.js"
-    ]
-  },
-  {
-    "id": "proposal",
-    "description": "Switch to proposal poll",
-    "defaultMessage": "Proposal",
-    "message": "",
-    "files": ["src/routes/proposal/ProposalContainer.js"]
-  },
-  {
-    "id": "voting",
-    "description": "Switch to voting poll",
-    "defaultMessage": "Voting",
-    "message": "",
-    "files": ["src/routes/proposal/ProposalContainer.js"]
-  },
-  {
-    "id": "form.error-select",
-    "description":
-      "Help for selection, when input does not match with a suggestion",
-    "defaultMessage": "You selection is not correct. Click on a suggestion",
-    "message": "",
-    "files": [
-      "src/components/DiscussionInput/DiscussionInput.js",
-      "src/components/ProposalInput/ProposalInput.js",
-      "src/components/TagForm/TagForm.js",
-      "src/components/WorkTeamForm/WorkTeamForm.js",
-      "src/components/WorkTeamInput/WorkTeamInput.js",
-      "src/components/WorkTeamManager/WorkTeamManager.js"
-    ]
-  },
-  {
-    "id": "workTeams.economy",
-    "description": "Economy",
-    "defaultMessage": "Economy",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.education",
-    "description": "Education",
-    "defaultMessage": "Education, youth, sport",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.environment",
-    "description": "Environment",
-    "defaultMessage": "Environment",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.events",
-    "description": "Event",
-    "defaultMessage": "Event organization, admission",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.health",
-    "description": "Health",
-    "defaultMessage": "Public health systems and welfare",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.mobility",
-    "description": "Mobility",
-    "defaultMessage": "Mobilty and transport",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.urbanism",
-    "description": "Urbanism",
-    "defaultMessage": "Urbanism",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "help.firstSteps",
-    "description": "Title of help section",
-    "defaultMessage": "What to do next",
-    "message": "",
-    "files": ["src/components/Help/Help.js"]
-  },
-  {
-    "id": "signup.welcome-title",
-    "description": "Welcome message header",
-    "defaultMessage": "Welcome on board!",
-    "message": "",
-    "files": ["src/routes/signup/SignupContainer.js"]
-  },
-  {
-    "id": "statements.delete",
-    "description": "Menu entry on statements to delete statement",
-    "defaultMessage": "delete",
-    "message": "",
-    "files": [
-      "src/components/Comment/Comment.js",
-      "src/components/Statement/Statement.js"
-    ]
-  },
-  {
-    "id": "statements.flag",
-    "description": "Menu entry on statements to flag statement",
-    "defaultMessage": "flag",
-    "message": "",
-    "files": [
-      "src/components/Comment/Comment.js",
-      "src/components/Statement/Statement.js"
-    ]
-  },
-  {
-    "id": "statements.follow",
-    "description": "Menu entry on statements to follow author",
-    "defaultMessage": "follow",
-    "message": "",
-    "files": [
-      "src/components/Comment/Comment.js",
-      "src/components/Statement/Statement.js"
-    ]
-  },
-  {
-    "id": "settings.email.heading",
-    "description": "Heading of email section",
-    "defaultMessage": "Email",
-    "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
-    "id": "settings.password.heading",
-    "description": "Heading of password section",
-    "defaultMessage": "Password",
-    "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
-    "id": "settings.workTeams",
-    "description": "Workteam",
-    "defaultMessage": "Workteams",
-    "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
     "id": "account.workTeamMissing",
     "description": "No team choosen",
     "defaultMessage": "No team choosen",
     "message": "",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
-  },
-  {
-    "id": "navigation.feed",
-    "description": "Feed link in header",
-    "defaultMessage": "Feed",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
   },
   {
     "id": "rights.header",
@@ -946,101 +785,11 @@
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
-    "id": "settings.name",
-    "description": "First name",
-    "defaultMessage": "Name",
+    "id": "discussion.new",
+    "description": "Title for activity",
+    "defaultMessage": "New discussion",
     "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
-    "id": "settings.name.heading",
-    "description": "Heading of name section",
-    "defaultMessage": "Name",
-    "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
-    "id": "settings.surname",
-    "description": "Surname",
-    "defaultMessage": "Surname",
-    "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
-    "id": "statements.collapse",
-    "description": "Btn to collapse statements",
-    "defaultMessage": "Show less",
-    "message": "",
-    "files": [
-      "src/components/Comment/Comment.js",
-      "src/components/Statement/Statement.js"
-    ]
-  },
-  {
-    "id": "statements.expand",
-    "description": "Btn to expand statements",
-    "defaultMessage": "Read more",
-    "message": "",
-    "files": [
-      "src/components/Comment/Comment.js",
-      "src/components/Statement/Statement.js"
-    ]
-  },
-  {
-    "id": "commands.collapseReplies",
-    "description": "Hide replies",
-    "defaultMessage": "Hide replies",
-    "message": "",
-    "files": ["src/components/Comment/Comment.js"]
-  },
-  {
-    "id": "commands.edit",
-    "description": "Edit",
-    "defaultMessage": "Edit",
-    "message": "",
-    "files": ["src/components/Comment/Comment.js"]
-  },
-  {
-    "id": "commands.expandReplies",
-    "description": "Show replies",
-    "defaultMessage": "View all {cnt} replies",
-    "message": "",
-    "files": ["src/components/Comment/Comment.js"]
-  },
-  {
-    "id": "commands.expandReply",
-    "description": "Show reply",
-    "defaultMessage": "View reply",
-    "message": "",
-    "files": ["src/components/Comment/Comment.js"]
-  },
-  {
-    "id": "commands.reply",
-    "description": "Btn to reply",
-    "defaultMessage": "Reply",
-    "message": "",
-    "files": ["src/components/Comment/Comment.js"]
-  },
-  {
-    "id": "label.edited",
-    "description": "Comment edited",
-    "defaultMessage": "edited {time}",
-    "message": "",
-    "files": ["src/components/Comment/Comment.js"]
-  },
-  {
-    "id": "numComments",
-    "description": "Number of comments",
-    "defaultMessage": "{cnt} comments",
-    "message": "",
-    "files": ["src/components/DiscussionPreview/DiscussionPreview.js"]
-  },
-  {
-    "id": "cookieBanner",
-    "description": "Cookie banner, should comply to EU regulations",
-    "defaultMessage": "By using this site you accept our privacy policy.",
-    "message": "",
-    "files": ["src/components/Layout/Layout.js"]
+    "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.failed",
@@ -1092,6 +841,218 @@
     "files": ["src/components/Activity/Activity.js"]
   },
   {
+    "id": "commands.collapseReplies",
+    "description": "Hide replies",
+    "defaultMessage": "Hide replies",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "commands.edit",
+    "description": "Edit",
+    "defaultMessage": "Edit",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "commands.expandReplies",
+    "description": "Show replies",
+    "defaultMessage": "View all {cnt} replies",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "commands.expandReply",
+    "description": "Show reply",
+    "defaultMessage": "View reply",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "commands.reply",
+    "description": "Btn to reply",
+    "defaultMessage": "Reply",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "label.edited",
+    "description": "Comment edited",
+    "defaultMessage": "edited {time}",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "statements.collapse",
+    "description": "Btn to collapse statements",
+    "defaultMessage": "Show less",
+    "message": "",
+    "files": [
+      "src/components/Comment/Comment.js",
+      "src/components/Statement/Statement.js"
+    ]
+  },
+  {
+    "id": "statements.delete",
+    "description": "Menu entry on statements to delete statement",
+    "defaultMessage": "delete",
+    "message": "",
+    "files": [
+      "src/components/Comment/Comment.js",
+      "src/components/Statement/Statement.js"
+    ]
+  },
+  {
+    "id": "statements.expand",
+    "description": "Btn to expand statements",
+    "defaultMessage": "Read more",
+    "message": "",
+    "files": [
+      "src/components/Comment/Comment.js",
+      "src/components/Statement/Statement.js"
+    ]
+  },
+  {
+    "id": "statements.flag",
+    "description": "Menu entry on statements to flag statement",
+    "defaultMessage": "flag",
+    "message": "",
+    "files": [
+      "src/components/Comment/Comment.js",
+      "src/components/Statement/Statement.js"
+    ]
+  },
+  {
+    "id": "statements.follow",
+    "description": "Menu entry on statements to follow author",
+    "defaultMessage": "follow",
+    "message": "",
+    "files": [
+      "src/components/Comment/Comment.js",
+      "src/components/Statement/Statement.js"
+    ]
+  },
+  {
+    "id": "form.error-select",
+    "description":
+      "Help for selection, when input does not match with a suggestion",
+    "defaultMessage": "You selection is not correct. Click on a suggestion",
+    "message": "",
+    "files": [
+      "src/components/DiscussionInput/DiscussionInput.js",
+      "src/components/ProposalInput/ProposalInput.js",
+      "src/components/TagForm/TagForm.js",
+      "src/components/WorkTeamForm/WorkTeamForm.js",
+      "src/components/WorkTeamInput/WorkTeamInput.js",
+      "src/components/WorkTeamManager/WorkTeamManager.js"
+    ]
+  },
+  {
+    "id": "numComments",
+    "description": "Number of comments",
+    "defaultMessage": "{cnt} comments",
+    "message": "",
+    "files": ["src/components/DiscussionPreview/DiscussionPreview.js"]
+  },
+  {
+    "id": "help.firstSteps",
+    "description": "Title of help section",
+    "defaultMessage": "What to do next",
+    "message": "",
+    "files": ["src/components/Help/Help.js"]
+  },
+  {
+    "id": "cookieBanner",
+    "description": "Cookie banner, should comply to EU regulations",
+    "defaultMessage": "By using this site you accept our privacy policy.",
+    "message": "",
+    "files": ["src/components/Layout/Layout.js"]
+  },
+  {
+    "id": "navigation.feed",
+    "description": "Feed link in header",
+    "defaultMessage": "Feed",
+    "message": "",
+    "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "navigation.profile",
+    "description": "Profile link in header",
+    "defaultMessage": "Profile",
+    "message": "",
+    "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "navigation.users",
+    "description": "Workteam list link in header",
+    "defaultMessage": "All workteams",
+    "message": "",
+    "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "command.loadMore",
+    "description": "To get more data",
+    "defaultMessage": "Load more",
+    "message": "",
+    "files": [
+      "src/components/ProposalListView/ProposalListView.js",
+      "src/components/UserPanel/UserPanel.js",
+      "src/routes/accountList/AccountListContainer.js"
+    ]
+  },
+  {
+    "id": "tags",
+    "description": "Tags",
+    "defaultMessage": "Tags",
+    "message": "",
+    "files": [
+      "src/components/ProposalPanel/ProposalPanel.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
+  },
+  {
+    "id": "settings.email.heading",
+    "description": "Heading of email section",
+    "defaultMessage": "Email",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "settings.name",
+    "description": "First name",
+    "defaultMessage": "Name",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "settings.name.heading",
+    "description": "Heading of name section",
+    "defaultMessage": "Name",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "settings.password.heading",
+    "description": "Heading of password section",
+    "defaultMessage": "Password",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "settings.surname",
+    "description": "Surname",
+    "defaultMessage": "Surname",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "settings.workTeams",
+    "description": "Workteam",
+    "defaultMessage": "Workteams",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
     "id": "join",
     "description": "Button label",
     "defaultMessage": "Join",
@@ -1113,34 +1074,73 @@
     "files": ["src/components/WorkTeam/WorkTeam.js"]
   },
   {
-    "id": "tags",
-    "description": "Tags",
-    "defaultMessage": "Tags",
+    "id": "workTeams.economy",
+    "description": "Economy",
+    "defaultMessage": "Economy",
     "message": "",
-    "files": [
-      "src/components/ProposalPanel/ProposalPanel.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
+    "files": ["src/routes/account/AccountContainer.js"]
   },
   {
-    "id": "discussion.new",
-    "description": "Title for activity",
-    "defaultMessage": "New discussion",
+    "id": "workTeams.education",
+    "description": "Education",
+    "defaultMessage": "Education, youth, sport",
     "message": "",
-    "files": ["src/components/Activity/Activity.js"]
+    "files": ["src/routes/account/AccountContainer.js"]
   },
   {
-    "id": "navigation.profile",
-    "description": "Profile link in header",
-    "defaultMessage": "Profile",
+    "id": "workTeams.environment",
+    "description": "Environment",
+    "defaultMessage": "Environment",
     "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "files": ["src/routes/account/AccountContainer.js"]
   },
   {
-    "id": "navigation.users",
-    "description": "Workteam list link in header",
-    "defaultMessage": "All workteams",
+    "id": "workTeams.events",
+    "description": "Event",
+    "defaultMessage": "Event organization, admission",
     "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "workTeams.health",
+    "description": "Health",
+    "defaultMessage": "Public health systems and welfare",
+    "message": "",
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "workTeams.mobility",
+    "description": "Mobility",
+    "defaultMessage": "Mobilty and transport",
+    "message": "",
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "workTeams.urbanism",
+    "description": "Urbanism",
+    "defaultMessage": "Urbanism",
+    "message": "",
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "proposal",
+    "description": "Switch to proposal poll",
+    "defaultMessage": "Proposal",
+    "message": "",
+    "files": ["src/routes/proposal/ProposalContainer.js"]
+  },
+  {
+    "id": "voting",
+    "description": "Switch to voting poll",
+    "defaultMessage": "Voting",
+    "message": "",
+    "files": ["src/routes/proposal/ProposalContainer.js"]
+  },
+  {
+    "id": "signup.welcome-title",
+    "description": "Welcome message header",
+    "defaultMessage": "Welcome on board!",
+    "message": "",
+    "files": ["src/routes/signup/SignupContainer.js"]
   }
 ]
