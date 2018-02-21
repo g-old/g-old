@@ -195,9 +195,7 @@ class AccountContainer extends React.Component {
   handleImageChange() {
     this.setState({ showUpload: true });
   }
-
   render() {
-    if (!this.props.user) return null;
     const {
       subscription,
       updates,
@@ -205,8 +203,30 @@ class AccountContainer extends React.Component {
       logs,
       logError,
       logPending,
+      user,
     } = this.props;
-    const { followees = [] } = this.props.user;
+    if (!user) return null;
+    const { followees = [] } = user;
+    let notification;
+    if (ownAccount && !user.emailVerified) {
+      notification = (
+        <Box padding="medium" justify>
+          <Notification
+            type="alert"
+            message="Please confirm your email address first - (warning)"
+            action={
+              <Button
+                onClick={() => {
+                  alert('Not implemented!');
+                }}
+                primary
+                label="Resend link"
+              />
+            }
+          />
+        </Box>
+      );
+    }
     const profile = (
       <Profile
         ownAccount={ownAccount}
@@ -297,66 +317,68 @@ class AccountContainer extends React.Component {
     }
 
     return (
-      <Box flex justify wrap className={s.account}>
-        {this.state.showUpload && (
-          <ImageUpload
-            uploadAvatar={data => {
-              this.props.uploadAvatar({ ...data, id: this.props.user.id });
-            }}
-            uploadPending={updates.dataUrl && updates.dataUrl.pending}
-            uploadError={updates.dataUrl && updates.dataUrl.error}
-            uploadSuccess={updates.dataUrl && updates.dataUrl.success}
-            ratio={1}
-            onClose={() => {
-              this.setState({ showUpload: false });
-            }}
-          />
-        )}
-        {profile}
-
-        <Box column flex className={s.details}>
-          {followeeContainer}
-
-          <FormField label="WebPush" error={subscription.error}>
-            <CheckBox
-              toggle
-              checked={subscription.isPushEnabled}
-              label={subscription.isPushEnabled ? 'ON' : 'OFF'}
-              onChange={this.handleWPSubscription}
-              disabled={this.state.disableSubscription || subscription.pending}
+      <div>
+        {notification}
+        <Box flex justify wrap className={s.account}>
+          {this.state.showUpload && (
+            <ImageUpload
+              uploadAvatar={data => {
+                this.props.uploadAvatar({ ...data, id: this.props.user.id });
+              }}
+              uploadPending={updates.dataUrl && updates.dataUrl.pending}
+              uploadError={updates.dataUrl && updates.dataUrl.error}
+              uploadSuccess={updates.dataUrl && updates.dataUrl.success}
+              ratio={1}
+              onClose={() => {
+                this.setState({ showUpload: false });
+              }}
             />
-          </FormField>
-          <Accordion openMulti>
-            <AccordionPanel
-              heading={<FormattedMessage {...messages.settings} />}
-              onActive={() => {
-                this.props.loadWorkTeams();
-              }}
-            >
-              <div style={{ marginTop: '1em' }}>
-                <UserSettings
-                  resendEmail={this.props.verifyEmail}
-                  updates={updates}
-                  user={this.props.user}
-                  updateUser={this.props.updateUser}
-                  onJoinWorkTeam={this.props.joinWorkTeam}
-                  onLeaveWorkTeam={this.props.leaveWorkTeam}
-                  workTeams={this.props.workTeams}
-                />
-              </div>
-            </AccordionPanel>
-            <AccordionPanel
-              heading="Log / Notifications"
-              column
-              onActive={() => {
-                this.props.loadLogs(true);
-              }}
-            >
-              {displayLog}
-            </AccordionPanel>
-          </Accordion>
+          )}
+          {profile}
+
+          <Box column flex className={s.details}>
+            {followeeContainer}
+
+            <FormField label="WebPush" error={subscription.error}>
+              <CheckBox
+                toggle
+                checked={subscription.isPushEnabled}
+                label={subscription.isPushEnabled ? 'ON' : 'OFF'}
+                onChange={this.handleWPSubscription}
+                disabled={
+                  this.state.disableSubscription || subscription.pending
+                }
+              />
+            </FormField>
+            <Accordion openMulti>
+              <AccordionPanel
+                heading={<FormattedMessage {...messages.settings} />}
+              >
+                <div style={{ marginTop: '1em' }}>
+                  <UserSettings
+                    resendEmail={this.props.verifyEmail}
+                    updates={updates}
+                    user={this.props.user}
+                    updateUser={this.props.updateUser}
+                    onJoinWorkTeam={this.props.joinWorkTeam}
+                    onLeaveWorkTeam={this.props.leaveWorkTeam}
+                    workTeams={this.props.workTeams}
+                  />
+                </div>
+              </AccordionPanel>
+              <AccordionPanel
+                heading="Log / Notifications"
+                column
+                onActive={() => {
+                  this.props.loadLogs(true);
+                }}
+              >
+                {displayLog}
+              </AccordionPanel>
+            </Accordion>
+          </Box>
         </Box>
-      </Box>
+      </div>
     );
   }
 }

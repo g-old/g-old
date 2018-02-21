@@ -230,51 +230,89 @@ app.post('/logout', (req, res) => {
   res.status(200).json({ loggedOut: true, redirect: '/logged-out' });
 });
 
+const recaptchaKeys = {
+  secret:
+    privateConfig[__DEV__ ? 'development' : 'production'].recaptcha.secret,
+  siteKey:
+    privateConfig[__DEV__ ? 'development' : 'production'].recaptcha.siteKey,
+};
 app.post('/signup', (req, res) => {
   // OR post to graphql
   /* res.status(500).json();
   return; */
-
-  User.create({ id: 1, groups: Groups.SYSTEM }, req.body.user)
-    .then(user => {
-      if (!user) throw Error('User creation failed');
-      const job = {
-        type: 'mail',
-        data: {
-          lang: req.cookies.lang,
-          mailType: EmailTypes.WELCOME,
-          address: user.email,
-          viewer: user,
-          connection: {
-            host: req.hostname,
-            protocol: req.protocol || 'https' /* getProtocol(req) */,
-          },
-        },
-      };
-      if (!sendJob(job)) {
-        log.error('Verification email not sent');
-      }
-      return new Promise((resolve, reject) => {
-        // eslint-disable-next-line no-confusing-arrow
-        req.login(user, err => (err ? reject(err) : resolve()));
-      });
-    })
-    .then(
-      () =>
-        new Promise((resolve, reject) => {
-          // eslint-disable-next-line no-confusing-arrow
-          req.session.save(err => (err ? reject(err) : resolve()));
-        }),
-    )
-    .then(() => res.status(200).json({ user: req.session.passport.user }))
-    .catch(error => {
-      if (error.code === '23505') {
-        res
-          .status(200)
-          .json({ error: { fields: { email: { unique: false } } } });
-      }
-      res.status(500).json({ error: error.message });
+  const { responseCode, user: userData } = req.body;
+  if (!responseCode)
+    return res.status(404).json({
+      error: 'response-code-missing',
     });
+  return nodeFetch(
+    'https://www.google.com/recaptcha/api/siteverify' +
+      `?secret=${recaptchaKeys.secret}&response=${responseCode}`,
+    {
+      method: 'POST',
+    },
+  )
+    .then(
+      resp => resp.json(),
+      err => {
+        log.error({ err, req }, 'Recaptcha failed');
+        return res.status(404).json({
+          error: `Recaptcha authorization failed: Network error `,
+        });
+      },
+    )
+    .then(data => {
+      if (!data.success) {
+        const errors = data['error-codes'] ? data['error-codes'].join(' ') : '';
+        return res.status(404).json({
+          error: `Recaptcha authorization failed: ${errors}`,
+        });
+      }
+      return null;
+    })
+    .then(() =>
+      User.create({ id: 1, groups: Groups.SYSTEM }, userData)
+        .then(user => {
+          if (!user) throw Error('User creation failed');
+          const job = {
+            type: 'mail',
+            data: {
+              lang: req.cookies.lang,
+              mailType: EmailTypes.WELCOME,
+              address: user.email,
+              viewer: user,
+              connection: {
+                host: req.hostname,
+                protocol: req.protocol || 'https' /* getProtocol(req) */,
+              },
+            },
+          };
+          if (!sendJob(job)) {
+            log.error('Verification email not sent');
+          }
+          return new Promise((resolve, reject) => {
+            // eslint-disable-next-line no-confusing-arrow
+            req.login(user, err => (err ? reject(err) : resolve()));
+          });
+        })
+        .then(
+          () =>
+            new Promise((resolve, reject) => {
+              // eslint-disable-next-line no-confusing-arrow
+              req.session.save(err => (err ? reject(err) : resolve()));
+            }),
+        )
+        .then(() => res.status(200).json({ user: req.session.passport.user }))
+        .catch(error => {
+          if (error && error.code === '23505') {
+            return res
+              .status(200)
+              .json({ error: { fields: { email: { unique: false } } } });
+          }
+          log.error({ err: error, req }, 'Signup failed');
+          return res.status(500).json({ error: error.message });
+        }),
+    );
 });
 const storage = multer.memoryStorage();
 const FileStore = FileStorage(AvatarManager({ local: !!__DEV__ }));
@@ -358,7 +396,7 @@ app.post('/reset/:token', (req, res) =>
       );
     })
     .then(userData => {
-      const user = userData.user;
+      const { user } = userData;
       if (user) {
         if (!user) throw Error('Update failed');
         // TODO separate errorhandling for mail and login
@@ -532,15 +570,18 @@ app.get('*', async (req, res, next) => {
       styles.forEach(style => css.add(style._getCss()));
     };
 
-        // Universal HTTP client
+    // Universal HTTP client
     const fetch = createFetch(nodeFetch, {
       baseUrl: config.api.serverUrl,
       cookie: req.headers.cookie,
     });
 
     let normalizedData = { entities: {}, result: null };
+    let recaptchaKey;
     if (req.user) {
       normalizedData = normalize(req.user, userSchema);
+    } else {
+      recaptchaKey = recaptchaKeys.siteKey;
     }
     let cookieConsent;
     if (req.cookies) {
@@ -555,6 +596,7 @@ app.get('*', async (req, res, next) => {
         roles: normalizedData.entities.roles || {},
       },
       webPushKey: privateConfig.webpush.publicKey,
+      recaptchaKey, // will be null if user is logged in
       consent: cookieConsent,
     };
     const store = configureStore(initialState, {
@@ -563,7 +605,7 @@ app.get('*', async (req, res, next) => {
       history: null,
     });
 
-       store.dispatch(
+    store.dispatch(
       setRuntimeVariable({
         name: 'initialNow',
         value: Date.now(),
@@ -577,7 +619,7 @@ app.get('*', async (req, res, next) => {
       }),
     );
 
-       const locale = req.language;
+    const locale = req.language;
     const intl = await store.dispatch(
       setLocale({
         locale,
@@ -605,10 +647,8 @@ app.get('*', async (req, res, next) => {
 
     const data = { ...route };
     data.children = ReactDOM.renderToString(
-      <App context={context} /*store={store}*/>
-        {route.component}
-      </App>,
-    );   
+      <App context={context} /* store={store} */>{route.component}</App>,
+    );
     data.styles = [{ id: 'css', cssText: [...css].join('') }];
 
     data.scripts = [assets.vendor.js];

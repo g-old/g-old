@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import Recaptcha from 'react-recaptcha';
+
 import { defineMessages, FormattedMessage } from 'react-intl';
 import s from './SignUp.css';
 import Button from '../Button';
@@ -15,6 +17,7 @@ import {
   capitalizeFirstLetter,
 } from '../../core/validation';
 
+const SCRIPT_ID = 'gold-recaptcha-script';
 const fieldNames = ['name', 'surname', 'email', 'password', 'passwordAgain'];
 const messages = defineMessages({
   title: {
@@ -96,6 +99,7 @@ class SignUp extends React.Component {
     error: PropTypes.bool,
     pending: PropTypes.bool,
     notUniqueEmail: PropTypes.bool,
+    recaptchaKey: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
@@ -103,6 +107,25 @@ class SignUp extends React.Component {
     error: false,
     notUniqueEmail: false,
   };
+  static renderScript() {
+    let script = document.getElementById(SCRIPT_ID);
+    if (!script) {
+      script = document.createElement('script');
+      script.src =
+        'https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit';
+      script.async = true;
+      script.defer = true;
+      script.id = SCRIPT_ID;
+      document.body.appendChild(script);
+    }
+  }
+
+  static removeScript() {
+    const script = document.getElementById(SCRIPT_ID);
+    if (script) {
+      script.parentNode.removeChild(script);
+    }
+  }
   constructor(props) {
     super(props);
     this.state = {
@@ -112,6 +135,7 @@ class SignUp extends React.Component {
       surname: '',
       email: '',
       invalidEmails: [],
+      captchaPending: true,
       errors: {
         password: {
           touched: false,
@@ -136,6 +160,8 @@ class SignUp extends React.Component {
     this.visibleErrors = this.visibleErrors.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
     this.handleValueChange = this.handleValueChange.bind(this);
+    this.verifyCallback = this.verifyCallback.bind(this);
+    this.executeCaptcha = this.executeCaptcha.bind(this);
     const testValues = {
       password: { fn: 'password' },
       passwordAgain: { fn: 'passwordAgain' },
@@ -159,6 +185,13 @@ class SignUp extends React.Component {
     );
   }
 
+  componentDidMount() {
+    SignUp.renderScript();
+    if (this.recaptchaInstance) {
+      this.recaptchaInstance.reset();
+    }
+  }
+
   componentWillReceiveProps({ notUniqueEmail }) {
     if (notUniqueEmail) {
       this.setState({
@@ -173,6 +206,9 @@ class SignUp extends React.Component {
         },
       });
     }
+  }
+  componentWillUnmount() {
+    SignUp.removeScript();
   }
 
   onSubmit() {
@@ -191,13 +227,12 @@ class SignUp extends React.Component {
         password,
       };
       //  alert(JSON.stringify(data));
-      this.props.onCreateUser(data);
+      this.props.onCreateUser(data, this.state.captchaResponse);
     }
   }
 
   handleValueChange(e) {
-    const field = e.target.name;
-    const value = e.target.value;
+    const { name: field, value } = e.target;
     if (this.state.errors[field].touched) {
       this.setState({
         errors: {
@@ -238,6 +273,24 @@ class SignUp extends React.Component {
     }, {});
   }
 
+  verifyCallback(response) {
+    this.setState(
+      { captchaResponse: response, captchaPending: false },
+      this.onSubmit,
+    );
+  }
+
+  executeCaptcha() {
+    if (this.handleValidation(fieldNames)) {
+      this.setState(
+        {
+          captchaPending: true,
+        },
+        () => this.recaptchaInstance.execute(),
+      );
+    }
+  }
+
   render() {
     const {
       nameError,
@@ -245,6 +298,7 @@ class SignUp extends React.Component {
       passwordError,
       passwordAgainError,
       emailError,
+      pending,
     } = this.visibleErrors(fieldNames);
 
     const loginError = this.props.error ? (
@@ -279,6 +333,7 @@ class SignUp extends React.Component {
                 <input
                   type="text"
                   name="surname"
+                  autoComplete="family-name"
                   value={this.state.surname}
                   onChange={this.handleValueChange}
                   onBlur={this.handleBlur}
@@ -318,6 +373,7 @@ class SignUp extends React.Component {
                   id="email"
                   type="text"
                   name="email"
+                  autoComplete="email"
                   value={this.state.email}
                   onChange={this.handleValueChange}
                   onBlur={this.handleBlur}
@@ -325,14 +381,29 @@ class SignUp extends React.Component {
               </FormField>
               {!this.props.notUniqueEmail && loginError}
             </fieldset>
+
             <Button
               primary
               fill
-              onClick={this.onSubmit}
-              disabled={this.props.pending}
+              onClick={this.executeCaptcha}
+              disabled={this.state.captchaPending || pending}
             >
               <FormattedMessage {...messages.nextStep} />
             </Button>
+            <Recaptcha // eslint-disable-next-line
+              ref={e => (this.recaptchaInstance = e)}
+              size="invisible"
+              render="explicit"
+              sitekey={this.props.recaptchaKey}
+              verifyCallback={this.verifyCallback}
+              onloadCallback={() =>
+                this.setState({
+                  captchaPending: false,
+                })
+              }
+              theme="dark"
+              badge="inline"
+            />
           </Box>
         </div>
       </div>

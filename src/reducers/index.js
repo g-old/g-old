@@ -14,6 +14,7 @@ export default combineReducers({
   entities,
   ui,
   webPushKey: (state = '') => state,
+  recaptchaKey: (state = '') => state,
   consent,
   statistics,
 });

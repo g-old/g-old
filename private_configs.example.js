@@ -20,6 +20,10 @@ module.exports = {
       },
       sender: '{email address}',
     },
+    recaptcha: {
+      secret: '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe', // dev keys
+      siteKey: '6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI',
+    },
   },
   production: {
     dbConfig: {
@@ -45,6 +49,10 @@ module.exports = {
       },
     },
     SENDGRID_API_KEY: 'api key', // or set it as env variable
+    recaptcha: {
+      secret: '',
+      siteKey: '',
+    },
   },
   test: {
     dbConfig: {

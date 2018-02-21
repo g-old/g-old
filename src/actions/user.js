@@ -182,7 +182,8 @@ export function loadUserList({ group, first, after, union = false }) {
 }
 
 const initialId = '0000';
-export function createUser(newUser) {
+
+export function createUser(newUser, responseCode = null) {
   return async dispatch => {
     const properties = genStatusIndicators(newUser);
     dispatch({
@@ -199,6 +200,7 @@ export function createUser(newUser) {
         },
         body: JSON.stringify({
           user: newUser,
+          responseCode,
         }),
         credentials: 'include',
       });
@@ -253,7 +255,7 @@ export function updateUser(user) {
 
     try {
       const { data } = await graphqlRequest(updateUserMutation, user);
-      const errors = data.updateUser.errors;
+      const { errors } = data.updateUser;
       if (errors.length) {
         // TODO rewrite error handling
         const standardError = errors.reduce((acc, curr) => {
@@ -409,7 +411,7 @@ export function deleteUser({ id }) {
 
     try {
       const { data } = await graphqlRequest(deleteUserMutation, { id });
-      const errors = data.deleteUser.errors;
+      const { errors } = data.deleteUser;
       if (errors.length) {
         /* eslint-disable no-return-assign */
         const standardError = errors.reduce(

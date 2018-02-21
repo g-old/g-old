@@ -31,6 +31,8 @@ class SignupContainer extends React.Component {
     // uploadAvatar: PropTypes.func.isRequired,
     updates: PropTypes.shape({}).isRequired,
     locale: PropTypes.string.isRequired,
+    user: PropTypes.shape({}),
+    recaptchaKey: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
@@ -42,7 +44,6 @@ class SignupContainer extends React.Component {
     this.state = {
       step: 0,
       serverCalled: false,
-      showUpload: false,
     };
     this.onCreateUser = this.onCreateUser.bind(this);
   }
@@ -69,14 +70,14 @@ class SignupContainer extends React.Component {
       }
     }
   }
-  onCreateUser(data) {
+  onCreateUser(data, captchaResponse) {
     // dispatch
-    this.props.createUser(data);
+    this.props.createUser(data, captchaResponse);
     this.setState({ serverCalled: true });
   }
 
   render() {
-    const { updates } = this.props;
+    const { updates, recaptchaKey } = this.props;
     let emailError = false;
     if (updates.email && updates.email.error) {
       emailError = updates.email.error.unique === false;
@@ -89,6 +90,7 @@ class SignupContainer extends React.Component {
             notUniqueEmail={emailError}
             error={this.state.error}
             onCreateUser={this.onCreateUser}
+            recaptchaKey={recaptchaKey}
           />
         );
       case 1:
@@ -114,6 +116,7 @@ class SignupContainer extends React.Component {
 const mapStateToProps = state => ({
   updates: getAccountUpdates(state, '0000'),
   intl: getLocale(state), // fix for forceUpdate
+  recaptchaKey: state.recaptchaKey,
 });
 const mapDispatch = {
   createUser,
