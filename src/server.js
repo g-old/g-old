@@ -232,8 +232,10 @@ app.post('/logout', (req, res) => {
 
 const recaptchaKeys = {
   secret:
+    process.env.RECAPTCHA_SECRET ||
     privateConfig[__DEV__ ? 'development' : 'production'].recaptcha.secret,
   siteKey:
+    process.env.RECAPTCHA_KEY ||
     privateConfig[__DEV__ ? 'development' : 'production'].recaptcha.siteKey,
 };
 app.post('/signup', (req, res) => {

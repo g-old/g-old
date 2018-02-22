@@ -10,7 +10,7 @@
   margin-right: 24px;
 }
 
-.root.column.pad > *:not(:last-child) {
+.root.column > *:not(:last-child) {
   margin-bottom: 24px;
 }
 
@@ -63,4 +63,9 @@
 
 .fill {
   width: 100%;
+}
+
+.pad {
+  padding-left: 24px;
+  padding-right: 24px;
 }

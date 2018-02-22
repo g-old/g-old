@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './UserProfile.css';
 import Box from '../Box';
 import Value from '../Value';
 import Label from '../Label';
@@ -42,7 +40,7 @@ class UserProfile extends React.Component {
     } = this.props.user;
     const canChangeImg = this.props.ownAccount;
     return (
-      <Box className={s.profile} column align>
+      <Box column align>
         <ProfilePicture
           user={this.props.user}
           img={avatar}
@@ -54,7 +52,7 @@ class UserProfile extends React.Component {
         <Label big>
           {name} {surname}
         </Label>
-        <Box pad>
+        <Box>
           <Value
             icon={
               <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
@@ -138,4 +136,4 @@ class UserProfile extends React.Component {
   }
 }
 
-export default withStyles(s)(UserProfile);
+export default UserProfile;

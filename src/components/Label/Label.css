@@ -1,4 +1,4 @@
-@import "../../components/variables.css";
+@import '../../components/variables.css';
 
 .label {
   font-weight: 300;
@@ -14,6 +14,6 @@
 
 .big {
   font-size: 2.5rem;
-  padding-bottom: 1em;
   color: var(--color-accent-5);
+  text-align: center;
 }

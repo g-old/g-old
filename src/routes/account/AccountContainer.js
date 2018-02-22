@@ -44,6 +44,7 @@ import ActivityLog from '../../components/ActivityLog';
 import Notification from '../../components/Notification';
 import Profile from '../../components/UserProfile';
 import s from './AccountContainer.css';
+import Responsive from '../../core/Responsive';
 
 const messages = defineMessages({
   settings: {
@@ -146,12 +147,12 @@ class AccountContainer extends React.Component {
     this.handleWPSubscription = this.handleWPSubscription.bind(this);
     this.handleImageChange = this.handleImageChange.bind(this);
     this.getUserData = this.getUserData.bind(this);
+    this.onResponsive = this.onResponsive.bind(this);
   }
 
   componentDidMount() {
     this.getUserData(this.props.user);
-    //  this.props.loadWorkTeams();
-    // this.props.loadFeed(true);
+    this.responsive = Responsive.start(this.onResponsive);
   }
 
   componentWillReceiveProps({ updates, subscription, user }) {
@@ -164,6 +165,24 @@ class AccountContainer extends React.Component {
     // eslint-disable-next-line eqeqeq
     if (user.id != this.props.user.id) {
       this.getUserData(user);
+    }
+  }
+  componentWillUnmount() {
+    if (this.responsive) {
+      this.responsive.stop();
+    }
+  }
+
+  onResponsive(small) {
+    // deactivate if we change resolutions
+    if (small) {
+      this.setState({
+        smallSize: true,
+      });
+    } else {
+      this.setState({
+        smallSize: false,
+      });
     }
   }
 
@@ -210,21 +229,19 @@ class AccountContainer extends React.Component {
     let notification;
     if (ownAccount && !user.emailVerified) {
       notification = (
-        <Box padding="medium" justify>
-          <Notification
-            type="alert"
-            message="Please confirm your email address first - (warning)"
-            action={
-              <Button
-                onClick={() => {
-                  alert('Not implemented!');
-                }}
-                primary
-                label="Resend link"
-              />
-            }
-          />
-        </Box>
+        <Notification
+          type="alert"
+          message="Please confirm your email address first - (warning)"
+          action={
+            <Button
+              onClick={() => {
+                alert('Not implemented!');
+              }}
+              primary
+              label="Resend link"
+            />
+          }
+        />
       );
     }
     const profile = (
@@ -238,7 +255,7 @@ class AccountContainer extends React.Component {
     );
     if (!ownAccount) {
       return (
-        <Box flex justify wrap className={s.account}>
+        <Box padding="medium" justify>
           {profile}
         </Box>
       );
@@ -315,15 +332,17 @@ class AccountContainer extends React.Component {
     } else {
       displayLog = 'No data';
     }
-
     return (
-      <div>
+      <Box tag="article" column padding="medium">
         {notification}
-        <Box flex justify wrap className={s.account}>
+        <Box between column={this.state.smallSize}>
           {this.state.showUpload && (
             <ImageUpload
               uploadAvatar={data => {
-                this.props.uploadAvatar({ ...data, id: this.props.user.id });
+                this.props.uploadAvatar({
+                  ...data,
+                  id: this.props.user.id,
+                });
               }}
               uploadPending={updates.dataUrl && updates.dataUrl.pending}
               uploadError={updates.dataUrl && updates.dataUrl.error}
@@ -336,7 +355,7 @@ class AccountContainer extends React.Component {
           )}
           {profile}
 
-          <Box column flex className={s.details}>
+          <Box column flex>
             {followeeContainer}
 
             <FormField label="WebPush" error={subscription.error}>
@@ -378,7 +397,7 @@ class AccountContainer extends React.Component {
             </Accordion>
           </Box>
         </Box>
-      </div>
+      </Box>
     );
   }
 }

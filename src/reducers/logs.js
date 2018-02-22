@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 
 import { denormalize } from 'normalizr';
-import byId, * as fromById from './logById';
+import byId from './logById';
 // import allIds, * as fromList from './activityList';
 import allIds, * as fromList from './logList';
 import { logList as logsSchema } from './../store/schema';
@@ -24,9 +24,7 @@ const hydrateActivities = (state, data, entities) =>
 
 export const getLogs = (state, entities) => {
   const ids = fromList.getIds(state.allIds);
-  console.log({ ids: ids });
   const hydrated = hydrateActivities(state, ids, entities);
-  console.log('hydrated', hydrated);
   return hydrated.logs || [];
 };
 

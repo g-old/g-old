@@ -116,12 +116,12 @@ const messages = defineMessages({
     description: 'Resend verification email ',
   },
   emailHeading: {
-    id: 'settings.email.heading',
+    id: 'label.email',
     defaultMessage: 'Email',
     description: 'Heading of email section',
   },
   passwordHeading: {
-    id: 'settings.password.heading',
+    id: 'label.password',
     defaultMessage: 'Password',
     description: 'Heading of password section',
   },
@@ -131,7 +131,7 @@ const messages = defineMessages({
     description: 'Workteam',
   },
   nameHeading: {
-    id: 'settings.name.heading',
+    id: 'label.name',
     defaultMessage: 'Name',
     description: 'Heading of name section',
   },
@@ -294,8 +294,7 @@ class UserSettings extends React.Component {
   }
 
   handleValueChange(e) {
-    const field = e.target.name;
-    const value = e.target.value;
+    const { name: field, value } = e.target;
     if (this.state.errors[field].touched) {
       this.setState({
         errors: {
@@ -545,9 +544,7 @@ class UserSettings extends React.Component {
           !user.emailVerified && (
             <Notification
               type="alert"
-              message={
-                'Look in your mail account. Soon something should be there'
-              }
+              message="Look in your mail account. Soon something should be there"
             />
           )}
         <legend>{<FormattedMessage {...messages.passwordHeading} />}</legend>
