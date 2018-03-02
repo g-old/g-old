@@ -6,7 +6,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import { updateUser, fetchUser, fetchProfileData } from '../../actions/user';
 import { verifyEmail } from '../../actions/verifyEmail';
 import { loadLogs } from '../../actions/log';
-
+import { createRequest, deleteRequest } from '../../actions/request';
 import {
   createWebPushSub,
   deleteWebPushSub,
@@ -23,6 +23,7 @@ import {
   getUser,
   getSessionUser,
   getAccountUpdates,
+  getRequestUpdates,
   getSubscription,
   getWorkTeams,
   getLogs,
@@ -51,6 +52,11 @@ const messages = defineMessages({
     id: 'settings.title',
     defaultMessage: 'Settings',
     description: 'Header for settings',
+  },
+  verificationCall: {
+    id: 'settings.verificationCall',
+    defaultMessage: 'Please confirm your email address',
+    description: 'Notification to verify mail address',
   },
   followees: {
     id: 'profile.followees',
@@ -130,6 +136,9 @@ class AccountContainer extends React.Component {
     fetched: PropTypes.bool.isRequired,
     fetchProfileData: PropTypes.func.isRequired,
     sessionUser: PropTypes.shape({ id: PropTypes.string }).isRequired,
+    requestUpdates: PropTypes.shape({}).isRequired,
+    deleteRequest: PropTypes.func.isRequired,
+    createRequest: PropTypes.func.isRequired,
   };
   static defaultProps = {
     logs: null,
@@ -223,6 +232,7 @@ class AccountContainer extends React.Component {
       logError,
       logPending,
       user,
+      requestUpdates,
     } = this.props;
     if (!user) return null;
     const { followees = [] } = user;
@@ -231,16 +241,7 @@ class AccountContainer extends React.Component {
       notification = (
         <Notification
           type="alert"
-          message="Please confirm your email address first - (warning)"
-          action={
-            <Button
-              onClick={() => {
-                alert('Not implemented!');
-              }}
-              primary
-              label="Resend link"
-            />
-          }
+          message={<FormattedMessage {...messages.verificationCall} />}
         />
       );
     }
@@ -375,10 +376,14 @@ class AccountContainer extends React.Component {
               >
                 <div style={{ marginTop: '1em' }}>
                   <UserSettings
+                    smallSize={this.state.smallSize}
                     resendEmail={this.props.verifyEmail}
+                    deleteRequest={this.props.deleteRequest}
                     updates={updates}
+                    requestUpdates={requestUpdates}
                     user={this.props.user}
                     updateUser={this.props.updateUser}
+                    createRequest={this.props.createRequest}
                     onJoinWorkTeam={this.props.joinWorkTeam}
                     onLeaveWorkTeam={this.props.leaveWorkTeam}
                     workTeams={this.props.workTeams}
@@ -415,10 +420,13 @@ const mapDispatch = {
   loadFeed,
   loadLogs,
   fetchProfileData,
+  createRequest,
+  deleteRequest,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getUser(state, user.id) || user,
   sessionUser: getSessionUser(state),
+  requestUpdates: getRequestUpdates(state),
   updates: getAccountUpdates(state, user.id),
   subscription: getSubscription(state),
   workTeams: getWorkTeams(state),

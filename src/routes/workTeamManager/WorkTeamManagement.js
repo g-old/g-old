@@ -21,11 +21,7 @@ import ProposalsManager from '../../components/ProposalsManager';
 import ProposalListView from '../../components/ProposalListView';
 import ProposalStatusRow from './ProposalStatusRow';
 
-import {
-  loadRequestList,
-  deleteRequest,
-  updateRequest,
-} from '../../actions/request';
+import { deleteRequest, updateRequest } from '../../actions/request';
 
 import {
   getWorkTeam,
@@ -139,6 +135,7 @@ class WorkTeamManagement extends React.Component {
     loadProposalStatus: PropTypes.func.isRequired,
     errorMessage: PropTypes.string,
     pageInfo: PropTypes.shape({}),
+    proposalUpdates: PropTypes.shape({}),
   };
 
   static defaultProps = {
@@ -161,14 +158,6 @@ class WorkTeamManagement extends React.Component {
     this.onDenyRequest = this.onDenyRequest.bind(this);
     this.onProposalClick = this.onProposalClick.bind(this);
   }
-  componentDidMount() {
-    this.props.loadRequestList({
-      first: 10,
-      type: 'joinWT',
-      contentId: this.props.workTeam.id,
-    });
-  }
-
   onRequestClick(action, data) {
     this.setState({ showRequest: true, currentRequest: data });
   }
@@ -234,7 +223,7 @@ class WorkTeamManagement extends React.Component {
           onClickMenu={this.onRequestClick}
           allowMultiSelect
           searchTerm=""
-          noRequestsFound={'No requests found'}
+          noRequestsFound="No requests found"
           checkedIndices={[]}
           requests={this.props.workTeam.requests || []}
           tableHeaders={[
@@ -258,13 +247,14 @@ class WorkTeamManagement extends React.Component {
             this.props.loadProposalsList({
               state: 'pending',
               workTeamId: workTeam.id,
-            })}
+            })
+          }
         >
           <ProposalListView
             proposals={proposals}
             onProposalClick={this.onProposalClick}
             pageInfo={pageInfo}
-            filter={'pending'}
+            filter="pending"
             onLoadMore={this.props.loadProposalsList}
             isFetching={isFetching}
             error={errorMessage}
@@ -276,14 +266,15 @@ class WorkTeamManagement extends React.Component {
             this.props.loadProposalStatus({
               state: 'pending',
               id: workTeam.id,
-            })}
+            })
+          }
         >
           <AssetsTable
             onClickCheckbox={this.onClickCheckbox}
             onClickMenu={this.onProposalClick}
             allowMultiSelect
             searchTerm=""
-            noRequestsFound={'No requests found'}
+            noRequestsFound="No requests found"
             checkedIndices={[]}
             assets={this.props.workTeam.linkedProposals || []}
             row={ProposalStatusRow}
@@ -354,7 +345,6 @@ const mapStateToProps = (state, { id }) => ({
 
 const mapDispatch = {
   loadWorkTeam,
-  loadRequestList,
   deleteRequest,
   joinWorkTeam,
   updateRequest,

@@ -1,10 +1,10 @@
 import { GraphQLNonNull } from 'graphql';
 import RequestInput from '../types/RequestInputType';
-import RequestType from '../types/RequestType';
+import RequestResultType from '../types/RequestResultType';
 import Request from '../models/Request';
 
 const createRequest = {
-  type: new GraphQLNonNull(RequestType),
+  type: new GraphQLNonNull(RequestResultType),
   args: {
     request: {
       type: RequestInput,
@@ -12,8 +12,13 @@ const createRequest = {
     },
   },
   resolve: async (data, { request }, { viewer, loaders }) => {
-    const newRequest = await Request.create(viewer, request, loaders);
-    return newRequest;
+    const requestResult = await Request.create(
+      viewer,
+      request,
+      loaders,
+      data.request,
+    );
+    return requestResult;
   },
 };
 

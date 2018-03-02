@@ -22,6 +22,7 @@ import {
   DELETE_USER_ERROR,
 } from '../constants';
 import { getUsersStatus } from '../reducers';
+import { requestFields } from './request';
 
 const userFields = `
   id,
@@ -78,6 +79,17 @@ query ($id:ID!) {
     followees{
       ${userFields}
     }
+    requestConnection(filterBy:[{filter:REQUESTER_ID id:$id}]){
+      pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          ${requestFields}
+        }
+      }
+    }
     ${userFields}
 
   }
@@ -132,6 +144,20 @@ query ($term:String) {
   }
 }
 `;
+
+const depaginate = (resource, response) => {
+  const conn = response[`${resource}Connection`];
+  if (conn) {
+    const key = `${resource}Connection`;
+    delete response[key];
+
+    return {
+      ...response,
+      [`${resource}s`]: conn.edges.map(p => p.node),
+    };
+  }
+  return response;
+};
 
 export function loadUserList({ group, first, after, union = false }) {
   return async (dispatch, getState, { graphqlRequest }) => {
@@ -349,7 +375,10 @@ export function fetchUser({ id }) {
 
     try {
       const { data } = await graphqlRequest(userQuery, { id });
-      const normalizedData = normalize(data.user, userSchema);
+      const normalizedData = normalize(
+        depaginate('request', data.user),
+        userSchema,
+      );
       dispatch({
         type: FETCH_USER_SUCCESS,
         payload: normalizedData,

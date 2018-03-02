@@ -51,15 +51,38 @@ import log from './logger';
 import { SubscriptionManager, SubscriptionServer } from './core/sse';
 import PubSub from './core/pubsub';
 import responseTiming from './core/timing';
-import { Groups } from './organization';
+import { Groups, Permissions } from './organization';
 import EventManager from './core/EventManager';
 import root from './compositionRoot';
 import { EmailTypes } from './core/BackgroundService';
+import Request from './data/models/Request';
 
 const pubsub = new PubSub();
 
 worker(pubsub);
 BWorker.start(path.resolve(__dirname, 'backgroundWorker.js'));
+
+const sendMailJob = (viewer, { content }, mailType) => {
+  const job = {
+    type: 'mail',
+    data: {
+      lang: content.lang,
+      mailType,
+      address: content.email,
+      viewer,
+      connection: {
+        host: content.hostname,
+        protocol: content.protocol,
+      },
+    },
+  }; // TODO investigate why email has to be overwritten
+  if (!sendJob(job)) {
+    log.error(
+      { viewer, job: { type: 'mail', data: content } },
+      'Could not send job to worker',
+    );
+  }
+};
 
 EventManager.subscribe('onProposalCreated', ({ proposal, viewer }) => {
   if (!sendJob({ type: 'webpush', data: proposal })) {
@@ -88,6 +111,13 @@ EventManager.subscribe('onStatementCreated', ({ statement, viewer }) => {
     );
   }
 });
+
+EventManager.subscribe('sendVerificationMail', ({ request, viewer }) =>
+  sendMailJob(viewer, { content: request.content }, EmailTypes.VERIFICATION),
+);
+EventManager.subscribe('sendWelcomeMail', ({ request, viewer }) =>
+  sendMailJob(viewer, { content: request.content }, EmailTypes.WELCOME),
+);
 
 const app = express();
 
@@ -276,22 +306,18 @@ app.post('/signup', (req, res) => {
       User.create({ id: 1, groups: Groups.SYSTEM }, userData)
         .then(user => {
           if (!user) throw Error('User creation failed');
-          const job = {
-            type: 'mail',
-            data: {
-              lang: req.cookies.lang,
-              mailType: EmailTypes.WELCOME,
-              address: user.email,
-              viewer: user,
-              connection: {
+          EventManager.publish('sendWelcomeMail', {
+            viewer: user,
+            request: {
+              content: {
+                email: user.email,
+                lang: req.cookies.lang,
                 host: req.hostname,
-                protocol: req.protocol || 'https' /* getProtocol(req) */,
+                protocol: __DEV__ ? 'http' : 'https',
               },
             },
-          };
-          if (!sendJob(job)) {
-            log.error('Verification email not sent');
-          }
+          });
+
           return new Promise((resolve, reject) => {
             // eslint-disable-next-line no-confusing-arrow
             req.login(user, err => (err ? reject(err) : resolve()));
@@ -436,27 +462,44 @@ app.post('/reset/:token', (req, res) =>
 
 app.get('/verify/:token', (req, res) => {
   // ! No check if user is logged in !
+  const systemViewer = {
+    id: 1,
+    groups: Groups.SYSTEM,
+    permissions: Permissions.VIEW_USER_INFO,
+  };
+  const loaders = createLoaders();
   checkToken({ token: req.params.token, table: 'verify_tokens' })
     .then(data => {
       if (data) {
         return User.update(
-          {
-            id: 1,
-            groups: Groups.SYSTEM,
-          },
+          systemViewer,
           { email: data.email, id: data.userId, emailVerified: true },
-          createLoaders(),
+          loaders,
         ).then(result => (result ? result.user : null));
       }
       throw Error('Token not valid');
     })
     .then(user => {
       if (user) {
-        // update session
-        return new Promise((resolve, reject) => {
-          // eslint-disable-next-line no-confusing-arrow
-          req.login(user, err => (err ? reject(err) : resolve()));
-        })
+        // delete request
+        return knex('requests')
+          .where({ type: 'changeEmail' })
+          .whereRaw("content->>'email'=?", [user.email])
+          .pluck('id')
+          .then(([id]) => {
+            if (id) {
+              return Request.delete(systemViewer, { id }, loaders);
+            }
+            return null;
+          })
+          .then(
+            () =>
+              // update session
+              new Promise((resolve, reject) => {
+                // eslint-disable-next-line no-confusing-arrow
+                req.login(user, err => (err ? reject(err) : resolve()));
+              }),
+          )
           .then(
             () =>
               new Promise((resolve, reject) => {
@@ -476,42 +519,49 @@ app.get('/verify/:token', (req, res) => {
     });
 });
 
-app.post('/verify', (req, res) =>
-  // ! No check if user is logged in !
-  User.gen(req.user, req.user.id, createLoaders())
-    .then(user => {
+app.post('/verify', (req, res) => {
+  let promise;
+  if (req.body && req.body.requestId) {
+    promise = Request.gen(req.user, req.body.requestId, createLoaders()).then(
+      request => {
+        if (request) {
+          EventManager.publish('sendVerificationMail', {
+            viewer: req.user,
+            request,
+          });
+        } else {
+          throw new Error('Request not found');
+        }
+      },
+    );
+  } else {
+    promise = User.gen(req.user, req.user.id, createLoaders()).then(user => {
       if (user) {
-        const job = {
-          type: 'mail',
-          data: {
-            mailType: req.user.emailVerified
-              ? EmailTypes.VERIFICATION
-              : EmailTypes.WELCOME,
-            lang: req.cookies.lang,
-            verify: true,
-            address: user.email,
-            viewer: user,
-            connection: {
+        EventManager.publish('sendVerificationMail', {
+          viewer: user,
+          request: {
+            content: {
+              email: user.email,
+              lang: req.cookies.lang,
               host: req.hostname,
-              protocol: req.protocol || 'https' /* getProtocol(req) */,
+              protocol: __DEV__ ? 'http' : 'https',
             },
           },
-        };
-        if (!sendJob(job)) {
-          throw Error('Verification email not sent');
-        }
+        });
       } else {
-        throw Error('Could not get user');
+        throw new Error('Verification mail could not been sent');
       }
-    })
+    });
+  }
+  return promise
     .then(() => {
       res.status(200).send();
     })
     .catch(err => {
       log.error({ err }, 'Verification process failed');
       res.status(500).send();
-    }),
-);
+    });
+});
 
 const subscriptionManager = new SubscriptionManager({ schema, pubsub });
 SubscriptionServer({

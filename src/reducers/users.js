@@ -34,6 +34,7 @@ export const getUser = (state, id, entities) => {
     ...entities,
     users: entities.users.byId,
     workTeams: entities.workTeams.byId,
+    requests: entities.requests.byId,
   });
 };
 

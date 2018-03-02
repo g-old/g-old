@@ -110,8 +110,12 @@ function userWriteControl(viewer, data) {
 }
 
 function userReadControl(viewer, data) {
-  // eslint-disable-next-line eqeqeq
-  return viewer.id == data.id || (viewer.permissions & AccessMasks.LEVEL_1) > 0;
+  return (
+    // eslint-disable-next-line eqeqeq
+    viewer.id == data.id ||
+    viewer.groups === Groups.SYSTEM ||
+    (viewer.permissions & AccessMasks.LEVEL_1) > 0
+  );
 }
 
 function proposalReadControl(viewer, data) {

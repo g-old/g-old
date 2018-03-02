@@ -19,7 +19,12 @@ class MessageService {
     this.mailComposer = mailComposer;
     this.tokens = tokenService;
     //  this.events = eventSrc;
-    this.protocol = 'https';
+    this.protocol = __DEV__ ? 'http' : 'https';
+    if (!__DEV__) {
+      if (!process.env.HOST) {
+        throw new Error('HOST environment variable not set!');
+      }
+    }
     this.host = process.env.HOST || 'localhost:3000';
   }
 
@@ -118,6 +123,7 @@ class MessageService {
 
             const token = await this.tokens.createAndStoreEmailToken(
               user.email,
+              user.email,
             );
             const link = this.createVerificationLink(token);
             const personalizedMail = this.mailComposer.getWelcomeMail(
@@ -146,18 +152,18 @@ class MessageService {
       return { success: false, errors: [err.message] };
     }
   }
-  async sendVerificationMessage(user, transportTypes = [], locale) {
+  async sendVerificationMessage(user, address, transportTypes = [], locale) {
     const types = this.getTransportTypes(transportTypes);
     try {
       const promises = types.map(async type => {
         switch (type) {
           case TransportTypes.EMAIL: {
-            if (!user.email) {
+            if (!address) {
               throw new Error('Email address needed');
             }
-
             const token = await this.tokens.createAndStoreEmailToken(
               user.email,
+              address,
             );
             const link = this.createVerificationLink(token);
             const personalizedMail = this.mailComposer.getEmailVerificationMail(
@@ -167,9 +173,9 @@ class MessageService {
             );
             const finalMessage = MessageService.createHTMLMessage(
               personalizedMail,
-              user.email,
+              address,
             );
-            return this.send(finalMessage, user.email, type);
+            return this.send(finalMessage, address, type);
           }
           case TransportTypes.DATABASE: {
             throw new Error('To implement');

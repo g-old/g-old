@@ -12,6 +12,7 @@ import knex from '../knex';
 import WorkTeamType from './WorkTeamType';
 import WorkTeam from '../models/WorkTeam';
 import User from '../models/User';
+import requestConnection from '../queries/requestConnection';
 import { Permissions } from '../../organization';
 
 /* eslint-disable */
@@ -64,6 +65,7 @@ const UserType = new ObjectType({
           ids.map(id => User.gen(viewer, id, loaders)),
         ),
     },
+    requestConnection,
 
     numFollowers: {
       type: GraphQLInt,

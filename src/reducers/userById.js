@@ -23,10 +23,11 @@ import {
   LOAD_REPLIES_SUCCESS,
   LOAD_REQUESTS_SUCCESS,
   CREATE_REQUEST_SUCCESS,
+  DELETE_REQUEST_SUCCESS,
 } from '../constants';
 
 const handleUsers = (state, action) => {
-  const users = action.payload.entities.users;
+  const { users } = action.payload.entities;
   const newState = Object.keys(users).reduce(
     (acc, curr) => ({ ...acc, [curr]: { ...state[curr], ...users[curr] } }),
     {},
@@ -34,6 +35,37 @@ const handleUsers = (state, action) => {
   return {
     ...state,
     ...newState,
+  };
+};
+
+const addRequest = (state, action) => {
+  const request = action.payload.entities.requests[action.payload.result];
+  const ownerId = request.requester;
+  const requests = [];
+  if (state[ownerId].requests) {
+    requests.concat(state[ownerId].requests);
+  }
+  requests.push(request.id);
+
+  return {
+    ...state,
+    ...(action.payload.entities.users && action.payload.entities.users),
+    [ownerId]: {
+      ...state[ownerId],
+      requests,
+    },
+  };
+};
+
+const deleteRequest = (state, action) => {
+  const request = action.payload.entities.requests[action.payload.result];
+  const ownerId = request.requester;
+  return {
+    ...state,
+    [ownerId]: {
+      ...state[ownerId],
+      requests: state[ownerId].requests.filter(rId => rId !== request.id),
+    },
   };
 };
 
@@ -57,9 +89,15 @@ export default function byId(state = {}, action) {
     case LOAD_REPLIES_SUCCESS:
     case LOAD_REQUESTS_SUCCESS:
     case LOAD_WORKTEAM_SUCCESS:
-    case CREATE_REQUEST_SUCCESS:
     case SESSION_LOGIN_SUCCESS: {
       return merge({}, state, action.payload.entities.users);
+    }
+
+    case CREATE_REQUEST_SUCCESS: {
+      return addRequest(state, action);
+    }
+    case DELETE_REQUEST_SUCCESS: {
+      return deleteRequest(state, action);
     }
 
     case SSE_UPDATE_SUCCESS: {

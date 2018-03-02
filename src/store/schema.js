@@ -58,6 +58,7 @@ user.define({
   role,
   followees: [user],
   workTeams: [workTeam],
+  requests: [request],
 });
 export const notification = new schema.Entity('notifications', {
   sender: user,

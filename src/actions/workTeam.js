@@ -84,14 +84,23 @@ name
 lldName
 deName
 itName
-requests{
-${requestFields}
-}
 `;
 const workTeamWithDetails = `query($id:ID!){
     workTeam(id:$id) {
       ${workTeamFields}
       ${wtDetails}
+      requestConnection(type:"joinWT" filterBy:[{filter:CONTENT_ID id:$id}]){
+      pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          ${requestFields}
+        }
+      }
+    }
+
     }}`;
 
 const proposalFields = `
@@ -340,6 +349,12 @@ export function loadWorkTeam({ id, state = 'active' }, details) {
         proposals = data.workTeam.proposalConnection.edges.map(p => p.node);
       }
       data.workTeam.proposals = proposals;
+      // TODO make paginable
+      let requests = [];
+      if (data.workTeam.requestConnection) {
+        requests = data.workTeam.requestConnection.edges.map(p => p.node);
+      }
+      data.workTeam.requests = requests;
       const normalizedData = normalize(data.workTeam, workTeamSchema);
 
       dispatch({ type: LOAD_WORKTEAM_SUCCESS, payload: normalizedData });

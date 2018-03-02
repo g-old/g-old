@@ -99,18 +99,22 @@ class User {
       return { errors: ['Permission denied!'] };
     }
     // validate - if something seems corrupted, return.
-    if (data.email && !validateEmail(data.email))
-      return { errors: ['Wrong argument'] };
     if (data.password && data.password.trim().length <= 6)
       return { errors: ['Wrong argument'] };
     if (data.passwordOld && data.passwordOld.trim().length <= 6)
       return { errors: ['Wrong argument'] };
     // TODO write fn which gets all the props with the right name
-    // TODO Allow only specific updates, take car of role
+    // TODO Allow only specific updates, take care of role
     const newData = { updated_at: new Date() };
     if (data.email) {
+      if (!validateEmail(data.email)) {
+        return { errors: ['email-wrong-format'] };
+      }
       newData.email = data.email.trim();
-      newData.email_verified = !!data.emailVerified;
+      // newData.email_verified = !!data.emailVerified;
+    }
+    if (data.emailVerified) {
+      newData.email_verified = true;
     }
     if (data.name) {
       newData.name = data.name.trim();
@@ -123,10 +127,9 @@ class User {
     }
     if (data.password) {
       if (data.passwordOld) {
-        let passwordHash = await knex('users')
+        const [passwordHash = null] = await knex('users')
           .where({ id: data.id })
           .pluck('password_hash');
-        passwordHash = passwordHash[0];
         const same = await bcrypt.compare(data.passwordOld, passwordHash);
         if (!same) {
           errors.push('passwordOld');
@@ -224,7 +227,7 @@ class User {
     // updates session store;
     const updatedUser = await User.gen(viewer, data.id, loaders);
     if (viewer.id !== updatedUser.id) {
-      if (newData.groups || newData.email) {
+      if (newData.groups) {
         await updatedUser.modifySessions();
       }
     }

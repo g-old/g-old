@@ -8,10 +8,8 @@
   "javascript.validate.enable": false,
   "vsicons.presets.angular": false,
   "search.exclude": {
-    "**/.idea": true,
-    "**/build": true,
     "**/node_modules": true,
-    "**/yarn-error.log": true,
-    "**/yarn.lock": true
+    "**/bower_components": true,
+    "**/build": true
   }
 }

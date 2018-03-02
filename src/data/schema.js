@@ -13,8 +13,6 @@ import {
 } from 'graphql';
 
 import intl from './queries/intl';
-import proposal from './queries/proposal';
-import proposals from './queries/proposals';
 import votes from './queries/votes';
 import users from './queries/users';
 import createStatement from './mutations/createStatement';
@@ -78,8 +76,6 @@ const schema = new Schema({
     name: 'Query',
     fields: {
       intl,
-      proposal,
-      proposals,
       proposalDL,
       proposalsDL,
       users,

@@ -27,7 +27,7 @@ thumbnail
 name
 surname
 `;
-const requestFields = `
+export const requestFields = `
 id
 processor{
   ${userFields}
@@ -45,7 +45,10 @@ createdAt
 const createRequestMutation = `
   mutation ($request:RequestInput) {
     createRequest (request:$request){
-      ${requestFields}
+      result{
+        ${requestFields}
+      }
+      errors
     }
   }
 `;
@@ -67,8 +70,8 @@ const deleteRequestMutation = `
 `;
 
 const requestConnection = `
-query ($first:Int $after:String $type:String $contentId:ID) {
-  requestConnection (first:$first after:$after type:$type contentId:$contentId ) {
+query ($first:Int $after:String $type:String $filter:[FilterInput]) {
+  requestConnection (first:$first after:$after type:$type filterBy:$filter ) {
     pageInfo{
       endCursor
       hasNextPage
@@ -93,14 +96,30 @@ export function createRequest(request) {
     });
     try {
       const { data } = await graphqlRequest(createRequestMutation, { request });
-      const normalizedData = normalize(data.createRequest, requestSchema);
-      dispatch({
-        type: CREATE_REQUEST_SUCCESS,
-        payload: normalizedData,
-        id: virtualId,
-        properties,
-        request,
-      });
+      if (data.createRequest.errors) {
+        dispatch({
+          type: CREATE_REQUEST_ERROR,
+          payload: {
+            error: data.createRequest.errors,
+          },
+          message: data.createRequest.errors[0] || 'Something went wrong',
+          id: virtualId,
+          request,
+          properties,
+        });
+      } else {
+        const normalizedData = normalize(
+          data.createRequest.result,
+          requestSchema,
+        );
+        dispatch({
+          type: CREATE_REQUEST_SUCCESS,
+          payload: normalizedData,
+          id: virtualId,
+          properties,
+          request,
+        });
+      }
     } catch (error) {
       dispatch({
         type: CREATE_REQUEST_ERROR,
@@ -189,7 +208,13 @@ export function deleteRequest(request) {
   };
 }
 
-export function loadRequestList({ first, after, type, contentId }) {
+export function loadRequestList({
+  first,
+  after,
+  type,
+  contentId,
+  requesterId,
+}) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
 
@@ -198,11 +223,21 @@ export function loadRequestList({ first, after, type, contentId }) {
     });
 
     try {
+      const filter = [];
+      if (contentId) {
+        filter.push({ filter: 'CONTENT_ID', id: contentId });
+      }
+      if (requesterId) {
+        filter.push({
+          filter: 'REQUESTER_ID',
+          id: requesterId,
+        });
+      }
       const { data } = await graphqlRequest(requestConnection, {
         first,
         after,
         type,
-        contentId,
+        filter,
       });
       const requests = data.requestConnection.edges.map(u => u.node);
       const normalizedData = normalize(requests, requestListSchema);

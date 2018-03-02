@@ -367,13 +367,6 @@
     "files": ["src/components/Layout/Layout.js"]
   },
   {
-    "id": "form.email",
-    "description": "Email-address",
-    "defaultMessage": "Email",
-    "message": "",
-    "files": ["src/components/Login/Login.js"]
-  },
-  {
     "id": "form.error-invalidEmail",
     "description": "Help for email",
     "defaultMessage": "Your email address seems to be invalid",
@@ -385,13 +378,6 @@
       "src/components/UserSettings/UserSettings.js",
       "src/routes/passwordRecovery/PasswordRecovery.js"
     ]
-  },
-  {
-    "id": "form.password",
-    "description": "Password",
-    "defaultMessage": "Password",
-    "message": "",
-    "files": ["src/components/Login/Login.js"]
   },
   {
     "id": "login.error",
@@ -704,10 +690,7 @@
     "description": "Next",
     "defaultMessage": "Next step",
     "message": "",
-    "files": [
-      "src/components/SignUp/SignUp.js",
-      "src/routes/signup/SignupContainer.js"
-    ]
+    "files": ["src/components/SignUp/SignUp.js"]
   },
   {
     "id": "signup.password",
@@ -831,13 +814,6 @@
     ]
   },
   {
-    "id": "settings.email.heading",
-    "description": "Heading of email section",
-    "defaultMessage": "Email",
-    "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
     "id": "settings.error.passwordOld",
     "description": "Wrong password entered",
     "defaultMessage": "Wrong password",
@@ -848,20 +824,6 @@
     "id": "settings.name",
     "description": "First name",
     "defaultMessage": "Name",
-    "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
-    "id": "settings.name.heading",
-    "description": "Heading of name section",
-    "defaultMessage": "Name",
-    "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
-    "id": "settings.password.heading",
-    "description": "Heading of password section",
-    "defaultMessage": "Password",
     "message": "",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
@@ -918,55 +880,6 @@
     "id": "settings.title",
     "description": "Header for settings",
     "defaultMessage": "Settings",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.economy",
-    "description": "Economy",
-    "defaultMessage": "Economy",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.education",
-    "description": "Education",
-    "defaultMessage": "Education, youth, sport",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.environment",
-    "description": "Environment",
-    "defaultMessage": "Environment",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.events",
-    "description": "Event",
-    "defaultMessage": "Event organization, admission",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.health",
-    "description": "Health",
-    "defaultMessage": "Public health systems and welfare",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.mobility",
-    "description": "Mobility",
-    "defaultMessage": "Mobilty and transport",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "workTeams.urbanism",
-    "description": "Urbanism",
-    "defaultMessage": "Urbanism",
     "message": "",
     "files": ["src/routes/account/AccountContainer.js"]
   },
@@ -1040,13 +953,6 @@
     "files": ["src/routes/proposal/ProposalContainer.js"]
   },
   {
-    "id": "signup.welcome-title",
-    "description": "Welcome message header",
-    "defaultMessage": "Welcome on board!",
-    "message": "",
-    "files": ["src/routes/signup/SignupContainer.js"]
-  },
-  {
     "id": "account.role",
     "description": "Role of the user",
     "defaultMessage": "Role",
@@ -1066,5 +972,62 @@
     "defaultMessage": "Unlock viewer",
     "message": "",
     "files": ["src/components/GroupManager/GroupManager.js"]
+  },
+  {
+    "id": "action.cancel",
+    "description": "Label",
+    "defaultMessage": "Cancel",
+    "message": "",
+    "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
+  },
+  {
+    "id": "action.delete",
+    "description": "Label",
+    "defaultMessage": "Delete",
+    "message": "",
+    "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
+  },
+  {
+    "id": "action.leave",
+    "description": "Label",
+    "defaultMessage": "Leave",
+    "message": "",
+    "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
+  },
+  {
+    "id": "header.confirmation",
+    "description": "Confirmation components header",
+    "defaultMessage": "Please confirm",
+    "message": "",
+    "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
+  },
+  {
+    "id": "label.email",
+    "description": "Heading of email section",
+    "defaultMessage": "Email",
+    "message": "",
+    "files": [
+      "src/components/Login/Login.js",
+      "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "label.password",
+    "description": "Heading of password section",
+    "defaultMessage": "Password",
+    "message": "",
+    "files": [
+      "src/components/Login/Login.js",
+      "src/components/SignUp/SignUp.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
+  },
+  {
+    "id": "label.name",
+    "description": "Heading of name section",
+    "defaultMessage": "Name",
+    "message": "",
+    "files": ["src/components/UserSettings/UserSettings.js"]
   }
 ]

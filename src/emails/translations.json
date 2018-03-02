@@ -55,17 +55,17 @@
   },
   "emailVerification": {
     "de-DE":
-      "Sie haben Ihre Email-Adresse auf der Plattform GOLD geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
+      "Sie haben Ihre E-Mail-Adresse auf der Plattform GOLD geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
     "it-IT":
       "Lei ha appena modificato l'indirizzo e-mail della piattaforma GOLD. Per cortesia può confermare la correttezza dell'indirizzo e-mail?",
     "lld-IT":
       "Vos eis mudé la miscion e-mail dla paltaforma GOLD. Preibel podeis confermé la nueva miscion e-mail?"
   },
 
-  "GOLD email changed": {
-    "de-DE": "GOLD - Änderung ihrer Email-Adresse",
-    "it-IT": "GOLD - modifica dell'indirizzo e-mail",
-    "lld-IT": "GOLD - mudament dla mission e-mail"
+  "GOLD verification mail": {
+    "de-DE": "GOLD - Verifizierung ihrer Email-Adresse",
+    "it-IT": "GOLD - if you see this, someone has to update the translations ",
+    "lld-IT": "GOLD -if you see this, someone has to update the translations"
   },
   "resetNotification": {
     "de-DE":

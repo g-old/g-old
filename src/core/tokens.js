@@ -3,6 +3,8 @@ import knex from '../data/knex';
 import { validateEmail } from './helpers';
 import { throwIfMissing } from './utils';
 
+const RATE_LIMIT = 60 * 1000;
+
 const genToken = () =>
   new Promise((resolve, reject) => {
     // eslint-disable-next-line no-confusing-arrow
@@ -25,11 +27,10 @@ export const checkToken = async ({ token, table }) => {
   if (!token || typeof token !== 'string') return null;
   if (!table || typeof table !== 'string') return null;
   const dbData = await knex.transaction(async trx => {
-    let data = await trx
+    const [data] = await trx
       .where({ token })
       .into(table)
       .select();
-    data = data[0];
     if (data) {
       // eslint-disable-next-line newline-per-chained-call
       await knex(table)
@@ -52,6 +53,7 @@ export const checkToken = async ({ token, table }) => {
 
 export const createToken = async ({
   email = throwIfMissing('Email'),
+  newEmail,
   table = throwIfMissing('Table'),
   hoursValid = throwIfMissing('Hours'),
   withEmail,
@@ -60,14 +62,13 @@ export const createToken = async ({
     throw new Error('Hours not in range 1 - 72');
   }
   if (!validateEmail(email)) {
-    throw new Error('Email not valid');
+    throw new Error(`Email not valid: ${email}`);
   }
   const validToken = await knex.transaction(async trx => {
-    let userId = await trx
+    const [userId] = await trx
       .where({ email })
       .into('users')
       .pluck('id');
-    userId = userId[0];
     if (!userId) throw Error('User not found');
     const token = await genToken();
     if (!token) throw Error('Token generation failed');
@@ -80,7 +81,7 @@ export const createToken = async ({
       token_expires: expiration,
     };
     if (withEmail) {
-      newData.email = email;
+      newData.email = newEmail;
     }
     const [oldToken = null] = await knex(table)
       .transacting(trx)
@@ -92,7 +93,7 @@ export const createToken = async ({
       const lastTime = oldToken.updated_at
         ? oldToken.updated_at
         : oldToken.created_at;
-      const limit = new Date().getTime() - 10 * 60 * 1000;
+      const limit = new Date().getTime() - RATE_LIMIT;
       if (new Date(lastTime) > limit) {
         // TODO return error message
         throw new Error('Token rate limit reached');

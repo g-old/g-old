@@ -4,7 +4,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
-import Notification from '../Notification';
+import EmailField from './EmailField';
 // import Select from '../Select';
 import {
   createValidator,
@@ -178,9 +178,13 @@ class UserSettings extends React.Component {
     updateUser: PropTypes.func.isRequired,
     resendEmail: PropTypes.func.isRequired,
     updates: PropTypes.shape({}).isRequired,
+    requestUpdates: PropTypes.shape({}).isRequired,
     workTeams: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     onJoinWorkTeam: PropTypes.func.isRequired,
     onLeaveWorkTeam: PropTypes.func.isRequired,
+    smallSize: PropTypes.bool.isRequired,
+    createRequest: PropTypes.func.isRequired,
+    deleteRequest: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -221,24 +225,31 @@ class UserSettings extends React.Component {
     );
   }
 
-  componentWillReceiveProps({ updates }) {
-    if (updates) {
-      if (updates.email && updates.email.error) {
-        if (updates.email.error.email) {
-          this.setState({
-            invalidEmails: [
-              ...this.state.invalidEmails,
-              this.state.email.trim().toLowerCase(),
-            ],
-            errors: {
-              ...this.state.errors,
-              email: { touched: true, errorName: 'emailTaken' },
+  componentWillReceiveProps({ updates, requestUpdates }) {
+    if (requestUpdates) {
+      if (requestUpdates.error === 'request-email-exists') {
+        this.setState({
+          showEmailInput: true,
+          invalidEmails: [
+            ...this.state.invalidEmails,
+            this.state.email.trim().toLowerCase(),
+          ],
+          errors: {
+            ...this.state.errors,
+            email: {
+              touched: true,
+              errorName: 'emailTaken',
             },
-          });
-        } else {
-          this.setState({ emailError: true, showEmailInput: false });
-        }
+          },
+        });
+      } else {
+        this.setState({
+          emailError: true,
+          showEmailInput: false,
+        });
       }
+    }
+    if (updates) {
       if (updates.passwordOld && updates.passwordOld.error) {
         if (updates.passwordOld.error.passwordOld) {
           this.setState({
@@ -373,22 +384,38 @@ class UserSettings extends React.Component {
       const newEmail = this.state.email.trim().toLowerCase();
       if (this.props.user.email) {
         if (newEmail !== this.props.user.email.trim().toLowerCase()) {
-          this.props.updateUser({ id: this.props.user.id, email: newEmail });
+          // this.props.updateUser({ id: this.props.user.id, email: newEmail });
+          this.props.createRequest({
+            type: 'changeEmail',
+            content: JSON.stringify({
+              id: this.props.user.id,
+              email: newEmail,
+            }),
+          });
         }
       }
     }
   }
   render() {
     const { showEmailInput } = this.state;
-    const { updates, user, resendEmail } = this.props;
-    const emailPending = updates && updates.email && updates.email.pending;
-    const emailSuccess = updates && updates.email && updates.email.success;
+    const {
+      updates,
+      requestUpdates,
+      user,
+      resendEmail,
+      deleteRequest,
+    } = this.props;
+    /* const emailPending = updates && updates.email && updates.email.pending;
+    const emailSuccess = updates && updates.email && updates.email.success; */
+    const emailPending = requestUpdates && requestUpdates.pending;
+    const emailSuccess =
+      updates && updates.verifyEmail && updates.verifyEmail.success;
     const passwordPending =
       updates && updates.password && updates.password.pending;
     const passwordSuccess =
       updates && updates.password && updates.password.success;
     // const verifyError = updates && updates.verifyEmail && updates.verifyEmail.error;
-    const verifyPending =
+    /* const verifyPending =
       updates && updates.verifyEmail && updates.verifyEmail.pending;
     const verifySuccess =
       updates && updates.verifyEmail && updates.verifyEmail.success;
@@ -398,7 +425,7 @@ class UserSettings extends React.Component {
         onClick={this.handleEmailUpdate}
         label={<FormattedMessage {...messages.change} />}
       />
-    ) : null;
+    ) : null; */
     const buttonLabel = this.state.showEmailInput ? 'cancel' : 'change';
     const nameSuccess =
       updates &&
@@ -423,45 +450,12 @@ class UserSettings extends React.Component {
       }
     }
 
-    const showResendBtn =
-      !user.emailVerified && !emailPending && !showEmailInput;
-
+    /* const showResendBtn =
+      !user.emailVerified && !emailPending && !showEmailInput; */
+    const emailChangeRequest =
+      user.requests && user.requests.find(r => r.type === 'changeEmail');
     return (
       <Box column pad>
-        {/*  <legend>{<FormattedMessage {...messages.workteams} />}</legend>
-        <FormField label="Workteams">
-          <Select
-            inField
-            options={this.props.workTeams.map(wt => ({
-              value: wt.id,
-              label: wt.name,
-            }))}
-            value={
-              this.props.user.workTeams &&
-              this.props.user.workTeams.map(wt => ({
-                value: wt.id,
-                label: wt.name,
-              }))
-            }
-            onChange={e => {
-              if (
-                this.props.user.workTeams &&
-                this.props.user.workTeams.find(wt => wt.id === e.value.value)
-              ) {
-                this.props.onLeaveWorkTeam({
-                  id: e.value.value,
-                  memberId: this.props.user.id,
-                });
-              } else {
-                this.props.onJoinWorkTeam({
-                  id: e.value.value,
-                  /* e.value[0].value, */
-        /* memberId: this.props.user.id,
-                });
-              }
-            }}
-          />
-        </FormField> */}
         <legend>{<FormattedMessage {...messages.nameHeading} />}</legend>
         <fieldset>
           <FormField
@@ -500,8 +494,25 @@ class UserSettings extends React.Component {
           )}
         </Box>
         <legend>{<FormattedMessage {...messages.emailHeading} />}</legend>
-
-        <fieldset>
+        <EmailField
+          smallSize={this.props.smallSize}
+          emailSuccess={emailSuccess}
+          buttonLabel={buttonLabel}
+          request={emailChangeRequest}
+          resendEmail={resendEmail}
+          deleteRequest={deleteRequest}
+          pending={emailPending}
+          handleChange={this.handleValueChange}
+          emailStatus={emailStatus}
+          error={emailError}
+          changeEmail={this.handleEmailUpdate}
+          onEditEmail={this.onEditEmail}
+          emailVerified={user.emailVerified}
+          showEmailInput={showEmailInput}
+          email={user.email}
+          value={showEmailInput ? this.state.email : this.props.user.email}
+        />
+        {/* <fieldset>
           {this.state.emailError && (
             <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
               <FormattedMessage {...messages.error} />
@@ -522,6 +533,9 @@ class UserSettings extends React.Component {
           </FormField>
         </fieldset>
         <Box wrap justify>
+          {user.requests.find(r => r.type === 'changeEmail') && (
+            <Notification type="alert" message="Email change pending" />
+          )}
           {!emailSuccess && !emailPending && updateEmailBtn}
           {!emailSuccess && (
             <Button
@@ -546,7 +560,7 @@ class UserSettings extends React.Component {
               type="alert"
               message="Look in your mail account. Soon something should be there"
             />
-          )}
+          )} */}
         <legend>{<FormattedMessage {...messages.passwordHeading} />}</legend>
 
         <fieldset>

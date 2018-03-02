@@ -8,18 +8,22 @@ import Link from '../Link';
 import Button from '../Button';
 import Box from '../Box';
 import FormField from '../FormField';
-import { createValidator, passwordValidation, emailValidation } from '../../core/validation';
+import {
+  createValidator,
+  passwordValidation,
+  emailValidation,
+} from '../../core/validation';
 
 const messages = defineMessages({
   email: {
-    id: 'form.email',
+    id: 'label.email',
     defaultMessage: 'Email',
-    description: 'Email-address',
+    description: 'Heading of email section',
   },
   password: {
-    id: 'form.password',
+    id: 'label.password',
     defaultMessage: 'Password',
-    description: 'Password',
+    description: 'Heading of password section',
   },
   resetPassword: {
     id: 'login.resetPassword',
@@ -60,7 +64,11 @@ class Login extends React.Component {
     this.handleLogin = this.handleLogin.bind(this);
     this.onEmailChange = this.onEmailChange.bind(this);
     this.onPasswordChange = this.onPasswordChange.bind(this);
-    this.state = { email: '', password: '', errors: { email: {}, password: {} } };
+    this.state = {
+      email: '',
+      password: '',
+      errors: { email: {}, password: {} },
+    };
 
     const testValues = {
       password: { fn: 'password' },
@@ -78,7 +86,11 @@ class Login extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.status && nextProps.status.login && nextProps.status.login.error) {
+    if (
+      nextProps.status &&
+      nextProps.status.login &&
+      nextProps.status.login.error
+    ) {
       this.setState({ password: '' });
     }
   }
@@ -102,7 +114,10 @@ class Login extends React.Component {
     const validated = this.Validator(['password', 'email']);
     this.setState({ errors: { ...this.state.errors, ...validated.errors } });
     if (!validated.failed) {
-      this.props.login({ email: this.state.email.trim(), password: this.state.password.trim() });
+      this.props.login({
+        email: this.state.email.trim(),
+        password: this.state.password.trim(),
+      });
     }
   }
 
@@ -110,28 +125,31 @@ class Login extends React.Component {
     const { status } = this.props;
     /*  if (status.login && status.login.success) {
       // /  history.push('/feed');
-    }*/
-    const emailError = this.state.errors.email.errorName
-      ? <FormattedMessage {...messages[this.state.errors.email.errorName]} />
-      : null;
+    } */
+    const emailError = this.state.errors.email.errorName ? (
+      <FormattedMessage {...messages[this.state.errors.email.errorName]} />
+    ) : null;
 
-    const passwordError = this.state.errors.password.errorName
-      ? <FormattedMessage {...messages[this.state.errors.password.errorName]} />
-      : null;
+    const passwordError = this.state.errors.password.errorName ? (
+      <FormattedMessage {...messages[this.state.errors.password.errorName]} />
+    ) : null;
 
     const loginError =
-      status.login && status.login.error
-        ? (<div style={{ backgroundColor: 'rgba(255, 50, 77,0.3)' }}>
+      status.login && status.login.error ? (
+        <div style={{ backgroundColor: 'rgba(255, 50, 77,0.3)' }}>
           <FormattedMessage {...messages.error} />
-        </div>)
-        : null;
+        </div>
+      ) : null;
     return (
       <Box column pad>
         <form onSubmit={this.onSubmit}>
           {/* invisible submit button */}
           <input type="submit" style={{ display: 'none' }} />
           <fieldset>
-            <FormField label={<FormattedMessage {...messages.email} />} error={emailError}>
+            <FormField
+              label={<FormattedMessage {...messages.email} />}
+              error={emailError}
+            >
               <input
                 name="email"
                 type="text"
@@ -139,7 +157,10 @@ class Login extends React.Component {
                 onChange={this.onEmailChange}
               />
             </FormField>
-            <FormField label={<FormattedMessage {...messages.password} />} error={passwordError}>
+            <FormField
+              label={<FormattedMessage {...messages.password} />}
+              error={passwordError}
+            >
               <input
                 name="password"
                 type="password"
@@ -157,7 +178,10 @@ class Login extends React.Component {
           onClick={this.handleLogin}
           disabled={status.login && status.login.pending}
         />
-        <Link to={'/account/password/reset'}>
+        {/* eslint-disable */}
+        <Link to="/account/password/reset">
+          {/* eslint-enable */}
+
           <FormattedMessage {...messages.resetPassword} />
         </Link>
       </Box>
@@ -165,7 +189,7 @@ class Login extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   const initialId = '0000';
   return {
     status: getAccountUpdates(state, initialId),

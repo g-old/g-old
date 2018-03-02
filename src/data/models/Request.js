@@ -1,6 +1,44 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import EventManager from '../../core/EventManager';
+import { validateEmail } from '../../core/helpers';
 
+const checkEmail = async email => {
+  if (validateEmail(email)) {
+    const [emailExists] = await knex('users')
+      .where({ email })
+      .pluck('id');
+    return emailExists ? false : email.trim();
+  }
+  return false;
+};
+
+const getAndValidateContent = async (type, content, request) => {
+  const parsed = JSON.parse(content);
+  switch (type) {
+    case 'joinWT': {
+      return { id: parsed.id };
+    }
+    case 'changeEmail': {
+      const validEmail = await checkEmail(parsed.email);
+      if (!validEmail) {
+        throw new Error('request-email-exists');
+      }
+
+      await 'knex';
+      return {
+        id: parsed.id,
+        email: validEmail,
+        host: request.hostname,
+        connection: __DEV__ ? 'http' : 'https',
+        lang: request.cookies.lang,
+      };
+    }
+
+    default:
+      throw new Error(`request-type-invalid: ${type}`);
+  }
+};
 class Request {
   constructor(data) {
     this.id = data.id;
@@ -21,29 +59,35 @@ class Request {
     return canSee(viewer, data, Models.REQUEST) ? new Request(data) : null;
   }
 
-  static async create(viewer, data) {
-    if (!data || !data.content) return null;
-    if (!canMutate(viewer, data, Models.REQUEST)) return null;
-    if (data.content.length > 300) return null;
-    const parsed = JSON.parse(data.content);
-    const content = { id: parsed.id };
-    if (!content.id) return null;
+  static async create(viewer, data, loaders, req) {
+    if (!data || !data.content) return { errors: ['request-data-missing'] };
+    if (!canMutate(viewer, data, Models.REQUEST))
+      return { errors: ['request-authorization-failing'] };
+    if (data.content.length > 300) return { errors: ['request-content-size'] };
+    let content;
+    try {
+      content = await getAndValidateContent(data.type, data.content, req);
+    } catch (e) {
+      return { errors: [e.message] };
+    }
+    if (!content.id) return { errors: ['request-content-id'] };
     const newData = {
       requester_id: viewer.id,
       type: data.type,
       content,
       created_at: new Date(),
     };
-    if (data.type !== 'joinWT') {
-      throw Error('Selectors and validators for other types to implement');
+    if (!(data.type === 'joinWT' || data.type === 'changeEmail')) {
+      return { errors: ['request-type-invalid'] };
     }
     const requestInDB = await knex.transaction(async trx => {
       const res = await knex('requests')
         .where({ requester_id: viewer.id, type: data.type })
         .whereRaw("content->>'id' = ?", [content.id])
+        .where({ type: data.type })
         .pluck('id');
       if (res[0]) {
-        throw new Error('Already requested!');
+        return { errors: ['request-existance-true'] };
       }
       const [request = null] = await knex('requests')
         .transacting(trx)
@@ -53,8 +97,13 @@ class Request {
 
       return request;
     });
+    if (!requestInDB) return { errors: ['request-save-failure'] };
+    const request = new Request(requestInDB);
+    if (request.type === 'changeEmail') {
+      EventManager.publish('sendVerificationMail', { viewer, request });
+    }
 
-    return requestInDB ? new Request(requestInDB) : null;
+    return { result: request };
   }
 
   static async update(viewer, data) {
@@ -88,11 +137,12 @@ class Request {
     const deletedRequest = await knex.transaction(async trx => {
       let request;
       if (data.type) {
-        if (data.type === 'joinWT') {
-          const [requestData = null] = await knex('requests')
+        if (data.type === 'joinWT' || data.type === 'changeEmail') {
+          throw new Error('To implement: Finding of request to delete');
+          /* const [requestData = null] = await knex('requests')
             .where({ requester_id: viewer.id, type: data.type })
             .select('*');
-          request = requestData ? new Request(requestData) : null;
+          request = requestData ? new Request(requestData) : null; */
         } else {
           throw new Error('Type not recognized');
         }
@@ -109,7 +159,7 @@ class Request {
       return request;
     });
 
-    return deletedRequest ? new Request(deletedRequest) : null;
+    return deletedRequest || null;
   }
 }
 

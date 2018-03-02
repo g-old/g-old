@@ -13,13 +13,13 @@ import GroupStatusType from './GroupStatusType';
 import PageType from './PageType';
 
 import Request from '../models/Request';
-import RequestType from '../types/RequestType';
 import ProposalStatusType from '../types/ProposalStatusType';
 
 import Discussion from '../models/Discussion';
 import User from '../models/User';
 import knex from '../knex';
 import proposalConnection from '../queries/proposalConnection';
+import requestConnection from '../queries/requestConnection';
 
 const WorkTeamType = new ObjectType({
   name: 'WorkTeam',
@@ -112,7 +112,7 @@ const WorkTeamType = new ObjectType({
         return { status: 0 };
       },
     },
-    requests: {
+    /* requests: {
       type: new GraphQLList(RequestType),
       async resolve(parent, args, { viewer, loaders }) {
         const requests = await knex('requests')
@@ -121,7 +121,8 @@ const WorkTeamType = new ObjectType({
           .pluck('id');
         return requests.map(id => Request.gen(viewer, id, loaders));
       },
-    },
+    }, */
+    requestConnection,
     numMembers: {
       type: GraphQLInt,
     },

@@ -3,9 +3,13 @@
 import { genStatusIndicators } from '../core/helpers';
 import { getSessionUser } from '../reducers';
 
-import { CREATE_VEMAIL_START, CREATE_VEMAIL_SUCCESS, CREATE_VEMAIL_ERROR } from '../constants';
+import {
+  CREATE_VEMAIL_START,
+  CREATE_VEMAIL_SUCCESS,
+  CREATE_VEMAIL_ERROR,
+} from '../constants';
 
-export function verifyEmail() {
+export function verifyEmail({ requestId }) {
   return async (dispatch, getState, { fetch }) => {
     const properties = genStatusIndicators(['verifyEmail']);
     const state = await getState();
@@ -18,6 +22,7 @@ export function verifyEmail() {
     try {
       const resp = await fetch('/verify', {
         method: 'post',
+        ...(requestId && { body: JSON.stringify({ requestId }) }),
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',

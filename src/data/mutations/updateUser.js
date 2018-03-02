@@ -8,10 +8,10 @@ import UserInputType from '../types/UserInputType';
 import User from '../models/User';
 import UserType from '../types/UserType';
 import { sendJob } from '../../core/childProcess';
-import log from '../../logger';
-import { getProtocol } from '../../core/helpers';
+// import log from '../../logger';
+// import { getProtocol } from '../../core/helpers';
 import { Groups } from '../../organization';
-import { EmailTypes } from '../../core/BackgroundService';
+// import { EmailTypes } from '../../core/BackgroundService';
 
 const updateSession = (req, user) =>
   new Promise((resolve, reject) =>
@@ -75,32 +75,8 @@ const updateUser = {
     },
   },
   resolve: async (data, { user }, { viewer, loaders }) => {
-    const result = await User.update(viewer, user, loaders, true);
+    const result = await User.update(viewer, user, loaders, data.request); // request for emailChange
     if (result.user) {
-      // log user in or save session
-      if (
-        user.email &&
-        user.email === result.user.email &&
-        !result.user.emailVerified
-      ) {
-        const job = {
-          type: 'mail',
-          data: {
-            lang: data.request.cookies.lang,
-            mailType: EmailTypes.VERIFICATION,
-            address: result.user.email,
-            viewer: { ...viewer, email: result.user.email },
-            connection: {
-              host: data.request.hostname,
-              protocol: getProtocol(data.request),
-            },
-          },
-        };
-        if (!sendJob(job)) {
-          log.error({ job }, 'Job not sent!');
-        }
-      }
-
       if (user.groups) {
         // TODO better check!
 
@@ -111,12 +87,13 @@ const updateUser = {
           );
           notifyRoleChange(viewer, result.user, {
             subject: 'Group memberships changed',
-            body: `Your group memberships got changed. ${groups.added
-              ? `Congratulations ${result.user
-                  .name}, you are now member of the group ${groups.names.join(
-                  ',',
-                )}`
-              : `You got removed from the group ${groups.names.join(',')}`}`,
+            body: `Your group memberships got changed. ${
+              groups.added
+                ? `Congratulations ${
+                    result.user.name
+                  }, you are now member of the group ${groups.names.join(',')}`
+                : `You got removed from the group ${groups.names.join(',')}`
+            }`,
           });
           delete result.oldUser;
         }

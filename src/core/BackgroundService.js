@@ -34,6 +34,7 @@ class BackgroundService {
       case EmailTypes.VERIFICATION: {
         return this.messager.sendVerificationMessage(
           emailData.viewer,
+          emailData.address,
           emailTransport,
           emailData.lang,
         );
