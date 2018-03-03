@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FormattedRelative } from 'react-intl';
+import {
+  FormattedRelative,
+  FormattedMessage,
+  defineMessages,
+} from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import s from './ActivityLog.css';
@@ -9,6 +13,19 @@ import Statement from '../Statement';
 import { ICONS } from '../../constants';
 import Link from '../Link';
 import Comment from '../Comment';
+
+const messages = defineMessages({
+  joinWT: {
+    id: 'request.join.title',
+    defaultMessage: 'Request to join a workteam',
+    description: 'Label for logs',
+  },
+  changeEmail: {
+    id: 'request.email.title',
+    defaultMessage: 'Request to change my email address',
+    description: 'Label for logs',
+  },
+});
 
 class ActivityLog extends React.Component {
   static propTypes = {
@@ -37,7 +54,7 @@ class ActivityLog extends React.Component {
     const { content, verb, date } = this.props;
     const type = content && content.__typename;
     if (!type) {
-      return <div>{'FAILURE'}</div>;
+      return <div>FAILURE</div>;
     }
     let activity = null;
     switch (type) {
@@ -48,7 +65,7 @@ class ActivityLog extends React.Component {
             id: content.voteId,
           },
         });
-        activity = (
+        activity = ( // eslint-disable-next-line
           <Link to={`/proposal/xxx/${content.pollId}`}>
             <Statement {...obj} />
           </Link>
@@ -136,6 +153,7 @@ class ActivityLog extends React.Component {
           );
         }
         activity = (
+          // eslint-disable-next-line
           <Link to={`/proposal/xxx/${content.pollId}`}>
             <span style={{ display: 'flex', justifyContent: 'space-between' }}>
               {content.voter && <Avatar user={content.voter} />}
@@ -160,8 +178,17 @@ class ActivityLog extends React.Component {
         break;
       }
 
+      case 'Request': {
+        activity = (
+          <div>
+            <FormattedMessage {...messages[content.type]} />
+          </div>
+        );
+        break;
+      }
+
       default: {
-        activity = <div>{'TYPE NOT RECOGNIZED'}</div>;
+        activity = <div>{`TYPE NOT RECOGNIZED: ${type}`}</div>;
       }
     }
 

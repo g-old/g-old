@@ -83,6 +83,7 @@ export const unionSchema = new schema.Union(
     Notification: notification,
     Comment: comment,
     Discussion: discussion,
+    Request: request,
   },
   '__typename',
 );

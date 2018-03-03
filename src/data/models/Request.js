@@ -99,8 +99,11 @@ class Request {
     });
     if (!requestInDB) return { errors: ['request-save-failure'] };
     const request = new Request(requestInDB);
-    if (request.type === 'changeEmail') {
-      EventManager.publish('sendVerificationMail', { viewer, request });
+    if (request) {
+      EventManager.publish('onRequestCreated', { viewer, request });
+      if (request.type === 'changeEmail') {
+        EventManager.publish('sendVerificationMail', { viewer, request });
+      }
     }
 
     return { result: request };

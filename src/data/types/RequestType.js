@@ -2,6 +2,7 @@ import {
   GraphQLString as String,
   GraphQLObjectType as ObjectType,
   GraphQLID as ID,
+  GraphQLNonNull,
 } from 'graphql';
 import UserType from './UserType';
 import User from '../models/User';
@@ -10,7 +11,7 @@ const Request = new ObjectType({
   name: 'Request',
   fields: () => ({
     id: {
-      type: ID,
+      type: new GraphQLNonNull(ID),
     },
     type: {
       type: String,

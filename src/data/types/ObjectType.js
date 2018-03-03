@@ -11,6 +11,8 @@ import DiscussionType from './DiscussionType';
 import Discussion from '../models/Discussion';
 import CommentType from './CommentType';
 import Comment from '../models/Comment';
+import RequestType from './RequestType';
+import Request from '../models/Request';
 
 const ObjectType = new GraphQLUnionType({
   name: 'FeedObject',
@@ -22,6 +24,7 @@ const ObjectType = new GraphQLUnionType({
     NotificationType,
     DiscussionType,
     CommentType,
+    RequestType,
   ],
   resolveType(value) {
     if (value instanceof Proposal) {
@@ -44,6 +47,9 @@ const ObjectType = new GraphQLUnionType({
     }
     if (value instanceof Comment) {
       return CommentType;
+    }
+    if (value instanceof Request) {
+      return RequestType;
     }
     return null;
   },

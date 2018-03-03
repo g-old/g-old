@@ -21,6 +21,10 @@ export const feedOptions = [
     }),
   },
   {
+    resourceName: 'request',
+    events: [{ eventType: 'create', personalFeed: true }],
+  },
+  {
     resourceName: 'statement',
     events: [
       { eventType: 'create', systemFeed: true, personalFeed: true },

@@ -5,6 +5,7 @@ import {
   LOAD_LOGS_SUCCESS,
   LOAD_LOGS_ERROR,
 } from '../constants';
+import { requestFields } from './request';
 
 import { logList as logsSchema } from '../store/schema';
 import { getLogIsFetching, getSessionUser } from '../reducers';
@@ -124,6 +125,9 @@ query($userId:ID){
       }
       msg
       title
+    }
+    ... on Request {
+      ${requestFields}
     }
   }
 }
