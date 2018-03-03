@@ -96,7 +96,7 @@ class MessageService {
     };
   }
   createLink(token, route) {
-    return ` ${this.protocol}://${this.host}/${route}/${token}`;
+    return `${this.protocol}://${this.host}/${route}/${token}`;
   }
   createVerificationLink(token) {
     return this.createLink(token, 'verify');
@@ -205,7 +205,7 @@ class MessageService {
             const token = await this.tokens.createAndStoreResetToken(
               user.email,
             );
-            const link = this.createVerificationLink(token);
+            const link = this.createResetLink(token);
             const personalizedMail = this.mailComposer.getResetRequestMail(
               user,
               link,
