@@ -80,6 +80,16 @@ const messages = defineMessages({
     defaultMessage: 'Resend verification email',
     description: 'Resend verification email ',
   },
+  resendSuccess: {
+    id: 'settings.email.resendNotification',
+    defaultMessage: 'An email was sent to your new mail address "{email}"',
+    description: 'Verification mail sending success ',
+  },
+  requestPending: {
+    id: 'settings.email.requestCreated',
+    defaultMessage: 'You have to confirm your new email address "{email}"',
+    description: 'Notification that a request has been created',
+  },
 });
 
 const initState = {
@@ -125,7 +135,6 @@ class EmailField extends React.Component {
       handleChange,
       value,
       showEmailInput,
-      buttonLabel,
       emailStatus,
       request,
       resendEmail,
@@ -140,15 +149,17 @@ class EmailField extends React.Component {
     let notifications = [];
     let commandField;
     let input;
-    console.log('CHANGEREQUEST', changeRequested);
     const showResendBtn = true;
+    const mailAddress = request ? request.content.email : email;
     if (emailSuccess) {
-      const mailAddress = request ? request.content.email : email;
       notifications.push(
         <Notification
           type="success"
           message={
-            'New confirmation mail sent to your mail account :' + mailAddress
+            <FormattedMessage
+              {...messages.resendSuccess}
+              values={{ email: mailAddress }}
+            />
           }
         />,
       );
@@ -158,9 +169,10 @@ class EmailField extends React.Component {
         <Notification
           type="alert"
           message={
-            'You have requested to change your email to ' +
-            request.content.email +
-            ' Please click on the link in the email we sent you to the new address'
+            <FormattedMessage
+              {...messages.requestPending}
+              values={{ email: mailAddress }}
+            />
           }
         />,
       );
@@ -178,7 +190,6 @@ class EmailField extends React.Component {
     } else {
       if (!emailVerified) {
         if (showEmailInput) {
-          console.log('SHOWEMAILFIELD', showEmailInput);
           commandField = (
             <Box between={!smallSize} align={smallSize} column={smallSize}>
               <Button
@@ -215,7 +226,6 @@ class EmailField extends React.Component {
         }
       } else {
         if (showEmailInput) {
-          console.log('SHOWEMAILFIELD', showEmailInput);
           commandField = (
             <Box between={!smallSize} align={smallSize} column={smallSize}>
               <Button
@@ -234,7 +244,7 @@ class EmailField extends React.Component {
           );
         } else {
           commandField = (
-            <Box between={!smallSize} align={smallSize} column={smallSize}>
+            <Box justify>
               <Button
                 primary
                 disabled={pending}

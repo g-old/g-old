@@ -17,26 +17,6 @@ import {
 } from '../../core/validation';
 
 const messages = defineMessages({
-  invalidEmail: {
-    id: 'form.error-invalidEmail',
-    defaultMessage: 'Your email address seems to be invalid',
-    description: 'Help for email',
-  },
-  emailTaken: {
-    id: 'form.error-emailTaken',
-    defaultMessage: 'Email address already in use',
-    description: 'Help for not unique email',
-  },
-  change: {
-    id: 'commands.change',
-    defaultMessage: 'Change',
-    description: 'Short command to change a setting',
-  },
-  cancel: {
-    id: 'commands.cancel',
-    defaultMessage: 'Cancel',
-    description: 'Short command to cancel a operation',
-  },
   email: {
     id: 'settings.email',
     defaultMessage: 'Your current email address',
@@ -48,30 +28,10 @@ const messages = defineMessages({
     description: 'Email label in settings for new address',
   },
 
-  success: {
-    id: 'action.success',
-    defaultMessage: 'Success!',
-    description: 'Short success notification ',
-  },
   error: {
     id: 'action.error',
     defaultMessage: 'Action failed. Please retry!',
     description: 'Short failure notification ',
-  },
-  verified: {
-    id: 'settings.email.verified',
-    defaultMessage: 'Email verified!',
-    description: 'Email got verified ',
-  },
-  notVerified: {
-    id: 'settings.email.notVerified',
-    defaultMessage: 'Email not verified',
-    description: 'Email not yet verified ',
-  },
-  resend: {
-    id: 'settings.email.resend',
-    defaultMessage: 'Resend verification email',
-    description: 'Resend verification email ',
   },
 });
 

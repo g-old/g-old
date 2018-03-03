@@ -409,7 +409,8 @@ class UserSettings extends React.Component {
     const emailSuccess = updates && updates.email && updates.email.success; */
     const emailPending = requestUpdates && requestUpdates.pending;
     const emailSuccess =
-      updates && updates.verifyEmail && updates.verifyEmail.success;
+      (updates && updates.verifyEmail && updates.verifyEmail.success) ||
+      (requestUpdates && requestUpdates.success);
     const passwordPending =
       updates && updates.password && updates.password.pending;
     const passwordSuccess =
@@ -426,7 +427,6 @@ class UserSettings extends React.Component {
         label={<FormattedMessage {...messages.change} />}
       />
     ) : null; */
-    const buttonLabel = this.state.showEmailInput ? 'cancel' : 'change';
     const nameSuccess =
       updates &&
       ((updates.name && updates.name.success) ||
@@ -497,7 +497,6 @@ class UserSettings extends React.Component {
         <EmailField
           smallSize={this.props.smallSize}
           emailSuccess={emailSuccess}
-          buttonLabel={buttonLabel}
           request={emailChangeRequest}
           resendEmail={resendEmail}
           deleteRequest={deleteRequest}
@@ -512,55 +511,6 @@ class UserSettings extends React.Component {
           email={user.email}
           value={showEmailInput ? this.state.email : this.props.user.email}
         />
-        {/* <fieldset>
-          {this.state.emailError && (
-            <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
-              <FormattedMessage {...messages.error} />
-            </div>
-          )}
-          <FormField
-            label={<FormattedMessage {...messages.email} />}
-            error={emailError}
-            help={emailStatus}
-          >
-            <input
-              type="text"
-              onChange={this.handleValueChange}
-              value={showEmailInput ? this.state.email : this.props.user.email}
-              name="email"
-              readOnly={showEmailInput === false}
-            />
-          </FormField>
-        </fieldset>
-        <Box wrap justify>
-          {user.requests.find(r => r.type === 'changeEmail') && (
-            <Notification type="alert" message="Email change pending" />
-          )}
-          {!emailSuccess && !emailPending && updateEmailBtn}
-          {!emailSuccess && (
-            <Button
-              primary={!showResendBtn}
-              disabled={emailPending}
-              onClick={this.onEditEmail}
-              label={<FormattedMessage {...messages[buttonLabel]} />}
-            />
-          )}
-          {showResendBtn && (
-            <Button
-              primary
-              disabled={verifyPending}
-              onClick={resendEmail}
-              label={<FormattedMessage {...messages.resend} />}
-            />
-          )}
-        </Box>
-        {(verifySuccess || emailSuccess) &&
-          !user.emailVerified && (
-            <Notification
-              type="alert"
-              message="Look in your mail account. Soon something should be there"
-            />
-          )} */}
         <legend>{<FormattedMessage {...messages.passwordHeading} />}</legend>
 
         <fieldset>
