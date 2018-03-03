@@ -133,12 +133,18 @@ class Request {
     if (!data || (!data.id && !data.type)) return null;
 
     if (!canMutate(viewer, data, Models.REQUEST)) return null;
-
     const deletedRequest = await knex.transaction(async trx => {
       let request;
       if (data.type) {
         if (data.type === 'joinWT' || data.type === 'changeEmail') {
-          throw new Error('To implement: Finding of request to delete');
+          if (data.type === 'joinWT' && data.contentId) {
+            [request] = await knex('requests')
+              .where({ type: 'joinWT' })
+              .whereRaw("content->> 'id' = ?", [data.contentId])
+              .select();
+          } else {
+            throw new Error('To implement: Finding of request to delete');
+          }
           /* const [requestData = null] = await knex('requests')
             .where({ requester_id: viewer.id, type: data.type })
             .select('*');
@@ -149,12 +155,15 @@ class Request {
       } else {
         request = await Request.gen(viewer, data.id, loaders);
       }
-
-      await knex('requests')
-        .where({ id: request.id })
-        .transacting(trx)
-        .forUpdate()
-        .del();
+      if (request) {
+        await knex('requests')
+          .where({ id: request.id })
+          .transacting(trx)
+          .forUpdate()
+          .del();
+      } else {
+        throw new Error('Request not found');
+      }
 
       return request;
     });

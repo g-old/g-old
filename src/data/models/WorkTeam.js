@@ -183,7 +183,6 @@ class WorkTeam {
       }
     }
     /* eslint-enable eqeqeq */
-
     const workTeam = await knex.transaction(async trx => {
       const [id = null] = await trx
         .where({ user_id: requester.id, work_team_id: this.id })
@@ -191,6 +190,7 @@ class WorkTeam {
         .into('user_work_teams')
         .del()
         .returning('id');
+      // If member,
       if (id) {
         const [workTeaminDB = null] = await knex('work_teams')
           .where({ id: this.id })
@@ -209,19 +209,20 @@ class WorkTeam {
             viewer.wtMemberships &&
             viewer.wtMemberships.filter(id => id != this.id); // eslint-disable-line
         }
+
         return workTeaminDB ? new WorkTeam(workTeaminDB) : null;
       }
 
       // delete request ;
-
       const deletedRequest = await Request.delete(
         viewer,
-        { type: 'joinWT' },
+        { type: 'joinWT', contentId: this.id },
         loaders,
       );
       if (!deletedRequest) {
         throw new Error('Could not delete request');
       }
+
       loaders.workTeams.clear(this.id);
 
       return WorkTeam.gen(viewer, this.id, loaders);
