@@ -153,12 +153,14 @@ class User {
         return { user: null, errors: ['Permission denied'] };
       }
 
-      if (
-        (groups & Groups.VOTER) > 0 &&
-        (userInDB.groups & Groups.VOTER) === 0
-      ) {
-        newData.can_vote_since = new Date();
+      if (groups && (groups & Groups.VOTER) > 0) {
+        // changing vote rights
+        if (!(userInDB.groups & Groups.VOTER)) {
+          // user has no vote rights, but will receive them
+          newData.can_vote_since = new Date();
+        }
       } else if (userInDB.groups & Groups.VOTER) {
+        // user has vote rights, but we will take them
         newData.can_vote_since = null;
       }
 
