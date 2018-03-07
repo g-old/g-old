@@ -1,0 +1,19 @@
+.menuLink {
+  box-sizing: border-box;
+  padding: 12px 24px 12px 20px;
+  margin-bottom: 0;
+  width: 100%;
+  border-width: 4px;
+  border-color: transparent;
+  border-left-style: solid;
+  color: #000;
+  cursor: pointer;
+}
+
+.menuLink:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar {
+  width: 6em;
+}

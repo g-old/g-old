@@ -138,9 +138,7 @@ class Comment extends React.Component {
 
   static defaultProps = {
     ownLike: null,
-    ownStatement: false,
     asInput: false,
-    menuOpen: false,
     deletedAt: null,
     onFlagging: null,
     onDelete: null,
@@ -457,7 +455,7 @@ class Comment extends React.Component {
       <div className={s.header}>
         {/* eslint-disable jsx-a11y/interactive-supports-focus */}
         {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */}
-        <img
+        <img // eslint-disable-line
           onClick={this.handleProfileClick}
           className={cn(s.avatar)}
           src={actor && actor.thumbnail}

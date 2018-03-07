@@ -55,7 +55,8 @@ const messages = defineMessages({
   },
   verificationCall: {
     id: 'settings.verificationCall',
-    defaultMessage: 'Please confirm your email address',
+    defaultMessage:
+      'Confirm your email address. A confirmation message was sent to "{email}"',
     description: 'Notification to verify mail address',
   },
   followees: {
@@ -241,7 +242,12 @@ class AccountContainer extends React.Component {
       notification = (
         <Notification
           type="alert"
-          message={<FormattedMessage {...messages.verificationCall} />}
+          message={
+            <FormattedMessage
+              {...messages.verificationCall}
+              values={{ email: user.email }}
+            />
+          }
         />
       );
     }

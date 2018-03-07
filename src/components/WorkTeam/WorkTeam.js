@@ -12,6 +12,8 @@ import Button from '../Button';
 import DiscussionPreview from '../DiscussionPreview';
 import ProposalPreview from '../ProposalPreview';
 import history from '../../history';
+import Tabs from '../Tabs';
+import Tab from '../Tab';
 
 const messages = defineMessages({
   join: {
@@ -296,18 +298,14 @@ class WorkTeam extends React.Component {
         /> */}
         {actionBtn}
         <section>
-          <Box between align>
-            <Heading tag="h3"> OPEN VOTINGS</Heading>
-            {/* <Menu label="FILTER">
-              <div>Currently</div>
-              <div>Not</div>
-              <div>Working</div>
-            </Menu> */}
-          </Box>
-
-          <div>{proposalsSection}</div>
-          <Heading tag="h3"> OPEN DISCUSSIONS</Heading>
-          <div>{discussionSection}</div>
+          <Tabs>
+            <Tab title="Votings">
+              <div>{proposalsSection}</div>
+            </Tab>
+            <Tab title="Discussions">
+              <div>{discussionSection}</div>
+            </Tab>
+          </Tabs>
         </section>
         {layer}
       </Box>

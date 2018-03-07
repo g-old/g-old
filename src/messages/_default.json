@@ -329,6 +329,7 @@
     "message": "",
     "files": [
       "src/components/ImageUpload/ImageUpload.js",
+      "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -341,7 +342,7 @@
     "files": [
       "src/components/ImageUpload/ImageUpload.js",
       "src/components/Poll/Poll.js",
-      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -374,7 +375,7 @@
     "files": [
       "src/components/Login/Login.js",
       "src/components/SignUp/SignUp.js",
-      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js",
       "src/routes/passwordRecovery/PasswordRecovery.js"
     ]
@@ -625,7 +626,7 @@
     "message": "",
     "files": [
       "src/components/SignUp/SignUp.js",
-      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -748,7 +749,7 @@
     "defaultMessage": "Success!",
     "message": "",
     "files": [
-      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -759,7 +760,7 @@
     "message": "",
     "files": [
       "src/components/GroupManager/GroupManager.js",
-      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -769,6 +770,7 @@
     "defaultMessage": "Your current email address",
     "message": "",
     "files": [
+      "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -779,7 +781,7 @@
     "defaultMessage": "Email not verified",
     "message": "",
     "files": [
-      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -789,7 +791,7 @@
     "defaultMessage": "Resend verification email",
     "message": "",
     "files": [
-      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -799,7 +801,7 @@
     "defaultMessage": "Email verified!",
     "message": "",
     "files": [
-      "src/components/UserSettings/EmailInput.js",
+      "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -809,6 +811,7 @@
     "defaultMessage": "New email address",
     "message": "",
     "files": [
+      "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/EmailInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -1029,5 +1032,47 @@
     "defaultMessage": "Name",
     "message": "",
     "files": ["src/components/UserSettings/UserSettings.js"]
+  },
+  {
+    "id": "request.email.title",
+    "description": "Label for logs",
+    "defaultMessage": "Request to change my email address",
+    "message": "",
+    "files": ["src/components/ActivityLog/ActivityLog.js"]
+  },
+  {
+    "id": "request.join.title",
+    "description": "Label for logs",
+    "defaultMessage": "Request to join a workteam",
+    "message": "",
+    "files": ["src/components/ActivityLog/ActivityLog.js"]
+  },
+  {
+    "id": "action.save",
+    "description": "Label",
+    "defaultMessage": "Save",
+    "message": "",
+    "files": ["src/components/UserSettings/EmailField.js"]
+  },
+  {
+    "id": "settings.email.requestCreated",
+    "description": "Notification that a request has been created",
+    "defaultMessage": "You have to confirm your new email address \"{email}\"",
+    "message": "",
+    "files": ["src/components/UserSettings/EmailField.js"]
+  },
+  {
+    "id": "settings.email.resendNotification",
+    "description": "Verification mail sending success",
+    "defaultMessage": "An email was sent to your new mail address \"{email}\"",
+    "message": "",
+    "files": ["src/components/UserSettings/EmailField.js"]
+  },
+  {
+    "id": "settings.verificationCall",
+    "description": "Notification to verify mail address",
+    "defaultMessage": "Please confirm your email address",
+    "message": "",
+    "files": ["src/routes/account/AccountContainer.js"]
   }
 ]

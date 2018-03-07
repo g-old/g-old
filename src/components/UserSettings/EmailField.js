@@ -82,12 +82,12 @@ const messages = defineMessages({
   },
   resendSuccess: {
     id: 'settings.email.resendNotification',
-    defaultMessage: 'An email was sent to your new mail address "{email}"',
+    defaultMessage: 'An email was sent to your new mail address ({email})',
     description: 'Verification mail sending success ',
   },
   requestPending: {
     id: 'settings.email.requestCreated',
-    defaultMessage: 'You have to confirm your new email address "{email}"',
+    defaultMessage: 'Check your email ({email}) to confirm.',
     description: 'Notification that a request has been created',
   },
 });

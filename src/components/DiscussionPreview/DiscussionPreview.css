@@ -1,23 +1,4 @@
-@import "../variables.css";
-
-.root {
-  margin: auto;
-  margin-bottom: 1.5em;
-  max-width: var(--max-content-width);
-}
-
-.container {
-  margin: 0 auto;
-
-  /*  border: solid 1px gray; */
-  padding: 0.4em;
-
-  /* border-bottom: 1px solid rgba(0, 0, 0, 0.15); */
-
-  /* border-bottom: solid 1px #666; */
-
-  /* box-shadow: #666 1px 1px 1px; */
-}
+@import '../variables.css';
 
 .header {
   font-weight: 300;

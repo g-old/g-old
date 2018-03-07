@@ -1,0 +1,28 @@
+.sidebar {
+  @media only screen and (max-width: 45em) {
+    max-width: 100%;
+    width: 100vw;
+  }
+
+  @media only screen and (min-width: 45em) {
+    width: 21rem;
+  }
+}
+
+.fixed {
+  display: flex;
+  flex-direction: column;
+  max-height: 100vh;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+.small {
+  @media only screen and (max-width: 30em) {
+    width: 10em;
+  }
+}
+
+.full {
+  height: 100vh;
+  overflow: auto;
+}
