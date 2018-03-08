@@ -29,21 +29,13 @@ const messages = defineMessages({
     defaultMessage: 'About',
     description: 'About link in header',
   },
-  proposals: {
-    id: 'navigation.proposals',
-    defaultMessage: 'Proposals',
-    description: 'Proposals link in header',
-  },
+
   admin: {
     id: 'navigation.admin',
     defaultMessage: 'Admin',
     description: 'Admin link in header',
   },
-  surveys: {
-    id: 'navigation.surveys',
-    defaultMessage: 'Surveys',
-    description: 'Surveys link in header',
-  },
+
   profile: {
     id: 'navigation.profile',
     defaultMessage: 'Profile',
@@ -63,8 +55,6 @@ const messages = defineMessages({
 
 const contents = [
   { id: 1, path: '/feed', name: 'feed' },
-  { id: 2, path: '/proposals/active', name: 'proposals' },
-  { id: 3, path: '/surveys', name: 'surveys' },
   { id: 4, path: '/admin', name: 'admin' },
   { id: 5, path: '/about', name: 'about' },
 ];
@@ -77,7 +67,7 @@ const getMenu = (counter, path) =>
     }
 
     return (
-      <Link
+      <Link // eslint-disable-line
         key={p.id}
         className={cn(s.link, path === p.path ? s.current : null)}
         to={p.path}
