@@ -10,7 +10,12 @@ exports.up = function(knex, Promise) {
             .notNullable();
           table.foreign('author_id').references('users.id');
           table.string('title').notNullable();
-          table.text('body').notNullable();
+          table.text('text').notNullable();
+          table.text('text_html').notNullable();
+          table
+            .integer('current_phase_id')
+            .unsigned()
+            .notNullable();
           table
             .enu('state', [
               'proposed',
@@ -24,19 +29,11 @@ exports.up = function(knex, Promise) {
             .notNullable()
             .defaultsTo('proposed');
           table.integer('votes').defaultsTo(0);
-          table
-            .integer('poll_one_id')
-            .unsigned()
-            .notNullable()
-            .unique();
-          table.foreign('poll_one_id').references('polls.id');
-          table
-            .integer('poll_two_id')
-            .unsigned()
-            .unique();
-          table.foreign('poll_two_id').references('polls.id');
-          table.string('spokesman');
+          table.integer('spokesman_id').unsigned();
+          table.foreign('spokesman_id').references('users.id');
+
           table.timestamp('deleted_at');
+          table.timestamp('notified_at');
           table.timestamps();
         });
       }

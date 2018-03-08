@@ -4,11 +4,17 @@ exports.up = function(knex, Promise) {
       if (!exists) {
         return knex.schema.createTable('polls', table => {
           table.increments();
+          table.integer('group_id').unsigned();
+          table.foreign('group_id').references('groups.id');
           table
             .integer('polling_mode_id')
             .unsigned()
             .notNullable();
           table.foreign('polling_mode_id').references('polling_modes.id');
+          table.timestamp('start_time');
+          table.timestamp('end_time');
+          table.timestamp('closed_at');
+
           table
             .boolean('secret')
             .notNullable()
@@ -18,20 +24,10 @@ exports.up = function(knex, Promise) {
             .unsigned()
             .notNullable();
           table
-            .integer('upvotes')
-            .unsigned()
-            .defaultsTo(0);
-          table
-            .integer('downvotes')
-            .unsigned()
-            .defaultsTo(0);
-          table
             .integer('num_voter')
             .unsigned()
             .defaultsTo(0);
-          table.timestamp('start_time');
-          table.timestamp('end_time');
-          table.timestamp('closed_at');
+          table.json('votes_cache').defaultsTo('[]');
           table.timestamps();
         });
       }
@@ -39,7 +35,6 @@ exports.up = function(knex, Promise) {
     }),
   ]);
 };
-
 exports.down = function(knex, Promise) {
   return Promise.all([knex.schema.dropTable('polls')]);
 };

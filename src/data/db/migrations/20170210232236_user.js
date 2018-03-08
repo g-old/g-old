@@ -16,12 +16,7 @@ exports.up = function(knex, Promise) {
             .notNullable()
             .defaultsTo(false);
           table.string('password_hash');
-          table
-            .integer('role_id')
-            .unsigned()
-            .notNullable();
-          table.foreign('role_id').references('roles.id');
-          table.integer('privilege').defaultsTo(1);
+          table.jsonb('rights').defaultsTo('{}');
           table.timestamp('last_login_at');
           table.timestamps();
           table.timestamp('deleted_at'); // defaultTo(knex.raw('now()')).notNullable();

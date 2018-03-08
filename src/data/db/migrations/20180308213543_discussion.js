@@ -4,13 +4,15 @@ exports.up = function(knex, Promise) {
       if (!exists) {
         return knex.schema.createTable('discussions', table => {
           table.increments();
-          table.text('content').notNullable();
+          table.text('text').notNullable();
+          table.text('text_html').notNullable();
+
           table.string('title').notNullable();
           table
-            .integer('work_team_id')
+            .integer('group_id')
             .unsigned()
             .notNullable();
-          table.foreign('work_team_id').references('work_teams.id');
+          table.foreign('group_id').references('groups.id');
           table
             .integer('author_id')
             .unsigned()
