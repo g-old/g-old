@@ -19,7 +19,17 @@ exports.up = function(knex, Promise) {
             ])
             .notNullable();
           table
-            .enu('type', ['proposal', 'statement', 'like', 'vote', 'poll'])
+            .enu('type', [
+              'proposal',
+              'statement',
+              'like',
+              'vote',
+              'poll',
+              'notification',
+              'discussion',
+              'comment',
+              'request',
+            ])
             .notNullable();
           table
             .integer('object_id')

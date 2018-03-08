@@ -14,9 +14,9 @@ exports.up = function(knex, Promise) {
           table.foreign('processor_id').references('users.id');
           table.enu('type', [
             'joinGroup',
-            'joinWT',
-            'nameChange',
-            'avatarChange',
+            'changeEmail',
+            'changeAvatar',
+            'changeName',
           ]);
           table.timestamp('denied_at');
           table.timestamps();

@@ -4,10 +4,7 @@ exports.up = function(knex, Promise) {
       if (!exists) {
         return knex.schema.createTable('tags', table => {
           table.increments();
-          table
-            .string('text')
-            .notNullable()
-            .unique();
+          table.jsonb('text').notNullable();
           table.integer('count').defaultsTo(0);
         });
       }

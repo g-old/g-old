@@ -10,7 +10,7 @@ exports.up = function(knex, Promise) {
             .string('email')
             .notNullable()
             .unique();
-          table.string('avatar_path');
+          table.string('thumbnail');
           table
             .boolean('email_verified')
             .notNullable()

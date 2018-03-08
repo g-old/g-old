@@ -8,7 +8,13 @@ exports.up = function(knex, Promise) {
             .integer('user_id')
             .unsigned()
             .notNullable();
-          table.json('activity_ids');
+          table
+            .foreign('user_id')
+            .references('users.id')
+            .onDelete('CASCADE');
+          table.json('activity_ids').defaultsTo('[]');
+          table.json('history');
+
           table.timestamps();
         });
       }

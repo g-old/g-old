@@ -5,10 +5,15 @@ exports.up = function(knex, Promise) {
         return knex.schema.createTable('system_feeds', table => {
           table.increments();
           table
-            .integer('user_id')
+            .integer('groups_id')
             .unsigned()
             .notNullable();
-          table.json('activity_ids');
+          table
+            .foreign('groups_id')
+            .references('groups.id')
+            .onDelete('CASCADE');
+          table.jsonb('main_activities').defaultsTo('[]');
+          table.jsonb('activities').defaultsTo('[]');
           table.timestamps();
         });
       }
