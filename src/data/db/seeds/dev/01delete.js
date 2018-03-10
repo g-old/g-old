@@ -5,13 +5,7 @@ exports.seed = function(knex, Promise) {
 
   // prettier-ignore
   const deleteQueue = [
-    knex('proposal_voters')
-      .del()
-      .then(() =>
-        knex.raw(
-          'ALTER SEQUENCE proposal_voters_id_seq RESTART WITH 1;'
-        )
-      ),
+
     knex('proposal_user_subscriptions')
       .del()
       .then(() =>
@@ -97,7 +91,6 @@ exports.seed = function(knex, Promise) {
     knex('users')
       .del()
       .then(() => knex.raw('ALTER SEQUENCE users_id_seq RESTART WITH 1;')),
-    knex('roles').del().then(),
   ];
   /* const chain = deleteQueue.reduce(
     (soFar, f) => soFar.then(f,(e)=>{console.log(e)}),

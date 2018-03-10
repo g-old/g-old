@@ -1,34 +1,41 @@
 /* eslint-disable comma-dangle */
-
+/*
 const proposalFeedID = 1;
 const statementFeedID = 2;
 const maxActivitiesNum = 30;
 const fillRate = 100;
-const numActivitiesPerFeed = (maxActivitiesNum / 100) * fillRate;
+const numActivitiesPerFeed = maxActivitiesNum / 100 * fillRate;
 
 function randomNumber(max) {
   return Math.floor(max * Math.random());
 }
-
-exports.seed = function (knex, Promise) {
-  function createSystemFeeds() {
+*/
+exports.seed = function(knex, Promise) {
+  /* function createSystemFeeds() {
     return Promise.resolve(
       knex('system_feeds').insert({
         group_id: 1,
         type: 'GROUP',
-        main_activities:JSON.stringify([]),
+        main_activities: JSON.stringify([]),
         activities: JSON.stringify([]),
-      })
+      }),
     );
   }
   function createActivity(object) {
     let verb = null;
     let createdAt = null;
     let data = null;
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if ('likes' in object) {
         // statement
-        const verbs = ['create', 'delete', 'update', 'close', 'reject', 'accept'];
+        const verbs = [
+          'create',
+          'delete',
+          'update',
+          'close',
+          'reject',
+          'accept',
+        ];
 
         const randNum = Math.random();
         if (randNum > 0.3) {
@@ -62,7 +69,10 @@ exports.seed = function (knex, Promise) {
         };
       } else if ('state' in object) {
         // proposal
-        verb = object.state === 'proposed' || object.state === 'voting' ? 'create' : 'close';
+        verb =
+          object.state === 'proposed' || object.state === 'voting'
+            ? 'create'
+            : 'close';
         if (object.state === 'proposed' || object.state === 'voting') {
           verb = 'create';
 
@@ -109,10 +119,19 @@ exports.seed = function (knex, Promise) {
           createdAt.setDate(time.getDate() - randomNumber(70));
         }
 
-        data = { actor_id: object.user_id, verb, type: 'vote', object_id: object.id, content: JSON.stringify(object),
- created_at: createdAt };
+        data = {
+          actor_id: object.user_id,
+          verb,
+          type: 'vote',
+          object_id: object.id,
+          content: JSON.stringify(object),
+          created_at: createdAt,
+        };
       }
-      knex('activities').insert(data).returning('id').then(id => resolve(id));
+      knex('activities')
+        .insert(data)
+        .returning('id')
+        .then(id => resolve(id));
     });
   }
   function genActivitiesFromProposals(data, feedId, field) {
@@ -120,11 +139,15 @@ exports.seed = function (knex, Promise) {
       Promise.all(data[0].map(p => createActivity(p))),
       Promise.all(data[1].map(p => createActivity(p))),
       Promise.all(data[2].map(p => createActivity(p))),
-    ]).then((allIds) => {
+    ]).then(allIds => {
       const pIds = allIds.reduce((acc, curr) => acc.concat(curr), []);
-      return knex('system_feeds').where({ group_id: 1, type: 'GROUP' }).update({
-        [field]: JSON.stringify(pIds.reduce((acc, curr) => acc.concat(curr), []))
-      });
+      return knex('system_feeds')
+        .where({ group_id: 1, type: 'GROUP' })
+        .update({
+          [field]: JSON.stringify(
+            pIds.reduce((acc, curr) => acc.concat(curr), []),
+          ),
+        });
     });
   }
 
@@ -145,15 +168,20 @@ exports.seed = function (knex, Promise) {
         .orderBy('created_at', 'desc')
         .limit(numActivities / 3)
         .select(),
-    ])
-      .then(data => genActivitiesFromProposals(data, feedId, 'main_activities'));
+    ]).then(data =>
+      genActivitiesFromProposals(data, feedId, 'main_activities'),
+    );
   }
 
   function genActivitiesFromStatements(data, feedId) {
     return Promise.all(data.map(p => createActivity(p))).then(ids =>
-      knex('system_feeds').where({ group_id: 1, type:'GROUP' }).update({
-        activities: JSON.stringify(ids.reduce((acc, curr) => acc.concat(curr), [])),
-      })
+      knex('system_feeds')
+        .where({ group_id: 1, type: 'GROUP' })
+        .update({
+          activities: JSON.stringify(
+            ids.reduce((acc, curr) => acc.concat(curr), []),
+          ),
+        }),
     );
   }
 
@@ -167,31 +195,49 @@ exports.seed = function (knex, Promise) {
 
   function fillUserFeed(userId) {
     return Promise.all([
-      knex('statements').where({ author_id: userId }).limit(10).select(),
-      knex('votes').where({ user_id: userId }).limit(20).select(),
+      knex('statements')
+        .where({ author_id: userId })
+        .limit(10)
+        .select(),
+      knex('votes')
+        .where({ user_id: userId })
+        .limit(20)
+        .select(),
     ])
-      .then(data => Promise.resolve(data.reduce((acc, curr) => acc.concat(curr), [])))
+      .then(data =>
+        Promise.resolve(data.reduce((acc, curr) => acc.concat(curr), [])),
+      )
       .then(objects => Promise.all(objects.map(o => createActivity(o))))
       .then(ids =>
         knex('feeds').insert({
           user_id: userId,
-          activity_ids: JSON.stringify(ids.reduce((acc, curr) => acc.concat(curr), [])),
-        })
+          activity_ids: JSON.stringify(
+            ids.reduce((acc, curr) => acc.concat(curr), []),
+          ),
+        }),
       );
   }
 
-
   function createFolloweesForAccount(name, followeeIdArray) {
-    return knex('users').where('name', 'ilike', name).limit(1).select()
-    .then(account => Promise.all(
+    return knex('users')
+      .where('name', 'ilike', name)
+      .limit(1)
+      .select()
+      .then(account =>
+        Promise.all(
           followeeIdArray.map(f =>
-            knex('user_follows').insert({ follower_id: account[0].id, followee_id: f })
-          )
-        ));
+            knex('user_follows').insert({
+              follower_id: account[0].id,
+              followee_id: f,
+            }),
+          ),
+        ),
+      );
   }
-
-  return Promise.resolve(
-    createSystemFeeds()
+*/
+  return Promise
+    .resolve
+    /*  createSystemFeeds()
       .then(() => fillProposalsFeed(proposalFeedID, numActivitiesPerFeed))
       .then(() => fillStatementsFeed(statementFeedID, numActivitiesPerFeed))
       .then(() => fillUserFeed(8))
@@ -199,5 +245,6 @@ exports.seed = function (knex, Promise) {
       .then(() => fillUserFeed(10))
       .then(() => fillUserFeed(11))
       .then(() => createFolloweesForAccount('user_0', [8, 9, 10, 11]))
-  );
+  */
+    ();
 };

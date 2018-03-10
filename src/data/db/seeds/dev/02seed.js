@@ -1,3 +1,4 @@
+/*
 const faker = require('faker');
 const bcrypt = require('bcrypt');
 const Groups = {
@@ -44,7 +45,7 @@ const dedup = (arr) => {
 
 // https://www.frankmitchell.org/2015/01/fisher-yates/
 /* eslint-disable no-param-reassign */
-function shuffle(array) {
+/* function shuffle(array) {
   // in place!
   let i = 0;
   let j = 0;
@@ -58,10 +59,10 @@ function shuffle(array) {
 }
 /* eslint-enable no-param-reassign */
 
-exports.seed = function (knex, Promise) {
+exports.seed = function(knex, Promise) {
   /* eslint-disable comma-dangle */
 
-
+  /*
 
   function createUser(name, surname, passwordHash, email, groups, time, emailVerified, voteSince) {
     return knex('users').insert({
@@ -79,7 +80,7 @@ exports.seed = function (knex, Promise) {
   }
 
   /* eslint-disable prefer-template */
-  function createUsers() {
+  /* function createUsers() {
     const time = new Date();
     let users = [];
     const testSuperUser = Promise.resolve(
@@ -139,7 +140,7 @@ exports.seed = function (knex, Promise) {
       );
     }
     /* eslint-enable prefer-template */
-    guestUsers = guestUsers.concat(testGuests);
+  /* guestUsers = guestUsers.concat(testGuests);
 
     for (let i = 0; i < numGuests; i += 1) {
       const name = faker.name.firstName();
@@ -482,8 +483,8 @@ exports.seed = function (knex, Promise) {
       ]).then(ids => ids)
     );
   }
-
-  return Promise.resolve(
+*/
+  return Promise.resolve(/*
     //createRoles()
     createPollingmodes()
       .then(createPolls)
@@ -495,5 +496,5 @@ exports.seed = function (knex, Promise) {
       .then(createTags)
       .then(createProposalTags)
       .catch(e => console.log(e))
-  );
+  */);
 };

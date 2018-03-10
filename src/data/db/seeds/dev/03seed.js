@@ -1,13 +1,15 @@
 /* eslint-disable comma-dangle */
-const numProposalsToCorrect = 500;
+/* const numProposalsToCorrect = 500;
 
 function randomNumber(max) {
   return Math.floor(max * Math.random());
 }
 
-const thresholdInVotes = poll => Math.floor((poll.num_voter / 100) * poll.threshold);
+const thresholdInVotes = poll =>
+  Math.floor(poll.num_voter / 100 * poll.threshold);
 
-const calcNewThreshold = poll => Math.floor((poll.upvotes * 100) / poll.num_voter);
+const calcNewThreshold = poll =>
+  Math.floor(poll.upvotes * 100 / poll.num_voter);
 
 const getDates = finished => {
   const date = new Date();
@@ -25,10 +27,10 @@ const getDates = finished => {
     closeDate,
   };
 };
-
+*/
 /* eslint-enable no-param-reassign */
-exports.seed = function (knex, Promise) {
-  const correctProposed = (pollOne, pollTwo) => {
+exports.seed = function(knex, Promise) {
+  /* const correctProposed = (pollOne, pollTwo) => {
     const numNeededVotes = thresholdInVotes(pollOne);
     const oneVotePercentage = Math.floor(100 / pollOne.num_voter);
     const updates = [];
@@ -265,7 +267,9 @@ exports.seed = function (knex, Promise) {
 
     return Promise.all(proposals).then(data => data.reduce((a, b) => a.concat(b)));
   }
-  return Promise.resolve(
-    getProposals().then(data => mapData(data).then(arrayOfPollData => mapPolls(arrayOfPollData)))
-  );
+  */
+  return Promise
+    .resolve
+    /* getProposals().then(data => mapData(data).then(arrayOfPollData => mapPolls(arrayOfPollData))) */
+    ();
 };
