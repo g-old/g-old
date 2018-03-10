@@ -227,7 +227,7 @@ const getDiscussionsById = discussionIds =>
 
 const getGroupsById = groupIds =>
   new Promise(resolve => {
-    knex('work_teams')
+    knex('groups')
       .whereIn('id', groupIds)
       .select()
       .then(data =>

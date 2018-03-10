@@ -117,13 +117,13 @@ async function proposalPolling(pubsub) {
         if (proposalData) {
           // TODO refactor later
           let upliftPromise;
-          if (proposalData.workTeamId) {
-            upliftPromise = knex('work_teams')
+          if (proposalData.groupId) {
+            upliftPromise = knex('groups')
               .where({ main: true })
               .pluck('id')
               .then(([id]) => {
                 // eslint-disable-next-line eqeqeq
-                if (id && id != proposalData.workTeamId) {
+                if (id && id != proposalData.groupId) {
                   return knex('proposal_groups').insert({
                     group_id: id,
                     group_type: 'WT',
@@ -160,7 +160,7 @@ async function proposalPolling(pubsub) {
 
           return Promise.all([upliftPromise, insertionPromise]);
         }
-        return Promise.reject('Proposal update failed');
+        return Promise.reject(new Error('Proposal update failed'));
       })
       .catch(err => {
         log.error({ err, proposal }, 'Proposal update failed');

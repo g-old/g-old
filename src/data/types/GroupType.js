@@ -66,8 +66,8 @@ const GroupType = new ObjectType({
       type: new GraphQLList(UserType),
       resolve(data, args, { viewer, loaders }) {
         if (viewer) {
-          return knex('user_work_teams')
-            .where({ work_team_id: data.id })
+          return knex('user_groups')
+            .where({ group_id: data.id })
             .pluck('user_id')
             .then(ids => ids.map(id => User.gen(viewer, id, loaders)));
         }
@@ -92,8 +92,8 @@ const GroupType = new ObjectType({
         if (viewer.wtMemberships.includes(parent.id)) {
           return { status: 1 };
         }
-        const [membership = null] = await knex('user_work_teams')
-          .where({ work_team_id: parent.id, user_id: viewer.id })
+        const [membership = null] = await knex('user_groups')
+          .where({ group_id: parent.id, user_id: viewer.id })
           .pluck('id');
         if (!membership) {
           const requests = await knex('requests')
@@ -137,7 +137,7 @@ const GroupType = new ObjectType({
       resolve(data, args, { viewer, loaders }) {
         if (viewer && viewer.wtMemberships.includes(data.id)) {
           return knex('discussions')
-            .where({ work_team_id: data.id })
+            .where({ group_id: data.id })
             .pluck('id')
             .then(ids => ids.map(id => Discussion.gen(viewer, id, loaders)));
         }
@@ -149,7 +149,7 @@ const GroupType = new ObjectType({
       resolve(data, args, { viewer, loaders }) {
         if (viewer && viewer.wtMemberships.includes(data.id)) {
           return knex('proposals')
-            .where({ work_team_id: data.id })
+            .where({ group_id: data.id })
             .orderBy('created_at', 'DESC')
             .pluck('id')
             .then(ids => ids.map(id => Proposal.gen(viewer, id, loaders)));

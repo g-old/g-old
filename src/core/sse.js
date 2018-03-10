@@ -19,10 +19,10 @@ class ValidationError extends Error {
 const HEART_BEAT = 30000;
 // TODO try channels per group - no filtering
 function groupFilter(rootValue, context) {
-  if (rootValue.workTeamId) {
+  if (rootValue.groupId) {
     return (
       context.viewer.wtMemberships &&
-      context.viewer.wtMemberships.includes(rootValue.workTeamId)
+      context.viewer.wtMemberships.includes(rootValue.groupId)
     );
   }
   return true;
@@ -38,7 +38,7 @@ export class SubscriptionManager {
       if (['proposal', 'statement'].includes(payload.activity.type)) {
         this.pubsub.publish('activities', {
           id: payload.activity.id,
-          ...(payload.workTeamId && { workTeamId: payload.workTeamId }),
+          ...(payload.groupId && { groupId: payload.groupId }),
         });
       }
     });

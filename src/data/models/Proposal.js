@@ -152,7 +152,7 @@ class Proposal {
     this.createdAt = data.created_at;
     this.spokesmanId = data.spokesman_id;
     this.notifiedAt = data.notified_at;
-    this.groupId = data.work_team_id;
+    this.groupId = data.group_id;
   }
   static async gen(viewer, id, { proposals }) {
     const data = await proposals.load(id);
@@ -337,7 +337,7 @@ class Proposal {
             title: data.title,
             body: data.text,
             [pollField]: pollOne.id,
-            ...(data.groupId && { work_team_id: data.groupId }),
+            ...(data.groupId && { group_id: data.groupId }),
             state,
             ...additionalData,
             created_at: new Date(),
@@ -377,7 +377,7 @@ class Proposal {
       }
 
       if (data.groupId) {
-        await knex('work_teams')
+        await knex('groups')
           .where({ id: data.groupId })
           .increment('num_proposals', 1);
       }
@@ -416,8 +416,8 @@ class Proposal {
     if (['proposed', 'voting', 'survey'].indexOf(this.state) !== -1 && viewer) {
       if (this.groupId) {
         // TODO try to find a better way since it cannot be cached easily and voting isF common
-        const [data = null] = await knex('user_work_teams')
-          .where({ user_id: viewer.id, work_team_id: this.groupId })
+        const [data = null] = await knex('user_groups')
+          .where({ user_id: viewer.id, group_id: this.groupId })
           .select('created_at');
 
         if (data && data.created_at) {

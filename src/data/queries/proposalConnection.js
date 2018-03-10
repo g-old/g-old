@@ -47,7 +47,7 @@ const proposal = {
           [tagId],
         ),
       )
-        .where({ work_team_id: groupId || null })
+        .where({ group_id: groupId || null })
         .whereRaw('(proposals.created_at, proposals.id) < (?,?)', [cursor, id])
         .limit(first)
         .orderBy('proposals.created_at', 'desc')
@@ -68,7 +68,7 @@ const proposal = {
               });
             })
             //  .where({ 'polls.closed_at': null }) TODO find some other way to p1 to p2 transitioning
-            .where({ work_team_id: groupId || null })
+            .where({ group_id: groupId || null })
             .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
             .limit(first)
             .orderBy('polls.end_time', 'asc')
@@ -90,7 +90,7 @@ const proposal = {
                 );
               });
             })
-            .where({ work_team_id: groupId || null })
+            .where({ group_id: groupId || null })
             .where('proposals.state', '=', 'accepted')
             .whereRaw('(polls.end_time, polls.id) < (?,?)', [cursor, id])
             .limit(first)
@@ -112,7 +112,7 @@ const proposal = {
                 );
               });
             })
-            .where({ work_team_id: groupId || null })
+            .where({ group_id: groupId || null })
             .whereRaw('(polls.closed_at, polls.id) < (?,?)', [cursor, id])
             .limit(first)
             .orderBy('polls.closed_at', 'desc')
@@ -123,7 +123,7 @@ const proposal = {
           cursor = cursor ? new Date(cursor) : new Date(null);
           proposals = await knex('proposals')
             .innerJoin('polls', 'proposals.poll_one_id', 'polls.id')
-            .where({ work_team_id: groupId || null })
+            .where({ group_id: groupId || null })
             .where('proposals.state', '=', 'survey')
             .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
             .limit(first)
@@ -145,8 +145,8 @@ const proposal = {
                 );
               });
             })
-            .whereNot({ work_team_id: groupId })
-            .whereNotNull('work_team_id')
+            .whereNot({ group_id: groupId })
+            .whereNotNull('group_id')
             .where('proposals.state', '=', 'accepted')
             .whereRaw('(polls.end_time, polls.id) < (?,?)', [cursor, id])
             .limit(first)

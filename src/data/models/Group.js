@@ -133,21 +133,21 @@ class Group {
       const [id = null] = await trx
         .insert({
           user_id: requester.id,
-          work_team_id: this.id,
+          group_id: this.id,
           ...(this.restricted && { authorizer_id: viewer.id }),
           created_at: new Date(),
         })
         .forUpdate()
-        .into('user_work_teams')
+        .into('user_groups')
         .returning('id');
 
       if (id) {
-        const [groupinDB = null] = await knex('work_teams')
+        const [groupinDB = null] = await knex('groups')
           .where({ id: this.id })
           .transacting(trx)
           .forUpdate()
           .increment('num_members', 1)
-          .into('work_teams')
+          .into('groups')
           .returning('*');
         loaders.groups.clear(this.id);
         // insert into sessions;
@@ -185,19 +185,19 @@ class Group {
     /* eslint-enable eqeqeq */
     const group = await knex.transaction(async trx => {
       const [id = null] = await trx
-        .where({ user_id: requester.id, work_team_id: this.id })
+        .where({ user_id: requester.id, group_id: this.id })
         .forUpdate()
-        .into('user_work_teams')
+        .into('user_groups')
         .del()
         .returning('id');
       // If member,
       if (id) {
-        const [groupinDB = null] = await knex('work_teams')
+        const [groupinDB = null] = await knex('groups')
           .where({ id: this.id })
           .transacting(trx)
           .forUpdate()
           .decrement('num_members', 1)
-          .into('work_teams')
+          .into('groups')
           .returning('*');
 
         loaders.groups.clear(this.id);
@@ -232,7 +232,7 @@ class Group {
 
   static async checkForMainTeam(newTeamStatus, transaction) {
     if (newTeamStatus) {
-      const res = await knex('work_teams')
+      const res = await knex('groups')
         .transacting(transaction)
         .where({ main: true })
         .pluck('id');
@@ -246,8 +246,8 @@ class Group {
   async circularFeedNotification(viewer, activity, pushFn) {
     if (!this.canNotify(viewer)) return null;
 
-    const teamIds = await knex('user_work_teams')
-      .where({ work_team_id: this.id })
+    const teamIds = await knex('user_groups')
+      .where({ group_id: this.id })
       .pluck('user_id');
     const promises = teamIds.map(id => pushFn(id, activity.id));
 
@@ -258,12 +258,12 @@ class Group {
     if (!id) return null;
     const data = await groups.load(id);
     if (!data) return null;
-    if (!canSee(viewer, data, Models.WORKTEAM)) return null;
+    if (!canSee(viewer, data, Models.GROUP)) return null;
     return new Group(data);
   }
 
   static async create(viewer, data, loaders) {
-    if (!canMutate(viewer, data, Models.WORKTEAM)) return null;
+    if (!canMutate(viewer, data, Models.GROUP)) return null;
     if (!data) return null;
     if (!data.name) return null;
     const newData = {
@@ -289,7 +289,7 @@ class Group {
       await Group.checkForMainTeam(newData.main, trx);
       const [groupData = null] = await trx
         .insert(newData)
-        .into('work_teams')
+        .into('groups')
         .returning('*');
 
       if (!groupData) {
@@ -310,7 +310,7 @@ class Group {
 
   static async update(viewer, data, loaders) {
     if (!data || !data.id) return null;
-    if (!canMutate(viewer, data, Models.WORKTEAM)) return null;
+    if (!canMutate(viewer, data, Models.GROUP)) return null;
     const newData = {};
 
     if ('name' in data) {
@@ -350,7 +350,7 @@ class Group {
     const [group = null] = await knex.transaction(async trx => {
       await Group.checkForMainTeam(newData.main, trx);
       // eslint-disable-next-line newline-per-chained-call
-      return knex('work_teams')
+      return knex('groups')
         .where({ id: data.id })
         .transacting(trx)
         .forUpdate()

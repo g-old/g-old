@@ -8,7 +8,7 @@ const groups = {
   type: new GraphQLList(GroupType),
 
   resolve: (root, args, { viewer, loaders }) =>
-    knex('work_teams')
+    knex('groups')
       .orderBy('created_at', 'desc')
       .pluck('id')
       .then(ids => ids.map(id => Group.gen(viewer, id, loaders))),

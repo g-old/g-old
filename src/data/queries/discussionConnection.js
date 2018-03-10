@@ -32,7 +32,7 @@ const discussionConnection = {
 
     const discussions = await knex('discussions')
       // .whereRaw('groups & ? > 0', [group]) TODO Later
-      .where({ work_team_id: groupId })
+      .where({ group_id: groupId })
       .whereRaw('(discussions.created_at, users.id) < (?,?)', [cursor, id])
       .limit(first)
       .orderBy('discussions.created_at', 'desc')

@@ -7,7 +7,7 @@ class Discussion {
     this.id = data.id;
     this.title = data.title;
     this.authorId = data.author_id;
-    this.groupId = data.work_team_id;
+    this.groupId = data.group_id;
     this.content = data.content;
     this.numComments = data.num_comments;
     this.createdAt = data.created_at;
@@ -36,13 +36,13 @@ class Discussion {
           author_id: viewer.id,
           title: data.title.trim(),
           content: data.content.trim(),
-          work_team_id: data.groupId,
+          group_id: data.groupId,
           created_at: new Date(),
         })
         .returning('*');
 
       if (discussion) {
-        await knex('work_teams')
+        await knex('groups')
           .where({ id: data.groupId })
           .increment('num_discussions', 1);
       }

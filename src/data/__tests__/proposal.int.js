@@ -19,7 +19,7 @@ describe('Proposal', () => {
   const VOTER = Groups.VIEWER | Groups.VOTER; // eslint-disable-line no-bitwise
   describe('Proposal.isVotable', () => {
     test('Should allow members to vote', async () => {
-      const [wtId] = await knex('work_teams')
+      const [wtId] = await knex('groups')
         .insert(createGroup())
         .returning('id');
 
@@ -27,9 +27,9 @@ describe('Proposal', () => {
         .insert(createTestUser({ groups: VOTER }))
         .returning('id');
       const creationTime = new Date(new Date().getTime() - 1000);
-      await knex('user_work_teams').insert({
+      await knex('user_groups').insert({
         user_id: uId,
-        work_team_id: wtId,
+        group_id: wtId,
         created_at: creationTime,
       });
 
@@ -39,7 +39,7 @@ describe('Proposal', () => {
         wtMemberships: wtId,
       });
       const proposal = new Proposal({
-        work_team_id: wtId,
+        group_id: wtId,
         created_at: new Date(),
         state: 'proposed',
       });

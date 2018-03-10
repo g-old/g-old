@@ -17,7 +17,7 @@ export const feedOptions = [
     ],
     contentModyfier: (resource, info) => ({
       ...resource,
-      workTeamId: info.workTeamId,
+      groupId: info.groupId,
     }),
   },
   {
@@ -33,7 +33,7 @@ export const feedOptions = [
     ],
     contentModyfier: (resource, info) => ({
       ...resource,
-      workTeamId: info.workTeamId,
+      groupId: info.groupId,
     }),
   },
   {
@@ -53,7 +53,7 @@ export const feedOptions = [
     ],
     contentModyfier: (resource, info) => ({
       ...resource,
-      workTeamId: info.workTeamId,
+      groupId: info.groupId,
     }),
   },
 ];
@@ -126,7 +126,7 @@ class ActivityService {
           : payload[resourceType],
         objectId: payload[resourceType].id,
         verb: event.eventType,
-        workTeamId: payload.groupId,
+        groupId: payload.groupId,
       };
       try {
         const newActivity = await this.store.create(

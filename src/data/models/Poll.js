@@ -75,9 +75,9 @@ class Poll {
       if (pollingMode.thresholdRef === 'all') {
         // TODO change completely in case of group model
         if (data.groupId) {
-          numVoter = await knex('user_work_teams')
+          numVoter = await knex('user_groups')
             .transacting(trx)
-            .where({ work_team_id: data.groupId })
+            .where({ group_id: data.groupId })
             .count('id');
         } else {
           numVoter = await trx

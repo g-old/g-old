@@ -113,16 +113,16 @@ describe('userWriteControl', () => {
   });
 });
 
-describe('workTeamWriteControl', () => {
+describe('groupWriteControl', () => {
   it('Should allow to add a new WT', () => {
     const testViewer = {
       id: 1,
       privileges: 0,
-      permissions: Permissions.CREATE_WORKTEAMS,
+      permissions: Permissions.CREATE_GROUPS,
       groups: Groups.GUEST,
     };
     const testData = { coordinatorId: '2', name: 'NAME' };
-    expect(canMutate(testViewer, testData, Models.WORKTEAM)).toBe(true);
+    expect(canMutate(testViewer, testData, Models.GROUP)).toBe(true);
   });
   /*  it('Should not allow exclusive members of [Groups.GUEST] to join a WT', () => {
     const testViewer = {
@@ -164,7 +164,7 @@ describe('proposalReadControl', () => {
   it('Should deny access to protected proposals', () => {
     const testViewer = createTestActor({ groups: Groups.VIEWER });
     const testData = {
-      workTeamId: 1,
+      groupId: 1,
     };
     expect(canSee(testViewer, testData, Models.PROPOSAL)).toBe(false);
   });
@@ -174,7 +174,7 @@ describe('proposalReadControl', () => {
       memberships: 1,
     });
     const testData = {
-      workTeamId: 1,
+      groupId: 1,
     };
     expect(canSee(testViewer, testData, Models.PROPOSAL)).toBe(true);
   });

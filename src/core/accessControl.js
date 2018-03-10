@@ -16,7 +16,7 @@ export const Models = {
   POLL: 32,
   VOTE: 64,
   NOTIFICATION: 128,
-  WORKTEAM: 256,
+  GROUP: 256,
   ACTIVITY: 512,
   DISCUSSION: 1024,
   COMMENT: 2048,
@@ -45,14 +45,13 @@ function requestWriteControl(viewer, data) {
 
 function checkIfMember(viewer, resource) {
   if (resource) {
-    if (resource.workTeamId) {
+    if (resource.groupId) {
       // assumes there exist only workteams
       if (viewer.groups & Groups.SYSTEM) {
         return true;
       }
       return (
-        viewer.wtMemberships &&
-        viewer.wtMemberships.includes(resource.workTeamId)
+        viewer.wtMemberships && viewer.wtMemberships.includes(resource.groupId)
       );
     }
     return true; // is not owned by wt/group
@@ -260,16 +259,16 @@ function activityWriteControl(viewer, data) {
   return false;
 }
 
-function workTeamReadControl(viewer, data) {
+function groupReadControl(viewer, data) {
   if (viewer.permissions & AccessMasks.LEVEL_0) {
     return true;
   }
   return false;
 }
-function workTeamWriteControl(viewer, data) {
-  if (viewer.permissions & Permissions.CREATE_WORKTEAMS) {
+function groupWriteControl(viewer, data) {
+  if (viewer.permissions & Permissions.CREATE_GROUPS) {
     if (data.coordinatorId || data.name) {
-      if (viewer.permissions & Permissions.CREATE_WORKTEAMS) {
+      if (viewer.permissions & Permissions.CREATE_GROUPS) {
         return true;
       }
       return false;
@@ -280,7 +279,7 @@ function workTeamWriteControl(viewer, data) {
 }
 
 function discussionReadControl(viewer, data) {
-  if (viewer.wtMemberships.includes(data.work_team_id)) {
+  if (viewer.wtMemberships.includes(data.group_id)) {
     return true;
   }
 
@@ -293,7 +292,7 @@ function discussionWriteControl(viewer, data) {
   return false;
 }
 function commentReadControl(viewer, data) {
-  if (viewer.wtMemberships.includes(data.discussion.workTeamId)) {
+  if (viewer.wtMemberships.includes(data.discussion.groupId)) {
     // eslint-disable-line
     return true;
   }
@@ -305,7 +304,7 @@ function commentWriteControl(viewer, data) {
   }
   if (data.creating) {
     // TODO check group etc
-    if (viewer.wtMemberships.includes(data.discussion.workTeamId)) {
+    if (viewer.wtMemberships.includes(data.discussion.groupId)) {
       // eslint-disable-line
       return true;
     }
@@ -366,9 +365,9 @@ const accessFilter = {
     [ATypes.WRITE]: activityWriteControl,
     [ATypes.READ]: activityReadControl,
   },
-  [Models.WORKTEAM]: {
-    [ATypes.WRITE]: workTeamWriteControl,
-    [ATypes.READ]: workTeamReadControl,
+  [Models.GROUP]: {
+    [ATypes.WRITE]: groupWriteControl,
+    [ATypes.READ]: groupReadControl,
   },
   [Models.DISCUSSION]: {
     [ATypes.WRITE]: discussionWriteControl,

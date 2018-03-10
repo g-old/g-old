@@ -25,7 +25,7 @@ class Comment {
     if (
       !canSee(
         viewer,
-        { ...data, discussion: { groupId: discussion.work_team_id } },
+        { ...data, discussion: { groupId: discussion.group_id } },
         Models.COMMENT,
       )
     )
@@ -46,7 +46,7 @@ class Comment {
         viewer,
         {
           ...data,
-          discussion: { groupId: discussion.work_team_id },
+          discussion: { groupId: discussion.group_id },
           creating: true,
         },
         Models.COMMENT,
@@ -75,7 +75,7 @@ class Comment {
           .transacting(trx)
           .forUpdate()
           .increment('num_comments', 1)
-          .returning('work_team_id');
+          .returning('group_id');
 
         if (comment.parent_id) {
           await knex('comments')

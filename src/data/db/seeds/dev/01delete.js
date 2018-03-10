@@ -24,14 +24,14 @@ exports.seed = function(knex, Promise) {
       .then(() =>
         knex.raw('ALTER SEQUENCE notifications_id_seq RESTART WITH 1;')
       ),
-    knex('user_work_teams')
+    knex('user_groups')
       .del()
       .then(() =>
-        knex.raw('ALTER SEQUENCE user_work_teams_id_seq RESTART WITH 1;')
+        knex.raw('ALTER SEQUENCE user_groups_id_seq RESTART WITH 1;')
       ),
-    knex('work_teams')
+    knex('groups')
       .del()
-      .then(() => knex.raw('ALTER SEQUENCE work_teams_id_seq RESTART WITH 1;')),
+      .then(() => knex.raw('ALTER SEQUENCE groups_id_seq RESTART WITH 1;')),
     knex('webpush_subscriptions')
       .del()
       .then(() =>
@@ -103,7 +103,7 @@ exports.seed = function(knex, Promise) {
     (soFar, f) => soFar.then(f,(e)=>{console.log(e)}),
     Promise.resolve(console.log('deleting entries in table ... '))
   ).catch((e)=> console.log(e));
-  return chain.catch((e)=>console.log(e));*/
+  return chain.catch((e)=>console.log(e)); */
   // prettier-ignore
   return Promise.each(deleteQueue, () =>
     console.info('deleting entries in table ... ')

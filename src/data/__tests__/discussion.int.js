@@ -18,7 +18,7 @@ describe('Discussion', () => {
 
   describe('Discussion.create', () => {
     test('Should allow to create a new discussion', async () => {
-      const [wtId] = await knex('work_teams')
+      const [wtId] = await knex('groups')
         .insert(createGroup())
         .returning('id');
 

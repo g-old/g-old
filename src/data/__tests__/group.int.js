@@ -23,7 +23,7 @@ describe('Group', () => {
         .insert([testUser, testCoordinator])
         .returning('id');
       const testViewer = createTestActor({ id: uID, groups: Groups.GUEST });
-      const [testGroupData] = await knex('work_teams')
+      const [testGroupData] = await knex('groups')
         .insert(createGroup({ coordinatorId: cID }))
         .returning('*');
       const testGroup = new Group(testGroupData);
@@ -35,9 +35,9 @@ describe('Group', () => {
 
       expect(maybeFailJoinResult).toBeNull();
 
-      const [maybeFailId] = await knex('user_work_teams')
+      const [maybeFailId] = await knex('user_groups')
         .where({ user_id: testViewer.id })
-        .returning('work_team_id');
+        .returning('group_id');
       expect(maybeFailId).not.toBeDefined();
     });
 
@@ -51,7 +51,7 @@ describe('Group', () => {
         id: uID,
         groups: Groups.VOTER,
       });
-      const [testGroupData] = await knex('work_teams')
+      const [testGroupData] = await knex('groups')
         .insert(createGroup({ coordinatorId: cID }))
         .returning('*');
       const testGroup = new Group(testGroupData);
@@ -63,9 +63,9 @@ describe('Group', () => {
 
       expect(maybeFailJoinResult).toBeDefined();
 
-      const [maybeFailId] = await knex('user_work_teams')
+      const [maybeFailId] = await knex('user_groups')
         .where({ user_id: testViewer.id })
-        .pluck('work_team_id');
+        .pluck('group_id');
       expect(maybeFailId).toBe(testGroupData.id);
     });
   });
