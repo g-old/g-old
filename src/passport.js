@@ -38,17 +38,16 @@ passport.use(
           'name',
           'password_hash',
           'surname',
+          'rights',
           'email',
           'thumbnail',
-          'groups',
-          'can_vote_since',
           'email_verified',
         ])
         .update({ last_login_at: new Date() })
         .then(userData => {
           const user = userData[0];
           if (!user) {
-            return done(null, false);
+            return Promise.resolve(done(null, false));
           }
           return verifyUser(user, password).then(verified => {
             if (verified) {
@@ -70,7 +69,6 @@ passport.serializeUser((user, done) => {
   try {
     const emailVerified =
       'emailVerified' in user ? user.emailVerified : user.email_verified;
-    const rights = calcRights(user.groups);
     let avatar = user.thumbnail || '';
     const stIndex = avatar.indexOf('c_scale');
     if (stIndex > 0) {
@@ -78,11 +76,17 @@ passport.serializeUser((user, done) => {
       const endIndex = stIndex + 18; // (!)
       avatar = avatar.slice(0, stIndex) + avatar.substring(endIndex);
     }
-    return knex('user_work_teams')
+    return knex('user_groups')
       .where({ user_id: user.id })
-      .select('work_team_id')
-      .then(ids => {
-        const wtMemberships = ids.map(data => data.work_team_id);
+      .select('group_id')
+      .then(groups => {
+        if (user.rights) {
+          groups.push({
+            id: 'plattform',
+            rights: user.rights.plattform,
+          });
+        }
+        const rights = calcRights(groups);
         const sessionUser = {
           id: user.id,
           name: user.name,
@@ -90,31 +94,12 @@ passport.serializeUser((user, done) => {
           email: user.email,
           avatar,
           thumbnail: user.thumbnail,
-          permissions: rights.perm,
-          privileges: rights.priv,
-          groups: user.groups,
-          wtMemberships,
-          canVoteSince: user.can_vote_since || user.canVoteSince,
+          rights,
           emailVerified,
         };
         done(null, sessionUser);
         return null;
       });
-    /*  const sessionUser = {
-      id: user.id,
-      name: user.name,
-      surname: user.surname,
-      email: user.email,
-      avatar,
-      thumbnail: user.thumbnail,
-      permissions: rights.perm,
-      privileges: rights.priv,
-      groups: user.groups,
-      canVoteSince: user.can_vote_since || user.canVoteSince,
-      emailVerified,
-    }; */
-    // done(null, sessionUser);
-    // return null;
   } catch (error) {
     log.error({ user }, 'Serializing failed');
     done({ message: 'Serializing failed', name: 'SerializeError' });

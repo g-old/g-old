@@ -198,19 +198,11 @@ export const GroupConditions = {
   [Groups.GUEST]: Privileges.GRANT_GUEST,
 };
 
-export const calcRights = userGroups =>
-  Object.keys(Groups).reduce(
-    (acc, curr) => {
-      const r = Groups[curr];
-      if (userGroups & r) {
-        acc.perm |= PermissionsSchema[r];
-        acc.priv |= PrivilegesSchema[r];
-      }
-
-      return acc;
-    },
-    { perm: 0, priv: 0 },
-  );
+export const calcRights = membershipData =>
+  membershipData.reduce((acc, curr) => {
+    acc[curr.id] = curr.rights;
+    return acc;
+  }, {});
 
 const protectedViews = {
   Proposals: { type: 'permissions', name: 'LEVEL_1' },
