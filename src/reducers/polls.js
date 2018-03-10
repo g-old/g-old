@@ -13,8 +13,8 @@ import {
   LOAD_FEED_SUCCESS,
   CREATE_PROPOSAL_SUCCESS,
   UPDATE_PROPOSAL_SUCCESS,
-  JOIN_WORKTEAM_SUCCESS,
-  LOAD_WORKTEAM_SUCCESS,
+  JOIN_GROUP_SUCCESS,
+  LOAD_GROUP_SUCCESS,
   SSE_UPDATE_SUCCESS,
 } from '../constants';
 
@@ -24,7 +24,7 @@ export default function polls(state = {}, action) {
       const vote = action.payload.entities.votes[action.payload.result];
       const voteColumns = ['upvotes', 'downvotes'];
       const index = vote.position === 'pro' ? 0 : 1;
-      let votes = state[vote.pollId].votes;
+      let { votes } = state[vote.pollId];
       if (votes) {
         votes = [...state[vote.pollId].votes, vote.id];
       }
@@ -50,8 +50,8 @@ export default function polls(state = {}, action) {
       };
     case UPDATE_PROPOSAL_SUCCESS:
     case CREATE_PROPOSAL_SUCCESS:
-    case JOIN_WORKTEAM_SUCCESS:
-    case LOAD_WORKTEAM_SUCCESS:
+    case JOIN_GROUP_SUCCESS:
+    case LOAD_GROUP_SUCCESS:
     case LOAD_PROPOSAL_SUCCESS:
       return merge({}, state, action.payload.entities.polls);
     case SSE_UPDATE_SUCCESS: {
@@ -88,8 +88,7 @@ export default function polls(state = {}, action) {
       const voteColumns = ['upvotes', 'downvotes'];
       const index = vote.position === 'pro' ? 0 : 1;
       const poll = state[vote.pollId];
-      let statements = poll.statements;
-      let votes = poll.votes;
+      let { statements, votes } = poll.statements;
       if (poll.ownStatement && poll.statements) {
         // eslint-disable-next-line eqeqeq
         statements = poll.statements.filter(id => id != poll.ownStatement);

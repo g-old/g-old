@@ -18,24 +18,25 @@ class Request extends React.Component {
       success: PropTypes.bool,
       error: PropTypes.bool,
     }),
+    group: PropTypes.shape({}),
   };
-  static defaultProps = { updates: null };
+  static defaultProps = { updates: null, group: null };
 
   constructor(props) {
     super(props);
     this.state = {};
   }
-  componentWillReceiveProps({ workTeam, updates = {} }) {
+  componentWillReceiveProps({ group, updates = {} }) {
     const newUpdates = {};
     if (updates.success && !this.props.updates.success) {
-      // h istory.push(`/workteams/${this.props.workTeamId}/admin`);
+      // h istory.push(`/workteams/${this.props.groupId}/admin`);
       this.props.onCancel();
     }
     if (updates.error && !this.props.updates.error) {
       newUpdates.error = true;
     }
 
-    this.setState({ ...workTeam, ...newUpdates });
+    this.setState({ ...group, ...newUpdates });
   }
 
   render() {
@@ -52,9 +53,9 @@ class Request extends React.Component {
           </p>
         )}
         <Box column pad>
-          <Button onClick={onAllow} label={'Allow'} />
-          <Button onClick={onDeny} label={'Deny'} />
-          <Button primary onClick={onCancel} label={'Cancel'} />
+          <Button onClick={onAllow} label="Allow" />
+          <Button onClick={onDeny} label="Deny" />
+          <Button primary onClick={onCancel} label="Cancel" />
         </Box>
       </Box>
     );

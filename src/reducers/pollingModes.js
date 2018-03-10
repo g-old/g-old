@@ -6,8 +6,8 @@ import {
   CREATE_PROPOSAL_SUCCESS,
   UPDATE_PROPOSAL_SUCCESS,
   SSE_UPDATE_SUCCESS,
-  LOAD_WORKTEAM_SUCCESS,
-  JOIN_WORKTEAM_SUCCESS,
+  LOAD_GROUP_SUCCESS,
+  JOIN_GROUP_SUCCESS,
 } from '../constants';
 
 export default function pollingModes(state = {}, action) {
@@ -16,8 +16,8 @@ export default function pollingModes(state = {}, action) {
     case LOAD_PROPOSAL_SUCCESS:
     case CREATE_PROPOSAL_SUCCESS:
     case UPDATE_PROPOSAL_SUCCESS:
-    case JOIN_WORKTEAM_SUCCESS:
-    case LOAD_WORKTEAM_SUCCESS:
+    case JOIN_GROUP_SUCCESS:
+    case LOAD_GROUP_SUCCESS:
     case LOAD_PROPOSAL_LIST_SUCCESS: {
       return merge({}, state, action.payload.entities.pollingModes);
     }

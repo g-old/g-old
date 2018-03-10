@@ -1,189 +1,151 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import CheckBox from '../CheckBox';
+
+import SearchField from '../../components/SearchField';
 import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
-// import { PRIVILEGES } from '../../constants';
+import Layer from '../Layer';
 import {
-  Groups,
-  canChangeGroups,
-  Privileges,
-  GroupConditions,
-} from '../../organization';
+  nameValidation,
+  selectValidation,
+  createValidator,
+} from '../../core/validation';
 
 const messages = defineMessages({
-  role: {
-    id: 'account.role',
-    defaultMessage: 'Role',
-    description: 'Role of the user',
+  empty: {
+    id: 'form.error-empty',
+    defaultMessage: "You can't leave this empty",
+    description: 'Help for empty fields',
   },
-  change: {
-    id: 'commands.change',
-    defaultMessage: 'Change',
-    description: 'Short command to change a setting',
-  },
-  unlock: {
-    id: 'roles.unlock',
-    defaultMessage: 'Unlock viewer',
-    description: 'Button label for those who can only unlock viewers',
-  },
-  error: {
-    id: 'notifications.error.undefined',
-    defaultMessage: 'Something went wrong',
-    description: 'Server or network error ',
+  wrongSelect: {
+    id: 'form.error-select',
+    defaultMessage: 'You selection is not correct. Click on a suggestion',
+    description:
+      'Help for selection, when input does not match with a suggestion',
   },
 });
-
-const calcState = (roleNames, role) =>
-  roleNames.reduce((acc, curr) => {
-    // eslint-disable-next-line no-bitwise
-    if (Groups[curr] & role) {
-      acc[curr] = { status: true, value: Groups[curr] };
-    } else {
-      acc[curr] = { status: false, value: Groups[curr] };
-    }
-    return acc;
-  }, {});
-
-// eslint-disable-next-line eqeqeq
-const getGroupName = group => Object.keys(Groups).find(c => Groups[c] == group);
-// TODO memotize
-const getAvailableGroups = user =>
-  Object.keys(Privileges).reduce((acc, curr) => {
-    // eslint-disable-next-line no-bitwise
-    if (user.privileges & Privileges[curr]) {
-      const group = Object.keys(GroupConditions).find(
-        c => GroupConditions[c] === Privileges[curr],
-      );
-      if (group) {
-        const groupname = getGroupName(group);
-        acc.push(groupname);
-      }
-    }
-    return acc;
-  }, []);
-
+const formFields = ['teamName', 'coordinator'];
 class GroupManager extends React.Component {
   static propTypes = {
-    account: PropTypes.shape({
-      groups: PropTypes.number,
-      id: PropTypes.string,
-    }).isRequired,
-    user: PropTypes.shape({
-      groups: PropTypes.number,
-      id: PropTypes.string,
-    }).isRequired,
-
-    updateFn: PropTypes.func.isRequired,
-    updates: PropTypes.shape({
-      error: PropTypes.bool,
-      pending: PropTypes.bool,
-    }),
+    users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    findUser: PropTypes.func.isRequired,
+    createGroup: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
   };
-  static defaultProps = {
-    updates: {},
-  };
-
   constructor(props) {
     super(props);
-    this.onChange = this.onChange.bind(this);
-    this.availableGroups = getAvailableGroups(props.user);
-    this.state = calcState(this.availableGroups, props.account.groups);
+    this.onSubmit = this.onSubmit.bind(this);
+    this.handleBlur = this.handleBlur.bind(this);
+    this.handleValidation = this.handleValidation.bind(this);
+    this.visibleErrors = this.visibleErrors.bind(this);
+    this.handleValueChanges = this.handleValueChanges.bind(this);
+
+    this.state = {
+      teamName: '',
+      errors: {
+        teamName: {
+          touched: false,
+        },
+        coordinator: {
+          touched: false,
+        },
+      },
+    };
+    const testValues = {
+      teamName: { fn: 'name' },
+
+      coordinator: {
+        fn: 'coordinator',
+        valuesResolver: obj => obj.state.coordinatorValue,
+      },
+    };
+    this.Validator = createValidator(
+      testValues,
+      {
+        name: nameValidation,
+        coordinator: selectValidation,
+      },
+      this,
+      obj => obj.state,
+    );
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.updates && nextProps.updates.error) {
-      const old = this.props.updates || {};
-      this.setState({ error: !old.error });
-    }
-    if (nextProps !== this.props) {
-      this.availableGroups = getAvailableGroups(this.props.user);
-      const newState = calcState(
-        this.availableGroups,
-        nextProps.account.groups,
-      );
-      this.setState(newState);
+  onSubmit() {
+    if (this.handleValidation(formFields)) {
+      const { createGroup } = this.props;
+      const { coordinator, teamName } = this.state;
+      const coordinatorId = coordinator ? coordinator.id : undefined;
+      createGroup({ coordinatorId, name: teamName });
     }
   }
+  handleValidation(fields) {
+    const validated = this.Validator(fields);
+    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
+    return validated.failed === 0;
+  }
 
-  onChange(e) {
-    const {
-      user,
-      account: { groups, id, emailVerified, workTeams, thumbnail },
-    } = this.props;
-    // TODO VALIDATION FN
-    // dont allow change from guest if no profile, no workteam and no email verification
-    /* eslint-disable no-bitwise */
-    if (
-      (user.groups & (Groups.ADMIN | Groups.SUPER_USER)) > 0 ||
-      (emailVerified && thumbnail && workTeams && workTeams.length)
-    ) {
-      if (this.state[e.target.name].status === true) {
-        // remove
-        if (groups & this.state[e.target.name].value) {
-          const updatedGroups = groups & ~Groups[e.target.name];
-          if (canChangeGroups(user, this.props.account, updatedGroups)) {
-            this.props.updateFn({ id, groups: updatedGroups });
-          }
-        }
-      } else if ((groups & this.state[e.target.name].value) === 0) {
-        // assign
-        const updatedGroups = groups | Groups[e.target.name];
-        if (canChangeGroups(user, this.props.account, updatedGroups)) {
-          this.props.updateFn({ id, groups: updatedGroups });
-        }
+  handleBlur(e) {
+    const field = e.target.name;
+    if (this.state[field]) {
+      this.handleValidation([field]);
+    }
+  }
+  visibleErrors(errorNames) {
+    return errorNames.reduce((acc, curr) => {
+      const err = `${curr}Error`;
+      if (this.state.errors[curr].touched) {
+        acc[err] = (
+          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
+        );
       }
-    }
-    /* eslint-enable no-bitwise */
+      return acc;
+    }, {});
+  }
+  handleValueChanges(e) {
+    const { value } = e.target;
+    this.setState({ [e.target.name]: value });
   }
 
   render() {
-    let promoteButton = null;
-    const { user, updates, account } = this.props;
-    if (
-      (user.privileges & Groups.MEMBER_MANAGER) > 0 && // eslint-disable-line no-bitwise
-      account.groups === Groups.GUEST
-    ) {
-      promoteButton = (
-        <Button
-          primary
-          label={<FormattedMessage {...messages.unlock} />}
-          onClick={() =>
-            this.onChange({ target: { name: getGroupName(Groups.VIEWER) } })}
-        />
-      );
-    }
-
-    const error = this.state.error && <FormattedMessage {...messages.error} />;
-    let input;
-    if (promoteButton) {
-      input = promoteButton;
-    } else {
-      input = (
-        <FormField
-          label={<FormattedMessage {...messages.role} />}
-          error={error}
-        >
-          {!promoteButton &&
-            this.availableGroups.map(r => (
-              <CheckBox
-                label={r}
-                disabled={updates && updates.pending}
-                checked={this.state[r].status}
-                onChange={this.onChange}
-                name={r}
-              />
-            ))}
-        </FormField>
-      );
-    }
-
+    const { teamName } = this.state;
+    const { teamNameError, coordinatorError } = this.visibleErrors(formFields);
     return (
-      <Box column pad>
-        {input}
-      </Box>
+      <Layer onClose={this.props.onClose}>
+        <div style={{ height: '480px' }}>
+          <Box pad column>
+            <fieldset>
+              <FormField label="Teamname" error={teamNameError}>
+                <input
+                  name="teamName"
+                  onBlur={this.handleBlur}
+                  type="text"
+                  value={teamName}
+                  onChange={this.handleValueChanges}
+                />
+              </FormField>
+              <FormField overflow label="Coordinator" error={coordinatorError}>
+                <SearchField
+                  onChange={e =>
+                    this.handleValueChanges({
+                      target: { name: 'coordinatorValue', value: e.value },
+                    })
+                  }
+                  data={this.props.users}
+                  fetch={this.props.findUser}
+                  displaySelected={data => {
+                    this.handleValueChanges({
+                      target: { name: 'coordinator', value: data },
+                    });
+                  }}
+                />
+              </FormField>
+            </fieldset>
+            <Button primary fill label="Create Team" onClick={this.onSubmit} />
+          </Box>
+        </div>
+      </Layer>
     );
   }
 }

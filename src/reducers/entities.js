@@ -12,7 +12,7 @@ import statementLikes from './statementLikes';
 import flaggedStatements, * as fromFlaggedStatements from './flaggedStatements';
 import activities, * as fromActivities from './activities';
 import followees, * as fromFollowees from './followees';
-import workTeams, * as fromWorkTeams from './workTeams';
+import groups, * as fromGroups from './groups';
 import logs, * as fromLogs from './logs';
 import discussions, * as fromDiscussions from './discussions';
 import comments, * as fromComments from './comments';
@@ -36,7 +36,7 @@ export default combineReducers({
   flaggedStatements,
   activities,
   followees,
-  workTeams,
+  groups,
   notifications,
   logs,
   discussions,
@@ -130,17 +130,16 @@ export const getVisibibleStatementsByPoll = (state, id, filter) =>
     filter,
   );
 
-export const getWorkTeams = state =>
-  fromWorkTeams.getWorkTeams(state.workTeams, state);
+export const getGroups = state => fromGroups.getGroups(state.groups, state);
 
-export const getWorkTeamsIsFetching = state =>
-  fromWorkTeams.getIsFetching(state.workTeams);
+export const getGroupsIsFetching = state =>
+  fromGroups.getIsFetching(state.groups);
 
-export const getWorkTeamsErrorMessage = state =>
-  fromWorkTeams.getErrorMessage(state.workTeams);
+export const getGroupsErrorMessage = state =>
+  fromGroups.getErrorMessage(state.groups);
 
-export const getWorkTeam = (state, id) =>
-  fromWorkTeams.getWorkTeam(state.workTeams, id, state);
+export const getGroup = (state, id) =>
+  fromGroups.getGroup(state.groups, id, state);
 
 export const getDiscussion = (state, id) =>
   fromDiscussions.getDiscussion(state.discussions, id, state);

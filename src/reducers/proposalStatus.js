@@ -1,8 +1,8 @@
-import { LOAD_WORKTEAM_SUCCESS } from '../constants';
+import { LOAD_GROUP_SUCCESS } from '../constants';
 
 export default function byId(state = {}, action) {
   switch (action.type) {
-    case LOAD_WORKTEAM_SUCCESS: {
+    case LOAD_GROUP_SUCCESS: {
       return {
         ...state,
         ...action.payload.entities.proposalStatus,

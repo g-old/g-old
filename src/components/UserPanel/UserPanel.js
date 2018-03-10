@@ -24,7 +24,7 @@ import {
   getVisibleUsers,
   getUsersStatus,
   getSessionUser,
-  getWorkTeams,
+  getGroups,
 } from '../../reducers';
 
 const messages = defineMessages({
@@ -53,24 +53,20 @@ class UserPanel extends React.Component {
       id: PropTypes.string,
       permissions: PropTypes.number,
     }).isRequired,
-    createWorkTeam: PropTypes.func.isRequired,
-    loadWorkTeams: PropTypes.func.isRequired,
-    workTeams: PropTypes.arrayOf(PropTypes.shape({})),
+    createGroup: PropTypes.func.isRequired,
+    loadGroups: PropTypes.func.isRequired,
+    groups: PropTypes.arrayOf(PropTypes.shape({})),
     notifyUser: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     guestArray: null,
     viewerArray: null,
-    guestArrayIsFetching: null,
-    viewerArrayIsFetching: null,
-    viewerArrayErrorMessage: null,
-    guestArrayErrorMessage: null,
-    workTeams: null,
+    groups: null,
   };
   constructor(props) {
     super(props);
-    this.state = { selectedAccount: null, showAccount: false };
+    this.state = { showAccount: false };
     this.handleProfileClick = this.handleProfileClick.bind(this);
     this.handleLayerClosing = this.handleLayerClosing.bind(this);
   }
@@ -91,10 +87,10 @@ class UserPanel extends React.Component {
       <table className={s.userList}>
         <thead>
           <tr>
-            <th>{'Avatar'}</th>
-            <th>{'Name'}</th>
-            <th>{'Created at'}</th>
-            <th>{'Last login'}</th>
+            <th>Avatar</th>
+            <th>Name</th>
+            <th>Created at</th>
+            <th>Last login</th>
           </tr>
         </thead>
         <tbody>
@@ -111,14 +107,14 @@ class UserPanel extends React.Component {
     );
   }
 
-  renderWorkTeams(teams) {
+  renderGroups(teams) {
     return (
-      <table className={s.workTeams}>
+      <table className={s.groups}>
         <thead>
           <tr>
-            <th className={s.team}>{'Name'}</th>
-            <th className={s.members}>{'Members'}</th>
-            <th className={s.coordinator}>{'Coordinator'}</th>
+            <th className={s.team}>Name</th>
+            <th className={s.members}>Members</th>
+            <th className={s.coordinator}>Coordinator</th>
           </tr>
         </thead>
         <tbody>
@@ -170,7 +166,6 @@ class UserPanel extends React.Component {
                               />
                             </svg>
                           }
-                          onClick={() => this.setState({ showNotify: t.id })}
                         />
                       )}
                       {/* eslint-enable no-bitwise */}
@@ -230,7 +225,8 @@ class UserPanel extends React.Component {
                 <FetchError
                   message={guestArrayStatus.error}
                   onRetry={() =>
-                    this.props.loadUserList({ group: Groups.GUEST })}
+                    this.props.loadUserList({ group: Groups.GUEST })
+                  }
                 />
               )}
               {this.renderUserList(this.props.guestArray)}
@@ -265,7 +261,8 @@ class UserPanel extends React.Component {
                   onRetry={() =>
                     this.props.loadUserList({
                       group: VIEWERS,
-                    })}
+                    })
+                  }
                 />
               )}
               {this.renderUserList(this.props.viewerArray)}
@@ -297,7 +294,7 @@ const mapStateToProps = state => ({
   viewerArrayStatus: getUsersStatus(state, VIEWERS),
   userArray: getVisibleUsers(state, 'all'),
   user: getSessionUser(state),
-  workTeams: getWorkTeams(state),
+  groups: getGroups(state),
 });
 
 const mapDispatch = {

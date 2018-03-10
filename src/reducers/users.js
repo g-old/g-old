@@ -33,7 +33,7 @@ export const getUser = (state, id, entities) => {
   return hydrateUser(user, {
     ...entities,
     users: entities.users.byId,
-    workTeams: entities.workTeams.byId,
+    groups: entities.groups.byId,
     requests: entities.requests.byId,
   });
 };

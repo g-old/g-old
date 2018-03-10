@@ -8,8 +8,8 @@ import {
   CREATE_PROPOSALSUB_SUCCESS,
   DELETE_PROPOSALSUB_SUCCESS,
   SSE_UPDATE_SUCCESS,
-  LOAD_WORKTEAM_SUCCESS,
-  JOIN_WORKTEAM_SUCCESS,
+  LOAD_GROUP_SUCCESS,
+  JOIN_GROUP_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -23,8 +23,8 @@ export default function byId(state = {}, action) {
     case LOAD_FEED_SUCCESS: {
       return merge({}, state, action.payload.entities.proposals);
     }
-    case JOIN_WORKTEAM_SUCCESS:
-    case LOAD_WORKTEAM_SUCCESS: {
+    case JOIN_GROUP_SUCCESS:
+    case LOAD_GROUP_SUCCESS: {
       return merge({}, state, action.payload.entities.proposals);
     }
     case LOAD_PROPOSAL_SUCCESS: {
@@ -36,7 +36,7 @@ export default function byId(state = {}, action) {
     }
 
     case SSE_UPDATE_SUCCESS: {
-      const proposals = action.payload.entities.proposals;
+      const { proposals } = action.payload.entities;
       if (!proposals) return state;
       return merge({}, state, action.payload.entities.proposals);
     }

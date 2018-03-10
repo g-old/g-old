@@ -161,8 +161,8 @@ query{
 `;
 
 const proposalConnection = `
-query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID) {
-  proposalConnection (state:$state first:$first after:$after tagId:$tagId workTeamId:$workTeamId) {
+query ($state:String $first:Int, $after:String, $tagId:ID $groupId:ID) {
+  proposalConnection (state:$state first:$first after:$after tagId:$tagId groupId:$groupId) {
     pageInfo{
       endCursor
       hasNextPage
@@ -189,8 +189,8 @@ query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID) {
 `;
 
 const createProposalMutation = `
-mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput] $spokesmanId:ID $workTeamId:ID){
-  createProposal (proposal:{title:$title workTeamId:$workTeamId text:$text state:$state poll:$poll tags:$tags spokesmanId:$spokesmanId}){
+mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput] $spokesmanId:ID $groupId:ID){
+  createProposal (proposal:{title:$title groupId:$groupId text:$text state:$state poll:$poll tags:$tags spokesmanId:$spokesmanId}){
     ${proposal}
     tags{
       id
@@ -268,7 +268,7 @@ export function loadProposal({ id, pollId }) {
   };
 }
 
-export function loadProposalsList({ state, first, after, tagId, workTeamId }) {
+export function loadProposalsList({ state, first, after, tagId, groupId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
     // Dont fetch if pending
@@ -294,7 +294,7 @@ export function loadProposalsList({ state, first, after, tagId, workTeamId }) {
         first,
         after,
         tagId,
-        workTeamId,
+        groupId,
       });
       const proposals = data.proposalConnection.edges.map(p => p.node);
       const normalizedData = normalize(proposals, proposalListSchema);
@@ -345,9 +345,9 @@ export function createProposal(proposalData) {
         payload: normalizedData,
         filter,
         id: virtualId,
-        info: `${normalizedData.result}/${normalizedData.entities.proposals[
-          normalizedData.result
-        ].pollOne}`,
+        info: `${normalizedData.result}/${
+          normalizedData.entities.proposals[normalizedData.result].pollOne
+        }`,
       });
     } catch (error) {
       dispatch({

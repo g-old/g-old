@@ -40,7 +40,7 @@ const messages = defineMessages({
     description: 'Email not validated',
   },
   workteam: {
-    id: 'account.workTeamMissing',
+    id: 'account.groupMissing',
     defaultMessage: 'No team choosen',
     description: 'No team choosen',
   },
@@ -138,9 +138,9 @@ class AccountDetails extends React.Component {
     if (updates.dataUrl && updates.dataUrl.success) {
       this.setState({ showUpload: false });
     }
-    if (updates.notification && updates.notification.success) {
+    /* if (updates.notification && updates.notification.success) {
       this.setState({ notificationText: '', subject: '' });
-    }
+    } */
   }
   onPromoteToViewer() {
     const { accountData: { groups, id } } = this.props;
@@ -214,7 +214,7 @@ class AccountDetails extends React.Component {
     // eslint-disable-next-line no-bitwise
     if (canAccess(user, 'NotificationPanel')) {
       NotificationPanel = (
-        <AccordionPanel column pad heading={'Notify user'}>
+        <AccordionPanel column pad heading="Notify user">
           <NotificationInput
             receiverId={id}
             notifyUser={this.props.notifyUser}
@@ -256,13 +256,13 @@ class AccountDetails extends React.Component {
           </Label>
           {!avatarSet && (
             <Notification
-              type={'alert'}
+              type="alert"
               message={<FormattedMessage {...messages.avatarMissing} />}
             />
           )}
           {!emailVerified && (
             <Notification
-              type={'alert'}
+              type="alert"
               message={
                 <FormattedMessage {...messages.emailValidationMissing} />
               }

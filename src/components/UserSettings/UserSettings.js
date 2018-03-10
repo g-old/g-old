@@ -126,7 +126,7 @@ const messages = defineMessages({
     description: 'Heading of password section',
   },
   workteams: {
-    id: 'settings.workTeams',
+    id: 'settings.groups',
     defaultMessage: 'Workteams',
     description: 'Workteam',
   },
@@ -169,7 +169,7 @@ const initState = {
 class UserSettings extends React.Component {
   static propTypes = {
     user: PropTypes.shape({
-      workTeams: PropTypes.arrayOf(PropTypes.shape({})),
+      groups: PropTypes.arrayOf(PropTypes.shape({})),
       email: PropTypes.string.isRequired,
       id: PropTypes.string.isRequired,
       name: PropTypes.string,
@@ -179,9 +179,9 @@ class UserSettings extends React.Component {
     resendEmail: PropTypes.func.isRequired,
     updates: PropTypes.shape({}).isRequired,
     requestUpdates: PropTypes.shape({}).isRequired,
-    workTeams: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    onJoinWorkTeam: PropTypes.func.isRequired,
-    onLeaveWorkTeam: PropTypes.func.isRequired,
+    groups: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    onJoinGroup: PropTypes.func.isRequired,
+    onLeaveGroup: PropTypes.func.isRequired,
     smallSize: PropTypes.bool.isRequired,
     createRequest: PropTypes.func.isRequired,
     deleteRequest: PropTypes.func.isRequired,

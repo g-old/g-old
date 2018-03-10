@@ -50,7 +50,7 @@ query ($group:Int $after:String $union:Boolean) {
 }
 `;
 // makes problems bc it overwrites user
-/* const workTeam = `
+/* const group = `
   id
   name
   coordinator{
@@ -59,7 +59,7 @@ query ($group:Int $after:String $union:Boolean) {
     avatar
     id
   }`; */
-const workTeam = `
+const groupFields = `
     id
     name
     `;
@@ -73,8 +73,8 @@ query ($id:ID!) {
     numStatements
     numFollowers
     numLikes
-    workTeams{
-      ${workTeam}
+    groups{
+      ${groupFields}
     }
     followees{
       ${userFields}
@@ -102,8 +102,8 @@ query ($id:ID!) {
     numStatements
     numFollowers
     numLikes
-    workTeams{
-      ${workTeam}
+    groups{
+      ${groupFields}
     }
     ${userFields}
   }

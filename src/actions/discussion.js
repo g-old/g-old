@@ -29,8 +29,8 @@ name
 surname
 thumbnail
         `;
-/* const discussionConnection = `query($first:Int, $after:String, $workTeamId:ID){
-  discussionConnection(first:$first after:$after, workTeamId:$workTeamId){
+/* const discussionConnection = `query($first:Int, $after:String, $groupId:ID){
+  discussionConnection(first:$first after:$after, groupId:$groupId){
     pageInfo{
       endCursor
       hasNextPage
@@ -66,8 +66,8 @@ const discussionQuery = `query($id:ID $parentId:ID){
   }
 }`;
 
-const createDiscussionMutation = `mutation($workTeamId:ID $content:String $title:String){
-  createDiscussion(discussion:{workTeamId:$workTeamId content:$content title:$title}){
+const createDiscussionMutation = `mutation($groupId:ID $content:String $title:String){
+  createDiscussion(discussion:{groupId:$groupId content:$content title:$title}){
     ${discussionFragment}
   }
 }`;

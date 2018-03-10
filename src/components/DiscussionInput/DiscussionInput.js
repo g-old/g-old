@@ -101,17 +101,19 @@ class DiscussionInput extends React.Component {
         id: PropTypes.string,
       }),
     ).isRequired,
-    workTeamId: PropTypes.string.isRequired,
+    groupId: PropTypes.string.isRequired,
     updates: PropTypes.shape({
       success: PropTypes.bool,
       error: PropTypes.bool,
     }),
+    group: PropTypes.shape({}),
   };
 
   static defaultProps = {
     errorMessage: null,
     success: null,
     updates: null,
+    group: null,
   };
 
   constructor(props) {
@@ -156,17 +158,17 @@ class DiscussionInput extends React.Component {
     );
   }
 
-  componentWillReceiveProps({ workTeam, updates = {} }) {
+  componentWillReceiveProps({ group, updates = {} }) {
     const newUpdates = {};
     if (updates.success && !this.props.updates.success) {
-      // h istory.push(`/workteams/${this.props.workTeamId}/admin`);
+      // h istory.push(`/workteams/${this.props.groupId}/admin`);
       this.setState({ ...standardValues });
     }
     if (updates.error && !this.props.updates.error) {
       newUpdates.error = true;
     }
 
-    this.setState({ ...workTeam, ...newUpdates });
+    this.setState({ ...group, ...newUpdates });
   }
 
   onTextChange(e) {
@@ -222,7 +224,7 @@ class DiscussionInput extends React.Component {
       this.props.createDiscussion({
         title: title.trim(),
         content: this.md.render(body),
-        workTeamId: this.props.workTeamId,
+        groupId: this.props.groupId,
       });
     }
   }
@@ -268,13 +270,13 @@ class DiscussionInput extends React.Component {
       case 'body':
       case 'spokesman':
       case 'pollOption': {
-        value = e.target.value;
+        value = e.target.value; // eslint-disable-line
         break;
       }
       case 'withStatements':
       case 'unipolar':
       case 'secret': {
-        value = e.target.checked;
+        value = e.target.checked; // eslint-disable-line
         break;
       }
 
@@ -335,7 +337,7 @@ class DiscussionInput extends React.Component {
         {/* <Calendar lang={this.props.locale} /> */}
 
         <div>
-          <FormField label={'Title'} error={titleError}>
+          <FormField label="Title" error={titleError}>
             <input
               name="title"
               onBlur={this.handleBlur}
@@ -346,7 +348,7 @@ class DiscussionInput extends React.Component {
           </FormField>
           <FormField
             error={bodyError}
-            label={'Body'}
+            label="Body"
             help={
               <Box pad>
                 <Button

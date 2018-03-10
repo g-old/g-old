@@ -148,19 +148,18 @@ export const getSubscription = state => fromUi.getSubscription(state.ui);
 
 export const getActivityCounter = state => fromUi.getActivityCounter(state.ui);
 
-export const getWorkTeams = state => fromEntity.getWorkTeams(state.entities);
+export const getGroups = state => fromEntity.getGroups(state.entities);
 
-export const getWorkTeam = (state, id) =>
-  fromEntity.getWorkTeam(state.entities, id);
+export const getGroup = (state, id) => fromEntity.getGroup(state.entities, id);
 
-export const getWorkTeamsIsFetching = state =>
-  fromEntity.getWorkTeamsIsFetching(state.entities);
+export const getGroupsIsFetching = state =>
+  fromEntity.getGroupsIsFetching(state.entities);
 
-export const getWorkTeamsErrorMessage = state =>
-  fromEntity.getWorkTeamsErrorMessage(state.entities);
+export const getGroupsErrorMessage = state =>
+  fromEntity.getGroupsErrorMessage(state.entities);
 
-export const getWorkTeamStatus = (state, id) =>
-  fromUi.getWorkTeamUpdates(state.ui, id);
+export const getGroupStatus = (state, id) =>
+  fromUi.getGroupUpdates(state.ui, id);
 
 export const getStatistics = state => state.statistics;
 

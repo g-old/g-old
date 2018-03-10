@@ -1,0 +1,6 @@
+{
+  "name": "GroupInput",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./GroupInput.js"
+}

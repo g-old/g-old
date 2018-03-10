@@ -16,7 +16,7 @@ import UserPanel from '../../components/UserPanel';
 import ProposalPanel from '../../components/ProposalPanel';
 import SupervisionPanel from '../../components/SupervisionPanel';
 import TechPanel from '../../components/TechPanel';
-import WorkTeamPanel from '../../components/WorkTeamPanel';
+import GroupPanel from '../../components/GroupPanel';
 
 class Admin extends React.Component {
   static propTypes = {};
@@ -38,7 +38,7 @@ class Admin extends React.Component {
             <SupervisionPanel />
           </Tab>
           <Tab title="WORKTEAMS">
-            <WorkTeamPanel />
+            <GroupPanel />
           </Tab>
         </Tabs>
       </div>

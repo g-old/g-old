@@ -30,7 +30,7 @@ const onVisitAccounts = e => {
   history.push(`/accounts`);
 };
 
-const onVisitWorkTeams = e => {
+const onVisitGroups = e => {
   if (e.button !== 0) {
     // leftclick
     return;
@@ -123,7 +123,7 @@ class UserStatus extends React.Component {
           >
             <Button plain onClick={onVisitProfile} label="Profile" />
             <Button plain onClick={onVisitAccounts} label="Users" />
-            <Button plain onClick={onVisitWorkTeams} label="Workteams" />
+            <Button plain onClick={onVisitGroups} label="Workteams" />
             <Button plain onClick={this.onLogout} label="Logout" />
           </Menu>
         </div>

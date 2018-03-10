@@ -68,7 +68,7 @@ const initialState = {
     users: {
       byId: {},
     },
-    workTeams: { byId: null },
+    groups: { byId: null },
   },
   ui: {
     activityCounter: {

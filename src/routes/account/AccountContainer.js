@@ -12,11 +12,7 @@ import {
   deleteWebPushSub,
   checkSubscription,
 } from '../../actions/subscriptions';
-import {
-  loadWorkTeams,
-  joinWorkTeam,
-  leaveWorkTeam,
-} from '../../actions/workTeam';
+import { loadGroups, joinGroup, leaveGroup } from '../../actions/group';
 import { loadFeed } from '../../actions/feed';
 import { uploadAvatar } from '../../actions/file';
 import {
@@ -25,7 +21,7 @@ import {
   getAccountUpdates,
   getRequestUpdates,
   getSubscription,
-  getWorkTeams,
+  getGroups,
   getLogs,
   getLogIsFetching,
   getLogErrorMessage,
@@ -102,7 +98,7 @@ class AccountContainer extends React.Component {
       numStatements: PropTypes.number,
       numFollowers: PropTypes.number,
       numLikes: PropTypes.number,
-      workTeams: PropTypes.arrayOf(PropTypes.shape({})),
+      groups: PropTypes.arrayOf(PropTypes.shape({})),
       followees: PropTypes.arrayOf(
         PropTypes.shape({
           avatar: PropTypes.isRequired,
@@ -125,10 +121,10 @@ class AccountContainer extends React.Component {
     deleteWebPushSub: PropTypes.func.isRequired,
     createWebPushSub: PropTypes.func.isRequired,
     verifyEmail: PropTypes.func.isRequired,
-    loadWorkTeams: PropTypes.func.isRequired, // TODO implement in settings
-    joinWorkTeam: PropTypes.func.isRequired,
-    leaveWorkTeam: PropTypes.func.isRequired,
-    workTeams: PropTypes.arrayOf(PropTypes.shape({})),
+    loadGroups: PropTypes.func.isRequired, // TODO implement in settings
+    joinGroup: PropTypes.func.isRequired,
+    leaveGroup: PropTypes.func.isRequired,
+    groups: PropTypes.arrayOf(PropTypes.shape({})),
     loadLogs: PropTypes.func.isRequired,
     logs: PropTypes.arrayOf(PropTypes.shape({})),
     logPending: PropTypes.bool.isRequired,
@@ -144,7 +140,7 @@ class AccountContainer extends React.Component {
   static defaultProps = {
     logs: null,
     logError: null,
-    workTeams: null,
+    groups: null,
   };
   constructor(props) {
     super(props);
@@ -390,9 +386,9 @@ class AccountContainer extends React.Component {
                     user={this.props.user}
                     updateUser={this.props.updateUser}
                     createRequest={this.props.createRequest}
-                    onJoinWorkTeam={this.props.joinWorkTeam}
-                    onLeaveWorkTeam={this.props.leaveWorkTeam}
-                    workTeams={this.props.workTeams}
+                    onJoinGroup={this.props.joinGroup}
+                    onLeaveGroup={this.props.leaveGroup}
+                    groups={this.props.groups}
                   />
                 </div>
               </AccordionPanel>
@@ -420,9 +416,9 @@ const mapDispatch = {
   deleteWebPushSub,
   checkSubscription,
   verifyEmail,
-  loadWorkTeams,
-  joinWorkTeam,
-  leaveWorkTeam,
+  loadGroups,
+  joinGroup,
+  leaveGroup,
   loadFeed,
   loadLogs,
   fetchProfileData,
@@ -435,7 +431,7 @@ const mapStateToProps = (state, { user }) => ({
   requestUpdates: getRequestUpdates(state),
   updates: getAccountUpdates(state, user.id),
   subscription: getSubscription(state),
-  workTeams: getWorkTeams(state),
+  groups: getGroups(state),
   logs: getLogs(state),
   logPending: getLogIsFetching(state),
   logError: getLogErrorMessage(state),

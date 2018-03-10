@@ -44,7 +44,7 @@ export const proposal = new schema.Entity('proposals', {
 export const proposalStatus = new schema.Entity('proposalStatus', {
   proposal,
 });
-export const workTeam = new schema.Entity('workTeams', {
+export const group = new schema.Entity('groups', {
   coordinator: user,
   members: [user],
   ownStatus: {
@@ -57,7 +57,7 @@ export const workTeam = new schema.Entity('workTeams', {
 user.define({
   role,
   followees: [user],
-  workTeams: [workTeam],
+  groups: [group],
   requests: [request],
 });
 export const notification = new schema.Entity('notifications', {
@@ -102,7 +102,7 @@ export const flaggedStatementArray = [flaggedStatement];
 export const activityArray = [activity];
 export const tagArray = [tag];
 export const statementArray = [statement];
-export const workTeamList = [workTeam];
+export const groupList = [group];
 export const logList = [log];
 export const discussionList = [discussion];
 export const commentList = [comment];

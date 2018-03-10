@@ -118,7 +118,7 @@ class ProposalInput extends React.Component {
     pollOptions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     userArray: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     findUser: PropTypes.func.isRequired,
-    workTeamId: PropTypes.string.isRequired,
+    groupId: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
@@ -293,7 +293,7 @@ class ProposalInput extends React.Component {
 
       const spokesmanId = spokesman ? spokesman.id : null;
       this.props.createProposal({
-        ...(this.props.workTeamId && { workTeamId: this.props.workTeamId }),
+        ...(this.props.groupId && { groupId: this.props.groupId }),
         title: title.trim(),
         text: this.md.render(body),
         state,
@@ -361,13 +361,13 @@ class ProposalInput extends React.Component {
       case 'body':
       case 'spokesman':
       case 'pollOption': {
-        value = e.target.value;
+        value = e.target.value; // eslint-disable-line
         break;
       }
       case 'withStatements':
       case 'unipolar':
       case 'secret': {
-        value = e.target.checked;
+        value = e.target.checked; // eslint-disable-line
         break;
       }
 
@@ -445,7 +445,7 @@ class ProposalInput extends React.Component {
               formErrors={pollErrors}
               handleBlur={this.handleBlur}
             />
-            <FormField label={'Title'} error={titleError}>
+            <FormField label="Title" error={titleError}>
               <input
                 name="title"
                 onBlur={this.handleBlur}
@@ -456,7 +456,7 @@ class ProposalInput extends React.Component {
             </FormField>
             <FormField
               error={bodyError}
-              label={'Body'}
+              label="Body"
               help={
                 <Box pad>
                   <Button
@@ -500,7 +500,7 @@ class ProposalInput extends React.Component {
 
             <FormField label="Tags">
               <TagInput
-                name={'tagInput'}
+                name="tagInput"
                 tags={this.state.currentTagIds.map(t => this.state.tags[t])}
                 availableTags={Object.keys(this.props.tags).map(
                   t => this.props.tags[t],
@@ -596,7 +596,7 @@ class ProposalInput extends React.Component {
               }}
             />
           </Box>
-          {this.props.isPending && <span>{'...submitting'}</span>}
+          {this.props.isPending && <span>...submitting</span>}
           {this.state.error && (
             <Notification type="error" message={this.props.errorMessage} />
           )}

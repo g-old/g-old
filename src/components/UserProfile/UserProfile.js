@@ -16,7 +16,7 @@ class UserProfile extends React.Component {
       numStatements: PropTypes.number,
       numFollowers: PropTypes.number,
       numLikes: PropTypes.number,
-      workTeams: PropTypes.arrayOf(PropTypes.shape({})),
+      groups: PropTypes.arrayOf(PropTypes.shape({})),
       followees: PropTypes.arrayOf(
         PropTypes.shape({
           avatar: PropTypes.isRequired,
@@ -108,8 +108,8 @@ class UserProfile extends React.Component {
             value={numStatements || 0}
           />
         </Box>
-        {this.props.user.workTeams &&
-          this.props.user.workTeams.map(t => (
+        {this.props.user.groups &&
+          this.props.user.groups.map(t => (
             <Value
               icon={
                 <svg

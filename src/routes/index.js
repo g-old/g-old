@@ -61,15 +61,15 @@ const routes = {
     },
     {
       path: '/admin/workteam/create',
-      load: () => import(/* webpackChunkName: 'admin' */ './workTeamCreate'),
+      load: () => import(/* webpackChunkName: 'admin' */ './groupCreate'),
     },
     {
       path: '/workteams',
-      load: () => import(/* webpackChunkName: 'workteam' */ './workTeamList'),
+      load: () => import(/* webpackChunkName: 'workteam' */ './groupList'),
     },
     {
       path: '/workteams/:id',
-      load: () => import(/* webpackChunkName: 'workteam' */ './workTeam'),
+      load: () => import(/* webpackChunkName: 'workteam' */ './group'),
     },
     {
       path: '/workteams/:id/discussions/:id',
@@ -77,11 +77,11 @@ const routes = {
     },
     {
       path: '/workteams/:id/admin',
-      load: () => import(/* webpackChunkName: 'admin' */ './workTeamManager'),
+      load: () => import(/* webpackChunkName: 'admin' */ './groupManager'),
     },
     {
       path: '/workteams/:id/edit',
-      load: () => import(/* webpackChunkName: 'admin' */ './workTeamEdit'),
+      load: () => import(/* webpackChunkName: 'admin' */ './groupEdit'),
     },
     {
       path: '/signup',

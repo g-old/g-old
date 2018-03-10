@@ -73,7 +73,7 @@ function getProposalHeader(verb, proposal) {
   let identifier;
 
   if (proposal.state === 'update') {
-    state = proposal.state;
+    state = proposal.state; // eslint-disable-line
   }
   switch (state) {
     case 'create': {
@@ -119,7 +119,7 @@ class Activity extends React.Component {
       state: PropTypes.string,
       pollId: PropTypes.string,
       position: PropTypes.string,
-      workTeamId: PropTypes.string,
+      groupId: PropTypes.string,
       discussionId: PropTypes.string,
     }),
     info: PropTypes.string.isRequired,
@@ -193,16 +193,18 @@ class Activity extends React.Component {
       </svg>
     );
     return (
-      <Link
-        to={`/proposal/${info.proposalId || 'xxx'}/${this.props.content
-          .pollId}`}
+      <Link // eslint-disable-line
+        to={`/proposal/${info.proposalId || 'xxx'}/${
+          this.props.content.pollId
+        }`}
       >
         <div className={s.follower}>
           <span>
             <Avatar user={this.props.content.voter} isFollowee />
             <span>
-              {`${this.props.content.voter.name} ${this.props.content.voter
-                .surname}`}
+              {`${this.props.content.voter.name} ${
+                this.props.content.voter.surname
+              }`}
             </span>
           </span>
 
@@ -212,17 +214,16 @@ class Activity extends React.Component {
     );
   }
 
-  renderComment(workTeamId) {
+  renderComment(groupId) {
     const { content } = this.props;
     const parent = content.parentId;
     const child = parent ? content.id : null;
 
     return (
-      <Link
-        to={`/workteams/${workTeamId}/discussions/${this.props.content
-          .discussionId}?comment=${parent || content.id}${child
-          ? `&child=${child}`
-          : ''}`}
+      <Link // eslint-disable-line
+        to={`/workteams/${groupId}/discussions/${
+          this.props.content.discussionId
+        }?comment=${parent || content.id}${child ? `&child=${child}` : ''}`}
       >
         <Comment preview {...this.props.content} />
       </Link>
@@ -238,6 +239,7 @@ class Activity extends React.Component {
         const info = JSON.parse(this.props.info || '{}');
 
         result.content = (
+          // eslint-disable-next-line
           <Link to={`/proposal/${info.proposalId || 'xxx'}/${content.pollId}`}>
             <Statement {...content} />
           </Link>
@@ -251,7 +253,7 @@ class Activity extends React.Component {
           <ProposalPreview proposal={content} onClick={this.onProposalClick} />
         );
         let header = getProposalHeader(verb, content);
-        if (content.workTeamId) {
+        if (content.groupId) {
           const info = JSON.parse(this.props.info || '{}');
           header = this.renderGroupHeader(info, header);
         }
@@ -273,8 +275,9 @@ class Activity extends React.Component {
             discussion={content}
             onClick={() =>
               history.push(
-                `/workteams/${info.workTeamId}/discussions/${content.id}`,
-              )}
+                `/workteams/${info.groupId}/discussions/${content.id}`,
+              )
+            }
           />
         );
 
@@ -288,7 +291,7 @@ class Activity extends React.Component {
       case 'Comment': {
         const info = JSON.parse(this.props.info || '{}');
 
-        result.content = this.renderComment(info.workTeamId);
+        result.content = this.renderComment(info.groupId);
         result.header = info.title;
         break;
       }

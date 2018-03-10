@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 import { denormalize } from 'normalizr';
 import all, * as fromList from './discussionList';
 import byId, * as fromById from './discussionById';
-import byWT, * as fromByWorkTeam from './discussionsByWorkTeam';
+import byWT, * as fromByGroup from './discussionsByGroup';
 import { discussionList as discussionListSchema } from './../store/schema';
 
 export default combineReducers({
@@ -35,7 +35,7 @@ export const getDiscussion = (state, id, entities) => {
 export const getDiscussionsByWT = (state, tagId, entities) => {
   const hydrated = hydrateDiscussions(
     state,
-    fromByWorkTeam.getIds(state.byWT, tagId),
+    fromByGroup.getIds(state.byWT, tagId),
     entities,
   );
 

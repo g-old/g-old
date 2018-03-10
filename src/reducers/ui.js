@@ -10,7 +10,7 @@ import pageInfo, * as fromPageInfo from './ui/pageInfo';
 import { SESSION_LOGOUT_SUCCESS } from '../constants';
 import comments, * as fromComment from './ui/comments';
 import requests, * as fromRequest from './ui/requests';
-import workTeams, * as fromWorkTeam from './ui/workTeams';
+import groups, * as fromGroup from './ui/groups';
 import discussions, * as fromDiscussion from './ui/discussions';
 import tags, * as fromTag from './ui/tags';
 /* GENERATOR_IMPORTS */
@@ -27,7 +27,7 @@ const uiReducer = combineReducers({
   loading,
   pageInfo,
   comments,
-  workTeams,
+  groups,
   discussions,
   tags,
 });
@@ -42,8 +42,8 @@ export default (state, action) => {
 /* GENERATOR_EXPORTS */
 export const getTagUpdates = state => fromTag.getStatus(state.tags);
 export const getRequestUpdates = state => fromRequest.getStatus(state.requests);
-export const getWorkTeamUpdates = (state, id) =>
-  fromWorkTeam.getStatus(state.workTeams, id);
+export const getGroupUpdates = (state, id) =>
+  fromGroup.getStatus(state.groups, id);
 
 export const getProposalUpdates = (state, id) =>
   fromProposal.getStatus(state.proposals, id);

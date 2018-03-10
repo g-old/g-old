@@ -46,7 +46,7 @@ const messages = defineMessages({
     defaultMessage: 'All users',
     description: 'User list link in header',
   }, */
-  workTeams: {
+  groups: {
     id: 'navigation.users',
     defaultMessage: 'All workteams',
     description: 'Workteam list link in header',
