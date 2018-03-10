@@ -218,7 +218,11 @@ function voteReadControl(viewer, data) {
   return false;
 }
 function voteWriteControl(viewer, data) {
-  if (viewer.permissions & Permissions.VOTE) {
+  if (data.proposal.state === 'survey') {
+    if (viewer.permissions & Permissions.TAKE_SURVEYS) {
+      return checkIfMember(viewer, data.proposal);
+    }
+  } else if (viewer.permissions & Permissions.VOTE) {
     return checkIfMember(viewer, data.proposal);
   }
   return false;
