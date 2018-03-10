@@ -8,8 +8,8 @@ import {
 } from 'graphql';
 import knex from '../knex';
 
-import WorkTeamType from './WorkTeamType';
-import WorkTeam from '../models/WorkTeam';
+import GroupType from './GroupType';
+import Group from '../models/Group';
 import CommentType from './CommentType';
 import Comment from '../models/Comment';
 import UserType from './UserType';
@@ -37,10 +37,10 @@ const DiscussionType = new ObjectType({
       resolve: (data, args, { viewer, loaders }) =>
         User.gen(viewer, data.authorId, loaders),
     },
-    workTeam: {
-      type: WorkTeamType,
+    group: {
+      type: GroupType,
       resolve: (data, args, { viewer, loaders }) =>
-        WorkTeam.gen(viewer, data.workTeamId, loaders),
+        Group.gen(viewer, data.groupId, loaders),
     },
     // TODO or more
     ownComment: {
@@ -60,7 +60,7 @@ const DiscussionType = new ObjectType({
       type: new GraphQLList(CommentType),
       resolve: (data, args, { viewer, loaders }) => {
         // experimental
-        if (viewer && viewer.wtMemberships.includes(data.workTeamId)) {
+        if (viewer && viewer.wtMemberships.includes(data.groupId)) {
           return knex('comments')
             .where({ discussion_id: data.id })
             .where({ parent_id: null })

@@ -10,7 +10,7 @@ const DiscussionInputType = new GraphQLInputObjectType({
     id: {
       type: ID,
     },
-    workTeamId: {
+    groupId: {
       type: ID,
     },
     content: {

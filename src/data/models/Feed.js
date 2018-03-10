@@ -48,8 +48,8 @@ const aggregateActivities = (activities, viewer) =>
       // TODO make groupId field on activities?
       if (
         curr.content &&
-        curr.content.workTeamId &&
-        !viewer.wtMemberships.includes(curr.content.workTeamId)
+        curr.content.groupId &&
+        !viewer.wtMemberships.includes(curr.content.groupId)
       ) {
         return agg;
       }
@@ -157,9 +157,9 @@ class Feed {
         ),
       )
       .then(data => data);
-    let workTeamMainIds = [];
+    let groupMainIds = [];
     if (viewer.wtMemberships.length) {
-      workTeamMainIds = await knex('system_feeds')
+      groupMainIds = await knex('system_feeds')
         .where({ type: 'WT' })
         .whereIn('group_id', viewer.wtMemberships)
         .select('main_activities', 'activities');
@@ -168,7 +168,7 @@ class Feed {
     // fetch all activities
     fIds = fIds.reduce((acc, curr) => acc.concat(curr), []);
     fIds = fIds.reduce((acc, curr) => acc.concat(curr.activity_ids), []);
-    workTeamMainIds = workTeamMainIds.reduce(
+    groupMainIds = groupMainIds.reduce(
       (acc, curr) => acc.concat(curr.main_activities.concat(curr.activities)),
       [],
     );
@@ -181,7 +181,7 @@ class Feed {
         ...aIds[0].activities,
         ...aIds[0].main_activities,
         ...fIds,
-        ...workTeamMainIds,
+        ...groupMainIds,
       ]),
     ];
     const allActivities = await loadActivities(viewer, allIds, loaders);

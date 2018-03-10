@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import Activity from '../data/models/Activity';
 import Notification from '../data/models/Notification';
-import WorkTeam from '../data/models/WorkTeam';
+import Group from '../data/models/Group';
 import knex from '../data/knex';
 import log from '../logger';
 import User from '../data/models/User';
@@ -20,11 +20,10 @@ class FeedManager{
 */
 async function pushToLog(userId, activityId) {
   try {
-    let userActivities = await knex('feeds')
+    let [userActivities = null] = await knex('feeds')
       .where({ user_id: userId })
       .select('activity_ids');
 
-    userActivities = userActivities[0];
     if (!userActivities) {
       return knex('feeds').insert({
         user_id: userId,
@@ -99,7 +98,7 @@ export async function insertIntoFeed({ viewer, data, verb }, mainFeed) {
   return result;
 }
 
-export async function insertIntoWorkTeamFeeds(
+export async function insertIntoGroupFeeds(
   { viewer, data, verb, type, groupId },
   mainFeed,
 ) {
@@ -180,7 +179,7 @@ export async function circularFeedNotification({
     }
     let res;
     if (receiver.type === 'team') {
-      const team = await WorkTeam.gen(viewer, receiver.id);
+      const team = await Group.gen(viewer, receiver.id);
       if (!team) {
         throw new Error(
           `Team not found: Receiver: ${JSON.stringify(receiver)}`,

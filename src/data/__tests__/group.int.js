@@ -3,19 +3,19 @@
 import knex from '../knex';
 import createLoaders from '../dataLoader';
 import { Groups } from '../../organization';
-import WorkTeam from '../models/WorkTeam';
+import Group from '../models/Group';
 import {
   clearDB,
   createTestActor,
   createTestUser,
-  createWorkTeam,
+  createGroup,
 } from '../../../test/utils';
 
 jest.setTimeout(10000);
 
-describe('WorkTeam', () => {
+describe('Group', () => {
   beforeEach(() => clearDB());
-  describe('WorkTeam.join', () => {
+  describe('Group.join', () => {
     it('Should not allow exclusive members of [Groups.GUEST] to join a WT', async () => {
       const testCoordinator = createTestUser();
       const testUser = createTestUser({ groups: Groups.GUEST });
@@ -23,11 +23,11 @@ describe('WorkTeam', () => {
         .insert([testUser, testCoordinator])
         .returning('id');
       const testViewer = createTestActor({ id: uID, groups: Groups.GUEST });
-      const [testWorkTeamData] = await knex('work_teams')
-        .insert(createWorkTeam({ coordinatorId: cID }))
+      const [testGroupData] = await knex('work_teams')
+        .insert(createGroup({ coordinatorId: cID }))
         .returning('*');
-      const testWorkTeam = new WorkTeam(testWorkTeamData);
-      const maybeFailJoinResult = await testWorkTeam.join(
+      const testGroup = new Group(testGroupData);
+      const maybeFailJoinResult = await testGroup.join(
         testViewer,
         testViewer.id,
         createLoaders(),
@@ -51,11 +51,11 @@ describe('WorkTeam', () => {
         id: uID,
         groups: Groups.VOTER,
       });
-      const [testWorkTeamData] = await knex('work_teams')
-        .insert(createWorkTeam({ coordinatorId: cID }))
+      const [testGroupData] = await knex('work_teams')
+        .insert(createGroup({ coordinatorId: cID }))
         .returning('*');
-      const testWorkTeam = new WorkTeam(testWorkTeamData);
-      const maybeFailJoinResult = await testWorkTeam.join(
+      const testGroup = new Group(testGroupData);
+      const maybeFailJoinResult = await testGroup.join(
         testViewer,
         testViewer.id,
         createLoaders(),
@@ -66,7 +66,7 @@ describe('WorkTeam', () => {
       const [maybeFailId] = await knex('user_work_teams')
         .where({ user_id: testViewer.id })
         .pluck('work_team_id');
-      expect(maybeFailId).toBe(testWorkTeamData.id);
+      expect(maybeFailId).toBe(testGroupData.id);
     });
   });
 });

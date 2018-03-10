@@ -5,8 +5,8 @@ import {
   GraphQLBoolean,
 } from 'graphql';
 
-const WorkTeamInputType = new GraphQLInputObjectType({
-  name: 'WorkTeamInput',
+const GroupInputType = new GraphQLInputObjectType({
+  name: 'GroupInput',
   fields: {
     coordinatorId: {
       type: ID,
@@ -45,4 +45,4 @@ const WorkTeamInputType = new GraphQLInputObjectType({
     },
   },
 });
-export default WorkTeamInputType;
+export default GroupInputType;

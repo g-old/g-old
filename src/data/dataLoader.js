@@ -225,14 +225,14 @@ const getDiscussionsById = discussionIds =>
       );
   });
 
-const getWorkTeamsById = workTeamIds =>
+const getGroupsById = groupIds =>
   new Promise(resolve => {
     knex('work_teams')
-      .whereIn('id', workTeamIds)
+      .whereIn('id', groupIds)
       .select()
       .then(data =>
         resolve(
-          workTeamIds.map(
+          groupIds.map(
             id =>
               data.find(row => row.id == id) || // eslint-disable-line eqeqeq
               new Error(`Row not found: ${id}`),
@@ -273,7 +273,7 @@ function createLoaders() {
     activities: new DataLoader(ids => getActivitiesById(ids)),
     comments: new DataLoader(ids => getCommentsById(ids)),
     discussions: new DataLoader(ids => getDiscussionsById(ids)),
-    workTeams: new DataLoader(ids => getWorkTeamsById(ids)),
+    groups: new DataLoader(ids => getGroupsById(ids)),
   };
 }
 

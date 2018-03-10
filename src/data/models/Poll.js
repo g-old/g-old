@@ -74,10 +74,10 @@ class Poll {
 
       if (pollingMode.thresholdRef === 'all') {
         // TODO change completely in case of group model
-        if (data.workTeamId) {
+        if (data.groupId) {
           numVoter = await knex('user_work_teams')
             .transacting(trx)
-            .where({ work_team_id: data.workTeamId })
+            .where({ work_team_id: data.groupId })
             .count('id');
         } else {
           numVoter = await trx
@@ -88,8 +88,8 @@ class Poll {
         numVoter = Number(numVoter[0].count);
         if (numVoter < 1) throw Error('Not enough user');
       }
-      if (data.workTeamId) {
-        delete data.workTeamId; // eslint-disable-line
+      if (data.groupId) {
+        delete data.groupId; // eslint-disable-line
       }
       const id = await trx
         .insert(

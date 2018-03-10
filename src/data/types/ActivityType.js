@@ -13,7 +13,7 @@ import Statement from '../models/Statement';
 import Vote from '../models/Vote';
 import Discussion from '../models/Discussion';
 import Comment from '../models/Comment';
-import WorkTeam from '../models/WorkTeam';
+import Group from '../models/Group';
 
 const addProposalInfo = async (viewer, loaders, pollId) => {
   if (!pollId) {
@@ -24,18 +24,18 @@ const addProposalInfo = async (viewer, loaders, pollId) => {
   return JSON.stringify({ proposalId: id, proposalTitle: title });
 };
 
-const addWorkTeamInfo = async (viewer, loaders, workTeamId) => {
-  if (!workTeamId) {
+const addGroupInfo = async (viewer, loaders, groupId) => {
+  if (!groupId) {
     return JSON.stringify({});
   }
-  const { id, name, deName, itName, lldName, logo } = await WorkTeam.gen(
+  const { id, name, deName, itName, lldName, logo } = await Group.gen(
     viewer,
-    workTeamId,
+    groupId,
     loaders,
   );
 
   return JSON.stringify({
-    workTeamId: id,
+    groupId: id,
     name,
     logo,
     itName,
@@ -49,13 +49,13 @@ const addDiscussionInfo = async (viewer, loaders, discussionId) => {
   if (!discussionId) {
     return JSON.stringify({});
   }
-  const { workTeamId, title } = await Discussion.gen(
+  const { groupId, title } = await Discussion.gen(
     viewer,
     discussionId,
     loaders,
   );
   return JSON.stringify({
-    workTeamId,
+    groupId,
     title,
   });
 };
@@ -168,11 +168,11 @@ const ActivityType = new GraphQLObjectType({
             return addProposalInfo(viewer, loaders, vote.pollId, vote);
           }
           case 'proposal': {
-            return addWorkTeamInfo(viewer, loaders, parent.content.workTeamId);
+            return addGroupInfo(viewer, loaders, parent.content.groupId);
           }
 
           case 'discussion': {
-            return addWorkTeamInfo(viewer, loaders, parent.content.workTeamId);
+            return addGroupInfo(viewer, loaders, parent.content.groupId);
           }
           case 'comment': {
             return addDiscussionInfo(

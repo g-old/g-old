@@ -92,7 +92,7 @@ const validatePoll = async (viewer, poll, loaders) => {
     }
   }
   const { startTime, endTime } = validateDates({ poll });
-  let threshold = poll.threshold;
+  let { threshold } = poll;
   if (isSurvey) {
     threshold = 100;
   }
@@ -101,7 +101,7 @@ const validatePoll = async (viewer, poll, loaders) => {
     start_time: startTime,
     end_time: endTime,
     threshold: threshold || 50,
-    ...(poll.workTeamId && { workTeamId: poll.workTeamId }),
+    ...(poll.groupId && { groupId: poll.groupId }),
   };
 
   return { pollData, pollingModeData, createPollingMode };
@@ -152,7 +152,7 @@ class Proposal {
     this.createdAt = data.created_at;
     this.spokesmanId = data.spokesman_id;
     this.notifiedAt = data.notified_at;
-    this.workTeamId = data.work_team_id;
+    this.groupId = data.work_team_id;
   }
   static async gen(viewer, id, { proposals }) {
     const data = await proposals.load(id);
@@ -290,7 +290,7 @@ class Proposal {
     if (!data.title) return null;
     const { pollData, pollingModeData, createPollingMode } = await validatePoll(
       viewer,
-      { ...data.poll, ...(data.workTeamId && { workTeamId: data.workTeamId }) },
+      { ...data.poll, ...(data.groupId && { groupId: data.groupId }) },
       loaders,
     );
     const additionalData = {};
@@ -327,17 +327,17 @@ class Proposal {
       if (!['survey', 'proposed', 'voting'].includes(data.state)) {
         throw new Error('State is missing');
       }
-      const state = data.state;
+      const { state } = data;
 
       const pollField = state === 'voting' ? 'poll_two_id' : 'poll_one_id';
-      let id = await trx
+      const [id = null] = await trx
         .insert(
           {
             author_id: viewer.id,
             title: data.title,
             body: data.text,
             [pollField]: pollOne.id,
-            ...(data.workTeamId && { work_team_id: data.workTeamId }),
+            ...(data.groupId && { work_team_id: data.groupId }),
             state,
             ...additionalData,
             created_at: new Date(),
@@ -346,7 +346,6 @@ class Proposal {
         )
         .into('proposals');
 
-      id = id[0];
       // tags
       if (existingTags && existingTags.length) {
         await trx
@@ -377,9 +376,9 @@ class Proposal {
         //
       }
 
-      if (data.workTeamId) {
+      if (data.groupId) {
         await knex('work_teams')
-          .where({ id: data.workTeamId })
+          .where({ id: data.groupId })
           .increment('num_proposals', 1);
       }
       return id;
@@ -392,7 +391,7 @@ class Proposal {
       EventManager.publish('onProposalCreated', {
         viewer,
         proposal,
-        ...(data.workTeamId && { groupId: data.workTeamId }),
+        ...(data.groupId && { groupId: data.groupId }),
       });
     }
     return proposal;
@@ -401,10 +400,9 @@ class Proposal {
   async subscribe(viewer) {
     if (['accepted, revoked, rejected'].indexOf(this.state) !== -1) return null;
 
-    let sId = await knex('proposal_user_subscriptions')
+    const [sId = null] = await knex('proposal_user_subscriptions')
       .insert({ proposal_id: this.id, user_id: viewer.id })
       .returning('id');
-    sId = sId[0];
     return sId || null;
   }
 
@@ -416,10 +414,10 @@ class Proposal {
 
   async isVotable(viewer) {
     if (['proposed', 'voting', 'survey'].indexOf(this.state) !== -1 && viewer) {
-      if (this.workTeamId) {
+      if (this.groupId) {
         // TODO try to find a better way since it cannot be cached easily and voting isF common
         const [data = null] = await knex('user_work_teams')
-          .where({ user_id: viewer.id, work_team_id: this.workTeamId })
+          .where({ user_id: viewer.id, work_team_id: this.groupId })
           .select('created_at');
 
         if (data && data.created_at) {

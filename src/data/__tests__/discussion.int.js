@@ -7,7 +7,7 @@ import Discussion from '../models/Discussion';
 import {
   clearDB,
   createTestActor,
-  createWorkTeam,
+  createGroup,
   createTestUser,
 } from '../../../test/utils';
 
@@ -19,14 +19,14 @@ describe('Discussion', () => {
   describe('Discussion.create', () => {
     test('Should allow to create a new discussion', async () => {
       const [wtId] = await knex('work_teams')
-        .insert(createWorkTeam())
+        .insert(createGroup())
         .returning('id');
 
       const [vId] = await knex('users')
         .insert(createTestUser({ groups: Groups.RELATOR }))
         .returning('id');
       const actor = createTestActor({ id: vId, groups: Groups.RELATOR });
-      const testData = { workTeamId: wtId, title: 'title', content: 'content' };
+      const testData = { groupId: wtId, title: 'title', content: 'content' };
       const discussion = await Discussion.create(
         actor,
         testData,

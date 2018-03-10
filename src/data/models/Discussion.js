@@ -7,7 +7,7 @@ class Discussion {
     this.id = data.id;
     this.title = data.title;
     this.authorId = data.author_id;
-    this.workTeamId = data.work_team_id;
+    this.groupId = data.work_team_id;
     this.content = data.content;
     this.numComments = data.num_comments;
     this.createdAt = data.created_at;
@@ -30,21 +30,20 @@ class Discussion {
 
     if (!canMutate(viewer, data, Models.DISCUSSION)) return null;
     const discussionInDB = await knex.transaction(async trx => {
-      let discussion = await knex('discussions')
+      const [discussion = null] = await knex('discussions')
         .transacting(trx)
         .insert({
           author_id: viewer.id,
           title: data.title.trim(),
           content: data.content.trim(),
-          work_team_id: data.workTeamId,
+          work_team_id: data.groupId,
           created_at: new Date(),
         })
         .returning('*');
 
-      discussion = discussion[0];
       if (discussion) {
         await knex('work_teams')
-          .where({ id: data.workTeamId })
+          .where({ id: data.groupId })
           .increment('num_discussions', 1);
       }
       return discussion;

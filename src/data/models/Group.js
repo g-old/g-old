@@ -11,7 +11,7 @@ async function validateCoordinator(viewer, id, loaders) {
   return coordinator; // TODO val rules
 }
 
-class WorkTeam {
+class Group {
   constructor(data) {
     this.id = data.id;
     this.coordinatorId = data.coordinator_id;
@@ -110,11 +110,11 @@ class WorkTeam {
         if (!request) {
           throw new Error('Could not create request');
         }
-        return WorkTeam.gen(viewer, this.id, loaders);
+        return Group.gen(viewer, this.id, loaders);
       }
     }
 
-    const workTeam = await knex.transaction(async trx => {
+    const group = await knex.transaction(async trx => {
       // check for request
       // eslint-disable-next-line eqeqeq
       if (this.restricted && requester.id != this.coordinatorId) {
@@ -142,16 +142,16 @@ class WorkTeam {
         .returning('id');
 
       if (id) {
-        const [workTeaminDB = null] = await knex('work_teams')
+        const [groupinDB = null] = await knex('work_teams')
           .where({ id: this.id })
           .transacting(trx)
           .forUpdate()
           .increment('num_members', 1)
           .into('work_teams')
           .returning('*');
-        loaders.workTeams.clear(this.id);
+        loaders.groups.clear(this.id);
         // insert into sessions;
-        if (workTeaminDB) {
+        if (groupinDB) {
           await this.addMembershipToSessions(requester.id);
           // update viewer
           // eslint-disable-next-line no-param-reassign
@@ -160,11 +160,11 @@ class WorkTeam {
             : [this.id];
         }
         // TODO  should be sent via sse too in case viewer != requester.
-        return workTeaminDB;
+        return groupinDB;
       }
       return id;
     });
-    return workTeam ? new WorkTeam(workTeam) : null;
+    return group ? new Group(group) : null;
   }
 
   async leave(viewer, memberId, loaders) {
@@ -183,7 +183,7 @@ class WorkTeam {
       }
     }
     /* eslint-enable eqeqeq */
-    const workTeam = await knex.transaction(async trx => {
+    const group = await knex.transaction(async trx => {
       const [id = null] = await trx
         .where({ user_id: requester.id, work_team_id: this.id })
         .forUpdate()
@@ -192,7 +192,7 @@ class WorkTeam {
         .returning('id');
       // If member,
       if (id) {
-        const [workTeaminDB = null] = await knex('work_teams')
+        const [groupinDB = null] = await knex('work_teams')
           .where({ id: this.id })
           .transacting(trx)
           .forUpdate()
@@ -200,9 +200,9 @@ class WorkTeam {
           .into('work_teams')
           .returning('*');
 
-        loaders.workTeams.clear(this.id);
+        loaders.groups.clear(this.id);
 
-        if (workTeaminDB) {
+        if (groupinDB) {
           await this.removeMembershipFromSessions(requester.id);
           // eslint-disable-next-line no-param-reassign
           viewer.wtMemberships =
@@ -210,7 +210,7 @@ class WorkTeam {
             viewer.wtMemberships.filter(id => id != this.id); // eslint-disable-line
         }
 
-        return workTeaminDB ? new WorkTeam(workTeaminDB) : null;
+        return groupinDB ? new Group(groupinDB) : null;
       }
 
       // delete request ;
@@ -223,11 +223,11 @@ class WorkTeam {
         throw new Error('Could not delete request');
       }
 
-      loaders.workTeams.clear(this.id);
+      loaders.groups.clear(this.id);
 
-      return WorkTeam.gen(viewer, this.id, loaders);
+      return Group.gen(viewer, this.id, loaders);
     });
-    return workTeam;
+    return group;
   }
 
   static async checkForMainTeam(newTeamStatus, transaction) {
@@ -254,12 +254,12 @@ class WorkTeam {
     return Promise.all(promises);
   }
 
-  static async gen(viewer, id, { workTeams }) {
+  static async gen(viewer, id, { groups }) {
     if (!id) return null;
-    const data = await workTeams.load(id);
+    const data = await groups.load(id);
     if (!data) return null;
     if (!canSee(viewer, data, Models.WORKTEAM)) return null;
-    return new WorkTeam(data);
+    return new Group(data);
   }
 
   static async create(viewer, data, loaders) {
@@ -285,27 +285,27 @@ class WorkTeam {
       newData.coordinator_id = data.coordinatorId;
     }
     newData.created_at = new Date();
-    const workTeam = await knex.transaction(async trx => {
-      await WorkTeam.checkForMainTeam(newData.main, trx);
-      const [workTeamData = null] = await trx
+    const group = await knex.transaction(async trx => {
+      await Group.checkForMainTeam(newData.main, trx);
+      const [groupData = null] = await trx
         .insert(newData)
         .into('work_teams')
         .returning('*');
 
-      if (!workTeamData) {
-        throw new Error('Could not create workTeam');
+      if (!groupData) {
+        throw new Error('Could not create group');
       }
       // make feed;
       await knex('system_feeds')
         .transacting(trx)
         .insert({
-          group_id: workTeamData.id,
+          group_id: groupData.id,
           type: 'WT',
           main_activities: JSON.stringify([]),
         });
-      return workTeamData;
+      return groupData;
     });
-    return workTeam ? new WorkTeam(workTeam) : null;
+    return group ? new Group(group) : null;
   }
 
   static async update(viewer, data, loaders) {
@@ -347,8 +347,8 @@ class WorkTeam {
     if (Object.keys(newData).length) {
       newData.updated_at = new Date();
     }
-    const [workTeam = null] = await knex.transaction(async trx => {
-      await WorkTeam.checkForMainTeam(newData.main, trx);
+    const [group = null] = await knex.transaction(async trx => {
+      await Group.checkForMainTeam(newData.main, trx);
       // eslint-disable-next-line newline-per-chained-call
       return knex('work_teams')
         .where({ id: data.id })
@@ -357,7 +357,7 @@ class WorkTeam {
         .update(newData)
         .returning('*');
     });
-    return workTeam ? new WorkTeam(workTeam) : null;
+    return group ? new Group(group) : null;
   }
 
   async getLinkedProposals(viewer, loaders) {
@@ -373,4 +373,4 @@ class WorkTeam {
   }
 }
 
-export default WorkTeam;
+export default Group;

@@ -25,7 +25,7 @@ class Comment {
     if (
       !canSee(
         viewer,
-        { ...data, discussion: { workTeamId: discussion.work_team_id } },
+        { ...data, discussion: { groupId: discussion.work_team_id } },
         Models.COMMENT,
       )
     )
@@ -46,7 +46,7 @@ class Comment {
         viewer,
         {
           ...data,
-          discussion: { workTeamId: discussion.work_team_id },
+          discussion: { groupId: discussion.work_team_id },
           creating: true,
         },
         Models.COMMENT,
@@ -54,11 +54,11 @@ class Comment {
     ) {
       return null;
     }
-    let workTeamId;
+    let groupId;
     const commentInDB = await knex.transaction(async trx => {
       const content = data.content.substring(0, MAX_CONTENT_LENGTH);
 
-      let comment = await knex('comments')
+      const [comment = null] = await knex('comments')
         .transacting(trx)
         .insert({
           author_id: viewer.id,
@@ -69,9 +69,8 @@ class Comment {
         })
         .returning('*');
 
-      comment = comment[0];
       if (comment) {
-        [workTeamId] = await knex('discussions')
+        [groupId] = await knex('discussions')
           .where({ id: data.discussionId })
           .transacting(trx)
           .forUpdate()
@@ -90,12 +89,12 @@ class Comment {
     });
 
     const comment = commentInDB ? new Comment(commentInDB) : null;
-    if (comment && workTeamId) {
+    if (comment && groupId) {
       EventManager.publish('onCommentCreated', {
         viewer,
         comment,
-        groupId: workTeamId,
-        info: { workTeamId },
+        groupId,
+        info: { groupId },
       });
     }
 
@@ -118,7 +117,7 @@ class Comment {
     const commentInDB = await knex.transaction(async trx => {
       const content = data.content.substring(0, MAX_CONTENT_LENGTH);
       const now = new Date();
-      let comment = await knex('comments')
+      const [comment = null] = await knex('comments')
         .where({ id: data.id })
         .transacting(trx)
         .forUpdate()
@@ -128,7 +127,6 @@ class Comment {
           updated_at: now,
         })
         .returning('*');
-      comment = comment[0];
       if (comment) {
         comments.clear(data.id);
       }

@@ -20,7 +20,7 @@ const discussionConnection = {
   },
   resolve: async (
     parent,
-    { first = 10, after = '', workTeamId },
+    { first = 10, after = '', groupId },
     { viewer, loaders },
   ) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
@@ -32,7 +32,7 @@ const discussionConnection = {
 
     const discussions = await knex('discussions')
       // .whereRaw('groups & ? > 0', [group]) TODO Later
-      .where({ work_team_id: workTeamId })
+      .where({ work_team_id: groupId })
       .whereRaw('(discussions.created_at, users.id) < (?,?)', [cursor, id])
       .limit(first)
       .orderBy('discussions.created_at', 'desc')

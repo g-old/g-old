@@ -48,7 +48,7 @@ const ProposalType = new ObjectType({
             .then(tagIds => tagIds.map(tId => Tag.gen(viewer, tId, loaders))),
         ),
     },
-    workTeamId: {
+    groupId: {
       type: GraphQLString,
     },
     pollOne: {

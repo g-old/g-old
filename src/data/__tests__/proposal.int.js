@@ -7,7 +7,7 @@ import Proposal from '../models/Proposal';
 import {
   clearDB,
   createTestActor,
-  createWorkTeam,
+  createGroup,
   createTestUser,
   createPollingMode,
 } from '../../../test/utils';
@@ -20,7 +20,7 @@ describe('Proposal', () => {
   describe('Proposal.isVotable', () => {
     test('Should allow members to vote', async () => {
       const [wtId] = await knex('work_teams')
-        .insert(createWorkTeam())
+        .insert(createGroup())
         .returning('id');
 
       const [uId] = await knex('users')

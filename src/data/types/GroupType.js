@@ -21,8 +21,8 @@ import knex from '../knex';
 import proposalConnection from '../queries/proposalConnection';
 import requestConnection from '../queries/requestConnection';
 
-const WorkTeamType = new ObjectType({
-  name: 'WorkTeam',
+const GroupType = new ObjectType({
+  name: 'Group',
   fields: () => ({
     id: { type: new NonNull(ID) },
     coordinator: {
@@ -228,4 +228,4 @@ const WorkTeamType = new ObjectType({
     },
   }),
 });
-export default WorkTeamType;
+export default GroupType;

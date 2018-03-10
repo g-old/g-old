@@ -57,7 +57,7 @@ const ProposalInputType = new GraphQLInputObjectType({
       type: ID,
       description: 'Must be provided for mutations',
     },
-    workTeamId: {
+    groupId: {
       type: ID,
     },
   },

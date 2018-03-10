@@ -42,7 +42,7 @@ import User from './data/models/User';
 import FileStorage, { AvatarManager } from './core/FileStorage';
 import { user as userSchema } from './store/schema';
 import config from './config';
-import worker from './core/worker';
+// import worker from './core/worker';
 import BWorker, { sendJob } from './core/childProcess';
 // import { getProtocol } from './core/helpers';
 import privateConfig from '../private_configs';
@@ -59,7 +59,8 @@ import Request from './data/models/Request';
 
 const pubsub = new PubSub();
 
-worker(pubsub);
+console.info('Disabled worker temporarily');
+// worker(pubsub);
 BWorker.start(path.resolve(__dirname, 'backgroundWorker.js'));
 
 const sendMailJob = (viewer, { content }, mailType) => {

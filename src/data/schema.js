@@ -45,11 +45,11 @@ import createPushSub from './mutations/createPushSub';
 import deletePushSub from './mutations/deletePushSub';
 import notify from './mutations/sendNotification';
 import activities from './subscriptions/activities';
-import createWorkTeam from './mutations/createWorkTeam';
-import joinWorkTeam from './mutations/joinWorkTeam';
-import leaveWorkTeam from './mutations/leaveWorkTeam';
-import workTeams from './queries/workTeams';
-import workTeam from './queries/workTeam';
+import createGroup from './mutations/createGroup';
+import joinGroup from './mutations/joinGroup';
+import leaveGroup from './mutations/leaveGroup';
+import groups from './queries/groups';
+import group from './queries/group';
 import createProposalSub from './mutations/createProposalSub';
 import deleteProposalSub from './mutations/deleteProposalSub';
 import logs from './queries/logs';
@@ -65,7 +65,7 @@ import createRequest from './mutations/createRequest';
 import updateRequest from './mutations/updateRequest';
 import deleteRequest from './mutations/deleteRequest';
 import requestConnection from './queries/requestConnection';
-import updateWorkTeam from './mutations/updateWorkTeam';
+import updateGroup from './mutations/updateGroup';
 import createTag from './mutations/createTag';
 import updateTag from './mutations/updateTag';
 import deleteTag from './mutations/deleteTag';
@@ -89,8 +89,8 @@ const schema = new Schema({
       pollingModes,
       proposalConnection,
       flagConnection,
-      workTeams,
-      workTeam,
+      groups,
+      group,
       logs,
       statistics,
       discussion,
@@ -121,9 +121,9 @@ const schema = new Schema({
       createPushSub,
       deletePushSub,
       notify,
-      createWorkTeam,
-      joinWorkTeam,
-      leaveWorkTeam,
+      createGroup,
+      joinGroup,
+      leaveGroup,
       createProposalSub,
       deleteProposalSub,
       createComment,
@@ -133,7 +133,7 @@ const schema = new Schema({
       createRequest,
       updateRequest,
       deleteRequest,
-      updateWorkTeam,
+      updateGroup,
       createTag,
       updateTag,
       deleteTag,

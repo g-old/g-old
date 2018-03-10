@@ -9,8 +9,8 @@ import {
 
 import knex from '../knex';
 
-import WorkTeamType from './WorkTeamType';
-import WorkTeam from '../models/WorkTeam';
+import GroupType from './GroupType';
+import Group from '../models/Group';
 import User from '../models/User';
 import requestConnection from '../queries/requestConnection';
 import { Permissions } from '../../organization';
@@ -54,9 +54,6 @@ const UserType = new ObjectType({
     },
     createdAt: {
       type: GraphQLString,
-    },
-    groups: {
-      type: GraphQLInt,
     },
     followees: {
       type: new GraphQLList(UserType),
@@ -107,19 +104,17 @@ const UserType = new ObjectType({
       },
     },
 
-    workTeams: {
-      type: new GraphQLList(WorkTeamType),
+    groups: {
+      type: new GraphQLList(GroupType),
       resolve: (data, args, { viewer, loaders }) => {
         if (viewer) {
-          return knex('user_work_teams')
+          return knex('user_groups')
             .where({ user_id: data.id })
-            .innerJoin(
-              'work_teams',
-              'work_teams.id',
-              'user_work_teams.work_team_id',
-            )
+            .innerJoin('groups', 'groups.id', 'user_groups.group_id')
             .select()
-            .then(wts => wts.map(wt => WorkTeam.gen(viewer, wt.id, loaders)));
+            .then(groups =>
+              groups.map(group => Group.gen(viewer, group.id, loaders)),
+            );
         }
         return null;
       },

@@ -265,9 +265,9 @@ class Vote {
       EventManager.publish('onVoteCreated', {
         viewer,
         vote: newVote,
-        ...(proposal.workTeamId && {
-          groupId: proposal.workTeamId,
-          info: { workTeamId: proposal.workTeamId },
+        ...(proposal.groupId && {
+          groupId: proposal.groupId,
+          info: { groupId: proposal.groupId },
         }),
       });
     }

@@ -31,17 +31,16 @@ class Activity {
       content: JSON.stringify(data.content),
       created_at: new Date(),
     };
-    let id = await knex('activities')
+    const [id = null] = await knex('activities')
       .insert(activity)
       .returning('id');
-    id = id[0];
     if (id == null) return null;
     const newActivity = await new Activity({ ...activity, id });
     if (newActivity) {
       EventManager.publish('onActivityCreated', {
         viewer,
         activity: newActivity,
-        ...(data.workTeamId && { workTeamId: data.workTeamId }),
+        ...(data.groupId && { groupId: data.groupId }),
       });
     }
     return newActivity;
