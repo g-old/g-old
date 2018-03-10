@@ -20,7 +20,13 @@ async function action({ store, path }) {
   if (!user) {
     return { redirect: `/?redirect=${path}` };
   } else if (!canAccess(user, title)) {
-    return { component: <div> You have to login as admin or mod!</div> };
+    return {
+      component: (
+        <Layout>
+          <div> You have to login as admin or mod!</div>{' '}
+        </Layout>
+      ),
+    };
   }
 
   return {

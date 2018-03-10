@@ -212,7 +212,7 @@ const protectedViews = {
   Tagged: { type: 'permissions', name: 'LEVEL_1' },
   Home: { type: 'permissions', name: 'LEVEL_1' },
   Feed: { type: 'permissions', name: 'LEVEL_1' },
-  Admin: { type: 'groups', name: 'LEVEL_2' },
+  Admin: { type: 'groups', name: 'plattform' },
   NotificationPanel: { type: 'permissions', name: 'NOTIFICATION' },
   GroupsPanel: { type: 'privileges', name: 'GROUPS_MANAGER' },
   SSE: { type: 'permissions', name: 'LEVEL_1' },
@@ -225,7 +225,7 @@ const protectedViews = {
 export const canAccess = (user, name) => {
   if (user) {
     const qualification = protectedViews[name];
-    if (user[qualification.type] & AccessMasks[qualification.name]) {
+    if (user.rights[qualification.name]) {
       return true;
     }
   }

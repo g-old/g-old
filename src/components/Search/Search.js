@@ -32,6 +32,7 @@ class Search extends React.Component {
     onDOMChange: PropTypes.func.isRequired,
     onSelect: PropTypes.func.isRequired,
     placeHolder: PropTypes.string,
+    fill: PropTypes.bool,
     suggestions: PropTypes.arrayOf(
       PropTypes.oneOfType([
         PropTypes.shape({
@@ -51,6 +52,7 @@ class Search extends React.Component {
     dropAlign: null,
     id: null,
     onFocus: null,
+    fill: null,
   };
   constructor(props, context) {
     super(props, context);
@@ -65,7 +67,6 @@ class Search extends React.Component {
 
     this.state = {
       activeSuggestionIndex: -1,
-      align: 'left',
       dropActive: false,
     };
   }
@@ -97,7 +98,7 @@ class Search extends React.Component {
       document.addEventListener('click', this.onClickBody);
       let baseElement;
       if (this.controlRef) {
-        baseElement = findDOMNode(this.controlRef);
+        baseElement = findDOMNode(this.controlRef); // eslint-disable-line
       } else {
         baseElement = this.inputRef;
       }
@@ -134,7 +135,7 @@ class Search extends React.Component {
   // eslint-disable-next-line no-unused-vars
   onChangeInput(event) {
     const { onDOMChange } = this.props;
-    this.setState({ activeSuggestionIndex: -1, announceChange: true });
+    this.setState({ activeSuggestionIndex: -1 });
     if (onDOMChange) {
       this.fireDOMChange();
     }
@@ -197,8 +198,11 @@ class Search extends React.Component {
     let suggestionsNode;
     if (suggestions) {
       /* eslint-disable  react/no-array-index-key */
+      /* eslint-disable  jsx-a11y/click-events-have-key-events */
+      /* eslint-disable  react/jsx-no-bind */
+
       suggestionsNode = suggestions.map(
-        (suggestion, index) =>
+        (suggestion, index) => (
           <div
             key={index}
             className={cn(
@@ -207,41 +211,36 @@ class Search extends React.Component {
             )}
             tabIndex="-1"
             role="button"
-            onClick={this.onClickSuggestion.bind(this, suggestion)} // eslint-disable-line
+            onClick={this.onClickSuggestion.bind(this, suggestion)}
           >
             {renderLabel(suggestion)}
-          </div>,
+          </div>
+        ),
         this,
       );
       /* eslint-enable  react/no-array-index-key */
+      /* eslint-enable  jsx-a11y/click-events-have-key-events */
+      /* eslint-disable  react/jsx-no-bind */
 
-      suggestionsNode = (
-        <div key="suggestions">
-          {suggestionsNode}
-        </div>
-      );
+      suggestionsNode = <div key="suggestions">{suggestionsNode}</div>;
     }
 
     const contents = [
-      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+      // eslint-disable-next-line
       <div key="contents" onClick={onSink}>
         {suggestionsNode}
       </div>,
     ];
 
-    return (
-      <div className={s.searchDrop}>
-        {contents}
-      </div>
-    );
+    return <div className={s.searchDrop}>{contents}</div>;
   }
 
   render() {
-    const { id, placeHolder, value } = this.props;
+    const { id, placeHolder, value, fill } = this.props;
     return (
-      <div className={s.search}>
+      <div className={cn(s.search, fill && s.fill)}>
         <input
-          ref={ref => (this.inputRef = ref)}
+          ref={ref => (this.inputRef = ref)} //eslint-disable-line
           type="search"
           id={id}
           placeholder={placeHolder}

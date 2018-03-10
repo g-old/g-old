@@ -19,8 +19,7 @@ import { getConsent } from '../../reducers';
 import Toast from '../Toast';
 // external-global styles must be imported in your JS.
 import s from './Layout.css';
-import Header from '../Header';
-import Footer from '../Footer';
+import Navigation from '../Navigation';
 
 const messages = defineMessages({
   cookieBanner: {
@@ -70,11 +69,10 @@ class Layout extends React.Component {
         <div className={this.props.loading ? s.loader : null} />
         {toast}
         {logo}
-        <Header />
-        <div className={s.content}>{this.props.children}</div>
-        <div className={s.footer}>
-          <Footer />
+        <div className={s.nav}>
+          <Navigation />
         </div>
+        <div className={s.content}>{this.props.children}</div>
       </div>
     );
   }

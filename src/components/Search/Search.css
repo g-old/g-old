@@ -12,6 +12,10 @@
   }
 }
 
+.fill {
+  width: 100%;
+}
+
 .active {
   text-decoration: none;
 }
@@ -60,12 +64,13 @@
 }
 
 .searchInput {
+  width: 100%;
   background-color: transparent;
   color: inherit;
   padding: 11px 23px;
   border-width: 1px;
   border-style: solid;
-  border-color: rgba(0, 0, 0, 0.14902);
+  border-color: #fff; /* rgba(0, 0, 0, 0.14902); */
   border-image: initial;
   border-radius: 4px;
   outline: none;
