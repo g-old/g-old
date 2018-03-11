@@ -1,0 +1,9 @@
+.anchor {
+  text-decoration: none;
+  flex: 0 0 auto;
+  font-weight: 300;
+  font-size: 1.1875rem;
+  line-height: 1.26316;
+  color: #000;
+  cursor: pointer;
+}

@@ -17,9 +17,16 @@ export default combineReducers({
   recaptchaKey: (state = '') => state,
   consent,
   statistics,
+  plattform: (state = {}) => state,
 });
 
 /* GENERATOR */
+
+export const getPlattform = (state, filter) =>
+  fromEntity.getPlattform(state.entities, filter);
+
+export const getPlattformUpdates = (state, filter) =>
+  fromUi.getPlattformUpdates(state.ui, filter);
 export const getVisibleRequests = (state, filter) =>
   fromEntity.getVisibleRequests(state.entities, filter);
 

@@ -57,7 +57,49 @@ const routes = {
     },
     {
       path: '/admin',
-      load: () => import(/* webpackChunkName: 'admin' */ './admin'),
+      children: [
+        {
+          path: '',
+          load: () => import(/* webpackChunkName: 'admin' */ './admin'),
+        },
+        {
+          path: '/plattform',
+          children: [
+            {
+              path: '',
+              load: () => import(/* webpackChunkName: 'admin' */ './plattform'),
+            },
+            {
+              path: '/settings',
+              load: () =>
+                import(/* webpackChunkName: 'admin' */ './plattformSettings'),
+            },
+          ],
+        },
+        {
+          path: '/users',
+          children: [
+            {
+              path: '',
+              load: () => import(/* webpackChunkName: 'admin' */ './users'),
+            },
+          ],
+        },
+        {
+          path: '/groups',
+          children: [
+            {
+              path: '',
+              load: () => import(/* webpackChunkName: 'admin' */ './groups'),
+            },
+            {
+              path: '/add',
+              load: () =>
+                import(/* webpackChunkName: 'admin' */ './groupsEdit'),
+            },
+          ],
+        },
+      ],
     },
     {
       path: '/admin/workteam/create',

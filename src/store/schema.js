@@ -108,4 +108,5 @@ export const discussionList = [discussion];
 export const commentList = [comment];
 
 export const requestList = [request];
+export const plattform = new schema.Entity('plattforms', {});
 /* GENERATOR */

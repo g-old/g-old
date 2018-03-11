@@ -13,10 +13,12 @@ import requests, * as fromRequest from './ui/requests';
 import groups, * as fromGroup from './ui/groups';
 import discussions, * as fromDiscussion from './ui/discussions';
 import tags, * as fromTag from './ui/tags';
+import plattforms, * as fromPlattform from './ui/plattforms';
 /* GENERATOR_IMPORTS */
 
 const uiReducer = combineReducers({
   /* GENERATOR_COMBINE */
+  plattforms,
   requests,
   proposals,
   polls,
@@ -40,6 +42,8 @@ export default (state, action) => {
 };
 
 /* GENERATOR_EXPORTS */
+export const getPlattformUpdates = state =>
+  fromPlattform.getStatus(state.plattforms);
 export const getTagUpdates = state => fromTag.getStatus(state.tags);
 export const getRequestUpdates = state => fromRequest.getStatus(state.requests);
 export const getGroupUpdates = (state, id) =>

@@ -651,6 +651,10 @@ app.get('*', async (req, res, next) => {
       webPushKey: privateConfig.webpush.publicKey,
       recaptchaKey, // will be null if user is logged in
       consent: cookieConsent,
+      plattform: {
+        name: 'StaticPlattformname',
+        picture: './tile.png',
+      },
     };
     const store = configureStore(initialState, {
       // cookie: req.headers.cookie,

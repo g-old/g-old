@@ -10,8 +10,8 @@
 import React from 'react';
 import Layout from '../../components/Layout';
 import { getSessionUser } from '../../reducers';
-import Admin from './Admin';
 import { canAccess } from '../../organization';
+import AdminPage from '../../containers/AdminPage';
 
 const title = 'Admin';
 
@@ -29,15 +29,24 @@ async function action({ store, path }) {
     };
   }
 
+  const links = [
+    { to: 'admin/plattform', name: 'PLATTFORM' },
+    { to: 'admin/users', name: 'USERS' },
+    { to: 'admin/groups', name: 'GROUPS' },
+  ];
+
   return {
     title,
     chunks: ['admin'],
     component: (
-      <Layout>
-        <Admin title={title} />
-      </Layout>
+      <AdminPage menuLinks={links}>
+        {'i am the default admin plattform content'}
+      </AdminPage>
     ),
   };
+  /*  <Layout>
+        <Admin title={title}>{'i am the default plattform content'}</Admin>
+      </Layout> */
 }
 
 export default action;

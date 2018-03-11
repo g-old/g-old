@@ -8,39 +8,50 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+
 import s from './Admin.css';
-import Tab from '../../components/Tab';
-import Tabs from '../../components/Tabs';
-import UserPanel from '../../components/UserPanel';
-import ProposalPanel from '../../components/ProposalPanel';
-import SupervisionPanel from '../../components/SupervisionPanel';
-import TechPanel from '../../components/TechPanel';
-import GroupPanel from '../../components/GroupPanel';
+import Box from '../../components/Box';
+
+import Image from '../../components/Image';
+import Label from '../../components/Label';
+import Anchor from '../../components/Anchor';
 
 class Admin extends React.Component {
-  static propTypes = {};
+  static propTypes = { children: PropTypes.node.isRequired };
 
   render() {
+    const { children } = this.props;
+    const navHeader = (
+      <Box className={s.navHeader} between fill>
+        <span>
+          <Anchor to="/admin" className={s.title}>
+            {'Plattformtitle'}
+          </Anchor>
+          <div>
+            <span>Owner: </span>
+          </div>
+        </span>
+        <Image className={s.picture} src="/tile.png" />
+      </Box>
+    );
+
+    const pageNav = (
+      <Box className={s.pageNav} pad>
+        <Anchor to="/admin/users">USERS</Anchor>
+        <Anchor to="/admin/plattform">PLATTFORM</Anchor>
+        <Label>GROUPS</Label>
+        <Label>PROPOSALS</Label>
+        <Label>SURVEYS</Label>
+        <Label>TECHDATA</Label>
+      </Box>
+    );
     return (
       <div className={s.container}>
-        <Tabs>
-          <Tab title="USERMANAGEMENT">
-            <UserPanel />
-          </Tab>
-          <Tab title="PROPOSALS">
-            <ProposalPanel />
-          </Tab>
-          <Tab title="TECH">
-            <TechPanel />
-          </Tab>
-          <Tab title="SUPERVISION">
-            <SupervisionPanel />
-          </Tab>
-          <Tab title="WORKTEAMS">
-            <GroupPanel />
-          </Tab>
-        </Tabs>
+        {navHeader}
+        {pageNav}
+        {children}
       </div>
     );
   }

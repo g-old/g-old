@@ -59,16 +59,15 @@ class Layout extends React.Component {
       );
     }
 
-    const logo = (
+    /* const logo = (
       <div className={s.banner}>
         <img alt="banner" src="/banner01.jpg" />
       </div>
-    );
+    ); */
     return (
       <div className={s.layout}>
         <div className={this.props.loading ? s.loader : null} />
         {toast}
-        {logo}
         <div className={s.nav}>
           <Navigation />
         </div>

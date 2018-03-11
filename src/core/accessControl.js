@@ -26,6 +26,14 @@ export const Models = {
 
 /* GENERATOR_FN */
 /* eslint-disable no-unused-vars */
+function plattformReadControl(viewer, data) {
+  console.error('Access control for Plattform not implemented');
+  return true;
+}
+function plattformWriteControl(viewer, data) {
+  console.error('Access control for Plattform not implemented');
+  return true;
+}
 function tagReadControl(viewer, data) {
   console.error('Access control for Tag not implemented');
   return true;
@@ -321,6 +329,10 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
+  [Models.PLATTFORM]: {
+    [ATypes.WRITE]: plattformWriteControl,
+    [ATypes.READ]: plattformReadControl,
+  },
   [Models.TAG]: {
     [ATypes.WRITE]: tagWriteControl,
     [ATypes.READ]: tagReadControl,
