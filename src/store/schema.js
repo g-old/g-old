@@ -95,6 +95,10 @@ export const log = new schema.Entity('logs', {
   actor: user,
 });
 
+export const plattform = new schema.Entity('plattform', {
+  admin: user,
+  defaultGroup: group,
+});
 export const proposalList = [proposal];
 export const voteList = [vote];
 export const userList = [user];
@@ -108,5 +112,4 @@ export const discussionList = [discussion];
 export const commentList = [comment];
 
 export const requestList = [request];
-export const plattform = new schema.Entity('plattforms', {});
 /* GENERATOR */

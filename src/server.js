@@ -37,6 +37,7 @@ import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
 import { setRuntimeVariable } from './actions/runtime';
 import { setLocale } from './actions/intl';
+import { loadPlattform } from './actions/plattform';
 import createLoaders from './data/dataLoader';
 import User from './data/models/User';
 import FileStorage, { AvatarManager } from './core/FileStorage';
@@ -304,7 +305,7 @@ app.post('/signup', (req, res) => {
       return null;
     })
     .then(() =>
-      User.create({ id: 1, groups: Groups.SYSTEM }, userData)
+      User.create({ id: 1, rights: { system: ['all'] } }, userData)
         .then(user => {
           if (!user) throw Error('User creation failed');
           EventManager.publish('sendWelcomeMail', {
@@ -640,6 +641,7 @@ app.get('*', async (req, res, next) => {
     if (req.cookies) {
       cookieConsent = req.cookies.consent || null;
     }
+
     const initialState = {
       user: normalizedData.result || null,
       entities: {
@@ -651,10 +653,6 @@ app.get('*', async (req, res, next) => {
       webPushKey: privateConfig.webpush.publicKey,
       recaptchaKey, // will be null if user is logged in
       consent: cookieConsent,
-      plattform: {
-        name: 'StaticPlattformname',
-        picture: './tile.png',
-      },
     };
     const store = configureStore(initialState, {
       // cookie: req.headers.cookie,
@@ -675,6 +673,10 @@ app.get('*', async (req, res, next) => {
         value: config.locales,
       }),
     );
+
+    // plattformSettings
+
+    await store.dispatch(loadPlattform());
 
     const locale = req.language;
     const intl = await store.dispatch(

@@ -80,10 +80,10 @@ const GroupType = new ObjectType({
     mainTeam: {
       type: GraphQLBoolean,
     },
-    logo: {
+    picture: {
       type: GraphQLString,
     },
-    background: {
+    cover: {
       type: GraphQLString,
     },
     ownStatus: {

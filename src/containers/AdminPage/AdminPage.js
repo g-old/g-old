@@ -7,6 +7,7 @@ import Box from '../../components/Box';
 import Image from '../../components/Image';
 import Anchor from '../../components/Anchor';
 import Layout from '../../components/Layout';
+import { getPlattform } from '../../reducers';
 
 class AdminPage extends React.Component {
   static propTypes = {
@@ -25,10 +26,12 @@ class AdminPage extends React.Component {
       <Box className={s.navHeader} between fill>
         <span>
           <Anchor to="/admin" className={s.title}>
-            {plattform.name}
+            {plattform.displayName}
           </Anchor>
           <div>
-            <span>Owner: </span>
+            <span>
+              {`Admin: ${plattform.admin.name} ${plattform.admin.surname} `}{' '}
+            </span>
           </div>
         </span>
         <Image className={s.picture} src={plattform.picture} />
@@ -51,5 +54,5 @@ class AdminPage extends React.Component {
     );
   }
 }
-const mapStateToProps = state => ({ plattform: state.plattform });
+const mapStateToProps = state => ({ plattform: getPlattform(state) });
 export default connect(mapStateToProps)(withStyles(s)(AdminPage));

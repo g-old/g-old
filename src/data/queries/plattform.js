@@ -1,17 +1,11 @@
-import { GraphQLID } from 'graphql';
-
 import PlattformType from '../types/PlattformType';
 import Plattform from '../models/Plattform';
 
 const plattform = {
   type: PlattformType,
-  args: {
-    id: {
-      type: GraphQLID,
-    },
-  },
-  resolve: (parent, { id }, { viewer, loaders }) =>
-    Plattform.gen(viewer, id, loaders),
+
+  resolve: (parent, args, { viewer, loaders }) =>
+    Plattform.gen(viewer, loaders),
 };
 
 export default plattform;

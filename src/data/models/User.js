@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import knex from '../knex';
 import { validateEmail } from '../../core/helpers';
-import { canChangeGroups, calcRights, Groups } from '../../organization';
+import { calcRights, Groups } from '../../organization';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import log from '../../logger';
 
@@ -142,18 +142,17 @@ class User {
     }
     let userInDB;
 
-    if (data.groups != null) {
+    if (data.rights != null) {
       // check i valid roles
       /* eslint-disable no-bitwise */
-      const groups = Number(data.groups);
       // TODO make it a member method - pro -cons?
       userInDB = await User.gen(viewer, data.id, loaders);
-      if (!canChangeGroups(viewer, userInDB, groups)) {
+      /*   if (!canChangeGroups(viewer, userInDB, data.rights)) {
         log.warn({ data, viewer }, 'Group change denied!');
         return { user: null, errors: ['Permission denied'] };
-      }
+      } */
 
-      if (groups && (groups & Groups.VOTER) > 0) {
+      /* if (groups && (groups & Groups.VOTER) > 0) {
         // changing vote rights
         if (!(userInDB.groups & Groups.VOTER)) {
           // user has no vote rights, but will receive them
@@ -162,9 +161,9 @@ class User {
       } else if (userInDB.groups & Groups.VOTER) {
         // user has vote rights, but we will take them
         newData.can_vote_since = null;
-      }
+      } */
 
-      newData.groups = groups;
+      newData.rights = data.rights;
     }
 
     // update
@@ -272,7 +271,6 @@ class User {
       thumbnail: null,
       email_verified: false,
       password_hash: hash,
-      groups: Groups.GUEST,
       created_at: new Date(),
     };
     const newUser = await knex.transaction(async trx => {

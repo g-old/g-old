@@ -3,20 +3,19 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import { defineMessages, FormattedMessage } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { loadGroup, updateGroup, createGroup } from '../../actions/group';
+import { loadPlattform, updatePlattform } from '../../actions/plattform';
 import { findUser } from '../../actions/user';
 
 import {
-  getGroup,
+  getPlattformUpdates,
   getVisibleUsers,
-  getGroupStatus,
+  getPlattform,
   getSessionUser,
 } from '../../reducers';
 import Box from '../../components/Box';
 import FormField from '../../components/FormField';
 import Button from '../../components/Button';
 import Label from '../../components/Label';
-import CheckBox from '../../components/CheckBox';
 import SearchField from '../../components/SearchField';
 import Form from '../../components/Form';
 import history from '../../history';
@@ -59,9 +58,9 @@ const getChangedFields = (inputFields, state, props) =>
     return agg;
   }, {});
 
-const formFields = ['name', 'coordinator'];
+const formFields = ['default_name'];
 // TODO Form HOC
-const genInitalState = (fields, values) =>
+const genInitialState = (fields, values) =>
   fields.reduce(
     (acc, curr) => {
       acc[curr] = values[curr] || '';
@@ -71,16 +70,29 @@ const genInitalState = (fields, values) =>
     { errors: {} },
   );
 
+const convertLocalesToNames = (locales, inputValues) => {
+  const values = inputValues;
+  let dirty = false;
+  const names = locales.reduce((acc, curr) => {
+    if (inputValues[curr]) {
+      dirty = true;
+      acc[curr] = inputValues[curr];
+      delete values[curr];
+    }
+    return acc;
+  }, {});
+  return dirty ? { ...values, names: JSON.stringify(names) } : inputValues;
+};
+
 // TODO EDIT + CREATE should be the same form
 class PlattformEdit extends React.Component {
   static propTypes = {
-    id: PropTypes.string.isRequired,
     users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    group: PropTypes.shape({ id: PropTypes.string }).isRequired,
+    plattform: PropTypes.shape({ names: PropTypes.shape({}) }).isRequired,
     user: PropTypes.shape({ id: PropTypes.string }).isRequired,
     findUser: PropTypes.func.isRequired,
-    updateGroup: PropTypes.func.isRequired,
-    createGroup: PropTypes.func.isRequired,
+    updatePlattform: PropTypes.func.isRequired,
+    createPlattform: PropTypes.func.isRequired,
     updates: PropTypes.shape({
       success: PropTypes.bool,
       error: PropTypes.bool,
@@ -98,28 +110,33 @@ class PlattformEdit extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.state = {
-      ...props.group,
-      ...genInitalState(formFields, props.group),
-      /*  error: null,
+      ...props.plattform,
+      ...genInitialState(formFields, {
+        ...props.plattform,
+        ...(props.plattform.names && props.plattform.names),
+      }),
+    };
+    /*  error: null,
       pending: false,
       success: false, */
-    };
     const testValues = {
-      name: { fn: 'name' },
-      deName: { fn: 'name' },
-      itName: { fn: 'name' },
-      lldName: { fn: 'name' },
-
-      coordinator: {
-        fn: 'coordinator',
-        valuesResolver: obj => obj.state.coordinatorValue,
+      default_name: { fn: 'name' },
+      'de-DE': { fn: 'name' },
+      'it-IT': { fn: 'name' },
+      'lld-IT': { fn: 'name' },
+      admin: { fn: 'admin', valuesResolver: obj => obj.state.adminValue },
+      picture: { fn: 'noCheck' },
+      defaultGroup: {
+        fn: 'group',
+        valuesResolver: obj => obj.state.pictureValue,
       },
     };
     this.Validator = createValidator(
       testValues,
       {
         name: nameValidation,
-        coordinator: selectValidation,
+        admin: selectValidation,
+        group: selectValidation,
         noCheck: () => {},
       },
       this,
@@ -127,7 +144,7 @@ class PlattformEdit extends React.Component {
     );
   }
 
-  componentWillReceiveProps({ group, updates = {} }) {
+  componentWillReceiveProps({ plattform, updates = {} }) {
     const newUpdates = {};
     if (updates.success && !this.props.updates.success) {
       this.onCancel();
@@ -135,8 +152,13 @@ class PlattformEdit extends React.Component {
     if (updates.error && !this.props.updates.error) {
       newUpdates.error = true;
     }
-
-    this.setState({ ...group, ...newUpdates });
+    this.setState({
+      ...genInitialState(formFields, {
+        ...plattform,
+        ...(plattform.names && plattform.names),
+      }),
+      ...newUpdates,
+    });
   }
 
   // eslint-disable-next-line
@@ -151,41 +173,38 @@ class PlattformEdit extends React.Component {
   onSubmit(e) {
     // TODO checks
     e.preventDefault();
-    const { id, group, user } = this.props;
-    const { coordinator } = this.state;
+    const { plattform, user } = this.props;
+    const { admin } = this.state;
     // eslint-disable-next-line
-    if (id && user.id != group.coordinator.id) {
+    if (
+      !(
+        user.rights.plattform.includes('superuser') ||
+        user.rights.plattform.includes('admin')
+      )
+    ) {
       return;
     }
     if (this.handleValidation(formFields)) {
-      const inputFields = [
-        'id',
-        'deName',
-        'itName',
-        'lldName',
-        'mainTeam',
-        'restricted',
-        'name',
-        'coordinatorId',
-      ];
-      const inputValues = getChangedFields(
-        inputFields,
-        this.state,
-        this.props.group,
-      );
-      // check coordinator
-      if (group.coordinator) {
-        // eslint-disable-next-line
-        if (coordinator && coordinator.id != group.coordinator.id) {
-          inputFields.coordinatorId = coordinator.id;
+      const inputFields = ['default_name'];
+      const inputValues = getChangedFields(inputFields, this.state, {
+        ...this.props.plattform,
+        ...(this.props.plattform.names && this.props.plattform.names),
+      });
+      if (inputValues) {
+        if (plattform.admin) {
+          // check admin
+          // eslint-disable-next-line
+          if (admin && admin.id != plattform.admin.id) {
+            inputFields.adminId = admin.id;
+          }
+        } else if (admin && admin.id) {
+          inputValues.adminId = admin.id;
         }
-      } else if (coordinator && coordinator.id) {
-        inputValues.coordinatorId = coordinator.id;
-      }
-      if (this.props.id) {
-        this.props.updateGroup({ id: this.state.id, ...inputValues });
-      } else {
-        this.props.createGroup({ ...inputValues });
+        const inputs = convertLocalesToNames(
+          ['default_name', 'de-DE', 'it-IT', 'lld-IT'],
+          inputValues,
+        );
+        this.props.updatePlattform({ ...inputs });
       }
     }
   }
@@ -225,109 +244,69 @@ class PlattformEdit extends React.Component {
   }
 
   render() {
-    const {
-      lldName,
-      name,
-      deName,
-      itName,
-      restricted,
-      mainTeam,
-      error,
-    } = this.state;
-    const { group, users = [], updates = {} } = this.props;
+    const { error } = this.state;
+    const { plattform, users = [], updates = {} } = this.props;
     const errors = this.visibleErrors(formFields);
-
     return (
       <Box column padding="medium">
         <Box type="section" align column pad>
           <Form onSubmit={this.onSubmit}>
-            <Label>Workteam names</Label>
+            <Label>Plattform names</Label>
             <fieldset>
-              <FormField label="Name" error={errors.nameError}>
+              <FormField label="Default name" error={errors.nameError}>
                 <input
                   type="text"
-                  name="name"
-                  value={name}
+                  name="default_name"
+                  value={this.state.default_name}
                   onChange={this.handleValueChanges}
                 />
               </FormField>
               <FormField label="Name german">
                 <input
                   type="text"
-                  name="deName"
-                  value={deName}
+                  name="de-DE"
+                  value={this.state['de-DE']}
                   onChange={this.handleValueChanges}
                 />
               </FormField>
               <FormField label="Name italian">
                 <input
                   type="text"
-                  name="itName"
-                  value={itName}
+                  name="it-IT"
+                  value={this.state['it-IT']}
                   onChange={this.handleValueChanges}
                 />
               </FormField>
               <FormField label="Name ladin">
                 <input
                   type="text"
-                  name="lldName"
-                  value={lldName}
+                  name="lld-IT"
+                  value={this.state['lld-IT']}
                   onChange={this.handleValueChanges}
                 />
               </FormField>
             </fieldset>
-            <Label>Coordinator</Label>
+            <Label>Admin</Label>
             <fieldset>
-              <FormField
-                overflow
-                label="Coordinator"
-                error={errors.coordinatorError}
-              >
+              <FormField overflow label="admin" error={errors.adminError}>
                 <SearchField
                   value={
-                    group.coordinator
-                      ? `${group.coordinator.name} ${group.coordinator.surname}`
+                    plattform.admin
+                      ? `${plattform.admin.name} ${plattform.admin.surname}`
                       : ''
                   }
                   onChange={e =>
                     this.handleValueChanges({
-                      target: { name: 'coordinatorValue', value: e.value },
+                      target: { name: 'adminValue', value: e.value },
                     })
                   }
                   data={users}
                   fetch={this.props.findUser}
                   displaySelected={data => {
                     this.handleValueChanges({
-                      target: { name: 'coordinator', value: data },
+                      target: { name: 'admin', value: data },
                     });
                   }}
-                />
-              </FormField>
-            </fieldset>
-            <Label>Member access policy</Label>
-            <fieldset>
-              <FormField>
-                <CheckBox
-                  label="Restriction"
-                  name="restricted"
-                  checked={restricted}
-                  onChange={this.handleValueChanges}
-                  toggle
-                />
-              </FormField>
-            </fieldset>
-
-            <Label>
-              {mainTeam ? 'Current main team (Rat)' : 'Set as main team (Rat)'}
-            </Label>
-            <fieldset>
-              <FormField>
-                <CheckBox
-                  label="mainTeam"
-                  name="mainTeam"
-                  checked={mainTeam}
-                  onChange={this.handleValueChanges}
-                  toggle
                 />
               </FormField>
             </fieldset>
@@ -338,6 +317,30 @@ class PlattformEdit extends React.Component {
               <Button disabled={updates.pending} primary label="Save" />{' '}
               <Button label="Cancel" onClick={this.onCancel} />
             </div>
+            <Label>Picture</Label>
+            <fieldset>
+              <FormField overflow label="admin" error={errors.adminError}>
+                <SearchField
+                  value={
+                    plattform.admin
+                      ? `${plattform.admin.name} ${plattform.admin.surname}`
+                      : ''
+                  }
+                  onChange={e =>
+                    this.handleValueChanges({
+                      target: { name: 'adminValue', value: e.value },
+                    })
+                  }
+                  data={users}
+                  fetch={this.props.findUser}
+                  displaySelected={data => {
+                    this.handleValueChanges({
+                      target: { name: 'admin', value: data },
+                    });
+                  }}
+                />
+              </FormField>
+            </fieldset>
           </Form>
         </Box>
       </Box>
@@ -345,18 +348,17 @@ class PlattformEdit extends React.Component {
   }
 }
 
-const mapStateToProps = (state, { id }) => ({
-  group: getGroup(state, id),
+const mapStateToProps = state => ({
+  plattform: getPlattform(state),
   users: getVisibleUsers(state, 'all'),
-  updates: getGroupStatus(state),
+  updates: getPlattformUpdates(state),
   user: getSessionUser(state),
 });
 
 const mapDispatch = {
-  loadGroup,
-  updateGroup,
+  loadPlattform,
+  updatePlattform,
   findUser,
-  createGroup,
 };
 
 export default connect(mapStateToProps, mapDispatch)(PlattformEdit);

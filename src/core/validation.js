@@ -177,10 +177,10 @@ export function createValidator(
       (acc, curr) => {
         let state = resolverFn(obj);
         const value = state[curr]; // obj[curr];
+
         if ('valuesResolver' in allValues[curr]) {
           state = allValues[curr].valuesResolver(obj);
         }
-
         const errors = validators[allValues[curr].fn](value, state, options);
         // eslint-disable-next-line no-param-reassign
         acc.errors[curr] = {

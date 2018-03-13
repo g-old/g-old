@@ -13,6 +13,7 @@ import PlattformEdit from '../../containers/PlattformEdit';
 
 import { getSessionUser } from '../../reducers';
 import { canAccess } from '../../organization';
+import { loadPlattform } from '../../actions/plattform';
 
 const title = 'Admin';
 
@@ -25,6 +26,7 @@ async function action({ store }) {
       return { redirect: '/admin' };
     }
   }
+  await store.dispatch(loadPlattform(true));
   const links = [{ to: 'plattform/settings', name: 'SETTINGS' }];
 
   return {

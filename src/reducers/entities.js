@@ -19,12 +19,10 @@ import comments, * as fromComments from './comments';
 import requests, * as fromRequests from './requests';
 import proposalStatus from './proposalStatus';
 
-import plattforms, * as fromPlattforms from './plattforms';
 /* GENERATOR */
 
 export default combineReducers({
   /* GENERATOR_COMBINED */
-  plattforms,
   requests,
   users,
   statements,
@@ -47,8 +45,6 @@ export default combineReducers({
 });
 
 /* GENERATOR_EXPORTS */
-export const getPlattform = (state, id) =>
-  fromPlattforms.getEntity(state.plattforms, id, state);
 
 export const getRequest = (state, id) =>
   fromRequests.getEntity(state.requests, id, state);

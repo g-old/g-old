@@ -1,7 +1,6 @@
 import {
   GraphQLString as String,
   GraphQLObjectType as ObjectType,
-  GraphQLID as ID,
 } from 'graphql';
 import UserType from './UserType';
 import User from '../models/User';
@@ -11,18 +10,16 @@ import Group from '../models/Group';
 const PlattformType = new ObjectType({
   name: 'Plattform',
   fields: {
-    id: {
-      type: ID,
-    },
-    name: {
+    names: {
       type: String,
+      resolve: parent => JSON.stringify(parent.names),
     },
 
     displayName: {
       type: String,
       resolve(parent, args, params, { rootValue }) {
         const locale = rootValue.request.language;
-        return parent.name[locale] || parent.default;
+        return parent.names[locale] || parent.names.default_name;
       },
     },
     picture: {

@@ -26,7 +26,6 @@ import { requestFields } from './request';
 
 const userFields = `
   id,
-  groups,
   name,
   surname,
   thumbnail,

@@ -10,7 +10,7 @@ const PlattformInputType = new GraphQLInputObjectType({
     id: {
       type: ID,
     },
-    name: {
+    names: {
       type: String,
     },
     adminId: {

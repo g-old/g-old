@@ -2,7 +2,6 @@ import {
   Permissions,
   Groups,
   AccessMasks,
-  PrivilegesSchema,
   PermissionsSchema,
 } from '../organization';
 /* eslint-disable no-bitwise */
@@ -85,25 +84,22 @@ function userWriteControl(viewer, data) {
     if (data.name || data.surname) {
       return viewer.groups === Groups.GUEST;
     }
-    if (data.groups == null) {
+    if (data.rights == null) {
       return true; // Nobody can change his own memberships
     }
   }
-  if ((viewer.groups & Groups.SYSTEM) > 0) {
+  if (viewer.rights.system) {
     // to set email as verified, reset password,
     if (data.email || data.password) {
       return true;
     }
   }
-  if (viewer.permissions & Permissions.MUTATE_PROFILES) {
+  if (viewer.rights.plattform) {
     if (data.thumbnail || data.dataUrl || data.name || data.surname) {
       return true;
     }
-    if (data.groups != null) {
-      if (
-        viewer.privileges &
-        (PrivilegesSchema[Groups.ADMIN] | PrivilegesSchema[Groups.SUPER_USER])
-      ) {
+    if (data.rights != null) {
+      if (viewer.rights.plattform) {
         return true;
         // TODO further checks!
       }
@@ -119,9 +115,7 @@ function userWriteControl(viewer, data) {
 function userReadControl(viewer, data) {
   return (
     // eslint-disable-next-line eqeqeq
-    viewer.id == data.id ||
-    viewer.groups === Groups.SYSTEM ||
-    (viewer.permissions & AccessMasks.LEVEL_1) > 0
+    viewer.id == data.id || viewer.rights.plattform || viewer.rights.system
   );
 }
 

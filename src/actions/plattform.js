@@ -11,18 +11,57 @@ import {
   DELETE_PLATTFORM_START,
   DELETE_PLATTFORM_SUCCESS,
   DELETE_PLATTFORM_ERROR,
+  LOAD_PLATTFORM_START,
+  LOAD_PLATTFORM_ERROR,
+  LOAD_PLATTFORM_SUCCESS,
 } from '../constants';
 import { plattform as plattformSchema } from '../store/schema';
 import { genStatusIndicators } from '../core/helpers';
 
 const plattformFields = `
-id
+  displayName
+  picture
+  defaultGroup{
+      id
+      displayName
+      picture
+    }
+`;
+
+const plattformQuery = `
+query{
+  plattform{
+    ${plattformFields}
+  }
+}`;
+
+const plattformQueryWithDetails = `
+query{
+  plattform{
+    ${plattformFields}
+    names,
+    admin{
+      id
+      name
+      surname
+      thumbnail
+    }
+
+  }
+}
 `;
 
 const createPlattformMutation = `
   mutation ($plattform:PlattformInput) {
     createPlattform (plattform:$plattform){
-      ${plattformFields}
+          ${plattformFields}
+    names,
+    admin{
+      id
+      name
+      surname
+      thumbnail
+    }
     }
   }
 `;
@@ -30,7 +69,14 @@ const createPlattformMutation = `
 const updatePlattformMutation = `
   mutation ($plattform:PlattformInput) {
     updatePlattform (plattform:$plattform){
-      ${plattformFields}
+          ${plattformFields}
+    names,
+    admin{
+      id
+      name
+      surname
+      thumbnail
+    }
     }
   }
 `;
@@ -38,10 +84,59 @@ const updatePlattformMutation = `
 const deletePlattformMutation = `
   mutation ($plattform:PlattformInput) {
     deletePlattform (plattform:$plattform){
-      ${plattformFields}
+          ${plattformFields}
+    names,
+    admin{
+      id
+      name
+      surname
+      thumbnail
+    }
     }
   }
 `;
+
+const normalizeSettings = data => {
+  const normalized = normalize({ id: 'plattform', ...data }, plattformSchema);
+
+  const { plattform } = normalized.entities.plattform;
+  if (plattform.names) {
+    plattform.names = JSON.parse(plattform.names);
+  }
+  delete plattform.id;
+  normalized.entities.plattform = plattform;
+
+  return normalized;
+};
+
+export function loadPlattform(withDetails) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: LOAD_PLATTFORM_START,
+    });
+    try {
+      const { data } = await graphqlRequest(
+        withDetails ? plattformQueryWithDetails : plattformQuery,
+      );
+      const normalizedData = normalizeSettings(data.plattform);
+      dispatch({
+        type: LOAD_PLATTFORM_SUCCESS,
+        payload: normalizedData,
+      });
+    } catch (error) {
+      dispatch({
+        type: LOAD_PLATTFORM_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
 
 export function createPlattform(plattform) {
   return async (dispatch, getState, { graphqlRequest }) => {
@@ -56,6 +151,7 @@ export function createPlattform(plattform) {
       const { data } = await graphqlRequest(createPlattformMutation, {
         plattform,
       });
+
       const normalizedData = normalize(data.createPlattform, plattformSchema);
       dispatch({
         type: CREATE_PLATTFORM_SUCCESS,
@@ -94,7 +190,7 @@ export function updatePlattform(plattform) {
       const { data } = await graphqlRequest(updatePlattformMutation, {
         plattform,
       });
-      const normalizedData = normalize(data.updatePlattform, plattformSchema);
+      const normalizedData = normalizeSettings(data.updatePlattform);
       dispatch({
         type: UPDATE_PLATTFORM_SUCCESS,
         payload: normalizedData,
