@@ -1,4 +1,12 @@
 pipeline:
+  restore-cache:
+    image: drillster/drone-volume-cache
+    restore: true
+    mount:
+      - ./node_modules
+    volumes:
+      - /tmp/cache:/cache
+
   build:
     image: node:8
     environment:
@@ -14,3 +22,11 @@ pipeline:
       - NODE_ENV=production
     commands:
       - echo "deploy?"
+
+  rebuild-cache:
+    image: drillster/drone-volume-cache
+    rebuild: true
+    mount:
+      - ./node_modules
+    volumes:
+      - /tmp/cache:/cache
