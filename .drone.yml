@@ -1,8 +1,8 @@
 pipeline:
-  npm_build:
+  build:
     image: node:8
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
     commands:
       - yarn install
       - yarn build
