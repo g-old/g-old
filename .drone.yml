@@ -1,8 +1,17 @@
 pipeline:
   build:
-    image: node:8
-    environment:
-      - NODE_ENV=production
-    commands:
-      - npm install
-      - npm build --release
+    
+    npm_build:
+      image: node:8
+      environment:
+        - NODE_ENV=production
+      commands:
+        - yarn install
+        - yarn build
+
+    deploy:
+      image: node:8
+      environment:
+        - NODE_ENV=production
+      commands:
+        - echo "deployed!"
