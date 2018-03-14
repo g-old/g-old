@@ -4,13 +4,13 @@ pipeline:
     environment:
       - NODE_ENV=development
     commands:
-      - yarn install
+      - yarn install --no-progress
       - touch private_configs.js
-      - yarn build --release
+      - yarn build --release --docker
 
   deploy:
     image: node:8
     environment:
       - NODE_ENV=production
     commands:
-      - echo "deployed!"
+      - echo "deploy?"
