@@ -6,7 +6,7 @@ pipeline:
     commands:
       - yarn install
       - touch private_configs.js
-      - yarn build
+      - yarn build --release
 
   deploy:
     image: node:8
