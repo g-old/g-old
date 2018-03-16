@@ -16,12 +16,11 @@ pipeline:
       - touch private_configs.js
       - yarn build --release --docker
 
-  deploy:
-    image: node:8
-    environment:
-      - NODE_ENV=production
-    commands:
-      - echo "deploy?"
+  push:
+    image: plugins/docker
+    username: tobiasmayr
+    repo: tobiasmayr/gold
+    tags: [ dev ]
 
   rebuild-cache:
     image: drillster/drone-volume-cache
