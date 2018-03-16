@@ -16,7 +16,7 @@ pipeline:
       - touch private_configs.js
       - yarn build --release --docker
 
-  push:
+  publish:
     image: plugins/docker
     username: tobiasmayr
     repo: tobiasmayr/gold
