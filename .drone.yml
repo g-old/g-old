@@ -18,9 +18,9 @@ pipeline:
 
   publish:
     image: plugins/docker
-    username: tobiasmayr
     repo: tobiasmayr/gold
     tags: [ dev ]
+    secrets: [ docker_username, docker_password ]
 
   rebuild-cache:
     image: drillster/drone-volume-cache
