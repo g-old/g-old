@@ -14,7 +14,7 @@ pipeline:
     commands:
       - yarn install --no-progress
       - touch private_configs.js
-      - yarn build --release --docker
+      - yarn build --release
       - rm build/private_configs.js
 
   publish:
