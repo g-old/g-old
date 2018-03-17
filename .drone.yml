@@ -33,7 +33,6 @@ pipeline:
     secrets: [ docker_username, docker_password ]
     when:
       event: tag
-      branch: live
 
   rebuild-cache:
     image: drillster/drone-volume-cache
