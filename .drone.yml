@@ -12,7 +12,7 @@ pipeline:
     environment:
       - NODE_ENV=development
     volumes:
-      - /home/gold/private_configs.js:/private_configs.js
+      - /home/gold/private_configs.js:/drone/src/github.com/g-old/g-old/private_configs.js
     commands:
       - yarn install --no-progress
       - yarn build --release
