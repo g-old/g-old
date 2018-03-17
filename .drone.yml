@@ -11,11 +11,11 @@ pipeline:
     image: node:8
     environment:
       - NODE_ENV=development
+    volumes:
+      - /home/gold/private_configs.js:/private_configs.js
     commands:
       - yarn install --no-progress
-      - touch private_configs.js
       - yarn build --release
-      - rm build/private_configs.js
 
   publish:
     image: plugins/docker
