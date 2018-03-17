@@ -17,11 +17,23 @@ pipeline:
       - yarn install --no-progress
       - yarn build --release
 
-  publish:
+  publish-dev:
     image: plugins/docker
     repo: tobiasmayr/gold
     tags: [ dev ]
     secrets: [ docker_username, docker_password ]
+    when:
+      branch: dev
+
+  publish-live:
+    image: plugins/docker
+    repo: tobiasmayr/gold
+    auto_tag: true
+    tags: [ live ]
+    secrets: [ docker_username, docker_password ]
+    when:
+      event: tag
+      branch: live
 
   rebuild-cache:
     image: drillster/drone-volume-cache
