@@ -15,6 +15,7 @@ pipeline:
       - yarn install --no-progress
       - touch private_configs.js
       - yarn build --release --docker
+      - rm build/private_configs.js
 
   publish:
     image: plugins/docker
