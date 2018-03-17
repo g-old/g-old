@@ -23,6 +23,7 @@ pipeline:
     tags: [ dev ]
     secrets: [ docker_username, docker_password ]
     when:
+      event: push
       branch: dev
 
   publish-live:
