@@ -6,13 +6,12 @@ import s from './Heading.css';
 
 class Heading extends React.Component {
   static propTypes = {
-    tag: PropTypes.string,
+    tag: PropTypes.string.isRequired,
     children: PropTypes.node.isRequired,
     className: PropTypes.string,
     strong: PropTypes.bool,
   };
   static defaultProps = {
-    tag: null,
     className: null,
     strong: null,
   };

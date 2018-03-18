@@ -9,8 +9,9 @@ import List from '../../components/List';
 import ListItem from '../../components/ListItem';
 import Avatar from '../../components/Avatar';
 import Button from '../../components/Button';
-import Headline from '../../components/Headline';
 import FetchError from '../../components/FetchError';
+import Box from '../../components/Box';
+import Heading from '../../components/Heading';
 
 import history from '../../history';
 
@@ -21,6 +22,11 @@ const messages = defineMessages({
     id: 'command.loadMore',
     defaultMessage: 'Load more',
     description: 'To get more data',
+  },
+  users: {
+    id: 'users',
+    defaultMessage: 'Users',
+    description: 'Users label',
   },
 });
 const handleItemClick = id => {
@@ -36,8 +42,10 @@ class AccountList extends React.Component {
   render() {
     const { userListStatus, userList } = this.props;
     return (
-      <div>
-        <Headline>{'MEMBERS'}</Headline>
+      <Box pad column>
+        <Heading tag="h2">
+          <FormattedMessage {...messages.users} />
+        </Heading>
         {userListStatus.pending && !userList.length && <p>Loading...</p>}
         {!userListStatus.pending &&
           !userList.length &&
@@ -46,16 +54,19 @@ class AccountList extends React.Component {
           <FetchError
             message={userListStatus.error}
             onRetry={() =>
-              this.props.loadUserList({ group: ACTIVE_USER, union: true })}
+              this.props.loadUserList({ group: ACTIVE_USER, union: true })
+            }
           />
         )}
         <List>
           {userList.map(u => (
             <ListItem onClick={() => handleItemClick(u.id)}>
-              <Avatar user={u} />
-              <span>
-                {u.name} {} {u.surname}
-              </span>
+              <Box pad>
+                <Avatar user={u} />
+                <span>
+                  {u.name} {} {u.surname}
+                </span>
+              </Box>
             </ListItem>
           ))}
         </List>
@@ -73,7 +84,7 @@ class AccountList extends React.Component {
             label={<FormattedMessage {...messages.loadMore} />}
           />
         )}
-      </div>
+      </Box>
     );
   }
 }

@@ -51,9 +51,9 @@ const messages = defineMessages({
     description: 'Profile link in header',
   },
   users: {
-    id: 'navigation.users',
+    id: 'users',
     defaultMessage: 'Users',
-    description: 'User list link in header',
+    description: 'Users label',
   },
   workTeams: {
     id: 'workTeams',
