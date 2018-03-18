@@ -16,34 +16,6 @@ a:visited {
   width: 100%;
 }
 
-.status {
-  width: 100%;
-  justify-content: center;
-  margin-top: 4px;
-  display: flex;
-  border-radius: 4px;
-}
-
-.accepted {
-  fill: var(--color-green);
-}
-
-.repelled {
-  fill: var(--color-red);
-}
-
-.active {
-  fill: var(--color-alert);
-}
-
-.statusIcon {
-  width: 24px;
-  height: 24px;
-  vertical-align: middle;
-  justify-content: center;
-  padding-top: 4px;
-}
-
 .pollPreview {
   display: flex;
   flex-flow: column;

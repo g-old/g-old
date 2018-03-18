@@ -4,6 +4,17 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import s from './VotesList.css';
 import FetchError from '../FetchError';
+import history from '../../history';
+
+const onThumbnailClick = (event, id) => {
+  if (event) {
+    event.stopPropagation();
+    event.preventDefault();
+    if (id) {
+      history.push(`/accounts/${id}`);
+    }
+  }
+};
 
 class VotesList extends React.Component {
   static propTypes = {
@@ -23,9 +34,12 @@ class VotesList extends React.Component {
 
   static renderVote(vote) {
     return (
-      <img
+      <img // eslint-disable-line
         key={vote.id}
         className={s.avatar}
+        onClick={e => {
+          onThumbnailClick(e, vote.voter.id);
+        }}
         src={vote.voter.thumbnail}
         title={`${vote.voter.name} ${vote.voter.surname}`}
         alt="IMG"
