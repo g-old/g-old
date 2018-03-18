@@ -60,7 +60,7 @@ class Layout extends React.Component {
       );
     }
 
-    const logo = (
+    const banner = (
       <div className={s.banner}>
         <img alt="banner" src="/banner01.jpg" />
       </div>
@@ -69,7 +69,7 @@ class Layout extends React.Component {
       <div className={s.layout}>
         <div className={this.props.loading ? s.loader : null} />
         {toast}
-        {logo}
+        {banner}
         <Header />
         <div className={s.content}>{this.props.children}</div>
         <div className={s.footer}>

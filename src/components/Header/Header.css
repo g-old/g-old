@@ -36,13 +36,13 @@
   color: rgba(255, 255, 255, 0.35);
 }
 
-@media only screen and (max-width: 40em) {
+@media only screen and (max-width: 50em) {
   .brand {
     display: none;
   }
 }
 
-@media only screen and (max-width: 30em) {
+@media only screen and (max-width: 40em) {
   .brand {
     display: inherit;
   }
