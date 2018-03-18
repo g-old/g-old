@@ -139,8 +139,7 @@
     "id": "navigation.proposals",
     "description": "Proposals link in header",
     "defaultMessage": "Proposals",
-    "message": "Beschlüsse",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Beschlüsse"
   },
   {
     "id": "account.changeRights",
@@ -488,8 +487,7 @@
     "id": "settings.title",
     "description": "Header for settings",
     "defaultMessage": "Settings",
-    "message": "Einstellungen",
-    "files": ["src/routes/account/AccountContainer.js"]
+    "message": "Einstellungen"
   },
   {
     "id": "action.error",
@@ -776,105 +774,105 @@
     "id": "account.avatarMissing",
     "description": "Avatar missing",
     "defaultMessage": "No photo set",
-    "message": "",
+    "message": "Kein Foto hochgeladen",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.delete",
     "description": "Deleting the account",
     "defaultMessage": "Delete account",
-    "message": "",
+    "message": "Konto löschen",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.emailValidationMissing",
     "description": "Email not validated",
     "defaultMessage": "Email not validated",
-    "message": "",
+    "message": "E-Mail-Adresse nicht bestätigt",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.lastLogin",
     "description": "Last login date",
     "defaultMessage": "Last login at",
-    "message": "",
+    "message": "Zuletzt angemeldet am",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.workTeamMissing",
     "description": "No team choosen",
     "defaultMessage": "No team choosen",
-    "message": "",
+    "message": "Keine Arbeitsgruppe gewählt",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "rights.header",
     "description": "Header of privilegemanager",
     "defaultMessage": "Rights",
-    "message": "",
+    "message": "Rechte",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "roles.header",
     "description": "Header of groupsemanager",
     "defaultMessage": "Set & Change Groups",
-    "message": "",
+    "message": "Gruppenzugehörigkeit einstellen",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "discussion.new",
     "description": "Title for activity",
     "defaultMessage": "New discussion",
-    "message": "",
+    "message": "Neue Diskussion",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.failed",
     "description": "Votation against proposal",
     "defaultMessage": "Failed!",
-    "message": "",
+    "message": "Abgelehnt!",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.new",
     "description": "Title for activity",
     "defaultMessage": "New proposal",
-    "message": "",
+    "message": "Neuer Beschluss",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.rejected",
     "description": "Proposal can be voted from now on",
     "defaultMessage": "Voting open",
-    "message": "",
+    "message": "Abstimmung eröffnet",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.revoked",
     "description": "Proposal was revoked",
     "defaultMessage": "Revoked",
-    "message": "",
+    "message": "Zurückgezogen",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.valid",
     "description": "Proposal turned valid",
     "defaultMessage": "Proposal accepted!",
-    "message": "",
+    "message": "Beschluss angenommen",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.voting",
     "description": "Proposal can be voted from now on",
     "defaultMessage": "Voting open",
-    "message": "",
+    "message": "Abstimmung eröffnet",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "survey.new",
     "description": "Title for activity",
     "defaultMessage": "New survey",
-    "message": "",
+    "message": "Neue Umfrage",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
@@ -888,63 +886,63 @@
     "id": "calendar.today.long",
     "description": "Today",
     "defaultMessage": "Today",
-    "message": "",
+    "message": "Heute",
     "files": ["src/components/Calendar/Calendar.js"]
   },
   {
     "id": "calendar.today.short",
     "description": "Today",
     "defaultMessage": "Today",
-    "message": "",
+    "message": "Heute",
     "files": ["src/components/Calendar/Calendar.js"]
   },
   {
     "id": "commands.collapseReplies",
     "description": "Hide replies",
     "defaultMessage": "Hide replies",
-    "message": "",
+    "message": "Antworten verbergen",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "commands.edit",
     "description": "Edit",
     "defaultMessage": "Edit",
-    "message": "",
+    "message": "Bearbeiten",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "commands.expandReplies",
     "description": "Show replies",
     "defaultMessage": "View all {cnt} replies",
-    "message": "",
+    "message": "Alle {cnt} Antworten sehen",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "commands.expandReply",
     "description": "Show reply",
     "defaultMessage": "View reply",
-    "message": "",
+    "message": "Antworten ansehen",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "commands.reply",
     "description": "Btn to reply",
     "defaultMessage": "Reply",
-    "message": "",
+    "message": "Antworten",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "label.edited",
     "description": "Comment edited",
     "defaultMessage": "edited {time}",
-    "message": "",
+    "message": "bearbeitet {time}",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "numComments",
     "description": "Number of comments",
     "defaultMessage": "{cnt} comments",
-    "message": "",
+    "message": "{cnt} Kommentare",
     "files": ["src/components/DiscussionPreview/DiscussionPreview.js"]
   },
   {
@@ -965,7 +963,8 @@
     "id": "cookieBanner",
     "description": "Cookie banner, should comply to EU regulations",
     "defaultMessage": "By using this site you accept our privacy policy.",
-    "message": "",
+    "message":
+      "Wenn Sie diese Seite benützen, akzeptieren Sie damit unsere Datenschutzregelung ",
     "files": ["src/components/Layout/Layout.js"]
   },
   {
@@ -986,15 +985,14 @@
     "id": "navigation.profile",
     "description": "Profile link in header",
     "defaultMessage": "Profile",
-    "message": "",
+    "message": "Profil",
     "files": ["src/components/Navigation/Navigation.js"]
   },
   {
     "id": "navigation.users",
     "description": "Workteam list link in header",
     "defaultMessage": "All workteams",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Mitglieder"
   },
   {
     "id": "tags",
@@ -1010,7 +1008,7 @@
     "id": "action.success",
     "description": "Short success notification",
     "defaultMessage": "Success!",
-    "message": "",
+    "message": "Erfolgreich durchgeführt!",
     "files": [
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
@@ -1020,7 +1018,7 @@
     "id": "settings.emailNew",
     "description": "Email label in settings for new address",
     "defaultMessage": "New email address",
-    "message": "",
+    "message": "Neue E-Mail-Adresse",
     "files": [
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/EmailInput.js",
@@ -1031,49 +1029,49 @@
     "id": "settings.error.passwordOld",
     "description": "Wrong password entered",
     "defaultMessage": "Wrong password",
-    "message": "",
+    "message": "Falsches Passwort",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
     "id": "settings.name",
     "description": "First name",
     "defaultMessage": "Name",
-    "message": "",
+    "message": "Vorname",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
     "id": "settings.surname",
     "description": "Surname",
     "defaultMessage": "Surname",
-    "message": "",
+    "message": "Nachname",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
     "id": "settings.workTeams",
     "description": "Workteam",
     "defaultMessage": "Workteams",
-    "message": "",
+    "message": "Arbeitsgruppen",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
     "id": "join",
     "description": "Button label",
     "defaultMessage": "Join",
-    "message": "",
+    "message": "Beitreten",
     "files": ["src/components/WorkTeam/WorkTeam.js"]
   },
   {
     "id": "join.withdraw",
     "description": "Cancel join request",
     "defaultMessage": "Dismiss request",
-    "message": "",
+    "message": "Anfrage zurückziehen",
     "files": ["src/components/WorkTeam/WorkTeam.js"]
   },
   {
     "id": "leave",
     "description": "Leave team",
     "defaultMessage": "Leave",
-    "message": "",
+    "message": "Austreten",
     "files": ["src/components/WorkTeam/WorkTeam.js"]
   },
   {
@@ -1087,7 +1085,7 @@
     "id": "passwordRecovery.reset",
     "description": "Reset Password",
     "defaultMessage": "Reset Password",
-    "message": "",
+    "message": "Passwort zurücksetzen",
     "files": [
       "src/routes/passwordRecovery/PasswordRecovery.js",
       "src/routes/passwordReset/PasswordReset.js"
@@ -1098,7 +1096,8 @@
     "description": "Password recovery instruction",
     "defaultMessage":
       "Enter your email address below and we'll send you a link to reset your password",
-    "message": "",
+    "message":
+      "Fügen Sie ihre E-Mail-Adresse ein. Sie erhalten eine E-Mail mit einem Link, über den sie das Passwort zurücksetzen können.",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
@@ -1106,42 +1105,43 @@
     "description": "Password recovery instruction",
     "defaultMessage":
       "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
-    "message": "",
+    "message":
+      "Öffnen sie die E-Mail, die an sie versendet wurde, und führen sie die dort beschriebenen Schritte aus. Haben Sie keine E-Mail erhalten? Vielleicht haben Sie bei der Anmeludng eine andere E-Mail-Adresse angegeben. ",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
     "id": "roles.unlock",
     "description": "Button label for those who can only unlock viewers",
     "defaultMessage": "Unlock viewer",
-    "message": "",
+    "message": "Viewer freischalten",
     "files": ["src/components/GroupManager/GroupManager.js"]
   },
   {
     "id": "action.cancel",
     "description": "Label",
     "defaultMessage": "Cancel",
-    "message": "",
+    "message": "Abbrechen",
     "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
   },
   {
     "id": "action.delete",
     "description": "Label",
     "defaultMessage": "Delete",
-    "message": "",
+    "message": "Löschen",
     "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
   },
   {
     "id": "action.leave",
     "description": "Label",
     "defaultMessage": "Leave",
-    "message": "",
+    "message": "Austreten",
     "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
   },
   {
     "id": "header.confirmation",
     "description": "Confirmation components header",
     "defaultMessage": "Please confirm",
-    "message": "",
+    "message": "Bitte bestätigen",
     "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
   },
   {
@@ -1170,49 +1170,122 @@
     "id": "label.name",
     "description": "Heading of name section",
     "defaultMessage": "Name",
-    "message": "",
+    "message": "Name",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
     "id": "request.email.title",
     "description": "Label for logs",
     "defaultMessage": "Request to change my email address",
-    "message": "",
+    "message": "Änderung meiner E-Mail-Adresse",
     "files": ["src/components/ActivityLog/ActivityLog.js"]
   },
   {
     "id": "request.join.title",
     "description": "Label for logs",
     "defaultMessage": "Request to join a workteam",
-    "message": "",
+    "message": "Beitrittsanfrage für eine Arbeitsgruppe",
     "files": ["src/components/ActivityLog/ActivityLog.js"]
   },
   {
     "id": "action.save",
     "description": "Label",
     "defaultMessage": "Save",
-    "message": "",
+    "message": "Speichern",
     "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
     "id": "settings.email.requestCreated",
     "description": "Notification that a request has been created",
-    "defaultMessage": "You have to confirm your new email address \"{email}\"",
-    "message": "",
+    "defaultMessage": "Check your email ({email}) to confirm.",
+    "message": "Sie müssen ihre neue E-Mail-Adresse ({email}) noch bestätigen",
     "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
     "id": "settings.email.resendNotification",
     "description": "Verification mail sending success",
-    "defaultMessage": "An email was sent to your new mail address \"{email}\"",
-    "message": "",
+    "defaultMessage": "An email was sent to your new mail address ({email})",
+    "message": "Eine E-Mail wurde an die Adresse ({email}) versandt.",
     "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
     "id": "settings.verificationCall",
     "description": "Notification to verify mail address",
-    "defaultMessage": "Please confirm your email address",
-    "message": "",
+    "defaultMessage":
+      "Confirm your email address. A confirmation message was sent to \"{email}\"",
+    "message": "Bitte bestätigen Sie ihre E-Mail-Adresse",
     "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "proposals",
+    "description": "Proposals label",
+    "defaultMessage": "Proposals",
+    "message": "Beschlüsse",
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/WorkTeam/WorkTeam.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
+  },
+  {
+    "id": "users",
+    "description": "Users label",
+    "defaultMessage": "Users",
+    "message": "Mitglieder",
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/routes/accountList/AccountListContainer.js"
+    ]
+  },
+  {
+    "id": "workTeams",
+    "description": "Workteam label",
+    "defaultMessage": "Workteams",
+    "message": "Arbeitsgruppen",
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/routes/workTeamList/WorkTeamListContainer.js"
+    ]
+  },
+  {
+    "id": "logout",
+    "description": "Label for logout",
+    "defaultMessage": "Logout",
+    "message": "Abmelden",
+    "files": ["src/components/UserStatus/UserStatus.js"]
+  },
+  {
+    "id": "profile",
+    "description": "Label for profile link",
+    "defaultMessage": "Profile",
+    "message": "Profil",
+    "files": ["src/components/UserStatus/UserStatus.js"]
+  },
+  {
+    "id": "discussions",
+    "description": "Discussions label",
+    "defaultMessage": "Discussions",
+    "message": "Diskussionen",
+    "files": [
+      "src/components/WorkTeam/WorkTeam.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
+  },
+  {
+    "id": "members",
+    "description": "Members label",
+    "defaultMessage": "Members",
+    "message": "Mitglieder",
+    "files": ["src/components/WorkTeam/WorkTeam.js"]
+  },
+  {
+    "id": "settings",
+    "description": "Label for settings",
+    "defaultMessage": "Settings",
+    "message": "Einstellungen",
+    "files": [
+      "src/routes/account/AccountContainer.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
   }
 ]
