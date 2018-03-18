@@ -56,9 +56,9 @@ const messages = defineMessages({
     description: 'User list link in header',
   },
   workTeams: {
-    id: 'navigation.workTeams',
+    id: 'workTeams',
     defaultMessage: 'Workteams',
-    description: 'Workteam list link in header',
+    description: 'Workteam label',
   },
 });
 
