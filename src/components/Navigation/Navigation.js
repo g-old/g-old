@@ -31,9 +31,9 @@ const messages = defineMessages({
     description: 'About link in header',
   },
   proposals: {
-    id: 'navigation.proposals',
+    id: 'proposals',
     defaultMessage: 'Proposals',
-    description: 'Proposals link in header',
+    description: 'Proposals label',
   },
   admin: {
     id: 'navigation.admin',

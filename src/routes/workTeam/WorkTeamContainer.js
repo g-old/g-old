@@ -117,7 +117,8 @@ class WorkTeamContainer extends React.Component {
     const { smallSize } = this.state;
     let sidebar;
     let content;
-    if (!smallSize) {
+    const isResponsive = false; // to deactivate
+    if (!smallSize && isResponsive) {
       sidebar = (
         <Nav
           {...this.props.workTeamData}
@@ -158,7 +159,7 @@ class WorkTeamContainer extends React.Component {
       );
     }
     return (
-      <Box justify={smallSize}>
+      <Box justify={smallSize || !isResponsive}>
         {sidebar}
         {content}
       </Box>

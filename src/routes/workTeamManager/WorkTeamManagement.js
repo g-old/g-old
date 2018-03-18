@@ -74,6 +74,21 @@ const messages = defineMessages({
     defaultMessage: 'Tags',
     description: 'Tags',
   },
+  discussions: {
+    id: 'discussions',
+    defaultMessage: 'Discussions',
+    description: 'Discussions label',
+  },
+  proposals: {
+    id: 'proposals',
+    defaultMessage: 'Proposals',
+    description: 'Proposals label',
+  },
+  settings: {
+    id: 'settings',
+    defaultMessage: 'Settings',
+    description: 'Label for settings',
+  },
 });
 const defaultPollValues = {
   1: {
@@ -285,7 +300,7 @@ class WorkTeamManagement extends React.Component {
     }
     return (
       <Tabs>
-        <Tab title="Discussions">
+        <Tab title={<FormattedMessage {...messages.discussions} />}>
           <Accordion>
             <AccordionPanel heading="Create discussion">
               <DiscussionInput
@@ -295,7 +310,7 @@ class WorkTeamManagement extends React.Component {
             </AccordionPanel>
           </Accordion>
         </Tab>
-        <Tab title="Proposals">
+        <Tab title={<FormattedMessage {...messages.proposals} />}>
           <Accordion>
             <AccordionPanel
               heading="Create proposal"
@@ -322,7 +337,7 @@ class WorkTeamManagement extends React.Component {
           </Accordion>
         </Tab>
         <Tab title="Requests">{content}</Tab>
-        <Tab title="Settings">
+        <Tab title={<FormattedMessage {...messages.settings} />}>
           <Button label="Edit" />
           {'TODO WORKTEAMEDIT'}
         </Tab>
