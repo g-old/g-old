@@ -456,8 +456,8 @@ class Comment extends React.Component {
         {/* eslint-disable jsx-a11y/interactive-supports-focus */}
         {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */}
         <img // eslint-disable-line
-          onClick={this.handleProfileClick}
-          className={cn(s.avatar)}
+          onClick={this.props.own ? null : this.handleProfileClick}
+          className={cn(s.avatar, this.props.own ? null : s.clickable)}
           src={actor && actor.thumbnail}
           alt="IMG"
         />
