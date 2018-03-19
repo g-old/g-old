@@ -30,7 +30,6 @@ pipeline:
     image: plugins/docker
     repo: tobiasmayr/gold
     auto_tag: true
-    tags: [ live ]
     secrets: [ docker_username, docker_password ]
     when:
       event: tag
