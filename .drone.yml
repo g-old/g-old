@@ -43,4 +43,4 @@ pipeline:
     volumes:
       - /tmp/cache:/cache
 
-branches: [ dev, live]
+branches: [ dev ]
