@@ -18,6 +18,7 @@ import Box from '../Box';
 import Link from '../Link';
 import history from '../../history';
 import { ICONS } from '../../constants';
+import Button from '../Button/Button';
 
 const messages = defineMessages({
   newSurvey: {
@@ -145,7 +146,10 @@ class Activity extends React.Component {
   renderGroupHeader(info, title) {
     return (
       <Box align between className={s.groupHeader}>
-        <div>
+        <Button
+          plain
+          onClick={() => history.push(`/workteams/${info.workTeamId}`)}
+        >
           {info.logo ? (
             'IMPLEMENT LOGO'
           ) : (
@@ -164,11 +168,11 @@ class Activity extends React.Component {
                 d={ICONS.workteam}
               />
             </svg>
-          )}{' '}
+          )}
           <span>
             {info[langSchema[this.props.locale]] || info.name || ':('}
           </span>
-        </div>
+        </Button>
         <Label>{title}</Label>
       </Box>
     );

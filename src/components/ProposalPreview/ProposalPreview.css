@@ -3,7 +3,6 @@
 /* stylelint-enable */
 
 .root {
-  margin: auto;
   max-width: var(--max-content-width);
 }
 
@@ -28,8 +27,6 @@ a:visited {
 }
 
 .container {
-  margin: 0 auto;
-
   /*  border: solid 1px gray; */
   padding: 0.4em;
 

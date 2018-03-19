@@ -2,6 +2,7 @@ import { FormattedRelative } from 'react-intl';
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import cn from 'classnames';
 import s from './ProposalPreview.css';
 import PollState from '../PollState';
 import history from '../../history';
@@ -24,6 +25,10 @@ class ProposalPreview extends React.Component {
       tags: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
     onClick: PropTypes.func.isRequired,
+    className: PropTypes.string,
+  };
+  static defaultProps = {
+    className: null,
   };
   constructor(props) {
     super(props);
@@ -84,7 +89,7 @@ class ProposalPreview extends React.Component {
     }
 
     return (
-      <div className={s.root}>
+      <div className={cn(s.root, this.props.className)}>
         <div className={s.container}>
           <div // eslint-disable-line
             style={{ display: 'flex', cursor: 'pointer' }}
