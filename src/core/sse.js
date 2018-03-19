@@ -35,7 +35,9 @@ export class SubscriptionManager {
     this.pubsub = options.pubsub;
     this.maxSubscriptionId = 0;
     EventManager.subscribe('onActivityCreated', payload => {
-      if (['proposal', 'statement'].includes(payload.activity.type)) {
+      if (
+        ['proposal', 'statement', 'discussion'].includes(payload.activity.type)
+      ) {
         this.pubsub.publish('activities', {
           id: payload.activity.id,
           ...(payload.workTeamId && { workTeamId: payload.workTeamId }),

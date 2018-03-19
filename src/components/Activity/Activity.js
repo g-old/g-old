@@ -73,7 +73,7 @@ function getProposalHeader(verb, proposal) {
   let identifier;
 
   if (proposal.state === 'update') {
-    state = proposal.state;
+    state = proposal.state; // eslint-disable-line
   }
   switch (state) {
     case 'create': {
@@ -161,7 +161,7 @@ class Activity extends React.Component {
                 fill="none"
                 stroke="#000"
                 strokeWidth="2"
-                d="M18,17 L18,18 C18,21 16,22 13,22 L11,22 C8,22 6,21 6,18 L6,17 C3.23857625,17 1,14.7614237 1,12 C1,9.23857625 3.23857625,7 6,7 L12,7 M6,7 L6,6 C6,3 8,2 11,2 L13,2 C16,2 18,3 18,6 L18,7 C20.7614237,7 23,9.23857625 23,12 C23,14.7614237 20.7614237,17 18,17 L12,17"
+                d={ICONS.workteam}
               />
             </svg>
           )}{' '}
@@ -193,16 +193,18 @@ class Activity extends React.Component {
       </svg>
     );
     return (
-      <Link
-        to={`/proposal/${info.proposalId || 'xxx'}/${this.props.content
-          .pollId}`}
+      <Link // eslint-disable-line
+        to={`/proposal/${info.proposalId || 'xxx'}/${
+          this.props.content.pollId
+        }`}
       >
         <div className={s.follower}>
           <span>
             <Avatar user={this.props.content.voter} isFollowee />
             <span>
-              {`${this.props.content.voter.name} ${this.props.content.voter
-                .surname}`}
+              {`${this.props.content.voter.name} ${
+                this.props.content.voter.surname
+              }`}
             </span>
           </span>
 
@@ -218,11 +220,10 @@ class Activity extends React.Component {
     const child = parent ? content.id : null;
 
     return (
-      <Link
-        to={`/workteams/${workTeamId}/discussions/${this.props.content
-          .discussionId}?comment=${parent || content.id}${child
-          ? `&child=${child}`
-          : ''}`}
+      <Link // eslint-disable-line
+        to={`/workteams/${workTeamId}/discussions/${
+          this.props.content.discussionId
+        }?comment=${parent || content.id}${child ? `&child=${child}` : ''}`}
       >
         <Comment preview {...this.props.content} />
       </Link>
@@ -238,7 +239,9 @@ class Activity extends React.Component {
         const info = JSON.parse(this.props.info || '{}');
 
         result.content = (
-          <Link to={`/proposal/${info.proposalId || 'xxx'}/${content.pollId}`}>
+          <Link // eslint-disable-line
+            to={`/proposal/${info.proposalId || 'xxx'}/${content.pollId}`}
+          >
             <Statement {...content} />
           </Link>
         );
@@ -274,7 +277,8 @@ class Activity extends React.Component {
             onClick={() =>
               history.push(
                 `/workteams/${info.workTeamId}/discussions/${content.id}`,
-              )}
+              )
+            }
           />
         );
 
