@@ -1226,5 +1226,12 @@
       "src/routes/account/AccountContainer.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
     ]
+  },
+  {
+    "id": "spokesman",
+    "description": "Spokesman label",
+    "defaultMessage": "Spokesman",
+    "message": "",
+    "files": ["src/components/Proposal/Proposal.js"]
   }
 ]
