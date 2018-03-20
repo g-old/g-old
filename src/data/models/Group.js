@@ -263,7 +263,7 @@ class Group {
     if (
       !canMutate(
         viewer,
-        { ...data, id: data.parentId || 'platform' },
+        { ...data, id: data.parentGroupId || 'platform' },
         Models.GROUP,
       )
     )
@@ -283,6 +283,9 @@ class Group {
       if (!validateCoordinator(viewer, data.coordinatorId, loaders))
         return null;
       newData.coordinator_id = data.coordinatorId;
+    }
+    if (data.parentGroupId) {
+      newData.parent_group_id = data.parentGroupId;
     }
     newData.created_at = new Date();
     const group = await knex.transaction(async trx => {

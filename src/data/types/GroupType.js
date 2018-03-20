@@ -11,7 +11,7 @@ import UserType from './UserType';
 import DiscussionType from './DiscussionType';
 import GroupStatusType from './GroupStatusType';
 import PageType from './PageType';
-
+import Group from '../models/Group';
 import Request from '../models/Request';
 import ProposalStatusType from '../types/ProposalStatusType';
 
@@ -125,6 +125,15 @@ const GroupType = new ObjectType({
             .then(ids => ids.map(id => Discussion.gen(viewer, id, loaders)));
         }
         return null;
+      },
+    },
+    subGroups: {
+      type: new GraphQLList(GroupType),
+      resolve(parent, args, { viewer, loaders }) {
+        return knex('groups')
+          .where({ parent_group_id: parent.id })
+          .pluck('id')
+          .then(ids => ids.map(id => Group.gen(viewer, id, loaders)));
       },
     },
     proposalConnection /* {

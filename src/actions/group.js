@@ -86,6 +86,9 @@ const groupWithDetails = `query($id:ID!){
     group(id:$id) {
       ${groupFields}
       ${wtDetails}
+      subGroups{
+        ${groupFields}
+      }
       requestConnection(type:"joinWT" filterBy:[{filter:CONTENT_ID id:$id}]){
       pageInfo{
         endCursor

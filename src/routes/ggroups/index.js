@@ -12,7 +12,7 @@ import GroupLayout from '../../containers/GroupLayout';
 import GroupsPage from '../../containers/GroupsPage';
 import { getSessionUser } from '../../reducers';
 import { canAccess } from '../../organization';
-import { loadGroups } from '../../actions/group';
+import { loadGroups, loadGroup } from '../../actions/group';
 
 const title = 'Admin';
 
@@ -25,14 +25,18 @@ async function action({ store }, { id }) {
       return { redirect: '/admin' };
     }
   }
-  await store.dispatch(loadGroups());
+  if (id) {
+    await store.dispatch(loadGroup({ id }, true));
+  } else {
+    await store.dispatch(loadGroups());
+  }
   const links = [{ to: 'groups/add', name: 'ADD NEW GROUP' }];
   return {
     chunks: ['admin'],
     title,
     component: (
       <GroupLayout id={id} menuLinks={links}>
-        <GroupsPage />
+        <GroupsPage id={id} />
       </GroupLayout>
     ),
   };

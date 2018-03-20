@@ -4,14 +4,24 @@ import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './GroupsPage.css';
 import Box from '../../components/Box';
-import { getGroups } from '../../reducers';
+import { getGroups, getGroup } from '../../reducers';
 
 import AssetsTable from '../../components/AssetsTable';
 import GroupRow from './GroupRow';
 import history from '../../history';
 
 class GroupsPage extends React.Component {
-  static propTypes = { groups: PropTypes.arrayOf({}).isRequired };
+  static propTypes = {
+    groups: PropTypes.arrayOf({}),
+    group: PropTypes.shape({ subGroups: PropTypes.shape({}) }),
+    id: PropTypes.string,
+  };
+
+  static defaultProps = {
+    id: null,
+    group: null,
+    groups: null,
+  };
 
   // eslint-disable-next-line
   onGroupClick(action, { id }) {
@@ -23,6 +33,10 @@ class GroupsPage extends React.Component {
   }
 
   render() {
+    const groups = this.props.id
+      ? this.props.group.subGroups
+      : this.props.groups;
+
     return (
       <Box>
         <AssetsTable
@@ -32,7 +46,7 @@ class GroupsPage extends React.Component {
           searchTerm=""
           noRequestsFound="No requests found"
           checkedIndices={[]}
-          assets={this.props.groups}
+          assets={groups || []}
           row={GroupRow}
           tableHeaders={['', 'name', 'subgroups', '', '']}
         />
@@ -40,7 +54,8 @@ class GroupsPage extends React.Component {
     );
   }
 }
-const mapStateToProps = state => ({
+const mapStateToProps = (state, { id }) => ({
   groups: getGroups(state),
+  group: getGroup(state, id),
 });
 export default connect(mapStateToProps)(withStyles(s)(GroupsPage));

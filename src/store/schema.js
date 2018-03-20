@@ -2,6 +2,7 @@ import { schema } from 'normalizr';
 
 export const role = new schema.Entity('roles');
 export const user = new schema.Entity('users');
+export const group = new schema.Entity('groups');
 export const request = new schema.Entity('requests', {
   requester: user,
   processor: user,
@@ -44,12 +45,13 @@ export const proposal = new schema.Entity('proposals', {
 export const proposalStatus = new schema.Entity('proposalStatus', {
   proposal,
 });
-export const group = new schema.Entity('groups', {
+group.define({
   coordinator: user,
   members: [user],
   ownStatus: {
     request,
   },
+  subGroups: [group],
   requests: [request],
   proposals: [proposal],
   linkedProposals: [proposalStatus],

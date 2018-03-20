@@ -38,6 +38,7 @@ export const getGroup = (state, id, entities) =>
     requests: entities.requests.byId,
     proposals: entities.proposals.byId,
     proposalStatus: entities.proposalStatus,
+    groups: entities.groups.byId,
   });
 
 export const getIsFetching = state => fromList.getIsFetching(state.allIds);

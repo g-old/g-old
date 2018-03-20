@@ -31,7 +31,7 @@ async function action({ store }, { id }) {
     title,
     component: (
       <GroupLayout id={id} menuLinks={[]}>
-        <GroupForm />
+        <GroupForm id={id} />
       </GroupLayout>
     ),
   };

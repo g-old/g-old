@@ -173,7 +173,7 @@ class GroupForm extends React.Component {
   onSubmit(e) {
     // TODO checks
     e.preventDefault();
-    const { group } = this.props;
+    const { group, id } = this.props;
     const { coordinator } = this.state;
     // eslint-disable-next-line
 
@@ -197,6 +197,9 @@ class GroupForm extends React.Component {
         ['default_name', 'de-DE', 'it-IT', 'lld-IT'],
         inputValues,
       );
+      if (id) {
+        inputs.parentGroupId = id;
+      }
 
       if (this.props.id) {
         this.props.updateGroup({ id: this.state.id, ...inputs });
