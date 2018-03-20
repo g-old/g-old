@@ -25,9 +25,13 @@ import Discussion from '../../components/Discussion';
 import Box from '../../components/Box';
 // import Button from '../../components/Button';
 // import Filter from '../../components/Filter';
-import CheckBox from '../../components/CheckBox';
+// import CheckBox from '../../components/CheckBox';
 import Comment from '../../components/Comment';
+import history from '../../history';
 
+const handleProfileClick = ({ id }) => {
+  if (id) history.push(`/accounts/${id}`);
+};
 class DiscussionContainer extends React.Component {
   static propTypes = {
     discussion: PropTypes.shape({
@@ -64,7 +68,7 @@ class DiscussionContainer extends React.Component {
   };
   constructor(props) {
     super(props);
-    this.state = { filter: 'all' };
+    this.state = {};
     this.scrollToId = props.childId || props.commentId;
     //  this.handleSubscription = this.handleSubscription.bind(this);
     this.handleCommentCreation = this.handleCommentCreation.bind(this);
@@ -93,10 +97,6 @@ class DiscussionContainer extends React.Component {
     return this.props.discussion;
   }
 
-  filterStatements(e, { filter }) {
-    e.preventDefault();
-    this.setState({ filter });
-  }
   handleCommentCreation(data) {
     this.props.createComment({ ...data, discussionId: this.props.id });
   }
@@ -131,19 +131,18 @@ class DiscussionContainer extends React.Component {
     }
     if (this.isReady()) {
       // return proposal, poll, statementslist
-      if (!discussion.comments) return <span>{'NOTHING TO SEE'}</span>;
+      if (!discussion.comments) return <span>NOTHING TO SEE</span>;
       return (
         <div>
           <Box tag="article" column pad align padding="medium">
-            <CheckBox
+            {/* <CheckBox
               toggle
               checked={discussion.subscribed}
               label={discussion.subscribed ? 'ON' : 'OFF'}
               onChange={this.handleSubscription}
               disabled={isFetching}
-            />
+            /> */}
             <Discussion {...discussion} />
-            {`COMMENTS * ${discussion.numComments}`}
             <Box tag="section" column pad fill className={s.commentsSection}>
               <Comment
                 asInput
@@ -151,9 +150,7 @@ class DiscussionContainer extends React.Component {
                 onCreate={this.handleCommentCreation}
                 updates={this.props.updates['0000'] || {}}
               />
-              <Box justify>
-                <span>{'TOP COMMENTS'} </span>
-              </Box>
+
               {discussion.comments &&
                 discussion.comments.map(c => (
                   <Comment
@@ -164,6 +161,7 @@ class DiscussionContainer extends React.Component {
                     onCreate={this.handleCommentCreation}
                     onUpdate={this.props.updateComment}
                     onDelete={this.props.deleteComment}
+                    onProfileClick={handleProfileClick}
                     openInput={c.id === this.state.replying}
                     // eslint-disable-next-line eqeqeq
                     own={c.author.id == user.id}
@@ -186,6 +184,7 @@ class DiscussionContainer extends React.Component {
                           onUpdate={this.props.updateComment}
                           onDelete={this.props.deleteComment}
                           openInput={r.id === this.state.replying}
+                          onProfileClick={handleProfileClick}
                           // eslint-disable-next-line eqeqeq
                           own={r.author.id == user.id}
                           updates={this.props.updates[c.id]}

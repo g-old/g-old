@@ -1,0 +1,15 @@
+version: "3"
+services:
+  web:
+    image: index.docker.io/tobiasmayr/gold:${TAG}
+    restart: always
+    network_mode: "host"
+    volumes:
+      - ${BANNER}:/app/public/banner01.jpg
+    environment:
+      - PORT=${PORT}
+      - NODE_ENV=production
+      - HOST=${HOST}
+      - DATABASE_URL=${DATABASE_URL}
+      - RECAPTCHA_SECRET='6LefH0cUAAAAAAf-XmPeMwE7ObE7DAvG5foUqgdi'
+      - RECAPTCHA_KEY='6LefH0cUAAAAAA1GZB8T57pffEwSWXjN7S74UcRG'

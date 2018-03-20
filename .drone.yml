@@ -1,0 +1,45 @@
+pipeline:
+  restore-cache:
+    image: drillster/drone-volume-cache
+    restore: true
+    mount:
+      - ./node_modules
+    volumes:
+      - /tmp/cache:/cache
+
+  build:
+    image: node:8
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - /home/gold/private_configs.js:/drone/src/github.com/g-old/g-old/private_configs.js
+    commands:
+      - yarn install --no-progress
+      - yarn build --release
+
+  publish-dev:
+    image: plugins/docker
+    repo: tobiasmayr/gold
+    tags: [ dev ]
+    secrets: [ docker_username, docker_password ]
+    when:
+      event: push
+      branch: dev
+
+  publish-live:
+    image: plugins/docker
+    repo: tobiasmayr/gold
+    auto_tag: true
+    secrets: [ docker_username, docker_password ]
+    when:
+      event: tag
+
+  rebuild-cache:
+    image: drillster/drone-volume-cache
+    rebuild: true
+    mount:
+      - ./node_modules
+    volumes:
+      - /tmp/cache:/cache
+
+branches: [ dev ]

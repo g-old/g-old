@@ -1,11 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { logout } from '../../actions/session';
 import { getSessionUser } from '../../reducers';
 import Menu from '../Menu';
 import Button from '../Button';
 import history from '../../history';
+
+const messages = defineMessages({
+  logout: {
+    id: 'logout',
+    defaultMessage: 'Logout',
+    description: 'Label for logout',
+  },
+  profile: {
+    id: 'profile',
+    defaultMessage: 'Profile',
+    description: 'Label for profile link',
+  },
+});
+
+const onVisitProfile = e => {
+  if (e.button !== 0) {
+    // leftclick
+    return;
+  }
+  if (e.defaultPrevented === true) {
+    return;
+  }
+  e.preventDefault();
+  history.push(`/account`);
+};
 
 const goHome = e => {
   if (e.button !== 0) {
@@ -98,8 +124,16 @@ class UserStatus extends React.Component {
             dropAlign={{ top: 'top', left: 'left' }}
             icon={avatar}
           >
-            <Button plain onClick={this.onVisitProfile} label="Profile" />
-            <Button plain onClick={this.onLogout} label="Logout" />
+            <Button
+              plain
+              onClick={onVisitProfile}
+              label={<FormattedMessage {...messages.profile} />}
+            />
+            <Button
+              plain
+              onClick={this.onLogout}
+              label={<FormattedMessage {...messages.logout} />}
+            />
           </Menu>
         </div>
       );

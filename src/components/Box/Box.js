@@ -8,7 +8,6 @@ class Box extends React.Component {
   static propTypes = {
     children: PropTypes.node,
     onClick: PropTypes.func,
-    clickable: PropTypes.bool,
     column: PropTypes.bool,
     className: PropTypes.string,
     pad: PropTypes.bool,
@@ -26,7 +25,6 @@ class Box extends React.Component {
   static defaultProps = {
     children: null,
     onClick: null,
-    clickable: false,
     column: false,
     className: null,
     pad: false,
@@ -46,7 +44,6 @@ class Box extends React.Component {
       tag,
       column,
       children,
-      clickable,
       onClick,
       pad,
       className,
@@ -70,7 +67,7 @@ class Box extends React.Component {
           className || null,
           containerClassName || null,
           column ? s.column : null,
-          clickable ? s.clickable : null,
+          onClick ? s.clickable : null,
           pad ? s.pad : null,
           align ? s.align : null,
           justify ? s.justify : null,

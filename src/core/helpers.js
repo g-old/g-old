@@ -30,8 +30,7 @@ export const dedup = arr => {
   return arr.filter(el => {
     const key = JSON.stringify(el);
     const match = Boolean(hashTable[key]);
-
-    return match ? false : (hashTable[key] = true);
+    return match ? false : (hashTable[key] = true); // eslint-disable-line
   });
 };
 
@@ -198,8 +197,8 @@ export const genStatusIndicators = data => {
 export const urlBase64ToUint8Array = base64String => {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
-    .replace(/\-/g, "+") //eslint-disable-line
-    .replace(/_/g, "/"); // eslint-disable-line
+    .replace(/\-/g, '+') //eslint-disable-line
+    .replace(/_/g, '/'); // eslint-disable-line
   const rawData = window.atob(base64);
   return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
 };
@@ -238,3 +237,13 @@ export const getFilter = proposal => {
       return 'repelled';
   }
 };
+
+// from : s https://github.com/grommet/grommet/commit/4faf4898e2d1c7dcfb2c5760bfe23775e9964e81
+export function findVisibleParent(element) {
+  if (element) {
+    return element.offsetParent
+      ? element
+      : findVisibleParent(element.parentElement);
+  }
+  return null;
+}

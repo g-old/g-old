@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-// import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { loadGroups } from '../../actions/group';
 import {
   getGroups,
@@ -10,18 +10,20 @@ import {
 } from '../../reducers';
 import List from '../../components/List';
 import ListItem from '../../components/ListItem';
-import Headline from '../../components/Headline';
+import Heading from '../../components/Heading';
 import FetchError from '../../components/FetchError';
+import Box from '../../components/Box';
+import { ICONS } from '../../constants';
 
 import history from '../../history';
 
-/* const messages = defineMessages({
-  loadMore: {
-    id: 'command.loadMore',
-    defaultMessage: 'Load more',
-    description: 'To get more data',
+const messages = defineMessages({
+  workTeams: {
+    id: 'workTeams',
+    defaultMessage: 'Workteams',
+    description: 'Workteam label',
   },
-}); */
+});
 const handleItemClick = id => {
   history.push(`/workteams/${id}`);
 };
@@ -40,24 +42,40 @@ class GroupListContainer extends React.Component {
   render() {
     const { groups, pending, error } = this.props;
     return (
-      <div>
-        <Headline>{'Workteams'}</Headline>
+      <Box pad column>
+        <Heading tag="h2">
+          <FormattedMessage {...messages.workTeams} />{' '}
+        </Heading>
         {pending && !groups.length && <p>Loading...</p>}
         {!pending && !groups.length && !error && <p> No data</p>}
         {error && (
-          <FetchError
-            message={error}
-            onRetry={() => this.props.loadGroups()}
-          />
+          <FetchError message={error} onRetry={() => this.props.loadGroups()} />
         )}
         <List>
           {groups.map(u => (
             <ListItem onClick={() => handleItemClick(u.id)}>
-              <span>{u.displayName}</span>
+              <Box pad>
+                <svg
+                  version="1.1"
+                  viewBox="0 0 24 24"
+                  width="24px"
+                  height="24px"
+                  role="img"
+                  aria-label="organization"
+                >
+                  <path
+                    fill="none"
+                    stroke="#000"
+                    strokeWidth="2"
+                    d={ICONS.workteam}
+                  />
+                </svg>
+                <span>{u.displayName}</span>
+              </Box>
             </ListItem>
           ))}
         </List>
-      </div>
+      </Box>
     );
   }
 }

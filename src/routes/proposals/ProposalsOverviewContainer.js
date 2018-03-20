@@ -74,12 +74,13 @@ class ProposalsOverviewContainer extends React.Component {
       );
     }
 
+    const platformProposals = proposals.filter(p => !p.workTeamId);
     return (
       <div>
         {/* <Navigation filter={filter} /> */}
         <ProposalsSubHeader filter={filter} />
         <ProposalListView
-          proposals={proposals}
+          proposals={platformProposals}
           onProposalClick={this.onProposalClick}
           pageInfo={this.props.pageInfo}
           filter={filter}

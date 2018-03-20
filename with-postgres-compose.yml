@@ -1,0 +1,29 @@
+version: "3"
+services:
+  db:
+    image: postgres:9.6-alpine
+    restart: always
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=gold
+      - POSTGRES_PASSWORD=gold
+      - POSTGRES_DB=test
+
+  web:
+    image: index.docker.io/tobiasmayr/gold:dev
+    restart: always
+    #volumes:
+    #  - ${BANNER}:/app/public/banner01.jpg
+    ports:
+      - 3005:3005
+    environment:
+      - PORT=3005
+      - NODE_ENV=production
+      - HOST=test.g-old.org
+      - DATABASE_URL=postgresql://gold:gold@db:5432/test
+      - RECAPTCHA_SECRET='6LefH0cUAAAAAAf-XmPeMwE7ObE7DAvG5foUqgdi'
+      - RECAPTCHA_KEY='6LefH0cUAAAAAA1GZB8T57pffEwSWXjN7S74UcRG'
+
+volumes:
+  pgdata:

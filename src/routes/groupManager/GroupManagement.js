@@ -4,13 +4,11 @@ import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import Accordion from '../../components/Accordion';
 import Button from '../../components/Button';
-
+import Heading from '../../components/Heading';
+import Box from '../../components/Box';
+import { ICONS } from '../../constants';
 import AccordionPanel from '../../components/AccordionPanel';
-import {
-  loadGroup,
-  joinGroup,
-  loadProposalStatus,
-} from '../../actions/group';
+import { loadGroup, joinGroup, loadProposalStatus } from '../../actions/group';
 import {
   createProposal,
   loadTags,
@@ -73,6 +71,21 @@ const messages = defineMessages({
     id: 'tags',
     defaultMessage: 'Tags',
     description: 'Tags',
+  },
+  discussions: {
+    id: 'discussions',
+    defaultMessage: 'Discussions',
+    description: 'Discussions label',
+  },
+  proposals: {
+    id: 'proposals',
+    defaultMessage: 'Proposals',
+    description: 'Proposals label',
+  },
+  settings: {
+    id: 'settings',
+    defaultMessage: 'Settings',
+    description: 'Label for settings',
   },
 });
 const defaultPollValues = {
@@ -284,49 +297,73 @@ class GroupManagement extends React.Component {
       ];
     }
     return (
-      <Tabs>
-        <Tab title="Discussions">
-          <Accordion>
-            <AccordionPanel heading="Create discussion">
-              <DiscussionInput
-                groupId={this.props.id}
-                updates={discussionUpdates}
-              />
-            </AccordionPanel>
-          </Accordion>
-        </Tab>
-        <Tab title="Proposals">
-          <Accordion>
-            <AccordionPanel
-              heading="Create proposal"
-              onActive={() => {
-                this.props.loadTags();
-              }}
+      <Box column>
+        <Heading tag="h3">
+          {group.logo ? (
+            'IMPLEMENT LOGO'
+          ) : (
+            <svg
+              version="1.1"
+              viewBox="0 0 24 24"
+              role="img"
+              width="48px"
+              height="48px"
+              aria-label="cloud"
             >
-              <ProposalInput
-                groupId={this.props.id}
-                maxTags={8}
-                pollOptions={pollOptions}
-                defaultPollValues={defaultPollValues}
+              <path
+                fill="none"
+                stroke="#000"
+                strokeWidth="2"
+                d={ICONS.workteam}
               />
-            </AccordionPanel>
-            <AccordionPanel heading="Manage proposals">
-              <ProposalsManager
-                proposals={this.props.group.proposals || []}
-                groupId={this.props.id}
-                pollOptions={pollOptions}
-                defaultPollValues={defaultPollValues}
-              />
-            </AccordionPanel>
-            {mainTeamView}
-          </Accordion>
-        </Tab>
-        <Tab title="Requests">{content}</Tab>
-        <Tab title="Settings">
-          <Button label="Edit" />
-          {'TODO WORKTEAMEDIT'}
-        </Tab>
-      </Tabs>
+            </svg>
+          )}
+          {group && group.displayName}
+        </Heading>
+        <Tabs>
+          <Tab title={<FormattedMessage {...messages.discussions} />}>
+            <Accordion>
+              <AccordionPanel heading="Create discussion">
+                <DiscussionInput
+                  groupId={this.props.id}
+                  updates={discussionUpdates}
+                />
+              </AccordionPanel>
+            </Accordion>
+          </Tab>
+          <Tab title={<FormattedMessage {...messages.proposals} />}>
+            <Accordion>
+              <AccordionPanel
+                heading="Create proposal"
+                onActive={() => {
+                  this.props.loadTags();
+                }}
+              >
+                <ProposalInput
+                  groupId={this.props.id}
+                  maxTags={8}
+                  pollOptions={pollOptions}
+                  defaultPollValues={defaultPollValues}
+                />
+              </AccordionPanel>
+              <AccordionPanel heading="Manage proposals">
+                <ProposalsManager
+                  proposals={this.props.group.proposals || []}
+                  groupId={this.props.id}
+                  pollOptions={pollOptions}
+                  defaultPollValues={defaultPollValues}
+                />
+              </AccordionPanel>
+              {mainTeamView}
+            </Accordion>
+          </Tab>
+          <Tab title="Requests">{content}</Tab>
+          <Tab title={<FormattedMessage {...messages.settings} />}>
+            <Button label="Edit" />
+            {'TODO WORKTEAMEDIT'}
+          </Tab>
+        </Tabs>
+      </Box>
     );
   }
 }

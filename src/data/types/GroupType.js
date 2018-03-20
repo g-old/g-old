@@ -120,6 +120,7 @@ const GroupType = new ObjectType({
         if (viewer && viewer.wtMemberships.includes(data.id)) {
           return knex('discussions')
             .where({ group_id: data.id })
+            .orderBy('created_at', 'DESC')
             .pluck('id')
             .then(ids => ids.map(id => Discussion.gen(viewer, id, loaders)));
         }

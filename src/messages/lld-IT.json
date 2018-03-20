@@ -597,8 +597,7 @@
     "id": "settings.title",
     "description": "Header for settings",
     "defaultMessage": "Settings",
-    "message": "Settings",
-    "files": ["src/routes/account/AccountContainer.js"]
+    "message": "Settings"
   },
   {
     "id": "action.success",
@@ -694,8 +693,7 @@
     "id": "navigation.proposals",
     "description": "Proposals link in header",
     "defaultMessage": "Proposals",
-    "message": "Propostes",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Propostes"
   },
   {
     "id": "navigation.surveys",
@@ -981,13 +979,6 @@
     "files": ["src/components/Navigation/Navigation.js"]
   },
   {
-    "id": "navigation.users",
-    "description": "Workteam list link in header",
-    "defaultMessage": "All workteams",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
     "id": "command.loadMore",
     "description": "To get more data",
     "defaultMessage": "Load more",
@@ -1145,22 +1136,102 @@
   {
     "id": "settings.email.requestCreated",
     "description": "Notification that a request has been created",
-    "defaultMessage": "You have to confirm your new email address \"{email}\"",
+    "defaultMessage": "Check your email ({email}) to confirm.",
     "message": "",
     "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
     "id": "settings.email.resendNotification",
     "description": "Verification mail sending success",
-    "defaultMessage": "An email was sent to your new mail address \"{email}\"",
+    "defaultMessage": "An email was sent to your new mail address ({email})",
     "message": "",
     "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
     "id": "settings.verificationCall",
     "description": "Notification to verify mail address",
-    "defaultMessage": "Please confirm your email address",
+    "defaultMessage":
+      "Confirm your email address. A confirmation message was sent to \"{email}\"",
     "message": "",
     "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "proposals",
+    "description": "Proposals label",
+    "defaultMessage": "Proposals",
+    "message": "",
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/WorkTeam/WorkTeam.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
+  },
+  {
+    "id": "users",
+    "description": "Users label",
+    "defaultMessage": "Users",
+    "message": "",
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/routes/accountList/AccountListContainer.js"
+    ]
+  },
+  {
+    "id": "workTeams",
+    "description": "Workteam label",
+    "defaultMessage": "Workteams",
+    "message": "",
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/routes/workTeamList/WorkTeamListContainer.js"
+    ]
+  },
+  {
+    "id": "logout",
+    "description": "Label for logout",
+    "defaultMessage": "Logout",
+    "message": "",
+    "files": ["src/components/UserStatus/UserStatus.js"]
+  },
+  {
+    "id": "profile",
+    "description": "Label for profile link",
+    "defaultMessage": "Profile",
+    "message": "",
+    "files": ["src/components/UserStatus/UserStatus.js"]
+  },
+  {
+    "id": "discussions",
+    "description": "Discussions label",
+    "defaultMessage": "Discussions",
+    "message": "",
+    "files": [
+      "src/components/WorkTeam/WorkTeam.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
+  },
+  {
+    "id": "members",
+    "description": "Members label",
+    "defaultMessage": "Members",
+    "message": "",
+    "files": ["src/components/WorkTeam/WorkTeam.js"]
+  },
+  {
+    "id": "settings",
+    "description": "Label for settings",
+    "defaultMessage": "Settings",
+    "message": "",
+    "files": [
+      "src/routes/account/AccountContainer.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
+  },
+  {
+    "id": "spokesman",
+    "description": "Spokesman label",
+    "defaultMessage": "Spokesman",
+    "message": "",
+    "files": ["src/components/Proposal/Proposal.js"]
   }
 ]

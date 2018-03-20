@@ -4,7 +4,7 @@
 import React from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
 import DropContents from '../DropContents';
-import { findScrollParents } from '../../core/helpers';
+import { findScrollParents, findVisibleParent } from '../../core/helpers';
 
 class Drop {
   constructor(control, content, options) {
@@ -100,7 +100,7 @@ class Drop {
     container.style.maxHeight = '';
 
     // get bounds
-    const controlRect = control.getBoundingClientRect();
+    const controlRect = findVisibleParent(control).getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
 
     // determine width
@@ -110,6 +110,7 @@ class Drop {
     );
     //
     // set left position
+    /* eslint-disable prefer-destructuring */
     let left;
     if (align.left) {
       if (align.left === 'left') {
@@ -188,7 +189,7 @@ class Drop {
         }
       }
     }
-    //
+    /* eslint-enable prefer-destructuring */
 
     // for Chrome, Safari, and Opera, use document.body
     // for Firefox and IE, use document.documentElement

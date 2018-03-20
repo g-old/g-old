@@ -14,6 +14,7 @@ import ProposalPreview from '../ProposalPreview';
 import history from '../../history';
 import Tabs from '../Tabs';
 import Tab from '../Tab';
+import { ICONS } from '../../constants';
 
 const messages = defineMessages({
   join: {
@@ -30,6 +31,21 @@ const messages = defineMessages({
     id: 'leave',
     defaultMessage: 'Leave',
     description: 'Leave team',
+  },
+  proposals: {
+    id: 'proposals',
+    defaultMessage: 'Proposals',
+    description: 'Proposals label',
+  },
+  discussions: {
+    id: 'discussions',
+    defaultMessage: 'Discussions',
+    description: 'Discussions label',
+  },
+  members: {
+    id: 'members',
+    defaultMessage: 'Members',
+    description: 'Members label',
   },
 });
 
@@ -177,12 +193,7 @@ class Group extends React.Component {
           height="100px"
           aria-label="cloud"
         >
-          <path
-            fill="none"
-            stroke="#000"
-            strokeWidth="2"
-            d="M18,17 L18,18 C18,21 16,22 13,22 L11,22 C8,22 6,21 6,18 L6,17 C3.23857625,17 1,14.7614237 1,12 C1,9.23857625 3.23857625,7 6,7 L12,7 M6,7 L6,6 C6,3 8,2 11,2 L13,2 C16,2 18,3 18,6 L18,7 C20.7614237,7 23,9.23857625 23,12 C23,14.7614237 20.7614237,17 18,17 L12,17"
-          />
+          <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.workteam} />
         </svg>
       );
     }
@@ -192,34 +203,39 @@ class Group extends React.Component {
       actionBtn = this.renderActionButton(ownStatus.status, updates);
     }
 
-    let discussionSection;
-    let proposalsSection;
+    let contentSection;
     if (ownStatus.status === 'MEMBER') {
-      discussionSection = (
-        <div className={s.discussions}>
-          {discussions.map(
-            d =>
-              d && (
-                <DiscussionPreview
-                  discussion={d}
-                  onClick={this.handleDiscussionClick}
-                />
-              ),
-          )}
-        </div>
-      );
-      proposalsSection = (
-        <div>
-          {proposals.map(
-            p =>
-              p && (
-                <ProposalPreview
-                  proposal={p}
-                  onClick={Group.onProposalClick}
-                />
-              ),
-          )}
-        </div>
+      contentSection = (
+        <Box tag="section" column fill>
+          <Tabs>
+            <Tab title={<FormattedMessage {...messages.proposals} />}>
+              <Box column className={s.itemContainer}>
+                {proposals.map(
+                  p =>
+                    p && (
+                      <ProposalPreview
+                        proposal={p}
+                        onClick={Group.onProposalClick}
+                      />
+                    ),
+                )}
+              </Box>
+            </Tab>
+            <Tab title={<FormattedMessage {...messages.discussions} />}>
+              <Box column className={s.itemContainer}>
+                {discussions.map(
+                  d =>
+                    d && (
+                      <DiscussionPreview
+                        discussion={d}
+                        onClick={this.handleDiscussionClick}
+                      />
+                    ),
+                )}
+              </Box>
+            </Tab>
+          </Tabs>
+        </Box>
       );
     }
     let layer;
@@ -233,7 +249,7 @@ class Group extends React.Component {
       );
     }
     return (
-      <Box align column padding="medium" pad>
+      <Box align column padding="medium" pad fill>
         {picture}
         <Heading tag="h2">{displayName}</Heading>
         <Box>
@@ -248,7 +264,7 @@ class Group extends React.Component {
                 />
               </svg>
             }
-            label="Members"
+            label={<FormattedMessage {...messages.members} />}
             value={numMembers || 0}
           />
 
@@ -263,7 +279,7 @@ class Group extends React.Component {
                 />
               </svg>
             }
-            label="Discussions"
+            label={<FormattedMessage {...messages.discussions} />}
             value={numDiscussions || 0}
           />
           <Value
@@ -284,29 +300,13 @@ class Group extends React.Component {
                 />
               </svg>
             }
-            label="Proposals"
+            label={<FormattedMessage {...messages.proposals} />}
             value={numProposals || 0}
           />
           <Box />
         </Box>
-        {/* <Button
-          onClick={() => {
-            history.push(`/workteams/${id}/admin`);
-          }}
-          primary
-          label={'Management'}
-        /> */}
         {actionBtn}
-        <section>
-          <Tabs>
-            <Tab title="Votings">
-              <div>{proposalsSection}</div>
-            </Tab>
-            <Tab title="Discussions">
-              <div>{discussionSection}</div>
-            </Tab>
-          </Tabs>
-        </section>
+        {contentSection}
         {layer}
       </Box>
     );

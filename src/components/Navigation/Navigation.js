@@ -31,7 +31,6 @@ const messages = defineMessages({
     defaultMessage: 'About',
     description: 'About link in header',
   },
-
   admin: {
     id: 'navigation.admin',
     defaultMessage: 'Admin',
@@ -43,15 +42,15 @@ const messages = defineMessages({
     defaultMessage: 'Profile',
     description: 'Profile link in header',
   },
-  /* users: {
-    id: 'navigation.users',
-    defaultMessage: 'All users',
-    description: 'User list link in header',
-  }, */
-  groups: {
-    id: 'navigation.users',
-    defaultMessage: 'All workteams',
-    description: 'Workteam list link in header',
+  users: {
+    id: 'users',
+    defaultMessage: 'Users',
+    description: 'Users label',
+  },
+  workTeams: {
+    id: 'workTeams',
+    defaultMessage: 'Workteams',
+    description: 'Workteam label',
   },
 });
 

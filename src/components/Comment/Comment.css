@@ -24,10 +24,13 @@
 
 .avatar {
   display: inline-block;
-  cursor: pointer;
   margin-right: 0.5em;
   width: 2.5em;
   height: 2.5em;
+}
+
+.clickable {
+  cursor: pointer;
 }
 
 .replies {

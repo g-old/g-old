@@ -82,7 +82,6 @@ class MenuDrop extends React.Component {
         ref={ref => (this.menuDropRef = ref)} // eslint-disable-line
         onClick={onClick}
         column
-        clickable
         className={
           this.props.align.right ? s.menu_drop_right : s.menu_drop_left
         }

@@ -2,11 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import { defineMessages, FormattedMessage } from 'react-intl';
-import {
-  loadGroup,
-  joinGroup,
-  leaveGroup,
-} from '../../actions/group';
+import { loadGroup, joinGroup, leaveGroup } from '../../actions/group';
 import { createRequest, deleteRequest } from '../../actions/request';
 import { getGroup, getGroupStatus } from '../../reducers';
 import Group from '../../components/Group';
@@ -117,7 +113,8 @@ class GroupContainer extends React.Component {
     const { smallSize } = this.state;
     let sidebar;
     let content;
-    if (!smallSize) {
+    const isResponsive = false; // to deactivate
+    if (!smallSize && isResponsive) {
       sidebar = (
         <Nav
           {...this.props.groupData}
@@ -158,7 +155,7 @@ class GroupContainer extends React.Component {
       );
     }
     return (
-      <Box justify={smallSize}>
+      <Box justify={smallSize || !isResponsive}>
         {sidebar}
         {content}
       </Box>
