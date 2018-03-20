@@ -6,7 +6,7 @@ import entities, * as fromEntity from './entities';
 import ui, * as fromUi from './ui';
 import consent from './consent';
 import statistics from './statistics';
-import plattform, * as fromPlattform from './plattform';
+import platform, * as fromPlatform from './platform';
 
 export default combineReducers({
   user,
@@ -18,15 +18,14 @@ export default combineReducers({
   recaptchaKey: (state = '') => state,
   consent,
   statistics,
-  plattform,
+  platform,
 });
 
 /* GENERATOR */
 
-export const getPlattform = state => fromPlattform.getPlattform(state);
+export const getPlatform = state => fromPlatform.getPlatform(state);
 
-export const getPlattformUpdates = state =>
-  fromUi.getPlattformUpdates(state.ui);
+export const getPlatformUpdates = state => fromUi.getPlatformUpdates(state.ui);
 export const getVisibleRequests = (state, filter) =>
   fromEntity.getVisibleRequests(state.entities, filter);
 

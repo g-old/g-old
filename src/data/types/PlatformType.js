@@ -7,8 +7,8 @@ import User from '../models/User';
 import GroupType from './GroupType';
 import Group from '../models/Group';
 
-const PlattformType = new ObjectType({
-  name: 'Plattform',
+const PlatformType = new ObjectType({
+  name: 'Platform',
   fields: {
     names: {
       type: String,
@@ -40,4 +40,4 @@ const PlattformType = new ObjectType({
   },
 });
 
-export default PlattformType;
+export default PlatformType;

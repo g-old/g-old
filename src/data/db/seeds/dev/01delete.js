@@ -88,9 +88,9 @@ exports.seed = function(knex, Promise) {
       .del()
       .then(() =>
         knex.raw('ALTER SEQUENCE users_id_seq RESTART WITH 1;'),
-      ), knex('plattform_settings')
+      ), knex('platform_settings')
       .del()
-      .then(() => knex.raw('ALTER SEQUENCE plattform_settings_id_seq RESTART WITH 1;'))];
+      .then(() => knex.raw('ALTER SEQUENCE platform_settings_id_seq RESTART WITH 1;'))];
   /* const chain = deleteQueue.reduce(
     (soFar, f) => soFar.then(f,(e)=>{console.log(e)}),
     Promise.resolve(console.log('deleting entries in table ... '))

@@ -8,16 +8,14 @@
  */
 
 import React from 'react';
-import AdminPage from '../../containers/AdminPage';
-import PlattformEdit from '../../containers/PlattformEdit';
-
+import UserLayout from '../../containers/UserLayout';
 import { getSessionUser } from '../../reducers';
 import { canAccess } from '../../organization';
-import { loadPlattform } from '../../actions/plattform';
+import { loadGroups } from '../../actions/group';
 
 const title = 'Admin';
 
-async function action({ store }) {
+async function action({ store }, { id }) {
   const state = await store.getState();
   const user = getSessionUser(state);
 
@@ -26,16 +24,18 @@ async function action({ store }) {
       return { redirect: '/admin' };
     }
   }
-  await store.dispatch(loadPlattform(true));
-  const links = [{ to: 'plattform/settings', name: 'SETTINGS' }];
-
+  await store.dispatch(loadGroups());
+  const links = [
+    { to: 'password/', name: 'PASSWORD' },
+    { to: 'notifications', name: 'NOTIFICATIONS' },
+  ];
   return {
     chunks: ['admin'],
     title,
     component: (
-      <AdminPage menuLinks={links}>
-        <PlattformEdit />
-      </AdminPage>
+      <UserLayout id={id} menuLinks={links}>
+        {'Hm, what to show as Settings?'}
+      </UserLayout>
     ),
   };
 }

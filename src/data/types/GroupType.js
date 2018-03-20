@@ -31,37 +31,19 @@ const GroupType = new ObjectType({
         return User.gen(viewer, data.coordinatorId, loaders);
       },
     },
-    name: {
+    names: {
       type: GraphQLString,
+      resolve: parent => JSON.stringify(parent.names),
     },
+
     displayName: {
       type: GraphQLString,
       resolve(parent, args, params, { rootValue }) {
-        switch (rootValue.request.language) {
-          case 'de-DE': {
-            return parent.deName || parent.name;
-          }
-          case 'it-IT': {
-            return parent.itName || parent.name;
-          }
-          case 'lld-IT': {
-            return parent.lldName || parent.name;
-          }
-
-          default:
-            return parent.name;
-        }
+        const locale = rootValue.request.language;
+        return parent.names[locale] || parent.names.default_name;
       },
     },
-    deName: {
-      type: GraphQLString,
-    },
-    itName: {
-      type: GraphQLString,
-    },
-    lldName: {
-      type: GraphQLString,
-    },
+
     members: {
       type: new GraphQLList(UserType),
       resolve(data, args, { viewer, loaders }) {

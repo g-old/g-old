@@ -89,7 +89,7 @@ class Navigation extends React.Component {
   }
   canSeeAdmin() {
     const { user } = this.props;
-    if (user && user.rights.plattform) {
+    if (user && user.rights.platform) {
       return true;
     }
     return false;
@@ -128,6 +128,7 @@ class Navigation extends React.Component {
       <Box className={s.root} pad column fill>
         <Box between>
           <UserStatus />
+          {'GROUPNAME'}
           <Box>
             <Button
               plain

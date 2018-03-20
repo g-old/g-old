@@ -95,7 +95,7 @@ export const log = new schema.Entity('logs', {
   actor: user,
 });
 
-export const plattform = new schema.Entity('plattform', {
+export const platform = new schema.Entity('platform', {
   admin: user,
   defaultGroup: group,
 });

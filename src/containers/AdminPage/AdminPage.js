@@ -4,16 +4,17 @@ import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './AdminPage.css';
 import Box from '../../components/Box';
-import Image from '../../components/Image';
 import Anchor from '../../components/Anchor';
 import Layout from '../../components/Layout';
-import { getPlattform } from '../../reducers';
+import PageHeader from '../../components/PageHeader';
+
+import { getPlatform } from '../../reducers';
 
 class AdminPage extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     menuLinks: PropTypes.arrayOf(PropTypes.shape({})),
-    plattform: PropTypes.shape({}).isRequired,
+    platform: PropTypes.shape({}).isRequired,
   };
 
   static defaultProps = {
@@ -21,22 +22,7 @@ class AdminPage extends React.Component {
   };
 
   render() {
-    const { children, menuLinks = [], plattform } = this.props;
-    const navHeader = (
-      <Box className={s.navHeader} between fill>
-        <span>
-          <Anchor to="/admin" className={s.title}>
-            {plattform.displayName}
-          </Anchor>
-          <div>
-            <span>
-              {`Admin: ${plattform.admin.name} ${plattform.admin.surname} `}{' '}
-            </span>
-          </div>
-        </span>
-        <Image className={s.picture} src={plattform.picture} />
-      </Box>
-    );
+    const { children, menuLinks = [], platform } = this.props;
 
     const pageNav = (
       <Box className={s.pageNav} pad>
@@ -46,7 +32,12 @@ class AdminPage extends React.Component {
     return (
       <Layout>
         <div className={s.container}>
-          {navHeader}
+          <PageHeader
+            displayName={platform.displayName}
+            link="/admin"
+            account={platform.admin}
+            picture={platform.picture || '/tile.png'}
+          />
           {pageNav}
           {children}
         </div>
@@ -54,5 +45,5 @@ class AdminPage extends React.Component {
     );
   }
 }
-const mapStateToProps = state => ({ plattform: getPlattform(state) });
+const mapStateToProps = state => ({ platform: getPlatform(state) });
 export default connect(mapStateToProps)(withStyles(s)(AdminPage));

@@ -5,11 +5,11 @@ exports.up = function(knex, Promise) {
         return knex.schema.createTable('system_feeds', table => {
           table.increments();
           table
-            .integer('groups_id')
+            .integer('group_id')
             .unsigned()
             .notNullable();
           table
-            .foreign('groups_id')
+            .foreign('group_id')
             .references('groups.id')
             .onDelete('CASCADE');
           table.jsonb('main_activities').defaultsTo('[]');

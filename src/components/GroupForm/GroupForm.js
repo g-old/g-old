@@ -3,11 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import { defineMessages, FormattedMessage } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import {
-  loadGroup,
-  updateGroup,
-  createGroup,
-} from '../../actions/group';
+import { loadGroup, updateGroup, createGroup } from '../../actions/group';
 import { findUser } from '../../actions/user';
 
 import {
@@ -63,9 +59,9 @@ const getChangedFields = (inputFields, state, props) =>
     return agg;
   }, {});
 
-const formFields = ['name', 'coordinator'];
+const formFields = ['default_name'];
 // TODO Form HOC
-const genInitalState = (fields, values) =>
+const genInitialState = (fields, values) =>
   fields.reduce(
     (acc, curr) => {
       acc[curr] = values[curr] || '';
@@ -75,12 +71,27 @@ const genInitalState = (fields, values) =>
     { errors: {} },
   );
 
+const convertLocalesToNames = (locales, inputValues) => {
+  const values = inputValues;
+  let dirty = false;
+  const names = locales.reduce((acc, curr) => {
+    if (inputValues[curr]) {
+      dirty = true;
+      acc[curr] = inputValues[curr];
+      delete values[curr];
+    }
+    return acc;
+  }, {});
+  return dirty ? { ...values, names: JSON.stringify(names) } : inputValues;
+};
+
 // TODO EDIT + CREATE should be the same form
-class GroupManagement extends React.Component {
+class GroupForm extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
     users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    group: PropTypes.shape({ id: PropTypes.string }).isRequired,
+    group: PropTypes.shape({ id: PropTypes.string, names: PropTypes.shape({}) })
+      .isRequired,
     user: PropTypes.shape({ id: PropTypes.string }).isRequired,
     findUser: PropTypes.func.isRequired,
     updateGroup: PropTypes.func.isRequired,
@@ -92,7 +103,6 @@ class GroupManagement extends React.Component {
   };
 
   static defaultProps = {
-    requests: null,
     updates: null,
   };
   constructor(props) {
@@ -104,17 +114,18 @@ class GroupManagement extends React.Component {
     this.onCancel = this.onCancel.bind(this);
     this.state = {
       ...props.group,
-      ...genInitalState(formFields, props.group),
-      /*  error: null,
+      ...genInitialState(formFields, {
+        ...props.group,
+        ...(props.group.names && props.group.names),
+      }) /*  error: null,
       pending: false,
-      success: false, */
+      success: false, */,
     };
     const testValues = {
-      name: { fn: 'name' },
-      deName: { fn: 'name' },
-      itName: { fn: 'name' },
-      lldName: { fn: 'name' },
-
+      default_name: { fn: 'name' },
+      'de-DE': { fn: 'name' },
+      'it-IT': { fn: 'name' },
+      'lld-IT': { fn: 'name' },
       coordinator: {
         fn: 'coordinator',
         valuesResolver: obj => obj.state.coordinatorValue,
@@ -141,7 +152,13 @@ class GroupManagement extends React.Component {
       newUpdates.error = true;
     }
 
-    this.setState({ ...group, ...newUpdates });
+    this.setState({
+      ...genInitialState(formFields, {
+        ...group,
+        ...(group.names && group.names),
+      }),
+      ...newUpdates,
+    });
   }
 
   // eslint-disable-next-line
@@ -156,23 +173,12 @@ class GroupManagement extends React.Component {
   onSubmit(e) {
     // TODO checks
     e.preventDefault();
-    const { id, group, user } = this.props;
+    const { group } = this.props;
     const { coordinator } = this.state;
     // eslint-disable-next-line
-    if (id && user.id != group.coordinator.id) {
-      return;
-    }
+
     if (this.handleValidation(formFields)) {
-      const inputFields = [
-        'id',
-        'deName',
-        'itName',
-        'lldName',
-        'mainTeam',
-        'restricted',
-        'name',
-        'coordinatorId',
-      ];
+      const inputFields = ['default_name'];
       const inputValues = getChangedFields(
         inputFields,
         this.state,
@@ -187,11 +193,18 @@ class GroupManagement extends React.Component {
       } else if (coordinator && coordinator.id) {
         inputValues.coordinatorId = coordinator.id;
       }
+      const inputs = convertLocalesToNames(
+        ['default_name', 'de-DE', 'it-IT', 'lld-IT'],
+        inputValues,
+      );
+
       if (this.props.id) {
-        this.props.updateGroup({ id: this.state.id, ...inputValues });
+        this.props.updateGroup({ id: this.state.id, ...inputs });
       } else {
-        this.props.createGroup({ ...inputValues });
+        this.props.createGroup({ ...inputs });
       }
+    } else {
+      alert('Validation failed');
     }
   }
 
@@ -223,22 +236,14 @@ class GroupManagement extends React.Component {
     if (e.target.type === 'checkbox') {
       value = !this.state[e.target.name];
     } else {
-      value = e.target.value;
+      value = e.target.value; //eslint-disable-line
     }
 
     this.setState({ [e.target.name]: value });
   }
 
   render() {
-    const {
-      lldName,
-      name,
-      deName,
-      itName,
-      restricted,
-      mainTeam,
-      error,
-    } = this.state;
+    const { restricted, error } = this.state;
     const { group, users = [], updates = {} } = this.props;
     const errors = this.visibleErrors(formFields);
 
@@ -246,42 +251,41 @@ class GroupManagement extends React.Component {
       <Box column padding="medium">
         <Box type="section" align column pad>
           <Form onSubmit={this.onSubmit}>
-            <Label>{'Workteam names'}</Label>
             <fieldset>
-              <FormField label="Name" error={errors.nameError}>
+              <FormField label="Default name" error={errors.nameError}>
                 <input
                   type="text"
-                  name="name"
-                  value={name}
+                  name="default_name"
+                  value={this.state.default_name}
                   onChange={this.handleValueChanges}
                 />
               </FormField>
               <FormField label="Name german">
                 <input
                   type="text"
-                  name="deName"
-                  value={deName}
+                  name="de-DE"
+                  value={this.state['de-DE']}
                   onChange={this.handleValueChanges}
                 />
               </FormField>
               <FormField label="Name italian">
                 <input
                   type="text"
-                  name="itName"
-                  value={itName}
+                  name="it-IT"
+                  value={this.state['it-IT']}
                   onChange={this.handleValueChanges}
                 />
               </FormField>
               <FormField label="Name ladin">
                 <input
                   type="text"
-                  name="lldName"
-                  value={lldName}
+                  name="lld-IT"
+                  value={this.state['lld-IT']}
                   onChange={this.handleValueChanges}
                 />
               </FormField>
             </fieldset>
-            <Label>{'Coordinator'}</Label>
+            <Label>Coordinator</Label>
             <fieldset>
               <FormField
                 overflow
@@ -291,14 +295,17 @@ class GroupManagement extends React.Component {
                 <SearchField
                   value={
                     group.coordinator
-                      ? `${group.coordinator.name} ${group.coordinator
-                          .surname}`
+                      ? `${group.coordinator.name} ${group.coordinator.surname}`
                       : ''
                   }
                   onChange={e =>
                     this.handleValueChanges({
-                      target: { name: 'coordinatorValue', value: e.value },
-                    })}
+                      target: {
+                        name: 'coordinatorValue',
+                        value: e.value,
+                      },
+                    })
+                  }
                   data={users}
                   fetch={this.props.findUser}
                   displaySelected={data => {
@@ -309,28 +316,13 @@ class GroupManagement extends React.Component {
                 />
               </FormField>
             </fieldset>
-            <Label>{'Member access policy'}</Label>
+            <Label>Privacy</Label>
             <fieldset>
               <FormField>
                 <CheckBox
                   label="Restriction"
                   name="restricted"
                   checked={restricted}
-                  onChange={this.handleValueChanges}
-                  toggle
-                />
-              </FormField>
-            </fieldset>
-
-            <Label>
-              {mainTeam ? 'Current main team (Rat)' : 'Set as main team (Rat)'}
-            </Label>
-            <fieldset>
-              <FormField>
-                <CheckBox
-                  label="mainTeam"
-                  name="mainTeam"
-                  checked={mainTeam}
                   onChange={this.handleValueChanges}
                   toggle
                 />
@@ -364,4 +356,4 @@ const mapDispatch = {
   createGroup,
 };
 
-export default connect(mapStateToProps, mapDispatch)(GroupManagement);
+export default connect(mapStateToProps, mapDispatch)(GroupForm);

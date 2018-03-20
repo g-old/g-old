@@ -2,7 +2,7 @@
   "greeting": { "de-DE": "Hallo", "it-IT": "Ciao", "lld-IT": "" },
   "signup": {
     "de-DE":
-      " Wir freuen uns sehr, Sie hier auf unserer Plattform GOLD begrüßen zu dürfen!",
+      " Wir freuen uns sehr, Sie hier auf unserer Platform GOLD begrüßen zu dürfen!",
     "it-IT": "Siamo lieti di accogliervi sulla Piattaforma  GOLD!",
     "lld-IT": "Con plajei Ves saludun sun la plataforma GOLD"
   },
@@ -55,7 +55,7 @@
   },
   "emailVerification": {
     "de-DE":
-      "Sie haben Ihre E-Mail-Adresse auf der Plattform GOLD geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
+      "Sie haben Ihre E-Mail-Adresse auf der Platform GOLD geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
     "it-IT":
       "Lei ha appena modificato l'indirizzo e-mail della piattaforma GOLD. Per cortesia può confermare la correttezza dell'indirizzo e-mail?",
     "lld-IT":

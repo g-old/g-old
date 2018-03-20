@@ -27,7 +27,7 @@ class Admin extends React.Component {
       <Box className={s.navHeader} between fill>
         <span>
           <Anchor to="/admin" className={s.title}>
-            {'Plattformtitle'}
+            {'Platformtitle'}
           </Anchor>
           <div>
             <span>Owner: </span>
@@ -40,7 +40,7 @@ class Admin extends React.Component {
     const pageNav = (
       <Box className={s.pageNav} pad>
         <Anchor to="/admin/users">USERS</Anchor>
-        <Anchor to="/admin/plattform">PLATTFORM</Anchor>
+        <Anchor to="/admin/platform">PLATFORM</Anchor>
         <Label>GROUPS</Label>
         <Label>PROPOSALS</Label>
         <Label>SURVEYS</Label>

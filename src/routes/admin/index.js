@@ -30,7 +30,7 @@ async function action({ store, path }) {
   }
 
   const links = [
-    { to: 'admin/plattform', name: 'PLATTFORM' },
+    { to: 'admin/platform', name: 'SETTINGS' },
     { to: 'admin/users', name: 'USERS' },
     { to: 'admin/groups', name: 'GROUPS' },
   ];
@@ -40,12 +40,12 @@ async function action({ store, path }) {
     chunks: ['admin'],
     component: (
       <AdminPage menuLinks={links}>
-        {'i am the default admin plattform content'}
+        {'i am the default admin platform content'}
       </AdminPage>
     ),
   };
   /*  <Layout>
-        <Admin title={title}>{'i am the default plattform content'}</Admin>
+        <Admin title={title}>{'i am the default platform content'}</Admin>
       </Layout> */
 }
 

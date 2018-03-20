@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import { defineMessages, FormattedMessage } from 'react-intl';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { loadPlattform, updatePlattform } from '../../actions/plattform';
+import { loadPlatform, updatePlatform } from '../../actions/platform';
 import { findUser } from '../../actions/user';
 
 import {
-  getPlattformUpdates,
+  getPlatformUpdates,
   getVisibleUsers,
-  getPlattform,
+  getPlatform,
   getSessionUser,
 } from '../../reducers';
 import Box from '../../components/Box';
@@ -85,14 +85,14 @@ const convertLocalesToNames = (locales, inputValues) => {
 };
 
 // TODO EDIT + CREATE should be the same form
-class PlattformEdit extends React.Component {
+class PlatformEdit extends React.Component {
   static propTypes = {
     users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    plattform: PropTypes.shape({ names: PropTypes.shape({}) }).isRequired,
+    platform: PropTypes.shape({ names: PropTypes.shape({}) }).isRequired,
     user: PropTypes.shape({ id: PropTypes.string }).isRequired,
     findUser: PropTypes.func.isRequired,
-    updatePlattform: PropTypes.func.isRequired,
-    createPlattform: PropTypes.func.isRequired,
+    updatePlatform: PropTypes.func.isRequired,
+    createPlatform: PropTypes.func.isRequired,
     updates: PropTypes.shape({
       success: PropTypes.bool,
       error: PropTypes.bool,
@@ -110,10 +110,10 @@ class PlattformEdit extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.state = {
-      ...props.plattform,
+      ...props.platform,
       ...genInitialState(formFields, {
-        ...props.plattform,
-        ...(props.plattform.names && props.plattform.names),
+        ...props.platform,
+        ...(props.platform.names && props.platform.names),
       }),
     };
     /*  error: null,
@@ -144,7 +144,7 @@ class PlattformEdit extends React.Component {
     );
   }
 
-  componentWillReceiveProps({ plattform, updates = {} }) {
+  componentWillReceiveProps({ platform, updates = {} }) {
     const newUpdates = {};
     if (updates.success && !this.props.updates.success) {
       this.onCancel();
@@ -154,8 +154,8 @@ class PlattformEdit extends React.Component {
     }
     this.setState({
       ...genInitialState(formFields, {
-        ...plattform,
-        ...(plattform.names && plattform.names),
+        ...platform,
+        ...(platform.names && platform.names),
       }),
       ...newUpdates,
     });
@@ -173,13 +173,13 @@ class PlattformEdit extends React.Component {
   onSubmit(e) {
     // TODO checks
     e.preventDefault();
-    const { plattform, user } = this.props;
+    const { platform, user } = this.props;
     const { admin } = this.state;
     // eslint-disable-next-line
     if (
       !(
-        user.rights.plattform.includes('superuser') ||
-        user.rights.plattform.includes('admin')
+        user.rights.platform.includes('superuser') ||
+        user.rights.platform.includes('admin')
       )
     ) {
       return;
@@ -187,14 +187,14 @@ class PlattformEdit extends React.Component {
     if (this.handleValidation(formFields)) {
       const inputFields = ['default_name'];
       const inputValues = getChangedFields(inputFields, this.state, {
-        ...this.props.plattform,
-        ...(this.props.plattform.names && this.props.plattform.names),
+        ...this.props.platform,
+        ...(this.props.platform.names && this.props.platform.names),
       });
       if (inputValues) {
-        if (plattform.admin) {
+        if (platform.admin) {
           // check admin
           // eslint-disable-next-line
-          if (admin && admin.id != plattform.admin.id) {
+          if (admin && admin.id != platform.admin.id) {
             inputFields.adminId = admin.id;
           }
         } else if (admin && admin.id) {
@@ -204,7 +204,7 @@ class PlattformEdit extends React.Component {
           ['default_name', 'de-DE', 'it-IT', 'lld-IT'],
           inputValues,
         );
-        this.props.updatePlattform({ ...inputs });
+        this.props.updatePlatform({ ...inputs });
       }
     }
   }
@@ -245,13 +245,13 @@ class PlattformEdit extends React.Component {
 
   render() {
     const { error } = this.state;
-    const { plattform, users = [], updates = {} } = this.props;
+    const { platform, users = [], updates = {} } = this.props;
     const errors = this.visibleErrors(formFields);
     return (
       <Box column padding="medium">
         <Box type="section" align column pad>
           <Form onSubmit={this.onSubmit}>
-            <Label>Plattform names</Label>
+            <Label>Platform names</Label>
             <fieldset>
               <FormField label="Default name" error={errors.nameError}>
                 <input
@@ -291,8 +291,8 @@ class PlattformEdit extends React.Component {
               <FormField overflow label="admin" error={errors.adminError}>
                 <SearchField
                   value={
-                    plattform.admin
-                      ? `${plattform.admin.name} ${plattform.admin.surname}`
+                    platform.admin
+                      ? `${platform.admin.name} ${platform.admin.surname}`
                       : ''
                   }
                   onChange={e =>
@@ -322,8 +322,8 @@ class PlattformEdit extends React.Component {
               <FormField overflow label="admin" error={errors.adminError}>
                 <SearchField
                   value={
-                    plattform.admin
-                      ? `${plattform.admin.name} ${plattform.admin.surname}`
+                    platform.admin
+                      ? `${platform.admin.name} ${platform.admin.surname}`
                       : ''
                   }
                   onChange={e =>
@@ -349,16 +349,16 @@ class PlattformEdit extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  plattform: getPlattform(state),
+  platform: getPlatform(state),
   users: getVisibleUsers(state, 'all'),
-  updates: getPlattformUpdates(state),
+  updates: getPlatformUpdates(state),
   user: getSessionUser(state),
 });
 
 const mapDispatch = {
-  loadPlattform,
-  updatePlattform,
+  loadPlatform,
+  updatePlatform,
   findUser,
 };
 
-export default connect(mapStateToProps, mapDispatch)(PlattformEdit);
+export default connect(mapStateToProps, mapDispatch)(PlatformEdit);

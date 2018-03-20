@@ -15,14 +15,11 @@ class Group {
   constructor(data) {
     this.id = data.id;
     this.coordinatorId = data.coordinator_id;
-    this.name = data.name;
+    this.names = data.names;
     this.numMembers = data.num_members;
     this.numDiscussions = data.num_discussions;
     this.numProposals = data.num_proposals;
     this.restricted = data.restricted;
-    this.deName = data.de_name;
-    this.itName = data.it_name;
-    this.lldName = data.lld_name;
     this.mainTeam = data.main;
   }
   canNotify(viewer) {
@@ -263,22 +260,25 @@ class Group {
   }
 
   static async create(viewer, data, loaders) {
-    if (!canMutate(viewer, data, Models.GROUP)) return null;
+    if (
+      !canMutate(
+        viewer,
+        { ...data, id: data.parentId || 'platform' },
+        Models.GROUP,
+      )
+    )
+      return null;
+
     if (!data) return null;
-    if (!data.name) return null;
+    if (!data.names) return null;
     const newData = {
-      ...(data.name && { name: data.name }),
-      ...(data.deName && { de_name: data.deName }),
-      ...(data.itName && { it_name: data.itName }),
-      ...(data.lldName && { lld_name: data.lldName }),
       ...(data.restricted && { restricted: data.restricted }),
     };
-    if (!data.restricted) {
-      newData.restricted = false;
+
+    if (data.names) {
+      newData.names = JSON.parse(data.names);
     }
-    if (typeof data.mainTeam === 'boolean') {
-      newData.main = data.mainTeam;
-    }
+
     if (data.coordinatorId) {
       if (!validateCoordinator(viewer, data.coordinatorId, loaders))
         return null;
@@ -286,7 +286,7 @@ class Group {
     }
     newData.created_at = new Date();
     const group = await knex.transaction(async trx => {
-      await Group.checkForMainTeam(newData.main, trx);
+      // await Group.checkForMainTeam(newData.main, trx);
       const [groupData = null] = await trx
         .insert(newData)
         .into('groups')
@@ -295,12 +295,12 @@ class Group {
       if (!groupData) {
         throw new Error('Could not create group');
       }
+
       // make feed;
       await knex('system_feeds')
         .transacting(trx)
         .insert({
           group_id: groupData.id,
-          type: 'WT',
           main_activities: JSON.stringify([]),
         });
       return groupData;

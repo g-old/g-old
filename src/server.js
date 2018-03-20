@@ -37,7 +37,7 @@ import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
 import { setRuntimeVariable } from './actions/runtime';
 import { setLocale } from './actions/intl';
-import { loadPlattform } from './actions/plattform';
+import { loadPlatform } from './actions/platform';
 import createLoaders from './data/dataLoader';
 import User from './data/models/User';
 import FileStorage, { AvatarManager } from './core/FileStorage';
@@ -674,9 +674,9 @@ app.get('*', async (req, res, next) => {
       }),
     );
 
-    // plattformSettings
+    // platformSettings
 
-    await store.dispatch(loadPlattform());
+    await store.dispatch(loadPlatform());
 
     const locale = req.language;
     const intl = await store.dispatch(

@@ -26,7 +26,7 @@ exports.seed = function(knex, Promise) {
       'User',
       hash,
       'superuser@example.com',
-      { plattform: ['superuser'] },
+      { platform: ['superuser'] },
       new Date(),
       false,
     );

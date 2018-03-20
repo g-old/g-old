@@ -25,12 +25,12 @@ export const Models = {
 
 /* GENERATOR_FN */
 /* eslint-disable no-unused-vars */
-function plattformReadControl(viewer, data) {
-  console.error('Access control for Plattform not implemented');
+function platformReadControl(viewer, data) {
+  console.error('Access control for Platform not implemented');
   return true;
 }
-function plattformWriteControl(viewer, data) {
-  console.error('Access control for Plattform not implemented');
+function platformWriteControl(viewer, data) {
+  console.error('Access control for Platform not implemented');
   return true;
 }
 function tagReadControl(viewer, data) {
@@ -94,12 +94,12 @@ function userWriteControl(viewer, data) {
       return true;
     }
   }
-  if (viewer.rights.plattform) {
+  if (viewer.rights.platform) {
     if (data.thumbnail || data.dataUrl || data.name || data.surname) {
       return true;
     }
     if (data.rights != null) {
-      if (viewer.rights.plattform) {
+      if (viewer.rights.platform) {
         return true;
         // TODO further checks!
       }
@@ -115,7 +115,7 @@ function userWriteControl(viewer, data) {
 function userReadControl(viewer, data) {
   return (
     // eslint-disable-next-line eqeqeq
-    viewer.id == data.id || viewer.rights.plattform || viewer.rights.system
+    viewer.id == data.id || viewer.rights.platform || viewer.rights.system
   );
 }
 
@@ -262,19 +262,13 @@ function activityWriteControl(viewer, data) {
 }
 
 function groupReadControl(viewer, data) {
-  if (viewer.permissions & AccessMasks.LEVEL_0) {
+  if (viewer.rights.platform) {
     return true;
   }
   return false;
 }
 function groupWriteControl(viewer, data) {
-  if (viewer.permissions & Permissions.CREATE_GROUPS) {
-    if (data.coordinatorId || data.name) {
-      if (viewer.permissions & Permissions.CREATE_GROUPS) {
-        return true;
-      }
-      return false;
-    }
+  if (viewer.rights[data.id] && viewer.rights[data.id].includes('admin')) {
     return true;
   }
   return false;
@@ -323,9 +317,9 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
-  [Models.PLATTFORM]: {
-    [ATypes.WRITE]: plattformWriteControl,
-    [ATypes.READ]: plattformReadControl,
+  [Models.PLATFORM]: {
+    [ATypes.WRITE]: platformWriteControl,
+    [ATypes.READ]: platformReadControl,
   },
   [Models.TAG]: {
     [ATypes.WRITE]: tagWriteControl,

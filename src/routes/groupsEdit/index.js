@@ -30,7 +30,7 @@ async function action({ store }) {
     chunks: ['admin'],
     title,
     component: (
-      <AdminPage>
+      <AdminPage menuLinks={[]}>
         <GroupForm />
       </AdminPage>
     ),

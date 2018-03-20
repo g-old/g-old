@@ -82,8 +82,8 @@ passport.serializeUser((user, done) => {
       .then(groups => {
         if (user.rights) {
           groups.push({
-            id: 'plattform',
-            rights: user.rights.plattform,
+            id: 'platform',
+            rights: user.rights.platform,
           });
         }
         const rights = calcRights(groups);

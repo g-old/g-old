@@ -212,7 +212,7 @@ const protectedViews = {
   Tagged: { type: 'permissions', name: 'LEVEL_1' },
   Home: { type: 'permissions', name: 'LEVEL_1' },
   Feed: { type: 'permissions', name: 'LEVEL_1' },
-  Admin: { type: 'groups', name: 'plattform' },
+  Admin: { type: 'groups', name: 'platform' },
   NotificationPanel: { type: 'permissions', name: 'NOTIFICATION' },
   GroupsPanel: { type: 'privileges', name: 'GROUPS_MANAGER' },
   SSE: { type: 'permissions', name: 'LEVEL_1' },

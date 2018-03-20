@@ -1,22 +1,22 @@
 import {
-  CREATE_PLATTFORM_START,
-  CREATE_PLATTFORM_SUCCESS,
-  CREATE_PLATTFORM_ERROR,
-  UPDATE_PLATTFORM_START,
-  UPDATE_PLATTFORM_ERROR,
-  UPDATE_PLATTFORM_SUCCESS,
-  DELETE_PLATTFORM_START,
-  DELETE_PLATTFORM_ERROR,
-  DELETE_PLATTFORM_SUCCESS,
+  CREATE_PLATFORM_START,
+  CREATE_PLATFORM_SUCCESS,
+  CREATE_PLATFORM_ERROR,
+  UPDATE_PLATFORM_START,
+  UPDATE_PLATFORM_ERROR,
+  UPDATE_PLATFORM_SUCCESS,
+  DELETE_PLATFORM_START,
+  DELETE_PLATFORM_ERROR,
+  DELETE_PLATFORM_SUCCESS,
 } from '../../constants';
 
 import { getErrors, getSuccessState } from '../../core/helpers';
 
-const plattforms = (state = {}, action) => {
+const platforms = (state = {}, action) => {
   switch (action.type) {
-    case CREATE_PLATTFORM_START:
-    case UPDATE_PLATTFORM_START:
-    case DELETE_PLATTFORM_START: {
+    case CREATE_PLATFORM_START:
+    case UPDATE_PLATFORM_START:
+    case DELETE_PLATFORM_START: {
       return {
         ...state,
         [action.id]: {
@@ -26,9 +26,9 @@ const plattforms = (state = {}, action) => {
       };
     }
 
-    case CREATE_PLATTFORM_ERROR:
-    case UPDATE_PLATTFORM_ERROR:
-    case DELETE_PLATTFORM_ERROR: {
+    case CREATE_PLATFORM_ERROR:
+    case UPDATE_PLATFORM_ERROR:
+    case DELETE_PLATFORM_ERROR: {
       const current = state[action.id];
       const newState = getErrors(current, action);
       return {
@@ -39,9 +39,9 @@ const plattforms = (state = {}, action) => {
         },
       };
     }
-    case CREATE_PLATTFORM_SUCCESS:
-    case UPDATE_PLATTFORM_SUCCESS:
-    case DELETE_PLATTFORM_SUCCESS: {
+    case CREATE_PLATFORM_SUCCESS:
+    case UPDATE_PLATFORM_SUCCESS:
+    case DELETE_PLATFORM_SUCCESS: {
       const { id } = action; // Is initial id!
       const current = state[id];
       const newState = getSuccessState(current, action);
@@ -58,6 +58,6 @@ const plattforms = (state = {}, action) => {
       return state;
   }
 };
-export default plattforms;
+export default platforms;
 
 export const getStatus = (state, id) => state[id] || {};

@@ -10,7 +10,7 @@ exports.up = function(knex, Promise) {
           table.foreign('coordinator_id').references('users.id');
           table.integer('owner_id').unsigned();
           table.foreign('owner_id').references('users.id');
-          table.jsonb('name').notNullable();
+          table.jsonb('names').notNullable();
           table.jsonb('about');
           table.jsonb('description');
           table.jsonb('engagement').defaultsTo('{}');

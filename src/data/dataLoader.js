@@ -259,7 +259,7 @@ const getCommentsById = commentIds =>
 
 const getSettings = () =>
   new Promise(resolve => {
-    knex('plattform_settings')
+    knex('platform_settings')
       .select()
       .then(data => resolve(data.length ? data : [[]]));
   });
@@ -281,7 +281,7 @@ function createLoaders() {
     comments: new DataLoader(ids => getCommentsById(ids)),
     discussions: new DataLoader(ids => getDiscussionsById(ids)),
     groups: new DataLoader(ids => getGroupsById(ids)),
-    plattforms: new DataLoader(key => getSettings(key)),
+    platforms: new DataLoader(key => getSettings(key)),
   };
 }
 

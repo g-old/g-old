@@ -3,7 +3,7 @@ import User from './User';
 import Group from './Group';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 
-class Plattform {
+class Platform {
   constructor(data) {
     this.names = data.settings.names;
     this.picture = data.settings.picture;
@@ -11,14 +11,14 @@ class Plattform {
     this.adminId = data.settings.admin_id;
     this.updatedAt = data.updatedAt;
   }
-  static async gen(viewer, { plattforms }) {
-    const data = await plattforms.load('plattform');
+  static async gen(viewer, { platforms }) {
+    const data = await platforms.load('platform');
     if (data === null) return null;
-    return canSee(viewer, data, Models.PLATTFORM) ? new Plattform(data) : null;
+    return canSee(viewer, data, Models.PLATFORM) ? new Platform(data) : null;
   }
   static async create(viewer, data, loaders) {
     if (!data) return null;
-    if (!canMutate(viewer, data, Models.PLATTFORM)) return null;
+    if (!canMutate(viewer, data, Models.PLATFORM)) return null;
     const newData = { created_at: new Date() };
     if (data.name) {
       newData.name = data.name;
@@ -30,7 +30,7 @@ class Plattform {
       if (newAdmin) {
         newData.admin_id = data.adminId;
       } else {
-        throw new Error('plattform-admin-notfound');
+        throw new Error('platform-admin-notfound');
       }
     }
     if (data.defaultGroupId) {
@@ -42,26 +42,26 @@ class Plattform {
       if (defaultGroup) {
         newData.default_group_id = data.defaultGroupId;
       } else {
-        throw new Error('plattform-group-notfound');
+        throw new Error('platform-group-notfound');
       }
     }
 
-    const plattformInDB = await knex.transaction(async trx => {
-      const [plattform = null] = await knex('plattform_settings')
+    const platformInDB = await knex.transaction(async trx => {
+      const [platform = null] = await knex('platform_settings')
         .transacting(trx)
         .insert(newData)
         .returning('*');
-      return plattform;
+      return platform;
     });
-    return plattformInDB ? new Plattform(plattformInDB) : null;
+    return platformInDB ? new Platform(platformInDB) : null;
   }
 
   static async update(viewer, data, loaders) {
     if (!data) return null;
-    if (!canMutate(viewer, data, Models.PLATTFORM)) return null;
-    const [plattformData = null] = await knex('plattform_settings').select();
+    if (!canMutate(viewer, data, Models.PLATFORM)) return null;
+    const [platformData = null] = await knex('platform_settings').select();
     const newData = {
-      settings: plattformData.settings,
+      settings: platformData.settings,
       updated_at: new Date(),
     };
     if (data.names) {
@@ -75,12 +75,15 @@ class Plattform {
     }
 
     if (data.adminId) {
-      // check user, give him rights
-      const newAdmin = await User.gen(viewer, data.adminId, loaders);
-      if (newAdmin) {
-        newData.settings.admin_id = data.adminId;
-      } else {
-        throw new Error('plattform-admin-notfound');
+      const platform = await Platform.gen(viewer, loaders);
+      if (data.adminId !== platform.adminId) {
+        // check user, give him rights
+        const newAdmin = await User.gen(viewer, data.adminId, loaders);
+        if (newAdmin) {
+          newData.settings.admin_id = data.adminId;
+        } else {
+          throw new Error('platform-admin-notfound');
+        }
       }
     }
     if (data.defaultGroupId) {
@@ -92,17 +95,17 @@ class Plattform {
       if (defaultGroup) {
         newData.settings.default_group_id = data.defaultGroupId;
       } else {
-        throw new Error('plattform-group-notfound');
+        throw new Error('platform-group-notfound');
       }
     }
-    const updatedPlattform = await knex.transaction(async trx => {
-      const [plattform = null] = await knex('plattform_settings')
+    const updatedPlatform = await knex.transaction(async trx => {
+      const [platform = null] = await knex('platform_settings')
         .transacting(trx)
         .forUpdate()
         .update(newData)
         .returning('*');
 
-      if (plattform) {
+      if (platform) {
         // update successful
         let updatedUserResult;
         if (data.adminId) {
@@ -110,22 +113,22 @@ class Plattform {
             viewer,
             {
               id: data.adminId,
-              rights: { plattform: ['admin'] },
+              rights: { platform: ['admin'] },
             },
             loaders,
           );
           if (!updatedUserResult.user) {
             throw new Error('update-user-error');
           } else if (
-            plattformData.settings.admin_id &&
-            plattformData.settings.adminId !== data.adminId
+            platformData.settings.admin_id &&
+            platformData.settings.adminId !== data.adminId
           ) {
             // remove admin rights
             updatedUserResult = await User.update(
               viewer,
               {
-                id: plattformData.settings.admin_id,
-                rights: { plattform: [] },
+                id: platformData.settings.admin_id,
+                rights: { platform: [] },
               },
               loaders,
             );
@@ -135,14 +138,14 @@ class Plattform {
           }
         }
       }
-      return plattform;
+      return platform;
     });
-    return updatedPlattform ? new Plattform(updatedPlattform) : null;
+    return updatedPlatform ? new Platform(updatedPlatform) : null;
   }
   static async delete(viewer, data) {
     if (!data || !data.id) return null;
-    if (!canMutate(viewer, data, Models.PLATTFORM)) return null;
+    if (!canMutate(viewer, data, Models.PLATFORM)) return null;
     throw new Error('To implement');
   }
 }
-export default Plattform;
+export default Platform;

@@ -7,41 +7,6 @@ import Menu from '../Menu';
 import Button from '../Button';
 import history from '../../history';
 
-const onVisitProfile = e => {
-  if (e.button !== 0) {
-    // leftclick
-    return;
-  }
-  if (e.defaultPrevented === true) {
-    return;
-  }
-  e.preventDefault();
-  history.push(`/account`);
-};
-const onVisitAccounts = e => {
-  if (e.button !== 0) {
-    // leftclick
-    return;
-  }
-  if (e.defaultPrevented === true) {
-    return;
-  }
-  e.preventDefault();
-  history.push(`/accounts`);
-};
-
-const onVisitGroups = e => {
-  if (e.button !== 0) {
-    // leftclick
-    return;
-  }
-  if (e.defaultPrevented === true) {
-    return;
-  }
-  e.preventDefault();
-  history.push(`/workteams`);
-};
-
 const goHome = e => {
   if (e.button !== 0) {
     // leftclick
@@ -70,7 +35,19 @@ class UserStatus extends React.Component {
   constructor(props) {
     super(props);
     this.onLogout = this.onLogout.bind(this);
+    this.onVisitProfile = this.onVisitProfile.bind(this);
   }
+  onVisitProfile = e => {
+    if (e.button !== 0) {
+      // leftclick
+      return;
+    }
+    if (e.defaultPrevented === true) {
+      return;
+    }
+    e.preventDefault();
+    history.push(`/useraccount/${this.props.user.id}/`);
+  };
 
   onLogout() {
     this.props.logout();
@@ -121,9 +98,7 @@ class UserStatus extends React.Component {
             dropAlign={{ top: 'top', left: 'left' }}
             icon={avatar}
           >
-            <Button plain onClick={onVisitProfile} label="Profile" />
-            <Button plain onClick={onVisitAccounts} label="Users" />
-            <Button plain onClick={onVisitGroups} label="Workteams" />
+            <Button plain onClick={this.onVisitProfile} label="Profile" />
             <Button plain onClick={this.onLogout} label="Logout" />
           </Menu>
         </div>

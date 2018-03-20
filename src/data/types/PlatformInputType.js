@@ -4,8 +4,8 @@ import {
   GraphQLID as ID,
 } from 'graphql';
 
-const PlattformInputType = new GraphQLInputObjectType({
-  name: 'PlattformInput',
+const PlatformInputType = new GraphQLInputObjectType({
+  name: 'PlatformInput',
   fields: {
     id: {
       type: ID,
@@ -24,4 +24,4 @@ const PlattformInputType = new GraphQLInputObjectType({
     },
   },
 });
-export default PlattformInputType;
+export default PlatformInputType;

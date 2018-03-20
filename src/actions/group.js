@@ -55,8 +55,8 @@ const groupFields = `
   numProposals
   restricted
   mainTeam
-  logo
-  background
+  picture
+  cover
   coordinator{
     name
     surname
@@ -80,10 +80,7 @@ const groupsWithMembers = `query{
     }}`;
 
 const wtDetails = `
-name
-lldName
-deName
-itName
+names
 `;
 const groupWithDetails = `query($id:ID!){
     group(id:$id) {

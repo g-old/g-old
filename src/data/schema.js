@@ -69,10 +69,10 @@ import updateGroup from './mutations/updateGroup';
 import createTag from './mutations/createTag';
 import updateTag from './mutations/updateTag';
 import deleteTag from './mutations/deleteTag';
-import plattform from './queries/plattform';
-import createPlattform from './mutations/createPlattform';
-import updatePlattform from './mutations/updatePlattform';
-import deletePlattform from './mutations/deletePlattform';
+import platform from './queries/platform';
+import createPlatform from './mutations/createPlatform';
+import updatePlatform from './mutations/updatePlatform';
+import deletePlatform from './mutations/deletePlatform';
 /* GENERATOR */
 
 const schema = new Schema({
@@ -100,7 +100,7 @@ const schema = new Schema({
       discussion,
       comments,
       requestConnection,
-      plattform,
+      platform,
       /* GENERATOR_QUERIES */
     },
   }),
@@ -142,9 +142,9 @@ const schema = new Schema({
       createTag,
       updateTag,
       deleteTag,
-      createPlattform,
-      updatePlattform,
-      deletePlattform,
+      createPlatform,
+      updatePlatform,
+      deletePlatform,
       /* GENERATOR_MUTATIONS */
     },
   }),

@@ -61,8 +61,6 @@ AssetTableRows.propTypes = {
 
 AssetTableRows.defaultProps = {
   assets: null,
-  searchTerm: null,
-  requiresSearch: null,
 
   children: null,
   checkedIndices: null,

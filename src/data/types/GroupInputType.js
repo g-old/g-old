@@ -11,7 +11,7 @@ const GroupInputType = new GraphQLInputObjectType({
     coordinatorId: {
       type: ID,
     },
-    name: {
+    names: {
       type: String,
     },
     memberId: {

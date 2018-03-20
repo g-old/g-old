@@ -63,16 +63,16 @@ const routes = {
           load: () => import(/* webpackChunkName: 'admin' */ './admin'),
         },
         {
-          path: '/plattform',
+          path: '/platform',
           children: [
             {
               path: '',
-              load: () => import(/* webpackChunkName: 'admin' */ './plattform'),
+              load: () => import(/* webpackChunkName: 'admin' */ './platform'),
             },
             {
               path: '/settings',
               load: () =>
-                import(/* webpackChunkName: 'admin' */ './plattformSettings'),
+                import(/* webpackChunkName: 'admin' */ './platformSettings'),
             },
           ],
         },
@@ -82,6 +82,15 @@ const routes = {
             {
               path: '',
               load: () => import(/* webpackChunkName: 'admin' */ './users'),
+            },
+          ],
+        },
+        {
+          path: '/group',
+          children: [
+            {
+              path: '/:id/',
+              load: () => import(/* webpackChunkName: 'admin' */ './groupShow'),
             },
           ],
         },
@@ -96,6 +105,76 @@ const routes = {
               path: '/add',
               load: () =>
                 import(/* webpackChunkName: 'admin' */ './groupsEdit'),
+            },
+          ],
+        },
+      ],
+    },
+    {
+      path: '/group/:id',
+      children: [
+        {
+          path: '',
+          load: () => import(/* webpackChunkName: 'admin' */ './groupShow'),
+        },
+        {
+          path: '/members',
+          load: () => import(/* webpackChunkName: 'admin' */ './groupShow'),
+        },
+        {
+          path: '/proposals',
+          load: () => import(/* webpackChunkName: 'admin' */ './groupShow'),
+        },
+        {
+          path: '/groups',
+          load: () => import(/* webpackChunkName: 'admin' */ './groupShow'),
+        },
+        {
+          path: '/admin',
+          children: [
+            {
+              path: '',
+              load: () =>
+                import(/* webpackChunkName: 'admin' */ './groupAdmin'),
+            },
+            {
+              path: '/proposals',
+              load: () =>
+                import(/* webpackChunkName: 'admin' */ './proposalsManager'),
+            },
+            {
+              path: '/groups',
+              children: [
+                {
+                  path: '',
+                  load: () =>
+                    import(/* webpackChunkName: 'admin' */ './ggroups'),
+                },
+                {
+                  path: '/add',
+                  load: () =>
+                    import(/* webpackChunkName: 'admin' */ './ggroupsEdit'),
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      path: '/useraccount/:id/',
+      children: [
+        {
+          path: '',
+          load: () => import(/* webpackChunkName: 'admin' */ './userShow'),
+        },
+        {
+          path: '/settings/',
+          children: [
+            {
+              path: '',
+              load: () =>
+                import(/* webpackChunkName: 'admin' */ './settingsShow'),
             },
           ],
         },

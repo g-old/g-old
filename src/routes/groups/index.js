@@ -12,6 +12,7 @@ import AdminPage from '../../containers/AdminPage';
 import GroupsPage from '../../containers/GroupsPage';
 import { getSessionUser } from '../../reducers';
 import { canAccess } from '../../organization';
+import { loadGroups } from '../../actions/group';
 
 const title = 'Admin';
 
@@ -24,6 +25,7 @@ async function action({ store }) {
       return { redirect: '/admin' };
     }
   }
+  await store.dispatch(loadGroups());
   const links = [{ to: 'groups/add', name: 'ADD NEW GROUP' }];
   return {
     chunks: ['admin'],
