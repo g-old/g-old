@@ -14,6 +14,8 @@ import {
 } from '../../reducers';
 import Box from '../../components/Box';
 import FormField from '../../components/FormField';
+import CheckBox from '../../components/CheckBox';
+
 import Button from '../../components/Button';
 import Label from '../../components/Label';
 import SearchField from '../../components/SearchField';
@@ -175,6 +177,7 @@ class PlatformEdit extends React.Component {
     e.preventDefault();
     const { platform, user } = this.props;
     const { admin } = this.state;
+
     // eslint-disable-next-line
     if (
       !(
@@ -184,6 +187,7 @@ class PlatformEdit extends React.Component {
     ) {
       return;
     }
+
     if (this.handleValidation(formFields)) {
       const inputFields = ['default_name'];
       const inputValues = getChangedFields(inputFields, this.state, {
@@ -245,7 +249,7 @@ class PlatformEdit extends React.Component {
 
   render() {
     const { error } = this.state;
-    const { platform, users = [], updates = {} } = this.props;
+    const { platform, users = [], updates = {}, user } = this.props;
     const errors = this.visibleErrors(formFields);
     return (
       <Box column padding="medium">
@@ -286,30 +290,84 @@ class PlatformEdit extends React.Component {
                 />
               </FormField>
             </fieldset>
-            <Label>Admin</Label>
+            <Label>Gold mode</Label>
             <fieldset>
-              <FormField overflow label="admin" error={errors.adminError}>
-                <SearchField
-                  value={
-                    platform.admin
-                      ? `${platform.admin.name} ${platform.admin.surname}`
-                      : ''
-                  }
-                  onChange={e =>
-                    this.handleValueChanges({
-                      target: { name: 'adminValue', value: e.value },
-                    })
-                  }
-                  data={users}
-                  fetch={this.props.findUser}
-                  displaySelected={data => {
-                    this.handleValueChanges({
-                      target: { name: 'admin', value: data },
-                    });
+              <FormField error={errors.goldMode}>
+                <CheckBox
+                  toggle
+                  checked={this.state.goldMode}
+                  onChange={() => {
+                    alert('TO implement');
                   }}
+                  label={this.state.goldMode ? 'ON' : 'OFF'}
                 />
               </FormField>
             </fieldset>
+            <Label>Contact information</Label>
+            <fieldset>
+              <FormField label="Email" error={errors.goldMode}>
+                <input
+                  type="text"
+                  name="email"
+                  value={this.state.email}
+                  onChange={this.handleValueChanges}
+                />
+              </FormField>
+            </fieldset>
+            <fieldset>
+              <FormField label="Address" error={errors.goldMode}>
+                <input
+                  type="text"
+                  name="address"
+                  value={this.state.address}
+                  onChange={this.handleValueChanges}
+                />
+              </FormField>
+              <FormField label="Town" error={errors.goldMode}>
+                <input
+                  type="text"
+                  name="town"
+                  value={this.state.town}
+                  onChange={this.handleValueChanges}
+                />
+              </FormField>
+              <FormField label="Postal Code" error={errors.goldMode}>
+                <input
+                  type="text"
+                  name="postalCode"
+                  value={this.state.postalCode}
+                  onChange={this.handleValueChanges}
+                />
+              </FormField>
+            </fieldset>
+            {user.rights.platform.includes('superuser') && (
+              <div>
+                <Label>Admin</Label>
+                <fieldset>
+                  <FormField overflow label="admin" error={errors.adminError}>
+                    <SearchField
+                      value={
+                        platform.admin
+                          ? `${platform.admin.name} ${platform.admin.surname}`
+                          : ''
+                      }
+                      onChange={e =>
+                        this.handleValueChanges({
+                          target: { name: 'adminValue', value: e.value },
+                        })
+                      }
+                      data={users}
+                      fetch={this.props.findUser}
+                      displaySelected={data => {
+                        this.handleValueChanges({
+                          target: { name: 'admin', value: data },
+                        });
+                      }}
+                    />
+                  </FormField>
+                </fieldset>
+              </div>
+            )}
             <p>
               {error && <Notification type="error" message={updates.error} />}
             </p>
@@ -317,30 +375,6 @@ class PlatformEdit extends React.Component {
               <Button disabled={updates.pending} primary label="Save" />{' '}
               <Button label="Cancel" onClick={this.onCancel} />
             </div>
-            <Label>Picture</Label>
-            <fieldset>
-              <FormField overflow label="admin" error={errors.adminError}>
-                <SearchField
-                  value={
-                    platform.admin
-                      ? `${platform.admin.name} ${platform.admin.surname}`
-                      : ''
-                  }
-                  onChange={e =>
-                    this.handleValueChanges({
-                      target: { name: 'adminValue', value: e.value },
-                    })
-                  }
-                  data={users}
-                  fetch={this.props.findUser}
-                  displaySelected={data => {
-                    this.handleValueChanges({
-                      target: { name: 'admin', value: data },
-                    });
-                  }}
-                />
-              </FormField>
-            </fieldset>
           </Form>
         </Box>
       </Box>

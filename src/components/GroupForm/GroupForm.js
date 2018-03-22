@@ -200,12 +200,7 @@ class GroupForm extends React.Component {
       if (id) {
         inputs.parentGroupId = id;
       }
-
-      if (this.props.id) {
-        this.props.updateGroup({ id: this.state.id, ...inputs });
-      } else {
-        this.props.createGroup({ ...inputs });
-      }
+      this.props.createGroup({ ...inputs });
     } else {
       alert('Validation failed');
     }

@@ -30,7 +30,7 @@ async function action({ store, path }) {
   }
 
   const links = [
-    { to: 'admin/platform', name: 'SETTINGS' },
+    { to: 'admin/platform', name: 'PLATFORM' },
     { to: 'admin/users', name: 'USERS' },
     { to: 'admin/groups', name: 'GROUPS' },
   ];

@@ -8,7 +8,7 @@ import {
   GraphQLList,
 } from 'graphql';
 
-import PollingModeType from './PollingModeDLType';
+import PollingModeType from './PollingModeType';
 import VoteType from './VoteDLType';
 import StatementType from './StatementDLType';
 import Statement from '../models/Statement';

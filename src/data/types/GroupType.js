@@ -14,6 +14,8 @@ import PageType from './PageType';
 import Group from '../models/Group';
 import Request from '../models/Request';
 import ProposalStatusType from '../types/ProposalStatusType';
+import PollingModeType from './PollingModeType';
+import PollingMode from '../models/PollingMode';
 
 import Discussion from '../models/Discussion';
 import User from '../models/User';
@@ -29,6 +31,14 @@ const GroupType = new ObjectType({
       type: UserType,
       resolve(data, args, { viewer, loaders }) {
         return User.gen(viewer, data.coordinatorId, loaders);
+      },
+    },
+    parentGroup: {
+      type: GroupType,
+      resolve(data, args, { viewer, loaders }) {
+        return data.parentGroupId
+          ? Group.gen(viewer, data.parentGroupId, loaders)
+          : null;
       },
     },
     names: {
@@ -94,16 +104,7 @@ const GroupType = new ObjectType({
         return { status: 0 };
       },
     },
-    /* requests: {
-      type: new GraphQLList(RequestType),
-      async resolve(parent, args, { viewer, loaders }) {
-        const requests = await knex('requests')
-          .where({ type: 'joinWT' })
-          .whereRaw("content->>'id' = ?", [parent.id])
-          .pluck('id');
-        return requests.map(id => Request.gen(viewer, id, loaders));
-      },
-    }, */
+
     requestConnection,
     numMembers: {
       type: GraphQLInt,
@@ -113,6 +114,9 @@ const GroupType = new ObjectType({
     },
     numProposals: {
       type: GraphQLInt,
+    },
+    goldMode: {
+      type: GraphQLBoolean,
     },
     discussions: {
       type: new GraphQLList(DiscussionType),
@@ -127,6 +131,17 @@ const GroupType = new ObjectType({
         return null;
       },
     },
+    pollingModes: {
+      type: new GraphQLList(PollingModeType),
+      resolve(data, args, { viewer, loaders }) {
+        return knex('group_pollingmodes')
+          .where({ group_id: data.id })
+          .pluck('polling_mode_id')
+          .then(pmIds =>
+            pmIds.map(pmId => PollingMode.gen(viewer, pmId, loaders)),
+          );
+      },
+    },
     subGroups: {
       type: new GraphQLList(GroupType),
       resolve(parent, args, { viewer, loaders }) {
@@ -136,19 +151,7 @@ const GroupType = new ObjectType({
           .then(ids => ids.map(id => Group.gen(viewer, id, loaders)));
       },
     },
-    proposalConnection /* {
-      type: new GraphQLList(ProposalType),
-      resolve(data, args, { viewer, loaders }) {
-        if (viewer && viewer.wtMemberships.includes(data.id)) {
-          return knex('proposals')
-            .where({ group_id: data.id })
-            .orderBy('created_at', 'DESC')
-            .pluck('id')
-            .then(ids => ids.map(id => Proposal.gen(viewer, id, loaders)));
-        }
-        return null;
-      },
-    }, */,
+    proposalConnection,
 
     // TODO see https://github.com/graphql/swapi-graphql/blob/master/src/schema/connections.js
     // make own query and link here

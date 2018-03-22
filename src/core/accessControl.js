@@ -1,9 +1,4 @@
-import {
-  Permissions,
-  Groups,
-  AccessMasks,
-  PermissionsSchema,
-} from '../organization';
+import { Permissions, Groups, AccessMasks } from '../organization';
 /* eslint-disable no-bitwise */
 // TODO make object
 export const Models = {
@@ -127,19 +122,14 @@ function proposalReadControl(viewer, data) {
 }
 
 function proposalWriteControl(viewer, data) {
-  if (viewer.permissions & PermissionsSchema[Groups.RELATOR]) {
-    if (data.id && data.state) {
-      // updates
-      if (viewer.permissions & Permissions.MODIFY_PROPOSALS) {
-        return true;
-      }
-      return false;
-    }
+  if (
+    viewer.rights[data.groupId] &&
+    viewer.rights[data.groupId].proposal.includes('writeSameGroup')
+  ) {
     return true;
-  } else if (data.state === 'survey') {
-    if (viewer.permissions & Permissions.PUBLISH_SURVEYS) {
-      return true;
-    }
+  } else if (viewer.rights.plattform) {
+    console.error('TEST_ ALLOW');
+    return true;
   }
   return false;
 }
@@ -200,13 +190,13 @@ function pollReadControl(viewer, data) {
   return false;
 }
 function pollWriteControl(viewer, data) {
-  if (viewer.permissions & PermissionsSchema[Groups.RELATOR]) {
-    if (data.closedAt) {
-      if (viewer.permissions & Permissions.CLOSE_POLLS) {
-        return true;
-      }
-      return false;
-    }
+  if (
+    viewer.rights[data.groupId] &&
+    viewer.rights[data.groupId].proposal.includes('writeSameGroup')
+  ) {
+    return true;
+  } else if (viewer.rights.plattform) {
+    console.error('TEST_ ALLOW');
     return true;
   }
   return false;
@@ -270,7 +260,13 @@ function groupReadControl(viewer, data) {
 function groupWriteControl(viewer, data) {
   if (viewer.rights[data.id] && viewer.rights[data.id].includes('admin')) {
     return true;
+  } else if (
+    viewer.rights.platform &&
+    viewer.rights.platform.includes('admin')
+  ) {
+    return true;
   }
+
   return false;
 }
 

@@ -1,4 +1,5 @@
 import {
+  GraphQLBoolean,
   GraphQLString as String,
   GraphQLObjectType as ObjectType,
 } from 'graphql';
@@ -9,7 +10,7 @@ import Group from '../models/Group';
 
 const PlatformType = new ObjectType({
   name: 'Platform',
-  fields: {
+  fields: () => ({
     names: {
       type: String,
       resolve: parent => JSON.stringify(parent.names),
@@ -25,6 +26,12 @@ const PlatformType = new ObjectType({
     picture: {
       type: String,
     },
+    goldMode: {
+      type: GraphQLBoolean,
+    },
+    email: {
+      type: String,
+    },
     admin: {
       type: UserType,
       resolve(parent, args, { viewer, loaders }) {
@@ -37,7 +44,7 @@ const PlatformType = new ObjectType({
         return Group.gen(viewer, parent.defaultGroupId, loaders);
       },
     },
-  },
+  }),
 });
 
 export default PlatformType;

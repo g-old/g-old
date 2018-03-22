@@ -12,10 +12,7 @@ exports.up = function(knex, Promise) {
           table.string('title').notNullable();
           table.text('text').notNullable();
           table.text('text_html').notNullable();
-          table
-            .integer('current_phase_id')
-            .unsigned()
-            .notNullable();
+          table.integer('current_phase_id').unsigned();
           table
             .enu('state', [
               'proposed',

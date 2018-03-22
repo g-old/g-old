@@ -14,7 +14,9 @@ function checkCanMutate(viewer, data) {
 class PollingMode {
   constructor(data) {
     this.id = data.id;
-    this.name = data.name;
+    this.names = data.names;
+    this.ownerId = data.owner_id;
+    this.inheritable = data.inheritable;
     this.description = data.description;
     this.thresholdRef = data.threshold_ref;
     this.unipolar = data.unipolar;

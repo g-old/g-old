@@ -51,9 +51,11 @@ group.define({
   ownStatus: {
     request,
   },
+  parentGroup: group,
   subGroups: [group],
   requests: [request],
   proposals: [proposal],
+  pollingModes: [pollingMode],
   linkedProposals: [proposalStatus],
 });
 user.define({

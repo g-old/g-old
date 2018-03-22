@@ -1,6 +1,6 @@
 import { GraphQLList } from 'graphql';
 
-import PollingModeType from '../types/PollingModeDLType';
+import PollingModeType from '../types/PollingModeType';
 import PollingMode from '../models/PollingMode';
 import knex from '../knex';
 

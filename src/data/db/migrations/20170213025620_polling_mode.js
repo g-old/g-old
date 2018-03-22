@@ -4,7 +4,13 @@ exports.up = function(knex, Promise) {
       if (!exists) {
         return knex.schema.createTable('polling_modes', table => {
           table.increments();
-          table.string('name').notNullable();
+          table.integer('owner_id').notNullable();
+          table
+            .foreign('owner_id')
+            .references('groups.id')
+            .onDelete('CASCADE');
+          table.jsonb('names').notNullable();
+          table.boolean('inheritable').defaultsTo('false');
           table.string('description');
           table.boolean('unipolar').notNullable();
           table.boolean('with_statements').notNullable();

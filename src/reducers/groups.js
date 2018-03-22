@@ -39,6 +39,7 @@ export const getGroup = (state, id, entities) =>
     proposals: entities.proposals.byId,
     proposalStatus: entities.proposalStatus,
     groups: entities.groups.byId,
+    pollingModes: entities.pollingModes,
   });
 
 export const getIsFetching = state => fromList.getIsFetching(state.allIds);

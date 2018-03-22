@@ -15,6 +15,8 @@ exports.up = function(knex, Promise) {
           table.jsonb('description');
           table.jsonb('engagement').defaultsTo('{}');
           table.bool('is_published');
+          table.bool('gold_mode').notNullable();
+          table.enu('privacy', ['open', 'closed']);
           table.string('icon');
           table.string('cover');
           table.timestamps();

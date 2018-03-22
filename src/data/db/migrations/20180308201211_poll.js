@@ -4,8 +4,11 @@ exports.up = function(knex, Promise) {
       if (!exists) {
         return knex.schema.createTable('polls', table => {
           table.increments();
-          table.integer('group_id').unsigned();
+          table.integer('group_id').notNullable();
           table.foreign('group_id').references('groups.id');
+          table.integer('phase_id').notNullable();
+          table.foreign('phase_id').references('phases.id');
+
           table
             .integer('polling_mode_id')
             .unsigned()

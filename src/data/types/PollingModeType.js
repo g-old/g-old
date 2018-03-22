@@ -5,13 +5,12 @@ import {
   GraphQLID as ID,
   GraphQLBoolean,
 } from 'graphql';
-
+import GroupType from './GroupType';
+import Group from '../models/Group';
 
 const PollingModeType = new ObjectType({
   name: 'PollingMode',
-  sqlTable: 'polling_modes', // the SQL table for this object type is called "accounts"
-  uniqueKey: 'id',
-  fields: {
+  fields: () => ({
     id: { type: new NonNull(ID) },
     withStatements: {
       type: GraphQLBoolean,
@@ -19,23 +18,41 @@ const PollingModeType = new ObjectType({
     unipolar: {
       type: GraphQLBoolean,
     },
+    names: {
+      type: GraphQLString,
+      resolve: parent => JSON.stringify(parent.names),
+    },
+
+    displayName: {
+      type: GraphQLString,
+      resolve(parent, args, params, { rootValue }) {
+        const locale = rootValue.request.language;
+        return parent.names[locale] || parent.names.default_name;
+      },
+    },
+    owner: {
+      type: GroupType,
+      resolve(data, args, { viewer, loaders }) {
+        return Group.gen(viewer, data.ownerId, loaders);
+      },
+    },
+    inheritable: {
+      type: GraphQLBoolean,
+    },
     thresholdRef: {
       type: GraphQLString,
     },
-    name: {
-      type: GraphQLString,
-    },
+
     description: {
       type: GraphQLString,
     },
 
     createdAt: {
       type: GraphQLString,
-      sqlColumn: 'created_at',
     },
-
-
-  },
-
+    updatedAt: {
+      type: GraphQLString,
+    },
+  }),
 });
 export default PollingModeType;

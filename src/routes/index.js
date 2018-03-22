@@ -123,7 +123,8 @@ const routes = {
         },
         {
           path: '/proposals',
-          load: () => import(/* webpackChunkName: 'admin' */ './groupShow'),
+          load: () =>
+            import(/* webpackChunkName: 'admin' */ './proposalsManager'),
         },
         {
           path: '/groups',
@@ -138,9 +139,19 @@ const routes = {
                 import(/* webpackChunkName: 'admin' */ './groupAdmin'),
             },
             {
-              path: '/proposals',
-              load: () =>
-                import(/* webpackChunkName: 'admin' */ './proposalsManager'),
+              path: '/proposals/',
+              children: [
+                {
+                  path: '',
+                  load: () =>
+                    import(/* webpackChunkName: 'admin' */ './proposalsManager'),
+                },
+                {
+                  path: '/add',
+                  load: () =>
+                    import(/* webpackChunkName: 'admin' */ './proposalsAdd'),
+                },
+              ],
             },
             {
               path: '/groups',

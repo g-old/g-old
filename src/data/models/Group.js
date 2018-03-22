@@ -21,6 +21,9 @@ class Group {
     this.numProposals = data.num_proposals;
     this.restricted = data.restricted;
     this.mainTeam = data.main;
+    this.parentGroupId = data.parent_group_id;
+    this.privacy = data.privacy;
+    this.goldMode = data.gold_mode;
   }
   canNotify(viewer) {
     // eslint-disable-next-line eqeqeq
@@ -268,7 +271,6 @@ class Group {
       )
     )
       return null;
-
     if (!data) return null;
     if (!data.names) return null;
     const newData = {

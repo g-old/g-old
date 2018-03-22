@@ -1,7 +1,6 @@
 import knex from '../knex';
 import PollingMode from './PollingMode';
 import { canSee, canMutate, Models } from '../../core/accessControl';
-import { Permissions } from '../../organization';
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
@@ -61,6 +60,8 @@ class Poll {
     if (!data.polling_mode_id) return null;
     if (!data.threshold) return null;
     if (!data.end_time) return null;
+    if (!data.group_id) return null;
+    if (!data.phase_id) return null;
 
     // create
     const newPollId = await knex.transaction(async trx => {
@@ -74,23 +75,19 @@ class Poll {
 
       if (pollingMode.thresholdRef === 'all') {
         // TODO change completely in case of group model
-        if (data.groupId) {
-          numVoter = await knex('user_groups')
-            .transacting(trx)
-            .where({ group_id: data.groupId })
-            .count('id');
-        } else {
-          numVoter = await trx
-            .whereRaw('groups & ? > 0', [Permissions.VOTE]) // TODO whitelist
-            .count('id')
-            .into('users');
-        }
+
+        // SELECT * FROM reports WHERE data->'objects' @> '[{"src":"foo.png"}]';
+
+        numVoter = await knex('user_groups')
+          .transacting(trx)
+          .where({ group_id: data.groupId })
+          .whereRaw("rights->'vote' @> '[?]'", ['proposal'])
+          .count('id');
+
         numVoter = Number(numVoter[0].count);
         if (numVoter < 1) throw Error('Not enough user');
       }
-      if (data.groupId) {
-        delete data.groupId; // eslint-disable-line
-      }
+
       const id = await trx
         .insert(
           {

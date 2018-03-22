@@ -8,6 +8,8 @@ exports.up = function(knex, Promise) {
             .json('settings')
             .notNullable()
             .defaultsTo('{}');
+          table.string('email');
+          table.bool('gold_mode').defaultsTo(true);
           table.timestamps();
         });
       }

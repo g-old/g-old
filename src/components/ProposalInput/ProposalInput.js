@@ -15,6 +15,7 @@ import {
   getProposalErrorMessage,
   getProposalSuccess,
   getVisibleUsers,
+  getGroup,
 } from '../../reducers';
 import TagInput from '../TagInput';
 import PollInput from '../PollInput';
@@ -23,6 +24,7 @@ import Button from '../Button';
 import FormField from '../FormField';
 import Box from '../Box';
 import Layer from '../Layer';
+import Label from '../Label';
 import Proposal from '../Proposal';
 import { ICONS } from '../../constants';
 import {
@@ -35,6 +37,7 @@ import {
 import Notification from '../Notification';
 import history from '../../history';
 import SearchField from '../SearchField';
+import Select from '../Select';
 
 const messages = defineMessages({
   empty: {
@@ -119,6 +122,7 @@ class ProposalInput extends React.Component {
     userArray: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     findUser: PropTypes.func.isRequired,
     groupId: PropTypes.string.isRequired,
+    group: PropTypes.shape({}).isRequired,
   };
 
   static defaultProps = {
@@ -359,6 +363,7 @@ class ProposalInput extends React.Component {
       case 'tagInput':
       case 'title':
       case 'body':
+      case 'nextGroup':
       case 'spokesman':
       case 'pollOption': {
         value = e.target.value; // eslint-disable-line
@@ -419,13 +424,21 @@ class ProposalInput extends React.Component {
   }
 
   render() {
-    const { title, body, spokesman } = this.state.settings;
+    const { title, body, spokesman, nextGroup } = this.state.settings;
+    const { group } = this.props;
     const {
       titleError,
       bodyError,
       spokesmanError,
       ...pollErrors
     } = this.visibleErrors(formFields);
+    const selectableGroups = [
+      ...(group.subGroups && group.subGroups),
+      ...(group.parentGroup && group.parentGroup.subGroups
+        ? group.parentGroup.subGroups
+        : []),
+    ].filter(g => g.id !== group.id);
+
     return (
       <div className={s.root}>
         <Box column pad>
@@ -452,6 +465,26 @@ class ProposalInput extends React.Component {
                 type="text"
                 value={title}
                 onChange={this.handleValueChanges}
+              />
+            </FormField>
+            <Label>Next Group</Label>
+            <FormField>
+              <Select
+                inField
+                options={selectableGroups.map(g => ({
+                  value: g.id,
+                  label: g.displayName,
+                }))}
+                onSearch={false}
+                value={{
+                  value: nextGroup,
+                  label: '',
+                }}
+                onChange={e =>
+                  this.handleValueChanges({
+                    target: { name: 'nextGroup', value: e.value.value },
+                  })
+                }
               />
             </FormField>
             <FormField
@@ -637,12 +670,13 @@ class ProposalInput extends React.Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, { groupId }) => ({
   tags: getTags(state),
   isPending: getIsProposalFetching(state, '0000'),
   errorMessage: getProposalErrorMessage(state, '0000'),
   success: getProposalSuccess(state, '0000'),
   userArray: getVisibleUsers(state, 'all'),
+  group: getGroup(state, groupId),
 });
 
 const mapDispatch = {

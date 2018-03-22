@@ -26,6 +26,16 @@ import {
   group as groupSchema,
 } from '../store/schema';
 
+const pollingModeFields = `
+    id
+    withStatements
+    unipolar
+    thresholdRef
+    displayName
+    names,
+    inheritable
+`;
+
 const userFields = `
 id
 thumbnail
@@ -88,6 +98,15 @@ const groupWithDetails = `query($id:ID!){
       ${wtDetails}
       subGroups{
         ${groupFields}
+      }
+      parentGroup{
+        ${groupFields}
+            subGroups{
+        ${groupFields}
+        }
+      }
+      pollingModes{
+        ${pollingModeFields}
       }
       requestConnection(type:"joinWT" filterBy:[{filter:CONTENT_ID id:$id}]){
       pageInfo{
