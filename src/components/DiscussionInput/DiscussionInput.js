@@ -15,6 +15,7 @@ import {
 } from '../../reducers';
 import Button from '../Button';
 import FormField from '../FormField';
+
 import Box from '../Box';
 import Layer from '../Layer';
 import Discussion from '../Discussion';
@@ -49,6 +50,11 @@ const messages = defineMessages({
     id: 'command.submit',
     defaultMessage: 'Submit',
     description: 'Short command for sending data to the server',
+  },
+  visit: {
+    id: 'command.visit',
+    defaultMessage: 'Visit',
+    description: 'Short command to visit something',
   },
 });
 
@@ -102,11 +108,11 @@ class DiscussionInput extends React.Component {
       }),
     ).isRequired,
     groupId: PropTypes.string.isRequired,
+    group: PropTypes.shape({}),
     updates: PropTypes.shape({
       success: PropTypes.bool,
       error: PropTypes.bool,
     }),
-    group: PropTypes.shape({}),
   };
 
   static defaultProps = {
@@ -159,13 +165,15 @@ class DiscussionInput extends React.Component {
   }
 
   componentWillReceiveProps({ group, updates = {} }) {
-    const newUpdates = {};
+    let newUpdates = {};
     if (updates.success && !this.props.updates.success) {
-      // h istory.push(`/workteams/${this.props.groupId}/admin`);
-      this.setState({ ...standardValues });
+      newUpdates = standardValues;
+      newUpdates.success = updates.success;
+      newUpdates.error = false;
     }
     if (updates.error && !this.props.updates.error) {
       newUpdates.error = true;
+      newUpdates.success = false;
     }
 
     this.setState({ ...group, ...newUpdates });
@@ -333,10 +341,9 @@ class DiscussionInput extends React.Component {
     const { error } = this.state;
     const { updates = {} } = this.props;
     return (
-      <Box column pad className={s.root}>
+      <div className={s.root}>
         {/* <Calendar lang={this.props.locale} /> */}
-
-        <div>
+        <Box column pad>
           <FormField label="Title" error={titleError}>
             <input
               name="title"
@@ -389,75 +396,85 @@ class DiscussionInput extends React.Component {
               onBlur={this.handleBlur}
             />
           </FormField>
-        </div>
-        {this.state.showPreview && (
-          <Layer
-            onClose={() => {
-              this.setState({ showPreview: false });
-            }}
-          >
-            <Discussion
-              {...{
-                id: '0000',
+          {this.state.showPreview && (
+            <Layer
+              onClose={() => {
+                this.setState({ showPreview: false });
+              }}
+            >
+              <Box tag="article" column pad align padding="medium">
+                <Discussion
+                  {...{
+                    id: '0000',
+                    createdAt: new Date(),
+                    title:
+                      title.trim().length < 3
+                        ? 'Title is missing!'
+                        : title.trim(),
+                    content:
+                      this.md.render(body).length < 3
+                        ? 'Body is missing'
+                        : this.md.render(body),
+                  }}
+                />
+              </Box>
+            </Layer>
+          )}
 
-                title:
-                  title.trim().length < 3 ? 'Title is missing!' : title.trim(),
-                body:
-                  this.md.render(body).length < 3
-                    ? 'Body is missing'
-                    : this.md.render(body),
+          <Box pad>
+            <Button
+              primary
+              label={<FormattedMessage {...messages.submit} />}
+              onClick={this.onSubmit}
+              disabled={this.isPending}
+            />
+            <Button
+              label="Preview"
+              onClick={() => {
+                this.setState({ showPreview: true });
               }}
             />
-          </Layer>
-        )}
-
-        <Box pad>
-          <Button
-            primary
-            label={<FormattedMessage {...messages.submit} />}
-            onClick={this.onSubmit}
-            disabled={this.isPending}
-          />
-          <Button
-            label="Preview"
-            onClick={() => {
-              this.setState({ showPreview: true });
-            }}
-          />
+          </Box>
+          <p>
+            {error && <Notification type="error" message={updates.error} />}
+          </p>
+          {this.state.success && (
+            <Notification
+              type="success"
+              message={<FormattedMessage {...messages.success} />}
+              action={
+                <Button
+                  plain
+                  reverse
+                  icon={
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="24px"
+                      height="24px"
+                      role="img"
+                    >
+                      <path
+                        fill="none"
+                        stroke="#000"
+                        strokeWidth="2"
+                        d="M2,12 L22,12 M13,3 L22,12 L13,21"
+                      />
+                    </svg>
+                  }
+                  onClick={() => {
+                    history.push(
+                      `/workteams/${this.props.groupId}/discussions/${
+                        this.state.success
+                      }`,
+                    );
+                  }}
+                  label={<FormattedMessage {...messages.visit} />}
+                />
+              }
+            />
+          )}
         </Box>
-        <p>{error && <Notification type="error" message={updates.error} />}</p>
-        {this.state.success && (
-          <Notification
-            type="success"
-            message={<FormattedMessage {...messages.success} />}
-            action={
-              <Button
-                plain
-                reverse
-                icon={
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24px"
-                    height="24px"
-                    role="img"
-                  >
-                    <path
-                      fill="none"
-                      stroke="#000"
-                      strokeWidth="2"
-                      d="M2,12 L22,12 M13,3 L22,12 L13,21"
-                    />
-                  </svg>
-                }
-                onClick={() => {
-                  history.push(`/proposal/${this.props.success}`);
-                }}
-                label="Visit"
-              />
-            }
-          />
-        )}
-      </Box>
+      </div>
     );
   }
 }

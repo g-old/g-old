@@ -57,6 +57,10 @@ const aggregateActivities = (activities, viewer) =>
       if (curr.verb === 'delete') {
         // eslint-disable-next-line no-param-reassign
         agg.del[curr.id] = curr.objectId;
+        if (curr.type === 'vote') {
+          // eslint-disable-next-line no-param-reassign
+          agg.votes[curr.objectId] = curr.objectId;
+        }
         return agg;
       }
       if (curr.type === 'comment') {
@@ -100,6 +104,11 @@ const aggregateActivities = (activities, viewer) =>
         // dont't include other notifications!
         return agg;
       }
+      if (curr.type === 'vote') {
+        if (curr.objectId in agg.votes) {
+          return agg;
+        }
+      }
       agg.all.push(curr);
       return agg;
     },
@@ -109,6 +118,7 @@ const aggregateActivities = (activities, viewer) =>
       updatedProposals: {},
       updatedStatements: {},
       polls: {},
+      votes: {},
     },
   );
 
@@ -184,7 +194,10 @@ class Feed {
         ...groupMainIds,
       ]),
     ];
-    const allActivities = await loadActivities(viewer, allIds, loaders);
+
+    const descendingById = allIds.sort((a, b) => b - a);
+
+    const allActivities = await loadActivities(viewer, descendingById, loaders);
     // process them
     // deduplicate
 
@@ -193,7 +206,7 @@ class Feed {
     // filter deleted statements
     // reverse so newest are in front BUT: not sorted by time
 
-    allActivities.reverse();
+    // allActivities.reverse();
     const sorted = aggregateActivities(allActivities, viewer);
     const aggregated = sorted.all.filter(e => {
       if (e.id in sorted.del) {
@@ -204,6 +217,11 @@ class Feed {
           if (e.verb === 'update') {
             return true; // get only updated ones
           }
+          return false;
+        }
+      }
+      if (e.type === 'vote') {
+        if (e.objectId in sorted.votes) {
           return false;
         }
       }

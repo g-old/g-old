@@ -124,7 +124,7 @@ class ActivityService {
         content: modyfier
           ? modyfier(payload[resourceType])
           : payload[resourceType],
-        objectId: payload[resourceType].id,
+        objectId: payload[resourceType] && payload[resourceType].id,
         verb: event.eventType,
         groupId: payload.groupId,
       };
