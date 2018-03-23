@@ -54,7 +54,8 @@ const discussions = (state = initState, action) => {
         ...state,
         mutation: {
           pending: false,
-          success: true,
+          success: action.info || true, // to get id of created discussion
+
           error: '',
         },
       };
