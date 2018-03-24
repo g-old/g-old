@@ -13,4 +13,4 @@ RUN yarn install --production --no-progress
 COPY ./build .
 
 ENV LOGFILE ./logfile
-CMD node server.js -- --release >> $LOGFILE 2>&1
+CMD node server.js -- --release 2>&1 | tee -a $LOGFILE
