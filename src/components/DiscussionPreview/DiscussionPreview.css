@@ -1,5 +1,10 @@
 @import '../variables.css';
 
+.root {
+  margin: 0.5em 1em;
+  padding: 1em 0.5em;
+}
+
 .header {
   font-weight: 300;
   font-size: 1.25rem;

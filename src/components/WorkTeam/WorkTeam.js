@@ -206,26 +206,23 @@ class WorkTeam extends React.Component {
     let contentSection;
     if (ownStatus.status === 'MEMBER') {
       contentSection = (
-        <section>
+        <Box tag="section" column fill>
           <Tabs>
             <Tab title={<FormattedMessage {...messages.proposals} />}>
-              <div>
-                {' '}
-                <div>
-                  {proposals.map(
-                    p =>
-                      p && (
-                        <ProposalPreview
-                          proposal={p}
-                          onClick={WorkTeam.onProposalClick}
-                        />
-                      ),
-                  )}
-                </div>
-              </div>
+              <Box column className={s.itemContainer}>
+                {proposals.map(
+                  p =>
+                    p && (
+                      <ProposalPreview
+                        proposal={p}
+                        onClick={WorkTeam.onProposalClick}
+                      />
+                    ),
+                )}
+              </Box>
             </Tab>
             <Tab title={<FormattedMessage {...messages.discussions} />}>
-              <div className={s.discussions}>
+              <Box column className={s.itemContainer}>
                 {discussions.map(
                   d =>
                     d && (
@@ -235,10 +232,10 @@ class WorkTeam extends React.Component {
                       />
                     ),
                 )}
-              </div>
+              </Box>
             </Tab>
           </Tabs>
-        </section>
+        </Box>
       );
     }
     let layer;
@@ -252,7 +249,7 @@ class WorkTeam extends React.Component {
       );
     }
     return (
-      <Box align column padding="medium" pad>
+      <Box align column padding="medium" pad fill>
         {picture}
         <Heading tag="h2">{displayName}</Heading>
         <Box>

@@ -27,7 +27,6 @@ class Discussion {
 
   static async create(viewer, data) {
     if (!data) return null;
-
     if (!canMutate(viewer, data, Models.DISCUSSION)) return null;
     const discussionInDB = await knex.transaction(async trx => {
       const [discussion = null] = await knex('discussions')

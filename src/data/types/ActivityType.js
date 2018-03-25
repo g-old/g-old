@@ -70,6 +70,9 @@ const getVote = async (viewer, parent, loaders) => {
       poll_id: parent.content.pollId,
     });
   } else {
+    if (parent.verb === 'update') {
+      loaders.votes.clear(parent.objectId);
+    }
     vote = await Vote.gen(viewer, parent.objectId, loaders);
   }
   return vote;
@@ -154,7 +157,6 @@ const ActivityType = new GraphQLObjectType({
         switch (parent.type) {
           case 'statement': {
             const statement = await getStatement(viewer, parent, loaders);
-
             return addProposalInfo(
               viewer,
               loaders,
@@ -164,8 +166,7 @@ const ActivityType = new GraphQLObjectType({
           }
           case 'vote': {
             const vote = await getVote(viewer, parent, loaders);
-
-            return addProposalInfo(viewer, loaders, vote.pollId, vote);
+            return addProposalInfo(viewer, loaders, vote && vote.pollId, vote);
           }
           case 'proposal': {
             return addWorkTeamInfo(viewer, loaders, parent.content.workTeamId);

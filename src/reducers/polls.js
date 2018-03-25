@@ -18,13 +18,71 @@ import {
   SSE_UPDATE_SUCCESS,
 } from '../constants';
 
+const updatePolls = (state, action) => {
+  let deleteVote;
+  let updatedPolls;
+  let updateVote;
+  const activity = action.payload.entities.activities[action.payload.result];
+  if (activity && activity.type === 'vote') {
+    if (activity.verb === 'delete') {
+      deleteVote = true;
+    } else if (activity.verb === 'update') {
+      updateVote = true;
+    }
+
+    updatedPolls = Object.keys(action.payload.entities.votes).reduce(
+      (agg, curr) => {
+        const vote = action.payload.entities.votes[curr];
+        if (state[vote.pollId]) {
+          if (vote.position === 'pro') {
+            /* eslint-disable no-param-reassign */
+            if (updateVote) {
+              agg[vote.pollId] = {
+                ...state[vote.pollId],
+                upvotes: state[vote.pollId].upvotes + 1,
+                downvotes: state[vote.pollId].downvotes - 1,
+              };
+            } else {
+              agg[vote.pollId] = {
+                ...state[vote.pollId],
+                upvotes: deleteVote
+                  ? state[vote.pollId].upvotes - 1
+                  : state[vote.pollId].upvotes + 1,
+              };
+            }
+          } else if (updateVote) {
+            agg[vote.pollId] = {
+              ...state[vote.pollId],
+              upvotes: state[vote.pollId].upvotes - 1,
+              downvotes: state[vote.pollId].downvotes + 1,
+            };
+          } else {
+            // eslint-disable-next-line no-param-reassign
+            agg[vote.pollId] = {
+              ...state[vote.pollId],
+              downvotes: deleteVote
+                ? state[vote.pollId].downvotes - 1
+                : state[vote.pollId].downvotes + 1,
+            };
+          }
+        }
+        /* eslint-enable no-param-reassign */
+
+        return agg;
+      },
+      {},
+    );
+  }
+  return updatedPolls;
+};
+
 export default function polls(state = {}, action) {
   switch (action.type) {
     case CREATE_VOTE_SUCCESS: {
       const vote = action.payload.entities.votes[action.payload.result];
       const voteColumns = ['upvotes', 'downvotes'];
       const index = vote.position === 'pro' ? 0 : 1;
-      let votes = state[vote.pollId].votes;
+      let votes = state[vote.pollId].votes; // eslint-disable-line
       if (votes) {
         votes = [...state[vote.pollId].votes, vote.id];
       }
@@ -55,9 +113,15 @@ export default function polls(state = {}, action) {
     case LOAD_PROPOSAL_SUCCESS:
       return merge({}, state, action.payload.entities.polls);
     case SSE_UPDATE_SUCCESS: {
-      return action.payload.entities.polls
-        ? merge({}, state, action.payload.entities.polls)
-        : state;
+      // ! Works only if we are not including the poll
+      let updatedPolls;
+      if (action.payload.entities.votes) {
+        updatedPolls = updatePolls(state, action);
+      }
+      if (updatedPolls || action.payload.entities.polls) {
+        return merge({}, state, updatedPolls, action.payload.entities.polls);
+      }
+      return state;
     }
     case LOAD_PROPOSAL_LIST_SUCCESS: {
       return merge({}, state, action.payload.entities.polls);
@@ -88,8 +152,8 @@ export default function polls(state = {}, action) {
       const voteColumns = ['upvotes', 'downvotes'];
       const index = vote.position === 'pro' ? 0 : 1;
       const poll = state[vote.pollId];
-      let statements = poll.statements;
-      let votes = poll.votes;
+      let { statements, votes } = poll;
+
       if (poll.ownStatement && poll.statements) {
         // eslint-disable-next-line eqeqeq
         statements = poll.statements.filter(id => id != poll.ownStatement);
