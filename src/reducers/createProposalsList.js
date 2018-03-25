@@ -5,6 +5,7 @@ import {
   LOAD_PROPOSAL_LIST_SUCCESS,
   LOAD_PROPOSAL_SUCCESS,
   CREATE_PROPOSAL_SUCCESS,
+  UPDATE_PROPOSAL_SUCCESS,
   SSE_UPDATE_SUCCESS,
 } from '../constants';
 
@@ -16,14 +17,21 @@ const handlePageInfo = (state, action) => {
 };
 
 const createList = filter => {
+  const handleStateChange = (state, action) => {
+    const { state: updatedState, id } = action.payload.entities.proposals[
+      action.payload.result
+    ];
+    return updatedState === filter
+      ? [...new Set([...state, id])]
+      : state.filter(pId => pId !== id);
+  };
   const ids = (state = [], action) => {
-    if (action.filter !== filter) {
-      return state;
-    }
     switch (action.type) {
       case CREATE_PROPOSAL_SUCCESS:
       case LOAD_PROPOSAL_SUCCESS: {
-        return [...new Set([...state, action.payload.result])];
+        return filter === action.filter
+          ? [...new Set([...state, action.payload.result])]
+          : state;
       }
       case SSE_UPDATE_SUCCESS: {
         const activity =
@@ -31,12 +39,19 @@ const createList = filter => {
         if (!activity.type === 'proposal') {
           return state;
         }
-        return [...new Set([activity.objectId, ...state])];
+        return filter === action.filter
+          ? [...new Set([activity.objectId, ...state])]
+          : state;
+      }
+      case UPDATE_PROPOSAL_SUCCESS: {
+        return handleStateChange(state, action);
       }
       case LOAD_PROPOSAL_LIST_SUCCESS: {
-        const newEntries = action.payload.result || [];
-        return [...new Set([...state, ...newEntries])];
+        return filter === action.filter
+          ? [...new Set([...state, ...(action.payload.result || [])])]
+          : state;
       }
+
       default:
         return state;
     }
