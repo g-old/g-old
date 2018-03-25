@@ -15,9 +15,6 @@ if (process.env.BROWSER) {
   );
 }
 
-/** parse dotenv files first! */
-require('dotenv-extended').config();
-
 module.exports = {
   // default locale is the first one
   locales: ['de-DE', 'it-IT', 'lld-IT'],
@@ -44,7 +41,7 @@ module.exports = {
       // gmail example, no pooling used!
       host: process.env.MAILER_HOST,
       port: process.env.MAILER_PORT,
-      secure: process.env.MAILER_SECURE, // upgrade later with STARTTLS
+      secure: process.env.MAILER_SECURE,
       auth: {
         user: process.env.MAILER_USER,
         pass: process.env.MAILER_PASSWORD,
@@ -52,9 +49,9 @@ module.exports = {
     },
     sender: process.env.MAILER_SENDER,
   },
-  SENDGRID_API_KEY: 'api key', // or set it as env variable
+  SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
   recaptcha: {
-    secret: process.env.RECAPTCHA_SECRET, // dev keys
+    secret: process.env.RECAPTCHA_SECRET,
     siteKey: process.env.RECAPTCHA_KEY,
   },
   cloudinary: {
@@ -69,7 +66,7 @@ module.exports = {
     privateKey: process.env.WEBPUSH_PRIVKEY,
   },
 
-  /** test-configuration */
+  /** test-configuration, we might be able to move this to a .test.env and source it before the default .env file */
   test: {
     dbConfig: process.env.TEST_DATABASE_URL,
     mailer: {

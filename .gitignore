@@ -28,3 +28,4 @@ yarn-error.log*
 
 # Config
 private_configs.js
+.env

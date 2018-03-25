@@ -1,6 +1,6 @@
 import handlebars from 'handlebars';
 import nodemailer from 'nodemailer';
-import config from '../private_configs';
+import config from './config';
 import knex from './data/knex';
 import ActivityRepo from './data/models/Activity';
 import EventManager from './core/EventManager';
@@ -13,7 +13,7 @@ import BackgroundService from './core/BackgroundService';
 import { createToken } from './core/tokens';
 
 const env = process.env.NODE_ENV || 'development';
-const mailOptions = config[env].mailer;
+const mailOptions = config.mailer;
 
 const USE_SENDGRID = 'test';
 let Transporter;
