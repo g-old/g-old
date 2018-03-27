@@ -6,12 +6,7 @@
     "node": ">=7.0",
     "npm": ">=3.10"
   },
-  "browserslist": [
-    ">1%",
-    "last 4 versions",
-    "Firefox ESR",
-    "not ie < 9"
-  ],
+  "browserslist": [">1%", "last 4 versions", "Firefox ESR", "not ie < 9"],
   "dependencies": {
     "@babel/polyfill": "7.0.0-beta.40",
     "@sendgrid/mail": "^6.1.4",
@@ -167,18 +162,9 @@
     "webpack-node-externals": "^1.6.0"
   },
   "lint-staged": {
-    "*.{js,jsx}": [
-      "eslint --no-ignore --fix",
-      "git add --force"
-    ],
-    "*.{json,md,graphql}": [
-      "prettier --write",
-      "git add --force"
-    ],
-    "*.{css,less,styl,scss,sass,sss}": [
-      "stylelint --fix",
-      "git add --force"
-    ]
+    "*.{js,jsx}": ["eslint --no-ignore --fix", "git add --force"],
+    "*.{json,md,graphql}": ["prettier --write", "git add --force"],
+    "*.{css,less,styl,scss,sass,sss}": ["stylelint --fix", "git add --force"]
   },
   "scripts": {
     "precommit": "lint-staged",
@@ -198,7 +184,6 @@
     "messages": "babel-node tools/run messages",
     "bundle": "babel-node tools/run bundle",
     "build": "babel-node tools/run build",
-    "deploy": "babel-node tools/run deployToHeroku",
     "build:stats": "yarn run build  --release --analyse",
     "render": "babel-node tools/run render",
     "serve": "babel-node tools/run runServer",

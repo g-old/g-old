@@ -7,13 +7,14 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-/* eslint-disable max-len */
-
 if (process.env.BROWSER) {
   throw new Error(
     'Do not import `config.js` from inside the client-side code.',
   );
 }
+
+/* first of all, read in the .env file */
+require('dotenv-extended').config({ path: process.env.DOTENV || '.env' });
 
 module.exports = {
   // default locale is the first one

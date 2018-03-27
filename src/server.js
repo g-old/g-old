@@ -7,13 +7,6 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-/* first of all, read in env files */
-require('dotenv-extended').config();
-/* use the .test.env file if this is a test */
-if (true || process.env.TESTING) {
-  require('dotenv-extended').config({ path: '.test.env' }); // eslint-disable-line global-require
-}
-
 /* eslint-disable import/first */
 import path from 'path';
 import Promise from 'bluebird';
