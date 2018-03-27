@@ -21,7 +21,7 @@ pipeline:
     tags: [ dev ]
     secrets: [ docker_username, docker_password ]
     build_args:
-      - DRONE_BUILD=${DRONE_BUILD}
+      - DRONE_BUILD_NUMBER=${DRONE_BUILD_NUMBER}
       - DRONE_COMMIT=${DRONE_COMMIT}
     when:
       event: push
