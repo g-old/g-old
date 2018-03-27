@@ -1,10 +1,10 @@
 // Update with your config settings.
-const config = require('../private_configs');
+const config = require('./config');
 
 module.exports = {
   development: {
     client: 'postgresql',
-    connection: config.development.dbConfig,
+    connection: config.dbConfig,
     pool: {
       min: 2,
       max: 10,
@@ -20,7 +20,7 @@ module.exports = {
   },
   production: {
     client: 'postgresql',
-    connection: config.production.dbConfig, // process.env.DATABASE_URL,
+    connection: config.dbConfig, // process.env.DATABASE_URL,
     pool: {
       min: 2,
       max: 10,

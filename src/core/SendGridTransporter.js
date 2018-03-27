@@ -1,9 +1,7 @@
 import Sendgrid from '@sendgrid/mail';
-import config from '../../private_configs';
+import config from '../config';
 
-Sendgrid.setApiKey(
-  process.env.SENDGRID_API_KEY || config.production.SENDGRID_API_KEY,
-);
+Sendgrid.setApiKey(config.SENDGRID_API_KEY);
 
 class Transporter {
   constructor(SendGrid) {

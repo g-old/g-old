@@ -395,13 +395,6 @@
     "files": ["src/components/Login/Login.js"]
   },
   {
-    "id": "navigation.about",
-    "description": "About link in header",
-    "defaultMessage": "About",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
     "id": "navigation.admin",
     "description": "Admin link in header",
     "defaultMessage": "Admin",
@@ -410,22 +403,8 @@
   },
   {
     "id": "navigation.feed",
-    "description": "Feed link in header",
+    "description": "Feed label",
     "defaultMessage": "Feed",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
-    "id": "navigation.profile",
-    "description": "Profile link in header",
-    "defaultMessage": "Profile",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
-    "id": "navigation.surveys",
-    "description": "Surveys link in header",
-    "defaultMessage": "Surveys",
     "message": "",
     "files": ["src/components/Navigation/Navigation.js"]
   },
@@ -1098,7 +1077,10 @@
     "description": "Label for profile link",
     "defaultMessage": "Profile",
     "message": "",
-    "files": ["src/components/UserStatus/UserStatus.js"]
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/UserStatus/UserStatus.js"
+    ]
   },
   {
     "id": "discussions",
@@ -1133,5 +1115,26 @@
     "defaultMessage": "Spokesman",
     "message": "",
     "files": ["src/components/Proposal/Proposal.js"]
+  },
+  {
+    "id": "command.visit",
+    "description": "Short command to visit something",
+    "defaultMessage": "Visit",
+    "message": "",
+    "files": ["src/components/DiscussionInput/DiscussionInput.js"]
+  },
+  {
+    "id": "about",
+    "description": "About label",
+    "defaultMessage": "About",
+    "message": "",
+    "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "surveys",
+    "description": "Surveys label",
+    "defaultMessage": "Surveys",
+    "message": "",
+    "files": ["src/components/Navigation/Navigation.js"]
   }
 ]

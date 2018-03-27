@@ -1,5 +1,5 @@
 import cloudinary from 'cloudinary';
-import config from '../../private_configs';
+import config from '../config';
 
 cloudinary.config(config.cloudinary);
 

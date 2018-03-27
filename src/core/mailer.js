@@ -1,9 +1,8 @@
 import nodemailer from 'nodemailer';
 
-const config = require('../../private_configs');
+const config = require('../config');
 
-const env = process.env.NODE_ENV || 'development';
-const mailOptions = config[env].mailer;
+const mailOptions = config.mailer;
 const Transporter = nodemailer.createTransport(mailOptions.config);
 
 const composeMail = ({ lang, type, connection, token, address, name }) => {
@@ -25,7 +24,7 @@ const composeMail = ({ lang, type, connection, token, address, name }) => {
       },
       verification: {
         subject: 'G-old - Bestätigungslink',
-        text: `Hallo ${name}! \n\n Wir freuen uns sehr, dass Sie sich hier auf der Platform G-old angemeldet haben. Jetzt müssen Sie \n nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben. \n \n
+        text: `Hallo ${name}! \n\n Wir freuen uns sehr, dass Sie sich hier auf der Plattform G-old angemeldet haben. Jetzt müssen Sie \n nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben. \n \n
         Bitte klicken Sie auf den folgenden Link, oder fügen Sie ihn in Ihrem Browser ein:\n\n ${
           connection.protocol
         }://${connection.host}${
@@ -35,7 +34,7 @@ const composeMail = ({ lang, type, connection, token, address, name }) => {
       },
       mailChange: {
         subject: 'G-old Email-Adresse geändert!',
-        text: `Hallo ${name}! \n\n Sie haben Ihre Email-Adresse auf der Platform G-old geändert. Sie müssen \n nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben. \n \n
+        text: `Hallo ${name}! \n\n Sie haben Ihre Email-Adresse auf der Plattform G-old geändert. Sie müssen \n nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben. \n \n
         Bitte klicken Sie auf den folgenden Link, oder fügen Sie ihn in Ihrem Browser ein:\n\n ${
           connection.protocol
         }://${connection.host}${

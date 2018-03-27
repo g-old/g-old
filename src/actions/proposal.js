@@ -31,6 +31,21 @@ import {
 import { getProposalsIsFetching, getIsProposalFetching } from '../reducers';
 import { getFilter } from '../core/helpers';
 
+const userFields = `
+        id
+        name
+        surname
+        thumbnail
+`;
+
+const voteFields = `
+    id
+    position
+    pollId
+    voter{
+      ${userFields}
+    }
+`;
 const statementFields = `
     id
     likes
@@ -43,18 +58,12 @@ const statementFields = `
       id
       position
       voter{
-        id
-        name
-        surname
-        thumbnail
+       ${userFields}
       }
       pollId
     }
     author{
-      id
-      name
-      surname
-      thumbnail
+      ${userFields}
     }
 
 `;
@@ -65,15 +74,7 @@ const pollFields = `{
     statementId
   }
   ownVote{
-    id
-    position
-    pollId
-    voter{
-      id
-      name
-      surname
-      thumbnail
-    }
+    ${voteFields}
   }
   ownStatement {${statementFields} deletedAt}
   upvotes
@@ -84,13 +85,7 @@ const pollFields = `{
   endTime
   allVoters
   followees{
-    id
-    position
-    voter{
-      id
-      name
-      surname
-    }
+    ${voteFields}
   }
   mode{
     id
@@ -110,10 +105,7 @@ state
 body
 votes
 spokesman{
-  id
-  name
-  surname
-  thumbnail
+  ${userFields}
 }
 pollOne ${pollFields}
 pollTwo ${pollFields}

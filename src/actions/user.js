@@ -60,7 +60,8 @@ query ($group:Int $after:String $union:Boolean) {
   }`; */
 const groupFields = `
     id
-    name
+    displayName
+    logo
     `;
 const userQuery = `
 query ($id:ID!) {

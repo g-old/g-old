@@ -7,6 +7,7 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
+/* eslint-disable import/first */
 import path from 'path';
 import Promise from 'bluebird';
 import express from 'express';
@@ -45,8 +46,6 @@ import { user as userSchema } from './store/schema';
 import config from './config';
 // import worker from './core/worker';
 import BWorker, { sendJob } from './core/childProcess';
-// import { getProtocol } from './core/helpers';
-import privateConfig from '../private_configs';
 import { checkToken } from './core/tokens';
 import log from './logger';
 import { SubscriptionManager, SubscriptionServer } from './core/sse';
@@ -57,6 +56,7 @@ import EventManager from './core/EventManager';
 import root from './compositionRoot';
 import { EmailTypes } from './core/BackgroundService';
 import Request from './data/models/Request';
+/* eslint-enable import/first */
 
 const pubsub = new PubSub();
 
@@ -263,12 +263,8 @@ app.post('/logout', (req, res) => {
 });
 
 const recaptchaKeys = {
-  secret:
-    process.env.RECAPTCHA_SECRET ||
-    privateConfig[__DEV__ ? 'development' : 'production'].recaptcha.secret,
-  siteKey:
-    process.env.RECAPTCHA_KEY ||
-    privateConfig[__DEV__ ? 'development' : 'production'].recaptcha.siteKey,
+  secret: config.recaptcha.secret,
+  siteKey: config.recaptcha.siteKey,
 };
 app.post('/signup', (req, res) => {
   // OR post to graphql
@@ -650,7 +646,7 @@ app.get('*', async (req, res, next) => {
         },
         roles: normalizedData.entities.roles || {},
       },
-      webPushKey: privateConfig.webpush.publicKey,
+      webPushKey: config.webpush.publicKey,
       recaptchaKey, // will be null if user is logged in
       consent: cookieConsent,
     };
