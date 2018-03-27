@@ -52,6 +52,7 @@ class FeedContainer extends React.Component {
     const outDated = {};
     const polls = {};
     const proposals = {};
+    const votes = {};
     return (
       <div className={cn(s.container)}>
         {activities.map(activity => {
@@ -100,6 +101,14 @@ class FeedContainer extends React.Component {
               return null;
             }
             proposals[activity.objectId] = activity.objectId;
+          } else if (activity.type === 'vote') {
+            if (votes[activity.objectId]) {
+              return null;
+            }
+            votes[activity.objectId] = activity.objectId;
+            if (activity.verb === 'delete') {
+              return null;
+            }
           }
 
           return (

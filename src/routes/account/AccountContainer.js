@@ -49,9 +49,9 @@ import Responsive from '../../core/Responsive';
 
 const messages = defineMessages({
   settings: {
-    id: 'settings.title',
+    id: 'settings',
     defaultMessage: 'Settings',
-    description: 'Header for settings',
+    description: 'Label for settings',
   },
   verificationCall: {
     id: 'settings.verificationCall',

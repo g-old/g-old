@@ -21,7 +21,7 @@ import ProposalListEntry from './ProposalListEntry';
 import Layer from '../Layer';
 
 const ProposalInfo = props => (
-  <Box clickable column onClick={props.onClick}>
+  <Box column onClick={props.onClick}>
     <Label>{props.title}</Label>
     <div style={{ marginTop: '1em' }}>
       <PollState
@@ -99,13 +99,13 @@ class ProposalsManager extends React.Component {
       case 'threshold':
       case 'thresholdRef':
       case 'pollOption': {
-        value = e.target.value;
+        value = e.target.value; // eslint-disable-line
         break;
       }
       case 'withStatements':
       case 'unipolar':
       case 'secret': {
-        value = e.target.checked;
+        value = e.target.checked; // eslint-disable-line
         break;
       }
 
@@ -180,9 +180,9 @@ class ProposalsManager extends React.Component {
       <table className={s.proposalList}>
         <thead>
           <tr>
-            <th className={s.title}>{'Title'}</th>
-            <th>{'Poll'}</th>
-            <th className={s.date}>{'Endtime'}</th>
+            <th className={s.title}>Title</th>
+            <th>Poll</th>
+            <th className={s.date}>Endtime</th>
           </tr>
         </thead>
         <tbody>

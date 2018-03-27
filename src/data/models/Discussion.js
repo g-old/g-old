@@ -27,10 +27,9 @@ class Discussion {
 
   static async create(viewer, data) {
     if (!data) return null;
-
     if (!canMutate(viewer, data, Models.DISCUSSION)) return null;
     const discussionInDB = await knex.transaction(async trx => {
-      let discussion = await knex('discussions')
+      const [discussion = null] = await knex('discussions')
         .transacting(trx)
         .insert({
           author_id: viewer.id,
@@ -41,7 +40,6 @@ class Discussion {
         })
         .returning('*');
 
-      discussion = discussion[0];
       if (discussion) {
         await knex('work_teams')
           .where({ id: data.workTeamId })
@@ -54,7 +52,7 @@ class Discussion {
       EventManager.publish('onDiscussionCreated', {
         viewer,
         discussion,
-        groupId: discussion.id,
+        groupId: discussion.workTeamId,
       });
     }
     return discussion;

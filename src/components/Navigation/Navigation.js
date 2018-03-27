@@ -13,26 +13,27 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { connect } from 'react-redux';
 import cn from 'classnames';
-import { getActivityCounter } from '../../reducers';
+import { getActivityCounter, getSessionUser } from '../../reducers';
 import s from './Navigation.css';
 import Link from '../Link';
 import Menu from '../Menu';
+import { canAccess } from '../../organization';
 
 const messages = defineMessages({
   feed: {
     id: 'navigation.feed',
     defaultMessage: 'Feed',
-    description: 'Feed link in header',
+    description: 'Feed label',
   },
   about: {
-    id: 'navigation.about',
+    id: 'about',
     defaultMessage: 'About',
-    description: 'About link in header',
+    description: 'About label',
   },
   proposals: {
-    id: 'navigation.proposals',
+    id: 'proposals',
     defaultMessage: 'Proposals',
-    description: 'Proposals link in header',
+    description: 'Proposals label',
   },
   admin: {
     id: 'navigation.admin',
@@ -40,24 +41,24 @@ const messages = defineMessages({
     description: 'Admin link in header',
   },
   surveys: {
-    id: 'navigation.surveys',
+    id: 'surveys',
     defaultMessage: 'Surveys',
-    description: 'Surveys link in header',
+    description: 'Surveys label',
   },
   profile: {
-    id: 'navigation.profile',
+    id: 'profile',
     defaultMessage: 'Profile',
-    description: 'Profile link in header',
+    description: 'Profile label',
   },
-  /* users: {
-    id: 'navigation.users',
-    defaultMessage: 'All users',
-    description: 'User list link in header',
-  }, */
+  users: {
+    id: 'users',
+    defaultMessage: 'Users',
+    description: 'Users label',
+  },
   workTeams: {
-    id: 'navigation.users',
-    defaultMessage: 'All workteams',
-    description: 'Workteam list link in header',
+    id: 'workTeams',
+    defaultMessage: 'Workteams',
+    description: 'Workteam label',
   },
 });
 
@@ -65,27 +66,28 @@ const contents = [
   { id: 1, path: '/feed', name: 'feed' },
   { id: 2, path: '/proposals/active', name: 'proposals' },
   { id: 3, path: '/surveys', name: 'surveys' },
-  { id: 4, path: '/admin', name: 'admin' },
-  { id: 5, path: '/about', name: 'about' },
+  { id: 4, path: '/workteams', name: 'workTeams' },
+  { id: 5, path: '/accounts', name: 'users' },
+  { id: 6, path: '/about', name: 'about' },
 ];
 
-const getMenu = (counter, path) =>
-  contents.map(p => {
-    const children = [<FormattedMessage key={p.id} {...messages[p.name]} />];
-    if (p.name === 'feed' && counter.feed > 0) {
-      children.unshift(<span className={s.news}>{`(${counter.feed}) `}</span>);
-    }
-
-    return (
-      <Link
-        key={p.id}
-        className={cn(s.link, path === p.path ? s.current : null)}
-        to={p.path}
-      >
-        {children}
-      </Link>
-    );
-  });
+const makeLink = (linkData, currentPath, counter) => {
+  const label = [
+    <FormattedMessage key={linkData.id} {...messages[linkData.name]} />,
+  ];
+  if (linkData.name === 'feed' && counter.feed > 0) {
+    label.unshift(<span className={s.news}>{`(${counter.feed}) `}</span>);
+  }
+  return (
+    <Link //eslint-disable-line
+      key={linkData.id}
+      className={cn(s.link, currentPath === linkData.path ? s.current : null)}
+      to={linkData.path}
+    >
+      {label}
+    </Link>
+  );
+};
 
 class Navigation extends React.Component {
   static propTypes = {
@@ -94,6 +96,10 @@ class Navigation extends React.Component {
       proposals: PropTypes.number,
     }).isRequired,
     path: PropTypes.string.isRequired,
+    user: PropTypes.shape({}),
+  };
+  static defaultProps = {
+    user: null,
   };
 
   componentWillReceiveProps({ activityCounter }) {
@@ -108,12 +114,24 @@ class Navigation extends React.Component {
       document.title = `(${notice}) ${oldTitle}`;
     }
   }
+  getMenu() {
+    const { activityCounter, path, user } = this.props;
+    const links = contents.map(p => makeLink(p, path, activityCounter));
+    if (canAccess(user, 'Admin')) {
+      links.push(
+        makeLink(
+          { id: 7, path: '/admin', name: 'admin' },
+          path,
+          activityCounter,
+        ),
+      );
+    }
+    return links;
+  }
   render() {
     return (
       <div role="navigation">
-        <div className={s.navBar}>
-          {getMenu(this.props.activityCounter, this.props.path)}
-        </div>
+        <div className={s.navBar}>{this.getMenu()}</div>
         <div className={s.menu}>
           <Menu
             withControl
@@ -137,7 +155,7 @@ class Navigation extends React.Component {
               </svg>
             }
           >
-            {getMenu(this.props.activityCounter, this.props.path || '')}
+            {this.getMenu()}
           </Menu>
         </div>
       </div>
@@ -148,6 +166,7 @@ class Navigation extends React.Component {
 const mapToProps = state => ({
   activityCounter: getActivityCounter(state),
   path: state.ui.loading.path,
+  user: getSessionUser(state),
 });
 
 export default connect(mapToProps, null)(withStyles(s)(Navigation));

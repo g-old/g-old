@@ -12,4 +12,5 @@ RUN yarn install --production --no-progress
 # Copy application files
 COPY ./build .
 
-CMD [ "node", "server.js" ]
+ENV LOGFILE ./logfile
+CMD node server.js -- --release 2>&1 | tee -a $LOGFILE

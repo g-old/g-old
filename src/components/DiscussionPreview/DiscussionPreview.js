@@ -50,7 +50,7 @@ class DiscussionPreview extends React.Component {
       /* eslint-disable jsx-a11y/no-static-element-interactions */
       /* eslint-disable jsx-a11y/interactive-supports-focus */
 
-      <Box>
+      <Box column className={s.root}>
         <div>
           <div className={s.date}>
             <FormattedRelative value={discussion.createdAt} />

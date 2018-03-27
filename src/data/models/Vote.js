@@ -100,12 +100,23 @@ class Vote {
     }
     const delVote = new Vote(deletedVote);
     if (deletedVote) {
-      EventManager.publish('onVoteDeleted', { viewer, vote: delVote });
+      EventManager.publish('onVoteDeleted', {
+        viewer,
+        vote: delVote,
+        ...(proposal.workTeamId && {
+          groupId: proposal.workTeamId,
+          info: { workTeamId: proposal.workTeamId },
+        }),
+      });
     }
     if (deletedStatement) {
       EventManager.publish('onStatementDeleted', {
         viewer,
         statemente: deletedStatement,
+        ...(proposal.workTeamId && {
+          groupId: proposal.workTeamId,
+          info: { workTeamId: proposal.workTeamId },
+        }),
       });
     }
     return { deletedVote: delVote || null, deletedStatement };
@@ -189,12 +200,23 @@ class Vote {
     }
     const vote = await Vote.gen(viewer, data.id, loaders);
     if (vote) {
-      EventManager.publish('onVoteUpdated', { viewer, vote });
+      EventManager.publish('onVoteUpdated', {
+        viewer,
+        vote,
+        ...(proposal.workTeamId && {
+          groupId: proposal.workTeamId,
+          info: { workTeamId: proposal.workTeamId },
+        }),
+      });
     }
     if (deletedStatement) {
       EventManager.publish('onStatementDeleted', {
         viewer,
         statemente: deletedStatement,
+        ...(proposal.workTeamId && {
+          groupId: proposal.workTeamId,
+          info: { workTeamId: proposal.workTeamId },
+        }),
       });
     }
     return {

@@ -42,9 +42,9 @@ async function copy() {
     copyFile('LICENSE.txt', 'build/LICENSE.txt'),
     copyFile('yarn.lock', 'build/yarn.lock'),
     copyDir('src/messages', 'build/messages'),
-    // TODO If node env is production
+
     copyDir('src/data/db', 'build/db'),
-    copyFile('private_configs.js', 'build/private_configs.js'),
+    copyFile('.env.defaults', 'build/.env.defaults'),
     copyFile('src/core/serviceworker.js', 'build/public/serviceworker.js'),
   ]);
 

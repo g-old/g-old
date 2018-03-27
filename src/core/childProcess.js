@@ -11,7 +11,7 @@ const handleResults = msg => {
 const fork = async file => {
   log.info('Creating background worker');
   if (!initialized) {
-    worker = await cp.fork(file);
+    worker = await cp.fork(file, { env: process.env });
     if (worker) {
       worker.on('message', handleResults);
       // Listen for an exit event:

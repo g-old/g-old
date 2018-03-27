@@ -9,8 +9,7 @@
     "id": "navigation.about",
     "description": "About link in header",
     "defaultMessage": "About",
-    "message": "Informazioni",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Informazioni"
   },
   {
     "id": "login.email",
@@ -569,36 +568,8 @@
   },
   {
     "id": "navigation.feed",
-    "description": "Feed link in header",
+    "description": "Feed label",
     "defaultMessage": "Feed",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
-    "id": "navigation.profile",
-    "description": "Profile link in header",
-    "defaultMessage": "Profile",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
-    "id": "navigation.proposals",
-    "description": "Proposals link in header",
-    "defaultMessage": "Proposals",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
-    "id": "navigation.surveys",
-    "description": "Surveys link in header",
-    "defaultMessage": "Surveys",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
-    "id": "navigation.users",
-    "description": "Workteam list link in header",
-    "defaultMessage": "All workteams",
     "message": "",
     "files": ["src/components/Navigation/Navigation.js"]
   },
@@ -738,7 +709,7 @@
     "id": "form.error-emailTaken",
     "description": "Help for not unique email",
     "defaultMessage": "Email address already in use",
-    "message": "",
+    "message": "Questo indirizzo e-mail è già in uso. Riprova",
     "files": [
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/EmailField.js",
@@ -749,7 +720,7 @@
     "id": "form.error-passwordMismatch",
     "description": "Help for mismatching passwords",
     "defaultMessage": "These passwords don't match. Try again?",
-    "message": "",
+    "message": "Le password non corrispondono. Riprova.",
     "files": [
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
@@ -760,7 +731,7 @@
     "description": "Help for short passwords",
     "defaultMessage":
       "Short passwords are easy to guess. Try one with at least 6 characters",
-    "message": "",
+    "message": "Per la tua password utilizza almeno 6 caratteri ",
     "files": [
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
@@ -770,21 +741,21 @@
     "id": "form.forename",
     "description": "Forename",
     "defaultMessage": "First",
-    "message": "",
+    "message": "Nome",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
     "id": "form.name",
     "description": "Name",
     "defaultMessage": "Name",
-    "message": "",
+    "message": "Nome",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
     "id": "form.surname",
     "description": "Surname",
     "defaultMessage": "Surname",
-    "message": "",
+    "message": "Cognome",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
@@ -851,7 +822,7 @@
     "id": "settings.email.notVerified",
     "description": "Email not yet verified",
     "defaultMessage": "Email not verified",
-    "message": "",
+    "message": "Indirizzo e-mail non verificato",
     "files": [
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
@@ -871,7 +842,7 @@
     "id": "settings.email.verified",
     "description": "Email got verified",
     "defaultMessage": "Email verified!",
-    "message": "",
+    "message": "Indirizzo e-mail verificato",
     "files": [
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
@@ -881,7 +852,7 @@
     "id": "settings.emailNew",
     "description": "Email label in settings for new address",
     "defaultMessage": "New email address",
-    "message": "",
+    "message": "Nuovo indirizzo e-mail",
     "files": [
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/EmailInput.js",
@@ -899,14 +870,14 @@
     "id": "settings.name",
     "description": "First name",
     "defaultMessage": "Name",
-    "message": "",
+    "message": "Nome",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
     "id": "settings.surname",
     "description": "Surname",
     "defaultMessage": "Surname",
-    "message": "",
+    "message": "Cognome",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
@@ -948,13 +919,6 @@
     "id": "profile.followees",
     "description": "Followees",
     "defaultMessage": "Followees",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "settings.title",
-    "description": "Header for settings",
-    "defaultMessage": "Settings",
     "message": "",
     "files": ["src/routes/account/AccountContainer.js"]
   },
@@ -1073,7 +1037,7 @@
     "id": "label.name",
     "description": "Heading of name section",
     "defaultMessage": "Name",
-    "message": "",
+    "message": "Nome",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
@@ -1100,22 +1064,126 @@
   {
     "id": "settings.email.requestCreated",
     "description": "Notification that a request has been created",
-    "defaultMessage": "You have to confirm your new email address \"{email}\"",
+    "defaultMessage": "Check your email ({email}) to confirm.",
     "message": "",
     "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
     "id": "settings.email.resendNotification",
     "description": "Verification mail sending success",
-    "defaultMessage": "An email was sent to your new mail address \"{email}\"",
+    "defaultMessage": "An email was sent to your new mail address ({email})",
     "message": "",
     "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
     "id": "settings.verificationCall",
     "description": "Notification to verify mail address",
-    "defaultMessage": "Please confirm your email address",
+    "defaultMessage":
+      "Confirm your email address. A confirmation message was sent to \"{email}\"",
     "message": "",
     "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "proposals",
+    "description": "Proposals label",
+    "defaultMessage": "Proposals",
+    "message": "Proposte",
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/WorkTeam/WorkTeam.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
+  },
+  {
+    "id": "users",
+    "description": "Users label",
+    "defaultMessage": "Users",
+    "message": "Utenti",
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/routes/accountList/AccountListContainer.js"
+    ]
+  },
+  {
+    "id": "workTeams",
+    "description": "Workteam label",
+    "defaultMessage": "Workteams",
+    "message": "Gruppi di lavoro",
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/routes/workTeamList/WorkTeamListContainer.js"
+    ]
+  },
+  {
+    "id": "logout",
+    "description": "Label for logout",
+    "defaultMessage": "Logout",
+    "message": "Esci",
+    "files": ["src/components/UserStatus/UserStatus.js"]
+  },
+  {
+    "id": "profile",
+    "description": "Label for profile link",
+    "defaultMessage": "Profile",
+    "message": "Account",
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/UserStatus/UserStatus.js"
+    ]
+  },
+  {
+    "id": "discussions",
+    "description": "Discussions label",
+    "defaultMessage": "Discussions",
+    "message": "Discussioni",
+    "files": [
+      "src/components/WorkTeam/WorkTeam.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
+  },
+  {
+    "id": "members",
+    "description": "Members label",
+    "defaultMessage": "Members",
+    "message": "Membri",
+    "files": ["src/components/WorkTeam/WorkTeam.js"]
+  },
+  {
+    "id": "settings",
+    "description": "Label for settings",
+    "defaultMessage": "Settings",
+    "message": "Impostazioni",
+    "files": [
+      "src/routes/account/AccountContainer.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
+  },
+  {
+    "id": "spokesman",
+    "description": "Spokesman label",
+    "defaultMessage": "Spokesman",
+    "message": "Relatore",
+    "files": ["src/components/Proposal/Proposal.js"]
+  },
+  {
+    "id": "command.visit",
+    "description": "Short command to visit something",
+    "defaultMessage": "Visit",
+    "message": "",
+    "files": ["src/components/DiscussionInput/DiscussionInput.js"]
+  },
+  {
+    "id": "about",
+    "description": "About label",
+    "defaultMessage": "About",
+    "message": "Informazioni",
+    "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "surveys",
+    "description": "Surveys label",
+    "defaultMessage": "Surveys",
+    "message": "Sondaggi",
+    "files": ["src/components/Navigation/Navigation.js"]
   }
 ]

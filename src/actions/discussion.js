@@ -157,6 +157,7 @@ export function createDiscussion(discussion) {
         type: CREATE_DISCUSSION_SUCCESS,
         payload: normalizedData,
         id: virtualId,
+        info: `${normalizedData.result}`,
       });
     } catch (error) {
       dispatch({

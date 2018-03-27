@@ -10,7 +10,6 @@ import {
   CHECK_PSUB_STATUS,
 } from '../constants';
 import { getSessionUser } from '../reducers';
-// import { webPush as publicKey } from '../../private_configs';
 
 const createPushSub = `mutation($endpoint:String! $p256dh:String! $auth:String!){
 createPushSub (subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})

@@ -1,9 +1,8 @@
 @import '../../components/variables.css';
 
 .root {
-  padding: 3rem;
-  width: 30rem;
-  margin: auto;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .textInput {

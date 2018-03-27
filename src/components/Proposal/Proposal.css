@@ -22,10 +22,15 @@
   word-break: break-word;
 }
 
-.avatar {
-  width: 1em;
-  height: 1em;
-  margin: 0.1em;
+.spokesman {
+  display: flex;
+  cursor: pointer;
+
+  img {
+    width: 1em;
+    height: 1em;
+    margin: 0.1em;
+  }
 }
 
 /*

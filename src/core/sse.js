@@ -18,7 +18,11 @@ class ValidationError extends Error {
 
 const HEART_BEAT = 30000;
 // TODO try channels per group - no filtering
-function groupFilter(rootValue, context) {
+function contextFilter(rootValue, context) {
+  // Dont sse own changes
+  if (rootValue.actorId === context.viewer.id) {
+    return false;
+  }
   if (rootValue.workTeamId) {
     return (
       context.viewer.wtMemberships &&
@@ -35,9 +39,14 @@ export class SubscriptionManager {
     this.pubsub = options.pubsub;
     this.maxSubscriptionId = 0;
     EventManager.subscribe('onActivityCreated', payload => {
-      if (['proposal', 'statement'].includes(payload.activity.type)) {
+      if (
+        ['proposal', 'statement', 'discussion', 'vote'].includes(
+          payload.activity.type,
+        )
+      ) {
         this.pubsub.publish('activities', {
           id: payload.activity.id,
+          actorId: payload.activity.actorId,
           ...(payload.workTeamId && { workTeamId: payload.workTeamId }),
         });
       }
@@ -84,7 +93,7 @@ export class SubscriptionManager {
     const onMessage = rootValue =>
       Promise.resolve(options.context)
         .then(context =>
-          Promise.all([context, groupFilter(rootValue, context)]),
+          Promise.all([context, contextFilter(rootValue, context)]),
         )
         .then(([context, doExecute]) => {
           if (!doExecute) {

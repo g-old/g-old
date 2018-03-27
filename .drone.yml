@@ -11,8 +11,6 @@ pipeline:
     image: node:8
     environment:
       - NODE_ENV=development
-    volumes:
-      - /home/gold/private_configs.js:/drone/src/github.com/g-old/g-old/private_configs.js
     commands:
       - yarn install --no-progress
       - yarn build --release
@@ -30,7 +28,6 @@ pipeline:
     image: plugins/docker
     repo: tobiasmayr/gold
     auto_tag: true
-    tags: [ live ]
     secrets: [ docker_username, docker_password ]
     when:
       event: tag
@@ -43,4 +40,4 @@ pipeline:
     volumes:
       - /tmp/cache:/cache
 
-branches: [ dev, live]
+branches: [ dev ]
