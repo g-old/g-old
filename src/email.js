@@ -1,6 +1,4 @@
-import config from '../private_configs';
-
-const env = process.env.NODE_ENV || 'development';
+import config from './config';
 
 // eslint-disable-next-line import/no-mutable-exports
 let Mailer = {
@@ -9,11 +7,9 @@ let Mailer = {
   },
 };
 
-const USE_SENDGRID = process.env.NODE_ENV === 'test';
-
-if (env === 'development') {
+if (process.env.NODE_ENV === 'development') {
   const nodeMailer = require('nodemailer'); // eslint-disable-line global-require
-  const mailOptions = config[env].mailer;
+  const mailOptions = config.mailer;
   const Transporter = nodeMailer.createTransport(mailOptions.config);
   Mailer.send = mail =>
     new Promise((resolve, reject) => {
@@ -26,13 +22,10 @@ if (env === 'development') {
       console.info(info);
       return info.message;
     });
-}
-if (env === 'production' || USE_SENDGRID) {
+} else {
   const sendGrid = require('@sendgrid/mail'); // eslint-disable-line global-require
 
-  sendGrid.setApiKey(
-    process.env.SENDGRID_API_KEY || config.production.SENDGRID_API_KEY,
-  );
+  sendGrid.setApiKey(config.SENDGRID_API_KEY);
   Mailer = sendGrid;
 }
 
