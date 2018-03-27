@@ -14,6 +14,7 @@ import Button from '../Button';
 import Box from '../Box';
 import Layer from '../Layer';
 import Notification from '../Notification';
+import history from '../../history';
 
 const messages = defineMessages({
   closed: {
@@ -80,7 +81,6 @@ class Poll extends React.Component {
   };
 
   static defaultProps = {
-    updates: {},
     votes: null,
     ownVote: null,
     ownStatement: null,
@@ -114,7 +114,10 @@ class Poll extends React.Component {
     return this.props.followeeVotes
       .filter(user => user.position === pos)
       .map(user => (
-        <img
+        <img // eslint-disable-line
+          onClick={() => {
+            history.push(`/accounts/${user.voter.id}`);
+          }}
           key={user.id}
           className={s.followee}
           src={user.voter.thumbnail}
@@ -274,7 +277,7 @@ class Poll extends React.Component {
               <Box justify>
                 <Button
                   onClick={() => this.state.confirmationFunc()}
-                  label={'Ok'}
+                  label="Ok"
                 />
                 <Button
                   primary

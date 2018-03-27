@@ -1,8 +1,15 @@
 import merge from 'lodash.merge';
 import { denormalize } from 'normalizr';
 import { combineReducers } from 'redux';
-import { voteList as voteListSchema, userList as userListSchema } from './../store/schema';
-import { LOAD_PROPOSAL_SUCCESS, FETCH_USER_SUCCESS, UPDATE_USER_SUCCESS } from '../constants';
+import {
+  voteList as voteListSchema,
+  userList as userListSchema,
+} from './../store/schema';
+import {
+  LOAD_PROPOSAL_SUCCESS,
+  FETCH_USER_SUCCESS,
+  UPDATE_USER_SUCCESS,
+} from '../constants';
 
 const allIds = (state = [], action) => {
   switch (action.type) {
@@ -12,7 +19,7 @@ const allIds = (state = [], action) => {
       const ids = Object.keys(polls).reduce((acc, curr) => {
         const voteIds = polls[curr].followees || [];
         return acc.concat(
-          voteIds.map((vId) => {
+          voteIds.map(vId => {
             const vote = action.payload.entities.votes[vId];
             return vote.voter;
           }),
@@ -32,7 +39,10 @@ const allIds = (state = [], action) => {
     case FETCH_USER_SUCCESS: {
       const { users } = action.payload.entities;
       return [
-        ...new Set([...state, ...Object.keys(users).filter(id => id !== action.payload.result)]),
+        ...new Set([
+          ...state,
+          ...Object.keys(users).filter(id => id !== action.payload.result),
+        ]),
       ];
     }
 
@@ -44,9 +54,16 @@ const allIds = (state = [], action) => {
 const votesByPoll = (state = {}, action) => {
   switch (action.type) {
     case UPDATE_USER_SUCCESS: {
-      if (action.properties.followee && action.info && action.info.delete) return {};
+      if (action.properties.followee && action.info && action.info.delete)
+        return {};
       return action.properties.followee && action.info && action.info.voteId
-        ? { ...state, [action.info.pollId]: [...state[action.info.pollId], action.info.voteId] }
+        ? {
+            ...state,
+            [action.info.pollId]: [
+              ...state[action.info.pollId],
+              action.info.voteId,
+            ],
+          }
         : state;
     }
     case LOAD_PROPOSAL_SUCCESS: {
@@ -81,7 +98,10 @@ const votesByFollowee = (state = {}, action) => {
         const followeesWithVote = voteIds.reduce(
           (a, c) => ({
             ...a,
-            [votes[c].voter]: [...(a[votes[c].voter] ? a[votes[c].voter] : []), c],
+            [votes[c].voter]: [
+              ...(a[votes[c].voter] ? a[votes[c].voter] : []),
+              c,
+            ],
           }),
           acc,
         );
@@ -90,7 +110,9 @@ const votesByFollowee = (state = {}, action) => {
       const newState = Object.keys(followeeVotes).reduce(
         (ac, cu) => ({
           ...ac,
-          [cu]: [...new Set([...(state[cu] ? state[cu] : []), ...followeeVotes[cu]])],
+          [cu]: [
+            ...new Set([...(state[cu] ? state[cu] : []), ...followeeVotes[cu]]),
+          ],
         }),
         {},
       );
@@ -122,7 +144,7 @@ export const getFolloweeVotesByPoll = (state, pollId) => {
   return votes;
 };
 
-export const getFollowees = (state) => {
+export const getFollowees = state => {
   const ids = state.followees.allIds;
   return denormalize(ids, userListSchema, {
     ...state,
