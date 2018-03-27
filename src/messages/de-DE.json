@@ -9,8 +9,7 @@
     "id": "navigation.about",
     "description": "About link in header",
     "defaultMessage": "About",
-    "message": "Über",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Über"
   },
   {
     "id": "login.email",
@@ -325,8 +324,7 @@
     "id": "navigation.surveys",
     "description": "Surveys link in header",
     "defaultMessage": "Surveys",
-    "message": "Umfragen",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Umfragen"
   },
   {
     "id": "login.error",
@@ -976,7 +974,7 @@
   },
   {
     "id": "navigation.feed",
-    "description": "Feed link in header",
+    "description": "Feed label",
     "defaultMessage": "Feed",
     "message": "",
     "files": ["src/components/Navigation/Navigation.js"]
@@ -985,8 +983,7 @@
     "id": "navigation.profile",
     "description": "Profile link in header",
     "defaultMessage": "Profile",
-    "message": "Profil",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Profil"
   },
   {
     "id": "navigation.users",
@@ -1259,7 +1256,10 @@
     "description": "Label for profile link",
     "defaultMessage": "Profile",
     "message": "Profil",
-    "files": ["src/components/UserStatus/UserStatus.js"]
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/UserStatus/UserStatus.js"
+    ]
   },
   {
     "id": "discussions",
@@ -1294,5 +1294,26 @@
     "defaultMessage": "Spokesman",
     "message": "Referent",
     "files": ["src/components/Proposal/Proposal.js"]
+  },
+  {
+    "id": "command.visit",
+    "description": "Short command to visit something",
+    "defaultMessage": "Visit",
+    "message": "Aufrufen",
+    "files": ["src/components/DiscussionInput/DiscussionInput.js"]
+  },
+  {
+    "id": "about",
+    "description": "About label",
+    "defaultMessage": "About",
+    "message": "Über",
+    "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "surveys",
+    "description": "Surveys label",
+    "defaultMessage": "Surveys",
+    "message": "Umfragen",
+    "files": ["src/components/Navigation/Navigation.js"]
   }
 ]

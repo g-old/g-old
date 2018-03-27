@@ -61,7 +61,8 @@ query ($group:Int $after:String $union:Boolean) {
   }`; */
 const workTeam = `
     id
-    name
+    displayName
+    logo
     `;
 const userQuery = `
 query ($id:ID!) {

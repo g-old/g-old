@@ -9,8 +9,7 @@
     "id": "navigation.about",
     "description": "About link in header",
     "defaultMessage": "About",
-    "message": "Informazioni",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Informazioni"
   },
   {
     "id": "login.email",
@@ -569,22 +568,8 @@
   },
   {
     "id": "navigation.feed",
-    "description": "Feed link in header",
+    "description": "Feed label",
     "defaultMessage": "Feed",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
-    "id": "navigation.profile",
-    "description": "Profile link in header",
-    "defaultMessage": "Profile",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
-    "id": "navigation.surveys",
-    "description": "Surveys link in header",
-    "defaultMessage": "Surveys",
     "message": "",
     "files": ["src/components/Navigation/Navigation.js"]
   },
@@ -1141,7 +1126,10 @@
     "description": "Label for profile link",
     "defaultMessage": "Profile",
     "message": "Account",
-    "files": ["src/components/UserStatus/UserStatus.js"]
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/UserStatus/UserStatus.js"
+    ]
   },
   {
     "id": "discussions",
@@ -1173,8 +1161,29 @@
   {
     "id": "spokesman",
     "description": "Spokesman label",
-    "defaultMessage": "Relatore",
-    "message": "",
+    "defaultMessage": "Spokesman",
+    "message": "Relatore",
     "files": ["src/components/Proposal/Proposal.js"]
+  },
+  {
+    "id": "command.visit",
+    "description": "Short command to visit something",
+    "defaultMessage": "Visit",
+    "message": "",
+    "files": ["src/components/DiscussionInput/DiscussionInput.js"]
+  },
+  {
+    "id": "about",
+    "description": "About label",
+    "defaultMessage": "About",
+    "message": "Informazioni",
+    "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "surveys",
+    "description": "Surveys label",
+    "defaultMessage": "Surveys",
+    "message": "Sondaggi",
+    "files": ["src/components/Navigation/Navigation.js"]
   }
 ]

@@ -23,12 +23,12 @@ const messages = defineMessages({
   feed: {
     id: 'navigation.feed',
     defaultMessage: 'Feed',
-    description: 'Feed link in header',
+    description: 'Feed label',
   },
   about: {
-    id: 'navigation.about',
+    id: 'about',
     defaultMessage: 'About',
-    description: 'About link in header',
+    description: 'About label',
   },
   proposals: {
     id: 'proposals',
@@ -41,14 +41,14 @@ const messages = defineMessages({
     description: 'Admin link in header',
   },
   surveys: {
-    id: 'navigation.surveys',
+    id: 'surveys',
     defaultMessage: 'Surveys',
-    description: 'Surveys link in header',
+    description: 'Surveys label',
   },
   profile: {
-    id: 'navigation.profile',
+    id: 'profile',
     defaultMessage: 'Profile',
-    description: 'Profile link in header',
+    description: 'Profile label',
   },
   users: {
     id: 'users',
