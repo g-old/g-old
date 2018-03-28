@@ -57,6 +57,12 @@ import { EmailTypes } from './core/BackgroundService';
 import Request from './data/models/Request';
 /* eslint-enable import/first */
 
+process.on('unhandledRejection', (reason, p) => {
+  log.error({ err: { position: p, reason } }, 'Unhandled Rejection');
+  // send entire app down.
+  process.exit(1);
+});
+
 const pubsub = new PubSub();
 
 worker(pubsub);

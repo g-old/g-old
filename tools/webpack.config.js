@@ -19,7 +19,6 @@ const ROOT_DIR = path.resolve(__dirname, '..');
 const resolvePath = (...args) => path.resolve(ROOT_DIR, ...args);
 const SRC_DIR = resolvePath('src');
 const BUILD_DIR = resolvePath('build');
-const NODE_MODULES_DIR = `${ROOT_DIR}/node_modules`;
 
 const isDebug = !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
@@ -53,7 +52,7 @@ const config = {
   mode: isDebug ? 'development' : 'production',
 
   output: {
-    path: `${BUILD_DIR}/public/assets`,
+    path: resolvePath(BUILD_DIR, 'public/assets'),
     publicPath: '/assets/',
     pathinfo: isVerbose,
     filename: isDebug ? '[name].js' : '[name].[chunkhash:8].js',
@@ -285,7 +284,9 @@ const config = {
         ? []
         : [
             {
-              test: `${NODE_MODULES_DIR}/react-deep-force-update/lib/index.js`,
+              test: resolvePath(
+                'node_modules/react-deep-force-update/lib/index.js',
+              ),
               loader: 'null-loader',
             },
           ]),
