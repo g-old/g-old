@@ -34,7 +34,7 @@ import createFetch from './createFetch';
 import passport from './passport';
 import router from './router';
 import schema from './data/schema';
-import assets from './assets.json'; // eslint-disable-line import/no-unresolved
+import chunks from './chunk-manifest.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
 import { setRuntimeVariable } from './actions/runtime';
 import { setLocale } from './actions/intl';
@@ -699,11 +699,19 @@ app.get('*', async (req, res, next) => {
     );
     data.styles = [{ id: 'css', cssText: [...css].join('') }];
 
-    data.scripts = [assets.vendor.js];
-    if (route.chunks) {
-      data.scripts.push(...route.chunks.map(chunk => assets[chunk].js));
-    }
-    data.scripts.push(assets.client.js);
+    const scripts = new Set();
+    const addChunk = chunk => {
+      if (chunks[chunk]) {
+        chunks[chunk].forEach(asset => scripts.add(asset));
+      } else if (__DEV__) {
+        throw new Error(`Chunk with name '${chunk}' cannot be found`);
+      }
+    };
+    addChunk('client');
+    if (route.chunk) addChunk(route.chunk);
+    if (route.chunks) route.chunks.forEach(addChunk);
+
+    data.scripts = Array.from(scripts);
 
     // Furthermore invoked actions will be ignored, client will not receive them!
     if (__DEV__) {
