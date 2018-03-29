@@ -1,6 +1,7 @@
 import knex from '../knex';
 import User from './User';
 import Activity from './Activity';
+// import Proposal from './Proposal';
 
 // https://github.com/clux/decay/blob/master/decay.js
 /* function rankStatements(likes, date) {
@@ -41,84 +42,81 @@ function rankInPlace(activity) {
 const loadActivities = (viewer, ids, loaders) =>
   Promise.all(ids.map(id => Activity.gen(viewer, id, loaders)));
 
-const aggregateActivities = (activities, viewer) =>
+const getSubjects = (activities, viewer) =>
   activities.reduce(
-    (agg, curr) => {
+    async (posts, activity) => {
       // filter content from wt out
       // TODO make groupId field on activities?
       if (
-        curr.content &&
-        curr.content.workTeamId &&
-        !viewer.wtMemberships.includes(curr.content.workTeamId)
+        activity.content &&
+        activity.content.workTeamId &&
+        !viewer.wtMemberships.includes(activity.content.workTeamId)
       ) {
-        return agg;
+        return posts;
       }
 
-      if (curr.verb === 'delete') {
-        // eslint-disable-next-line no-param-reassign
-        agg.del[curr.id] = curr.objectId;
-        if (curr.type === 'vote') {
-          // eslint-disable-next-line no-param-reassign
-          agg.votes[curr.objectId] = curr.objectId;
-        }
-        return agg;
+      // skip already known activity objects
+      const uniqueObjectId = activity.type + activity.objectId;
+      if (posts.handledObjectIds.has(uniqueObjectId)) return posts;
+      posts.handledObjectIds.add(uniqueObjectId);
+
+      let subjectId = null;
+      let type = null;
+      switch (activity.type) {
+        /* proposal activities */
+        case 'proposal':
+          type = 'Proposal';
+          subjectId = activity.objectId;
+          break;
+
+        case 'poll':
+        case 'statement':
+        case 'vote':
+          type = 'Proposal';
+          // TODO: get subjectId from activity
+          return posts;
+
+        /* discussion activities */
+        case 'discussion':
+          type = 'Discussion';
+          subjectId = activity.objectId;
+          break;
+
+        case 'comment':
+          type = 'Discussion';
+          // TODO: get subjectId from activit
+          return posts;
+
+        // ignored
+        case 'like':
+        case 'notification':
+          return posts;
+
+        default:
+          throw new Error(
+            `Unexpected activity type in getSubjects: ${activity.type}`,
+          );
       }
-      if (curr.type === 'comment') {
-        if (curr.actorId === viewer.id) {
-          return agg; // Dont show own comments
-        }
-      }
-      if (curr.type === 'statement') {
-        if (curr.actorId === viewer.id) {
-          return agg; // Dont show own statements
-        }
-        // get only newest update
-        if (curr.verb === 'update') {
-          if (curr.objectId in agg.updatedStatements) {
-            return agg; // dont' push, as it is an old update
-          }
-          // eslint-disable-next-line no-param-reassign
-          agg.updatedStatements[curr.objectId] = curr.objectId;
-        }
-        if (curr.verb === 'create') {
-          if (
-            curr.content.pollId in agg.polls &&
-            curr.content.author_id === agg.polls[curr.content.pollId]
-          ) {
-            return agg;
-          }
-          // eslint-disable-next-line no-param-reassign
-          agg.polls[curr.content.pollId] = curr.content.author_id;
-        }
-      }
-      if (curr.type === 'proposal') {
-        if (curr.verb === 'update') {
-          if (curr.objectId in agg.updatedProposals) {
-            return agg; // dont' push, as it is an old update
-          }
-          // eslint-disable-next-line no-param-reassign
-          agg.updatedProposals[curr.objectId] = curr.objectId;
-        }
-      }
-      if (curr.type === 'notification') {
-        // dont't include other notifications!
-        return agg;
-      }
-      if (curr.type === 'vote') {
-        if (curr.objectId in agg.votes) {
-          return agg;
-        }
-      }
-      agg.all.push(curr);
-      return agg;
+
+      // skip duplicate subjects
+      const uniqueSubjectId = type + subjectId;
+      if (posts.handledSubjectIds.has(uniqueSubjectId)) return posts;
+      posts.handledSubjectIds.add(uniqueSubjectId);
+
+      const subject = {
+        id: subjectId,
+        type,
+        verb: 'TODO',
+        rank: activity.id,
+      };
+
+      posts.subjects.push(subject);
+      return posts;
     },
     {
-      del: {},
-      all: [],
-      updatedProposals: {},
-      updatedStatements: {},
-      polls: {},
-      votes: {},
+      handledObjectIds: new Set(),
+      handledSubjectIds: new Set(),
+      subjects: [],
     },
   );
 
@@ -196,24 +194,22 @@ class Feed {
     ];
 
     const descendingById = allIds.sort((a, b) => b - a);
-
     const allActivities = await loadActivities(viewer, descendingById, loaders);
-    // process them
-    // deduplicate
 
-    // aggregate
+    // get relevant subjects (proposals, discussions...)
+    const subjects = getSubjects(allActivities, viewer);
+    /**
+      sort not needed, as the rank is equal to the activity id,
+      and activities were already sorted
+      subjects.sort((a, b) => b.rank - a.rank);
+    */
 
-    // filter deleted statements
-    // reverse so newest are in front BUT: not sorted by time
-
-    // allActivities.reverse();
-    const sorted = aggregateActivities(allActivities, viewer);
-    const aggregated = sorted.all.filter(e => {
-      if (e.id in sorted.del) {
+    const aggregated = subjects.all.filter(e => {
+      if (e.id in subjects.del) {
         return false;
       }
       if (e.type === 'proposal') {
-        if (e.objectId in sorted.updatedProposals) {
+        if (e.objectId in subjects.updatedProposals) {
           if (e.verb === 'update') {
             return true; // get only updated ones
           }
@@ -221,7 +217,7 @@ class Feed {
         }
       }
       if (e.type === 'vote') {
-        if (e.objectId in sorted.votes) {
+        if (e.objectId in subjects.votes) {
           return false;
         }
       }

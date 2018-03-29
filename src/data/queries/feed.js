@@ -1,10 +1,10 @@
 import { GraphQLList, GraphQLID } from 'graphql';
 
-import ActivityType from '../types/ActivityType';
+import PostType from '../types/PostType';
 import Feed from '../models/Feed';
 
 const feed = {
-  type: new GraphQLList(ActivityType),
+  type: new GraphQLList(PostType),
   args: {
     userId: {
       type: GraphQLID,
