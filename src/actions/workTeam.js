@@ -85,12 +85,31 @@ lldName
 deName
 itName
 `;
+const proposalFields = `
+    id
+    title
+    state
+    body
+    pollOne ${pollFieldsForList}
+    pollTwo ${pollFieldsForList}`;
+
 const workTeamWithDetails = `query($id:ID!){
     workTeam(id:$id) {
       ${workTeamFields}
       ${wtDetails}
-      requestConnection(type:"joinWT" filterBy:[{filter:CONTENT_ID id:$id}]){
+          proposalConnection(state:"active" workTeamId:$id){
       pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          ${proposalFields}
+        }
+      }
+    }
+      requestConnection(type:"joinWT" filterBy:[{filter:CONTENT_ID id:$id}]){
+        pageInfo{
         endCursor
         hasNextPage
       }
@@ -102,14 +121,6 @@ const workTeamWithDetails = `query($id:ID!){
     }
 
     }}`;
-
-const proposalFields = `
-    id
-    title
-    state
-    body
-    pollOne ${pollFieldsForList}
-    pollTwo ${pollFieldsForList}`;
 
 const workTeamQuery = `query($id:ID! $state:String){
   workTeam(id:$id){
