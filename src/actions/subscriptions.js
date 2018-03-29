@@ -9,7 +9,7 @@ import {
   DELETE_PSUB_ERROR,
   CHECK_PSUB_STATUS,
 } from '../constants';
-import { getSessionUser } from '../reducers';
+import { getSessionUser, getWebPushKey } from '../reducers';
 
 const createPushSub = `mutation($endpoint:String! $p256dh:String! $auth:String!){
 createPushSub (subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})
@@ -31,14 +31,14 @@ const registerSW = async file => {
     console.info('SW is now ready', isReady);
     return new Promise((resolve, reject) => {
       if (!serviceWorker) {
-        reject('No serviceWorker in registration');
+        reject(new Error('No serviceWorker in registration'));
         return;
       }
       if (serviceWorker.state === 'activated') {
         resolve(registration);
       }
       if (serviceWorker.state === 'redundant') {
-        reject('SW registration is redundant!');
+        reject(new Error('SW registration is redundant!'));
       }
 
       const changeListener = () => {
@@ -46,7 +46,7 @@ const registerSW = async file => {
         if (serviceWorker.state === 'activated') {
           resolve(registration);
         } else if (serviceWorker.state === 'redundant') {
-          reject('SW registration is redundant!');
+          reject(new Error('SW registration is redundant!'));
         }
         serviceWorker.removeEventListener('statechange', changeListener);
       };
@@ -125,7 +125,7 @@ export function createWebPushSub() {
     });
 
     try {
-      const publicKey = getState().webPushKey;
+      const publicKey = getWebPushKey(getState());
       const subscription = await getPushSubscription(publicKey);
       const { data } = await graphqlRequest(createPushSub, subscription);
       const result = data.createPushSub;
