@@ -39,9 +39,6 @@ const ObjectType = new GraphQLUnionType({
     if (value instanceof Notification) {
       return NotificationType;
     }
-    if (value instanceof Notification) {
-      return NotificationType;
-    }
     if (value instanceof Discussion) {
       return DiscussionType;
     }

@@ -12,7 +12,8 @@ const feed = {
     },
   },
 
-  resolve: (parent, { userId }, { viewer, loaders }) => Feed.gen(viewer, userId, loaders),
+  resolve: (parent, { userId }, { viewer, loaders }) =>
+    Feed.gen(viewer, userId, loaders),
 };
 
 export default feed;
