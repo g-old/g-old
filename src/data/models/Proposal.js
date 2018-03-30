@@ -92,7 +92,7 @@ const validatePoll = async (viewer, poll, loaders) => {
     }
   }
   const { startTime, endTime } = validateDates({ poll });
-  let threshold = poll.threshold;
+  let { threshold } = poll;
   if (isSurvey) {
     threshold = 100;
   }
@@ -274,7 +274,12 @@ class Proposal {
 
     const proposal = await Proposal.gen(viewer, proposalId, loaders);
     if (proposal) {
-      EventManager.publish('onProposalUpdated', { viewer, proposal });
+      EventManager.publish('onProposalUpdated', {
+        viewer,
+        proposal,
+        subjectId: proposal.id,
+        ...(data.workTeamId && { groupId: data.workTeamId }),
+      });
     }
     return proposal;
   }
@@ -327,10 +332,10 @@ class Proposal {
       if (!['survey', 'proposed', 'voting'].includes(data.state)) {
         throw new Error('State is missing');
       }
-      const state = data.state;
+      const { state } = data;
 
       const pollField = state === 'voting' ? 'poll_two_id' : 'poll_one_id';
-      let id = await trx
+      const [id = null] = await trx
         .insert(
           {
             author_id: viewer.id,
@@ -346,7 +351,6 @@ class Proposal {
         )
         .into('proposals');
 
-      id = id[0];
       // tags
       if (existingTags && existingTags.length) {
         await trx
@@ -392,6 +396,7 @@ class Proposal {
       EventManager.publish('onProposalCreated', {
         viewer,
         proposal,
+        subjectId: proposal.id,
         ...(data.workTeamId && { groupId: data.workTeamId }),
       });
     }
@@ -401,10 +406,9 @@ class Proposal {
   async subscribe(viewer) {
     if (['accepted, revoked, rejected'].indexOf(this.state) !== -1) return null;
 
-    let sId = await knex('proposal_user_subscriptions')
+    const [sId = null] = await knex('proposal_user_subscriptions')
       .insert({ proposal_id: this.id, user_id: viewer.id })
       .returning('id');
-    sId = sId[0];
     return sId || null;
   }
 

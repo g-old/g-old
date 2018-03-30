@@ -2,6 +2,11 @@ import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
 
+export const SubjectType = {
+  PROPOSAL: 'proposal',
+  DISCUSSION: 'discussion',
+  SURVEY: 'survey',
+};
 class Activity {
   constructor(data) {
     this.id = data.id;
@@ -28,6 +33,8 @@ class Activity {
       verb: data.verb,
       type: data.type,
       object_id: data.objectId,
+      ...(data.subjectId && { subject_id: data.subjectId }),
+      ...(data.subjectType && { subject_type: data.subjectType }),
       content: JSON.stringify(data.content),
       created_at: new Date(),
     };

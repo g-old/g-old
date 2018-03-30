@@ -1,15 +1,25 @@
 import log from '../logger';
+import { SubjectType } from '../data/models/Activity';
+
+export const ResourceType = {
+  PROPOSAL: 'proposal',
+  VOTE: 'vote',
+  REQUEST: 'request',
+  STATEMENT: 'statement',
+  DISCUSSION: 'discussion',
+  COMMENT: 'comment',
+};
 
 export const feedOptions = [
   {
-    resourceName: 'proposal',
+    resourceName: ResourceType.PROPOSAL,
     events: [
       { eventType: 'create', mainFeed: true, systemFeed: true },
       { eventType: 'update', mainFeed: true, systemFeed: true },
     ],
   },
   {
-    resourceName: 'vote',
+    resourceName: ResourceType.VOTE,
     events: [
       { eventType: 'create', personalFeed: true },
       { eventType: 'update', personalFeed: true },
@@ -21,11 +31,11 @@ export const feedOptions = [
     }),
   },
   {
-    resourceName: 'request',
+    resourceName: ResourceType.REQUEST,
     events: [{ eventType: 'create', personalFeed: true }],
   },
   {
-    resourceName: 'statement',
+    resourceName: ResourceType.STATEMENT,
     events: [
       { eventType: 'create', systemFeed: true, personalFeed: true },
       { eventType: 'update', personalFeed: true },
@@ -34,11 +44,10 @@ export const feedOptions = [
     contentModifier: (resource, info) => ({
       ...resource,
       workTeamId: info.workTeamId,
-      subjectId: info.subjectId,
     }),
   },
   {
-    resourceName: 'discussion',
+    resourceName: ResourceType.DISCUSSION,
     events: [
       { eventType: 'create', mainFeed: true, systemFeed: true },
       { eventType: 'update', mainFeed: true, systemFeed: true },
@@ -46,7 +55,7 @@ export const feedOptions = [
     ],
   },
   {
-    resourceName: 'comment',
+    resourceName: ResourceType.COMMENT,
     events: [
       { eventType: 'create', systemFeed: true, personalFeed: true },
       { eventType: 'update', personalFeed: true },
@@ -71,6 +80,25 @@ const createEventname = (resourceName, eventName) =>
     eventName,
   )}d`;
 
+const getSubjectType = resourceType => {
+  let subjectType;
+  switch (resourceType) {
+    case ResourceType.VOTE:
+    case ResourceType.STATEMENT:
+    case ResourceType.PROPOSAL:
+      subjectType = SubjectType.PROPOSAL;
+      break;
+
+    case ResourceType.DISCUSSION:
+    case ResourceType.COMMENT:
+      subjectType = SubjectType.DISCUSSION;
+      break;
+    /* Not all resources have a subjectType */
+    default:
+      break;
+  }
+  return subjectType;
+};
 class ActivityService {
   constructor(props, resourcePresets) {
     if (!props.dbConnector) {
@@ -122,6 +150,8 @@ class ActivityService {
       const groupType = payload.groupId ? 'WT' : 'GROUP';
       const activityData = {
         type: resourceType,
+        subjectId: payload.subjectId,
+        subjectType: getSubjectType(resourceType),
         content: modifier
           ? modifier(payload[resourceType], payload)
           : payload[resourceType],

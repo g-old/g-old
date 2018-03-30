@@ -6682,7 +6682,7 @@ kind-of@^6.0.0, kind-of@^6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.2.tgz#01146b36a6218e64e58f3a8d66de5d7fc6f6d051"
 
-knex@^0.14.1:
+knex@^0.14.4:
   version "0.14.4"
   resolved "https://registry.yarnpkg.com/knex/-/knex-0.14.4.tgz#d974b7e0355244260c703731c8d90f662bfe798a"
   dependencies:

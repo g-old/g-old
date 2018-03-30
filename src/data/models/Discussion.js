@@ -52,6 +52,7 @@ class Discussion {
       EventManager.publish('onDiscussionCreated', {
         viewer,
         discussion,
+        subjectId: discussion.id,
         groupId: discussion.workTeamId,
       });
     }
