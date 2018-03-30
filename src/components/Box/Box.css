@@ -8,6 +8,10 @@
 
 .root:not(.column) > *:not(:last-child) {
   margin-right: 24px;
+
+  @media only screen and (max-width: 30em) {
+    margin-right: 12px;
+  }
 }
 
 .root.column > *:not(:last-child) {

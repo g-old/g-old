@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import SignUp from '../../components/SignUp';
 import { createUser } from '../../actions/user';
 import { uploadAvatar } from '../../actions/file';
-import { getAccountUpdates, getLocale } from '../../reducers';
+import { getAccountUpdates, getLocale, getRecaptchaKey } from '../../reducers';
 // import Button from '../../components/Button';
 import history from '../../history';
 // import Headline from '../../components/Headline';
@@ -121,7 +121,7 @@ class SignupContainer extends React.Component {
 const mapStateToProps = state => ({
   updates: getAccountUpdates(state, '0000'),
   intl: getLocale(state), // fix for forceUpdate
-  recaptchaKey: state.recaptchaKey,
+  recaptchaKey: getRecaptchaKey(state),
 });
 const mapDispatch = {
   createUser,

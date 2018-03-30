@@ -67,7 +67,7 @@ class SurveyListContainer extends React.Component {
           proposals={proposals}
           onProposalClick={this.handleSurveyClick}
           pageInfo={this.props.pageInfo}
-          filter={'survey'}
+          filter="survey"
           onLoadMore={this.props.loadProposalsList}
           isFetching={isFetching}
         />
@@ -77,7 +77,9 @@ class SurveyListContainer extends React.Component {
 }
 // TODO implement memoiziation with reselect
 const mapStateToProps = state => ({
-  proposals: getVisibleProposals(state, 'survey'),
+  proposals: getVisibleProposals(state, 'survey').sort(
+    (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt),
+  ),
   isFetching: getProposalsIsFetching(state, 'survey'),
   errorMessage: getProposalsErrorMessage(state, 'survey'),
   pageInfo: getProposalsPage(state, 'survey'),

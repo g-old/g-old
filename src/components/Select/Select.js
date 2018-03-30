@@ -2,7 +2,7 @@
 // https://github.com/grommet/grommet/blob/master/src/js/components/Select.js
 
 /*  eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-/* eslint-disable jsx-a11y/no-static-element-interactions*/
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -213,9 +213,10 @@ class Select extends React.Component {
         const selected = optionSelected(option, value);
 
         const content = renderLabel(option);
+        // eslint-disbale-line
         const itemOnClick = this.onClickOption.bind(this, option);
         return (
-          <li
+          <li // eslint-disable-line
             // eslint-disable-next-line react/no-array-index-key
             key={index}
             className={cn(
@@ -223,7 +224,7 @@ class Select extends React.Component {
               index === activeOptionIndex ? s.active : null,
               s.select_option,
             )}
-            onClick={itemOnClick}
+            onClick={itemOnClick} // eslint-disable-line
           >
             {content}
           </li>
@@ -233,9 +234,11 @@ class Select extends React.Component {
 
     return (
       <div className={s.select_drop}>
+        {/* eslint-disable */}
         <ol onClick={this.onRemoveDrop} className={s.options}>
           {items}
         </ol>
+        {/* eslint-enable */}
       </div>
     );
   }
@@ -243,12 +246,12 @@ class Select extends React.Component {
   render() {
     const { placeHolder, value } = this.props;
     return (
-      <div
-        ref={ref => (this.componentRef = ref)}
+      <div // eslint-disable-line
+        ref={ref => (this.componentRef = ref)} // eslint-disable-line
         className={s.select}
         onClick={this.onAddDrop}
       >
-        <input
+        <input // eslint-disable-next-line
           ref={ref => (this.inputRef = ref)}
           className={s.input}
           placeholder={placeHolder}

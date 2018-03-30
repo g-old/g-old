@@ -649,9 +649,13 @@ app.get('*', async (req, res, next) => {
         },
         roles: normalizedData.entities.roles || {},
       },
-      webPushKey: config.webpush.publicKey,
-      recaptchaKey, // will be null if user is logged in
       consent: cookieConsent,
+      system: {
+        webPushKey: config.webpush.publicKey,
+        recaptchaKey, // will be null if user is logged in
+        droneCommit: process.env.DRONE_COMMIT || (__DEV__ ? 'dev' : null),
+        droneBuild: process.env.DRONE_BUILD_NUMBER || (__DEV__ ? 'dev' : null),
+      },
     };
     const store = configureStore(initialState, {
       // cookie: req.headers.cookie,

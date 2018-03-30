@@ -68,6 +68,10 @@ class Statement {
         viewer,
         statement: deletedStatement,
         subjectId: proposal.id,
+        ...(proposal.workTeamId && {
+          groupId: proposal.workTeamId,
+          info: { workTeamId: proposal.workTeamId },
+        }),
       });
     }
     return deletedStatement || null;
@@ -119,6 +123,10 @@ class Statement {
         viewer,
         statement,
         subjectId: proposal.id,
+        ...(proposal.workTeamId && {
+          groupId: proposal.workTeamId,
+          info: { workTeamId: proposal.workTeamId },
+        }),
       });
     }
     return statement;
