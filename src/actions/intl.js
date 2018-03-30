@@ -2,7 +2,11 @@
 
 import { IntlProvider } from 'react-intl';
 
-import { SET_LOCALE_START, SET_LOCALE_SUCCESS, SET_LOCALE_ERROR } from '../constants';
+import {
+  SET_LOCALE_START,
+  SET_LOCALE_SUCCESS,
+  SET_LOCALE_ERROR,
+} from '../constants';
 
 const query = `
   query ($locale:String!) {
@@ -12,7 +16,11 @@ const query = `
     }
   }
 `;
-
+export const locales = {
+  'de-DE': 'Deutsch',
+  'it-IT': 'Italiano',
+  'lld-IT': 'Ladin',
+};
 function getIntlFromState(state) {
   const intl = (state && state.intl) || {};
   const { initialNow, locale, messages } = intl;
