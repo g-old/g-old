@@ -102,6 +102,7 @@ class Vote {
     if (deletedVote) {
       EventManager.publish('onVoteDeleted', {
         viewer,
+        subjectId: proposal.id,
         vote: delVote,
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
@@ -112,7 +113,8 @@ class Vote {
     if (deletedStatement) {
       EventManager.publish('onStatementDeleted', {
         viewer,
-        statemente: deletedStatement,
+        subjectId: proposal.id,
+        statement: deletedStatement,
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },
@@ -203,6 +205,8 @@ class Vote {
       EventManager.publish('onVoteUpdated', {
         viewer,
         vote,
+        subjectId: proposal.id,
+
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },
@@ -213,6 +217,8 @@ class Vote {
       EventManager.publish('onStatementDeleted', {
         viewer,
         statemente: deletedStatement,
+        subjectId: proposal.id,
+
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },
@@ -286,6 +292,7 @@ class Vote {
     if (newVote) {
       EventManager.publish('onVoteCreated', {
         viewer,
+        subjectId: proposal.id,
         vote: newVote,
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,

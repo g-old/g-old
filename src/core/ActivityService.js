@@ -15,7 +15,7 @@ export const feedOptions = [
       { eventType: 'update', personalFeed: true },
       { eventType: 'delete', personalFeed: true },
     ],
-    contentModyfier: (resource, info) => ({
+    contentModifier: (resource, info) => ({
       ...resource,
       workTeamId: info.workTeamId,
     }),
@@ -31,9 +31,10 @@ export const feedOptions = [
       { eventType: 'update', personalFeed: true },
       { eventType: 'delete', systemFeed: true, personalFeed: true },
     ],
-    contentModyfier: (resource, info) => ({
+    contentModifier: (resource, info) => ({
       ...resource,
       workTeamId: info.workTeamId,
+      subjectId: info.subjectId,
     }),
   },
   {
@@ -51,7 +52,7 @@ export const feedOptions = [
       { eventType: 'update', personalFeed: true },
       { eventType: 'delete', systemFeed: true, personalFeed: true },
     ],
-    contentModyfier: (resource, info) => ({
+    contentModifier: (resource, info) => ({
       ...resource,
       workTeamId: info.workTeamId,
     }),
@@ -95,7 +96,7 @@ class ActivityService {
   register(resource) {
     if (this.checkPreset(resource)) {
       resource.events.map(event =>
-        this.subscribe(event, resource.resourceName),
+        this.subscribe(event, resource.resourceName, resource.contentModifier),
       );
     } else {
       throw new Error('Preset format wrong: ', resource);
@@ -106,13 +107,13 @@ class ActivityService {
     return option.resourceName && option.events.length;
   }
 
-  subscribe(event, resourceName) {
+  subscribe(event, resourceName, modifier) {
     this.eventSrc.subscribe(
       createEventname(resourceName, event.eventType),
-      this.createListener(event, resourceName),
+      this.createListener(event, resourceName, modifier),
     );
   }
-  createListener(event, resourceType, modyfier) {
+  createListener(event, resourceType, modifier) {
     const feedField = event.mainFeed ? 'main_activities' : 'activities';
 
     return async payload => {
@@ -121,8 +122,8 @@ class ActivityService {
       const groupType = payload.groupId ? 'WT' : 'GROUP';
       const activityData = {
         type: resourceType,
-        content: modyfier
-          ? modyfier(payload[resourceType])
+        content: modifier
+          ? modifier(payload[resourceType], payload)
           : payload[resourceType],
         objectId: payload[resourceType] && payload[resourceType].id,
         verb: event.eventType,

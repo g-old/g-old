@@ -67,6 +67,7 @@ class Statement {
       EventManager.publish('onStatementDeleted', {
         viewer,
         statement: deletedStatement,
+        subjectId: proposal.id,
       });
     }
     return deletedStatement || null;
@@ -117,6 +118,7 @@ class Statement {
       EventManager.publish('onStatementUpdated', {
         viewer,
         statement,
+        subjectId: proposal.id,
       });
     }
     return statement;
@@ -176,6 +178,7 @@ class Statement {
       EventManager.publish('onStatementCreated', {
         viewer,
         statement,
+        subjectId: proposal.id,
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },
@@ -281,7 +284,7 @@ class Statement {
       const text = `Deleted by moderation at ${new Date()}`;
       if (data.statementId && !flaggedStmtInDb.id) {
         // create fstatement
-        let flaggedStmtId = await knex('flagged_statements')
+        const [flaggedStmtId = null] = await knex('flagged_statements')
           .transacting(trx)
           .forUpdate()
           .insert({
@@ -295,7 +298,6 @@ class Statement {
             created_at: new Date(),
           })
           .returning('id');
-        flaggedStmtId = flaggedStmtId[0];
         await knex('statements')
           .transacting(trx)
           .forUpdate()

@@ -58,7 +58,7 @@ class Comment {
     const commentInDB = await knex.transaction(async trx => {
       const content = data.content.substring(0, MAX_CONTENT_LENGTH);
 
-      let comment = await knex('comments')
+      const [comment = null] = await knex('comments')
         .transacting(trx)
         .insert({
           author_id: viewer.id,
@@ -69,7 +69,6 @@ class Comment {
         })
         .returning('*');
 
-      comment = comment[0];
       if (comment) {
         [workTeamId] = await knex('discussions')
           .where({ id: data.discussionId })
@@ -94,6 +93,8 @@ class Comment {
       EventManager.publish('onCommentCreated', {
         viewer,
         comment,
+        subjectId: discussion.id,
+
         groupId: workTeamId,
         info: { workTeamId },
       });
@@ -118,7 +119,7 @@ class Comment {
     const commentInDB = await knex.transaction(async trx => {
       const content = data.content.substring(0, MAX_CONTENT_LENGTH);
       const now = new Date();
-      let comment = await knex('comments')
+      const [comment = null] = await knex('comments')
         .where({ id: data.id })
         .transacting(trx)
         .forUpdate()
@@ -128,7 +129,6 @@ class Comment {
           updated_at: now,
         })
         .returning('*');
-      comment = comment[0];
       if (comment) {
         comments.clear(data.id);
       }
@@ -152,7 +152,7 @@ class Comment {
     ) {
       return null;
     }
-
+    let workTeamId;
     const commentInDB = await knex.transaction(async trx => {
       const statusOK = await knex('comments')
         .where({ id: data.id })
@@ -167,11 +167,12 @@ class Comment {
           .forUpdate()
           .decrement('num_replies', 1);
       } else {
-        await knex('discussions')
+        [workTeamId] = await knex('discussions')
           .where({ id: oldComment.discussion_id })
           .transacting(trx)
           .forUpdate()
-          .decrement('num_comments', oldComment.num_replies + 1); // TODO check if correct
+          .decrement('num_comments', oldComment.num_replies + 1)
+          .returning('work_team_id'); // TODO check if correct
       }
 
       if (statusOK) {
@@ -180,7 +181,19 @@ class Comment {
       }
       return statusOK;
     });
-    return commentInDB ? new Comment(commentInDB) : null;
+
+    const comment = commentInDB ? new Comment(commentInDB) : null;
+    if (comment && workTeamId) {
+      EventManager.publish('onCommentDeleted', {
+        viewer,
+        comment,
+        subjectId: discussion.id,
+
+        groupId: workTeamId,
+        info: { workTeamId },
+      });
+    }
+    return comment;
   }
 }
 

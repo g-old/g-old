@@ -73,8 +73,9 @@ const getSubjects = (activities, viewer) =>
         case 'statement':
         case 'vote':
           type = 'Proposal';
-          // TODO: get subjectId from activity
-          return posts;
+          // eslint-disable-next-line
+          subjectId = activity.content.subjectId;
+          break;
 
         /* discussion activities */
         case 'discussion':
@@ -84,9 +85,9 @@ const getSubjects = (activities, viewer) =>
 
         case 'comment':
           type = 'Discussion';
-          // TODO: get subjectId from activit
-          return posts;
-
+          // eslint-disable-next-line
+          subjectId = activity.content.subjectId;
+          break;
         // ignored
         case 'like':
         case 'notification':
