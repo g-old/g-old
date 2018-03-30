@@ -126,6 +126,9 @@ export function createWebPushSub() {
 
     try {
       const publicKey = getWebPushKey(getState());
+      if (!publicKey) {
+        throw new Error('Public key not found');
+      }
       const subscription = await getPushSubscription(publicKey);
       const { data } = await graphqlRequest(createPushSub, subscription);
       const result = data.createPushSub;

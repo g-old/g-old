@@ -184,6 +184,6 @@ export const getDiscussionUpdates = state =>
 export const getConsent = state => state.consent;
 
 export const getRecaptchaKey = state => state.system.recaptchaKey;
-export const getWebPushKey = state => state.system.webpushKey;
+export const getWebPushKey = state => state.system.webPushKey;
 export const getDroneCommit = state => state.system.droneCommit;
 export const getDroneBuild = state => state.system.droneBuild;
