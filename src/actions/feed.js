@@ -32,18 +32,11 @@ const feed = `
 query($userId:ID){
   feed (userId:$userId) {
   id
-  type
-  objectId
-  verb
-  info
-  createdAt
-  actor {
-    id
+  group {
     name
-    surname
-    thumbnail
   }
-  object {
+  verb
+  subject {
     __typename
     ... on Discussion {
       id

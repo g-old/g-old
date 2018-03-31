@@ -1,14 +1,5 @@
 import log from '../logger';
-import { SubjectType } from '../data/models/Activity';
-
-export const ResourceType = {
-  PROPOSAL: 'proposal',
-  VOTE: 'vote',
-  REQUEST: 'request',
-  STATEMENT: 'statement',
-  DISCUSSION: 'discussion',
-  COMMENT: 'comment',
-};
+import { ResourceType, SubjectType } from '../data/models/Activity';
 
 export const feedOptions = [
   {

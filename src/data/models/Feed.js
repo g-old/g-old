@@ -1,7 +1,11 @@
+// @flow
+
 import knex from '../knex';
 import User from './User';
-import Activity from './Activity';
+import Activity /* , { ResourceType, SubjectType } */ from './Activity';
+import Post from './Post';
 // import Proposal from './Proposal';
+// import Discussion from './Discussion';
 
 // https://github.com/clux/decay/blob/master/decay.js
 /* function rankStatements(likes, date) {
@@ -13,111 +17,70 @@ import Activity from './Activity';
 } */
 
 // older means bigger result
-function timeDecay(date) {
+/* function timeDecay(date) {
   const decay = 45000;
   return (Date.now() - date.getTime()) / 1000 / decay;
-}
+} */
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   return true;
 }
 
-function rankInPlace(activity) {
+/* function rankInPlace(activity) {
   // how important is this for the user
   const affinity = 1;
   // what action/content happened
   const content = 1;
-  /*  if (activity.type === 'proposal') {
-    content = 5;
-    if (activity.verb === 'close') {
-      content = 10;
-    }
-  } */
+  //if (activity.type === 'proposal') {
+  //  content = 5;
+  //  if (activity.verb === 'close') {
+  //    content = 10;
+  //  }
+  //}
 
   // time-based decay
   const decay = timeDecay(activity.createdAt);
   // eslint-disable-next-line no-param-reassign
   activity.rank = affinity + content - decay; //  eslint-disable-line no-mixed-operators
-}
-const loadActivities = (viewer, ids, loaders) =>
+} */
+const loadActivities = (viewer, ids, loaders): Activity[] =>
   Promise.all(ids.map(id => Activity.gen(viewer, id, loaders)));
 
-const getSubjects = (activities, viewer) =>
+/* extract subjects from activities */
+const createPosts = (activities: Activity[], viewer) =>
   activities.reduce(
-    async (posts, activity) => {
-      // filter content from wt out
-      // TODO make groupId field on activities?
+    (res, activity) => {
+      // filter workteam content by visibility
       if (
         activity.content &&
         activity.content.workTeamId &&
         !viewer.wtMemberships.includes(activity.content.workTeamId)
       ) {
-        return posts;
+        return res;
       }
 
-      // skip already known activity objects
-      const uniqueObjectId = activity.type + activity.objectId;
-      if (posts.handledObjectIds.has(uniqueObjectId)) return posts;
-      posts.handledObjectIds.add(uniqueObjectId);
-
-      let subjectId = null;
-      let type = null;
-      switch (activity.type) {
-        /* proposal activities */
-        case 'proposal':
-          type = 'Proposal';
-          subjectId = activity.objectId;
-          break;
-
-        case 'poll':
-        case 'statement':
-        case 'vote':
-          type = 'Proposal';
-          // eslint-disable-next-line
-          subjectId = activity.content.subjectId;
-          break;
-
-        /* discussion activities */
-        case 'discussion':
-          type = 'Discussion';
-          subjectId = activity.objectId;
-          break;
-
-        case 'comment':
-          type = 'Discussion';
-          // eslint-disable-next-line
-          subjectId = activity.content.subjectId;
-          break;
-        // ignored
-        case 'like':
-        case 'notification':
-          return posts;
-
-        default:
-          throw new Error(
-            `Unexpected activity type in getSubjects: ${activity.type}`,
-          );
-      }
+      const { subjectId, subjectType } = activity;
+      if (!subjectId || !subjectType) return res;
 
       // skip duplicate subjects
-      const uniqueSubjectId = type + subjectId;
-      if (posts.handledSubjectIds.has(uniqueSubjectId)) return posts;
-      posts.handledSubjectIds.add(uniqueSubjectId);
+      const uniqueSubjectId = subjectType + subjectId;
+      if (res.handledSubjectIds.has(uniqueSubjectId)) return res;
+      res.handledSubjectIds.add(uniqueSubjectId);
 
-      const subject = {
-        id: subjectId,
-        type,
+      const post: Post = {
+        id: uniqueSubjectId,
+        subjectId,
+        type: subjectType,
         verb: 'TODO',
         rank: activity.id,
       };
 
-      posts.subjects.push(subject);
-      return posts;
+      res.posts.push(post);
+      return res;
     },
     {
-      handledObjectIds: new Set(),
       handledSubjectIds: new Set(),
-      subjects: [],
+      posts: [],
     },
   );
 
@@ -198,47 +161,21 @@ class Feed {
     const allActivities = await loadActivities(viewer, descendingById, loaders);
 
     // get relevant subjects (proposals, discussions...)
-    const subjects = getSubjects(allActivities, viewer);
+    const { posts } = createPosts(allActivities, viewer);
     /**
       sort not needed, as the rank is equal to the activity id,
       and activities were already sorted
       subjects.sort((a, b) => b.rank - a.rank);
     */
 
-    const aggregated = subjects.all.filter(e => {
-      if (e.id in subjects.del) {
-        return false;
-      }
-      if (e.type === 'proposal') {
-        if (e.objectId in subjects.updatedProposals) {
-          if (e.verb === 'update') {
-            return true; // get only updated ones
-          }
-          return false;
-        }
-      }
-      if (e.type === 'vote') {
-        if (e.objectId in subjects.votes) {
-          return false;
-        }
-      }
-      return true;
-    });
-
-    aggregated.forEach(el => {
-      rankInPlace(el);
-    });
-
-    aggregated.sort((a, b) => b.rank - a.rank);
-    // store to history;
-    const history = aggregated.map(a => a.id);
+    // TODO: store to history;
+    /* const history = posts.map(a => a.id);
     await knex('feeds')
       .where({ user_id: viewer.id })
-      .update({ history: JSON.stringify(history), updated_at: new Date() });
+      .update({ history: JSON.stringify(history), updated_at: new Date() }); */
 
-    // TODO store activity ids in userfeed - then recompose only if updates in other feeds
     // TODO paginate feed. How?
-    return aggregated.slice(0, 30);
+    return posts.slice(0, 30);
   }
 }
 

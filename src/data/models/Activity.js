@@ -1,3 +1,4 @@
+// @flow
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
@@ -7,6 +8,15 @@ export const SubjectType = {
   DISCUSSION: 'discussion',
   SURVEY: 'survey',
 };
+export const ResourceType = {
+  PROPOSAL: 'proposal',
+  VOTE: 'vote',
+  REQUEST: 'request',
+  STATEMENT: 'statement',
+  DISCUSSION: 'discussion',
+  COMMENT: 'comment',
+};
+
 class Activity {
   constructor(data) {
     this.id = data.id;
@@ -16,8 +26,10 @@ class Activity {
     this.objectId = data.object_id;
     this.content = data.content;
     this.createdAt = data.created_at;
+    this.subjectId = data.subject_id;
+    this.subjectType = data.subject_type;
   }
-  static async gen(viewer, id, { activities }) {
+  static async gen(viewer, id, { activities }): Activity {
     const data = await activities.load(id);
     if (data === null) return null;
     return canSee(viewer, data, Models.ACTIVITY) ? new Activity(data) : null;

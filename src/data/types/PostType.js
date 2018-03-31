@@ -1,3 +1,5 @@
+// @flow
+
 import { GraphQLObjectType, GraphQLID, GraphQLNonNull } from 'graphql';
 import WorkTeam from '../models/WorkTeam';
 import WorkTeamType from './WorkTeamType';
@@ -5,6 +7,8 @@ import ObjectType from './ObjectType';
 import Proposal from '../models/Proposal';
 import Discussion from '../models/Discussion';
 import PostVerbType from './PostVerbType';
+import Post from '../models/Post';
+import { SubjectType } from '../models/Activity';
 
 const PostType = new GraphQLObjectType({
   name: 'Post',
@@ -17,7 +21,7 @@ const PostType = new GraphQLObjectType({
 
     group: {
       type: WorkTeamType,
-      resolve: (parent, args, { viewer, loaders }) =>
+      resolve: (parent: Post, args, { viewer, loaders }) =>
         WorkTeam.gen(viewer, parent.groupId, loaders),
     },
 
@@ -27,11 +31,11 @@ const PostType = new GraphQLObjectType({
 
     subject: {
       type: ObjectType,
-      resolve: (parent, args, { viewer, loaders }) => {
+      resolve: (parent: Post, args, { viewer, loaders }) => {
         switch (parent.type) {
-          case 'Proposal':
+          case SubjectType.PROPOSAL:
             return Proposal.gen(viewer, parent.subjectId, loaders);
-          case 'Discussion':
+          case SubjectType.DISCUSSION:
             return Discussion.gen(viewer, parent.subjectId, loaders);
 
           default:
