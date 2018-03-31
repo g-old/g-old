@@ -9,7 +9,7 @@ import {
   DELETE_PSUB_ERROR,
   CHECK_PSUB_STATUS,
 } from '../constants';
-import { getSessionUser } from '../reducers';
+import { getSessionUser, getWebPushKey } from '../reducers';
 
 const createPushSub = `mutation($endpoint:String! $p256dh:String! $auth:String!){
 createPushSub (subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})
@@ -125,7 +125,10 @@ export function createWebPushSub() {
     });
 
     try {
-      const publicKey = getState().webPushKey;
+      const publicKey = getWebPushKey(getState());
+      if (!publicKey) {
+        throw new Error('Public key not found');
+      }
       const subscription = await getPushSubscription(publicKey);
       const { data } = await graphqlRequest(createPushSub, subscription);
       const result = data.createPushSub;

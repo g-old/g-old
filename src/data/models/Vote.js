@@ -112,7 +112,7 @@ class Vote {
     if (deletedStatement) {
       EventManager.publish('onStatementDeleted', {
         viewer,
-        statemente: deletedStatement,
+        statement: deletedStatement,
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },

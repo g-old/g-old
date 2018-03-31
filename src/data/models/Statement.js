@@ -67,6 +67,10 @@ class Statement {
       EventManager.publish('onStatementDeleted', {
         viewer,
         statement: deletedStatement,
+        ...(proposal.workTeamId && {
+          groupId: proposal.workTeamId,
+          info: { workTeamId: proposal.workTeamId },
+        }),
       });
     }
     return deletedStatement || null;
@@ -117,6 +121,10 @@ class Statement {
       EventManager.publish('onStatementUpdated', {
         viewer,
         statement,
+        ...(proposal.workTeamId && {
+          groupId: proposal.workTeamId,
+          info: { workTeamId: proposal.workTeamId },
+        }),
       });
     }
     return statement;

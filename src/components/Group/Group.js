@@ -252,7 +252,7 @@ class Group extends React.Component {
       <Box align column padding="medium" pad fill>
         {picture}
         <Heading tag="h2">{displayName}</Heading>
-        <Box>
+        <Box wrap>
           <Value
             icon={
               <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
@@ -303,7 +303,6 @@ class Group extends React.Component {
             label={<FormattedMessage {...messages.proposals} />}
             value={numProposals || 0}
           />
-          <Box />
         </Box>
         {actionBtn}
         {contentSection}

@@ -34,7 +34,7 @@ import createFetch from './createFetch';
 import passport from './passport';
 import router from './router';
 import schema from './data/schema';
-import assets from './assets.json'; // eslint-disable-line import/no-unresolved
+import chunks from './chunk-manifest.json'; // eslint-disable-line import/no-unresolved
 import configureStore from './store/configureStore';
 import { setRuntimeVariable } from './actions/runtime';
 import { setLocale } from './actions/intl';
@@ -57,6 +57,12 @@ import root from './compositionRoot';
 import { EmailTypes } from './core/BackgroundService';
 import Request from './data/models/Request';
 /* eslint-enable import/first */
+
+process.on('unhandledRejection', (reason, p) => {
+  log.error({ err: { position: p, reason } }, 'Unhandled Rejection');
+  // send entire app down.
+  process.exit(1);
+});
 
 const pubsub = new PubSub();
 
@@ -646,9 +652,13 @@ app.get('*', async (req, res, next) => {
         },
         roles: normalizedData.entities.roles || {},
       },
-      webPushKey: config.webpush.publicKey,
-      recaptchaKey, // will be null if user is logged in
       consent: cookieConsent,
+      system: {
+        webPushKey: config.webpush.publicKey,
+        recaptchaKey, // will be null if user is logged in
+        droneCommit: process.env.DRONE_COMMIT || (__DEV__ ? 'dev' : null),
+        droneBuild: process.env.DRONE_BUILD_NUMBER || (__DEV__ ? 'dev' : null),
+      },
     };
     const store = configureStore(initialState, {
       // cookie: req.headers.cookie,
@@ -706,11 +716,19 @@ app.get('*', async (req, res, next) => {
     );
     data.styles = [{ id: 'css', cssText: [...css].join('') }];
 
-    data.scripts = [assets.vendor.js];
-    if (route.chunks) {
-      data.scripts.push(...route.chunks.map(chunk => assets[chunk].js));
-    }
-    data.scripts.push(assets.client.js);
+    const scripts = new Set();
+    const addChunk = chunk => {
+      if (chunks[chunk]) {
+        chunks[chunk].forEach(asset => scripts.add(asset));
+      } else if (__DEV__) {
+        throw new Error(`Chunk with name '${chunk}' cannot be found`);
+      }
+    };
+    addChunk('client');
+    if (route.chunk) addChunk(route.chunk);
+    if (route.chunks) route.chunks.forEach(addChunk);
+
+    data.scripts = Array.from(scripts);
 
     // Furthermore invoked actions will be ignored, client will not receive them!
     if (__DEV__) {

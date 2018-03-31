@@ -13,6 +13,8 @@ import {
 } from '../constants';
 
 import { createSSESub, closeSSE } from './sseSubs';
+import { locales } from './intl';
+
 // import fetch from '../core/fetch';
 
 export function allowCookies() {
@@ -27,7 +29,7 @@ export function allowCookies() {
 
 export function logout() {
   return async (dispatch, getState, { fetch, history }) => {
-    const user = getState().user;
+    const { user } = getState();
     dispatch({
       type: SESSION_LOGOUT_START,
       payload: {
@@ -84,7 +86,10 @@ export function login(data) {
       history.location.search &&
       history.location.search.indexOf('=') !== -1
     ) {
-      redirect = history.location.search.split('=')[1];
+      const newPath = history.location.search.split('=')[1];
+
+      // don't redirect on language selection
+      if (!locales[newPath]) redirect = newPath;
     }
     dispatch({
       type: SESSION_LOGIN_START,

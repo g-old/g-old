@@ -112,28 +112,30 @@ class UserProfile extends React.Component {
             value={numStatements || 0}
           />
         </Box>
-        {this.props.user.workTeams &&
-          this.props.user.workTeams.map(t => (
-            <Box onClick={() => history.push(`/workteams/${t.id}`)}>
-              <svg
-                version="1.1"
-                viewBox="0 0 24 24"
-                width="24px"
-                height="24px"
-                role="img"
-                aria-label="group"
-              >
-                <path
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  d={ICONS.workteam}
-                />
-              </svg>
+        <Box column>
+          {this.props.user.workTeams &&
+            this.props.user.workTeams.map(t => (
+              <Box between onClick={() => history.push(`/workteams/${t.id}`)}>
+                <svg
+                  version="1.1"
+                  viewBox="0 0 24 24"
+                  width="24px"
+                  height="24px"
+                  role="img"
+                  aria-label="group"
+                >
+                  <path
+                    fill="none"
+                    stroke="#000"
+                    strokeWidth="2"
+                    d={ICONS.workteam}
+                  />
+                </svg>
 
-              <span>{t.displayName}</span>
-            </Box>
-          ))}
+                <span>{t.displayName}</span>
+              </Box>
+            ))}
+        </Box>
       </Box>
     );
   }

@@ -1,5 +1,9 @@
 {
-  "greeting": { "de-DE": "Hallo", "it-IT": "Ciao", "lld-IT": "" },
+  "greeting": {
+    "de-DE": "Hallo",
+    "it-IT": "Ciao",
+    "lld-IT": ""
+  },
   "signup": {
     "de-DE":
       " Wir freuen uns sehr, Sie hier auf unserer Platform GOLD begrüßen zu dürfen!",
@@ -9,7 +13,7 @@
   "explainConfirmation": {
     "de-DE":
       "Jetzt müssen Sie nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
-    "it-IT": "Attendiamo ancora la conferma del suo indirizzo e-mail?",
+    "it-IT": "Attendiamo ancora la conferma del Suo indirizzo e-mail?",
     "lld-IT": "Al mancia ma plu la conferma de vosta miscion e-mail."
   },
   "ctAConfirmation": {
@@ -36,7 +40,7 @@
     "de-DE":
       "Wir schicken Ihnen diese Email, da Sie (oder jemand anderes) das Passwort für ihr Konto zurücksetzen möchten.",
     "it-IT":
-      "Le mandiamo questa mail perchè Lei (o qualcun altro) ha chiesto di modificare la password del suo account",
+      "Le mandiamo questa mail perchè Lei (o qualcun altro) ha chiesto di modificare la password del Suo account",
     "lld-IT":
       "Ves manun chesta mail, ajache valgungn à damandé de mudé la password de vost account"
   },
@@ -49,7 +53,7 @@
     "de-DE":
       "Wenn die Anfrage nicht von ihnen kommt, ignorieren Sie bitte diese Email. Ihr Passwort bleibt dann unverändert.",
     "it-IT":
-      "Se non ha mandato Lei la richiesta, ignori questa mail. La sua password non verrà modificata",
+      "Se non ha mandato Lei la richiesta, ignori questa mail. La Sua password non verrà modificata",
     "lld-IT":
       "Sce ne eis nia Vos damané le mudament dla password, no Ves cruziede. La password restarà la medema"
   },
@@ -61,7 +65,6 @@
     "lld-IT":
       "Vos eis mudé la miscion e-mail dla paltaforma GOLD. Preibel podeis confermé la nueva miscion e-mail?"
   },
-
   "GOLD verification mail": {
     "de-DE": "GOLD - Verifizierung ihrer Email-Adresse",
     "it-IT": "GOLD - if you see this, someone has to update the translations ",
@@ -71,8 +74,8 @@
     "de-DE":
       "Wir möchten Ihnen mitteilen, dass Sie das Passwort für ihr Konto gerade erfolgreich geändert haben.",
     "it-IT":
-      "Le confermiamo che il suo indirizzo e-mail è appena stato modificato correttamente.",
-    "lld-IT": "Vosta miscion e-mail é vegnuda mudeda coretamenter."
+      "Le confermiamo che la Sua password è appena stata modificata correttamente.",
+    "lld-IT": "Vosta password é vegnuda mudeda coretamenter."
   },
   "GOLD password changed": {
     "de-DE": "GOLD - Passwort geändert",
@@ -94,7 +97,6 @@
     "it-IT": "Benvenuti su g-old.org",
     "lld-IT": "Benvegnus sun g-old.org"
   },
-
   "messageSubject": {
     "de-DE": "Persönliche Nachricht für Sie von g-old.org",
     "it-IT": "Messaggio personale per Lei da g-old.org",

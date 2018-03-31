@@ -7,6 +7,7 @@ import ui, * as fromUi from './ui';
 import consent from './consent';
 import statistics from './statistics';
 import platform, * as fromPlatform from './platform';
+import system from './system';
 
 export default combineReducers({
   user,
@@ -14,11 +15,10 @@ export default combineReducers({
   intl,
   entities,
   ui,
-  webPushKey: (state = '') => state,
-  recaptchaKey: (state = '') => state,
   consent,
   statistics,
   platform,
+  system,
 });
 
 /* GENERATOR */
@@ -187,3 +187,8 @@ export const getDiscussionUpdates = state =>
   fromUi.getDiscussionUpdates(state.ui);
 
 export const getConsent = state => state.consent;
+
+export const getRecaptchaKey = state => state.system.recaptchaKey;
+export const getWebPushKey = state => state.system.webPushKey;
+export const getDroneCommit = state => state.system.droneCommit;
+export const getDroneBuild = state => state.system.droneBuild;
