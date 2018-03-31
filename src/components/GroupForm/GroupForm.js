@@ -78,6 +78,7 @@ class GroupForm extends React.Component {
     super(props);
     this.onCancel = this.onCancel.bind(this);
     this.handleFormSubmission = this.handleFormSubmission.bind(this);
+    this.state = {};
   }
 
   // eslint-disable-next-line
@@ -110,6 +111,9 @@ class GroupForm extends React.Component {
     if (id) {
       inputs.parentGroupId = id;
     }
+    if (inputs.privacy) {
+      inputs.privacy = inputs.privacy.value;
+    }
     /* eslint-enable no-param-reassign */
 
     this.props.createGroup({ ...inputs });
@@ -135,6 +139,7 @@ class GroupForm extends React.Component {
                 args: { required: true },
               },
               goldMode: {},
+              privacy: {},
             }}
           >
             {({
@@ -145,6 +150,8 @@ class GroupForm extends React.Component {
               onBlur,
             }) => (
               <Form>
+                <Label>Group names</Label>
+
                 <fieldset>
                   <FormField
                     label="Default name"
@@ -228,31 +235,30 @@ class GroupForm extends React.Component {
                     />
                   </FormField>
                 </fieldset>
-                <Label>Privacy</Label>
+                <Label>Privacy Settings</Label>
                 <fieldset>
-                  <Select
-                    inField
-                    options={[
-                      {
-                        value: 'open',
-                        label: <FormattedMessage {...messages.open} />,
-                      },
-                      {
-                        value: 'closed',
-                        label: <FormattedMessage {...messages.closed} />,
-                      },
-                    ]}
-                    onSearch={false}
-                    value={{
-                      value: values.privacy,
-                      label: values.privacy === 'open' ? 'open' : 'closed',
-                    }}
-                    onChange={e => {
-                      handleValueChanges({
-                        target: { name: 'privacy', value: e.value },
-                      });
-                    }}
-                  />
+                  <FormField label="Privacy" error={errorMessages.privacyError}>
+                    <Select
+                      inField
+                      options={[
+                        {
+                          value: 'open',
+                          label: <FormattedMessage {...messages.open} />,
+                        },
+                        {
+                          value: 'closed',
+                          label: <FormattedMessage {...messages.closed} />,
+                        },
+                      ]}
+                      onSearch={false}
+                      value={values.privacy}
+                      onChange={e => {
+                        handleValueChanges({
+                          target: { name: 'privacy', value: e.value },
+                        });
+                      }}
+                    />
+                  </FormField>
                 </fieldset>
                 <Label>Mode</Label>
                 <fieldset>

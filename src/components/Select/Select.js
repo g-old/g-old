@@ -7,6 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
+import { injectIntl, intlShape } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Select.css';
 import Button from '../Button';
@@ -50,21 +51,6 @@ const renderLabel = option => {
   return option || '';
 };
 
-// eslint-disable-next-line consistent-return
-const renderValue = option => {
-  if (Array.isArray(option)) {
-    if (option.length === 1) {
-      return renderValue(option[0]);
-    } else if (option.length > 1) {
-      return `Selected ${option.length}`; // TODO FormattedMessage
-    }
-  } else if (option && typeof option === 'object') {
-    return option.label || option.value || '';
-  } else {
-    return undefined === option || option === null ? '' : option;
-  }
-};
-
 const optionSelected = (option, value) => {
   let result = false;
   if (value && Array.isArray(value)) {
@@ -91,6 +77,7 @@ class Select extends React.Component {
     placeHolder: PropTypes.string,
     multiple: PropTypes.bool,
     inField: PropTypes.bool,
+    intl: intlShape.isRequired,
   };
 
   static defaultProps = {
@@ -203,6 +190,23 @@ class Select extends React.Component {
     }
     return nextValue;
   }
+  // eslint-disable-next-line consistent-return
+  renderValue(option) {
+    if (Array.isArray(option)) {
+      if (option.length === 1) {
+        return this.renderValue(option[0]);
+      } else if (option.length > 1) {
+        return `Selected ${option.length}`; // TODO FormattedMessage
+      }
+    } else if (option && typeof option === 'object') {
+      if (option.label.props) {
+        return this.props.intl.formatMessage({ ...option.label.props });
+      }
+      return option.label || option.value || '';
+    } else {
+      return undefined === option || option === null ? '' : option;
+    }
+  }
 
   renderOptions() {
     let items;
@@ -256,7 +260,7 @@ class Select extends React.Component {
           className={s.input}
           placeholder={placeHolder}
           readOnly
-          value={renderValue(value)}
+          value={this.renderValue(value)}
         />
         <Button
           className={s.select_control}
@@ -281,4 +285,4 @@ Select.contextTypes = {
   intl: PropTypes.object,
 };
 
-export default withStyles(s)(Select);
+export default withStyles(s)(injectIntl(Select));

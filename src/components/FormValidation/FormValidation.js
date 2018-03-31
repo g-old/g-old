@@ -95,14 +95,14 @@ class FormValidation extends React.Component {
   static propTypes = {
     validations: PropTypes.arrayOf(
       PropTypes.shape({
-        fn: PropTypes.function,
-        valuesResolver: PropTypes.function,
+        fn: PropTypes.func,
+        valuesResolver: PropTypes.func,
         args: PropTypes.shape({}),
       }),
     ).isRequired,
     data: PropTypes.shape({}),
-    submit: PropTypes.function.isRequired,
-    children: PropTypes.function.isRequired,
+    submit: PropTypes.func.isRequired,
+    children: PropTypes.func.isRequired,
   };
   static defaultProps = { data: null };
 
@@ -215,7 +215,6 @@ class FormValidation extends React.Component {
     } else {
       value = e.target.value; //eslint-disable-line
     }
-
     this.setState({ [e.target.name]: value });
   }
 
