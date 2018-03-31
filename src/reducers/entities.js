@@ -19,10 +19,12 @@ import comments, * as fromComments from './comments';
 import requests, * as fromRequests from './requests';
 import proposalStatus from './proposalStatus';
 
+import posts, * as fromPosts from './posts';
 /* GENERATOR */
 
 export default combineReducers({
   /* GENERATOR_COMBINED */
+  posts,
   requests,
   users,
   statements,
@@ -45,6 +47,9 @@ export default combineReducers({
 });
 
 /* GENERATOR_EXPORTS */
+export const getAllPosts = state => fromPosts.getAllPosts(state.posts, state);
+export const getPostsStatus = state => fromPosts.getStatus(state.posts);
+
 export const getRequest = (state, id) =>
   fromRequests.getEntity(state.requests, id, state);
 

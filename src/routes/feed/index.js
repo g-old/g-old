@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from '../../components/Layout';
-import { loadFeed } from '../../actions/feed';
+import { loadFeed } from '../../actions/posts';
 import FeedContainer from './FeedContainer';
 import { getSessionUser } from '../../reducers';
 import { RESET_ACTIVITY_COUNTER } from '../../constants';

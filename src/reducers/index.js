@@ -20,6 +20,11 @@ export default combineReducers({
 });
 
 /* GENERATOR */
+export const getAllPosts = state => fromEntity.getAllPosts(state.entities);
+
+export const getPostsStatus = state =>
+  fromEntity.getPostsStatus(state.entities);
+
 export const getVisibleRequests = (state, filter) =>
   fromEntity.getVisibleRequests(state.entities, filter);
 

@@ -94,6 +94,10 @@ export const activity = new schema.Entity('activities', {
 export const log = new schema.Entity('logs', {
   actor: user,
 });
+export const post = new schema.Entity('posts', {
+  group: workTeam,
+  subject: unionSchema,
+});
 
 export const proposalList = [proposal];
 export const voteList = [vote];
@@ -108,4 +112,5 @@ export const discussionList = [discussion];
 export const commentList = [comment];
 
 export const requestList = [request];
+export const posts = [post];
 /* GENERATOR */

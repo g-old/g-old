@@ -8,6 +8,15 @@ import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
 import log from '../../logger';
 
+export const ProposalState = {
+  PROPOSED: 'proposed',
+  VOTING: 'voting',
+  REJECTED: 'rejected',
+  REVOKED: 'revoked',
+  ACCEPTED: 'accepted',
+  SURVEY: 'survey',
+};
+
 const validateTags = async tags => {
   let existingTags;
   let newTags;
@@ -113,7 +122,8 @@ const validateStateChange = async (
   loaders,
 ) => {
   const pollId =
-    proposalInDB.state === 'proposed' || proposalInDB.state === 'survey'
+    proposalInDB.state === ProposalState.PROPOSED ||
+    proposalInDB.state === 'survey'
       ? proposalInDB.pollOne_id
       : proposalInDB.pollTwo_id;
   const pollInDB = await Poll.gen(viewer, pollId, loaders);
@@ -248,7 +258,8 @@ class Proposal {
       }
       if (newValues.state && newValues.state !== 'voting') {
         const pollId =
-          proposalInDB.state === 'proposed' || proposalInDB.state === 'survey'
+          proposalInDB.state === ProposalState.PROPOSED ||
+          proposalInDB.state === 'survey'
             ? proposalInDB.pollOne_id
             : proposalInDB.pollTwo_id;
         await trx
@@ -329,7 +340,7 @@ class Proposal {
       const pollOne = await Poll.create(viewer, pollOneData, loaders);
       if (!pollOne) throw Error('No pollOne provided');
 
-      if (!['survey', 'proposed', 'voting'].includes(data.state)) {
+      if (!['survey', ProposalState.PROPOSED, 'voting'].includes(data.state)) {
         throw new Error('State is missing');
       }
       const { state } = data;
@@ -419,7 +430,10 @@ class Proposal {
   }
 
   async isVotable(viewer) {
-    if (['proposed', 'voting', 'survey'].indexOf(this.state) !== -1 && viewer) {
+    if (
+      [ProposalState.PROPOSED, 'voting', 'survey'].indexOf(this.state) !== -1 &&
+      viewer
+    ) {
       if (this.workTeamId) {
         // TODO try to find a better way since it cannot be cached easily and voting isF common
         const [data = null] = await knex('user_work_teams')

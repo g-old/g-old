@@ -3,135 +3,49 @@ import PropTypes from 'prop-types';
 import withstyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import { connect } from 'react-redux';
-import { loadFeed } from '../../actions/feed';
-import {
-  getActivities,
-  getFeedIsFetching,
-  getFeedErrorMessage,
-} from '../../reducers/index';
+import { loadFeed } from '../../actions/posts';
+import { getAllPosts, getPostsStatus } from '../../reducers';
 import s from './FeedContainer.css';
 import FetchError from '../../components/FetchError';
-import Activity from '../../components/Activity';
 
 class FeedContainer extends React.Component {
   static propTypes = {
-    activities: PropTypes.arrayOf(
+    posts: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,
       }),
     ).isRequired,
-    isFetching: PropTypes.bool.isRequired,
+    status: PropTypes.shape,
     loadFeed: PropTypes.func.isRequired,
-    errorMessage: PropTypes.string,
-    locale: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
-    errorMessage: '',
+    status: null,
   };
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
-    return this.props.activities != null;
+    return this.props.posts != null;
   }
 
   render() {
-    const { activities, isFetching, errorMessage, locale } = this.props;
-    if (isFetching && !activities.length) {
+    const { posts, status: { error, pending } } = this.props;
+    if (pending && !posts.length) {
       return <p> Loading ... </p>;
     }
 
-    if (errorMessage && !activities.length) {
+    if (error && !posts.length) {
       return (
-        <FetchError
-          message={errorMessage}
-          onRetry={() => this.props.loadFeed()}
-        />
+        <FetchError message={error} onRetry={() => this.props.loadFeed()} />
       );
     }
 
-    const outDated = {};
-    const polls = {};
-    const proposals = {};
-    const votes = {};
-    return (
-      <div className={cn(s.container)}>
-        {activities.map(activity => {
-          if (!activity.object) return null; // hotfix - problem is ondelete cascade for votes
-          if (activity.type === 'statement') {
-            if (activity.verb === 'update') {
-              if (activity.objectId in outDated) {
-                return null;
-              }
-              if (
-                activity.object.pollId in polls &&
-                activity.object.author.id === polls[activity.object.pollId]
-              ) {
-                return null;
-              }
-              outDated[activity.objectId] = activity.objectId;
-              polls[activity.object.pollId] = activity.object.author.id;
-            } else if (activity.verb === 'delete') {
-              outDated[activity.objectId] = activity.object.author.id;
-              polls[activity.object.pollId] = activity.object.author.id;
-
-              return null;
-            } else if (activity.objectId in outDated) {
-              return null;
-            } else if (activity.verb === 'create') {
-              if (activity.object) {
-                if (
-                  activity.object.pollId in outDated &&
-                  activity.object.author.id === outDated[activity.object.pollId]
-                ) {
-                  return null;
-                }
-                if (
-                  activity.object.pollId in polls &&
-                  activity.object.author.id === polls[activity.object.pollId]
-                ) {
-                  return null;
-                }
-                outDated[activity.object.pollId] = activity.object.author.id;
-              } else {
-                return null;
-              }
-            }
-          } else if (activity.type === 'proposal') {
-            if (activity.objectId in proposals) {
-              return null;
-            }
-            proposals[activity.objectId] = activity.objectId;
-          } else if (activity.type === 'vote') {
-            if (votes[activity.objectId]) {
-              return null;
-            }
-            votes[activity.objectId] = activity.objectId;
-            if (activity.verb === 'delete') {
-              return null;
-            }
-          }
-
-          return (
-            <Activity
-              key={activity.id}
-              actor={activity.actor}
-              date={activity.createdAt}
-              verb={activity.verb}
-              content={activity.object}
-              info={activity.info}
-              locale={locale}
-            />
-          );
-        })}
-      </div>
-    );
+    return <div className={cn(s.container)}>{posts.map(post => post.id)}</div>;
   }
 }
 // TODO implement memoiziation with reselect
 const mapStateToProps = state => ({
-  activities: getActivities(state, 'all'),
-  isFetching: getFeedIsFetching(state, 'all'),
-  errorMessage: getFeedErrorMessage(state, 'all'),
+  posts: getAllPosts(state),
+  status: getPostsStatus(state),
   locale: state.intl.locale,
 });
 

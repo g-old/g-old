@@ -15,6 +15,7 @@ import Poll from '../models/Poll';
 import Tag from '../models/Tag';
 
 import knex from '../knex';
+import { ProposalState } from '../models/Proposal';
 
 const ProposalType = new ObjectType({
   name: 'ProposalDL',
@@ -60,6 +61,24 @@ const ProposalType = new ObjectType({
       type: PollType,
       resolve: (parent, args, { viewer, loaders }) =>
         Poll.gen(viewer, parent.pollTwo_id, loaders),
+    },
+    activePoll: {
+      type: PollType,
+      resolve: (parent, args, { viewer, loaders }) => {
+        let pollId;
+        switch (parent.state) {
+          case ProposalState.PROPOSED:
+            pollId = parent.pollOne_id;
+            break;
+          case ProposalState.VOTING:
+            pollId = parent.pollTwo_id;
+            break;
+
+          default:
+            return null;
+        }
+        return Poll.gen(viewer, pollId, loaders);
+      },
     },
 
     spokesman: {
