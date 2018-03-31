@@ -44,8 +44,12 @@ const hydratePosts = (state, data, entities) =>
     { posts: postListSchema },
     {
       ...entities,
+      posts: state.byId,
       users: entities.users.byId,
       workTeams: entities.workTeams.byId,
+      proposals: entities.proposals.byId,
+      statements: entities.statements.byId,
+      votes: entities.votes.byId,
     },
   );
 

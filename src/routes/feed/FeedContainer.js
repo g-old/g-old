@@ -39,7 +39,11 @@ class FeedContainer extends React.Component {
       );
     }
 
-    return <div className={cn(s.container)}>{posts.map(post => post.id)}</div>;
+    return (
+      <div className={cn(s.container)}>
+        {posts.map(post => <p>{post.id} </p>)}
+      </div>
+    );
   }
 }
 // TODO implement memoiziation with reselect
