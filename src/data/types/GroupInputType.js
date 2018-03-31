@@ -5,6 +5,8 @@ import {
   GraphQLBoolean,
 } from 'graphql';
 
+import PrivacyType from './PrivacyType';
+
 const GroupInputType = new GraphQLInputObjectType({
   name: 'GroupInput',
   fields: {
@@ -17,22 +19,13 @@ const GroupInputType = new GraphQLInputObjectType({
     names: {
       type: String,
     },
-    memberId: {
-      type: ID,
-      description: 'For mutations of members / admission of members',
+    privacy: {
+      type: PrivacyType,
     },
+
     id: {
       type: ID,
       description: 'Must be provided for mutations',
-    },
-    deName: {
-      type: String,
-    },
-    itName: {
-      type: String,
-    },
-    lldName: {
-      type: String,
     },
     restricted: {
       type: GraphQLBoolean,

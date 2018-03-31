@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { loadGroup, updateGroup, createGroup } from '../../actions/group';
 import { findUser } from '../../actions/user';
+import Select from '../Select';
 
 import {
   getGroup,
@@ -19,66 +20,34 @@ import Label from '../Label';
 import CheckBox from '../CheckBox';
 import SearchField from '../SearchField';
 import Form from '../Form';
+import FormValidation from '../FormValidation';
+
 import history from '../../history';
 
-import {
-  nameValidation,
-  selectValidation,
-  createValidator,
-} from '../../core/validation';
+import { selectValidation } from '../../core/validation';
 import Notification from '../../components/Notification';
 
 const messages = defineMessages({
-  empty: {
-    id: 'form.error-empty',
-    defaultMessage: "You can't leave this empty",
-    description: 'Help for empty fields',
+  open: {
+    id: 'privacy.open',
+    defaultMessage: 'Open',
+    description: 'Label',
   },
-  wrongSelect: {
-    id: 'form.error-select',
-    defaultMessage: 'You selection is not correct. Click on a suggestion',
-    description:
-      'Help for selection, when input does not match with a suggestion',
+  closed: {
+    id: 'privacy.closed',
+    defaultMessage: 'Closed',
+    description: 'Label',
   },
 });
-
-// import FetchError from '../../components/FetchError';
-
-const getChangedFields = (inputFields, state, props) =>
-  inputFields.reduce((agg, curr) => {
-    if (curr in state) {
-      if (curr in props) {
-        if (state[curr] !== props[curr]) {
-          agg[curr] = state[curr]; // eslint-disable-line
-        }
-      } else {
-        agg[curr] = state[curr]; // eslint-disable-line
-      }
-      // only in state
-    }
-    return agg;
-  }, {});
-
-const formFields = ['default_name'];
-// TODO Form HOC
-const genInitialState = (fields, values) =>
-  fields.reduce(
-    (acc, curr) => {
-      acc[curr] = values[curr] || '';
-      acc.errors[curr] = { touched: false };
-      return acc;
-    },
-    { errors: {} },
-  );
 
 const convertLocalesToNames = (locales, inputValues) => {
   const values = inputValues;
   let dirty = false;
-  const names = locales.reduce((acc, curr) => {
-    if (inputValues[curr]) {
+  const names = locales.reduce((acc, field) => {
+    if (inputValues[field]) {
       dirty = true;
-      acc[curr] = inputValues[curr];
-      delete values[curr];
+      acc[field] = inputValues[field];
+      delete values[field];
     }
     return acc;
   }, {});
@@ -107,58 +76,8 @@ class GroupForm extends React.Component {
   };
   constructor(props) {
     super(props);
-    this.handleValueChanges = this.handleValueChanges.bind(this);
-    this.visibleErrors = this.visibleErrors.bind(this);
-    this.handleValidation = this.handleValidation.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
     this.onCancel = this.onCancel.bind(this);
-    this.state = {
-      ...props.group,
-      ...genInitialState(formFields, {
-        ...props.group,
-        ...(props.group.names && props.group.names),
-      }) /*  error: null,
-      pending: false,
-      success: false, */,
-    };
-    const testValues = {
-      default_name: { fn: 'name' },
-      'de-DE': { fn: 'name' },
-      'it-IT': { fn: 'name' },
-      'lld-IT': { fn: 'name' },
-      coordinator: {
-        fn: 'coordinator',
-        valuesResolver: obj => obj.state.coordinatorValue,
-      },
-    };
-    this.Validator = createValidator(
-      testValues,
-      {
-        name: nameValidation,
-        coordinator: selectValidation,
-        noCheck: () => {},
-      },
-      this,
-      obj => obj.state,
-    );
-  }
-
-  componentWillReceiveProps({ group, updates = {} }) {
-    const newUpdates = {};
-    if (updates.success && !this.props.updates.success) {
-      this.onCancel();
-    }
-    if (updates.error && !this.props.updates.error) {
-      newUpdates.error = true;
-    }
-
-    this.setState({
-      ...genInitialState(formFields, {
-        ...group,
-        ...(group.names && group.names),
-      }),
-      ...newUpdates,
-    });
+    this.handleFormSubmission = this.handleFormSubmission.bind(this);
   }
 
   // eslint-disable-next-line
@@ -170,170 +89,201 @@ class GroupForm extends React.Component {
     history.push(`/admin`);
   }
 
-  onSubmit(e) {
-    // TODO checks
-    e.preventDefault();
+  handleFormSubmission(values) {
+    // check coordinator
+    /* eslint-disable no-param-reassign */
     const { group, id } = this.props;
-    const { coordinator } = this.state;
-    // eslint-disable-next-line
-
-    if (this.handleValidation(formFields)) {
-      const inputFields = ['default_name'];
-      const inputValues = getChangedFields(
-        inputFields,
-        this.state,
-        this.props.group,
-      );
-      // check coordinator
-      if (group.coordinator) {
-        // eslint-disable-next-line
-        if (coordinator && coordinator.id != group.coordinator.id) {
-          inputFields.coordinatorId = coordinator.id;
-        }
-      } else if (coordinator && coordinator.id) {
-        inputValues.coordinatorId = coordinator.id;
+    const { coordinator } = values;
+    if (group.coordinator) {
+      // eslint-disable-next-line
+      if (coordinator && coordinator.id != group.coordinator.id) {
+        values.coordinatorId = coordinator.id;
       }
-      const inputs = convertLocalesToNames(
-        ['default_name', 'de-DE', 'it-IT', 'lld-IT'],
-        inputValues,
-      );
-      if (id) {
-        inputs.parentGroupId = id;
-      }
-      this.props.createGroup({ ...inputs });
-    } else {
-      alert('Validation failed');
+    } else if (coordinator && coordinator.id) {
+      values.coordinatorId = coordinator.id;
+      delete values.coordinator;
     }
-  }
-
-  handleValidation(fields) {
-    const validated = this.Validator(fields);
-    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
-    return validated.failed === 0;
-  }
-
-  handleBlur(e) {
-    const field = e.target.name;
-    if (this.state[field]) {
-      this.handleValidation([field]);
+    const inputs = convertLocalesToNames(
+      ['default_name', 'de-DE', 'it-IT', 'lld-IT'],
+      values,
+    );
+    if (id) {
+      inputs.parentGroupId = id;
     }
-  }
-  visibleErrors(errorNames) {
-    return errorNames.reduce((acc, curr) => {
-      const err = `${curr}Error`;
-      if (this.state.errors[curr].touched) {
-        acc[err] = (
-          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
-        );
-      }
-      return acc;
-    }, {});
-  }
-  handleValueChanges(e) {
-    let value;
-    if (e.target.type === 'checkbox') {
-      value = !this.state[e.target.name];
-    } else {
-      value = e.target.value; //eslint-disable-line
-    }
+    /* eslint-enable no-param-reassign */
 
-    this.setState({ [e.target.name]: value });
+    this.props.createGroup({ ...inputs });
   }
 
   render() {
-    const { restricted, error } = this.state;
+    const { error } = this.state;
     const { group, users = [], updates = {} } = this.props;
-    const errors = this.visibleErrors(formFields);
 
     return (
       <Box column padding="medium">
         <Box type="section" align column pad>
-          <Form onSubmit={this.onSubmit}>
-            <fieldset>
-              <FormField label="Default name" error={errors.nameError}>
-                <input
-                  type="text"
-                  name="default_name"
-                  value={this.state.default_name}
-                  onChange={this.handleValueChanges}
-                />
-              </FormField>
-              <FormField label="Name german">
-                <input
-                  type="text"
-                  name="de-DE"
-                  value={this.state['de-DE']}
-                  onChange={this.handleValueChanges}
-                />
-              </FormField>
-              <FormField label="Name italian">
-                <input
-                  type="text"
-                  name="it-IT"
-                  value={this.state['it-IT']}
-                  onChange={this.handleValueChanges}
-                />
-              </FormField>
-              <FormField label="Name ladin">
-                <input
-                  type="text"
-                  name="lld-IT"
-                  value={this.state['lld-IT']}
-                  onChange={this.handleValueChanges}
-                />
-              </FormField>
-            </fieldset>
-            <Label>Coordinator</Label>
-            <fieldset>
-              <FormField
-                overflow
-                label="Coordinator"
-                error={errors.coordinatorError}
-              >
-                <SearchField
-                  value={
-                    group.coordinator
-                      ? `${group.coordinator.name} ${group.coordinator.surname}`
-                      : ''
-                  }
-                  onChange={e =>
-                    this.handleValueChanges({
-                      target: {
-                        name: 'coordinatorValue',
-                        value: e.value,
+          <FormValidation
+            submit={this.handleFormSubmission}
+            validations={{
+              default_name: { args: { required: true, min: 3 } },
+              'de-DE': { args: { min: 3 } },
+              'it-IT': { args: { min: 3 } },
+              'lld-IT': { args: { min: 3 } },
+              coordinator: {
+                fn: selectValidation,
+                valuesResolver: obj => obj.state.coordinatorValue,
+                args: { required: true },
+              },
+              goldMode: {},
+            }}
+          >
+            {({
+              handleValueChanges,
+              values,
+              errorMessages,
+              onSubmit,
+              onBlur,
+            }) => (
+              <Form>
+                <fieldset>
+                  <FormField
+                    label="Default name"
+                    error={errorMessages.default_nameError}
+                  >
+                    <input
+                      type="text"
+                      name="default_name"
+                      value={values.default_name}
+                      onChange={handleValueChanges}
+                      onBlur={onBlur}
+                    />
+                  </FormField>
+                  <FormField
+                    label="Name german"
+                    error={errorMessages['de-DEError']}
+                  >
+                    <input
+                      type="text"
+                      name="de-DE"
+                      value={values['de-DE']}
+                      onChange={handleValueChanges}
+                      onBlur={onBlur}
+                    />
+                  </FormField>
+                  <FormField
+                    label="Name italian"
+                    error={errorMessages['it-ITError']}
+                  >
+                    <input
+                      type="text"
+                      name="it-IT"
+                      value={values['it-IT']}
+                      onChange={handleValueChanges}
+                      onBlur={onBlur}
+                    />
+                  </FormField>
+                  <FormField
+                    label="Name ladin"
+                    error={errorMessages['lld-ITError']}
+                  >
+                    <input
+                      type="text"
+                      name="lld-IT"
+                      value={values['lld-IT']}
+                      onChange={handleValueChanges}
+                      onBlur={onBlur}
+                    />
+                  </FormField>
+                </fieldset>
+                <Label>Coordinator</Label>
+                <fieldset>
+                  <FormField
+                    overflow
+                    label="Coordinator"
+                    error={errorMessages.coordinatorError}
+                  >
+                    <SearchField
+                      value={
+                        group.coordinator
+                          ? `${group.coordinator.name} ${
+                              group.coordinator.surname
+                            }`
+                          : ''
+                      }
+                      onChange={e =>
+                        handleValueChanges({
+                          target: {
+                            name: 'coordinatorValue',
+                            value: e.value,
+                          },
+                        })
+                      }
+                      data={users}
+                      fetch={this.props.findUser}
+                      displaySelected={data => {
+                        handleValueChanges({
+                          target: { name: 'coordinator', value: data },
+                        });
+                      }}
+                    />
+                  </FormField>
+                </fieldset>
+                <Label>Privacy</Label>
+                <fieldset>
+                  <Select
+                    inField
+                    options={[
+                      {
+                        value: 'open',
+                        label: <FormattedMessage {...messages.open} />,
                       },
-                    })
-                  }
-                  data={users}
-                  fetch={this.props.findUser}
-                  displaySelected={data => {
-                    this.handleValueChanges({
-                      target: { name: 'coordinator', value: data },
-                    });
-                  }}
-                />
-              </FormField>
-            </fieldset>
-            <Label>Privacy</Label>
-            <fieldset>
-              <FormField>
-                <CheckBox
-                  label="Restriction"
-                  name="restricted"
-                  checked={restricted}
-                  onChange={this.handleValueChanges}
-                  toggle
-                />
-              </FormField>
-            </fieldset>
-            <p>
-              {error && <Notification type="error" message={updates.error} />}
-            </p>
-            <div>
-              <Button disabled={updates.pending} primary label="Save" />{' '}
-              <Button label="Cancel" onClick={this.onCancel} />
-            </div>
-          </Form>
+                      {
+                        value: 'closed',
+                        label: <FormattedMessage {...messages.closed} />,
+                      },
+                    ]}
+                    onSearch={false}
+                    value={{
+                      value: values.privacy,
+                      label: values.privacy === 'open' ? 'open' : 'closed',
+                    }}
+                    onChange={e => {
+                      handleValueChanges({
+                        target: { name: 'privacy', value: e.value },
+                      });
+                    }}
+                  />
+                </fieldset>
+                <Label>Mode</Label>
+                <fieldset>
+                  <FormField>
+                    <CheckBox
+                      label="Goldmode"
+                      name="goldMode"
+                      checked={values.goldMode}
+                      onChange={handleValueChanges}
+                      toggle
+                    />
+                  </FormField>
+                </fieldset>
+
+                <p>
+                  {error && (
+                    <Notification type="error" message={updates.error} />
+                  )}
+                </p>
+                <div>
+                  <Button
+                    disabled={updates.pending}
+                    onClick={onSubmit}
+                    primary
+                    label="Save"
+                  />
+                  <Button label="Cancel" onClick={this.onCancel} />
+                </div>
+              </Form>
+            )}
+          </FormValidation>
         </Box>
       </Box>
     );

@@ -129,6 +129,26 @@ export function nameValidation(name) {
   return result;
 }
 
+/*
+
+export function required(value, args) {
+  let result = {
+    touched: false,
+  };
+  if(value){
+    if(value.constructor === 'String'){
+      const trimmed = value.trim();
+      if(trimmed){
+        if(args.min && trimmed.length <= args.min){
+              result = { touched: true, errorName: 'min' };
+        }
+      }
+    }
+  }
+
+  return result;
+} */
+
 export function emailValidation(email, { invalidEmails = [] }) {
   const mailAddress = email.trim().toLowerCase();
   let result = {
@@ -177,11 +197,11 @@ export function createValidator(
       (acc, curr) => {
         let state = resolverFn(obj);
         const value = state[curr]; // obj[curr];
-
         if ('valuesResolver' in allValues[curr]) {
           state = allValues[curr].valuesResolver(obj);
         }
         const errors = validators[allValues[curr].fn](value, state, options);
+
         // eslint-disable-next-line no-param-reassign
         acc.errors[curr] = {
           ...errors,

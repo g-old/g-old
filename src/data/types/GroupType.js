@@ -16,7 +16,7 @@ import Request from '../models/Request';
 import ProposalStatusType from '../types/ProposalStatusType';
 import PollingModeType from './PollingModeType';
 import PollingMode from '../models/PollingMode';
-
+import PrivacyType from './PrivacyType';
 import Discussion from '../models/Discussion';
 import User from '../models/User';
 import knex from '../knex';
@@ -117,6 +117,9 @@ const GroupType = new ObjectType({
     },
     goldMode: {
       type: GraphQLBoolean,
+    },
+    privacy: {
+      type: PrivacyType,
     },
     discussions: {
       type: new GraphQLList(DiscussionType),
