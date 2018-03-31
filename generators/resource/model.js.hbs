@@ -6,7 +6,7 @@ class {{properCase name}} {
     this.id = data.id
   }
 
-  static async gen(viewer, id, { {{camelCase name}s} }) {
+  static async gen(viewer, id, { {{camelCase name}}s }) {
     const data = await {{camelCase name}}s.load(id);
     if (data === null) return null;
     return canSee(viewer, data, Models.{{constantCase name}}) ? new {{properCase name}}(data) : null;
