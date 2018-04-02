@@ -31,6 +31,7 @@ const hydrateProposals = (state, data, entities) =>
       proposals: state.byId,
       users: entities.users.byId,
       statements: entities.statements.byId,
+      subscriptions: entities.subscriptions.byId,
     },
   );
 

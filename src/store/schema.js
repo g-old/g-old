@@ -34,12 +34,15 @@ export const poll = new schema.Entity('polls', {
   likedStatements: [statementLike],
 });
 export const tag = new schema.Entity('tags');
-
+export const subscription = new schema.Entity('subscriptions', {
+  user,
+});
 export const proposal = new schema.Entity('proposals', {
   author: user,
   pollOne: poll,
   pollTwo: poll,
   tags: [tag],
+  subscription,
 });
 export const proposalStatus = new schema.Entity('proposalStatus', {
   proposal,
@@ -106,6 +109,6 @@ export const workTeamList = [workTeam];
 export const logList = [log];
 export const discussionList = [discussion];
 export const commentList = [comment];
-
 export const requestList = [request];
+export const subscriptionList = [subscription];
 /* GENERATOR */

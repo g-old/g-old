@@ -26,6 +26,14 @@ export const Models = {
 
 /* GENERATOR_FN */
 /* eslint-disable no-unused-vars */
+function subscriptionReadControl(viewer, data) {
+  console.error('Access control for Subscription not implemented');
+  return true;
+}
+function subscriptionWriteControl(viewer, data) {
+  console.error('Access control for Subscription not implemented');
+  return true;
+}
 function tagReadControl(viewer, data) {
   console.error('Access control for Tag not implemented');
   return true;
@@ -322,6 +330,10 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
+  [Models.SUBSCRIPTION]: {
+    [ATypes.WRITE]: subscriptionWriteControl,
+    [ATypes.READ]: subscriptionReadControl,
+  },
   [Models.TAG]: {
     [ATypes.WRITE]: tagWriteControl,
     [ATypes.READ]: tagReadControl,

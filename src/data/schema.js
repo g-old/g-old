@@ -69,6 +69,10 @@ import updateWorkTeam from './mutations/updateWorkTeam';
 import createTag from './mutations/createTag';
 import updateTag from './mutations/updateTag';
 import deleteTag from './mutations/deleteTag';
+import createSubscription from './mutations/createSubscription';
+import updateSubscription from './mutations/updateSubscription';
+import deleteSubscription from './mutations/deleteSubscription';
+import subscriptionConnection from './queries/subscriptionConnection';
 /* GENERATOR */
 
 const schema = new Schema({
@@ -96,6 +100,7 @@ const schema = new Schema({
       discussion,
       comments,
       requestConnection,
+      subscriptionConnection,
       /* GENERATOR_QUERIES */
     },
   }),
@@ -137,6 +142,9 @@ const schema = new Schema({
       createTag,
       updateTag,
       deleteTag,
+      createSubscription,
+      updateSubscription,
+      deleteSubscription,
       /* GENERATOR_MUTATIONS */
     },
   }),

@@ -20,6 +20,15 @@ export default combineReducers({
 });
 
 /* GENERATOR */
+
+export const getSubscription = (state, filter) =>
+  fromEntity.getSubscription(state.entities, filter);
+
+export const getSubscriptionsStatus = (state, filter) =>
+  fromEntity.getSubscriptionsStatus(state.entities, filter);
+
+export const getSubscriptionUpdates = (state, filter) =>
+  fromUi.getSubscriptionUpdates(state.ui, filter);
 export const getVisibleRequests = (state, filter) =>
   fromEntity.getVisibleRequests(state.entities, filter);
 
@@ -144,7 +153,7 @@ export const getAllStatementsByPoll = (state, id) =>
 export const getVisibibleStatementsByPoll = (state, id, filter) =>
   fromEntity.getVisibibleStatementsByPoll(state.entities, id, filter);
 
-export const getSubscription = state => fromUi.getSubscription(state.ui);
+export const getPushSubscription = state => fromUi.getSubscription(state.ui);
 
 export const getActivityCounter = state => fromUi.getActivityCounter(state.ui);
 

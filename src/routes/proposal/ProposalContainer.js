@@ -8,6 +8,7 @@ import {
   createProposalSub,
   deleteProposalSub,
 } from '../../actions/proposal';
+import { createSubscription } from '../../actions/subscription';
 import {
   createVote,
   updateVote,
@@ -50,6 +51,7 @@ class ProposalContainer extends React.Component {
       pollTwo: PropTypes.shape({}),
       id: PropTypes.string,
       subscribed: PropTypes.bool,
+      subscription: PropTypes.shape({}),
     }).isRequired,
     user: PropTypes.shape({}).isRequired,
     proposalId: PropTypes.number.isRequired,
@@ -66,6 +68,7 @@ class ProposalContainer extends React.Component {
     followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     createProposalSub: PropTypes.func.isRequired,
     deleteProposalSub: PropTypes.func.isRequired,
+    createSubscription: PropTypes.func.isRequired,
   };
   static defaultProps = {
     errorMessage: null,
@@ -122,11 +125,14 @@ class ProposalContainer extends React.Component {
     }
   }
   handleSubscription() {
-    const { subscribed, id } = this.props.proposal;
-    if (subscribed) {
+    const { id, subscription } = this.props.proposal;
+    if (subscription) {
       this.props.deleteProposalSub(id);
     } else {
-      this.props.createProposalSub(id);
+      this.props.createSubscription({
+        eventType: 'NEW_STATEMENT',
+        targetId: id,
+      });
     }
   }
 
@@ -210,8 +216,8 @@ class ProposalContainer extends React.Component {
           <Box column pad>
             <CheckBox
               toggle
-              checked={proposal.subscribed}
-              label={proposal.subscribed ? 'ON' : 'OFF'}
+              checked={proposal.subscription}
+              label={proposal.subscription ? 'ON' : 'OFF'}
               onChange={this.handleSubscription}
               disabled={isFetching}
             />
@@ -263,6 +269,7 @@ const mapDispatch = {
   getVotes,
   createProposalSub,
   deleteProposalSub,
+  createSubscription,
 };
 
 export default connect(mapStateToProps, mapDispatch)(ProposalContainer);
