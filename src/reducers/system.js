@@ -1,6 +1,3 @@
-export default function system(state = {}, action) {
-  switch (action.type) {
-    default:
-      return state;
-  }
+export default function system(state = {}) {
+  return state;
 }
