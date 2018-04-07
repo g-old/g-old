@@ -11,7 +11,23 @@ import knex from '../knex';
 import UserType from './UserType';
 import User from '../models/User';
 
-const CommentType = new ObjectType({
+// @flow
+/* must be defined before CommentType (recursive type) */
+export type tCommentType = {
+  __typename: 'Comment',
+  id: number,
+  content: string,
+  author: typeof UserType,
+  discussionId: number,
+  replies: tCommentType,
+  parentId: number,
+  numReplies: number,
+  createdAt: string,
+  updatedAt: string,
+  editedAt: string,
+};
+
+const CommentType: tCommentType = new ObjectType({
   name: 'Comment',
   fields: () => ({
     id: {

@@ -2,13 +2,20 @@
 
 import { GraphQLObjectType, GraphQLID, GraphQLNonNull } from 'graphql';
 import WorkTeam from '../models/WorkTeam';
-import WorkTeamType from './WorkTeamType';
-import ObjectType from './ObjectType';
+import WorkTeamType, { type tWorkTeam } from './WorkTeamType';
+import ObjectType, { type tObjectType } from './ObjectType';
 import Proposal from '../models/Proposal';
 import Discussion from '../models/Discussion';
 import PostVerbType from './PostVerbType';
 import Post from '../models/Post';
 import { SubjectType } from '../models/Activity';
+
+export type tPostType = {
+  id: number,
+  group: tWorkTeam,
+  verb: tPostVerbType,
+  subject: tObjectType,
+};
 
 const PostType = new GraphQLObjectType({
   name: 'Post',

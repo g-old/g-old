@@ -8,7 +8,7 @@ import {
   GraphQLBoolean,
 } from 'graphql';
 import UserType from './UserType';
-import DiscussionType from './DiscussionType';
+import DiscussionType, { type tDiscussionType } from './DiscussionType';
 import GroupStatusType from './GroupStatusType';
 import PageType from './PageType';
 
@@ -20,6 +20,26 @@ import User from '../models/User';
 import knex from '../knex';
 import proposalConnection from '../queries/proposalConnection';
 import requestConnection from '../queries/requestConnection';
+
+// @flow
+export type tWorkTeam = {
+  id: number,
+  name: string,
+  displayName: string,
+  deName: string,
+  itName: string,
+  lldName: string,
+  members: tUserType[],
+  restricted: boolean,
+  mainTeam: boolean,
+  logo: string,
+  background: string,
+  ownStatus: GroupStatusType,
+  numMembers: number,
+  numDiscussions: number,
+  numProposals: number,
+  discussions: tDiscussionType,
+};
 
 const WorkTeamType = new ObjectType({
   name: 'WorkTeam',

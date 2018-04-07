@@ -1,6 +1,20 @@
-import { GraphQLString, GraphQLObjectType as ObjectType, GraphQLID, GraphQLNonNull } from 'graphql';
+import {
+  GraphQLString,
+  GraphQLObjectType as ObjectType,
+  GraphQLID,
+  GraphQLNonNull,
+} from 'graphql';
 import User from '../models/User';
 import UserType from './UserType';
+
+// @flow
+export type tVoteType = {
+  __typename: 'VoteDL',
+  id: number,
+  position: string,
+  voter: typeof UserType,
+  pollId: number,
+};
 
 const VoteType = new ObjectType({
   name: 'VoteDL',
@@ -17,7 +31,8 @@ const VoteType = new ObjectType({
     voter: {
       type: UserType,
       // resolve: (data) => data.user_id,
-      resolve: (parent, { id }, { viewer, loaders }) => User.gen(viewer, parent.userId, loaders),
+      resolve: (parent, _, { viewer, loaders }) =>
+        User.gen(viewer, parent.userId, loaders),
     },
     pollId: {
       type: GraphQLID,

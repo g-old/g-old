@@ -110,7 +110,6 @@ export const workTeamList = [workTeam];
 export const logList = [log];
 export const discussionList = [discussion];
 export const commentList = [comment];
-
 export const requestList = [request];
 export const posts = [post];
 /* GENERATOR */

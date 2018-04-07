@@ -1,19 +1,29 @@
 import { GraphQLUnionType } from 'graphql';
-import ProposalType from './ProposalDLType';
+import ProposalType, { type tProposalType } from './ProposalDLType';
 import Proposal from '../models/Proposal';
-import StatementType from './StatementDLType';
+import StatementType, { type tStatementType } from './StatementDLType';
 import Statement from '../models/Statement';
-import VoteType from './VoteDLType';
+import VoteType, { type tVoteType } from './VoteDLType';
 import Vote from '../models/Vote';
-import NotificationType from './NotificationType';
+import NotificationType, { type tNotificationType } from './NotificationType';
 import Notification from '../models/Notification';
-import DiscussionType from './DiscussionType';
+import DiscussionType, { type tDiscussionType } from './DiscussionType';
 import Discussion from '../models/Discussion';
-import CommentType from './CommentType';
+import CommentType, { type tCommentType } from './CommentType';
 import Comment from '../models/Comment';
-import RequestType from './RequestType';
+import RequestType, { type tRequestType } from './RequestType';
 import Request from '../models/Request';
 
+export type tObjectType =
+  | tProposalType
+  | tStatementType
+  | tVoteType
+  | tNotificationType
+  | tDiscussionType
+  | tCommentType
+  | tRequestType;
+
+// @flow
 const ObjectType = new GraphQLUnionType({
   name: 'FeedObject',
 

@@ -15,6 +15,23 @@ import Comment from '../models/Comment';
 import UserType from './UserType';
 import User from '../models/User';
 
+// @flow
+export type tDiscussionType = {
+  __typename: 'Discussion',
+  id: number,
+  title: string,
+  content: string,
+  author: typeof UserType,
+  workTeam: typeof WorkTeamType,
+  // TODO or more
+  ownComment: typeof CommentType,
+  comments: typeof CommentType[],
+  numComments: number,
+  createdAt: string,
+  updatedAt: string,
+  closedAt: string,
+};
+
 const DiscussionType = new ObjectType({
   name: 'Discussion',
   args: {

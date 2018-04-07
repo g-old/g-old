@@ -7,6 +7,19 @@ import {
 import UserType from './UserType';
 import User from '../models/User';
 
+// @flow
+export type tRequestType = {
+  __typename: 'Request',
+  id: number,
+  type: string,
+  content: string,
+  processor: typeof UserType,
+  requester: typeof UserType,
+  deniedAt: string,
+  createdAt: string,
+  updatedAt: string,
+};
+
 const Request = new ObjectType({
   name: 'Request',
   fields: () => ({

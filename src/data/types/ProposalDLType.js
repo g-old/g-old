@@ -17,6 +17,26 @@ import Tag from '../models/Tag';
 import knex from '../knex';
 import { ProposalState } from '../models/Proposal';
 
+// @flow
+export type tProposalType = {
+  __typename: 'ProposalDL',
+  id: number,
+  author: User,
+  body: string,
+  title: string,
+  tags: TagType[],
+  workTeamId: number,
+  pollOne: PollType,
+  pollTwo: PollType,
+  activePoll: PollType,
+  spokesman: UserType,
+  state: string,
+  votes: number,
+  publishedAt: string,
+  subscribed: boolean,
+  canVote: boolean,
+};
+
 const ProposalType = new ObjectType({
   name: 'ProposalDL',
   /* args: {

@@ -1,6 +1,24 @@
-import { GraphQLID, GraphQLNonNull, GraphQLString, GraphQLObjectType as ObjectType } from 'graphql';
+import {
+  GraphQLID,
+  GraphQLNonNull,
+  GraphQLString,
+  GraphQLObjectType as ObjectType,
+} from 'graphql';
 
 import UserType from './UserType';
+
+// @flow
+export type tNotificationType = {
+  __typename: 'Notification',
+  id: number,
+  msg: string,
+  title: string,
+  date: string,
+  sender: typeof UserType,
+  location: string,
+  type: string,
+  createdAt: string,
+};
 
 const NotificationType = new ObjectType({
   name: 'Notification',

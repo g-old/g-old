@@ -17,10 +17,31 @@ import { Permissions } from '../../organization';
 
 /* eslint-disable */
 const canSee = (viewer, data) =>
-  data.id == viewer.id || (viewer.permissions & Permissions.VIEW_USER_INFO) > 0;
+  data.id == viewer.id || (viewer.permissions & Permissions.VIEW_USER_INFO) > 0
 /* eslint-enable */
 
-const UserType = new ObjectType({
+// @flow
+/* tUserType needs to be defined before the UserType object, because it is recursive
+ * (contains a UserType array) */
+type tUserType = {
+  id: number,
+  name: string,
+  surname: string,
+  email: string,
+  thumbnail: string,
+  emailVerified: boolean,
+  lastLogin: string,
+  createdAt: string,
+  groups: number,
+  followees: tUserType[],
+  requestConnection: any,
+  numFollowers: number,
+  numStatements: number,
+  numLikes: number,
+  workTeams: typeof WorkTeamType[],
+};
+
+const UserType: tUserType = new ObjectType({
   name: 'User',
   fields: () => ({
     // we need a lazy evaluated fn , bc we use UserType, which has to be defined

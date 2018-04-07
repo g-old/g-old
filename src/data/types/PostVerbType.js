@@ -1,5 +1,13 @@
 import { GraphQLEnumType } from 'graphql';
 
+// @flow
+export type tPostVerbType =
+  | 'CREATED'
+  | 'CLOSED'
+  | 'REJECTED'
+  | 'REVOKED'
+  | 'VOTINGs';
+
 const PostVerb = new GraphQLEnumType({
   name: 'PostVerb',
   values: {
