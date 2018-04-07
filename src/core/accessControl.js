@@ -22,10 +22,19 @@ export const Models = {
   COMMENT: 2048,
   REQUEST: 4096,
   TAG: 8192,
+  MESSAGE: 16384,
 };
 
 /* GENERATOR_FN */
 /* eslint-disable no-unused-vars */
+function notificationReadControl(viewer, data) {
+  console.error('Access control for Notification not implemented');
+  return true;
+}
+function notificationWriteControl(viewer, data) {
+  console.error('Access control for Notification not implemented');
+  return true;
+}
 function subscriptionReadControl(viewer, data) {
   console.error('Access control for Subscription not implemented');
   return true;
@@ -236,13 +245,13 @@ function voteWriteControl(viewer, data) {
   return false;
 }
 
-function notificationReadControl(viewer, data) {
+function messageReadControl(viewer, data) {
   if (viewer.permissions & AccessMasks.LEVEL_0) {
     return true;
   }
   return false;
 }
-function notificationWriteControl(viewer, data) {
+function messageWriteControl(viewer, data) {
   if (
     viewer.permissions &
     (Permissions.NOTIFY_GROUPS | Permissions.NOTIFY_ALL)
@@ -330,6 +339,10 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
+  [Models.NOTIFICATION]: {
+    [ATypes.WRITE]: notificationWriteControl,
+    [ATypes.READ]: notificationReadControl,
+  },
   [Models.SUBSCRIPTION]: {
     [ATypes.WRITE]: subscriptionWriteControl,
     [ATypes.READ]: subscriptionReadControl,
@@ -370,9 +383,9 @@ const accessFilter = {
     [ATypes.WRITE]: voteWriteControl,
     [ATypes.READ]: voteReadControl,
   },
-  [Models.NOTIFICATION]: {
-    [ATypes.WRITE]: notificationWriteControl,
-    [ATypes.READ]: notificationReadControl,
+  [Models.MESSAGE]: {
+    [ATypes.WRITE]: messageWriteControl,
+    [ATypes.READ]: messageReadControl,
   },
   [Models.ACTIVITY]: {
     [ATypes.WRITE]: activityWriteControl,

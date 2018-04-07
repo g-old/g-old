@@ -14,7 +14,7 @@ import GroupManager from '../GroupManager';
 import { Groups, AccessMasks, canAccess } from '../../organization';
 import ImageUpload from '../ImageUpload';
 import { uploadAvatar } from '../../actions/file';
-import { notifyUser } from '../../actions/notifications';
+import { notifyUser } from '../../actions/messages';
 import ProfilePicture from '../ProfilePicture';
 import Box from '../Box';
 import NotificationInput from '../NotificationInput';
@@ -138,9 +138,6 @@ class AccountDetails extends React.Component {
     if (updates.dataUrl && updates.dataUrl.success) {
       this.setState({ showUpload: false });
     }
-    if (updates.notification && updates.notification.success) {
-      this.setState({ notificationText: '', subject: '' });
-    }
   }
   onPromoteToViewer() {
     const { accountData: { groups, id } } = this.props;
@@ -214,7 +211,7 @@ class AccountDetails extends React.Component {
     // eslint-disable-next-line no-bitwise
     if (canAccess(user, 'NotificationPanel')) {
       NotificationPanel = (
-        <AccordionPanel column pad heading={'Notify user'}>
+        <AccordionPanel column pad heading="Notify user">
           <NotificationInput
             receiverId={id}
             notifyUser={this.props.notifyUser}
@@ -256,13 +253,13 @@ class AccountDetails extends React.Component {
           </Label>
           {!avatarSet && (
             <Notification
-              type={'alert'}
+              type="alert"
               message={<FormattedMessage {...messages.avatarMissing} />}
             />
           )}
           {!emailVerified && (
             <Notification
-              type={'alert'}
+              type="alert"
               message={
                 <FormattedMessage {...messages.emailValidationMissing} />
               }

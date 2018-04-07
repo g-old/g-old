@@ -10,6 +10,7 @@ import MailService from './core/MailService';
 import MessageService from './core/MessageService';
 import TokenService from './core/TokenService';
 import BackgroundService from './core/BackgroundService';
+import NotificationService from './core/NotificationService';
 import { createToken } from './core/tokens';
 
 const env = process.env.NODE_ENV || 'development';
@@ -33,6 +34,10 @@ const messageService = new MessageService(
   mailComposer,
   tokenService,
 );
+const notificationService = new NotificationService({
+  eventManager: EventManager,
+  dbConnector: knex,
+});
 const backgroundService = new BackgroundService(messageService);
 export default {
   ActivityService: new ActivityService(
@@ -42,4 +47,5 @@ export default {
   MailComposer: mailComposer,
   MessageService: messageService,
   BackgroundService: backgroundService,
+  NotificationService: notificationService,
 };

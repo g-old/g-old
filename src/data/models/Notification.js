@@ -4,59 +4,69 @@ import { canSee, canMutate, Models } from '../../core/accessControl';
 class Notification {
   constructor(data) {
     this.id = data.id;
-    this.type = data.type;
-    this.date = data.date;
-    this.location = data.location;
-    this.msg = data.msg;
-    this.title = data.title;
-    this.senderId = data.sender_id;
+    this.activityId = data.activity_id;
+    this.read = data.read;
     this.createdAt = data.created_at;
+    this.updatedAt = data.updated_at;
   }
 
-  static async gen(viewer, id) {
-    let data = await knex('notifications')
-      .where({ id })
-      .select();
-    data = data[0];
-    if (!data) return null;
+  static async gen(viewer, id, { notifications }) {
+    const data = await notifications.load(id);
+    if (data === null) return null;
     return canSee(viewer, data, Models.NOTIFICATION)
       ? new Notification(data)
       : null;
   }
 
-  static async create(viewer, data, loaders, trx) {
-    if (!data || !data.type || !data.msg) return null;
+  static async create(viewer, data) {
+    if (!data) return null;
     if (!canMutate(viewer, data, Models.NOTIFICATION)) return null;
 
-    let notification;
-    const newData = Object.keys(data).reduce(
-      (acc, curr) => {
-        if (!(curr in acc)) {
-          acc[curr] = data[curr];
-        }
-        return acc;
-      },
-      {
-        type: data.type,
-        msg: data.msg,
-        sender_id: viewer.id,
-      },
-    );
-
-    if (trx) {
-      notification = await knex('notifications')
+    const newData = {
+      created_at: new Date(),
+    };
+    const notificationInDB = await knex.transaction(async trx => {
+      const [notification = null] = await knex('notifications')
         .transacting(trx)
         .insert(newData)
         .returning('*');
-    } else {
-      notification = await knex('notifications')
-        .insert(newData)
+
+      return notification;
+    });
+
+    return notificationInDB ? new Notification(notificationInDB) : null;
+  }
+
+  static async update(viewer, data) {
+    if (!data || !data.id) return null;
+    if (!canMutate(viewer, data, Models.NOTIFICATION)) return null;
+    const newData = { updated_at: new Date() };
+    const updatedNotification = await knex.transaction(async trx => {
+      const [notification = null] = await knex('notifications')
+        .where({ id: data.id })
+        .transacting(trx)
+        .forUpdate()
+        .update(newData)
         .returning('*');
-    }
 
-    notification = notification[0];
+      return notification;
+    });
 
-    return notification ? new Notification(notification) : null;
+    return updatedNotification ? new Notification(updatedNotification) : null;
+  }
+
+  static async delete(viewer, data) {
+    if (!data || !data.id) return null;
+    if (!canMutate(viewer, data, Models.NOTIFICATION)) return null;
+    const deletedNotification = await knex.transaction(async trx => {
+      await knex('notifications')
+        .where({ id: data.id })
+        .transacting(trx)
+        .forUpdate()
+        .del();
+    });
+
+    return deletedNotification ? new Notification(deletedNotification) : null;
   }
 }
 

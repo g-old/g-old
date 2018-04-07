@@ -57,13 +57,7 @@ export const workTeam = new schema.Entity('workTeams', {
   proposals: [proposal],
   linkedProposals: [proposalStatus],
 });
-user.define({
-  role,
-  followees: [user],
-  workTeams: [workTeam],
-  requests: [request],
-});
-export const notification = new schema.Entity('notifications', {
+export const message = new schema.Entity('messages', {
   sender: user,
 });
 export const comment = new schema.Entity('comments');
@@ -77,13 +71,12 @@ export const discussion = new schema.Entity('discussions', {
   comments: [comment],
   ownComment: comment,
 });
-
 export const unionSchema = new schema.Union(
   {
     ProposalDL: proposal,
     VoteDL: vote,
     StatementDL: statement,
-    Notification: notification,
+    Message: message,
     Comment: comment,
     Discussion: discussion,
     Request: request,
@@ -94,6 +87,17 @@ export const activity = new schema.Entity('activities', {
   actor: user,
   object: unionSchema,
 });
+export const notification = new schema.Entity('notifications', {
+  activity,
+});
+user.define({
+  role,
+  followees: [user],
+  workTeams: [workTeam],
+  requests: [request],
+  notifications: [notification],
+});
+
 export const log = new schema.Entity('logs', {
   actor: user,
 });
@@ -111,4 +115,5 @@ export const discussionList = [discussion];
 export const commentList = [comment];
 export const requestList = [request];
 export const subscriptionList = [subscription];
+export const notificationList = [notification];
 /* GENERATOR */

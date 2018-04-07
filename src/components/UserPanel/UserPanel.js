@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './UserPanel.css';
-import { notifyUser } from '../../actions/notifications';
+import { notifyUser } from '../../actions/messages';
 import { updateUser, loadUserList, findUser } from '../../actions/user';
 import FetchError from '../FetchError';
 import AccountDetails from '../AccountDetails';
@@ -62,15 +62,11 @@ class UserPanel extends React.Component {
   static defaultProps = {
     guestArray: null,
     viewerArray: null,
-    guestArrayIsFetching: null,
-    viewerArrayIsFetching: null,
-    viewerArrayErrorMessage: null,
-    guestArrayErrorMessage: null,
     workTeams: null,
   };
   constructor(props) {
     super(props);
-    this.state = { selectedAccount: null, showAccount: false };
+    this.state = { showAccount: false };
     this.handleProfileClick = this.handleProfileClick.bind(this);
     this.handleLayerClosing = this.handleLayerClosing.bind(this);
   }
@@ -91,10 +87,10 @@ class UserPanel extends React.Component {
       <table className={s.userList}>
         <thead>
           <tr>
-            <th>{'Avatar'}</th>
-            <th>{'Name'}</th>
-            <th>{'Created at'}</th>
-            <th>{'Last login'}</th>
+            <th>Avatar</th>
+            <th>Name</th>
+            <th>Created at</th>
+            <th>Last login</th>
           </tr>
         </thead>
         <tbody>
@@ -116,9 +112,9 @@ class UserPanel extends React.Component {
       <table className={s.workTeams}>
         <thead>
           <tr>
-            <th className={s.team}>{'Name'}</th>
-            <th className={s.members}>{'Members'}</th>
-            <th className={s.coordinator}>{'Coordinator'}</th>
+            <th className={s.team}>Name</th>
+            <th className={s.members}>Members</th>
+            <th className={s.coordinator}>Coordinator</th>
           </tr>
         </thead>
         <tbody>
@@ -170,7 +166,7 @@ class UserPanel extends React.Component {
                               />
                             </svg>
                           }
-                          onClick={() => this.setState({ showNotify: t.id })}
+                          onClick={() => alert('to implement')}
                         />
                       )}
                       {/* eslint-enable no-bitwise */}
@@ -230,7 +226,8 @@ class UserPanel extends React.Component {
                 <FetchError
                   message={guestArrayStatus.error}
                   onRetry={() =>
-                    this.props.loadUserList({ group: Groups.GUEST })}
+                    this.props.loadUserList({ group: Groups.GUEST })
+                  }
                 />
               )}
               {this.renderUserList(this.props.guestArray)}
@@ -265,7 +262,8 @@ class UserPanel extends React.Component {
                   onRetry={() =>
                     this.props.loadUserList({
                       group: VIEWERS,
-                    })}
+                    })
+                  }
                 />
               )}
               {this.renderUserList(this.props.viewerArray)}

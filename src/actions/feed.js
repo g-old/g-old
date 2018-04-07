@@ -28,10 +28,8 @@ ${userFields}
 }
 `;
 
-const feed = `
-query($userId:ID){
-  feed (userId:$userId) {
-  id
+export const activityFields = `
+id
   type
   objectId
   verb
@@ -132,7 +130,7 @@ query($userId:ID){
         thumbnail
       }
     }
-    ... on Notification {
+    ... on Message {
       id
       sender {
         name
@@ -143,7 +141,11 @@ query($userId:ID){
       msg
       title
     }
-  }
+  }`;
+const feed = `
+query($userId:ID){
+  feed (userId:$userId) {
+  ${activityFields}
 }
 }
 `;

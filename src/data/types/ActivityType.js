@@ -7,7 +7,7 @@ import {
 import User from '../models/User';
 import UserType from './UserType';
 import ObjectType from './ObjectType';
-import Notification from '../models/Notification';
+import Message from '../models/Message';
 import Proposal from '../models/Proposal';
 import Statement from '../models/Statement';
 import Vote from '../models/Vote';
@@ -100,7 +100,7 @@ const getStatement = async (viewer, parent, loaders) => {
 const ActivityType = new GraphQLObjectType({
   name: 'Activity',
 
-  fields: {
+  fields: () => ({
     id: {
       type: new GraphQLNonNull(GraphQLID),
     },
@@ -136,8 +136,8 @@ const ActivityType = new GraphQLObjectType({
         if (parent.type === 'vote') {
           return getVote(viewer, parent, loaders);
         }
-        if (parent.type === 'notification') {
-          return Notification.gen(viewer, parent.objectId, loaders);
+        if (parent.type === 'message') {
+          return Message.gen(viewer, parent.objectId, loaders);
         }
         if (parent.type === 'discussion') {
           return Discussion.gen(viewer, parent.objectId, loaders);
@@ -189,6 +189,6 @@ const ActivityType = new GraphQLObjectType({
         }
       },
     },
-  },
+  }),
 });
 export default ActivityType;

@@ -73,6 +73,10 @@ import createSubscription from './mutations/createSubscription';
 import updateSubscription from './mutations/updateSubscription';
 import deleteSubscription from './mutations/deleteSubscription';
 import subscriptionConnection from './queries/subscriptionConnection';
+import createNotification from './mutations/createNotification';
+import updateNotification from './mutations/updateNotification';
+import deleteNotification from './mutations/deleteNotification';
+import notificationConnection from './queries/notificationConnection';
 /* GENERATOR */
 
 const schema = new Schema({
@@ -101,6 +105,7 @@ const schema = new Schema({
       comments,
       requestConnection,
       subscriptionConnection,
+      notificationConnection,
       /* GENERATOR_QUERIES */
     },
   }),
@@ -145,6 +150,9 @@ const schema = new Schema({
       createSubscription,
       updateSubscription,
       deleteSubscription,
+      createNotification,
+      updateNotification,
+      deleteNotification,
       /* GENERATOR_MUTATIONS */
     },
   }),

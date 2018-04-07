@@ -14,10 +14,12 @@ import workTeams, * as fromWorkTeam from './ui/workTeams';
 import discussions, * as fromDiscussion from './ui/discussions';
 import tags, * as fromTag from './ui/tags';
 import subscriptions, * as fromSubscription from './ui/subscriptions';
+import notifications, * as fromNotification from './ui/notifications';
 /* GENERATOR_IMPORTS */
 
 const uiReducer = combineReducers({
   /* GENERATOR_COMBINE */
+  notifications,
   subscriptions,
   requests,
   proposals,
@@ -42,6 +44,8 @@ export default (state, action) => {
 };
 
 /* GENERATOR_EXPORTS */
+export const getNotificationUpdates = state =>
+  fromNotification.getStatus(state.notifications);
 export const getSubscriptionUpdates = state =>
   fromSubscription.getStatus(state.subscriptions);
 export const getTagUpdates = state => fromTag.getStatus(state.tags);

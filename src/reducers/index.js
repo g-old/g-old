@@ -20,6 +20,17 @@ export default combineReducers({
 });
 
 /* GENERATOR */
+export const getAllNotifications = state =>
+  fromEntity.getAllNotifications(state.entities);
+
+export const getNotification = (state, filter) =>
+  fromEntity.getNotification(state.entities, filter);
+
+export const getNotificationsStatus = (state, filter) =>
+  fromEntity.getNotificationsStatus(state.entities, filter);
+
+export const getNotificationUpdates = (state, filter) =>
+  fromUi.getNotificationUpdates(state.ui, filter);
 
 export const getSubscription = (state, filter) =>
   fromEntity.getSubscription(state.entities, filter);
