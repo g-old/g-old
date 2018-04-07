@@ -2,12 +2,14 @@ import knex from '../knex';
 import User from './User';
 import Group from './Group';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import { validateEmail } from '../../core/helpers';
 
 class Platform {
   constructor(data) {
     this.names = data.settings.names;
     this.picture = data.settings.picture;
     this.defaultGroupId = data.settings.default_group_id;
+    this.email = data.settings.email;
     this.adminId = data.settings.admin_id;
     this.updatedAt = data.updatedAt;
   }
@@ -72,6 +74,12 @@ class Platform {
         ...newData.settings.names,
         ...newNames,
       };
+    }
+
+    if (data.email) {
+      if (validateEmail(data.email)) {
+        newData.settings.email = data.email;
+      }
     }
 
     if (data.adminId) {

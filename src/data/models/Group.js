@@ -271,6 +271,7 @@ class Group {
       )
     )
       return null;
+
     if (!data) return null;
     if (!data.names) return null;
     const newData = {
@@ -289,7 +290,14 @@ class Group {
     if (data.parentGroupId) {
       newData.parent_group_id = data.parentGroupId;
     }
+
+    if (data.goldMode) {
+      newData.gold_mode = true;
+    } else {
+      newData.gold_mode = false;
+    }
     newData.created_at = new Date();
+
     const group = await knex.transaction(async trx => {
       // await Group.checkForMainTeam(newData.main, trx);
       const [groupData = null] = await trx

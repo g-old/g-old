@@ -6,6 +6,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import { loadGroup, updateGroup, createGroup } from '../../actions/group';
 import { findUser } from '../../actions/user';
 import Select from '../Select';
+import Image from '../Image';
 
 import {
   getGroup,
@@ -21,7 +22,7 @@ import CheckBox from '../CheckBox';
 import SearchField from '../SearchField';
 import Form from '../Form';
 import FormValidation from '../FormValidation';
-
+import AssetsLayer from '../../containers/AssetsLayer';
 import history from '../../history';
 
 import { selectValidation } from '../../core/validation';
@@ -78,6 +79,9 @@ class GroupForm extends React.Component {
     super(props);
     this.onCancel = this.onCancel.bind(this);
     this.handleFormSubmission = this.handleFormSubmission.bind(this);
+    this.openLayer = this.openLayer.bind(this);
+    this.closeLayer = this.closeLayer.bind(this);
+
     this.state = {};
   }
 
@@ -88,6 +92,20 @@ class GroupForm extends React.Component {
       e.stopPropagation();
     }
     history.push(`/admin`);
+  }
+  openLayer(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    this.setState({ showLayer: true });
+  }
+  closeLayer(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    this.setState({ showLayer: false });
   }
 
   handleFormSubmission(values) {
@@ -235,6 +253,15 @@ class GroupForm extends React.Component {
                     />
                   </FormField>
                 </fieldset>
+                <Label>Picture</Label>
+                <fieldset>
+                  <FormField label="picture" error={errorMessages.pictureError}>
+                    <Box between>
+                      <Image thumb src={values.picture} />
+                      <Button onClick={this.openLayer} label="Change" />
+                    </Box>
+                  </FormField>
+                </fieldset>
                 <Label>Privacy Settings</Label>
                 <fieldset>
                   <FormField label="Privacy" error={errorMessages.privacyError}>
@@ -290,6 +317,7 @@ class GroupForm extends React.Component {
               </Form>
             )}
           </FormValidation>
+          {this.state.showLayer && <AssetsLayer onClose={this.closeLayer} />}
         </Box>
       </Box>
     );

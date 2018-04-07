@@ -4,6 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import cn from 'classnames';
 import LayerContents from '../LayerContents';
 import s from './Layer.css';
 
@@ -12,10 +13,12 @@ class Layer extends React.Component {
     onClose: PropTypes.func.isRequired,
     id: PropTypes.string,
     hidden: PropTypes.bool,
+    flush: PropTypes.bool,
   };
   static defaultProps = {
     id: null,
     hidden: false,
+    flush: null,
   };
 
   componentDidMount() {
@@ -73,7 +76,7 @@ class Layer extends React.Component {
     const appElements = document.querySelectorAll('#app');
     let beforeElement;
     if (appElements.length > 0) {
-      beforeElement = appElements[0];
+      [beforeElement] = appElements;
     } else {
       beforeElement = document.body.firstChild;
     }
@@ -129,7 +132,7 @@ class Layer extends React.Component {
 
   renderLayer() {
     if (this.element) {
-      this.element.className = s.layer;
+      this.element.className = cn(s.layer, this.props.flush ? s.flush : null);
       const contents = (
         <LayerContents
           {...this.props}

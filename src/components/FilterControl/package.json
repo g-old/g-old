@@ -1,0 +1,6 @@
+{
+  "name": "FilterControl",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./FilterControl.js"
+}

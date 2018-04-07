@@ -22,6 +22,9 @@ const GroupInputType = new GraphQLInputObjectType({
     privacy: {
       type: PrivacyType,
     },
+    goldMode: {
+      type: GraphQLBoolean,
+    },
 
     id: {
       type: ID,

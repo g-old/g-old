@@ -14,10 +14,12 @@ import groups, * as fromGroup from './ui/groups';
 import discussions, * as fromDiscussion from './ui/discussions';
 import tags, * as fromTag from './ui/tags';
 import platform, * as fromPlatform from './ui/platform';
+import assets, * as fromAsset from './ui/assets';
 /* GENERATOR_IMPORTS */
 
 const uiReducer = combineReducers({
   /* GENERATOR_COMBINE */
+  assets,
   platform,
   requests,
   proposals,
@@ -42,6 +44,7 @@ export default (state, action) => {
 };
 
 /* GENERATOR_EXPORTS */
+export const getAssetUpdates = state => fromAsset.getStatus(state.assets);
 export const getPlatformUpdates = state =>
   fromPlatform.getStatus(state.platform);
 export const getTagUpdates = state => fromTag.getStatus(state.tags);

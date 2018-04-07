@@ -22,6 +22,17 @@ export default combineReducers({
 });
 
 /* GENERATOR */
+export const getVisibleAssets = (state, filter) =>
+  fromEntity.getVisibleAssets(state.entities, filter);
+
+export const getAsset = (state, filter) =>
+  fromEntity.getAsset(state.entities, filter);
+
+export const getAssetsStatus = (state, filter) =>
+  fromEntity.getAssetsStatus(state.entities, filter);
+
+export const getAssetUpdates = (state, filter) =>
+  fromUi.getAssetUpdates(state.ui, filter);
 
 export const getPlatform = state => fromPlatform.getPlatform(state);
 

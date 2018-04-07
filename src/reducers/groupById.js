@@ -7,6 +7,7 @@ import {
   FETCH_USER_SUCCESS,
   JOIN_GROUP_SUCCESS,
   LEAVE_GROUP_SUCCESS,
+  LOAD_PLATFORM_SUCCESS,
   //  CREATE_REQUEST_SUCCESS,
   //  DELETE_REQUEST_SUCCESS,
 } from '../constants';
@@ -17,6 +18,7 @@ export default function groups(state = {}, action) {
     case FETCH_USER_SUCCESS:
     case LOAD_GROUP_SUCCESS:
     case LEAVE_GROUP_SUCCESS:
+    case LOAD_PLATFORM_SUCCESS:
     case CREATE_GROUP_SUCCESS: {
       return merge({}, state, action.payload.entities.groups);
     }

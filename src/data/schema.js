@@ -73,6 +73,10 @@ import platform from './queries/platform';
 import createPlatform from './mutations/createPlatform';
 import updatePlatform from './mutations/updatePlatform';
 import deletePlatform from './mutations/deletePlatform';
+import createAsset from './mutations/createAsset';
+import updateAsset from './mutations/updateAsset';
+import deleteAsset from './mutations/deleteAsset';
+import assetConnection from './queries/assetConnection';
 /* GENERATOR */
 
 const schema = new Schema({
@@ -101,6 +105,7 @@ const schema = new Schema({
       comments,
       requestConnection,
       platform,
+      assetConnection,
       /* GENERATOR_QUERIES */
     },
   }),
@@ -145,6 +150,9 @@ const schema = new Schema({
       createPlatform,
       updatePlatform,
       deletePlatform,
+      createAsset,
+      updateAsset,
+      deleteAsset,
       /* GENERATOR_MUTATIONS */
     },
   }),

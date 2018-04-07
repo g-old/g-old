@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import AvatarEditor from 'react-avatar-editor';
-import { defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './ImageUpload.css';
 import Box from '../Box';
@@ -19,44 +18,22 @@ const standardValues = {
   loaded: false,
 };
 
-const messages = defineMessages({
-  upload: {
-    id: 'commands.upload',
-    defaultMessage: 'Upload',
-    description: 'Short command for uploading',
-  },
-  rotate: {
-    id: 'commands.rotate',
-    defaultMessage: 'Rotate',
-    description: 'Short command for rotation',
-  },
-  cancel: {
-    id: 'commands.cancel',
-    defaultMessage: 'Cancel',
-    description: 'Short command to cancel a operation',
-  },
-  error: {
-    id: 'action.error',
-    defaultMessage: 'Action failed. Please retry!',
-    description: 'Short failure notification ',
-  },
-});
-
 class ImageUpload extends React.Component {
   static propTypes = {
-    uploadAvatar: PropTypes.func.isRequired,
+    uploadImage: PropTypes.func.isRequired,
     uploadPending: PropTypes.bool.isRequired,
     uploadError: PropTypes.shape({}),
     onClose: PropTypes.func,
     ratio: PropTypes.number,
     serverResizing: PropTypes.bool,
+    inLayer: PropTypes.bool,
   };
   static defaultProps = {
     uploadError: null,
-    uploadSuccess: false,
     onClose: null,
     ratio: null,
     serverResizing: null,
+    inLayer: null,
   };
   constructor(props) {
     super(props);
@@ -77,13 +54,13 @@ class ImageUpload extends React.Component {
     e.preventDefault();
     let files;
     if (e.dataTransfer) {
-      files = e.dataTransfer.files;
+      ({ files } = e.dataTransfer);
     } else if (e.target) {
-      files = e.target.files;
+      ({ files } = e.target);
     }
     const reader = new FileReader();
     reader.onload = () => {
-      this.setState({ src: reader.result, ...standardValues });
+      this.setState({ src: reader.result, file: files[0], ...standardValues });
     };
     if (files.length) {
       reader.readAsDataURL(files[0]);
@@ -96,17 +73,16 @@ class ImageUpload extends React.Component {
 
   handleSave() {
     if (this.props.serverResizing) {
-      alert('TO IMPLEMENT');
+      const croppingRect = this.editor.getCroppingRect();
+      const image = this.state.file;
+      this.props.uploadImage(image, croppingRect);
+    } else {
+      const img = this.editor
+        .getImageScaledToCanvas()
+        .toDataURL('image/jpeg', 0.5); // this.editor.getImage().toDataURL();
+
+      this.props.uploadImage({ dataUrl: img });
     }
-    const img = this.editor
-      .getImageScaledToCanvas()
-      .toDataURL('image/jpeg', 0.5); // this.editor.getImage().toDataURL();
-    const rect = this.editor.getCroppingRect();
-    this.setState({
-      preview: img,
-      croppingRect: rect,
-    });
-    this.props.uploadAvatar({ dataUrl: img });
   }
 
   handleScale(e) {
@@ -125,11 +101,18 @@ class ImageUpload extends React.Component {
 
   render() {
     let editor = null;
-    const { uploadPending, uploadError, onClose, ratio = 1 } = this.props;
+    const {
+      uploadPending,
+      uploadError,
+      onClose,
+      ratio = 1,
+      serverResizing,
+      inLayer,
+    } = this.props;
     const disableControls = !this.state.src;
 
     editor = (
-      <Box pad justify column>
+      <Box pad justify column align>
         <AvatarEditor
           ref={this.setEditorRef}
           image={this.state.src}
@@ -142,12 +125,12 @@ class ImageUpload extends React.Component {
           scale={this.state.scale}
           rotate={this.state.rotate || 0}
           onLoadFailure={() =>
-            alert('Image could not been loaded -> load another one')}
-          onLoadSuccess={() => this.setState({ loaded: true })}
+            alert('Image could not been loaded -> load another one')
+          }
         />
         <Box pad column justify>
           <Box pad justify align>
-            <Label>{'Zoom:'}</Label>
+            <Label>Zoom:</Label>
 
             <Button
               plain
@@ -197,56 +180,58 @@ class ImageUpload extends React.Component {
               }
             />
           </Box>
-          <Box justify>
-            <Button
-              disable={disableControls}
-              plain
-              label={<FormattedMessage {...messages.rotate} />}
-              onClick={this.handleLeftRotation}
-            >
-              <svg viewBox={'0 0 24 24'} width={24} height={24}>
-                <path
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  d={ICONS.retry}
-                />
-              </svg>
-            </Button>
-          </Box>
+          {!serverResizing && (
+            <Box justify>
+              <Button
+                disable={disableControls}
+                plain
+                label="Drehen"
+                onClick={this.handleLeftRotation}
+              >
+                <svg viewBox="0 0 24 24" width={24} height={24}>
+                  <path
+                    fill="none"
+                    stroke="#000"
+                    strokeWidth="2"
+                    d={ICONS.retry}
+                  />
+                </svg>
+              </Button>
+            </Box>
+          )}
         </Box>
       </Box>
     );
-
-    return (
-      <Layer onClose={onClose}>
-        <div className={s.article}>
-          <FormField label="File">
-            <input
-              ref={input => (this.input = input)} // eslint-disable-line
-              onChange={this.onChange}
-              accept="image/*"
-              type="file"
-            />
-          </FormField>
-          <FormField label="Image">{editor}</FormField>
-          <div className={s.footer}>
-            <Button
-              primary
-              label={<FormattedMessage {...messages.upload} />}
-              onClick={this.handleSave}
-              disabled={uploadPending || disableControls}
-            />
-          </div>
-          {uploadPending && 'Uploading...'}
-          {uploadError && (
-            <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
-              <FormattedMessage {...messages.error} />
-            </div>
-          )}
+    const uploader = (
+      <div className={s.article}>
+        <FormField label="Datei">
+          <input
+            ref={
+              input => (this.input = input) // eslint-disable-line
+            }
+            onChange={this.onChange}
+            accept="image/*"
+            type="file"
+          />
+        </FormField>
+        <FormField label="Foto">{editor}</FormField>
+        <div className={s.footer}>
+          <Button
+            primary
+            label="Hochladen"
+            onClick={this.handleSave}
+            disabled={uploadPending || disableControls}
+          />
         </div>
-      </Layer>
+        {uploadPending && 'Uploading...'}
+        {uploadError && (
+          <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
+            {uploadError.error}
+          </div>
+        )}
+      </div>
     );
+    return inLayer ? <Layer onClose={onClose}>uploader</Layer> : { uploader };
   }
 }
 

@@ -41,7 +41,6 @@
       overflow: auto;
       padding: 0 2rem;
       border-radius: 5px;
-      box-shadow: $layer-box-shadow;
     }
 
     @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
@@ -49,6 +48,12 @@
         max-width: 100vw;
       }
     }
+  }
+}
+
+.flush {
+  .container {
+    padding: 0;
   }
 }
 

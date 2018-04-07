@@ -46,7 +46,15 @@ query{
       surname
       thumbnail
     }
-
+    defaultGroup{
+      id
+      displayName
+    }
+    mainGroups{
+      id
+      displayName
+    }
+    email
   }
 }
 `;

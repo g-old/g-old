@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import { defineMessages, FormattedMessage } from 'react-intl';
-import { defineMessages, FormattedMessage } from 'react-intl';
 import { loadPlatform, updatePlatform } from '../../actions/platform';
 import { findUser } from '../../actions/user';
 
@@ -15,62 +14,19 @@ import {
 import Box from '../../components/Box';
 import FormField from '../../components/FormField';
 import CheckBox from '../../components/CheckBox';
+import Select from '../../components/Select';
 
 import Button from '../../components/Button';
 import Label from '../../components/Label';
 import SearchField from '../../components/SearchField';
 import Form from '../../components/Form';
 import history from '../../history';
+import FormValidation from '../../components/FormValidation';
 
-import {
-  nameValidation,
-  selectValidation,
-  createValidator,
-} from '../../core/validation';
+import { selectValidation, emailValidation } from '../../core/validation';
 import Notification from '../../components/Notification';
 
-const messages = defineMessages({
-  empty: {
-    id: 'form.error-empty',
-    defaultMessage: "You can't leave this empty",
-    description: 'Help for empty fields',
-  },
-  wrongSelect: {
-    id: 'form.error-select',
-    defaultMessage: 'You selection is not correct. Click on a suggestion',
-    description:
-      'Help for selection, when input does not match with a suggestion',
-  },
-});
-
 // import FetchError from '../../components/FetchError';
-
-const getChangedFields = (inputFields, state, props) =>
-  inputFields.reduce((agg, curr) => {
-    if (curr in state) {
-      if (curr in props) {
-        if (state[curr] !== props[curr]) {
-          agg[curr] = state[curr]; // eslint-disable-line
-        }
-      } else {
-        agg[curr] = state[curr]; // eslint-disable-line
-      }
-      // only in state
-    }
-    return agg;
-  }, {});
-
-const formFields = ['default_name'];
-// TODO Form HOC
-const genInitialState = (fields, values) =>
-  fields.reduce(
-    (acc, curr) => {
-      acc[curr] = values[curr] || '';
-      acc.errors[curr] = { touched: false };
-      return acc;
-    },
-    { errors: {} },
-  );
 
 const convertLocalesToNames = (locales, inputValues) => {
   const values = inputValues;
@@ -94,7 +50,6 @@ class PlatformEdit extends React.Component {
     user: PropTypes.shape({ id: PropTypes.string }).isRequired,
     findUser: PropTypes.func.isRequired,
     updatePlatform: PropTypes.func.isRequired,
-    createPlatform: PropTypes.func.isRequired,
     updates: PropTypes.shape({
       success: PropTypes.bool,
       error: PropTypes.bool,
@@ -106,47 +61,13 @@ class PlatformEdit extends React.Component {
   };
   constructor(props) {
     super(props);
-    this.handleValueChanges = this.handleValueChanges.bind(this);
-    this.visibleErrors = this.visibleErrors.bind(this);
-    this.handleValidation = this.handleValidation.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
+
+    this.handleFormSubmission = this.handleFormSubmission.bind(this);
     this.onCancel = this.onCancel.bind(this);
-    this.state = {
-      ...props.platform,
-      ...genInitialState(formFields, {
-        ...props.platform,
-        ...(props.platform.names && props.platform.names),
-      }),
-    };
-    /*  error: null,
-      pending: false,
-      success: false, */
-    const testValues = {
-      default_name: { fn: 'name' },
-      'de-DE': { fn: 'name' },
-      'it-IT': { fn: 'name' },
-      'lld-IT': { fn: 'name' },
-      admin: { fn: 'admin', valuesResolver: obj => obj.state.adminValue },
-      picture: { fn: 'noCheck' },
-      defaultGroup: {
-        fn: 'group',
-        valuesResolver: obj => obj.state.pictureValue,
-      },
-    };
-    this.Validator = createValidator(
-      testValues,
-      {
-        name: nameValidation,
-        admin: selectValidation,
-        group: selectValidation,
-        noCheck: () => {},
-      },
-      this,
-      obj => obj.state,
-    );
+    this.state = {};
   }
 
-  componentWillReceiveProps({ platform, updates = {} }) {
+  componentWillReceiveProps({ updates = {} }) {
     const newUpdates = {};
     if (updates.success && !this.props.updates.success) {
       this.onCancel();
@@ -155,10 +76,6 @@ class PlatformEdit extends React.Component {
       newUpdates.error = true;
     }
     this.setState({
-      ...genInitialState(formFields, {
-        ...platform,
-        ...(platform.names && platform.names),
-      }),
       ...newUpdates,
     });
   }
@@ -172,210 +89,258 @@ class PlatformEdit extends React.Component {
     history.push(`/admin`);
   }
 
-  onSubmit(e) {
-    // TODO checks
-    e.preventDefault();
-    const { platform, user } = this.props;
-    const { admin } = this.state;
+  handleFormSubmission(values) {
+    // check coordinator
+    /* eslint-disable no-param-reassign */
+    const { platform } = this.props;
 
-    // eslint-disable-next-line
-    if (
-      !(
-        user.rights.platform.includes('superuser') ||
-        user.rights.platform.includes('admin')
-      )
-    ) {
-      return;
-    }
-
-    if (this.handleValidation(formFields)) {
-      const inputFields = ['default_name'];
-      const inputValues = getChangedFields(inputFields, this.state, {
-        ...this.props.platform,
-        ...(this.props.platform.names && this.props.platform.names),
-      });
-      if (inputValues) {
-        if (platform.admin) {
-          // check admin
-          // eslint-disable-next-line
-          if (admin && admin.id != platform.admin.id) {
-            inputFields.adminId = admin.id;
-          }
-        } else if (admin && admin.id) {
-          inputValues.adminId = admin.id;
-        }
-        const inputs = convertLocalesToNames(
-          ['default_name', 'de-DE', 'it-IT', 'lld-IT'],
-          inputValues,
-        );
-        this.props.updatePlatform({ ...inputs });
+    const { admin } = values;
+    if (platform.admin) {
+      // eslint-disable-next-line
+      if (admin && admin.id != platform.admin.id) {
+        values.adminId = admin.id;
       }
+    } else if (admin && admin.id) {
+      values.adminId = admin.id;
+      delete values.admin;
     }
-  }
-
-  handleValidation(fields) {
-    const validated = this.Validator(fields);
-    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
-    return validated.failed === 0;
-  }
-
-  handleBlur(e) {
-    const field = e.target.name;
-    if (this.state[field]) {
-      this.handleValidation([field]);
+    if (values.admin) {
+      delete values.admin;
     }
-  }
-  visibleErrors(errorNames) {
-    return errorNames.reduce((acc, curr) => {
-      const err = `${curr}Error`;
-      if (this.state.errors[curr].touched) {
-        acc[err] = (
-          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
-        );
-      }
-      return acc;
-    }, {});
-  }
-  handleValueChanges(e) {
-    let value;
-    if (e.target.type === 'checkbox') {
-      value = !this.state[e.target.name];
-    } else {
-      value = e.target.value; // eslint-disable-line
+    if (values.defaultGroup) {
+      delete values.defaultGroup;
     }
 
-    this.setState({ [e.target.name]: value });
+    const inputs = convertLocalesToNames(
+      ['default_name', 'de-DE', 'it-IT', 'lld-IT'],
+      values,
+    );
+
+    /* eslint-enable no-param-reassign */
+
+    this.props.updatePlatform({ ...inputs });
   }
 
   render() {
     const { error } = this.state;
     const { platform, users = [], updates = {}, user } = this.props;
-    const errors = this.visibleErrors(formFields);
     return (
       <Box column padding="medium">
         <Box type="section" align column pad>
-          <Form onSubmit={this.onSubmit}>
-            <Label>Platform names</Label>
-            <fieldset>
-              <FormField label="Default name" error={errors.nameError}>
-                <input
-                  type="text"
-                  name="default_name"
-                  value={this.state.default_name}
-                  onChange={this.handleValueChanges}
-                />
-              </FormField>
-              <FormField label="Name german">
-                <input
-                  type="text"
-                  name="de-DE"
-                  value={this.state['de-DE']}
-                  onChange={this.handleValueChanges}
-                />
-              </FormField>
-              <FormField label="Name italian">
-                <input
-                  type="text"
-                  name="it-IT"
-                  value={this.state['it-IT']}
-                  onChange={this.handleValueChanges}
-                />
-              </FormField>
-              <FormField label="Name ladin">
-                <input
-                  type="text"
-                  name="lld-IT"
-                  value={this.state['lld-IT']}
-                  onChange={this.handleValueChanges}
-                />
-              </FormField>
-            </fieldset>
-            <Label>Gold mode</Label>
-            <fieldset>
-              <FormField error={errors.goldMode}>
-                <CheckBox
-                  toggle
-                  checked={this.state.goldMode}
-                  onChange={() => {
-                    alert('TO implement');
-                  }}
-                  label={this.state.goldMode ? 'ON' : 'OFF'}
-                />
-              </FormField>
-            </fieldset>
-            <Label>Contact information</Label>
-            <fieldset>
-              <FormField label="Email" error={errors.goldMode}>
-                <input
-                  type="text"
-                  name="email"
-                  value={this.state.email}
-                  onChange={this.handleValueChanges}
-                />
-              </FormField>
-            </fieldset>
-            <fieldset>
-              <FormField label="Address" error={errors.goldMode}>
-                <input
-                  type="text"
-                  name="address"
-                  value={this.state.address}
-                  onChange={this.handleValueChanges}
-                />
-              </FormField>
-              <FormField label="Town" error={errors.goldMode}>
-                <input
-                  type="text"
-                  name="town"
-                  value={this.state.town}
-                  onChange={this.handleValueChanges}
-                />
-              </FormField>
-              <FormField label="Postal Code" error={errors.goldMode}>
-                <input
-                  type="text"
-                  name="postalCode"
-                  value={this.state.postalCode}
-                  onChange={this.handleValueChanges}
-                />
-              </FormField>
-            </fieldset>
-            {user.rights.platform.includes('superuser') && (
-              <div>
-                <Label>Admin</Label>
+          <FormValidation
+            data={platform}
+            submit={this.handleFormSubmission}
+            validations={{
+              default_name: { args: { required: true, min: 3 } },
+              'de-DE': { args: { min: 3 } },
+              'it-IT': { args: { min: 3 } },
+              'lld-IT': { args: { min: 3 } },
+              goldMode: {},
+              admin: {
+                fn: selectValidation,
+                valuesResolver: obj => obj.state.adminValue,
+                args: { required: true },
+              },
+              email: { fn: emailValidation, args: { required: true } },
+              address: {},
+              town: {},
+              postalCode: {},
+            }}
+          >
+            {({
+              handleValueChanges,
+              values,
+              errorMessages,
+              onSubmit,
+              onBlur,
+            }) => (
+              <Form>
+                <Label>Platform names</Label>
                 <fieldset>
-                  <FormField overflow label="admin" error={errors.adminError}>
-                    <SearchField
-                      value={
-                        platform.admin
-                          ? `${platform.admin.name} ${platform.admin.surname}`
-                          : ''
+                  <FormField
+                    label="Default name"
+                    error={errorMessages.default_nameError}
+                  >
+                    <input
+                      type="text"
+                      name="default_name"
+                      value={values.default_name}
+                      onChange={handleValueChanges}
+                      onBlur={onBlur}
+                    />
+                  </FormField>
+                  <FormField
+                    label="Name german"
+                    error={errorMessages['de-DeError']}
+                  >
+                    <input
+                      type="text"
+                      name="de-DE"
+                      value={values['de-DE']}
+                      onChange={handleValueChanges}
+                      onBlur={onBlur}
+                    />
+                  </FormField>
+                  <FormField
+                    label="Name italian"
+                    error={errorMessages['it-ITError']}
+                  >
+                    <input
+                      type="text"
+                      name="it-IT"
+                      value={values['it-IT']}
+                      onChange={handleValueChanges}
+                      onBlur={onBlur}
+                    />
+                  </FormField>
+                  <FormField
+                    label="Name ladin"
+                    error={errorMessages['lld-ITError']}
+                  >
+                    <input
+                      type="text"
+                      name="lld-IT"
+                      value={values['lld-IT']}
+                      onChange={handleValueChanges}
+                      onBlur={onBlur}
+                    />
+                  </FormField>
+                </fieldset>
+                <Label>Settings</Label>
+                <fieldset>
+                  <FormField>
+                    <CheckBox
+                      label="Goldmode"
+                      name="goldMode"
+                      checked={values.goldMode}
+                      onChange={handleValueChanges}
+                      toggle
+                    />
+                  </FormField>
+                </fieldset>
+                <fieldset>
+                  <FormField
+                    label="Default group"
+                    error={errorMessages.defaultGroupError}
+                  >
+                    <Select
+                      inField
+                      options={
+                        platform.mainGroups
+                          ? platform.mainGroups.map(g => ({
+                              label: g.displayName,
+                              value: g.id,
+                            }))
+                          : []
                       }
-                      onChange={e =>
-                        this.handleValueChanges({
-                          target: { name: 'adminValue', value: e.value },
-                        })
-                      }
-                      data={users}
-                      fetch={this.props.findUser}
-                      displaySelected={data => {
-                        this.handleValueChanges({
-                          target: { name: 'admin', value: data },
+                      onSearch={false}
+                      value={values.defaultGroup}
+                      onChange={e => {
+                        handleValueChanges({
+                          target: { name: 'defaultGroup', value: e.value },
                         });
                       }}
                     />
                   </FormField>
                 </fieldset>
-              </div>
+                <Label>Contact information</Label>
+                <fieldset>
+                  <FormField label="Email" error={errorMessages.emailError}>
+                    <input
+                      type="text"
+                      name="email"
+                      value={values.email}
+                      onChange={handleValueChanges}
+                      onBlur={onBlur}
+                    />
+                  </FormField>
+                </fieldset>
+                <fieldset>
+                  <FormField label="Address" error={errorMessages.addressError}>
+                    <input
+                      type="text"
+                      name="address"
+                      value={values.address}
+                      onChange={handleValueChanges}
+                      onBlur={onBlur}
+                    />
+                  </FormField>
+                  <FormField label="Town" error={errorMessages.townError}>
+                    <input
+                      type="text"
+                      name="town"
+                      value={values.town}
+                      onChange={handleValueChanges}
+                      onBlur={onBlur}
+                    />
+                  </FormField>
+                  <FormField
+                    label="Postal Code"
+                    error={errorMessages.postalCodeError}
+                  >
+                    <input
+                      type="text"
+                      name="postalCode"
+                      value={values.postalCode}
+                      onChange={handleValueChanges}
+                      onBlur={onBlur}
+                    />
+                  </FormField>
+                </fieldset>
+                {user.rights.platform.includes('superuser') && (
+                  <div>
+                    <Label>Admin</Label>
+                    <fieldset>
+                      <FormField
+                        overflow
+                        label="admin"
+                        error={errorMessages.adminError}
+                      >
+                        <SearchField
+                          value={
+                            platform.admin
+                              ? `${platform.admin.name} ${
+                                  platform.admin.surname
+                                }`
+                              : ''
+                          }
+                          onChange={e =>
+                            this.handleValueChanges({
+                              target: {
+                                name: 'adminValue',
+                                value: e.value,
+                              },
+                            })
+                          }
+                          data={users}
+                          fetch={this.props.findUser}
+                          displaySelected={data => {
+                            this.handleValueChanges({
+                              target: { name: 'admin', value: data },
+                            });
+                          }}
+                        />
+                      </FormField>
+                    </fieldset>
+                  </div>
+                )}
+                <p>
+                  {error && (
+                    <Notification type="error" message={updates.error} />
+                  )}
+                </p>
+                <div>
+                  <Button
+                    onClick={onSubmit}
+                    disabled={updates.pending}
+                    primary
+                    label="Save"
+                  />{' '}
+                  <Button label="Cancel" onClick={this.onCancel} />
+                </div>
+              </Form>
             )}
-            <p>
-              {error && <Notification type="error" message={updates.error} />}
-            </p>
-            <div>
-              <Button disabled={updates.pending} primary label="Save" />{' '}
-              <Button label="Cancel" onClick={this.onCancel} />
-            </div>
-          </Form>
+          </FormValidation>
         </Box>
       </Box>
     );

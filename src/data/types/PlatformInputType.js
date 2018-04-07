@@ -2,6 +2,7 @@ import {
   GraphQLString as String,
   GraphQLInputObjectType,
   GraphQLID as ID,
+  GraphQLBoolean,
 } from 'graphql';
 
 const PlatformInputType = new GraphQLInputObjectType({
@@ -15,6 +16,12 @@ const PlatformInputType = new GraphQLInputObjectType({
     },
     adminId: {
       type: ID,
+    },
+    email: {
+      type: String,
+    },
+    goldMode: {
+      type: GraphQLBoolean,
     },
     about: {
       type: String,

@@ -20,6 +20,14 @@ export const Models = {
 
 /* GENERATOR_FN */
 /* eslint-disable no-unused-vars */
+function assetReadControl(viewer, data) {
+  console.error('Access control for Asset not implemented');
+  return true;
+}
+function assetWriteControl(viewer, data) {
+  console.error('Access control for Asset not implemented');
+  return true;
+}
 function platformReadControl(viewer, data) {
   console.error('Access control for Platform not implemented');
   return true;
@@ -313,6 +321,10 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
+  [Models.ASSET]: {
+    [ATypes.WRITE]: assetWriteControl,
+    [ATypes.READ]: assetReadControl,
+  },
   [Models.PLATFORM]: {
     [ATypes.WRITE]: platformWriteControl,
     [ATypes.READ]: platformReadControl,

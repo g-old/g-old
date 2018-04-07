@@ -467,7 +467,7 @@ class ProposalInput extends React.Component {
                 onChange={this.handleValueChanges}
               />
             </FormField>
-            <Label>Next Group</Label>
+            <Label>Pipeline</Label>
             <FormField>
               <Select
                 inField

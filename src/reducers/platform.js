@@ -26,6 +26,7 @@ const hydrateEntity = (data, entities) =>
   denormalize(data, platformSchema, {
     ...entities,
     users: entities.users.byId,
+    groups: entities.groups.byId,
   });
 
 export const getPlatform = state => {

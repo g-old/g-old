@@ -17,7 +17,7 @@ function setHeadersFromArray(res, headers) {
 }
 
 function setWriteHeaders(statusCode) {
-  const length = arguments.length;
+  const length = arguments.length; // eslint-disable-line
   const headerIndex = length > 1 && typeof arguments[1] === 'string' ? 2 : 1;
 
   const headers =
@@ -75,10 +75,11 @@ function timing() {
       const timePassed = diff[0] * 1e3 + diff[1] * 1e-6;
       let query;
       if (req.body && req.body.query) {
-        query =
+        const isMatch =
           typeof req.body.query === 'string'
-            ? req.body.query.match(/{\S*\s+(\S+)/)[1]
-            : '';
+            ? req.body.query.match(/{\S*\s+(\S+)/) // could be dangerous
+            : null;
+        query = isMatch && isMatch.length > 1 ? isMatch[1] : '';
       }
       log.info({
         time: new Date(),

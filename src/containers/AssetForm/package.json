@@ -1,0 +1,6 @@
+{
+  "name": "AssetForm",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./AssetForm.js"
+}

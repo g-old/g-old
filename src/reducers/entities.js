@@ -19,10 +19,12 @@ import comments, * as fromComments from './comments';
 import requests, * as fromRequests from './requests';
 import proposalStatus from './proposalStatus';
 
+import assets, * as fromAssets from './assets';
 /* GENERATOR */
 
 export default combineReducers({
   /* GENERATOR_COMBINED */
+  assets,
   requests,
   users,
   statements,
@@ -45,6 +47,14 @@ export default combineReducers({
 });
 
 /* GENERATOR_EXPORTS */
+export const getAsset = (state, id) =>
+  fromAssets.getEntity(state.assets, id, state);
+
+export const getVisibleAssets = (state, filter) =>
+  fromAssets.getVisible(state.assets, filter, state);
+
+export const getAssetsStatus = (state, filter) =>
+  fromAssets.getStatus(state.assets, filter);
 
 export const getRequest = (state, id) =>
   fromRequests.getEntity(state.requests, id, state);

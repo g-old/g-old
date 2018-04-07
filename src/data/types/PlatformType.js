@@ -2,7 +2,9 @@ import {
   GraphQLBoolean,
   GraphQLString as String,
   GraphQLObjectType as ObjectType,
+  GraphQLList,
 } from 'graphql';
+import knex from '../knex';
 import UserType from './UserType';
 import User from '../models/User';
 import GroupType from './GroupType';
@@ -42,6 +44,18 @@ const PlatformType = new ObjectType({
       type: GroupType,
       resolve(parent, args, { viewer, loaders }) {
         return Group.gen(viewer, parent.defaultGroupId, loaders);
+      },
+    },
+    mainGroups: {
+      type: new GraphQLList(GroupType),
+      resolve(parent, args, { viewer, loaders }) {
+        if (viewer) {
+          return knex('groups')
+            .whereNull('parent_group_id')
+            .pluck('id')
+            .then(ids => ids.map(id => Group.gen(viewer, id, loaders)));
+        }
+        return [];
       },
     },
   }),

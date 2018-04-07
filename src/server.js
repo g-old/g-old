@@ -348,12 +348,12 @@ app.post('/signup', (req, res) => {
 });
 const storage = multer.memoryStorage();
 const FileStore = FileStorage(AvatarManager({ local: !!__DEV__ }));
-app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
+app.post('/upload', multer({ storage }).single('files'), (req, res) => {
   if (!req.user) res.status(505);
   FileStore.save(
     {
       viewer: req.user,
-      data: { dataUrl: req.body.avatar, id: req.body.id },
+      data: { dataUrl: req.body.files, id: req.body.id },
       loaders: createLoaders(),
     },
     'avatars/',

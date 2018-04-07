@@ -102,6 +102,7 @@ export const log = new schema.Entity('logs', {
 export const platform = new schema.Entity('platform', {
   admin: user,
   defaultGroup: group,
+  mainGroups: [group],
 });
 export const proposalList = [proposal];
 export const voteList = [vote];
@@ -116,4 +117,6 @@ export const discussionList = [discussion];
 export const commentList = [comment];
 
 export const requestList = [request];
+export const asset = new schema.Entity('assets', {});
+export const assetList = [asset];
 /* GENERATOR */
