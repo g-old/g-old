@@ -1,11 +1,16 @@
-import { GraphQLString, GraphQLObjectType as ObjectType, GraphQLID, GraphQLNonNull } from 'graphql';
+import {
+  GraphQLString,
+  GraphQLObjectType as ObjectType,
+  GraphQLID,
+  GraphQLNonNull,
+} from 'graphql';
 import User from '../models/User';
 import UserType from './UserType';
 
 const VoteType = new ObjectType({
   name: 'VoteDL',
 
-  fields: {
+  fields: () => ({
     id: {
       type: new GraphQLNonNull(GraphQLID),
     },
@@ -17,11 +22,12 @@ const VoteType = new ObjectType({
     voter: {
       type: UserType,
       // resolve: (data) => data.user_id,
-      resolve: (parent, { id }, { viewer, loaders }) => User.gen(viewer, parent.userId, loaders),
+      resolve: (parent, args, { viewer, loaders }) =>
+        User.gen(viewer, parent.userId, loaders),
     },
     pollId: {
       type: GraphQLID,
     },
-  },
+  }),
 });
 export default VoteType;

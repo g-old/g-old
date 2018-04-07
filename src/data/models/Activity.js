@@ -41,6 +41,7 @@ class Activity {
         viewer,
         activity: newActivity,
         ...(data.workTeamId && { workTeamId: data.workTeamId }),
+        subjectId: data.subjectId,
       });
     }
     return newActivity;

@@ -74,6 +74,7 @@ query ($id:ID!) {
     numStatements
     numFollowers
     numLikes
+    unreadNotifications
     workTeams{
       ${workTeam}
     }

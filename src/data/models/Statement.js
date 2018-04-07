@@ -184,6 +184,7 @@ class Statement {
       EventManager.publish('onStatementCreated', {
         viewer,
         statement,
+        subjectId: proposal.id,
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },
