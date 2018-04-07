@@ -46,6 +46,7 @@ import Notification from '../../components/Notification';
 import Profile from '../../components/UserProfile';
 import s from './AccountContainer.css';
 import Responsive from '../../core/Responsive';
+import NotificationSettings from '../../components/NotificationSettings';
 
 const messages = defineMessages({
   settings: {
@@ -397,13 +398,16 @@ class AccountContainer extends React.Component {
                 </div>
               </AccordionPanel>
               <AccordionPanel
-                heading="Log / Notifications"
+                heading="Log"
                 column
                 onActive={() => {
                   this.props.loadLogs(true);
                 }}
               >
                 {displayLog}
+              </AccordionPanel>
+              <AccordionPanel heading="NotificationSettings">
+                <NotificationSettings />
               </AccordionPanel>
             </Accordion>
           </Box>

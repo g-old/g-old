@@ -1,0 +1,167 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import s from './NotificationMenu.css';
+import Box from '../Box';
+import { ICONS } from '../../constants';
+import Button from '../Button';
+import Drop from '../Drop';
+import List from '../List';
+import ListItem from '../ListItem';
+import Notification from '../UserNotification';
+import { getAllNotifications, getSessionUser } from '../../reducers';
+import Link from '../Link';
+import Label from '../Label';
+import { loadNotificationList } from '../../actions/notification';
+
+class NotificationMenu extends React.Component {
+  static propTypes = {
+    loadNotificationList: PropTypes.func.isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      unreadNotifications: PropTypes.number,
+    }),
+    notifications: PropTypes.arrayOf(PropTypes.shape({})),
+  };
+  static defaultProps = {
+    user: null,
+    notifications: null,
+  };
+  constructor(props) {
+    super(props);
+    this.onOpenMenu = this.onOpenMenu.bind(this);
+    this.onCloseMenu = this.onCloseMenu.bind(this);
+    // this.onClickNotification = this.onClickNotification.bind(this);
+    this.renderNotifications = this.renderNotifications.bind(this);
+
+    this.state = { dropActive: false };
+    this.toggleMenu = this.toggleMenu.bind(this);
+  }
+  componentDidMount() {
+    //
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { dropActive } = this.state;
+
+    if (!dropActive && prevState.dropActive) {
+      document.removeEventListener('click', this.onCloseMenu);
+
+      if (this.drop) {
+        this.drop.remove();
+        this.drop = undefined;
+      }
+    }
+
+    if (dropActive && !prevState.dropActive) {
+      document.addEventListener('click', this.onCloseMenu);
+      const container = this.componentRef.parentNode;
+      this.control = document.createElement('div');
+      // createPortal(this.renderNotifications(), container);
+      // container.insertBefore(this.control, sibling);
+      this.drop = new Drop(container, this.renderNotifications(), {
+        align: { top: 'bottom', left: 'left' },
+        context: this.context,
+        responsive: false,
+        className: s.drop,
+      });
+    } else if (dropActive && prevState.dropActive) {
+      this.drop.render(this.renderNotifications());
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.drop) {
+      this.drop.remove();
+    }
+  }
+
+  onOpenMenu() {
+    this.props.loadNotificationList({ first: 10, userId: this.props.user.id });
+    this.setState({ dropActive: true });
+  }
+
+  onCloseMenu() {
+    this.setState({ dropActive: false });
+  }
+
+  toggleMenu() {
+    // history.push('/notifications');
+
+    const { dropActive } = this.state;
+    if (dropActive) {
+      this.onCloseMenu();
+    } else {
+      this.onOpenMenu();
+    }
+  }
+  renderNotifications() {
+    return (
+      <Box column fill>
+        <Box between>
+          <Label>Notifications</Label>
+          <Button
+            onClick={() => alert('to implement')}
+            label="Mark all as read"
+            plain
+          />
+        </Box>
+        <List>
+          {this.props.notifications.map(n => (
+            <ListItem>
+              <Notification {...n} />
+            </ListItem>
+          ))}
+        </List>
+        {/* eslint-disable-next-line */}
+        <Link to="/notifications">See all Notifications</Link>
+      </Box>
+    );
+  }
+
+  render() {
+    if (!this.props.user) {
+      return null;
+    }
+
+    return (
+      // eslint-disable-next-line
+      <div ref={elm => (this.componentRef = elm)}>
+        <Button
+          plain
+          onClick={this.toggleMenu}
+          icon={
+            <svg
+              version="1.1"
+              viewBox="0 0 24 24"
+              width="24px"
+              height="24px"
+              role="img"
+              aria-label="menu"
+            >
+              <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.bell} />
+            </svg>
+          }
+          reverse
+          label={this.props.user.unreadNotifications}
+        />
+      </div>
+    );
+  }
+}
+NotificationMenu.contextTypes = {
+  intl: PropTypes.object,
+  insertCss: PropTypes.func,
+};
+const mapPropsToState = state => ({
+  notifications: getAllNotifications(state),
+  user: getSessionUser(state),
+});
+const mapDispatch = {
+  loadNotificationList,
+};
+
+export default connect(mapPropsToState, mapDispatch)(
+  withStyles(s)(NotificationMenu),
+);
