@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import withstyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import { connect } from 'react-redux';
@@ -7,18 +6,17 @@ import { loadFeed } from '../../actions/posts';
 import { getAllPosts, getPostsStatus } from '../../reducers';
 import s from './FeedContainer.css';
 import FetchError from '../../components/FetchError';
+import Post from '../../components/Post';
+import { type tPostType } from '../../data/types/PostType';
 
-class FeedContainer extends React.Component {
-  static propTypes = {
-    posts: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-      }),
-    ).isRequired,
-    status: PropTypes.shape,
-    loadFeed: PropTypes.func.isRequired,
-  };
+// @flow
+type Props = {
+  posts: [tPostType],
+  status: { error: string, pending: boolean },
+  loadFeed: () => void,
+};
 
+class FeedContainer extends React.Component<Props> {
   static defaultProps = {
     status: null,
   };
@@ -28,7 +26,8 @@ class FeedContainer extends React.Component {
   }
 
   render() {
-    const { posts, status: { error, pending } } = this.props;
+    const { posts, status: { error, pending } }: Props = this.props;
+
     if (pending && !posts.length) {
       return <p> Loading ... </p>;
     }
@@ -41,7 +40,10 @@ class FeedContainer extends React.Component {
 
     return (
       <div className={cn(s.container)}>
-        {posts.map(post => <p>{post.id} </p>)}
+        {posts.map(post => (
+          /* console.log('post.subject', post.subject); */
+          <Post subject={post.subject} group={post.group} />
+        ))}
       </div>
     );
   }
