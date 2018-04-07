@@ -54,6 +54,8 @@ class ProposalPreview extends React.Component {
       this.props.proposal,
     );
 
+    if (!poll) return <div>No poll data.</div>;
+
     const pollPreview = [
       <svg key="0" viewBox="0 0 24 24" width="16px" height="16px" role="img">
         <path fill="none" stroke="#666" strokeWidth="2" d={ICONS.up} />
