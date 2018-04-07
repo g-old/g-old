@@ -87,6 +87,7 @@ const ProposalType = new ObjectType({
       resolve: (parent, args, { viewer, loaders }) => {
         let pollId;
         switch (parent.state) {
+          case ProposalState.SURVEY:
           case ProposalState.PROPOSED:
             pollId = parent.pollOne_id;
             break;

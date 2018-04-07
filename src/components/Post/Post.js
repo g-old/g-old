@@ -45,7 +45,7 @@ function getProposalVerb(verb: string, proposal: tProposalType) {
   let identifier;
 
   if (proposal.state === 'update') {
-    state = proposal.state // eslint-disable-line
+    state = proposal.state; // eslint-disable-line
   }
   switch (state) {
     case 'create': {

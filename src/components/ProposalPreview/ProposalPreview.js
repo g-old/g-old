@@ -22,6 +22,7 @@ class ProposalPreview extends React.Component {
       publishedAt: PropTypes.string,
       pollOne: PropTypes.object,
       pollTwo: PropTypes.object,
+      activePoll: PropTypes.object,
       tags: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
     onClick: PropTypes.func.isRequired,
@@ -49,10 +50,12 @@ class ProposalPreview extends React.Component {
       return <div />;
     }
     // TODO move to state
-    const poll = getLastActivePoll(
-      this.props.proposal.state,
-      this.props.proposal,
-    );
+    let poll;
+    if (this.props.proposal.activePoll) {
+      poll = this.props.proposal.activePoll;
+    } else {
+      poll = getLastActivePoll(this.props.proposal.state, this.props.proposal);
+    }
 
     if (!poll) return <div>No poll data.</div>;
 
