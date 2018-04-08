@@ -40,6 +40,7 @@ export const proposal = new schema.Entity('proposals', {
   pollOne: poll,
   pollTwo: poll,
   tags: [tag],
+  activePoll: poll,
 });
 export const proposalStatus = new schema.Entity('proposalStatus', {
   proposal,
