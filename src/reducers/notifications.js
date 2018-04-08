@@ -42,6 +42,7 @@ const hydrateList = (state, data, entities) =>
       activities: entities.activities.byId,
       users: entities.users.byId,
       statements: entities.statements.byId,
+      proposals: entities.proposals.byId,
     },
   );
 

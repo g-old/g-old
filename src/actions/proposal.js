@@ -124,7 +124,7 @@ const query = `
   }
 `;
 
-export const pollFieldsForList = `{
+export const pollFieldsForList = `
   id
   upvotes
   downvotes
@@ -139,7 +139,7 @@ export const pollFieldsForList = `{
     unipolar
     thresholdRef
   }
-}
+
 `;
 
 const tagsQuery = `
@@ -174,8 +174,8 @@ query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID) {
           id
           count
         }
-        pollOne ${pollFieldsForList}
-        pollTwo ${pollFieldsForList}
+        pollOne {${pollFieldsForList}}
+        pollTwo {${pollFieldsForList}}
       }
 
       }

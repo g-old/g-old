@@ -17,7 +17,7 @@ import { uploadAvatar } from '../../actions/file';
 import { notifyUser } from '../../actions/messages';
 import ProfilePicture from '../ProfilePicture';
 import Box from '../Box';
-import NotificationInput from '../NotificationInput';
+import MessageInput from '../MessageInput';
 import Notification from '../Notification';
 import Label from '../Label';
 import s from './AccountDetails.css';
@@ -106,7 +106,7 @@ class AccountDetails extends React.Component {
     uploadAvatar: PropTypes.func.isRequired,
     updates: PropTypes.shape({
       dataUrl: PropTypes.string,
-      notification: PropTypes.shape({
+      message: PropTypes.shape({
         success: PropTypes.bool,
         pending: PropTypes.bool,
       }),
@@ -207,16 +207,16 @@ class AccountDetails extends React.Component {
       );
     }
 
-    let NotificationPanel = <div />;
+    let MessagePanel = <div />;
     // eslint-disable-next-line no-bitwise
-    if (canAccess(user, 'NotificationPanel')) {
-      NotificationPanel = (
+    if (canAccess(user, 'MessagePanel')) {
+      MessagePanel = (
         <AccordionPanel column pad heading="Notify user">
-          <NotificationInput
+          <MessageInput
             receiverId={id}
             notifyUser={this.props.notifyUser}
-            updates={this.props.updates && this.props.updates.notification}
-            types={['email', 'notification']}
+            updates={this.props.updates && this.props.updates.message}
+            types={['email', 'message']}
           />
         </AccordionPanel>
       );
@@ -283,7 +283,7 @@ class AccountDetails extends React.Component {
             <Accordion column>
               {GroupPanel}
               {RightsPanel}
-              {NotificationPanel}
+              {MessagePanel}
             </Accordion>
             <Button
               onClick={this.handleDelete}

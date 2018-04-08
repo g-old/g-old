@@ -16,6 +16,11 @@ const messages = defineMessages({
     defaultMessage: '{author} wrote a statement on {topic} ',
     description: 'Status message for notifications',
   },
+  proposalNew: {
+    id: 'notifications.proposal.new',
+    defaultMessage: 'New proposal published: {title}',
+    description: 'Status message for notifications',
+  },
 });
 
 class UserNotification extends React.Component {
@@ -46,7 +51,21 @@ class UserNotification extends React.Component {
           };
         }
         return 'To implement';
-
+      case 'proposal': {
+        const activePoll = activity.object.polTow || activity.object.pollOne;
+        if (activity.verb === 'create') {
+          return {
+            message: (
+              <FormattedMessage
+                {...messages.proposalNew}
+                values={{ title: activity.object.title }}
+              />
+            ),
+            path: `/proposal/${activity.object.id}/${activePoll.id}`,
+          };
+        }
+        return 'To implement';
+      }
       default:
         return <span>Not found</span>;
     }

@@ -20,12 +20,14 @@ import {
   notificationList as notificationListSchema,
 } from '../store/schema';
 import { genStatusIndicators } from '../core/helpers';
+import { pollFieldsForList } from './proposal';
 
 const userFields = `
 id
 name
 surname
 thumbnail`;
+
 const notificationFields = `
       id
       activity{
@@ -37,6 +39,16 @@ const notificationFields = `
             pollId
             position
             text
+          }
+          ...on ProposalDL{
+            id
+            title
+            pollOne{
+              ${pollFieldsForList}
+            }
+            pollTwo{
+              ${pollFieldsForList}
+            }
           }
         }
         info

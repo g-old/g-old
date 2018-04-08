@@ -47,8 +47,8 @@ const messages = defineMessages({
 class ProposalContainer extends React.Component {
   static propTypes = {
     proposal: PropTypes.shape({
-      pollOne: PropTypes.shape({}),
-      pollTwo: PropTypes.shape({}),
+      pollOne: PropTypes.shape({ mode: PropTypes.shape({}) }),
+      pollTwo: PropTypes.shape({ mode: PropTypes.shape({}) }),
       id: PropTypes.string,
       subscribed: PropTypes.bool,
       subscription: PropTypes.shape({}),
@@ -86,7 +86,8 @@ class ProposalContainer extends React.Component {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
     return (
       this.props.proposal &&
-      (this.props.proposal.pollOne || this.props.proposal.pollTwo)
+      ((this.props.proposal.pollOne && this.props.proposal.pollOne.mode) ||
+        (this.props.proposal.pollTwo && this.props.proposal.pollTwo.mode))
     );
   }
 

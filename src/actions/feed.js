@@ -8,6 +8,7 @@ import {
 
 import { activityArray as activitiesSchema } from '../store/schema';
 import { getFeedIsFetching, getSessionUser } from '../reducers';
+import { pollFieldsForList } from './proposal';
 
 const userFields = `
 id
@@ -68,36 +69,11 @@ id
       votes
       workTeamId
       pollOne {
-        id
-        upvotes
-        downvotes
-        threshold
-        start_time
-        endTime
-        allVoters
-        closedAt
-        mode{
-          id
-          withStatements
-          unipolar
-          thresholdRef
-        }
+        ${pollFieldsForList}
       }
       pollTwo {
-        id
-        upvotes
-        downvotes
-        threshold
-        start_time
-        endTime
-        allVoters
-        closedAt
-        mode{
-          id
-          withStatements
-          unipolar
-          thresholdRef
-        }
+        ${pollFieldsForList}
+
       }
     }
     ... on StatementDL {

@@ -221,7 +221,7 @@ const protectedViews = {
   Home: { type: 'permissions', name: 'LEVEL_1' },
   Feed: { type: 'permissions', name: 'LEVEL_1' },
   Admin: { type: 'groups', name: 'LEVEL_2' },
-  NotificationPanel: { type: 'permissions', name: 'NOTIFICATION' },
+  MessagePanel: { type: 'permissions', name: 'NOTIFICATION' },
   GroupsPanel: { type: 'privileges', name: 'GROUPS_MANAGER' },
   SSE: { type: 'permissions', name: 'LEVEL_1' },
   AccountList: { type: 'permissions', name: 'LEVEL_1' },

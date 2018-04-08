@@ -50,6 +50,11 @@ class Subscription {
           isValid = target && ['proposed', 'voting'].includes(target.state);
           break;
         }
+        case EventType.NEW_PROPOSAL: {
+          target = { id: 0 }; // means main "group" - TODO change later
+          isValid = true;
+          break;
+        }
 
         default:
           isValid = false;

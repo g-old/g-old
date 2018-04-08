@@ -33,6 +33,16 @@ const messages = defineMessages({
     defaultMessage: 'Enter atleast {value} chars or numbers',
     description: 'Min',
   },
+  invalidEmail: {
+    id: 'form.error-invalidEmail',
+    defaultMessage: 'Your email address seems to be invalid',
+    description: 'Help for email',
+  },
+  emailTaken: {
+    id: 'form.error-emailTaken',
+    defaultMessage: 'Email address already in use',
+    description: 'Help for not unique email',
+  },
 });
 
 const genInitialState = (fields, values) =>
@@ -96,15 +106,16 @@ class FormValidation extends React.Component {
     validations: PropTypes.arrayOf(
       PropTypes.shape({
         fn: PropTypes.func,
-        valuesResolver: PropTypes.function,
+        valuesResolver: PropTypes.func,
         args: PropTypes.shape({}),
       }),
     ).isRequired,
     data: PropTypes.shape({}),
     submit: PropTypes.func.isRequired,
     children: PropTypes.func.isRequired,
+    names: PropTypes.shape({}),
   };
-  static defaultProps = { data: null };
+  static defaultProps = { data: null, names: null };
 
   constructor(props) {
     super(props);
@@ -112,6 +123,7 @@ class FormValidation extends React.Component {
     this.state = {
       ...genInitialState(this.formFields, {
         ...(props.data && props.data),
+        ...(props.names && { ...props.names }),
       }),
     };
     const validationMappings = Object.keys(props.validations).reduce(
@@ -161,7 +173,16 @@ class FormValidation extends React.Component {
     this.handleBlur = this.handleBlur.bind(this);
   }
 
-  componentWillMount() {}
+  componentWillReceiveProps({ data }) {
+    if (data !== this.props.data) {
+      this.state = {
+        ...genInitialState(this.formFields, {
+          ...(data && data),
+          ...(data.names && { ...data.names }),
+        }),
+      };
+    }
+  }
 
   onSubmit(e) {
     if (e) {
@@ -174,8 +195,9 @@ class FormValidation extends React.Component {
         this.state,
         this.props,
       );
-
-      this.props.submit(newValues);
+      if (this.props.submit) {
+        this.props.submit(newValues);
+      }
     }
   }
 
@@ -215,7 +237,6 @@ class FormValidation extends React.Component {
     } else {
       value = e.target.value; //eslint-disable-line
     }
-
     this.setState({ [e.target.name]: value });
   }
 

@@ -42,7 +42,7 @@ class NotificationService {
           break;
         case 'proposal':
           type = EventType.NEW_PROPOSAL;
-          targetId = activity.groupId;
+          targetId = activity.groupId || 0;
           break;
 
         default:
@@ -51,7 +51,8 @@ class NotificationService {
       // or store compund key?
       activity.eventType = type; // eslint-disable-line
       activity.targetId = targetId; // eslint-disable-line
-      if (activity.targetId) {
+      // console.log('ACTIVITY', { activity });
+      if ('targetId' in activity) {
         this.activityQueue.push(activity);
       }
     }
@@ -117,13 +118,16 @@ class NotificationService {
 
   async batchProcessing() {
     // const startTime = process.hrtime();
-
+    // console.log('BATCH -activities', this.activityQueue);
     const activities = this.activityQueue.splice(0, this.activityQueue.length);
+    // console.log('ACTIVITIES', { activities });
     if (activities.length) {
       const groupedActivities = this.groupByTargetAndEventType(activities);
       const subscribers = await this.findSubscribers(groupedActivities);
+      // console.log('SUBSCRIBERS', { subscribers });
 
       const notificationData = this.combineData(subscribers, groupedActivities);
+      // console.log('NOTIFICATIONDATA', { notificationData });
 
       const { notifications, webpush, email } = this.getAndGroupNotifications(
         notificationData,

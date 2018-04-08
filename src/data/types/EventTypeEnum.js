@@ -2,7 +2,7 @@ import { GraphQLEnumType } from 'graphql';
 import { EventType } from '../models/Subscription';
 
 const EventTypeEnum = new GraphQLEnumType({
-  name: 'SubscriptionType',
+  name: 'EventTypeEnum',
   values: {
     NEW_PROPOSAL: {
       value: EventType.NEW_PROPOSAL,

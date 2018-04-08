@@ -7,7 +7,7 @@ import {
 import User from '../models/User';
 import UserType from './UserType';
 import ObjectType from './ObjectType';
-import Notification from '../models/Notification';
+import Message from '../models/Message';
 // import Proposal from '../models/Proposal';
 import Statement from '../models/Statement';
 import Vote from '../models/Vote';
@@ -66,8 +66,8 @@ const LogType = new GraphQLObjectType({
             });
           }
 
-          case 'notification': {
-            return Notification.gen(viewer, parent.objectId, loaders);
+          case 'message': {
+            return Message.gen(viewer, parent.objectId, loaders);
           }
 
           case 'comment': {

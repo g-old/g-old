@@ -107,6 +107,7 @@ const ProposalState = ({ state }) => {
       break;
     }
     default:
+      icon = <div>Ups!</div>;
   }
   return icon;
 };

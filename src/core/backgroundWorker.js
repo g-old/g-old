@@ -2,14 +2,14 @@ import knex from '../data/knex';
 import webPush from '../webPush';
 import log from '../logger';
 import Proposal from '../data/models/Proposal';
-import { circularFeedNotification } from './feed';
+import { circularFeedMessage } from './feed';
 import createLoaders from '../data/dataLoader';
 import root from '../compositionRoot';
 
-const handleNotifications = async (viewer, notificationData, receiver) =>
-  circularFeedNotification({
+const handleMessages = async (viewer, messageData, receiver) =>
+  circularFeedMessage({
     viewer,
-    data: notificationData,
+    data: messageData,
     verb: 'create',
     receiver,
     loaders: createLoaders(),
@@ -23,9 +23,9 @@ const push = async (subscriptionData, msg) => {
       keys: { auth: s.auth, p256dh: s.p256dh },
     }));
 
-    const notifications = subscriptions.map(sub =>
+    const messages = subscriptions.map(sub =>
       webPush
-        .sendNotification(
+        .sendMessage(
           sub,
           JSON.stringify({
             body: msg.body,
@@ -52,9 +52,9 @@ const push = async (subscriptionData, msg) => {
         }),
     );
 
-    result = await Promise.all(notifications);
+    result = await Promise.all(messages);
   } catch (e) {
-    log.error({ err: e }, 'Notification failed');
+    log.error({ err: e }, 'Message failed');
   }
   return result;
 };
@@ -129,7 +129,7 @@ const notifyProposalCreation = async proposal => {
   });
 };
 
-async function handleMessages(data) {
+async function processMessages(data) {
   log.info({ data }, 'Job received');
   let result = null;
   try {
@@ -157,8 +157,8 @@ async function handleMessages(data) {
         break;
       }
 
-      case 'notification': {
-        result = handleNotifications(
+      case 'message': {
+        result = handleMessages(
           data.data.viewer,
           data.data,
           data.data.receiver,
@@ -180,7 +180,7 @@ async function handleMessages(data) {
   }
   return result;
 }
-process.on('message', handleMessages);
+process.on('message', processMessages);
 function onClosing(code, signal) {
   log.warn({ signal }, 'Worker closing');
   this.kill();

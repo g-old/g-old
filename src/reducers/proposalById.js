@@ -10,6 +10,7 @@ import {
   SSE_UPDATE_SUCCESS,
   LOAD_WORKTEAM_SUCCESS,
   JOIN_WORKTEAM_SUCCESS,
+  LOAD_NOTIFICATIONS_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -23,6 +24,7 @@ export default function byId(state = {}, action) {
     case LOAD_FEED_SUCCESS: {
       return merge({}, state, action.payload.entities.proposals);
     }
+    case LOAD_NOTIFICATIONS_SUCCESS:
     case JOIN_WORKTEAM_SUCCESS:
     case LOAD_WORKTEAM_SUCCESS: {
       return merge({}, state, action.payload.entities.proposals);
@@ -36,6 +38,7 @@ export default function byId(state = {}, action) {
     }
 
     case SSE_UPDATE_SUCCESS: {
+      // eslint-disable-next-line
       const proposals = action.payload.entities.proposals;
       if (!proposals) return state;
       return merge({}, state, action.payload.entities.proposals);

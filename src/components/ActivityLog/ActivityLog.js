@@ -163,7 +163,7 @@ class ActivityLog extends React.Component {
         );
         break;
       }
-      case 'Notification': {
+      case 'Message': {
         activity = (
           <div>
             <h3>{content.title}</h3>

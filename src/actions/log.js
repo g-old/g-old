@@ -115,7 +115,7 @@ query($userId:ID){
     ... on Comment {
       ${commentFields}
     }
-    ... on Notification {
+    ... on Message {
       id
       sender {
         name

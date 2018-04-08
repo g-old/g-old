@@ -1,0 +1,6 @@
+{
+  "name": "MessageInput",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./MessageInput.js"
+}
