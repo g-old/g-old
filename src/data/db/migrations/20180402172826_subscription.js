@@ -10,15 +10,16 @@ exports.up = function(knex, Promise) {
             .references('users.id')
             .onDelete('CASCADE');
           table
-            .enu('event_type', [
-              'new_proposal',
-              'new_discussion',
-              'new_statement',
-              'new_comment',
+            .enu('target_type', [
+              'group',
+              'user',
+              'proposal',
+              'survey',
+              'discussion',
             ])
             .notNullable();
           table.integer('target_id').notNullable();
-          table.enu('subscription_type', ['no', 'followees', 'all']);
+          table.enu('subscription_type', ['no', 'followees', 'all', 'updates']);
           table.timestamps();
         });
       }

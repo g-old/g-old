@@ -5,10 +5,12 @@ import { connect } from 'react-redux';
 import FormValidation from '../FormValidation';
 import Form from '../Form';
 import FormField from '../FormField';
-// import Label from '../Label';
+import Label from '../Label';
 import CheckBox from '../CheckBox';
 import Notification from '../Notification';
 import Button from '../Button';
+import Box from '../Box';
+import Select from '../Select';
 
 import { createSubscription } from '../../actions/subscription';
 
@@ -42,36 +44,109 @@ class NotificationSettings extends React.Component {
           {({ values, handleValueChanges, onSubmit }) => (
             <Form>
               <legend>Notifications</legend>
-              <FormField label="Notifications">
-                <CheckBox
-                  name="proposals"
-                  toggle
-                  checked={values.proposals}
-                  onChange={handleValueChanges}
-                  label=" Proposals ON"
-                />
-                <CheckBox toggle label=" Discussions ON" />
-                <CheckBox toggle label=" Surveys ON" />
-                <CheckBox toggle label=" Messages ON" />
-              </FormField>
+              <Label>Proposals and Surveys</Label>
               <fieldset>
-                <FormField label="Notify me on new proposals">
-                  <CheckBox label="InBox" />
+                <FormField label="New Proposals">
                   <CheckBox label="E-Mail" />
                   <CheckBox label="Push" />
                 </FormField>
-                <FormField label="Notify me on new messages">
-                  <CheckBox label="InBox" />
+                <FormField label="New Surveys">
                   <CheckBox label="E-Mail" />
                   <CheckBox label="Push" />
                 </FormField>
-                <FormField label="Notify me on new discussions">
-                  <CheckBox label="InBox" />
+              </fieldset>
+              <Label>on watched proposals/surveys</Label>
+              <fieldset>
+                <FormField label="State updates">
+                  <CheckBox label="E-Mail" />
+                  <CheckBox label="Push" />
+                  <Select
+                    inField
+                    options={[
+                      { label: 'All', value: 'ALL' },
+                      { label: 'Followees', value: 'FOLLOWEES' },
+                    ]}
+                    onSearch={false}
+                    value={
+                      values.proposalSubscriptionSettings || {
+                        label: 'All',
+                        value: 'ALL',
+                      }
+                    }
+                    onChange={e => {
+                      handleValueChanges({
+                        target: {
+                          name: 'proposalSubscriptionSettings',
+                          value: e.value,
+                        },
+                      });
+                    }}
+                  />
+                </FormField>
+                <FormField label="Statements">
+                  <CheckBox label="E-Mail" />
+                  <CheckBox label="Push" />
+                  <Select
+                    inField
+                    options={[
+                      { label: 'All', value: 'ALL' },
+                      { label: 'Followees', value: 'FOLLOWEES' },
+                    ]}
+                    onSearch={false}
+                    value={
+                      values.statementSubscriptionSettings || {
+                        label: 'Followees',
+                        value: 'FOLLOWEES',
+                      }
+                    }
+                    onChange={e => {
+                      handleValueChanges({
+                        target: {
+                          name: 'statementSubscriptionSettings',
+                          value: e.value,
+                        },
+                      });
+                    }}
+                  />
+                </FormField>
+                <FormField label="Votes">
                   <CheckBox label="E-Mail" />
                   <CheckBox label="Push" />
                 </FormField>
-                <FormField label="Notify me on new surveys">
-                  <CheckBox label="InBox" />
+              </fieldset>
+              <Label>Discussions</Label>
+
+              <fieldset>
+                <FormField label="New Discussions">
+                  <Box pad>
+                    <CheckBox label="E-Mail" />
+                    <CheckBox label="Push" />
+                  </Box>
+                </FormField>
+              </fieldset>
+              <Label>on watched discussions</Label>
+              <fieldset>
+                <FormField label="Comments">
+                  <CheckBox label="E-Mail" />
+                  <CheckBox label="Push" />
+                </FormField>
+                <FormField label="Replies">
+                  <CheckBox label="E-Mail" />
+                  <CheckBox label="Push" />
+                </FormField>
+              </fieldset>
+              <Label>Messages</Label>
+
+              <fieldset>
+                <FormField label="Messages">
+                  <CheckBox label="E-Mail" />
+                  <CheckBox label="Push" />
+                </FormField>
+              </fieldset>
+              <Label>Group Events</Label>
+
+              <fieldset>
+                <FormField label="Group Events">
                   <CheckBox label="E-Mail" />
                   <CheckBox label="Push" />
                 </FormField>

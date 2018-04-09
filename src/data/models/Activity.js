@@ -2,6 +2,18 @@ import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
 
+export const ActivityType = {
+  PROPOSAL: 'proposal',
+  STATEMENT: 'proposal',
+  LIKE: 'like',
+  VOTE: 'vote',
+  POLL: 'poll',
+  MESSAGE: 'message',
+  DISCUSSION: 'discussion',
+  COMMENT: 'comment',
+  REQUEST: 'request',
+  SURVEY: 'survey',
+};
 class Activity {
   constructor(data) {
     this.id = data.id;

@@ -100,7 +100,7 @@ const aggregateActivities = (activities, viewer) =>
           agg.updatedProposals[curr.objectId] = curr.objectId;
         }
       }
-      if (curr.type === 'notification') {
+      if (curr.type === 'message') {
         // dont't include other notifications!
         return agg;
       }

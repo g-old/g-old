@@ -1,7 +1,8 @@
 import { throwIfMissing } from './utils';
 import log from '../logger';
 
-import { EventType, SubscriptionType } from '../data/models/Subscription';
+import { SubscriptionType, TargetType } from '../data/models/Subscription';
+import { ActivityType } from '../data/models/Activity';
 // TODO write Dataloaders for batching
 let timer;
 class NotificationService {
@@ -32,35 +33,45 @@ class NotificationService {
     this.EventManager.subscribe('onActivityCreated', this.filterActivity);
   }
   filterActivity({ activity, subjectId }) {
-    if (['statement', 'proposal'].includes(activity.type)) {
-      let type;
-      let targetId;
-      switch (activity.type) {
-        case 'statement':
-          type = EventType.NEW_STATEMENT;
-          targetId = activity.subjectId || subjectId;
-          break;
-        case 'proposal':
-          type = EventType.NEW_PROPOSAL;
-          targetId = activity.groupId || 0;
-          break;
+    let type;
+    let targetId;
+    switch (activity.type) {
+      case ActivityType.STATEMENT:
+        type = TargetType.PROPOSAL;
+        targetId = activity.subjectId || subjectId;
+        break;
 
-        default:
-          throw new Error(`Activity type not found: ${activity.type}`);
-      }
-      // or store compund key?
-      activity.eventType = type; // eslint-disable-line
-      activity.targetId = targetId; // eslint-disable-line
-      // console.log('ACTIVITY', { activity });
-      if ('targetId' in activity) {
-        this.activityQueue.push(activity);
-      }
+      case ActivityType.DISCUSSION:
+      case ActivityType.SURVEY: // not used yet
+      case ActivityType.PROPOSAL:
+        type = TargetType.GROUP;
+        targetId = activity.groupId || 0;
+        break;
+
+      case ActivityType.COMMENT:
+        type = TargetType.DISCUSSION;
+        targetId = activity.subjectId || subjectId;
+        break;
+
+      case ActivityType.MESSAGE:
+        type = TargetType.USER;
+        targetId = activity.subjectId || subjectId;
+        break;
+      default:
+        return;
+    }
+    // or store compund key?
+    activity.targetType = type; // eslint-disable-line
+    activity.targetId = targetId; // eslint-disable-line
+    // console.log('ACTIVITY', { activity });
+    if ('targetId' in activity) {
+      this.activityQueue.push(activity);
     }
   }
   groupByTargetAndEventType(activities) {
     return activities.reduce((agg, activity) => {
       const compoundKey =
-        activity.eventType + this.delimiter + activity.targetId;
+        activity.targetType + this.delimiter + activity.targetId;
       if (agg[compoundKey]) {
         agg[compoundKey].push(activity);
       } else {
@@ -97,7 +108,7 @@ class NotificationService {
     }
   }
 
-  loadSubscriptions(selector) {
+  loadSubscriptions2(selector) {
     // TODO Write with where in ... and where in ...
 
     return this.dbConnector('subscriptions')
@@ -114,6 +125,53 @@ class NotificationService {
         'subscriptions.event_type as eventType',
         'subscriptions.target_id as targetId',
       );
+  }
+
+  loadSubscriptions(selector) {
+    // TODO Write with where in ... and where in ...
+    switch (selector[0]) {
+      case TargetType.GROUP:
+        return this.dbConnector('user_groups')
+          .where({ group_id: selector[1] })
+          .innerJoin(
+            'notification_settings',
+            'notification_settings.user_id',
+            'user_groups.user_id',
+          )
+          .select(
+            'notification_settings.user_id as userId',
+            'notification_settings.settings as settings',
+          );
+      case TargetType.USER: // messages
+        return this.dbConnector('notification_settings')
+          .where({ user_id: selector[1] })
+          .select(
+            'notification_settings.user_id as userId',
+            'notification_settings.settings as settings',
+          );
+      case TargetType.PROPOSAL:
+      case TargetType.DISCUSSION: {
+        return this.dbConnector('subscriptions')
+          .where({
+            target_type: selector[0],
+            target_id: selector[1],
+          })
+          .innerJoin(
+            'notification_settings',
+            'notification_settings.user_id',
+            'subscriptions.user_id',
+          )
+          .select(
+            'notification_settings.user_id as userId',
+            'notification_settings.settings as settings',
+            'subscriptions.subscription_type as subscriptionType',
+            'subscriptions.target_type as targetType',
+            'subscriptions.target_id as targetId',
+          );
+      }
+      default:
+        throw new Error(`TargetType not recognized: ${selector[0]}`);
+    }
   }
 
   async batchProcessing() {
@@ -152,7 +210,7 @@ class NotificationService {
     );
   }
 
-  mergeNotifyableActivitiesWithSubscribers(subscriber, groupedActivities) {
+  mergeNotifyableActivitiesWithSubscribers2(subscriber, groupedActivities) {
     const compoundKey =
       subscriber.eventType + this.delimiter + subscriber.targetId;
     switch (subscriber.subscriptionType) {
@@ -180,6 +238,77 @@ class NotificationService {
         return {};
     }
   }
+  async mergeNotifyableActivitiesWithSubscribers(
+    subscriber,
+    groupedActivities,
+  ) {
+    const compoundKey =
+      subscriber.targetType + this.delimiter + subscriber.targetId;
+    if (
+      !subscriber.subscriptionType ||
+      subscriber.subscriptionType === SubscriptionType.ALL
+    ) {
+      return { subscriber, activities: groupedActivities[compoundKey] };
+    }
+
+    switch (subscriber.subscriptionType) {
+      case SubscriptionType.FOLLOWEES: {
+        const activities = groupedActivities[compoundKey];
+        if (activities.length) {
+          // filter proposals and discussions aut
+          const followeeActivities = activities.filter(
+            activity =>
+              activity.type !== ActivityType.PROPOSAL &&
+              activity.type !== ActivityType.DISCUSSION,
+          );
+          const followerActivities = this.checkIfFollwing(
+            subscriber,
+            followeeActivities,
+          );
+          return { subscriber, acivities: followerActivities };
+        }
+        return {};
+      }
+      case SubscriptionType.REPLIES: {
+        const activities = groupedActivities[compoundKey];
+        if (activities.length) {
+          // for each one which has a parent id get parent comments author...
+          const relevantIds = activities.map(a => a.objectId);
+          // TODO  with Dataloader
+          const replyIds = await this.dbConnector('comments')
+            .whereNotNull('parent_id')
+            .whereIn('id', [relevantIds])
+            .where({ author_id: subscriber.id })
+            .pluck('id');
+          return {
+            subscriber,
+            activities: replyIds.map(
+              rId => activities.find(a => a.objectId == rId), // eslint-disable-line
+            ),
+          };
+        }
+        return {};
+      }
+      case SubscriptionType.UPDATES: {
+        const activities = groupedActivities[compoundKey];
+        return {
+          subscriber,
+          activties: activities.filter(
+            a =>
+              a.verb === 'update' &&
+              [
+                ActivityType.PROPOSAL,
+                ActivityType.DISCUSSION,
+                ActivityType.SURVEY,
+              ].includes(a.type),
+          ),
+        };
+      }
+
+      default:
+        return {};
+    }
+  }
 
   notifyPushServices({ webpush, email }) {
     this.EventManager.publish('readyForPush', webpush);
@@ -195,6 +324,7 @@ class NotificationService {
       followeeSet.has(Number(activity.authorId)),
     );
   }
+
   // eslint-disable-next-line class-methods-use-this
   getAndGroupNotifications(notificationData) {
     const now = new Date();
@@ -207,11 +337,18 @@ class NotificationService {
               activity_id: a.id,
               created_at: now,
             });
-            if (data.subscriber.settings.email) {
+            if (data.subscriber.settings[data.subscriber.eventType]) {
               // TODO normalize activities with Map aId: a, aId: [userIds]
-              acc.email.push({ userId: data.subscriber.userId, activity: a });
-            } else if (data.subscriber.settings.webpush) {
-              acc.webpush.push({ userId: data.subscriber.userId, activity: a });
+              if (data.subscriber.settings[data.subscriber.eventType].email) {
+                acc.email.push({ userId: data.subscriber.userId, activity: a });
+              } else if (
+                data.subscriber.settings[data.subscriber.eventType].webpush
+              ) {
+                acc.webpush.push({
+                  userId: data.subscriber.userId,
+                  activity: a,
+                });
+              }
             }
           });
         }

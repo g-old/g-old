@@ -101,7 +101,7 @@ const ProposalType = new ObjectType({
           .where({
             target_id: parent.id,
             user_id: viewer.id,
-            event_type: 'new_statement',
+            target_type: 'proposal',
           })
           .pluck('id')
           .then(([id]) => Subscription.gen(viewer, id, loaders)),

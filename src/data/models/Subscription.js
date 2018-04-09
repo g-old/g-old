@@ -12,6 +12,14 @@ export const SubscriptionType = {
   NO: 'no',
   ALL: 'all',
   FOLLOWEES: 'followees',
+  REPLIES: 'replies',
+  UPDATES: 'updates',
+};
+export const TargetType = {
+  PROPOSAL: 'proposal',
+  DISCUSSION: 'discussion',
+  GROUP: 'group',
+  USER: 'user',
 };
 
 class Subscription {
@@ -20,7 +28,7 @@ class Subscription {
     this.targetId = data.targetId;
     this.userId = data.userId;
     this.subscriptionType = data.subscription_type;
-    this.eventType = data.event_type;
+    this.targetType = data.target_type;
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
   }
@@ -41,16 +49,16 @@ class Subscription {
       created_at: new Date(),
       user_id: viewer.id,
     };
-    if (data.eventType) {
+    if (data.targetType) {
       let isValid;
       let target;
       switch (data.eventType) {
-        case EventType.NEW_STATEMENT: {
+        case TargetType.PROPOSAL: {
           target = await Proposal.gen(viewer, data.targetId, loaders);
           isValid = target && ['proposed', 'voting'].includes(target.state);
           break;
         }
-        case EventType.NEW_PROPOSAL: {
+        case TargetType.GROUP: {
           target = { id: 0 }; // means main "group" - TODO change later
           isValid = true;
           break;
@@ -60,7 +68,7 @@ class Subscription {
           isValid = false;
       }
       if (isValid) {
-        newData.event_type = data.eventType;
+        newData.target_type = data.targetType;
         newData.target_id = target.id;
       }
     }

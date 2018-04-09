@@ -3,7 +3,7 @@ import {
   GraphQLInputObjectType,
   GraphQLID as ID,
 } from 'graphql';
-import EventTypeEnum from './EventTypeEnum';
+import TargetTypeEnum from './TargetTypeEnum';
 import SubscriptionTypeEnum from './SubscriptionTypeEnum';
 
 const SubscriptionInputType = new GraphQLInputObjectType({
@@ -12,8 +12,8 @@ const SubscriptionInputType = new GraphQLInputObjectType({
     id: {
       type: ID,
     },
-    eventType: {
-      type: EventTypeEnum,
+    targetType: {
+      type: TargetTypeEnum,
     },
     subscriptionType: {
       type: SubscriptionTypeEnum,

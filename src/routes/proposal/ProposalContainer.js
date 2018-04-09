@@ -31,6 +31,7 @@ import Button from '../../components/Button';
 import Poll from '../../components/Poll';
 import Filter from '../../components/Filter';
 import CheckBox from '../../components/CheckBox';
+import SubscriptionButton from '../../components/SubscriptionButton';
 
 const messages = defineMessages({
   voting: {
@@ -125,13 +126,14 @@ class ProposalContainer extends React.Component {
         throw Error('Unknown method');
     }
   }
-  handleSubscription() {
+  handleSubscription({ targetType, subscriptionType }) {
     const { id, subscription } = this.props.proposal;
     if (subscription) {
       this.props.deleteProposalSub(id);
     } else {
       this.props.createSubscription({
-        eventType: 'NEW_STATEMENT',
+        targetType,
+        subscriptionType,
         targetId: id,
       });
     }
@@ -223,6 +225,10 @@ class ProposalContainer extends React.Component {
               disabled={isFetching}
             />
             <Proposal {...proposal} />
+            <SubscriptionButton
+              onSubscribe={this.handleSubscription}
+              susbcription={proposal.subscription}
+            />
             <Poll
               {...poll}
               canVote={proposal.canVote}
