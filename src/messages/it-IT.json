@@ -491,7 +491,7 @@
     "id": "help.firstSteps",
     "description": "Title of help section",
     "defaultMessage": "What to do next",
-    "message": "",
+    "message": "Come proseguire?",
     "files": ["src/components/Help/Help.js"]
   },
   {
