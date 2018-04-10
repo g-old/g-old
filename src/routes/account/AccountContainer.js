@@ -407,7 +407,10 @@ class AccountContainer extends React.Component {
                 {displayLog}
               </AccordionPanel>
               <AccordionPanel heading="NotificationSettings">
-                <NotificationSettings />
+                <NotificationSettings
+                  user={this.props.user}
+                  update={this.props.updateUser}
+                />
               </AccordionPanel>
             </Accordion>
           </Box>

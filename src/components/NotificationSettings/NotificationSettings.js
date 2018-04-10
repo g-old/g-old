@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import Box from '../Box';
 import { connect } from 'react-redux';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import FormValidation from '../FormValidation';
 import Form from '../Form';
 import FormField from '../FormField';
@@ -10,13 +10,103 @@ import CheckBox from '../CheckBox';
 import Notification from '../Notification';
 import Button from '../Button';
 import Box from '../Box';
-import Select from '../Select';
 
 import { createSubscription } from '../../actions/subscription';
 
+const messages = defineMessages({
+  email: {
+    id: 'notificationType.email',
+    description: 'Label email',
+    defaultMessage: 'Email',
+  },
+  push: {
+    id: 'webpush',
+    defaultMessage: 'Push',
+    description: 'Push label',
+  },
+});
+
+const FIELDS = [
+  'proposal',
+  'survey',
+  'comment',
+  'discussion',
+  'update',
+  'reply',
+  'message',
+];
+
+const mergeSettings = values => {
+  const result = {};
+  const setKey = (key, type, name) => {
+    const value = values[name];
+    if (!(key in result)) {
+      result[key] = { [type]: value };
+    } else {
+      result[key] = { ...result[key], [type]: value };
+    }
+  };
+  Object.keys(values).forEach(settingName => {
+    let key;
+    // better with regex settingName.match(/Email|Push/)
+    const match = settingName.match(/email|webpush/);
+    if (match) {
+      key = settingName.slice(0, match.index);
+      setKey(key, match[0], settingName);
+    }
+  });
+  return result;
+};
+
+const flattenSettings = settings =>
+  Object.keys(settings).reduce((acc, settingName) => {
+    Object.keys(settings[settingName]).forEach(type => {
+      if (type in settings[settingName]) {
+        acc[settingName + type] = settings[settingName][type];
+      }
+    });
+    return acc;
+  }, {});
+
+const generateValidations = fields => {
+  let cache;
+  return () => {
+    if (cache) {
+      return cache;
+    }
+    const validations = fields.reduce((acc, fieldName) => {
+      ['email', 'webpush'].forEach(type => {
+        acc[fieldName + type] = {};
+      });
+      return acc;
+    }, {});
+    cache = validations;
+    return validations;
+  };
+};
+
+const renderCheckBox = (fullName, type, values, changeFn) => (
+  <CheckBox
+    checked={values[fullName]}
+    label={<FormattedMessage {...messages[type]} />}
+    name={fullName}
+    onChange={changeFn}
+    s
+  />
+);
+const renderCheckBoxPair = (resource, values, changeFn) => (
+  <Box pad>
+    {renderCheckBox(`${resource}email`, 'email', values, changeFn)}
+    {renderCheckBox(`${resource}webpush`, 'push', values, changeFn)}
+  </Box>
+);
+
 class NotificationSettings extends React.Component {
   static propTypes = {
-    createSubscription: PropTypes.func.isRequired,
+    update: PropTypes.func.isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    }).isRequired,
     updates: PropTypes.shape({}).isRequired,
   };
   static defaultProps = {};
@@ -24,21 +114,29 @@ class NotificationSettings extends React.Component {
     super(props);
     this.handleSubmission = this.handleSubmission.bind(this);
     this.state = {};
+
+    this.validations = generateValidations(FIELDS);
   }
+
   handleSubmission(values) {
-    const inputs = {};
-    if (values.proposals) {
-      inputs.eventType = 'NEW_PROPOSAL';
+    const inputs = mergeSettings(values);
+    if (inputs) {
+      this.props.update({
+        id: this.props.user.id,
+        notificationSettings: JSON.stringify(inputs),
+      });
     }
-    this.props.createSubscription(inputs);
   }
+
   render() {
     const { error } = this.state;
-    const { updates = {} } = this.props;
+    const { updates = {}, user: { notificationSettings } } = this.props;
+    const validations = this.validations();
     return (
-      <div>
+      <Box column align>
         <FormValidation
-          validations={{ proposals: {} }}
+          data={flattenSettings(notificationSettings || {})}
+          validations={validations}
           submit={this.handleSubmission}
         >
           {({ values, handleValueChanges, onSubmit }) => (
@@ -47,110 +145,45 @@ class NotificationSettings extends React.Component {
               <Label>Proposals and Surveys</Label>
               <fieldset>
                 <FormField label="New Proposals">
-                  <CheckBox label="E-Mail" />
-                  <CheckBox label="Push" />
+                  {renderCheckBoxPair('proposal', values, handleValueChanges)}
                 </FormField>
                 <FormField label="New Surveys">
-                  <CheckBox label="E-Mail" />
-                  <CheckBox label="Push" />
+                  {renderCheckBoxPair('survey', values, handleValueChanges)}
                 </FormField>
               </fieldset>
               <Label>on watched proposals/surveys</Label>
               <fieldset>
                 <FormField label="State updates">
-                  <CheckBox label="E-Mail" />
-                  <CheckBox label="Push" />
-                  <Select
-                    inField
-                    options={[
-                      { label: 'All', value: 'ALL' },
-                      { label: 'Followees', value: 'FOLLOWEES' },
-                    ]}
-                    onSearch={false}
-                    value={
-                      values.proposalSubscriptionSettings || {
-                        label: 'All',
-                        value: 'ALL',
-                      }
-                    }
-                    onChange={e => {
-                      handleValueChanges({
-                        target: {
-                          name: 'proposalSubscriptionSettings',
-                          value: e.value,
-                        },
-                      });
-                    }}
-                  />
+                  {renderCheckBoxPair('update', values, handleValueChanges)}
                 </FormField>
                 <FormField label="Statements">
-                  <CheckBox label="E-Mail" />
-                  <CheckBox label="Push" />
-                  <Select
-                    inField
-                    options={[
-                      { label: 'All', value: 'ALL' },
-                      { label: 'Followees', value: 'FOLLOWEES' },
-                    ]}
-                    onSearch={false}
-                    value={
-                      values.statementSubscriptionSettings || {
-                        label: 'Followees',
-                        value: 'FOLLOWEES',
-                      }
-                    }
-                    onChange={e => {
-                      handleValueChanges({
-                        target: {
-                          name: 'statementSubscriptionSettings',
-                          value: e.value,
-                        },
-                      });
-                    }}
-                  />
-                </FormField>
-                <FormField label="Votes">
-                  <CheckBox label="E-Mail" />
-                  <CheckBox label="Push" />
+                  {renderCheckBoxPair('statement', values, handleValueChanges)}
                 </FormField>
               </fieldset>
               <Label>Discussions</Label>
 
               <fieldset>
                 <FormField label="New Discussions">
-                  <Box pad>
-                    <CheckBox label="E-Mail" />
-                    <CheckBox label="Push" />
-                  </Box>
+                  {renderCheckBoxPair('discussion', values, handleValueChanges)}
                 </FormField>
               </fieldset>
               <Label>on watched discussions</Label>
               <fieldset>
                 <FormField label="Comments">
-                  <CheckBox label="E-Mail" />
-                  <CheckBox label="Push" />
+                  {renderCheckBoxPair('comment', values, handleValueChanges)}
                 </FormField>
                 <FormField label="Replies">
-                  <CheckBox label="E-Mail" />
-                  <CheckBox label="Push" />
+                  {renderCheckBoxPair('reply', values, handleValueChanges)}
                 </FormField>
               </fieldset>
               <Label>Messages</Label>
 
               <fieldset>
                 <FormField label="Messages">
-                  <CheckBox label="E-Mail" />
-                  <CheckBox label="Push" />
+                  {renderCheckBoxPair('message', values, handleValueChanges)}
                 </FormField>
               </fieldset>
-              <Label>Group Events</Label>
 
-              <fieldset>
-                <FormField label="Group Events">
-                  <CheckBox label="E-Mail" />
-                  <CheckBox label="Push" />
-                </FormField>
-              </fieldset>
               <p>
                 {error && <Notification type="error" message={updates.error} />}
               </p>
@@ -166,7 +199,7 @@ class NotificationSettings extends React.Component {
             </Form>
           )}
         </FormValidation>
-      </div>
+      </Box>
     );
   }
 }

@@ -149,6 +149,16 @@ const UserType = new ObjectType({
               .then(([count]) => count.count)
           : 0,
     },
+    notificationSettings: {
+      type: GraphQLString,
+      resolve: (parent, agrs, { viewer }) =>
+        viewer
+          ? knex('notification_settings')
+              .where({ user_id: parent.id })
+              .select('settings')
+              .then(([data]) => JSON.stringify(data.settings || {}))
+          : {},
+    },
   }),
 });
 

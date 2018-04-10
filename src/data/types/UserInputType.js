@@ -33,6 +33,9 @@ const UserInputType = new GraphQLInputObjectType({
     followee: {
       type: ID,
     },
+    notificationSettings: {
+      type: String,
+    },
 
     id: {
       type: ID,

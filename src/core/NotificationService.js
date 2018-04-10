@@ -197,6 +197,9 @@ class NotificationService {
         this.maxBatchSize,
       );
       this.notifyPushServices({ webpush, email });
+
+      // TODO
+      // SSE all new notifications to active users - only count of new notifications
     }
     // const endTime = process.hrtime(startTime);
     // console.log('PROCESSING TIME:', endTime);
@@ -337,13 +340,11 @@ class NotificationService {
               activity_id: a.id,
               created_at: now,
             });
-            if (data.subscriber.settings[data.subscriber.eventType]) {
+            if (data.subscriber.settings[a.type]) {
               // TODO normalize activities with Map aId: a, aId: [userIds]
-              if (data.subscriber.settings[data.subscriber.eventType].email) {
+              if (data.subscriber.settings[a.type].email) {
                 acc.email.push({ userId: data.subscriber.userId, activity: a });
-              } else if (
-                data.subscriber.settings[data.subscriber.eventType].webpush
-              ) {
+              } else if (data.subscriber.settings[a.type].webpush) {
                 acc.webpush.push({
                   userId: data.subscriber.userId,
                   activity: a,

@@ -5,6 +5,16 @@ import { canChangeGroups, calcRights, Groups } from '../../organization';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import log from '../../logger';
 
+const NOTIFICATION_FIELDS = [
+  'proposal',
+  'survey',
+  'comment',
+  'discussion',
+  'update',
+  'reply',
+  'message',
+];
+
 class User {
   constructor(data) {
     this.id = data.id;
@@ -124,6 +134,68 @@ class User {
     }
     if (data.thumbnail) {
       newData.thumbnail = data.thumbnail;
+    }
+    if (data.notificationSettings) {
+      // validate
+      let validatedSettings;
+      if (data.notificationSettings.length < 256) {
+        const parsedSettings = JSON.parse(data.notificationSettings);
+        // check keys
+        validatedSettings = Object.keys(parsedSettings).reduce(
+          (acc, settingField) => {
+            const validatedKey = NOTIFICATION_FIELDS.find(
+              field => settingField === field,
+            );
+            if (!validatedKey) {
+              errors.push(`Wrong key in NotificationSettings: ${settingField}`);
+            }
+            const params = parsedSettings[validatedKey];
+            const validatedParams = {};
+            if ('email' in params) {
+              validatedParams.email = !!params.email;
+            }
+            if ('webpush' in params) {
+              validatedParams.webpush = !!params.webpush;
+            }
+            acc[validatedKey] = validatedParams;
+            return acc;
+          },
+
+          {},
+        );
+      }
+
+      const [settings] = await knex('notification_settings')
+        .where({ user_id: data.id })
+        .select('settings');
+
+      if (settings) {
+        // merge
+        const newSettings = NOTIFICATION_FIELDS.reduce((acc, key) => {
+          if (key in settings && key in validatedSettings) {
+            const mergedValues = {
+              ...settings[key],
+              ...validatedSettings[key],
+            };
+            acc[key] = mergedValues;
+          } else if (key in settings) {
+            acc[key] = settings[key];
+          } else {
+            acc[key] = validatedSettings[key];
+          }
+          return acc;
+        }, {});
+
+        await knex('notification_settings')
+          .where({ user_id: data.id })
+          .update({ settings: newSettings, updated_at: new Date() });
+      } else {
+        await knex('notification_settings').insert({
+          user_id: data.id,
+          settings: validatedSettings,
+          created_at: new Date(),
+        });
+      }
     }
     if (data.password) {
       if (data.passwordOld) {
