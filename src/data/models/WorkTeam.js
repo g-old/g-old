@@ -11,6 +11,16 @@ async function validateCoordinator(viewer, id, loaders) {
   return coordinator; // TODO val rules
 }
 
+async function updateCoordinatorsGroups(viewer, id, loaders) {
+  const coordinator = await User.gen(viewer, id, loaders);
+  if (coordinator) {
+    // eslint-disable-next-line no-bitwise
+    const newGroups = coordinator.groups | Groups.TEAM_LEADER;
+    await User.update(viewer, { id, groups: newGroups }, loaders);
+    loaders.users.clear(id);
+  }
+}
+
 class WorkTeam {
   constructor(data) {
     this.id = data.id;
@@ -305,6 +315,9 @@ class WorkTeam {
         });
       return workTeamData;
     });
+    if (workTeam) {
+      await updateCoordinatorsGroups(viewer, data.coordinatorId, loaders);
+    }
     return workTeam ? new WorkTeam(workTeam) : null;
   }
 
