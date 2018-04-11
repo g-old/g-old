@@ -92,7 +92,7 @@ const validatePoll = async (viewer, poll, loaders) => {
     }
   }
   const { startTime, endTime } = validateDates({ poll });
-  let threshold = poll.threshold;
+  let { threshold } = poll;
   if (isSurvey) {
     threshold = 100;
   }
@@ -137,6 +137,17 @@ const validateStateChange = async (
     return false;
   }
   return true;
+};
+
+const checkIfCoordinator = async (viewer, data) => {
+  if (data.workTeamId) {
+    const [coordinatorId] = await knex('work_teams')
+      .where({ id: data.workTeamId })
+      .pluck('coordinator_id');
+    // eslint-disable-next-line
+    return coordinatorId && coordinatorId == viewer.id;
+  }
+  return false;
 };
 
 class Proposal {
@@ -187,8 +198,11 @@ class Proposal {
   // TODO make member method
   static async update(viewer, data, loaders) {
     // throw Error('TESTERROR');
+    const isCoordinator = await checkIfCoordinator(viewer, data);
+
     // authorize
-    if (!canMutate(viewer, data, Models.PROPOSAL)) return null;
+    if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL))
+      return null;
     // validate
     if (!data.id) return null;
     const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
@@ -234,13 +248,17 @@ class Proposal {
           polling_mode_id: pId,
           ...pollData,
         };
-        const pollTwo = await Poll.create(viewer, pollTwoData, loaders);
+        const pollTwo = await Poll.create(
+          viewer,
+          { ...pollTwoData, isCoordinator },
+          loaders,
+        );
         if (!pollTwo) throw Error('No pollTwo provided');
         // update/close pollOne
         // TODO check first if not already closed?
         const pollOne = await Poll.update(
           viewer,
-          { id: proposalInDB.pollOne_id, closedAt: new Date() },
+          { id: proposalInDB.pollOne_id, closedAt: new Date(), isCoordinator },
           loaders,
         );
         if (!pollOne) throw Error('No pollOne provided');
@@ -282,8 +300,10 @@ class Proposal {
   static async create(viewer, data, loaders) {
     // throw Error('TestError');
     // authorize
+    const isCoordinator = await checkIfCoordinator(viewer, data);
 
-    if (!canMutate(viewer, data, Models.PROPOSAL)) return null;
+    if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL))
+      return null;
 
     // validate
     if (!data.text) return null;
@@ -321,16 +341,20 @@ class Proposal {
         polling_mode_id: pId,
         ...pollData,
       };
-      const pollOne = await Poll.create(viewer, pollOneData, loaders);
+      const pollOne = await Poll.create(
+        viewer,
+        { ...pollOneData, isCoordinator },
+        loaders,
+      );
       if (!pollOne) throw Error('No pollOne provided');
 
       if (!['survey', 'proposed', 'voting'].includes(data.state)) {
         throw new Error('State is missing');
       }
-      const state = data.state;
+      const { state } = data;
 
       const pollField = state === 'voting' ? 'poll_two_id' : 'poll_one_id';
-      let id = await trx
+      const [id = null] = await trx
         .insert(
           {
             author_id: viewer.id,
@@ -346,7 +370,6 @@ class Proposal {
         )
         .into('proposals');
 
-      id = id[0];
       // tags
       if (existingTags && existingTags.length) {
         await trx
@@ -401,10 +424,9 @@ class Proposal {
   async subscribe(viewer) {
     if (['accepted, revoked, rejected'].indexOf(this.state) !== -1) return null;
 
-    let sId = await knex('proposal_user_subscriptions')
+    const [sId = null] = await knex('proposal_user_subscriptions')
       .insert({ proposal_id: this.id, user_id: viewer.id })
       .returning('id');
-    sId = sId[0];
     return sId || null;
   }
 
