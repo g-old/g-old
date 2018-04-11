@@ -24,6 +24,7 @@ import CheckBox from '../CheckBox';
 import SearchField from '../SearchField';
 import Form from '../Form';
 import history from '../../history';
+import { Groups } from '../../organization';
 
 import {
   nameValidation,
@@ -92,7 +93,6 @@ class WorkTeamManagement extends React.Component {
   };
 
   static defaultProps = {
-    requests: null,
     updates: null,
   };
   constructor(props) {
@@ -155,6 +155,9 @@ class WorkTeamManagement extends React.Component {
 
   onSubmit(e) {
     // TODO checks
+    if (!this.canMutate()) {
+      alert('You dont have the necessary permissions');
+    }
     e.preventDefault();
     const { id, workTeam, user } = this.props;
     const { coordinator } = this.state;
@@ -194,6 +197,15 @@ class WorkTeamManagement extends React.Component {
       }
     }
   }
+  canMutate() {
+    const { user, workTeam } = this.props;
+    // eslint-disable-next-line no-bitwise
+    if (user.groups & Groups.ADMIN) {
+      return true;
+    }
+    // eslint-disable-next-line eqeqeq
+    return workTeam.coordinator.id == user.id;
+  }
 
   handleValidation(fields) {
     const validated = this.Validator(fields);
@@ -223,7 +235,7 @@ class WorkTeamManagement extends React.Component {
     if (e.target.type === 'checkbox') {
       value = !this.state[e.target.name];
     } else {
-      value = e.target.value;
+      ({ value } = e.target);
     }
 
     this.setState({ [e.target.name]: value });
@@ -246,7 +258,7 @@ class WorkTeamManagement extends React.Component {
       <Box column padding="medium">
         <Box type="section" align column pad>
           <Form onSubmit={this.onSubmit}>
-            <Label>{'Workteam names'}</Label>
+            <Label>Workteam names</Label>
             <fieldset>
               <FormField label="Name" error={errors.nameError}>
                 <input
@@ -281,7 +293,7 @@ class WorkTeamManagement extends React.Component {
                 />
               </FormField>
             </fieldset>
-            <Label>{'Coordinator'}</Label>
+            <Label>Coordinator</Label>
             <fieldset>
               <FormField
                 overflow
@@ -291,14 +303,16 @@ class WorkTeamManagement extends React.Component {
                 <SearchField
                   value={
                     workTeam.coordinator
-                      ? `${workTeam.coordinator.name} ${workTeam.coordinator
-                          .surname}`
+                      ? `${workTeam.coordinator.name} ${
+                          workTeam.coordinator.surname
+                        }`
                       : ''
                   }
                   onChange={e =>
                     this.handleValueChanges({
                       target: { name: 'coordinatorValue', value: e.value },
-                    })}
+                    })
+                  }
                   data={users}
                   fetch={this.props.findUser}
                   displaySelected={data => {
@@ -309,7 +323,7 @@ class WorkTeamManagement extends React.Component {
                 />
               </FormField>
             </fieldset>
-            <Label>{'Member access policy'}</Label>
+            <Label>Member access policy</Label>
             <fieldset>
               <FormField>
                 <CheckBox
