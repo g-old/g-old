@@ -43,6 +43,7 @@ import Tab from '../../components/Tab';
 import RequestsList from '../../components/RequestsList';
 import Request from '../../components/Request';
 import AssetsTable from '../../components/AssetsTable';
+import { Groups } from '../../organization';
 
 // import FetchError from '../../components/FetchError';
 const messages = defineMessages({
@@ -135,6 +136,7 @@ const pollOptions = [
 ];
 class WorkTeamManagement extends React.Component {
   static propTypes = {
+    user: PropTypes.shape({}).isRequired,
     id: PropTypes.string.isRequired,
     loadRequestList: PropTypes.func.isRequired,
     deleteRequest: PropTypes.func.isRequired,
@@ -210,7 +212,15 @@ class WorkTeamManagement extends React.Component {
     // should open proposalManager
     // then you can handle actions from there
   }
+  canAccess() {
+    const { workTeam, user } = this.props;
+    // eslint-disable-next-line
+    return workTeam.coordinator.id == user.id || user.groups & Groups.ADMIN;
+  }
   render() {
+    if (!this.canAccess()) {
+      return <div>ACCESS DENIED</div>;
+    }
     const {
       workTeamUpdates = {},
       requestUpdates = {},
@@ -221,6 +231,7 @@ class WorkTeamManagement extends React.Component {
       pageInfo = {},
       proposals = [],
     } = this.props;
+
     let content;
     if (this.state.showRequest) {
       const updates = this.state.joining ? workTeamUpdates : requestUpdates;

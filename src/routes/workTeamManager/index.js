@@ -24,7 +24,7 @@ async function action({ store, path }, { id }) {
     title,
     component: (
       <Layout>
-        <WorkTeamManagement id={id} />
+        <WorkTeamManagement id={id} user={user} />
       </Layout>
     ),
   };
