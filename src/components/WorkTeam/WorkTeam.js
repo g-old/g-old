@@ -15,6 +15,9 @@ import history from '../../history';
 import Tabs from '../Tabs';
 import Tab from '../Tab';
 import { ICONS } from '../../constants';
+import { Groups } from '../../organization';
+import Link from '../Link';
+import UserThumbnail from '../UserThumbnail';
 
 const messages = defineMessages({
   join: {
@@ -47,12 +50,19 @@ const messages = defineMessages({
     defaultMessage: 'Members',
     description: 'Members label',
   },
+  coordinator: {
+    id: 'coordinator',
+    defaultMessage: 'Coordinator',
+    description: 'Label coordinator',
+  },
 });
 
 class WorkTeam extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
     logo: PropTypes.string,
+    coordinator: PropTypes.shape().isRequired,
+    user: PropTypes.shape().isRequired,
     displayName: PropTypes.string.isRequired,
     numMembers: PropTypes.number.isRequired,
     numDiscussions: PropTypes.number.isRequired,
@@ -178,6 +188,9 @@ class WorkTeam extends React.Component {
       discussions = [],
       ownStatus = {},
       updates = {},
+      user,
+      coordinator,
+      id,
     } = this.props;
     let picture;
     if (logo) {
@@ -198,9 +211,29 @@ class WorkTeam extends React.Component {
       );
     }
 
-    let actionBtn;
+    let actionBtns;
     if (ownStatus.status) {
-      actionBtn = this.renderActionButton(ownStatus.status, updates);
+      const controls = [];
+      controls.push(this.renderActionButton(ownStatus.status, updates));
+      // eslint-disable-next-line
+      if (user.id == coordinator.id || user.groups & Groups.ADMIN) {
+        controls.push(
+          // eslint-disable-next-line jsx-a11y/anchor-is-valid
+          <Link to={`/workteams/${id}/admin`}>
+            <svg
+              version="1.1"
+              viewBox="0 0 24 24"
+              width="24px"
+              height="24px"
+              role="img"
+              aria-label="lock"
+            >
+              <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.lock} />
+            </svg>
+          </Link>,
+        );
+      }
+      actionBtns = <Box align>{controls}</Box>;
     }
 
     let contentSection;
@@ -252,6 +285,12 @@ class WorkTeam extends React.Component {
       <Box align column padding="medium" pad fill>
         {picture}
         <Heading tag="h2">{displayName}</Heading>
+        <Box>
+          <UserThumbnail
+            label={<FormattedMessage {...messages.coordinator} />}
+            user={coordinator}
+          />
+        </Box>
         <Box wrap>
           <Value
             icon={
@@ -304,7 +343,7 @@ class WorkTeam extends React.Component {
             value={numProposals || 0}
           />
         </Box>
-        {actionBtn}
+        {actionBtns}
         {contentSection}
         {layer}
       </Box>

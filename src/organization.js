@@ -189,6 +189,7 @@ export const AccessMasks = {
     Privileges.GRANT_DISTRICT_KEEPER |
     Privileges.GRANT_ADMIN,
   NOTIFICATION: Permissions.NOTIFY_ALL | Permissions.NOTIFY_GROUPS,
+  WORKTEAM_MANAGER: Groups.ADMIN | Groups.TEAM_LEADER,
 };
 
 export const GroupConditions = {
@@ -232,7 +233,7 @@ const protectedViews = {
   AccountList: { type: 'permissions', name: 'LEVEL_1' },
   WorkteamList: { type: 'permissions', name: 'LEVEL_1' },
   Workteam: { type: 'permissions', name: 'LEVEL_1' },
-  WorkteamManager: { type: 'permissions', name: 'LEVEL_1' },
+  WorkteamManager: { type: 'groups', name: 'WORKTEAM_MANAGER' },
   Discussion: { type: 'permissions', name: 'LEVEL_1' },
 };
 export const canAccess = (user, name) => {
