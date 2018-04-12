@@ -178,7 +178,7 @@ class ProposalActions extends React.Component {
       case 'threshold':
       case 'thresholdRef':
       case 'pollOption': {
-        value = e.target.value;
+        value = e.target.value; // eslint-disable-line
         break;
       }
       case 'withStatements':
@@ -252,19 +252,62 @@ class ProposalActions extends React.Component {
   }
 
   render() {
-    const settings = this.state.settings;
+    const { settings } = this.state;
     const { error, pending, proposal } = this.props;
-    const pollOne = proposal.pollOne;
+    const { pollOne } = proposal;
     const thresholdPassed = isThresholdPassed(pollOne);
     const numVotersForThreshold = Math.ceil(
       pollOne.allVoters * pollOne.threshold / 100,
     );
+
+    const panels = [];
+    if (!pollOne.closedAt) {
+      panels.push(
+        <AccordionPanel heading={<FormattedMessage {...messages.revoke} />}>
+          <Box pad column justify>
+            <Button
+              disabled={pending}
+              onClick={this.handleStateChange}
+              primary
+              label={<FormattedMessage {...messages.revokeShort} />}
+            />
+          </Box>
+        </AccordionPanel>,
+      );
+    }
+    panels.push(
+      <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
+        <Box column pad>
+          <PollInput
+            onValueChange={this.handleValueChanges}
+            handleDateChange={this.handleValueChanges}
+            selectedPMode={this.state.settings.pollOption}
+            displaySettings={this.state.displaySettings}
+            defaultPollValues={this.props.defaultPollValues}
+            pollValues={settings}
+            toggleSettings={this.toggleSettings}
+            pollOptions={this.props.pollOptions}
+            intl={this.props.intl}
+            formErrors={this.visibleErrors(formFields)}
+            handleBlur={this.handleBlur}
+          />
+          <Button
+            disabled={pending}
+            label={<FormattedMessage {...messages.open} />}
+            primary
+            onClick={this.handleOnSubmit}
+          />
+          {/* <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '} */}
+        </Box>
+      </AccordionPanel>,
+    );
+
     return (
       <Box className={s.root} flex wrap>
         <Box flex column pad className={s.proposal}>
           {this.state.error && <Notification type="error" message={error} />}
           <Label>{proposal.title}</Label>
-          <Label>{'Poll One'}</Label>
+          <Label>Poll One</Label>
           {pollOne && (
             <div>
               <PollState
@@ -302,42 +345,7 @@ class ProposalActions extends React.Component {
           )}
         </Box>
         <Box flex className={s.details}>
-          <Accordion>
-            <AccordionPanel heading={<FormattedMessage {...messages.revoke} />}>
-              <Box pad column justify>
-                <Button
-                  disabled={pending}
-                  onClick={this.handleStateChange}
-                  primary
-                  label={<FormattedMessage {...messages.revokeShort} />}
-                />
-              </Box>
-            </AccordionPanel>
-            <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
-              <Box column pad>
-                <PollInput
-                  onValueChange={this.handleValueChanges}
-                  handleDateChange={this.handleValueChanges}
-                  selectedPMode={this.state.settings.pollOption}
-                  displaySettings={this.state.displaySettings}
-                  defaultPollValues={this.props.defaultPollValues}
-                  pollValues={settings}
-                  toggleSettings={this.toggleSettings}
-                  pollOptions={this.props.pollOptions}
-                  intl={this.props.intl}
-                  formErrors={this.visibleErrors(formFields)}
-                  handleBlur={this.handleBlur}
-                />
-                <Button
-                  disabled={pending}
-                  label={<FormattedMessage {...messages.open} />}
-                  primary
-                  onClick={this.handleOnSubmit}
-                />
-                {/* <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '} */}
-              </Box>
-            </AccordionPanel>
-          </Accordion>
+          <Accordion>{panels}</Accordion>
         </Box>
       </Box>
     );

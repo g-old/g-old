@@ -5,7 +5,7 @@ import s from './UserThumbnail.css';
 import Link from '../Link';
 
 const UserThumbnail = ({ user, label }) => {
-  const fullName = `${user.name} ${user.surname}`;
+  const fullName = user ? `${user.name} ${user.surname}` : '';
   return user ? (
     // eslint-disable-next-line jsx-a11y/anchor-is-valid
     <Link to={`/accounts/${user.id}`} className={s.root}>

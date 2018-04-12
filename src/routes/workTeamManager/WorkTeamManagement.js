@@ -214,8 +214,11 @@ class WorkTeamManagement extends React.Component {
   }
   canAccess() {
     const { workTeam, user } = this.props;
-    // eslint-disable-next-line
-    return workTeam.coordinator.id == user.id || user.groups & Groups.ADMIN;
+    return (
+      /* eslint-disable */
+      user.groups & Groups.ADMIN ||
+      (workTeam.coordinator && workTeam.coordinator.id == user.id)
+    ); /* eslint-enable */
   }
   render() {
     if (!this.canAccess()) {
@@ -306,7 +309,7 @@ class WorkTeamManagement extends React.Component {
             checkedIndices={[]}
             assets={this.props.workTeam.linkedProposals || []}
             row={ProposalStatusRow}
-            tableHeaders={['title', 'lastPoll', 'state', 'closed at', '', '']}
+            tableHeaders={['title', 'lastPoll', 'state', 'closed at']}
           />
         </AccordionPanel>,
       ];
