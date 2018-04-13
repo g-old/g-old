@@ -208,8 +208,13 @@ class WorkTeamManagement extends React.Component {
   }
 
   // eslint-disable-next-line
-  onProposalClick() {
-    alert('TO IMPLEMENT');
+  onProposalClick(e, data) {
+    const proposal = data && data.proposal; // why??
+    if (proposal) {
+      const poll = proposal.pollTwo || proposal.pollOne;
+      history.push(`/proposal/${proposal.id}/${poll && poll.id}`);
+    }
+    console.error('TO IMPLEMENT');
     // should open proposalManager
     // then you can handle actions from there
   }
@@ -279,6 +284,7 @@ class WorkTeamManagement extends React.Component {
             this.props.loadProposalsList({
               state: 'pending',
               workTeamId: workTeam.id,
+              first: 30,
             })
           }
         >
@@ -298,6 +304,7 @@ class WorkTeamManagement extends React.Component {
             this.props.loadProposalStatus({
               state: 'pending',
               id: workTeam.id,
+              first: 30,
             })
           }
         >

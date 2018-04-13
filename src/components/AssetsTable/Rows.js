@@ -35,16 +35,19 @@ export default function AssetTableRows({
   }
   return (
     <tbody style={{ minHeight: '500px' }}>
-      {assets.map((asset, index) => (
-        <Row
-          checked={checkedIndices.indexOf(index) >= 0}
-          key={uuid()}
-          onClickCheckbox={checked => onClickCheckbox(index, checked)}
-          onClickMenu={action => onClickMenu(action, asset)}
-          allowMultiSelect={allowMultiSelect}
-          {...asset}
-        />
-      ))}
+      {assets.map(
+        (asset, index) =>
+          asset && (
+            <Row
+              checked={checkedIndices.indexOf(index) >= 0}
+              key={uuid()}
+              onClickCheckbox={checked => onClickCheckbox(index, checked)}
+              onClickMenu={action => onClickMenu(action, asset)}
+              allowMultiSelect={allowMultiSelect}
+              {...asset}
+            />
+          ),
+      )}
     </tbody>
   );
 }
@@ -61,9 +64,6 @@ AssetTableRows.propTypes = {
 
 AssetTableRows.defaultProps = {
   assets: null,
-  searchTerm: null,
-  requiresSearch: null,
-
   children: null,
   checkedIndices: null,
 };

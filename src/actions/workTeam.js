@@ -154,10 +154,10 @@ const workTeamQuery = `query($id:ID! $state:String){
   }
 }`;
 
-const proposalStatusQuery = `query($id:ID!){
+const proposalStatusQuery = `query($id:ID! $first:Int){
   workTeam(id:$id){
     id
-    linkedProposalConnection{
+    linkedProposalConnection(first:$first){
       pageInfo{
         endCursor
         hasNextPage
@@ -377,13 +377,13 @@ export function loadWorkTeam({ id, state = 'active' }, details) {
     }
   };
 }
-export function loadProposalStatus({ id }) {
+export function loadProposalStatus({ id, first }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: LOAD_WORKTEAM_START,
     });
     try {
-      const { data } = await graphqlRequest(proposalStatusQuery, { id });
+      const { data } = await graphqlRequest(proposalStatusQuery, { id, first });
       const proposals = data.workTeam.linkedProposalConnection.edges.map(
         p => p.node,
       );
