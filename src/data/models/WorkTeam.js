@@ -370,6 +370,13 @@ class WorkTeam {
         .update(newData)
         .returning('*');
     });
+
+    if (workTeam && newData.coordinator_id) {
+      // assign right to new coordinator
+      await updateCoordinatorsGroups(viewer, data.coordinatorId, loaders);
+      // check if old coordinator is still coordinator of a workteam
+    }
+
     return workTeam ? new WorkTeam(workTeam) : null;
   }
 

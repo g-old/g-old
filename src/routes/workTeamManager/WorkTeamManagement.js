@@ -44,6 +44,7 @@ import RequestsList from '../../components/RequestsList';
 import Request from '../../components/Request';
 import AssetsTable from '../../components/AssetsTable';
 import { Groups } from '../../organization';
+import history from '../../history';
 
 // import FetchError from '../../components/FetchError';
 const messages = defineMessages({
@@ -316,28 +317,31 @@ class WorkTeamManagement extends React.Component {
     }
     return (
       <Box column>
-        <Heading tag="h3">
-          {workTeam.logo ? (
-            'IMPLEMENT LOGO'
-          ) : (
-            <svg
-              version="1.1"
-              viewBox="0 0 24 24"
-              role="img"
-              width="48px"
-              height="48px"
-              aria-label="cloud"
-            >
-              <path
-                fill="none"
-                stroke="#000"
-                strokeWidth="2"
-                d={ICONS.workteam}
-              />
-            </svg>
-          )}
-          {workTeam && workTeam.displayName}
-        </Heading>
+        {/* eslint-disable-next-line */}
+        <div onClick={() => history.push(`/workteams/${workTeam.id}`)}>
+          <Heading tag="h3">
+            {workTeam.logo ? (
+              'IMPLEMENT LOGO'
+            ) : (
+              <svg
+                version="1.1"
+                viewBox="0 0 24 24"
+                role="img"
+                width="48px"
+                height="48px"
+                aria-label="cloud"
+              >
+                <path
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth="2"
+                  d={ICONS.workteam}
+                />
+              </svg>
+            )}
+            {workTeam && workTeam.displayName}
+          </Heading>
+        </div>
         <Tabs>
           <Tab title={<FormattedMessage {...messages.discussions} />}>
             <Accordion>
