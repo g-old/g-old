@@ -356,7 +356,7 @@ class WorkTeamManagement extends React.Component {
           <Tab title={<FormattedMessage {...messages.proposals} />}>
             <Accordion>
               <AccordionPanel
-                heading="Create proposal"
+                heading={<FormattedMessage {...messages.proposalInput} />}
                 onActive={() => {
                   this.props.loadTags();
                 }}
@@ -368,7 +368,9 @@ class WorkTeamManagement extends React.Component {
                   defaultPollValues={defaultPollValues}
                 />
               </AccordionPanel>
-              <AccordionPanel heading="Manage proposals">
+              <AccordionPanel
+                heading={<FormattedMessage {...messages.proposalManager} />}
+              >
                 <ProposalsManager
                   proposals={this.props.workTeam.proposals || []}
                   workTeamId={this.props.id}
