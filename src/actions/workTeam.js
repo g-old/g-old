@@ -193,6 +193,17 @@ const joinWorkTeamMutationWithDetails = `mutation($id:ID, $memberId:ID){
   joinWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     ${workTeamFields}
     ${wtDetails}
+      requestConnection(type:"joinWT" filterBy:[{filter:CONTENT_ID id:$id}]){
+        pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          ${requestFields}
+        }
+      }
+    }
   }
 }`;
 
@@ -242,6 +253,16 @@ const leaveWorkTeamMutation = `mutation($id:ID, $memberId:ID){
     }
   }
 }`;
+
+const dePaginate = (data, resourceName) => {
+  let resources = [];
+  const connectionName = `${resourceName}Connection`;
+  if (data[connectionName]) {
+    resources = data[connectionName].edges.map(p => p.node);
+    data[`${resourceName}s`] = resources; // eslint-disable-line no-param-reassign
+  }
+  return data;
+};
 
 export function loadWorkTeams(withMembers) {
   return async (dispatch, getState, { graphqlRequest }) => {
@@ -310,7 +331,10 @@ export function joinWorkTeam(workTeamData, details) {
         proposals = data.joinWorkTeam.proposalConnection.edges.map(p => p.node);
       }
       data.joinWorkTeam.proposals = proposals;
-      const normalizedData = normalize(data.joinWorkTeam, workTeamSchema);
+      const normalizedData = normalize(
+        dePaginate(data.joinWorkTeam, 'request'),
+        workTeamSchema,
+      );
 
       dispatch({ type: JOIN_WORKTEAM_SUCCESS, payload: normalizedData });
     } catch (e) {
