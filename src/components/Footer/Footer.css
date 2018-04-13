@@ -20,18 +20,20 @@
   text-align: center;
 }
 
-.text {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.spacer {
-  color: rgba(255, 255, 255, 0.3);
-}
-
 .text,
-.link {
+.buildinfo {
+  color: rgba(255, 255, 255, 0.5);
   padding: 2px 5px;
   font-size: 1em;
+}
+
+.buildinfo {
+  font-size: 0.8em;
+}
+
+/*
+.spacer {
+  color: rgba(255, 255, 255, 0.3);
 }
 
 .link,
@@ -44,3 +46,4 @@
 .link:hover {
   color: rgba(255, 255, 255, 1);
 }
+*/

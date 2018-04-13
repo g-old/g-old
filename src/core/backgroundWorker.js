@@ -101,7 +101,19 @@ const notifyNewStatements = async (viewer, data, loaders) => {
 };
 
 const notifyProposalCreation = async proposal => {
-  const subscriptionData = await knex('webpush_subscriptions').select();
+  let subscriptionData;
+  if (proposal.workTeamId) {
+    subscriptionData = await knex('webpush_subscriptions')
+      .innerJoin(
+        'user_work_teams',
+        'webpush_subscriptions.user_id',
+        'user_work_teams.user_id',
+      )
+      .where('user_work_teams.work_team_id', '=', proposal.workTeamId)
+      .select();
+  } else {
+    subscriptionData = await knex('webpush_subscriptions').select();
+  }
   const body =
     proposal.title.length > 40
       ? `${proposal.title.slice(0, 36)}...`

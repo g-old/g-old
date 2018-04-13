@@ -54,6 +54,7 @@ export const Groups = {
   VIEWER: 128,
   GUEST: 256,
   SYSTEM: 512,
+  TEAM_LEADER: 1024,
 };
 
 /* eslint-disable no-bitwise */
@@ -123,6 +124,7 @@ export const Privileges = {
   GRANT_DISTRICT_KEEPER: 64,
   GRANT_RELATOR: 128,
   GRANT_ADMIN: 256,
+  GRANT_LEADER: 512,
 };
 /* Privilege masks - Change here if you want to adjust privileges for groups */
 
@@ -134,7 +136,8 @@ const adminPrivileges =
   Privileges.GRANT_MODERATOR |
   Privileges.GRANT_RELATOR |
   Privileges.GRANT_DISTRICT_KEEPER |
-  Privileges.GRANT_MEMBER_MANAGER;
+  Privileges.GRANT_MEMBER_MANAGER |
+  Privileges.GRANT_LEADER;
 
 const superUserPrivileges = adminPrivileges | Privileges.GRANT_ADMIN;
 
@@ -176,6 +179,7 @@ export const AccessMasks = {
     Groups.DISTRICT_KEEPER |
     Groups.MEMBER_MANAGER |
     Groups.RELATOR |
+    Groups.TEAM_LEADER |
     Groups.MODERATOR,
   GROUPS_MANAGER:
     Privileges.GRANT_VIEWER |
@@ -185,6 +189,7 @@ export const AccessMasks = {
     Privileges.GRANT_DISTRICT_KEEPER |
     Privileges.GRANT_ADMIN,
   NOTIFICATION: Permissions.NOTIFY_ALL | Permissions.NOTIFY_GROUPS,
+  WORKTEAM_MANAGER: Groups.ADMIN | Groups.TEAM_LEADER,
 };
 
 export const GroupConditions = {
@@ -196,6 +201,7 @@ export const GroupConditions = {
   [Groups.VOTER]: Privileges.GRANT_VOTER,
   [Groups.VIEWER]: Privileges.GRANT_VIEWER,
   [Groups.GUEST]: Privileges.GRANT_GUEST,
+  [Groups.TEAM_LEADER]: Privileges.GRANT_LEADER,
 };
 
 export const calcRights = userGroups =>
@@ -227,7 +233,7 @@ const protectedViews = {
   AccountList: { type: 'permissions', name: 'LEVEL_1' },
   WorkteamList: { type: 'permissions', name: 'LEVEL_1' },
   Workteam: { type: 'permissions', name: 'LEVEL_1' },
-  WorkteamManager: { type: 'permissions', name: 'LEVEL_1' },
+  WorkteamManager: { type: 'groups', name: 'WORKTEAM_MANAGER' },
   Discussion: { type: 'permissions', name: 'LEVEL_1' },
 };
 export const canAccess = (user, name) => {
@@ -242,7 +248,7 @@ export const canAccess = (user, name) => {
 
 /* Groups which cannot be changed with the normal procedure */
 const restrictedGroups =
-  Groups.SUPER_USER | Groups.ADMIN | Groups.MEMBER_MANAGER;
+  Groups.SUPER_USER | Groups.ADMIN | Groups.MEMBER_MANAGER | Groups.TEAM_LEADER;
 
 /* See test cases */
 export const canChangeGroups = (actor, targetUser, updatedGroups) => {

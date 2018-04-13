@@ -1,6 +1,10 @@
 .value {
   font-weight: 500;
   font-size: 2.25rem;
+
+  @media only screen and (max-width: 30em) {
+    font-size: 1.25rem;
+  }
 }
 
 .container {
@@ -21,4 +25,8 @@
   stroke: #666;
   flex: 0 0 auto;
   margin-bottom: 12px;
+
+  @media only screen and (max-width: 30em) {
+    margin-bottom: 0;
+  }
 }

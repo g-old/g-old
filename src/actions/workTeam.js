@@ -85,12 +85,31 @@ lldName
 deName
 itName
 `;
+const proposalFields = `
+    id
+    title
+    state
+    body
+    pollOne ${pollFieldsForList}
+    pollTwo ${pollFieldsForList}`;
+
 const workTeamWithDetails = `query($id:ID!){
     workTeam(id:$id) {
       ${workTeamFields}
       ${wtDetails}
-      requestConnection(type:"joinWT" filterBy:[{filter:CONTENT_ID id:$id}]){
+          proposalConnection(state:"active" workTeamId:$id){
       pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          ${proposalFields}
+        }
+      }
+    }
+      requestConnection(type:"joinWT" filterBy:[{filter:CONTENT_ID id:$id}]){
+        pageInfo{
         endCursor
         hasNextPage
       }
@@ -102,14 +121,6 @@ const workTeamWithDetails = `query($id:ID!){
     }
 
     }}`;
-
-const proposalFields = `
-    id
-    title
-    state
-    body
-    pollOne ${pollFieldsForList}
-    pollTwo ${pollFieldsForList}`;
 
 const workTeamQuery = `query($id:ID! $state:String){
   workTeam(id:$id){
@@ -143,10 +154,10 @@ const workTeamQuery = `query($id:ID! $state:String){
   }
 }`;
 
-const proposalStatusQuery = `query($id:ID!){
+const proposalStatusQuery = `query($id:ID! $first:Int){
   workTeam(id:$id){
     id
-    linkedProposalConnection{
+    linkedProposalConnection(first:$first){
       pageInfo{
         endCursor
         hasNextPage
@@ -366,13 +377,13 @@ export function loadWorkTeam({ id, state = 'active' }, details) {
     }
   };
 }
-export function loadProposalStatus({ id }) {
+export function loadProposalStatus({ id, first }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: LOAD_WORKTEAM_START,
     });
     try {
-      const { data } = await graphqlRequest(proposalStatusQuery, { id });
+      const { data } = await graphqlRequest(proposalStatusQuery, { id, first });
       const proposals = data.workTeam.linkedProposalConnection.edges.map(
         p => p.node,
       );

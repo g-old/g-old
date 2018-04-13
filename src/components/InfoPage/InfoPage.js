@@ -11,6 +11,16 @@ const messages = defineMessages({
     defaultMessage: 'What to do next',
     description: 'Title of help section',
   },
+  privacy: {
+    id: 'privacy',
+    defaultMessage: 'Privacy',
+    description: 'Privacy label',
+  },
+  faq: {
+    id: 'faq',
+    defaultMessage: 'Frequently asked questions',
+    description: 'FAQ label',
+  },
 });
 
 class Help extends React.Component {
@@ -39,7 +49,8 @@ class Help extends React.Component {
   async loadHelpfile() {
     const firstStepsPromise = this.handleLoading('firstSteps');
     const helpPromise = this.handleLoading('help');
-    await Promise.all([firstStepsPromise, helpPromise]);
+    const privacyPromise = this.handleLoading('privacy');
+    await Promise.all([firstStepsPromise, helpPromise, privacyPromise]);
   }
   handleLoading(filename) {
     return new Promise(resolve => {
@@ -65,12 +76,24 @@ class Help extends React.Component {
           heading={<FormattedMessage {...messages.firstSteps} />}
           active={this.state.panel === 'firstSteps'}
         >
-          {!this.state.firstSteps && 'LOADING First Steps...'}
+          {!this.state.firstSteps && (
+            <FormattedMessage {...messages.firstSteps} />
+          )}
           {this.state.firstSteps && <Page {...this.state.firstSteps} />}
         </AccordionPanel>
-        <AccordionPanel heading="FAQ" active={this.state.panel === 'help'}>
-          {!this.state.help && 'LOADING Help...'}
+        <AccordionPanel
+          heading={<FormattedMessage {...messages.faq} />}
+          active={this.state.panel === 'help'}
+        >
+          {!this.state.help && <FormattedMessage {...messages.faq} />}
           {this.state.help && <Page {...this.state.help} />}
+        </AccordionPanel>
+        <AccordionPanel
+          heading={<FormattedMessage {...messages.privacy} />}
+          active={this.state.panel === 'help'}
+        >
+          {!this.state.privacy && <FormattedMessage {...messages.privacy} />}
+          {this.state.privacy && <Page {...this.state.privacy} />}
         </AccordionPanel>
       </Accordion>
     );

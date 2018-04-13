@@ -160,7 +160,7 @@ async function proposalPolling(pubsub) {
 
           return Promise.all([upliftPromise, insertionPromise]);
         }
-        return Promise.reject('Proposal update failed');
+        return Promise.reject(new Error('Proposal update failed'));
       })
       .catch(err => {
         log.error({ err, proposal }, 'Proposal update failed');

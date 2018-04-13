@@ -13,6 +13,32 @@ import FetchError from '../../components/FetchError';
 import ProposalsSubHeader from '../../components/ProposalsSubHeader';
 import ProposalListView from '../../components/ProposalListView';
 
+const sortActiveProposals = (a, b) => {
+  const timeA = new Date(
+    a.state === 'proposed' ? a.pollOne.endTime : a.pollTwo.endTime,
+  );
+
+  const timeB = new Date(
+    b.state === 'proposed' ? b.pollOne.endTime : b.pollTwo.endTime,
+  );
+  return timeA - timeB;
+};
+const sortClosedProposals = (a, b) => {
+  let timeA;
+  let timeB;
+  if (a.pollTwo) {
+    timeA = new Date(a.pollTwo.closedAt);
+  } else {
+    timeA = new Date(a.pollOne.closedAt);
+  }
+  if (b.pollTwo) {
+    timeB = new Date(b.pollTwo.closedAt);
+  } else {
+    timeB = new Date(b.pollOne.closedAt);
+  }
+  return timeB - timeA;
+};
+
 class ProposalsOverviewContainer extends React.Component {
   static propTypes = {
     proposals: PropTypes.arrayOf(
@@ -74,13 +100,15 @@ class ProposalsOverviewContainer extends React.Component {
       );
     }
 
-    const platformProposals = proposals.filter(p => !p.workTeamId);
+    /* const platformProposals = proposals
+      .filter(p => !p.workTeamId)
+      .sort(filter === 'active' ? sortActiveProposals : sortClosedProposals); */
     return (
       <div>
         {/* <Navigation filter={filter} /> */}
         <ProposalsSubHeader filter={filter} />
         <ProposalListView
-          proposals={platformProposals}
+          proposals={proposals}
           onProposalClick={this.onProposalClick}
           pageInfo={this.props.pageInfo}
           filter={filter}
@@ -92,11 +120,13 @@ class ProposalsOverviewContainer extends React.Component {
   }
 }
 // TODO implement memoiziation with reselect
-const mapStateToProps = (state, ownProps) => ({
-  proposals: getVisibleProposals(state, ownProps.filter),
-  isFetching: getProposalsIsFetching(state, ownProps.filter),
-  errorMessage: getProposalsErrorMessage(state, ownProps.filter),
-  pageInfo: getProposalsPage(state, ownProps.filter),
+const mapStateToProps = (state, { filter = '' }) => ({
+  proposals: getVisibleProposals(state, filter)
+    .filter(p => !p.workTeamId)
+    .sort(filter === 'active' ? sortActiveProposals : sortClosedProposals),
+  isFetching: getProposalsIsFetching(state, filter),
+  errorMessage: getProposalsErrorMessage(state, filter),
+  pageInfo: getProposalsPage(state, filter),
 });
 
 const mapDispatch = {

@@ -21,14 +21,7 @@ class Image extends React.Component {
   };
 
   render() {
-    const {
-      className,
-      thumb,
-      full,
-      size,
-      fit,
-      ...otherProps
-    } = this.otherProps;
+    const { className, thumb, full, size, fit, ...otherProps } = this.props;
     const classes = classnames(
       s.image,
       {

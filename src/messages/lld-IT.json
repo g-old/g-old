@@ -953,7 +953,7 @@
     "description": "Title of help section",
     "defaultMessage": "What to do next",
     "message": "",
-    "files": ["src/components/Help/Help.js"]
+    "files": ["src/components/InfoPage/InfoPage.js"]
   },
   {
     "id": "cookieBanner",
@@ -1248,5 +1248,26 @@
     "defaultMessage": "Surveys",
     "message": "Enrescides",
     "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "faq",
+    "description": "FAQ label",
+    "defaultMessage": "Frequently asked questions",
+    "message": "",
+    "files": ["src/components/InfoPage/InfoPage.js"]
+  },
+  {
+    "id": "privacy",
+    "description": "Privacy label",
+    "defaultMessage": "Privacy",
+    "message": "",
+    "files": ["src/components/InfoPage/InfoPage.js"]
+  },
+  {
+    "id": "coordinator",
+    "description": "Label coordinator",
+    "defaultMessage": "Coordinator",
+    "message": "",
+    "files": ["src/components/WorkTeam/WorkTeam.js"]
   }
 ]
