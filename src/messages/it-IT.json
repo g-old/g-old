@@ -15,7 +15,7 @@
     "id": "login.email",
     "description": "Email-address",
     "defaultMessage": "Email",
-    "message": "Indirizzo e-mail",
+    "message": "Indirizzo email",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
@@ -51,7 +51,7 @@
     "id": "signup.email",
     "description": "Email-address",
     "defaultMessage": "Your current email address",
-    "message": "Il tuo indirizzo e-mail attuale",
+    "message": "Il tuo indirizzo email attuale",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
@@ -118,7 +118,7 @@
     "id": "signup.error-emailTaken",
     "description": "Help for not unique email",
     "defaultMessage": "Email address already in use",
-    "message": "Indirizzo e-mail già in uso"
+    "message": "Indirizzo email già in uso"
   },
   {
     "id": "login.resetPassword",
@@ -195,7 +195,7 @@
     "id": "account.avatarMissing",
     "description": "Avatar missing",
     "defaultMessage": "No photo set",
-    "message": "",
+    "message": "Manca la foto nel profilo",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
@@ -209,14 +209,14 @@
     "id": "account.emailValidationMissing",
     "description": "Email not validated",
     "defaultMessage": "Email not validated",
-    "message": "",
+    "message": "Indirizzo E-mail non confermato",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.lastLogin",
     "description": "Last login date",
     "defaultMessage": "Last login at",
-    "message": "",
+    "message": "Ultimo accesso",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
@@ -491,8 +491,8 @@
     "id": "help.firstSteps",
     "description": "Title of help section",
     "defaultMessage": "What to do next",
-    "message": "",
-    "files": ["src/components/Help/Help.js"]
+    "message": "Come proseguire?",
+    "files": ["src/components/InfoPage/InfoPage.js"]
   },
   {
     "id": "action.error",
@@ -1185,5 +1185,26 @@
     "defaultMessage": "Surveys",
     "message": "Sondaggi",
     "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "faq",
+    "description": "FAQ label",
+    "defaultMessage": "Frequently asked questions",
+    "message": "",
+    "files": ["src/components/InfoPage/InfoPage.js"]
+  },
+  {
+    "id": "privacy",
+    "description": "Privacy label",
+    "defaultMessage": "Privacy",
+    "message": "",
+    "files": ["src/components/InfoPage/InfoPage.js"]
+  },
+  {
+    "id": "coordinator",
+    "description": "Label coordinator",
+    "defaultMessage": "Coordinator",
+    "message": "",
+    "files": ["src/components/WorkTeam/WorkTeam.js"]
   }
 ]

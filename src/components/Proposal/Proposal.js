@@ -6,10 +6,9 @@ import {
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import Box from '../Box';
 import ProposalState from '../ProposalState';
 import s from './Proposal.css';
-import history from '../../history';
+import UserThumbnail from '../UserThumbnail';
 
 const messages = defineMessages({
   spokesman: {
@@ -51,21 +50,12 @@ class Proposal extends React.Component {
             dangerouslySetInnerHTML={{ __html: this.props.body }}
           />
           {this.props.spokesman && (
-            <Box align>
-              <FormattedMessage {...messages.spokesman} />
-              <span // eslint-disable-line
-                className={s.spokesman}
-                role="button"
-                onClick={() => {
-                  history.push(`/accounts/${this.props.spokesman.id}`);
-                }}
-              >
-                <img src={this.props.spokesman.thumbnail} alt="IMG" />
-                <span>{`${this.props.spokesman.name} ${
-                  this.props.spokesman.surname
-                }`}</span>
-              </span>
-            </Box>
+            <div>
+              <UserThumbnail
+                label={<FormattedMessage {...messages.spokesman} />}
+                user={this.props.spokesman}
+              />
+            </div>
           )}
         </div>
       </div>

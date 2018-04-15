@@ -2,6 +2,17 @@ import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
 
+const checkIfCoordinator = async (viewer, data) => {
+  if (data.workTeamId) {
+    const [coordinatorId] = await knex('work_teams')
+      .where({ id: data.workTeamId })
+      .pluck('coordinator_id');
+    // eslint-disable-next-line
+    return coordinatorId && coordinatorId == viewer.id;
+  }
+  return false;
+};
+
 class Discussion {
   constructor(data) {
     this.id = data.id;
@@ -27,7 +38,11 @@ class Discussion {
 
   static async create(viewer, data) {
     if (!data) return null;
-    if (!canMutate(viewer, data, Models.DISCUSSION)) return null;
+    const isCoordinator = await checkIfCoordinator(viewer, data);
+
+    if (!canMutate(viewer, { ...data, isCoordinator }, Models.DISCUSSION))
+      return null;
+
     const discussionInDB = await knex.transaction(async trx => {
       const [discussion = null] = await knex('discussions')
         .transacting(trx)

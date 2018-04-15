@@ -710,7 +710,7 @@
     "description": "Title of help section",
     "defaultMessage": "What to do next",
     "message": "Die nächsten Schritte",
-    "files": ["src/components/Help/Help.js"]
+    "files": ["src/components/InfoPage/InfoPage.js"]
   },
   {
     "id": "signup.welcome-title",
@@ -1315,5 +1315,26 @@
     "defaultMessage": "Surveys",
     "message": "Umfragen",
     "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "faq",
+    "description": "FAQ label",
+    "defaultMessage": "Frequently asked questions",
+    "message": "Häufig gestellte Fragen",
+    "files": ["src/components/InfoPage/InfoPage.js"]
+  },
+  {
+    "id": "privacy",
+    "description": "Privacy label",
+    "defaultMessage": "Privacy",
+    "message": "Datenschutz",
+    "files": ["src/components/InfoPage/InfoPage.js"]
+  },
+  {
+    "id": "coordinator",
+    "description": "Label coordinator",
+    "defaultMessage": "Coordinator",
+    "message": "Koordinator",
+    "files": ["src/components/WorkTeam/WorkTeam.js"]
   }
 ]

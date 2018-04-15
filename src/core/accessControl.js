@@ -143,7 +143,12 @@ function proposalReadControl(viewer, data) {
 }
 
 function proposalWriteControl(viewer, data) {
-  if (viewer.permissions & PermissionsSchema[Groups.RELATOR]) {
+  if (data.workTeamId) {
+    if (data.isCoordinator) {
+      return true;
+    }
+    return viewer.permissions & PermissionsSchema[Groups.ADMIN];
+  } else if (viewer.permissions & PermissionsSchema[Groups.RELATOR]) {
     if (data.id && data.state) {
       // updates
       if (viewer.permissions & Permissions.MODIFY_PROPOSALS) {
@@ -224,8 +229,10 @@ function pollWriteControl(viewer, data) {
       return false;
     }
     return true;
+  } else if (data.isCoordinator) {
+    return true;
   }
-  return false;
+  return viewer.permissions & PermissionsSchema[Groups.ADMIN];
 }
 
 function voteReadControl(viewer, data) {
@@ -300,11 +307,15 @@ function discussionReadControl(viewer, data) {
   if (viewer.wtMemberships.includes(data.work_team_id)) {
     return true;
   }
-
   return false;
 }
 function discussionWriteControl(viewer, data) {
-  if (viewer.permissions & Permissions.PUBLISH_DISCUSSIONS) {
+  if (data.workTeamId) {
+    if (data.isCoordinator) {
+      return true;
+    }
+    return viewer.permissions & PermissionsSchema[Groups.ADMIN];
+  } else if (viewer.permissions & Permissions.PUBLISH_DISCUSSIONS) {
     return true;
   }
   return false;

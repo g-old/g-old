@@ -177,6 +177,7 @@ class FormValidation extends React.Component {
     if (data !== this.props.data) {
       this.state = {
         ...genInitialState(this.formFields, {
+          ...this.state,
           ...(data && data),
           ...(data.names && { ...data.names }),
         }),
@@ -193,7 +194,7 @@ class FormValidation extends React.Component {
       const newValues = getChangedFields(
         this.formFields,
         this.state,
-        this.props,
+        this.props.data,
       );
       if (this.props.submit) {
         this.props.submit(newValues);

@@ -1,0 +1,5 @@
+---
+component: ContentPage
+---
+
+### Privacy

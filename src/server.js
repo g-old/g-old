@@ -59,8 +59,10 @@ import Request from './data/models/Request';
 
 process.on('unhandledRejection', (reason, p) => {
   log.error({ err: { position: p, reason } }, 'Unhandled Rejection');
-  // send entire app down.
-  process.exit(1);
+  if (__DEV__) {
+    // send entire app down.
+    process.exit(1);
+  }
 });
 
 const pubsub = new PubSub();
