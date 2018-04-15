@@ -4,7 +4,7 @@ import EventManager from '../../core/EventManager';
 
 export const ActivityType = {
   PROPOSAL: 'proposal',
-  STATEMENT: 'proposal',
+  STATEMENT: 'statement',
   LIKE: 'like',
   VOTE: 'vote',
   POLL: 'poll',

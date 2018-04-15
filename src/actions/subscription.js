@@ -23,6 +23,8 @@ import { genStatusIndicators } from '../core/helpers';
 
 const subscriptionFields = `
 id
+targetType
+
 `;
 
 const createSubscriptionMutation = `

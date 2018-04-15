@@ -52,7 +52,7 @@ class Subscription {
     if (data.targetType) {
       let isValid;
       let target;
-      switch (data.eventType) {
+      switch (data.targetType) {
         case TargetType.PROPOSAL: {
           target = await Proposal.gen(viewer, data.targetId, loaders);
           isValid = target && ['proposed', 'voting'].includes(target.state);

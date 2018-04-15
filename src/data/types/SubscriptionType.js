@@ -6,7 +6,7 @@ import {
 
 import UserType from './UserType';
 import User from '../models/User';
-import EventType from './EventTypeEnum';
+import TargetType from './TargetTypeEnum';
 import SubscriptionTypeEnum from './SubscriptionTypeEnum';
 
 const SubscriptionType = new GraphQLObjectType({
@@ -24,8 +24,8 @@ const SubscriptionType = new GraphQLObjectType({
     subscriptionType: {
       type: SubscriptionTypeEnum,
     },
-    eventType: {
-      type: EventType,
+    targetType: {
+      type: TargetType,
     },
     /* TODO - group, proposal
     target: {

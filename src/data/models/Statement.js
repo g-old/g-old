@@ -67,6 +67,8 @@ class Statement {
       EventManager.publish('onStatementDeleted', {
         viewer,
         statement: deletedStatement,
+        subjectId: proposal.id,
+
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },
@@ -121,6 +123,7 @@ class Statement {
       EventManager.publish('onStatementUpdated', {
         viewer,
         statement,
+        subjectId: proposal.id,
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },

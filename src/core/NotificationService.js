@@ -45,7 +45,7 @@ class NotificationService {
       case ActivityType.SURVEY: // not used yet
       case ActivityType.PROPOSAL:
         type = TargetType.GROUP;
-        targetId = activity.groupId || 0;
+        targetId = activity.groupId ? activity.groupId : 0;
         break;
 
       case ActivityType.COMMENT:
@@ -60,10 +60,10 @@ class NotificationService {
       default:
         return;
     }
-    // or store compund key?
+    // or store compound key?
     activity.targetType = type; // eslint-disable-line
     activity.targetId = targetId; // eslint-disable-line
-    // console.log('ACTIVITY', { activity });
+    // console.log('ACTIVITY', { activity, subjectId });
     if ('targetId' in activity) {
       this.activityQueue.push(activity);
     }
@@ -73,23 +73,30 @@ class NotificationService {
       const compoundKey =
         activity.targetType + this.delimiter + activity.targetId;
       if (agg[compoundKey]) {
-        agg[compoundKey].push(activity);
+        agg[compoundKey].activities.push(activity);
       } else {
-        agg[compoundKey] = [activity]; // eslint-disable-line
+        // eslint-disable-next-line no-param-reassign
+        agg[compoundKey] = {
+          activities: [activity],
+          targetType: activity.targetType,
+          targetId: activity.targetId,
+        };
       }
       return agg;
     }, {});
   }
 
   async findSubscribers(groupedActivities) {
-    const selectors = Object.keys(groupedActivities).map(keys =>
-      keys.split(this.delimiter),
-    );
-
-    // TODO Write with where in ... and where in ...
-    const promises = selectors.map(this.loadSubscriptions);
-    const data = await Promise.all(promises);
-    return data.reduce((acc, curr) => acc.concat(curr), []);
+    const promises = Object.keys(groupedActivities).map(async key => {
+      const subscribers = await this.loadSubscriptions([
+        groupedActivities[key].targetType,
+        groupedActivities[key].targetId,
+      ]);
+      // eslint-disable-next-line no-param-reassign
+      groupedActivities[key].subscribers = subscribers;
+    });
+    await Promise.all(promises);
+    return groupedActivities;
   }
 
   async processQueue() {
@@ -108,35 +115,25 @@ class NotificationService {
     }
   }
 
-  loadSubscriptions2(selector) {
-    // TODO Write with where in ... and where in ...
-
-    return this.dbConnector('subscriptions')
-      .where({ event_type: selector[0], target_id: selector[1] })
-      .innerJoin(
-        'notification_settings',
-        'notification_settings.user_id',
-        'subscriptions.user_id',
-      )
-      .select(
-        'notification_settings.user_id as userId',
-        'notification_settings.settings as settings',
-        'subscriptions.subscription_type as subscriptionType',
-        'subscriptions.event_type as eventType',
-        'subscriptions.target_id as targetId',
-      );
-  }
-
   loadSubscriptions(selector) {
-    // TODO Write with where in ... and where in ...
     switch (selector[0]) {
       case TargetType.GROUP:
-        return this.dbConnector('user_groups')
+        // eslint-disable-next-line
+        if (selector[1] == 0) {
+          // means no group
+          // PROPBLEM : ALSO GUESTS GET NOTIFIED!! -if they have notificationsettings
+          return this.dbConnector('notification_settings').select(
+            'notification_settings.user_id as userId',
+            'notification_settings.settings as settings',
+          );
+        }
+        // workteams
+        return this.dbConnector('user_work_teams')
           .where({ group_id: selector[1] })
           .innerJoin(
             'notification_settings',
             'notification_settings.user_id',
-            'user_groups.user_id',
+            'user_work_teams.user_id',
           )
           .select(
             'notification_settings.user_id as userId',
@@ -177,86 +174,70 @@ class NotificationService {
   async batchProcessing() {
     // const startTime = process.hrtime();
     // console.log('BATCH -activities', this.activityQueue);
-    const activities = this.activityQueue.splice(0, this.activityQueue.length);
-    // console.log('ACTIVITIES', { activities });
-    if (activities.length) {
-      const groupedActivities = this.groupByTargetAndEventType(activities);
-      const subscribers = await this.findSubscribers(groupedActivities);
-      // console.log('SUBSCRIBERS', { subscribers });
-
-      const notificationData = this.combineData(subscribers, groupedActivities);
-      // console.log('NOTIFICATIONDATA', { notificationData });
-
-      const { notifications, webpush, email } = this.getAndGroupNotifications(
-        notificationData,
+    try {
+      const activities = this.activityQueue.splice(
+        0,
+        this.activityQueue.length,
       );
+      if (activities.length) {
+        const groupedActivities = this.groupByTargetAndEventType(activities);
+        const activitiesAndSubscribers = await this.findSubscribers(
+          groupedActivities,
+        );
 
-      await this.dbConnector.batchInsert(
-        'notifications',
-        notifications,
-        this.maxBatchSize,
-      );
-      this.notifyPushServices({ webpush, email });
+        const notificationData = await this.combineData(
+          activitiesAndSubscribers,
+        );
+
+        const { notifications, webpush, email } = this.getAndGroupNotifications(
+          notificationData,
+        );
+
+        await this.dbConnector.batchInsert(
+          'notifications',
+          notifications,
+          this.maxBatchSize,
+        );
+        this.notifyPushServices({ webpush, email });
+      }
+
+      // const endTime = process.hrtime(startTime);
+      // console.log('PROCESSING TIME:', endTime);
 
       // TODO
       // SSE all new notifications to active users - only count of new notifications
-    }
-    // const endTime = process.hrtime(startTime);
-    // console.log('PROCESSING TIME:', endTime);
-  }
-  combineData(subscribers, groupedActivities) {
-    return subscribers.map(subscriber =>
-      this.mergeNotifyableActivitiesWithSubscribers(
-        subscriber,
-        groupedActivities,
-      ),
-    );
-  }
-
-  mergeNotifyableActivitiesWithSubscribers2(subscriber, groupedActivities) {
-    const compoundKey =
-      subscriber.eventType + this.delimiter + subscriber.targetId;
-    switch (subscriber.subscriptionType) {
-      case SubscriptionType.ALL: {
-        return { subscriber, activities: groupedActivities[compoundKey] };
-      }
-      case SubscriptionType.FOLLOWEES: {
-        const activities = groupedActivities[compoundKey];
-        if (activities.length) {
-          // filter proposals and discussions aut
-          const followeeActivities = activities.filter(
-            activity =>
-              activity.type !== 'proposal' || activity.type !== 'discussion',
-          );
-          const followerActivities = this.checkIfFollwing(
-            subscriber,
-            followeeActivities,
-          );
-          return { subscriber, acivities: followerActivities };
-        }
-        return {};
-      }
-
-      default:
-        return {};
+    } catch (err) {
+      log.error({ err }, err.message);
     }
   }
-  async mergeNotifyableActivitiesWithSubscribers(
-    subscriber,
-    groupedActivities,
-  ) {
-    const compoundKey =
-      subscriber.targetType + this.delimiter + subscriber.targetId;
+
+  async combineData(groupedActivities) {
+    const proms = Object.keys(groupedActivities).map(compoundKey => {
+      const data = groupedActivities[compoundKey];
+      const promises = data.subscribers.map(subscriber =>
+        this.mergeNotifyableActivitiesWithSubscribers(
+          subscriber,
+          data.activities,
+        ),
+      );
+      return Promise.all(promises);
+    });
+    const data = await Promise.all(proms);
+    return data.reduce((acc, curr) => acc.concat(curr), []);
+  }
+
+  async mergeNotifyableActivitiesWithSubscribers(subscriber, activities) {
     if (
       !subscriber.subscriptionType ||
       subscriber.subscriptionType === SubscriptionType.ALL
     ) {
-      return { subscriber, activities: groupedActivities[compoundKey] };
+      return {
+        subscriber,
+        activities,
+      };
     }
-
     switch (subscriber.subscriptionType) {
       case SubscriptionType.FOLLOWEES: {
-        const activities = groupedActivities[compoundKey];
         if (activities.length) {
           // filter proposals and discussions aut
           const followeeActivities = activities.filter(
@@ -264,16 +245,15 @@ class NotificationService {
               activity.type !== ActivityType.PROPOSAL &&
               activity.type !== ActivityType.DISCUSSION,
           );
-          const followerActivities = this.checkIfFollwing(
+          const followerActivities = await this.checkIfFollowing(
             subscriber,
             followeeActivities,
           );
-          return { subscriber, acivities: followerActivities };
+          return { subscriber, activities: followerActivities };
         }
         return {};
       }
       case SubscriptionType.REPLIES: {
-        const activities = groupedActivities[compoundKey];
         if (activities.length) {
           // for each one which has a parent id get parent comments author...
           const relevantIds = activities.map(a => a.objectId);
@@ -293,10 +273,9 @@ class NotificationService {
         return {};
       }
       case SubscriptionType.UPDATES: {
-        const activities = groupedActivities[compoundKey];
         return {
           subscriber,
-          activties: activities.filter(
+          activities: activities.filter(
             a =>
               a.verb === 'update' &&
               [
@@ -321,10 +300,10 @@ class NotificationService {
   async checkIfFollowing(subscriber, activities) {
     const followees = await this.dbConnector('user_follows')
       .where({ follower_id: subscriber.userId })
-      .pluck('follower_id');
+      .pluck('followee_id');
     const followeeSet = new Set(followees);
     return activities.filter(activity =>
-      followeeSet.has(Number(activity.authorId)),
+      followeeSet.has(Number(activity.actorId)),
     );
   }
 

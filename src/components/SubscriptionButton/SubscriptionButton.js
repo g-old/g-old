@@ -37,11 +37,16 @@ const messages = defineMessages({
     defaultMessage: 'State updates',
     description: 'Subscribe for state updates',
   },
+  delete: {
+    id: 'subscriptionType.delete',
+    defaultMessage: 'Unsubscribe',
+    description: 'Deleting subscription',
+  },
 });
 class SubscriptionButton extends React.Component {
   static propTypes = {
     subscription: PropTypes.shape({}),
-    handleSubscription: PropTypes.func.isRequired,
+    onSubscribe: PropTypes.func.isRequired,
     intl: intlShape.isRequired,
   };
   static defaultProps = {
@@ -55,7 +60,11 @@ class SubscriptionButton extends React.Component {
 
   handleValueChange(e) {
     if (e) {
-      this.props.handleSubscription({ subscriptionType: e.option.value });
+      this.props.onSubscribe({
+        subscriptionType: e.option.value,
+        targetType: 'PROPOSAL',
+      });
+
       this.setState({ ...e.option });
     }
   }
@@ -78,8 +87,16 @@ class SubscriptionButton extends React.Component {
       <Box>
         <Select
           options={[
+            subscription && {
+              label: intl.formatMessage({
+                ...messages.delete,
+              }),
+              value: 'DELETE',
+            },
             {
-              label: intl.formatMessage({ ...messages.all }),
+              label: intl.formatMessage({
+                ...messages.all,
+              }),
               value: 'ALL',
             },
             {
@@ -96,10 +113,7 @@ class SubscriptionButton extends React.Component {
             },
           ]}
           onSearch={false}
-          value={{
-            label: displayValue,
-            value: this.state.value || 'UPDATES',
-          }}
+          value={{ label: displayValue, value: this.state.value || 'UPDATES' }}
           onChange={this.handleValueChange}
         />
       </Box>

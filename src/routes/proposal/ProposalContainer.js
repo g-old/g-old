@@ -8,7 +8,11 @@ import {
   createProposalSub,
   deleteProposalSub,
 } from '../../actions/proposal';
-import { createSubscription } from '../../actions/subscription';
+import {
+  createSubscription,
+  updateSubscription,
+  deleteSubscription,
+} from '../../actions/subscription';
 import {
   createVote,
   updateVote,
@@ -70,6 +74,8 @@ class ProposalContainer extends React.Component {
     createProposalSub: PropTypes.func.isRequired,
     deleteProposalSub: PropTypes.func.isRequired,
     createSubscription: PropTypes.func.isRequired,
+    deleteSubscription: PropTypes.func.isRequired,
+    updateSubscription: PropTypes.func.isRequired,
   };
   static defaultProps = {
     errorMessage: null,
@@ -128,8 +134,15 @@ class ProposalContainer extends React.Component {
   }
   handleSubscription({ targetType, subscriptionType }) {
     const { id, subscription } = this.props.proposal;
-    if (subscription) {
-      this.props.deleteProposalSub(id);
+    if (subscription && subscriptionType === 'DELETE') {
+      this.props.deleteSubscription({ id: subscription.id });
+    } else if (subscription) {
+      this.props.updateSubscription({
+        id: subscription.id,
+        targetType,
+        subscriptionType,
+        targetId: id,
+      });
     } else {
       this.props.createSubscription({
         targetType,
@@ -227,7 +240,7 @@ class ProposalContainer extends React.Component {
             <Proposal {...proposal} />
             <SubscriptionButton
               onSubscribe={this.handleSubscription}
-              susbcription={proposal.subscription}
+              subscription={proposal.subscription}
             />
             <Poll
               {...poll}
@@ -277,6 +290,8 @@ const mapDispatch = {
   createProposalSub,
   deleteProposalSub,
   createSubscription,
+  updateSubscription,
+  deleteSubscription,
 };
 
 export default connect(mapStateToProps, mapDispatch)(ProposalContainer);
