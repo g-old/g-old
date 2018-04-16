@@ -94,7 +94,11 @@ const ProposalType = new ObjectType({
           case ProposalState.VOTING:
             pollId = parent.pollTwo_id;
             break;
-
+          case ProposalState.REJECTED:
+          case ProposalState.ACCEPTED:
+          case ProposalState.REVOKED:
+            pollId = parent.pollTwo_id || parent.pollOne_id;
+            break;
           default:
             return null;
         }
