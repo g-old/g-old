@@ -56,7 +56,7 @@ const messages = defineMessages({
   verificationCall: {
     id: 'settings.verificationCall',
     defaultMessage:
-      'Confirm your email address. A confirmation message was sent to "{email}"',
+      'Confirm your email address. A confirmation message was sent to ({email})',
     description: 'Notification to verify mail address',
   },
   followees: {

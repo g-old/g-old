@@ -72,7 +72,7 @@ const messages = defineMessages({
   },
   edited: {
     id: 'label.edited',
-    defaultMessage: 'edited {time}',
+    defaultMessage: '{time} (edited)',
     description: 'Comment edited',
   },
 });
