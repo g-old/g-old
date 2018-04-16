@@ -1270,5 +1270,26 @@
     "defaultMessage": "Enter atleast {value} chars or numbers",
     "message": "",
     "files": ["src/components/FormValidation/FormValidation.js"]
+  },
+  {
+    "id": "label.login",
+    "description": "Label login",
+    "defaultMessage": "Log In",
+    "message": "",
+    "files": ["src/components/Login/Login.js"]
+  },
+  {
+    "id": "label.signup",
+    "description": "Label signup",
+    "defaultMessage": "Sign Up",
+    "message": "",
+    "files": ["src/routes/home/Home.js"]
+  },
+  {
+    "id": "label.or",
+    "description": "Label or",
+    "defaultMessage": "OR",
+    "message": "",
+    "files": ["src/routes/home/Home.js"]
   }
 ]

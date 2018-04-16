@@ -9,10 +9,24 @@
 
 import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { FormattedMessage, defineMessages } from 'react-intl';
 import Login from '../../components/Login';
 import s from './Home.css';
 import history from '../../history';
 import Button from '../../components/Button';
+
+const messages = defineMessages({
+  signup: {
+    id: 'label.signup',
+    defaultMessage: 'Sign Up',
+    description: 'Label signup',
+  },
+  or: {
+    id: 'label.or',
+    defaultMessage: 'OR',
+    description: 'Label or',
+  },
+});
 
 class Home extends React.Component {
   render() {
@@ -23,13 +37,17 @@ class Home extends React.Component {
             <Button
               fill
               primary
-              label="Sign Up"
+              label={<FormattedMessage {...messages.signup} />}
               onClick={() => {
                 history.push('/signup');
               }}
             />
           </div>
-          <strong className={s.lineThrough}>OR</strong>
+          {
+            <strong className={s.lineThrough}>
+              <FormattedMessage {...messages.or} />{' '}
+            </strong>
+          }
           <Login />
         </div>
       </div>
