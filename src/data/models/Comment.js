@@ -58,7 +58,7 @@ class Comment {
     const commentInDB = await knex.transaction(async trx => {
       const content = data.content.substring(0, MAX_CONTENT_LENGTH);
 
-      let comment = await knex('comments')
+      const [comment = null] = await knex('comments')
         .transacting(trx)
         .insert({
           author_id: viewer.id,
@@ -69,7 +69,6 @@ class Comment {
         })
         .returning('*');
 
-      comment = comment[0];
       if (comment) {
         [workTeamId] = await knex('discussions')
           .where({ id: data.discussionId })
@@ -94,6 +93,7 @@ class Comment {
       EventManager.publish('onCommentCreated', {
         viewer,
         comment,
+        subjectId: data.discussionId,
         groupId: workTeamId,
         info: { workTeamId },
       });
@@ -118,7 +118,7 @@ class Comment {
     const commentInDB = await knex.transaction(async trx => {
       const content = data.content.substring(0, MAX_CONTENT_LENGTH);
       const now = new Date();
-      let comment = await knex('comments')
+      const [comment = null] = await knex('comments')
         .where({ id: data.id })
         .transacting(trx)
         .forUpdate()
@@ -128,7 +128,6 @@ class Comment {
           updated_at: now,
         })
         .returning('*');
-      comment = comment[0];
       if (comment) {
         comments.clear(data.id);
       }

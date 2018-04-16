@@ -8,12 +8,16 @@ import {
   DELETE_NOTIFICATION_START,
   DELETE_NOTIFICATION_ERROR,
   DELETE_NOTIFICATION_SUCCESS,
+  CLEAR_NOTIFICATIONS_START,
+  CLEAR_NOTIFICATIONS_ERROR,
+  CLEAR_NOTIFICATIONS_SUCCESS,
 } from '../../constants';
 
 import { getErrors, getSuccessState } from '../../core/helpers';
 
 const notifications = (state = {}, action) => {
   switch (action.type) {
+    case CLEAR_NOTIFICATIONS_START:
     case CREATE_NOTIFICATION_START:
     case UPDATE_NOTIFICATION_START:
     case DELETE_NOTIFICATION_START: {
@@ -25,7 +29,7 @@ const notifications = (state = {}, action) => {
         },
       };
     }
-
+    case CLEAR_NOTIFICATIONS_ERROR:
     case CREATE_NOTIFICATION_ERROR:
     case UPDATE_NOTIFICATION_ERROR:
     case DELETE_NOTIFICATION_ERROR: {
@@ -39,6 +43,7 @@ const notifications = (state = {}, action) => {
         },
       };
     }
+    case CLEAR_NOTIFICATIONS_SUCCESS:
     case CREATE_NOTIFICATION_SUCCESS:
     case UPDATE_NOTIFICATION_SUCCESS:
     case DELETE_NOTIFICATION_SUCCESS: {

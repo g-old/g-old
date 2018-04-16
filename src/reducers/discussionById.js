@@ -8,6 +8,7 @@ import {
   DELETE_COMMENT_SUCCESS,
   JOIN_WORKTEAM_SUCCESS,
   CREATE_DISCUSSION_SUCCESS,
+  LOAD_NOTIFICATIONS_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -17,6 +18,7 @@ export default function byId(state = {}, action) {
     case JOIN_WORKTEAM_SUCCESS:
     case SSE_UPDATE_SUCCESS:
     case CREATE_DISCUSSION_SUCCESS:
+    case LOAD_NOTIFICATIONS_SUCCESS:
     case LOAD_FEED_SUCCESS: {
       return merge({}, state, action.payload.entities.discussions);
     }

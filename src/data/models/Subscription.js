@@ -1,6 +1,7 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import Proposal from './Proposal';
+import Discussion from './Discussion';
 
 export const EventType = {
   NEW_PROPOSAL: 'new_proposal',
@@ -58,6 +59,13 @@ class Subscription {
           isValid = target && ['proposed', 'voting'].includes(target.state);
           break;
         }
+
+        case TargetType.DISCUSSION: {
+          target = await Discussion.gen(viewer, data.targetId, loaders);
+          isValid = target && !target.closedAt;
+          break;
+        }
+
         case TargetType.GROUP: {
           target = { id: 0 }; // means main "group" - TODO change later
           isValid = true;

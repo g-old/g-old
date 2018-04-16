@@ -292,7 +292,12 @@ class Proposal {
 
     const proposal = await Proposal.gen(viewer, proposalId, loaders);
     if (proposal) {
-      EventManager.publish('onProposalUpdated', { viewer, proposal });
+      EventManager.publish('onProposalUpdated', {
+        viewer,
+        proposal,
+        ...(newValues.state && { info: { newState: newValues.state } }),
+        ...(data.workTeamId && { groupId: data.workTeamId }),
+      });
     }
     return proposal;
   }

@@ -1,13 +1,15 @@
 import React from 'react';
 import Layout from '../../components/Layout';
 import { loadProposal } from '../../actions/proposal';
+import { updateNotification } from '../../actions/notification';
+
 import ProposalContainer from './ProposalContainer';
-import { getSessionUser } from '../../reducers';
+import { getSessionUser, getNotification } from '../../reducers';
 import { canAccess } from '../../organization';
 
 const title = 'Proposal';
 
-async function action({ store, path }, { id, pollId }) {
+async function action({ store, path, query }, { id, pollId }) {
   const state = await store.getState();
   const user = getSessionUser(state);
   let proposalId = id;
@@ -38,6 +40,15 @@ async function action({ store, path }, { id, pollId }) {
       return { redirect: `/proposal/${proposalId}/${pollId}` };
     }
     store.dispatch(loadProposal({ id: proposalId, pollId }));
+  }
+
+  if (query && query.ref === 'notification') {
+    // check if notification in store
+    const notification = getNotification(state, query.id);
+    if (notification && !notification.read) {
+      await store.dispatch(updateNotification({ id: query.id, read: true }));
+    }
+    // ignore if not
   }
 
   return {

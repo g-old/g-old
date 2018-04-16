@@ -14,6 +14,9 @@ import {
   LOAD_NOTIFICATIONS_START,
   LOAD_NOTIFICATIONS_SUCCESS,
   LOAD_NOTIFICATIONS_ERROR,
+  CLEAR_NOTIFICATIONS_SUCCESS,
+  CLEAR_NOTIFICATIONS_ERROR,
+  CLEAR_NOTIFICATIONS_START,
 } from '../constants';
 import {
   notification as notificationSchema,
@@ -27,6 +30,19 @@ id
 name
 surname
 thumbnail`;
+
+const commentFields = `
+id
+parentId
+content
+numReplies
+discussionId
+createdAt
+editedAt
+author{
+${userFields}
+}
+`;
 
 const notificationFields = `
       id
@@ -43,6 +59,7 @@ const notificationFields = `
           ...on ProposalDL{
             id
             title
+            state
             pollOne{
               ${pollFieldsForList}
             }
@@ -50,6 +67,22 @@ const notificationFields = `
               ${pollFieldsForList}
             }
           }
+          ... on Comment {
+          ${commentFields}
+           }
+
+          ... on Discussion {
+          id
+          createdAt
+          title
+          numComments
+          closedAt
+         content
+         author{
+        ${userFields}
+      }
+
+    }
         }
         info
         type
@@ -100,6 +133,12 @@ query ($first:Int $after:String $userId:ID) {
       }
     }
   }
+}
+`;
+
+const clearNotificationsMutation = `
+mutation{
+  clearNotifications
 }
 `;
 
@@ -250,6 +289,33 @@ export function loadNotificationList({ first, after, userId }) {
     } catch (error) {
       dispatch({
         type: LOAD_NOTIFICATIONS_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function clearNotifications() {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: CLEAR_NOTIFICATIONS_START,
+    });
+    try {
+      const { data } = await graphqlRequest(clearNotificationsMutation);
+
+      dispatch({
+        type: CLEAR_NOTIFICATIONS_SUCCESS,
+        payload: data.clearNotifications,
+      });
+    } catch (error) {
+      dispatch({
+        type: CLEAR_NOTIFICATIONS_ERROR,
         payload: {
           error,
         },

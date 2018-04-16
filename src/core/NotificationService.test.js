@@ -139,13 +139,14 @@ describe('NotificationService', () => {
     const proposalActivities = [
       { type: ActivityType.PROPOSAL, verb: 'update' },
       { type: ActivityType.PROPOSAL, verb: 'create' },
+      { type: ActivityType.PROPOSAL, verb: 'update' },
     ];
     const updateActivities = await service.mergeNotifyableActivitiesWithSubscribers(
       subscriber,
       proposalActivities,
     );
 
-    expect(updateActivities.activities.length).toBe(1);
+    expect(updateActivities.activities.length).toBe(2);
 
     const statementActivities = [
       { type: ActivityType.STATEMENT, verb: 'update', authorId: 1 },

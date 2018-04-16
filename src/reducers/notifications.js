@@ -16,7 +16,9 @@ const all = (state = initialState, action) => {
         ? {
             ...state,
             ids: [
-              ...new Set(Object.keys(action.payload.entities.notifications)),
+              ...new Set(
+                Object.keys(action.payload.entities.notifications).reverse(),
+              ),
             ],
           }
         : state;
@@ -43,6 +45,8 @@ const hydrateList = (state, data, entities) =>
       users: entities.users.byId,
       statements: entities.statements.byId,
       proposals: entities.proposals.byId,
+      comments: entities.comments.byId,
+      discussions: entities.discussions.byId,
     },
   );
 

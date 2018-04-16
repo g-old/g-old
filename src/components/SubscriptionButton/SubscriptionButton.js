@@ -37,6 +37,11 @@ const messages = defineMessages({
     defaultMessage: 'State updates',
     description: 'Subscribe for state updates',
   },
+  replies: {
+    id: 'subscriptionType.replies',
+    defaultMessage: 'Replies',
+    description: 'Subscribe for replies',
+  },
   delete: {
     id: 'subscriptionType.delete',
     defaultMessage: 'Unsubscribe',
@@ -48,6 +53,7 @@ class SubscriptionButton extends React.Component {
     subscription: PropTypes.shape({}),
     onSubscribe: PropTypes.func.isRequired,
     intl: intlShape.isRequired,
+    targetType: PropTypes.oneOf(['DISCUSSION', 'PROPOSAL']).isRequired,
   };
   static defaultProps = {
     subscription: null,
@@ -62,7 +68,7 @@ class SubscriptionButton extends React.Component {
     if (e) {
       this.props.onSubscribe({
         subscriptionType: e.option.value,
-        targetType: 'PROPOSAL',
+        targetType: this.props.targetType || 'PROPOSAL',
       });
 
       this.setState({ ...e.option });
@@ -72,17 +78,27 @@ class SubscriptionButton extends React.Component {
   render() {
     const { subscription, intl } = this.props;
     const { value, label } = this.state;
-    let displayValue;
+    let displayLabel;
     if (subscription) {
-      displayValue = intl.formatMessage({ ...messages.subscribed });
+      displayLabel = intl.formatMessage({ ...messages.subscribed });
     } else if (value) {
-      displayValue = intl.formatMessage(
+      displayLabel = intl.formatMessage(
         { ...messages.confirm },
         { subType: label },
       );
     } else {
-      displayValue = intl.formatMessage({ ...messages.subscribe });
+      displayLabel = intl.formatMessage({ ...messages.subscribe });
     }
+    let messageKey;
+    let defaultOption;
+    if (this.props.targetType === 'DISCUSSION') {
+      messageKey = 'replies';
+      defaultOption = 'REPLIES';
+    } else {
+      messageKey = 'updates';
+      messageKey = 'UPDATES';
+    }
+
     return (
       <Box>
         <Select
@@ -107,13 +123,16 @@ class SubscriptionButton extends React.Component {
             },
             {
               label: intl.formatMessage({
-                ...messages.updates,
+                ...messages[messageKey],
               }),
-              value: 'UPDATES',
+              value: defaultOption,
             },
           ]}
           onSearch={false}
-          value={{ label: displayValue, value: this.state.value || 'UPDATES' }}
+          value={{
+            label: displayLabel,
+            value: this.state.value || defaultOption,
+          }}
           onChange={this.handleValueChange}
         />
       </Box>

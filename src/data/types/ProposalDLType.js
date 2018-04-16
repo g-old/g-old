@@ -13,7 +13,7 @@ import User from '../models/User';
 import UserType from './UserType';
 import Poll from '../models/Poll';
 import Tag from '../models/Tag';
-import Subscription from '../models/Subscription';
+import Subscription, { TargetType } from '../models/Subscription';
 import SubscriptionType from './SubscriptionType';
 import knex from '../knex';
 
@@ -101,7 +101,7 @@ const ProposalType = new ObjectType({
           .where({
             target_id: parent.id,
             user_id: viewer.id,
-            target_type: 'proposal',
+            target_type: TargetType.PROPOSAL,
           })
           .pluck('id')
           .then(([id]) => Subscription.gen(viewer, id, loaders)),

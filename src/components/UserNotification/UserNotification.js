@@ -16,9 +16,34 @@ const messages = defineMessages({
     defaultMessage: '{author} wrote a statement on {topic} ',
     description: 'Status message for notifications',
   },
+  commentNew: {
+    id: 'notifications.comment.new',
+    defaultMessage: '{author} wrote a comment on {topic} ',
+    description: 'Status message for notifications',
+  },
   proposalNew: {
     id: 'notifications.proposal.new',
     defaultMessage: 'New proposal published: {title}',
+    description: 'Status message for notifications',
+  },
+  discussionNew: {
+    id: 'notifications.discussion.new',
+    defaultMessage: 'New discussion published: {title}',
+    description: 'Status message for notifications',
+  },
+  voting: {
+    id: 'notifications.proposal.voting',
+    defaultMessage: 'Voting phase started for {title}',
+    description: 'Status message for notifications',
+  },
+  accepted: {
+    id: 'notifications.proposal.accepted',
+    defaultMessage: '{title} got accepted!',
+    description: 'Status message for notifications',
+  },
+  rejected: {
+    id: 'notifications.proposal.rejected',
+    defaultMessage: '{title} was rejected!',
     description: 'Status message for notifications',
   },
 });
@@ -26,12 +51,14 @@ const messages = defineMessages({
 class UserNotification extends React.Component {
   static propTypes = {
     activity: PropTypes.shape({}).isRequired,
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   };
   static defaultProps = {};
 
   computeData() {
-    const { activity } = this.props;
+    const { activity, id } = this.props;
     const info = JSON.parse(activity.info);
+    const param = `?ref=notification&id=${id}`;
     switch (activity.type) {
       case 'statement':
         if (activity.verb === 'create') {
@@ -47,12 +74,12 @@ class UserNotification extends React.Component {
             ),
             path:
               activity.object &&
-              `/proposal/${info.proposalId}/${activity.object.pollId}`,
+              `/proposal/${info.proposalId}/${activity.object.pollId}${param}`,
           };
         }
         return 'To implement';
       case 'proposal': {
-        const activePoll = activity.object.polTow || activity.object.pollOne;
+        const activePoll = activity.object.pollTow || activity.object.pollOne;
         if (activity.verb === 'create') {
           return {
             message: (
@@ -61,11 +88,61 @@ class UserNotification extends React.Component {
                 values={{ title: activity.object.title }}
               />
             ),
-            path: `/proposal/${activity.object.id}/${activePoll.id}`,
+            path: `/proposal/${activity.object.id}/${activePoll.id}${param}`,
+          };
+        } else if (activity.verb === 'update') {
+          if (activity.object.state) {
+            return {
+              message: (
+                <FormattedMessage
+                  {...messages[activity.object.state]}
+                  values={{ title: activity.object.title }}
+                />
+              ),
+              path: `/proposal/${activity.object.id}/${activePoll.id}${param}`,
+            };
+          }
+        }
+        return 'To implement';
+      }
+      case 'comment': {
+        if (activity.verb === 'create') {
+          return {
+            message: (
+              <FormattedMessage
+                {...messages.commentNew}
+                values={{
+                  author: `${activity.actor.name} ${activity.actor.surname}`,
+                  topic: info.discussionTitle,
+                }}
+              />
+            ),
+            path: `/workteams/${activity.workTeamId}/discussions/${
+              activity.object.discussionId
+            }?comment=${activity.objectId}&ref=notification&id=${id}`,
           };
         }
         return 'To implement';
       }
+      case 'discussion': {
+        if (activity.verb === 'create') {
+          return {
+            message: (
+              <FormattedMessage
+                {...messages.discussionNew}
+                values={{
+                  title: activity.object.title,
+                }}
+              />
+            ),
+            path: `/workteams/${activity.workTeamId}/discussions/${
+              activity.object.id
+            }${param}`,
+          };
+        }
+        return 'To implement';
+      }
+
       default:
         return <span>Not found</span>;
     }

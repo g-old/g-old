@@ -7,12 +7,13 @@ import {
   UPDATE_COMMENT_SUCCESS,
   DELETE_COMMENT_SUCCESS,
   LOAD_FEED_SUCCESS,
+  LOAD_NOTIFICATIONS_SUCCESS,
 } from '../constants';
 
 const addToParents = (state, action) => {
   // ! Assumes only replies are loaded, and every reply is loaded!
   const cIds = Object.keys(action.payload.entities.comments);
-  const parentId = action.payload.entities.comments[cIds[0]].parentId;
+  const { parentId } = action.payload.entities.comments[cIds[0]];
   if (parentId) {
     const replies = state[parentId].replies || [];
 
@@ -41,6 +42,7 @@ export default function byId(state = {}, action) {
     case LOAD_DISCUSSIONS_SUCCESS:
     case LOAD_DISCUSSION_SUCCESS:
     case UPDATE_COMMENT_SUCCESS:
+    case LOAD_NOTIFICATIONS_SUCCESS:
     case LOAD_FEED_SUCCESS:
       return merge({}, state, action.payload.entities.comments);
 

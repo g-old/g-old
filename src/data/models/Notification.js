@@ -41,6 +41,9 @@ class Notification {
     if (!data || !data.id) return null;
     if (!canMutate(viewer, data, Models.NOTIFICATION)) return null;
     const newData = { updated_at: new Date() };
+    if ('read' in data) {
+      newData.read = data.read;
+    }
     const updatedNotification = await knex.transaction(async trx => {
       const [notification = null] = await knex('notifications')
         .where({ id: data.id })
@@ -67,6 +70,17 @@ class Notification {
     });
 
     return deletedNotification ? new Notification(deletedNotification) : null;
+  }
+
+  static async batchUpdate(viewer) {
+    if (!viewer) return null;
+
+    const updatedIds = await knex('notifications')
+      .where({ user_id: viewer.id, read: false })
+      .update({ read: true })
+      .returning('id');
+
+    return updatedIds;
   }
 }
 

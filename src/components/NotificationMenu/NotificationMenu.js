@@ -13,7 +13,10 @@ import Notification from '../UserNotification';
 import { getAllNotifications, getSessionUser } from '../../reducers';
 import Link from '../Link';
 import Label from '../Label';
-import { loadNotificationList } from '../../actions/notification';
+import {
+  loadNotificationList,
+  clearNotifications,
+} from '../../actions/notification';
 
 class NotificationMenu extends React.Component {
   static propTypes = {
@@ -23,6 +26,7 @@ class NotificationMenu extends React.Component {
       unreadNotifications: PropTypes.number,
     }),
     notifications: PropTypes.arrayOf(PropTypes.shape({})),
+    clearNotifications: PropTypes.func.isRequired,
   };
   static defaultProps = {
     user: null,
@@ -34,6 +38,7 @@ class NotificationMenu extends React.Component {
     this.onCloseMenu = this.onCloseMenu.bind(this);
     // this.onClickNotification = this.onClickNotification.bind(this);
     this.renderNotifications = this.renderNotifications.bind(this);
+    this.onMarkAsRead = this.onMarkAsRead.bind(this);
 
     this.state = { dropActive: false };
     this.toggleMenu = this.toggleMenu.bind(this);
@@ -85,6 +90,13 @@ class NotificationMenu extends React.Component {
   onCloseMenu() {
     this.setState({ dropActive: false });
   }
+  onMarkAsRead(e) {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    this.props.clearNotifications();
+  }
 
   toggleMenu() {
     // history.push('/notifications');
@@ -101,14 +113,10 @@ class NotificationMenu extends React.Component {
       <Box column fill>
         <Box between>
           <Label>Notifications</Label>
-          <Button
-            onClick={() => alert('to implement')}
-            label="Mark all as read"
-            plain
-          />
+          <Button onClick={this.onMarkAsRead} label="Mark all as read" plain />
         </Box>
         <List>
-          {this.props.notifications.map(n => (
+          {this.props.notifications.filter(n => !n.read).map(n => (
             <ListItem>
               <Notification {...n} />
             </ListItem>
@@ -160,6 +168,7 @@ const mapPropsToState = state => ({
 });
 const mapDispatch = {
   loadNotificationList,
+  clearNotifications,
 };
 
 export default connect(mapPropsToState, mapDispatch)(
