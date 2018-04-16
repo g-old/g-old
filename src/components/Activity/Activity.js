@@ -53,8 +53,8 @@ const messages = defineMessages({
   },
   rejected: {
     id: 'proposal.rejected',
-    defaultMessage: 'Voting open',
-    description: 'Proposal can be voted from now on',
+    defaultMessage: 'Rejected',
+    description: 'Proposal got rejected',
   },
   revoked: {
     id: 'proposal.revoked',
