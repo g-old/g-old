@@ -64,8 +64,7 @@
     "id": "signup.error-empty",
     "description": "Help for empty fields",
     "defaultMessage": "You can't leave this empty",
-    "message": "Non è possibile lasciare vuoto questo campo",
-    "files": ["src/routes/passwordReset/PasswordReset.js"]
+    "message": "Non è possibile lasciare vuoto questo campo"
   },
   {
     "id": "signup.error-invalidEmail",
@@ -244,6 +243,7 @@
     "files": [
       "src/components/AccountDetails/AccountDetails.js",
       "src/components/DiscussionInput/DiscussionInput.js",
+      "src/components/FormValidation/FormValidation.js",
       "src/components/Login/Login.js",
       "src/components/NotificationInput/NotificationInput.js",
       "src/components/ProposalActions/ProposalActions.js",
@@ -254,7 +254,8 @@
       "src/components/WorkTeamForm/WorkTeamForm.js",
       "src/components/WorkTeamInput/WorkTeamInput.js",
       "src/components/WorkTeamManager/WorkTeamManager.js",
-      "src/routes/passwordRecovery/PasswordRecovery.js"
+      "src/routes/passwordRecovery/PasswordRecovery.js",
+      "src/routes/passwordReset/PasswordReset.js"
     ]
   },
   {
@@ -294,9 +295,9 @@
   },
   {
     "id": "proposal.rejected",
-    "description": "Proposal can be voted from now on",
-    "defaultMessage": "Voting open",
-    "message": "Votazione aperta",
+    "description": "Proposal got rejected",
+    "defaultMessage": "Rejected",
+    "message": "Rigettata",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
@@ -352,7 +353,7 @@
     "id": "commands.collapseReplies",
     "description": "Hide replies",
     "defaultMessage": "Hide replies",
-    "message": "nascondi le risposte",
+    "message": "Nascondi risposte",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
@@ -366,35 +367,35 @@
     "id": "commands.expandReplies",
     "description": "Show replies",
     "defaultMessage": "View all {cnt} replies",
-    "message": "Mostra le risposte",
+    "message": "Visualizza tutte e {cnt} le risposte",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "commands.expandReply",
     "description": "Show reply",
     "defaultMessage": "View reply",
-    "message": "Mostra la risposta",
+    "message": "Visualizza la risposta",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "commands.reply",
     "description": "Btn to reply",
     "defaultMessage": "Reply",
-    "message": "Risposta",
+    "message": "Rispondi",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "label.edited",
     "description": "Comment edited",
-    "defaultMessage": "edited {time}",
-    "message": "Modificato {time}",
+    "defaultMessage": "{time} (edited)",
+    "message": "{time} (modificato)",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "statements.delete",
     "description": "Menu entry on statements to delete statement",
     "defaultMessage": "delete",
-    "message": "Cancella",
+    "message": "Elimina",
     "files": [
       "src/components/Comment/Comment.js",
       "src/components/Statement/Statement.js"
@@ -404,7 +405,7 @@
     "id": "statements.flag",
     "description": "Menu entry on statements to flag statement",
     "defaultMessage": "flag",
-    "message": "",
+    "message": "Segnala abuso",
     "files": [
       "src/components/Comment/Comment.js",
       "src/components/Statement/Statement.js"
@@ -449,6 +450,7 @@
     "message": "La scelta è errata. Seleziona una delle opzioni proposte",
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
+      "src/components/FormValidation/FormValidation.js",
       "src/components/ProposalInput/ProposalInput.js",
       "src/components/TagForm/TagForm.js",
       "src/components/WorkTeamForm/WorkTeamForm.js",
@@ -512,6 +514,7 @@
     "defaultMessage": "Cancel",
     "message": "Cancella",
     "files": [
+      "src/components/ConfirmLayer/ConfirmLayer.js",
       "src/components/ImageUpload/ImageUpload.js",
       "src/components/Poll/Poll.js",
       "src/components/UserSettings/EmailField.js",
@@ -545,6 +548,7 @@
     "defaultMessage": "Your email address seems to be invalid",
     "message": "Il tuo indirizzo email sembra non essere valido",
     "files": [
+      "src/components/FormValidation/FormValidation.js",
       "src/components/Login/Login.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/EmailField.js",
@@ -711,6 +715,7 @@
     "defaultMessage": "Email address already in use",
     "message": "Questo indirizzo email è già in uso. Riprova",
     "files": [
+      "src/components/FormValidation/FormValidation.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
@@ -770,7 +775,10 @@
     "description": "Short command to invoke deletion",
     "defaultMessage": "Delete",
     "message": "Elimina",
-    "files": ["src/components/SupervisionPanel/SupervisionPanel.js"]
+    "files": [
+      "src/components/ConfirmLayer/ConfirmLayer.js",
+      "src/components/SupervisionPanel/SupervisionPanel.js"
+    ]
   },
   {
     "id": "commands.more",
@@ -937,7 +945,8 @@
     "description": "Password recovery instruction",
     "defaultMessage":
       "Enter your email address below and we'll send you a link to reset your password",
-    "message": "Inserisci il tuo indirizzo email qui sotto e ti invieremo un link per resettare la tua password",
+    "message":
+      "Inserisci il tuo indirizzo email qui sotto e ti invieremo un link per resettare la tua password",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
@@ -945,7 +954,8 @@
     "description": "Password recovery instruction",
     "defaultMessage":
       "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
-    "message": "Controlla la tua casella di posta per i prossimi passi. Se non ricevi un'email, e non è nella tua cartella spam, questo potrebbe significare che ti sei registrato con un indirizzo diverso.",
+    "message":
+      "Controlla la tua casella di posta per i prossimi passi. Se non ricevi un'email, e non è nella tua cartella spam, questo potrebbe significare che ti sei registrato con un indirizzo diverso.",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
@@ -987,15 +997,13 @@
     "id": "action.cancel",
     "description": "Label",
     "defaultMessage": "Cancel",
-    "message": "Annulla",
-    "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
+    "message": "Annulla"
   },
   {
     "id": "action.delete",
     "description": "Label",
     "defaultMessage": "Delete",
-    "message": "Elimina",
-    "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
+    "message": "Elimina"
   },
   {
     "id": "action.leave",
@@ -1079,8 +1087,9 @@
     "id": "settings.verificationCall",
     "description": "Notification to verify mail address",
     "defaultMessage":
-      "Confirm your email address. A confirmation message was sent to \"{email}\"",
-    "message": "Conferma il tuo indirizzo email. Un messaggio di conferma è stato inviato a \ "{email}\"",
+      "Confirm your email address. A confirmation message was sent to ({email})",
+    "message":
+      "Conferma il tuo indirizzo email. Un messaggio di conferma è stato inviato a ({email})",
     "files": ["src/routes/account/AccountContainer.js"]
   },
   {
@@ -1206,5 +1215,12 @@
     "defaultMessage": "Coordinator",
     "message": "Coordinatore",
     "files": ["src/components/WorkTeam/WorkTeam.js"]
+  },
+  {
+    "id": "form.error-min",
+    "description": "Min",
+    "defaultMessage": "Enter atleast {value} chars or numbers",
+    "message": "",
+    "files": ["src/components/FormValidation/FormValidation.js"]
   }
 ]
