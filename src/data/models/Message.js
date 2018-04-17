@@ -1,5 +1,6 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+// import EventManager from '../../core/EventManager';
 
 class Message {
   constructor(data) {
@@ -22,13 +23,13 @@ class Message {
   }
 
   static async create(viewer, data, loaders, trx) {
-    if (!data || !data.type || !data.msg) return null;
+    if (!data || !data.type || !data.msg /* || data.info */) return null;
     if (!canMutate(viewer, data, Models.MESSAGE)) return null;
 
     let message;
     const newData = Object.keys(data).reduce(
       (acc, curr) => {
-        if (!(curr in acc)) {
+        if (!(curr in acc) && curr !== 'info') {
           acc[curr] = data[curr];
         }
         return acc;
@@ -53,6 +54,13 @@ class Message {
 
     message = message[0]; // eslint-disable-line
 
+    if (message) {
+      /* EventManager.publish('onMessageCreated', {
+        viewer,
+        message: { ...message, targetType: data.info.targetType },
+        subjectId: data.info.targetId,
+      }); */
+    }
     return message ? new Message(message) : null;
   }
 }

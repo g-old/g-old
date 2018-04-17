@@ -96,9 +96,8 @@ class SubscriptionButton extends React.Component {
       defaultOption = 'REPLIES';
     } else {
       messageKey = 'updates';
-      messageKey = 'UPDATES';
+      defaultOption = 'UPDATES';
     }
-
     return (
       <Box>
         <Select

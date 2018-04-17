@@ -28,7 +28,7 @@ const notification = {
     id = Number(id);
 
     const notificationIds = await knex('notifications')
-      .where({ user_id: userId, read: false })
+      .where({ user_id: userId })
       .whereRaw('(notifications.created_at, notifications.id) < (?,?)', [
         cursor,
         id,

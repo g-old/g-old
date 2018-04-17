@@ -35,7 +35,7 @@ class Activity {
     if (!data.verb || !data.type || !data.objectId || !data.content)
       return null;
     if (!canMutate(viewer, data, Models.ACTIVITY)) return null;
-    const activity = {
+    const newData = {
       actor_id: viewer.id,
       verb: data.verb,
       type: data.type,
@@ -43,11 +43,11 @@ class Activity {
       content: JSON.stringify(data.content),
       created_at: new Date(),
     };
-    const [id = null] = await knex('activities')
-      .insert(activity)
-      .returning('id');
-    if (id == null) return null;
-    const newActivity = await new Activity({ ...activity, id });
+    const [activity = null] = await knex('activities')
+      .insert(newData)
+      .returning('*');
+    if (activity == null) return null;
+    const newActivity = await new Activity(activity);
     if (newActivity) {
       EventManager.publish('onActivityCreated', {
         viewer,

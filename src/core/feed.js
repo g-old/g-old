@@ -1,10 +1,11 @@
 /* eslint-disable import/prefer-default-export */
 import Activity from '../data/models/Activity';
 import Message from '../data/models/Message';
-import WorkTeam from '../data/models/WorkTeam';
+// import WorkTeam from '../data/models/WorkTeam';
 import knex from '../data/knex';
 import log from '../logger';
-import User from '../data/models/User';
+// import User from '../data/models/User';
+import { TargetType } from '../data/models/Subscription';
 
 const maxFeedLength = 30;
 
@@ -156,19 +157,33 @@ export async function circularFeedMessage({
   }
   const result = null;
   try {
-    const message = await Message.create(viewer, {
-      type: data.messageType, // event or msg
-      msg: data.msg,
-      title: data.title,
-      date: data.date,
-      location: data.location,
-    });
+    const message = await Message.create(
+      viewer,
+      {
+        type: data.messageType, // event or msg
+        msg: data.msg,
+        title: data.title,
+        date: data.date,
+        location: data.location,
+        /* info: {
+        targetType:
+          receiver.type === 'team' ? TargetType.GROUP : TargetType.USER,
+        targetId: receiver.id,
+      }, */
+      },
+      loaders,
+    );
     if (!message) return null;
     const activity = await Activity.create(viewer, {
       verb,
       type: 'message',
       objectId: message.id,
-      content: message,
+      content: {
+        ...message,
+        targetType:
+          receiver.type === 'team' ? TargetType.GROUP : TargetType.USER,
+        targetId: receiver.id,
+      },
     });
     if (!activity) {
       await knex('messages')
@@ -176,7 +191,8 @@ export async function circularFeedMessage({
         .del();
       return result;
     }
-    let res;
+    return result;
+    /* let res;
     if (receiver.type === 'team') {
       const team = await WorkTeam.gen(viewer, receiver.id);
       if (!team) {
@@ -204,7 +220,7 @@ export async function circularFeedMessage({
         .where({ id: activity.id })
         .del();
     }
-    return res;
+    return res; */
   } catch (err) {
     log.error(
       { err, args: { viewer, data, verb, receiver } },

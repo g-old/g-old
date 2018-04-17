@@ -13,6 +13,9 @@ const SubscriptionTypeEnum = new GraphQLEnumType({
     FOLLOWEES: {
       value: SubscriptionType.FOLLOWEES,
     },
+    REPLIES: {
+      value: SubscriptionType.REPLIES,
+    },
   },
 });
 

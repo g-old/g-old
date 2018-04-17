@@ -19,7 +19,13 @@ exports.up = function(knex, Promise) {
             ])
             .notNullable();
           table.integer('target_id').notNullable();
-          table.enu('subscription_type', ['no', 'followees', 'all', 'updates']);
+          table.enu('subscription_type', [
+            'no',
+            'followees',
+            'all',
+            'updates',
+            'replies',
+          ]);
           table.timestamps();
         });
       }

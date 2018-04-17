@@ -3,3 +3,7 @@
 .root {
   color: #000;
 }
+
+.unread {
+  background-color: beige;
+}

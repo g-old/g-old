@@ -239,6 +239,7 @@ class ProposalContainer extends React.Component {
             />
             <Proposal {...proposal} />
             <SubscriptionButton
+              targetType="PROPOSAL"
               onSubscribe={this.handleSubscription}
               subscription={proposal.subscription}
             />

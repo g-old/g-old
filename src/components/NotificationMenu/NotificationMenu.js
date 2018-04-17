@@ -116,7 +116,7 @@ class NotificationMenu extends React.Component {
           <Button onClick={this.onMarkAsRead} label="Mark all as read" plain />
         </Box>
         <List>
-          {this.props.notifications.filter(n => !n.read).map(n => (
+          {this.props.notifications.map(n => (
             <ListItem>
               <Notification {...n} />
             </ListItem>

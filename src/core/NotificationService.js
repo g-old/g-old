@@ -5,10 +5,25 @@ import { SubscriptionType, TargetType } from '../data/models/Subscription';
 import { ActivityType } from '../data/models/Activity';
 // TODO write Dataloaders for batching
 let timer;
+
+const filterReplies = (parents, activities) => {
+  const result = [];
+  parents.forEach(p => {
+    activities.forEach(a => {
+      // eslint-disable-next-line
+      if (a.content.parentId == p.id) {
+        result.push(a);
+      }
+    });
+  });
+  return result;
+};
+
 class NotificationService {
   constructor({
     eventManager = throwIfMissing('EventManager'),
     dbConnector = throwIfMissing('Database connection'),
+    // sseEmitter = throwIfMissing('SSE-Emitter'),
     maxBatchSize,
     batchingWindow,
   }) {
@@ -54,8 +69,8 @@ class NotificationService {
         break;
 
       case ActivityType.MESSAGE:
-        type = TargetType.USER;
-        targetId = activity.subjectId || subjectId;
+        type = activity.content.targetType;
+        targetId = activity.subjectId || activity.content.targetId;
         break;
       default:
         return;
@@ -188,6 +203,9 @@ class NotificationService {
         const notificationData = await this.combineData(
           activitiesAndSubscribers,
         );
+        // const counterData = getNotificationsCounts(notificationData);
+
+        // this.sseEmitter.publish('notifications', counterData);
 
         const { notifications, webpush, email } = this.getAndGroupNotifications(
           notificationData,
@@ -205,6 +223,7 @@ class NotificationService {
       // console.log('PROCESSING TIME:', endTime);
 
       // TODO
+
       // SSE all new notifications to active users - only count of new notifications
     } catch (err) {
       log.error({ err }, err.message);
@@ -233,7 +252,8 @@ class NotificationService {
     ) {
       return {
         subscriber,
-        activities,
+        // eslint-disable-next-line
+        activities: activities.filter(a => a.actorId != subscriber.userId),
       };
     }
     switch (subscriber.subscriptionType) {
@@ -256,18 +276,27 @@ class NotificationService {
       case SubscriptionType.REPLIES: {
         if (activities.length) {
           // for each one which has a parent id get parent comments author...
-          const relevantIds = activities.map(a => a.objectId);
+          const relevantIds = activities
+            .filter(
+              a =>
+                a.type === ActivityType.COMMENT && // eslint-disable-next-line
+                a.actorId != subscriber.userId,
+            )
+            .map(a => a.content.parentId);
           // TODO  with Dataloader
-          const replyIds = await this.dbConnector('comments')
-            .whereNotNull('parent_id')
-            .whereIn('id', [relevantIds])
-            .where({ author_id: subscriber.id })
-            .pluck('id');
+
+          const parents = await this.dbConnector('comments')
+            .whereNull('parent_id')
+            .whereIn('id', relevantIds)
+            .select(['author_id', 'id']);
+
+          const relevantParents = parents.filter(
+            // eslint-disable-next-line
+            p => p.author_id == subscriber.userId,
+          );
           return {
             subscriber,
-            activities: replyIds.map(
-              rId => activities.find(a => a.objectId == rId), // eslint-disable-line
-            ),
+            activities: filterReplies(relevantParents, activities),
           };
         }
         return {};

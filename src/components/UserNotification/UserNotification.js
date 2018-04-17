@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import cn from 'classnames';
 import {
   defineMessages,
   FormattedMessage,
@@ -31,6 +32,11 @@ const messages = defineMessages({
     defaultMessage: 'New discussion published: {title}',
     description: 'Status message for notifications',
   },
+  messageNew: {
+    id: 'notifications.message.new',
+    defaultMessage: 'You got a message from {author}',
+    description: 'Status message for notifications',
+  },
   voting: {
     id: 'notifications.proposal.voting',
     defaultMessage: 'Voting phase started for {title}',
@@ -52,6 +58,7 @@ class UserNotification extends React.Component {
   static propTypes = {
     activity: PropTypes.shape({}).isRequired,
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    read: PropTypes.bool.isRequired,
   };
   static defaultProps = {};
 
@@ -107,19 +114,23 @@ class UserNotification extends React.Component {
       }
       case 'comment': {
         if (activity.verb === 'create') {
+          const parent = activity.object.parentId;
+          const child = parent ? activity.object.id : null;
           return {
             message: (
               <FormattedMessage
                 {...messages.commentNew}
                 values={{
                   author: `${activity.actor.name} ${activity.actor.surname}`,
-                  topic: info.discussionTitle,
+                  topic: info.title,
                 }}
               />
             ),
-            path: `/workteams/${activity.workTeamId}/discussions/${
+            path: `/workteams/${info.workTeamId}/discussions/${
               activity.object.discussionId
-            }?comment=${activity.objectId}&ref=notification&id=${id}`,
+            }?comment=${parent || activity.object.id}${
+              child ? `&child=${child}` : ''
+            }&ref=notification&id=${id}`,
           };
         }
         return 'To implement';
@@ -142,6 +153,22 @@ class UserNotification extends React.Component {
         }
         return 'To implement';
       }
+      case 'message': {
+        if (activity.verb === 'create') {
+          return {
+            message: (
+              <FormattedMessage
+                {...messages.messageNew}
+                values={{
+                  author: `${activity.actor.name} ${activity.actor.surname}`,
+                }}
+              />
+            ),
+            path: `/messages/${activity.objectId}${param}`,
+          };
+        }
+        return 'To implement';
+      }
 
       default:
         return <span>Not found</span>;
@@ -153,7 +180,10 @@ class UserNotification extends React.Component {
     const data = this.computeData(activity);
     return (
       // eslint-disable-next-line
-      <Link to={data.path} className={s.root}>
+      <Link
+        to={data.path}
+        className={cn(s.root, this.props.read ? null : s.unread)}
+      >
         <Box pad column>
           <span>
             <img alt="" src={activity.actor.thumbnail} /> {data.message}
