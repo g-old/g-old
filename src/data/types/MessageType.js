@@ -6,6 +6,7 @@ import {
 } from 'graphql';
 
 import UserType from './UserType';
+import User from '../models/User';
 
 const MessageType = new ObjectType({
   name: 'Message',
@@ -28,6 +29,9 @@ const MessageType = new ObjectType({
 
     sender: {
       type: UserType,
+      resolve(parent, args, { viewer, loaders }) {
+        return User.gen(viewer, parent.senderId, loaders);
+      },
     },
 
     location: {

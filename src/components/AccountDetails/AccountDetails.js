@@ -14,7 +14,7 @@ import GroupManager from '../GroupManager';
 import { Groups, AccessMasks, canAccess } from '../../organization';
 import ImageUpload from '../ImageUpload';
 import { uploadAvatar } from '../../actions/file';
-import { notifyUser } from '../../actions/messages';
+import { notifyUser } from '../../actions/message';
 import ProfilePicture from '../ProfilePicture';
 import Box from '../Box';
 import MessageInput from '../MessageInput';

@@ -1,14 +1,22 @@
-import merge from 'lodash.merge';
-import { LOAD_FEED_SUCCESS } from '../constants';
+import { combineReducers } from 'redux';
+import { denormalize } from 'normalizr';
+import byId, * as fromById from './messageById';
+import { message as messageSchema } from './../store/schema';
 
-export default function votes(state = {}, action) {
-  switch (action.type) {
-    case LOAD_FEED_SUCCESS:
-      return action.payload.entities.messages
-        ? merge({}, state, action.payload.entities.messages)
-        : state;
+export default combineReducers({
+  byId,
+});
 
-    default:
-      return state;
-  }
-}
+export const getStatus = state => ({
+  error: state.all.errorMessage,
+  pending: state.all.pending,
+});
+const hydrateEntity = (data, entities) =>
+  denormalize(data, messageSchema, {
+    users: entities.users.byId,
+  });
+
+export const getEntity = (state, id, entities) => {
+  const message = fromById.getEntity(state.byId, id);
+  return hydrateEntity(message, entities);
+};

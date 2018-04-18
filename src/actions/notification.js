@@ -24,6 +24,7 @@ import {
 } from '../store/schema';
 import { genStatusIndicators } from '../core/helpers';
 import { pollFieldsForList } from './proposal';
+import { messageFields } from './message';
 
 const userFields = `
 id
@@ -81,6 +82,9 @@ const notificationFields = `
          author{
         ${userFields}
       }
+    }
+          ... on Message {
+        ${messageFields}
 
     }
         }

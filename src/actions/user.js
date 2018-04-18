@@ -24,9 +24,8 @@ import {
 import { getUsersStatus } from '../reducers';
 import { requestFields } from './request';
 
-const userFields = `
+export const userFields = `
   id,
-  groups,
   name,
   surname,
   thumbnail,
@@ -41,6 +40,7 @@ query ($group:Int $after:String $union:Boolean) {
     edges{
       node{
     ${userFields}
+    groups
     createdAt,
     lastLogin,
     emailVerified,
@@ -94,6 +94,7 @@ query ($id:ID!) {
       }
     }
     ${userFields}
+    groups
 
   }
 }
@@ -117,6 +118,7 @@ const updateUserMutation = `
 mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $password:String, $passwordOld:String, $followee:ID, $notificationSettings:String){
   updateUser ( user:{id:$id name:$name, surname:$surname, groups:$groups, email:$email, password:$password passwordOld:$passwordOld followee:$followee notificationSettings:$notificationSettings }){
     user{${userFields}
+    groups
     email,
     emailVerified,
     notificationSettings
@@ -135,7 +137,9 @@ mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $pass
 const deleteUserMutation = `
 mutation($id:ID){
   deleteUser(user:{id:$id}){
-    user{${userFields}}
+    user{${userFields}
+    groups
+  }
     errors
 
   }
@@ -145,6 +149,7 @@ const userSearch = `
 query ($term:String) {
   searchUser (term:$term) {
   ${userFields}
+  groups
   }
 }
 `;

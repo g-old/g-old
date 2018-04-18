@@ -47,6 +47,7 @@ const hydrateList = (state, data, entities) =>
       proposals: entities.proposals.byId,
       comments: entities.comments.byId,
       discussions: entities.discussions.byId,
+      messages: entities.messages.byId,
     },
   );
 

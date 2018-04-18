@@ -20,6 +20,10 @@ export default combineReducers({
 });
 
 /* GENERATOR */
+
+export const getMessage = (state, id) =>
+  fromEntity.getMessage(state.entities, id);
+
 export const getAllNotifications = state =>
   fromEntity.getAllNotifications(state.entities);
 

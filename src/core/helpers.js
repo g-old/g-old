@@ -247,3 +247,10 @@ export function findVisibleParent(element) {
   }
   return null;
 }
+
+export const createStaticCopyFn = keys => {
+  const keyValues = keys.map(key => `"${key}": obj.${key},`);
+  const body = [`return {`].concat(keyValues, `};`);
+  // eslint-disable-next-line no-new-func
+  return new Function('obj', body.join(''));
+};

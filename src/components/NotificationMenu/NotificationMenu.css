@@ -9,3 +9,19 @@
   border-radius: 4px;
   overflow: auto;
 }
+
+.notification {
+  cursor: pointer;
+  display: flex;
+  padding: 0.3em;
+  border-radius: 8px;
+  font-size: 1.2em;
+  color: #000;
+  stroke: #000;
+}
+
+.unread {
+  color: #fff;
+  stroke: #fff;
+  background-color: #f00;
+}

@@ -81,24 +81,31 @@ passport.serializeUser((user, done) => {
     return knex('user_work_teams')
       .where({ user_id: user.id })
       .select('work_team_id')
+      .then(ids => ids)
       .then(ids => {
         const wtMemberships = ids.map(data => data.work_team_id);
-        const sessionUser = {
-          id: user.id,
-          name: user.name,
-          surname: user.surname,
-          email: user.email,
-          avatar,
-          thumbnail: user.thumbnail,
-          permissions: rights.perm,
-          privileges: rights.priv,
-          groups: user.groups,
-          wtMemberships,
-          canVoteSince: user.can_vote_since || user.canVoteSince,
-          emailVerified,
-        };
-        done(null, sessionUser);
-        return null;
+        return knex('notifications')
+          .where({ user_id: user.id, read: false })
+          .count('id')
+          .then(([count]) => {
+            const sessionUser = {
+              id: user.id,
+              name: user.name,
+              surname: user.surname,
+              email: user.email,
+              avatar,
+              thumbnail: user.thumbnail,
+              permissions: rights.perm,
+              privileges: rights.priv,
+              groups: user.groups,
+              wtMemberships,
+              canVoteSince: user.can_vote_since || user.canVoteSince,
+              emailVerified,
+              unreadNotifications: count.count,
+            };
+            done(null, sessionUser);
+            return null;
+          });
       });
     /*  const sessionUser = {
       id: user.id,

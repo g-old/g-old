@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './UserPanel.css';
-import { notifyUser } from '../../actions/messages';
+import { notifyUser } from '../../actions/message';
 import { updateUser, loadUserList, findUser } from '../../actions/user';
 import FetchError from '../FetchError';
 import AccountDetails from '../AccountDetails';

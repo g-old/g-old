@@ -164,7 +164,7 @@ class UserNotification extends React.Component {
                 }}
               />
             ),
-            path: `/messages/${activity.objectId}${param}`,
+            path: `/message/${activity.object.id}${param}`,
           };
         }
         return 'To implement';

@@ -25,6 +25,7 @@ import {
   LOAD_REQUESTS_SUCCESS,
   CREATE_REQUEST_SUCCESS,
   DELETE_REQUEST_SUCCESS,
+  LOAD_MESSAGE_SUCCESS,
 } from '../constants';
 
 const handleUsers = (state, action) => {
@@ -91,6 +92,7 @@ export default function byId(state = {}, action) {
     case LOAD_REPLIES_SUCCESS:
     case LOAD_REQUESTS_SUCCESS:
     case LOAD_WORKTEAM_SUCCESS:
+    case LOAD_MESSAGE_SUCCESS:
     case SESSION_LOGIN_SUCCESS: {
       return merge({}, state, action.payload.entities.users);
     }

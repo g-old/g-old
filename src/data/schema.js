@@ -78,6 +78,7 @@ import updateNotification from './mutations/updateNotification';
 import deleteNotification from './mutations/deleteNotification';
 import notificationConnection from './queries/notificationConnection';
 import clearNotifications from './mutations/clearNotifications';
+import message from './queries/message';
 /* GENERATOR */
 
 const schema = new Schema({
@@ -107,6 +108,7 @@ const schema = new Schema({
       requestConnection,
       subscriptionConnection,
       notificationConnection,
+      message,
       /* GENERATOR_QUERIES */
     },
   }),

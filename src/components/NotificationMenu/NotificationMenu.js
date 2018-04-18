@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './NotificationMenu.css';
 import Box from '../Box';
@@ -132,28 +133,26 @@ class NotificationMenu extends React.Component {
     if (!this.props.user) {
       return null;
     }
-
+    let numUnread;
+    if (this.props.user.unreadNotifications > 0) {
+      numUnread = this.props.user.unreadNotifications;
+    }
     return (
       // eslint-disable-next-line
-      <div ref={elm => (this.componentRef = elm)}>
-        <Button
-          plain
-          onClick={this.toggleMenu}
-          icon={
-            <svg
-              version="1.1"
-              viewBox="0 0 24 24"
-              width="24px"
-              height="24px"
-              role="img"
-              aria-label="menu"
-            >
-              <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.bell} />
-            </svg>
-          }
-          reverse
-          label={this.props.user.unreadNotifications}
-        />
+      <div onClick={this.toggleMenu} ref={elm => (this.componentRef = elm)}>
+        <div className={cn(s.notification, numUnread ? s.unread : null)}>
+          <span>{numUnread && this.props.user.unreadNotifications}</span>
+          <svg
+            version="1.1"
+            viewBox="0 0 24 24"
+            width="24px"
+            height="24px"
+            role="img"
+            aria-label="menu"
+          >
+            <path fill="none" strokeWidth="2" d={ICONS.bell} />
+          </svg>
+        </div>
       </div>
     );
   }

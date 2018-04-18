@@ -7,7 +7,7 @@ import roles from './roles';
 import tags, * as fromTags from './tags';
 import pollingModes from './pollingModes';
 import votes from './votes';
-import messages from './messages';
+import messages, * as fromMessages from './messages';
 import statementLikes from './statementLikes';
 import flaggedStatements, * as fromFlaggedStatements from './flaggedStatements';
 import activities, * as fromActivities from './activities';
@@ -49,6 +49,10 @@ export default combineReducers({
 });
 
 /* GENERATOR_EXPORTS */
+
+export const getMessage = (state, id) =>
+  fromMessages.getEntity(state.messages, id, state);
+
 export const getNotification = (state, id) =>
   fromNotifications.getEntity(state.notifications, id, state);
 

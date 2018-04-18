@@ -66,6 +66,10 @@ const routes = {
       load: () => import(/* webpackChunkName: 'admin' */ './admin'),
     },
     {
+      path: '/message/:id',
+      load: () => import(/* webpackChunkName: 'message' */ './message'),
+    },
+    {
       path: '/admin/workteam/create',
       load: () => import(/* webpackChunkName: 'admin' */ './workTeamCreate'),
     },
