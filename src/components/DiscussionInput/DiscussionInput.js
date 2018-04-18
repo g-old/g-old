@@ -426,7 +426,7 @@ class DiscussionInput extends React.Component {
               primary
               label={<FormattedMessage {...messages.submit} />}
               onClick={this.onSubmit}
-              disabled={this.isPending}
+              disabled={this.props.isPending}
             />
             <Button
               label="Preview"
