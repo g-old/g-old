@@ -32,6 +32,8 @@ pipeline:
     repo: tobiasmayr/gold
     auto_tag: true
     secrets: [ docker_username, docker_password ]
+    build_args:
+      - DRONE_BUILD_NUMBER=${DRONE_BUILD_NUMBER}
     when:
       event: tag
 
@@ -42,5 +44,12 @@ pipeline:
       - ./node_modules
     volumes:
       - /tmp/cache:/cache
+
+  telegram:
+    image: appleboy/drone-telegram
+    token: $TELEGRAM_TOKEN
+    to: $TELEGRAM_GROUP_ID
+    when:
+      status: [ success, failure ]
 
 branches: [ dev ]
