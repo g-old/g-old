@@ -1,5 +1,6 @@
 import { throwIfMissing } from './utils';
 import log from '../logger';
+import { sendJob } from './childProcess';
 
 import { SubscriptionType, TargetType } from '../data/models/Subscription';
 import { ActivityType } from '../data/models/Activity';
@@ -216,7 +217,8 @@ class NotificationService {
           notifications,
           this.maxBatchSize,
         );
-        this.notifyPushServices({ webpush, email });
+
+        await this.notifyPushServices({ webpush, email });
       }
 
       // const endTime = process.hrtime(startTime);
@@ -321,7 +323,14 @@ class NotificationService {
     }
   }
 
-  notifyPushServices({ webpush, email }) {
+  async notifyPushServices({ webpush, email }) {
+    if (email) {
+      const job = {
+        type: 'batchMailing',
+        data: email,
+      };
+      await sendJob(job);
+    }
     this.EventManager.publish('readyForPush', webpush);
     this.EventManager.publish('readyForEmail', email);
   }
@@ -339,6 +348,7 @@ class NotificationService {
   // eslint-disable-next-line class-methods-use-this
   getAndGroupNotifications(notificationData) {
     const now = new Date();
+    const emailData = { activities: {}, subscriberIds: new Set() };
     return notificationData.reduce(
       (acc, data) => {
         if (data.subscriber && data.activities) {
@@ -351,7 +361,18 @@ class NotificationService {
             if (data.subscriber.settings[a.type]) {
               // TODO normalize activities with Map aId: a, aId: [userIds]
               if (data.subscriber.settings[a.type].email) {
-                acc.email.push({ userId: data.subscriber.userId, activity: a });
+                if (emailData.activities[a.id]) {
+                  emailData.activities[a.id].subscribers.push(
+                    data.subscriber.userId,
+                  );
+                } else {
+                  emailData.activities[a.id] = {
+                    subscribers: [data.subscriber.userId],
+                    activity: a,
+                  };
+                }
+                emailData.subscriberIds.add(data.subscriber.userId);
+                // acc.email.push({ userId: data.subscriber.userId, activity: a });
               } else if (data.subscriber.settings[a.type].webpush) {
                 acc.webpush.push({
                   userId: data.subscriber.userId,
@@ -363,7 +384,7 @@ class NotificationService {
         }
         return acc;
       },
-      { notifications: [], webpush: [], email: [] },
+      { notifications: [], webpush: [], email: emailData },
     );
   }
 }

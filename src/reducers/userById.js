@@ -26,6 +26,7 @@ import {
   CREATE_REQUEST_SUCCESS,
   DELETE_REQUEST_SUCCESS,
   LOAD_MESSAGE_SUCCESS,
+  UPDATE_NOTIFICATION_SUCCESS,
 } from '../constants';
 
 const handleUsers = (state, action) => {
@@ -117,6 +118,17 @@ export default function byId(state = {}, action) {
     case FETCH_USER_SUCCESS: {
       // bc of permissions
       return handleUsers(state, action);
+    }
+
+    case UPDATE_NOTIFICATION_SUCCESS: {
+      const { userId } = action;
+      return {
+        ...state,
+        [userId]: {
+          ...state[userId],
+          unreadNotifications: state[userId].unreadNotifications - 1,
+        },
+      };
     }
     default:
       return state;

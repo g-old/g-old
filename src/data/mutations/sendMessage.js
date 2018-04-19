@@ -1,7 +1,7 @@
 import { GraphQLNonNull, GraphQLBoolean } from 'graphql';
 import MessageInput from '../types/MessageInputType';
 import { canAccess } from '../../organization';
-import { EmailTypes } from '../../core/BackgroundService';
+import { EmailType } from '../../core/BackgroundService';
 import { sendJob } from '../../core/childProcess';
 import User from '../models/User';
 
@@ -28,7 +28,7 @@ const sendMessage = {
         const job = {
           type: 'mail',
           data: {
-            mailType: EmailTypes.MESSAGE,
+            mailType: EmailType.MESSAGE,
             message: msg.msg,
             subject: message.subject || 'Info from GOLD',
             recipient: receiver,

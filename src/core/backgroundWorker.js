@@ -5,6 +5,8 @@ import Proposal from '../data/models/Proposal';
 import { circularFeedMessage } from './feed';
 import createLoaders from '../data/dataLoader';
 import root from '../compositionRoot';
+import { EmailType } from './BackgroundService';
+import { ActivityType } from '../data/models/Activity';
 
 const handleMessages = async (viewer, messageData, receiver) =>
   circularFeedMessage({
@@ -129,27 +131,220 @@ const notifyProposalCreation = async proposal => {
   });
 };
 
-async function processMessages(data) {
-  log.info({ data }, 'Job received');
+const resourceByLocale = {
+  'de-DE': {
+    [ActivityType.PROPOSAL]: 'Neuer Beschluss',
+    [ActivityType.DISCUSSION]: 'Neue Diskussion',
+    [ActivityType.SURVEY]: 'Neue Umfrage',
+    [ActivityType.COMMENT]: 'Neuer Kommentar',
+    [ActivityType.STATEMENT]: 'Neues Statement',
+    [ActivityType.MESSAGE]: 'Neue Nachricht',
+  },
+  'it-IT': {
+    [ActivityType.PROPOSAL]: 'Nuova proposta',
+    [ActivityType.DISCUSSION]: 'Nuova discussione',
+    [ActivityType.SURVEY]: 'Nuovo sondaggio',
+    [ActivityType.COMMENT]: 'Nuovo commento',
+    [ActivityType.STATEMENT]: 'Nuovo statement',
+    [ActivityType.MESSAGE]: 'Nuovo messagio',
+  },
+  'lld-IT': {
+    [ActivityType.PROPOSAL]: 'Nuova proposta',
+    [ActivityType.DISCUSSION]: 'Nuova discussione',
+    [ActivityType.SURVEY]: 'Nuovo sondaggio',
+    [ActivityType.COMMENT]: 'Nuovo commento',
+    [ActivityType.STATEMENT]: 'Nuovo statement',
+    [ActivityType.MESSAGE]: 'Nuovo messagio',
+  },
+};
+
+const getProposalLink = proposal => {
+  if (proposal.poll_two_id && proposal.poll_one_id) {
+    return `/proposal/${proposal.poll_one_id}/${proposal.poll_two_id}`;
+  }
+  return `/proposal/${proposal.poll_two_id || proposal.poll_one_id}`;
+};
+
+const getCommentLink = (comment, groupId) => {
+  const parent = comment.parent_id;
+  const child = parent ? comment.id : null;
+
+  return `/workteams/${groupId}/discussions/${
+    comment.discussion_id
+  }?comment=${parent || comment.id}${child ? `&child=${child}` : ''}`;
+};
+
+// from :http://learnjsdata.com/combine_data.html
+function join(lookupTable, mainTable, lookupKey, mainKey, select) {
+  const l = lookupTable.length;
+  const m = mainTable.length;
+  const lookupIndex = [];
+  const output = [];
+  // eslint-disable-next-line
+  for (let i = 0; i < l; i++) {
+    // loop through l items
+    const row = lookupTable[i];
+    lookupIndex[row[lookupKey]] = row; // create an index for lookup table
+  }
+  // eslint-disable-next-line
+  for (let j = 0; j < m; j++) {
+    // loop through m items
+    const y = mainTable[j];
+    const x = lookupIndex[y[mainKey]]; // get corresponding row from lookupTable
+    output.push(select(y, x)); // select only the columns you need
+  }
+  return output;
+}
+
+const notifyMultiple = async data => {
+  // group by type&locale - get diff message by type , diff link
+
+  // get resources title for proposals
+  // load objects
+
+  const mapTypeToTable = {
+    [ActivityType.PROPOSAL]: 'proposals',
+    [ActivityType.DISCUSSION]: 'discussions',
+    [ActivityType.SURVEY]: 'proposals',
+    [ActivityType.STATEMENT]: 'statements',
+    [ActivityType.COMMENT]: 'comments',
+    [ActivityType.MESSAGE]: 'messages',
+  };
+
+  //
+
+  const groupedByType = Object.keys(data.activities).reduce(
+    (acc, activityId) => {
+      (acc[data.activities[activityId].type] =
+        acc[data.activities[activityId].type] || new Set()).add(
+        data.activities[activityId].objectId,
+      );
+      return acc;
+    },
+    {},
+  );
+  const allObjects = {};
+  const promises = Object.keys(groupedByType).map(async type => {
+    const objData = await this.dbConnector(mapTypeToTable[type])
+      .whereIn('id', groupedByType[type].values())
+      .select();
+    allObjects[type] = objData.reduce((acc, obj) => {
+      acc[obj.id] = obj;
+      return obj;
+    }, {});
+  });
+  await Promise.all(promises);
+  //
+
+  //
+
+  const userIds = data.subscriberIds.values();
+  const subscriptionData = await knex('subscriptions')
+    .whereIn('user_id', userIds)
+    .select();
+
+  let message;
+  let title;
+  let locale;
+  let link;
+
+  Object.keys(data.activities).map(activityId => {
+    const { activity } = data.activities[activityId];
+    const object = allObjects[activity.type][activity.objectId];
+    switch (activity.type) {
+      case ActivityType.SURVEY:
+        title = resourceByLocale[locale][activity.type];
+        message = object.title;
+        // problem if notifieing open votation
+        link = getProposalLink(object);
+        break;
+      case ActivityType.DISCUSSION:
+        title = resourceByLocale[locale][activity.type];
+        // problem if notifieing open votation
+        message = object.title;
+
+        link = `/workteams/${object.work_team_id}/discussions/${object.id}`;
+        break;
+      case ActivityType.PROPOSAL:
+        // get resources
+
+        title = resourceByLocale[locale][activity.type];
+        message = object.title;
+
+        link = getProposalLink(object);
+        // recipients are data-activities
+        break;
+
+      case ActivityType.STATEMENT:
+        message = 'Dont know how to get';
+        // Diff between reply and new ?
+
+        title = resourceByLocale[locale][activity.type];
+        link = getCommentLink(object, 'Noidea');
+        break;
+
+      case ActivityType.COMMENT:
+        message = 'Dont know how to get';
+        // Diff between reply and new ?
+
+        title = resourceByLocale[locale][activity.type];
+        link = getCommentLink(object, 'Noidea');
+        break;
+
+      case ActivityType.MESSAGE:
+        title = resourceByLocale[locale][activity.type];
+        link = `/message/${activity.objectId}`;
+        break;
+      default:
+        throw new Error(`Type not recognized ${activity.type}`);
+    }
+    // TODO
+    const activitySubscribers = join(subscriptionData); // data.activities[activityId].subscribers.filter(sId => ).find(sData => sData.user_id == )
+
+    return push(activitySubscribers, {
+      body: message.length > 40 ? `${message.slice(0, 36)}...` : message,
+      link,
+      title,
+      tag: activity.type,
+    });
+  });
+
+  // get subdata - for all, 1 query
+
+  // split in groups dh by activity
+};
+
+async function processMessages(message) {
+  log.info({ message }, 'Job received');
   let result = null;
   try {
-    switch (data.type) {
+    switch (message.type) {
       case 'webpush': {
         log.info('Starting webpush');
 
-        result = notifyProposalCreation(data.data);
+        result = notifyProposalCreation(message.data);
 
         break;
       }
       case 'webpushforstatementsTEST': {
         log.info('Starting webpush');
-        result = notifyNewStatements(data.viewer, data.data, createLoaders());
+        result = notifyNewStatements(
+          message.viewer,
+          message.data,
+          createLoaders(),
+        );
+
+        break;
+      }
+      case 'batchPushing': {
+        log.info('Starting webpush BATCH');
+        result = notifyMultiple(message.viewer, message.data, createLoaders());
 
         break;
       }
       case 'mail': {
         log.info('Starting mail');
-        const mailData = data.data;
+        const mailData = message.data;
         result = await root.BackgroundService.handleEmails(
           mailData.mailType,
           mailData,
@@ -157,11 +352,20 @@ async function processMessages(data) {
         break;
       }
 
+      case 'batchMailing': {
+        log.info('BATCHMAIL ;DATA', { message });
+        result = await root.BackgroundService.handleEmails(
+          message.data,
+          EmailType.TEST_BATCH,
+        );
+        break;
+      }
+
       case 'message': {
         result = handleMessages(
-          data.data.viewer,
-          data.data,
-          data.data.receiver,
+          message.data.viewer,
+          message.data,
+          message.data.receiver,
         );
         break;
       }
@@ -173,7 +377,7 @@ async function processMessages(data) {
       }
 
       default:
-        throw Error(`Job type not recognized: ${data.type}`);
+        throw Error(`Job type not recognized: ${message.type}`);
     }
   } catch (e) {
     log.error(e);

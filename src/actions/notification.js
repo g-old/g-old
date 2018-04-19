@@ -207,6 +207,7 @@ export function updateNotification(notification) {
       dispatch({
         type: UPDATE_NOTIFICATION_SUCCESS,
         payload: normalizedData,
+        userId: getState().user,
         properties,
         id: notification.id,
       });

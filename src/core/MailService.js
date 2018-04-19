@@ -63,6 +63,15 @@ class MailService {
       });
     });
   }
+  sendMultiple(mail) {
+    return new Promise((resolve, reject) => {
+      this.mailer.sendMail({ ...mail, isMultiple: true }, (err, data) => {
+        this.mailer.close();
+        if (err) reject(err);
+        resolve(data);
+      });
+    });
+  }
   async sendEmail(message) {
     const notOkay = this.checkMessage(message);
     if (notOkay) {
@@ -73,12 +82,15 @@ class MailService {
       content = 'html';
     }
     try {
-      const data = await this.send({
+      const messageData = {
         from: message.sender || this.DEFAULT_SENDER,
-        to: message.recipient,
+        to: message.isMultiple ? [message.recipient] : message.recipient,
         subject: message.subject || '',
         [content]: message[content],
-      });
+        ...(message.isMultiple && { isMultiple: true }),
+      };
+
+      const data = await this.send(messageData);
 
       // TODO notify success
       // TODO bulk mails
