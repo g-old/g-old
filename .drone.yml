@@ -47,8 +47,8 @@ pipeline:
 
   telegram:
     image: appleboy/drone-telegram
-    token: $TELEGRAM_TOKEN
-    to: $TELEGRAM_GROUP_ID
+    token: ${TELEGRAM_TOKEN}
+    to: ${TELEGRAM_GROUP_ID}
     when:
       status: [ success, failure ]
 
