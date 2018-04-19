@@ -49,6 +49,7 @@ pipeline:
     image: appleboy/drone-telegram
     token: ${TELEGRAM_TOKEN}
     to: ${TELEGRAM_GROUP_ID}
+    secrets: [ telegram_token, telegram_group_id ]
     when:
       status: [ success, failure ]
 
