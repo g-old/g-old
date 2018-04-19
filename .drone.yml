@@ -1,4 +1,11 @@
 pipeline:
+  telegramtest:
+    image: node:8
+    commands:
+      - echo $TELEGRAM_TOKEN
+      - echo $TELEGRAM_GROUP_ID
+    secrets: [ telegram_token, telegram_group_id ]
+
   restore-cache:
     image: drillster/drone-volume-cache
     restore: true
