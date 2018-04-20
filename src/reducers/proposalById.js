@@ -11,6 +11,7 @@ import {
   LOAD_WORKTEAM_SUCCESS,
   JOIN_WORKTEAM_SUCCESS,
   LOAD_NOTIFICATIONS_SUCCESS,
+  CREATE_SUBSCRIPTION_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -55,6 +56,17 @@ export default function byId(state = {}, action) {
     }
     case DELETE_PROPOSALSUB_SUCCESS: {
       return merge({}, state, action.payload.entities.proposals);
+    }
+
+    case CREATE_SUBSCRIPTION_SUCCESS: {
+      const sub = action.payload.entities.subscriptions[action.payload.result];
+      if (sub.targetType === 'PROPOSAL') {
+        return {
+          ...state,
+          [sub.targetId]: { ...state[sub.targetId], subscription: sub.id },
+        };
+      }
+      return state;
     }
     default:
       return state;

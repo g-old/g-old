@@ -26,7 +26,7 @@ export const TargetType = {
 class Subscription {
   constructor(data) {
     this.id = data.id;
-    this.targetId = data.targetId;
+    this.targetId = data.target_id;
     this.userId = data.userId;
     this.subscriptionType = data.subscription_type;
     this.targetType = data.target_type;

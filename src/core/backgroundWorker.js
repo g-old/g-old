@@ -174,69 +174,8 @@ const getCommentLink = (comment, groupId) => {
   }?comment=${parent || comment.id}${child ? `&child=${child}` : ''}`;
 };
 
-// from :http://learnjsdata.com/combine_data.html
-function join(lookupTable, mainTable, lookupKey, mainKey, select) {
-  const l = lookupTable.length;
-  const m = mainTable.length;
-  const lookupIndex = [];
-  const output = [];
-  // eslint-disable-next-line
-  for (let i = 0; i < l; i++) {
-    // loop through l items
-    const row = lookupTable[i];
-    lookupIndex[row[lookupKey]] = row; // create an index for lookup table
-  }
-  // eslint-disable-next-line
-  for (let j = 0; j < m; j++) {
-    // loop through m items
-    const y = mainTable[j];
-    const x = lookupIndex[y[mainKey]]; // get corresponding row from lookupTable
-    output.push(select(y, x)); // select only the columns you need
-  }
-  return output;
-}
-
 const notifyMultiple = async data => {
   // group by type&locale - get diff message by type , diff link
-
-  // get resources title for proposals
-  // load objects
-
-  const mapTypeToTable = {
-    [ActivityType.PROPOSAL]: 'proposals',
-    [ActivityType.DISCUSSION]: 'discussions',
-    [ActivityType.SURVEY]: 'proposals',
-    [ActivityType.STATEMENT]: 'statements',
-    [ActivityType.COMMENT]: 'comments',
-    [ActivityType.MESSAGE]: 'messages',
-  };
-
-  //
-
-  const groupedByType = Object.keys(data.activities).reduce(
-    (acc, activityId) => {
-      (acc[data.activities[activityId].type] =
-        acc[data.activities[activityId].type] || new Set()).add(
-        data.activities[activityId].objectId,
-      );
-      return acc;
-    },
-    {},
-  );
-  const allObjects = {};
-  const promises = Object.keys(groupedByType).map(async type => {
-    const objData = await this.dbConnector(mapTypeToTable[type])
-      .whereIn('id', groupedByType[type].values())
-      .select();
-    allObjects[type] = objData.reduce((acc, obj) => {
-      acc[obj.id] = obj;
-      return obj;
-    }, {});
-  });
-  await Promise.all(promises);
-  //
-
-  //
 
   const userIds = data.subscriberIds.values();
   const subscriptionData = await knex('subscriptions')
@@ -249,8 +188,8 @@ const notifyMultiple = async data => {
   let link;
 
   Object.keys(data.activities).map(activityId => {
-    const { activity } = data.activities[activityId];
-    const object = allObjects[activity.type][activity.objectId];
+    const { activity, subscribers } = data.activities[activityId];
+    const object = data.allObjects[activity.type][activity.objectId];
     switch (activity.type) {
       case ActivityType.SURVEY:
         title = resourceByLocale[locale][activity.type];
@@ -299,7 +238,10 @@ const notifyMultiple = async data => {
         throw new Error(`Type not recognized ${activity.type}`);
     }
     // TODO
-    const activitySubscribers = join(subscriptionData); // data.activities[activityId].subscribers.filter(sId => ).find(sData => sData.user_id == )
+    const activitySubscribers = subscribers.map(id =>
+      // eslint-disable-next-line eqeqeq
+      subscriptionData.find(susbcription => susbcription.user_id == id),
+    );
 
     return push(activitySubscribers, {
       body: message.length > 40 ? `${message.slice(0, 36)}...` : message,

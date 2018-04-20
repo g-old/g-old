@@ -53,7 +53,7 @@ import responseTiming from './core/timing';
 import { Groups, Permissions } from './organization';
 import EventManager from './core/EventManager';
 import root from './compositionRoot';
-import { EmailTypes } from './core/BackgroundService';
+import { EmailType } from './core/BackgroundService';
 import Request from './data/models/Request';
 /* eslint-enable import/first */
 
@@ -121,10 +121,10 @@ EventManager.subscribe('onStatementCreated', ({ statement, viewer }) => {
 });
 
 EventManager.subscribe('sendVerificationMail', ({ request, viewer }) =>
-  sendMailJob(viewer, { content: request.content }, EmailTypes.VERIFICATION),
+  sendMailJob(viewer, { content: request.content }, EmailType.VERIFICATION),
 );
 EventManager.subscribe('sendWelcomeMail', ({ request, viewer }) =>
-  sendMailJob(viewer, { content: request.content }, EmailTypes.WELCOME),
+  sendMailJob(viewer, { content: request.content }, EmailType.WELCOME),
 );
 
 const app = express();
@@ -394,7 +394,7 @@ app.post('/forgot', (req, res) => {
         const job = {
           type: 'mail',
           data: {
-            mailType: EmailTypes.RESET_REQUEST,
+            mailType: EmailType.RESET_REQUEST,
             lang: req.cookies.lang,
             address: user.email,
             viewer: user,
@@ -436,7 +436,7 @@ app.post('/reset/:token', (req, res) =>
         const job = {
           type: 'mail',
           data: {
-            mailType: EmailTypes.RESET_SUCCESS,
+            mailType: EmailType.RESET_SUCCESS,
             lang: req.cookies.lang,
             address: user.email,
             viewer: user,

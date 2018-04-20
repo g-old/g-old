@@ -21,10 +21,10 @@ import {
 } from '../store/schema';
 import { genStatusIndicators } from '../core/helpers';
 
-const subscriptionFields = `
+export const subscriptionFields = `
 id
 targetType
-
+targetId
 `;
 
 const createSubscriptionMutation = `

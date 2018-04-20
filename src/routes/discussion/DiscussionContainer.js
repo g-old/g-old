@@ -110,7 +110,15 @@ class DiscussionContainer extends React.Component {
   }
 
   handleCommentCreation(data) {
-    this.props.createComment({ ...data, discussionId: this.props.id });
+    let targetId;
+    if (!this.props.discussion.subscription) {
+      targetId = this.props.discussion.id;
+    }
+    this.props.createComment({
+      ...data,
+      discussionId: this.props.id,
+      targetId,
+    });
   }
 
   handleCommentFetching({ parentId }) {

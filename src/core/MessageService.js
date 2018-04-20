@@ -13,14 +13,14 @@ class MessageService {
     messageRepo = throwIfMissing('Message respository'),
     mailComposer = throwIfMissing('Mail composer'),
     tokenService = throwIfMissing('Token service'),
-    dbConnector = throwIfMissing('Database connector'),
+    // dbConnector = throwIfMissing('Database connector'),
     //  eventSrc = throwIfMissing('Event source'),
   ) {
     this.mailer = mailService;
     this.msgRepo = messageRepo;
     this.mailComposer = mailComposer;
     this.tokens = tokenService;
-    this.dbConnector = dbConnector;
+    // this.dbConnector = dbConnector;
     //  this.events = eventSrc;
     this.protocol = __DEV__ ? 'http' : 'https';
     if (!__DEV__) {
@@ -373,42 +373,6 @@ class MessageService {
 
     // group activities by type
 
-    const groupedByType = Object.keys(data.activities).reduce(
-      (acc, activityId) => {
-        (acc[data.activities[activityId.type]] =
-          acc[data.activities[activityId.type]] || new Set()).add(
-          data.activities[activityId.objectIds],
-        );
-        return acc;
-      },
-      {},
-    );
-
-    // load objects
-
-    const mapTypeToTable = {
-      [ActivityType.PROPOSAL]: 'proposals',
-      [ActivityType.DISCUSSION]: 'discussions',
-      [ActivityType.SURVEY]: 'proposals',
-      [ActivityType.STATEMENT]: 'statements',
-      [ActivityType.COMMENT]: 'comments',
-      [ActivityType.MESSAGE]: 'messages',
-    };
-
-    //
-    const allObjects = {};
-    const promises = Object.keys(groupedByType).map(async type => {
-      const objData = await this.dbConnector(mapTypeToTable[type])
-        .whereIn('id', groupedByType[type].values())
-        .select();
-      allObjects[type] = objData.reduce((acc, obj) => {
-        acc[obj.id] = obj;
-        return obj;
-      }, {});
-    });
-    await Promise.all(promises);
-    //
-
     await Object.keys(data.activities).map(async activityId => {
       const { activity } = data[activityId];
 
@@ -427,7 +391,10 @@ class MessageService {
 
               const message = this.mailComposer.getNotificationMail(
                 receiver,
-                { content: allObjects[activity.type][activity.objectId].body },
+                {
+                  content:
+                    data.allObjects[activity.type][activity.objectId].body,
+                },
                 { name: 'gold' },
                 locale,
               );

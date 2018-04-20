@@ -13,13 +13,16 @@ import {
   LOAD_VOTES_START,
   LOAD_VOTES_SUCCESS,
   LOAD_VOTES_ERROR,
+  CREATE_SUBSCRIPTION_SUCCESS,
 } from '../constants';
 import { genStatusIndicators } from '../core/helpers';
 
 import {
   voteList as voteListSchema,
   vote as voteSchema,
+  subscription as subscriptionSchema,
 } from '../store/schema';
+import { subscriptionFields } from './subscription';
 import { getVoteUpdates } from '../reducers';
 
 const voteInfo = `{
@@ -33,9 +36,18 @@ const voteInfo = `{
     thumbnail
   }
 }`;
+
+const resultFields = `
+  subscription{
+    ${subscriptionFields}
+  }
+  resource ${voteInfo}
+`;
 const createVoteMutation = `
-  mutation($pollId:ID! $position:Position!) {
-    createVote (vote:{pollId:$pollId position:$position}) ${voteInfo}
+  mutation($pollId:ID! $position:Position! $targetId:ID) {
+    createVote (vote:{pollId:$pollId position:$position} targetId:$targetId) {
+      ${resultFields}
+    }
   }
 `;
 const updateVoteMutation = `
@@ -79,13 +91,24 @@ export function createVote(vote) {
     });
     try {
       const { data } = await graphqlRequest(createVoteMutation, vote);
-      const normalized = normalize(data.createVote, voteSchema);
+      const { resource, subscription } = data.createVote;
+      const normalized = normalize(resource, voteSchema);
       dispatch({
         type: CREATE_VOTE_SUCCESS,
         payload: normalized,
         properties,
         id: vote.pollId,
       });
+      if (subscription) {
+        const normalizedSubscription = normalize(
+          subscription,
+          subscriptionSchema,
+        );
+        dispatch({
+          type: CREATE_SUBSCRIPTION_SUCCESS,
+          payload: normalizedSubscription,
+        });
+      }
     } catch (error) {
       dispatch({
         type: CREATE_VOTE_ERROR,

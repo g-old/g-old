@@ -27,6 +27,9 @@ const SubscriptionType = new GraphQLObjectType({
     targetType: {
       type: TargetType,
     },
+    targetId: {
+      type: ID,
+    },
     /* TODO - group, proposal
     target: {
       type: ObjectType,

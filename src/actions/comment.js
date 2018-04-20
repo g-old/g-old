@@ -14,12 +14,15 @@ import {
   DELETE_COMMENT_START,
   DELETE_COMMENT_SUCCESS,
   DELETE_COMMENT_ERROR,
+  CREATE_SUBSCRIPTION_SUCCESS,
 } from '../constants';
 import {
+  subscription as subscriptionSchema,
   comment as commentSchema,
   commentList as commentListSchema,
 } from '../store/schema';
 import { genStatusIndicators } from '../core/helpers';
+import { subscriptionFields } from './subscription';
 
 const commentFields = `
 id
@@ -37,10 +40,19 @@ author{
 }
 `;
 
+const resultFields = `
+  subscription{
+    ${subscriptionFields}
+  }
+  resource{
+    ${commentFields}
+  }
+`;
+
 const createCommentMutation = `
-  mutation ($content:String $discussionId:ID $parentId:ID) {
-    createComment (comment:{ content:$content discussionId:$discussionId parentId:$parentId}){
-      ${commentFields}
+  mutation ($content:String $discussionId:ID $parentId:ID, $targetId:ID) {
+    createComment (comment:{ content:$content discussionId:$discussionId parentId:$parentId} targetId:$targetId){
+      ${resultFields}
     }
   }
 `;
@@ -73,6 +85,7 @@ export function createComment(comment) {
   return async (dispatch, getState, { graphqlRequest }) => {
     const virtualId = comment.parentId || '0000';
     const properties = genStatusIndicators(['createCom']);
+
     dispatch({
       type: CREATE_COMMENT_START,
       id: virtualId,
@@ -80,14 +93,27 @@ export function createComment(comment) {
     });
     try {
       const { data } = await graphqlRequest(createCommentMutation, comment);
-      const normalizedData = normalize(data.createComment, commentSchema);
+      const { resource, subscription } = data.createComment;
+      const normalizedComment = normalize(resource, commentSchema);
+
       dispatch({
         type: CREATE_COMMENT_SUCCESS,
-        payload: normalizedData,
+        payload: normalizedComment,
         id: virtualId,
         properties,
         comment,
       });
+
+      if (subscription) {
+        const normalizedSubscription = normalize(
+          subscription,
+          subscriptionSchema,
+        );
+        dispatch({
+          type: CREATE_SUBSCRIPTION_SUCCESS,
+          payload: normalizedSubscription,
+        });
+      }
     } catch (error) {
       dispatch({
         type: CREATE_COMMENT_ERROR,

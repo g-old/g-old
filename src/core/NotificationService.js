@@ -20,6 +20,15 @@ const filterReplies = (parents, activities) => {
   return result;
 };
 
+const mapTypeToTable = {
+  [ActivityType.PROPOSAL]: 'proposals',
+  [ActivityType.DISCUSSION]: 'discussions',
+  [ActivityType.SURVEY]: 'proposals',
+  [ActivityType.STATEMENT]: 'statements',
+  [ActivityType.COMMENT]: 'comments',
+  [ActivityType.MESSAGE]: 'messages',
+};
+
 class NotificationService {
   constructor({
     eventManager = throwIfMissing('EventManager'),
@@ -187,6 +196,21 @@ class NotificationService {
     }
   }
 
+  async loadObjects(data) {
+    const allObjects = {};
+    const promises = Object.keys(data).map(async type => {
+      const objData = await this.dbConnector(mapTypeToTable[type])
+        .whereIn('id', data[type].values())
+        .select();
+      allObjects[type] = objData.reduce((acc, obj) => {
+        acc[obj.id] = obj;
+        return obj;
+      }, {});
+    });
+    await Promise.all(promises);
+    //
+  }
+
   async batchProcessing() {
     // const startTime = process.hrtime();
     // console.log('BATCH -activities', this.activityQueue);
@@ -208,9 +232,11 @@ class NotificationService {
 
         // this.sseEmitter.publish('notifications', counterData);
 
-        const { notifications, webpush, email } = this.getAndGroupNotifications(
-          notificationData,
-        );
+        const {
+          notifications,
+          webpushData,
+          emailData,
+        } = this.getAndGroupNotifications(notificationData);
 
         await this.dbConnector.batchInsert(
           'notifications',
@@ -218,7 +244,28 @@ class NotificationService {
           this.maxBatchSize,
         );
 
-        await this.notifyPushServices({ webpush, email });
+        // load all objects for webpush/email
+        const allActivities = Object.keys(emailData.activities)
+          .map(id => emailData.activities[id])
+          .concat(
+            Object.keys(webpushData.activities).map(
+              id => webpushData.activitiess[id],
+            ),
+          );
+
+        const groupedByType = allActivities.reduce((acc, activity) => {
+          (acc[activity.type] = acc[activity.type] || new Set()).add(
+            activity.objectId,
+          );
+          return acc;
+        }, {});
+
+        const objects = await this.loadObjects(groupedByType);
+
+        await this.notifyPushServices({
+          webpush: { ...webpushData, allObjects: objects },
+          email: { ...emailData, allObjects: objects },
+        });
       }
 
       // const endTime = process.hrtime(startTime);
@@ -322,7 +369,7 @@ class NotificationService {
         return {};
     }
   }
-
+  // eslint-disable-next-line class-methods-use-this
   async notifyPushServices({ webpush, email }) {
     if (email) {
       const job = {
@@ -331,8 +378,13 @@ class NotificationService {
       };
       await sendJob(job);
     }
-    this.EventManager.publish('readyForPush', webpush);
-    this.EventManager.publish('readyForEmail', email);
+    if (webpush) {
+      const job = {
+        type: 'batchPushing',
+        data: webpush,
+      };
+      await sendJob(job);
+    }
   }
 
   async checkIfFollowing(subscriber, activities) {
@@ -348,44 +400,53 @@ class NotificationService {
   // eslint-disable-next-line class-methods-use-this
   getAndGroupNotifications(notificationData) {
     const now = new Date();
-    const emailData = { activities: {}, subscriberIds: new Set() };
-    return notificationData.reduce(
-      (acc, data) => {
-        if (data.subscriber && data.activities) {
-          data.activities.forEach(a => {
-            acc.notifications.push({
-              user_id: data.subscriber.userId,
-              activity_id: a.id,
-              created_at: now,
-            });
-            if (data.subscriber.settings[a.type]) {
-              // TODO normalize activities with Map aId: a, aId: [userIds]
-              if (data.subscriber.settings[a.type].email) {
-                if (emailData.activities[a.id]) {
-                  emailData.activities[a.id].subscribers.push(
-                    data.subscriber.userId,
-                  );
-                } else {
-                  emailData.activities[a.id] = {
-                    subscribers: [data.subscriber.userId],
-                    activity: a,
-                  };
-                }
-                emailData.subscriberIds.add(data.subscriber.userId);
-                // acc.email.push({ userId: data.subscriber.userId, activity: a });
-              } else if (data.subscriber.settings[a.type].webpush) {
-                acc.webpush.push({
-                  userId: data.subscriber.userId,
-                  activity: a,
-                });
-              }
-            }
+    const resultSet = {
+      emailData: { activities: {}, subscriberIds: new Set() },
+      webpushData: { activities: {}, subscriberIds: new Set() },
+      notifications: [],
+    };
+
+    return notificationData.reduce((acc, data) => {
+      if (data.subscriber && data.activities) {
+        data.activities.forEach(a => {
+          acc.notifications.push({
+            user_id: data.subscriber.userId,
+            activity_id: a.id,
+            created_at: now,
           });
-        }
-        return acc;
-      },
-      { notifications: [], webpush: [], email: emailData },
-    );
+          if (data.subscriber.settings[a.type]) {
+            // TODO normalize activities with Map aId: a, aId: [userIds]
+            if (data.subscriber.settings[a.type].email) {
+              if (acc.emailData.activities[a.id]) {
+                acc.emailData.activities[a.id].subscribers.push(
+                  data.subscriber.userId,
+                );
+              } else {
+                acc.emailData.activities[a.id] = {
+                  subscribers: [data.subscriber.userId],
+                  activity: a,
+                };
+              }
+              acc.emailData.subscriberIds.add(data.subscriber.userId);
+              // acc.email.push({ userId: data.subscriber.userId, activity: a });
+            } else if (data.subscriber.settings[a.type].webpush) {
+              if (acc.webpushData.activities[a.id]) {
+                acc.webpushData.activities[a.id].subscribers.push(
+                  data.subscriber.userId,
+                );
+              } else {
+                acc.webpushData.activities[a.id] = {
+                  subscribers: [data.subscriber.userId],
+                  activity: a,
+                };
+              }
+              acc.emailData.subscriberIds.add(data.subscriber.userId);
+            }
+          }
+        });
+      }
+      return acc;
+    }, resultSet);
   }
 }
 
