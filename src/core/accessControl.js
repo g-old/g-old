@@ -318,7 +318,7 @@ function commentWriteControl(viewer, data) {
     // TODO check group etc
     if (viewer.wtMemberships.includes(data.discussion.workTeamId)) {
       // eslint-disable-line
-      return true;
+      return (viewer.permissions & Permissions.MAKE_COMMENT) > 0;
     }
   }
   // eslint-disable-next-line eqeqeq
