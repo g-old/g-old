@@ -293,6 +293,9 @@ class WorkTeam extends React.Component {
         </Box>
         <Box wrap>
           <Value
+            onClick={() => {
+              history.push(`/workteams/${id}/members`);
+            }}
             icon={
               <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
                 <path

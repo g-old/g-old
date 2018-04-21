@@ -79,6 +79,16 @@ const workTeamsWithMembers = `query{
       }
     }}`;
 
+const memberQuery = `query($id:ID!){
+    workTeam(id:$id){
+      id
+      displayName
+      members{
+        ${userFields}
+      }
+    }
+    }`;
+
 const wtDetails = `
 name
 lldName
@@ -401,6 +411,28 @@ export function loadWorkTeam({ id, state = 'active' }, details) {
     }
   };
 }
+
+export function loadWorkTeamMembers({ id }) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: LOAD_WORKTEAM_START,
+    });
+    try {
+      const { data } = await graphqlRequest(memberQuery, { id });
+
+      // TODO make paginable
+      const normalizedData = normalize(data.workTeam, workTeamSchema);
+
+      dispatch({ type: LOAD_WORKTEAM_SUCCESS, payload: normalizedData });
+    } catch (e) {
+      dispatch({
+        type: LOAD_WORKTEAM_ERROR,
+        message: e.message || 'Something went wrong',
+      });
+    }
+  };
+}
+
 export function loadProposalStatus({ id, first }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
