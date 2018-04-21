@@ -16,6 +16,9 @@ const SubscriptionTypeEnum = new GraphQLEnumType({
     REPLIES: {
       value: SubscriptionType.REPLIES,
     },
+    UPDATES: {
+      value: SubscriptionType.UPDATES,
+    },
   },
 });
 

@@ -52,6 +52,11 @@ const messages = defineMessages({
     defaultMessage: '{title} was rejected!',
     description: 'Status message for notifications',
   },
+  proposed: {
+    id: 'notifications.proposal.proposed',
+    defaultMessage: '{title} was proposed!',
+    description: 'Status message for notifications',
+  },
 });
 
 class UserNotification extends React.Component {
@@ -61,7 +66,6 @@ class UserNotification extends React.Component {
     read: PropTypes.bool.isRequired,
   };
   static defaultProps = {};
-
   computeData() {
     const { activity, id } = this.props;
     const info = JSON.parse(activity.info);
@@ -177,6 +181,7 @@ class UserNotification extends React.Component {
 
   render() {
     const { activity } = this.props;
+
     const data = this.computeData(activity);
     return (
       // eslint-disable-next-line

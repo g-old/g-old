@@ -54,6 +54,7 @@ class SubscriptionButton extends React.Component {
     onSubscribe: PropTypes.func.isRequired,
     intl: intlShape.isRequired,
     targetType: PropTypes.oneOf(['DISCUSSION', 'PROPOSAL']).isRequired,
+    status: PropTypes.shape({}).isRequired,
   };
   static defaultProps = {
     subscription: null,
@@ -76,7 +77,7 @@ class SubscriptionButton extends React.Component {
   }
 
   render() {
-    const { subscription, intl } = this.props;
+    const { subscription, intl, status = {} } = this.props;
     const { value, label } = this.state;
     let displayLabel;
     if (subscription) {
@@ -98,8 +99,10 @@ class SubscriptionButton extends React.Component {
       messageKey = 'updates';
       defaultOption = 'UPDATES';
     }
+
     return (
       <Box>
+        {status.error}
         <Select
           options={[
             subscription && {

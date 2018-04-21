@@ -64,8 +64,6 @@ export const getNotificationsStatus = (state, filter) =>
 export const getSubscription = (state, id) =>
   fromSubscriptions.getEntity(state.subscriptions, id, state);
 
-export const getSubscriptionsStatus = (state, filter) =>
-  fromSubscriptions.getStatus(state.subscriptions, filter);
 export const getRequest = (state, id) =>
   fromRequests.getEntity(state.requests, id, state);
 

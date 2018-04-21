@@ -39,9 +39,6 @@ export const getNotificationUpdates = (state, filter) =>
 export const getSubscription = (state, filter) =>
   fromEntity.getSubscription(state.entities, filter);
 
-export const getSubscriptionsStatus = (state, filter) =>
-  fromEntity.getSubscriptionsStatus(state.entities, filter);
-
 export const getSubscriptionUpdates = (state, filter) =>
   fromUi.getSubscriptionUpdates(state.ui, filter);
 export const getVisibleRequests = (state, filter) =>

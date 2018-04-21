@@ -26,6 +26,7 @@ import {
   getProposalErrorMessage,
   getFolloweeVotesByPoll,
   getFollowees,
+  getSubscriptionsUpdates,
 } from '../../reducers';
 import FetchError from '../../components/FetchError';
 import StatementsContainer from '../../components/StatementsContainer';
@@ -34,7 +35,6 @@ import Box from '../../components/Box';
 import Button from '../../components/Button';
 import Poll from '../../components/Poll';
 import Filter from '../../components/Filter';
-import CheckBox from '../../components/CheckBox';
 import SubscriptionButton from '../../components/SubscriptionButton';
 
 const messages = defineMessages({
@@ -76,9 +76,11 @@ class ProposalContainer extends React.Component {
     createSubscription: PropTypes.func.isRequired,
     deleteSubscription: PropTypes.func.isRequired,
     updateSubscription: PropTypes.func.isRequired,
+    subscriptionStatus: PropTypes.shape({}),
   };
   static defaultProps = {
     errorMessage: null,
+    subscriptionStatus: null,
   };
   constructor(props) {
     super(props);
@@ -157,7 +159,14 @@ class ProposalContainer extends React.Component {
   }
 
   render() {
-    const { proposal, isFetching, errorMessage, user, followees } = this.props;
+    const {
+      proposal,
+      isFetching,
+      errorMessage,
+      user,
+      followees,
+      subscriptionStatus,
+    } = this.props;
     const { filter } = this.state;
     if (isFetching && !proposal) {
       return <p>{'Loading...'} </p>;
@@ -234,15 +243,9 @@ class ProposalContainer extends React.Component {
       return (
         <div>
           <Box column pad>
-            <CheckBox
-              toggle
-              checked={proposal.subscription}
-              label={proposal.subscription ? 'ON' : 'OFF'}
-              onChange={this.handleSubscription}
-              disabled={isFetching}
-            />
             <Proposal {...proposal} />
             <SubscriptionButton
+              status={subscriptionStatus}
               targetType="PROPOSAL"
               onSubscribe={this.handleSubscription}
               subscription={proposal.subscription}
@@ -284,6 +287,7 @@ const mapStateToProps = (state, { pollId, proposalId }) => ({
   followees: getFollowees(state),
   voteUpdates: getVoteUpdates(state, pollId),
   followeeVotes: getFolloweeVotesByPoll(state, pollId),
+  subscriptionStatus: getSubscriptionsUpdates(state),
 });
 
 const mapDispatch = {
