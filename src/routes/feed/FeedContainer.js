@@ -42,7 +42,7 @@ class FeedContainer extends React.Component<Props> {
       <div className={cn(s.container)}>
         {posts.map(post => (
           /* console.log('post.subject', post.subject); */
-          <Post subject={post.subject} group={post.group} />
+          <Post subject={post.subject} group={post.group} key={post.id} />
         ))}
       </div>
     );

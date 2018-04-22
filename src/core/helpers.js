@@ -19,7 +19,7 @@ export const validateEmail = email => {
 export function b(a) {
   return a
     ? (a ^ ((Math.random() * 16) >> (a / 4))).toString(16)
-    : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
+    : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b)
 }
 /* eslint-enable */
 
@@ -30,7 +30,7 @@ export const dedup = arr => {
   return arr.filter(el => {
     const key = JSON.stringify(el);
     const match = Boolean(hashTable[key]);
-    return match ? false : (hashTable[key] = true); // eslint-disable-line
+    return match ? false : (hashTable[key] = true) // eslint-disable-line
   });
 };
 
@@ -67,55 +67,8 @@ const thresholdPassedUniversal = (poll, thresholdRef) => {
   ref *= poll.threshold / 100;
   return ref <= poll.upvotes;
 }; */
-export const getLastActivePoll = (state, proposal) => {
-  let poll;
-  switch (state) {
-    case 'proposed': {
-      poll = proposal.pollOne;
-      break;
-    }
-    case 'voting': {
-      poll = proposal.pollTwo;
-      break;
-    }
-    case 'accepted': {
-      // TODO check only dates
-      if (proposal.pollTwo && proposal.pollTwo.closedAt) {
-        poll = proposal.pollTwo;
-      } else {
-        poll = proposal.pollOne;
-      }
-      /*  if (thresholdPassedUniversal(proposal.pollOne, proposal.pollOne.mode.thresholdRef)) {
-        if (thresholdPassedUniversal(proposal.pollTwo, proposal.pollTwo.mode.thresholdRef)) {
-          poll = proposal.pollTwo;
-        } else {
-          throw Error('A proposal cannot fail at pollTwo and be accepted');
-        }
-      } else {
-        poll = proposal.pollOne;
-      } */
-      break;
-    }
-    case 'revoked': {
-      poll = proposal.pollOne;
-      break;
-    }
-    case 'rejected': {
-      poll = proposal.pollTwo;
-
-      break;
-    }
-
-    case 'survey': {
-      poll = proposal.pollOne;
-      break;
-    }
-
-    default:
-      throw Error(`Unknown proposal state: ${proposal.state}`);
-  }
-  return poll;
-};
+export const getLastActivePoll = (state, proposal) =>
+  proposal.activePoll || proposal.pollTwo || proposal.pollOne;
 
 export function findScrollParents(element, horizontal) {
   const result = [];
@@ -198,7 +151,7 @@ export const urlBase64ToUint8Array = base64String => {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
     .replace(/\-/g, '+') //eslint-disable-line
-    .replace(/_/g, '/'); // eslint-disable-line
+    .replace(/_/g, '/') // eslint-disable-line
   const rawData = window.atob(base64);
   return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
 };

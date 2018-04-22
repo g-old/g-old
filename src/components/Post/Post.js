@@ -8,7 +8,6 @@ import {
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Post.css';
 import Avatar from '../Avatar';
-import Statement from '../Statement';
 import Comment from '../Comment';
 import Label from '../Label';
 import ProposalPreview from '../ProposalPreview';
@@ -45,7 +44,7 @@ function getProposalVerb(verb: string, proposal: tProposalType) {
   let identifier;
 
   if (proposal.state === 'update') {
-    state = proposal.state; // eslint-disable-line
+    state = proposal.state // eslint-disable-line
   }
   switch (state) {
     case 'create': {
@@ -192,20 +191,6 @@ class Post extends React.Component<Props> {
     if (!subject) return { header: 'No content' };
     const result = {};
     switch (subject.__typename) { // eslint-disable-line
-      case 'StatementDL': {
-        const info = JSON.parse(this.props.info || '{}');
-
-        result.content = (
-          <Link // eslint-disable-line
-            to={`/proposal/${info.proposalId || 'xxx'}/${subject.pollId}`}
-          >
-            <Statement {...subject} />
-          </Link>
-        );
-
-        result.header = info.proposalTitle || ':(';
-        break;
-      }
       case 'ProposalDL': {
         result.content = (
           <ProposalPreview proposal={subject} onClick={this.onProposalClick} />
@@ -216,13 +201,6 @@ class Post extends React.Component<Props> {
           header = this.renderGroupHeader(info, header);
         }
         result.header = header;
-        break;
-      }
-      case 'VoteDL': {
-        const info = JSON.parse(this.props.info || '{}');
-
-        result.content = this.renderVote(info);
-        result.header = info.proposalTitle || ':(';
         break;
       }
 
@@ -246,14 +224,6 @@ class Post extends React.Component<Props> {
         break;
       }
 
-      case 'Comment': {
-        const info = JSON.parse(this.props.info || '{}');
-
-        result.content = this.renderComment(info.workTeamId);
-        result.header = info.title;
-        break;
-      }
-
       default: {
         return { header: 'Unknown error' };
       }
@@ -266,9 +236,11 @@ class Post extends React.Component<Props> {
 
     return (
       <div className={s.container}>
-        <div className={s.date}>
-          <FormattedRelative value={this.props.date} />
-        </div>
+        {this.props.date && (
+          <div className={s.date}>
+            <FormattedRelative value={this.props.date} />
+          </div>
+        )}
         <div>{header}</div>
 
         <div>{content}</div>

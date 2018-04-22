@@ -49,7 +49,7 @@ const hydratePosts = (state, data, entities) =>
       workTeams: entities.workTeams.byId,
       proposals: entities.proposals.byId,
       statements: entities.statements.byId,
-      votes: entities.votes.byId,
+      // votes: entities.votes.byId,
       poll: entities.polls,
     },
   );
