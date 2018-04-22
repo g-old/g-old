@@ -13,8 +13,8 @@ RUN yarn install --production --no-progress
 COPY ./build .
 
 # pass drone build args on as env variables
-ARG DRONE_COMMIT=0
-ENV DRONE_COMMIT=${DRONE_COMMIT}
+ARG DRONE_BRANCH=0
+ENV DRONE_BRANCH=${DRONE_BRANCH}
 ARG DRONE_BUILD_NUMBER=0
 ENV DRONE_BUILD_NUMBER=${DRONE_BUILD_NUMBER}
 
