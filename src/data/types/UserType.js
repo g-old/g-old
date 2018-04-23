@@ -39,6 +39,9 @@ const UserType = new ObjectType({
         return canSee(viewer, data) ? data.email : null;
       },
     },
+    locale: {
+      type: GraphQLString,
+    },
     thumbnail: {
       type: GraphQLString,
     },

@@ -74,6 +74,7 @@ query ($id:ID!) {
     numStatements
     numFollowers
     numLikes
+    locale
     unreadNotifications
     notificationSettings
     workTeams{
@@ -115,10 +116,11 @@ query ($id:ID!) {
 `;
 
 const updateUserMutation = `
-mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $password:String, $passwordOld:String, $followee:ID, $notificationSettings:String){
-  updateUser ( user:{id:$id name:$name, surname:$surname, groups:$groups, email:$email, password:$password passwordOld:$passwordOld followee:$followee notificationSettings:$notificationSettings }){
+mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $password:String, $passwordOld:String, $followee:ID, $notificationSettings:String $locale:String){
+  updateUser ( user:{id:$id name:$name, surname:$surname, groups:$groups, email:$email, password:$password passwordOld:$passwordOld followee:$followee notificationSettings:$notificationSettings locale:$locale }){
     user{${userFields}
     groups
+    locale
     email,
     emailVerified,
     notificationSettings

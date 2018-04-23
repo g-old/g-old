@@ -22,11 +22,7 @@ const all = (state = initialState, action) => {
       return action.payload.entities.notifications
         ? {
             ...state,
-            ids: [
-              ...new Set(
-                Object.keys(action.payload.entities.notifications).reverse(),
-              ),
-            ],
+            ids: [...state.ids, ...new Set(action.payload.result.reverse())],
           }
         : state;
     }

@@ -92,7 +92,7 @@ const sendMailJob = (viewer, { content }, mailType) => {
   }
 };
 
-EventManager.subscribe('onProposalCreated', ({ proposal, viewer }) => {
+/* EventManager.subscribe('onProposalCreated', ({ proposal, viewer }) => {
   if (!sendJob({ type: 'webpush', data: proposal })) {
     log.error(
       { viewer, job: { type: 'webpush', data: proposal } },
@@ -118,7 +118,7 @@ EventManager.subscribe('onStatementCreated', ({ statement, viewer }) => {
       'Could not send job to worker',
     );
   }
-});
+}); */
 
 EventManager.subscribe('sendVerificationMail', ({ request, viewer }) =>
   sendMailJob(viewer, { content: request.content }, EmailType.VERIFICATION),
@@ -307,7 +307,10 @@ app.post('/signup', (req, res) => {
       return null;
     })
     .then(() =>
-      User.create({ id: 1, groups: Groups.SYSTEM }, userData)
+      User.create(
+        { id: 1, groups: Groups.SYSTEM },
+        { ...userData, locale: req.language },
+      )
         .then(user => {
           if (!user) throw Error('User creation failed');
           EventManager.publish('sendWelcomeMail', {

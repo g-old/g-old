@@ -27,6 +27,7 @@ class User {
     this.lastLogin = data.last_login_at;
     this.createdAt = data.created_at;
     this.canVoteSince = data.can_vote_since;
+    this.locale = data.locale;
   }
   static async gen(viewer, id, { users }) {
     if (!id) return null;
@@ -134,6 +135,9 @@ class User {
     }
     if (data.thumbnail) {
       newData.thumbnail = data.thumbnail;
+    }
+    if (data.locale && ['it-IT', 'de-DE', 'lld-IT'].includes(data.locale)) {
+      newData.locale = data.locale;
     }
     if (data.notificationSettings) {
       // validate
@@ -346,13 +350,15 @@ class User {
       password_hash: hash,
       groups: Groups.GUEST,
       created_at: new Date(),
+      locale: data.locale,
     };
     const newUser = await knex.transaction(async trx => {
-      const uData = await trx
+      const [userData = null] = await trx
         .insert(newUserData)
         .into('users')
         .returning('*');
-      return uData[0];
+      await trx.insert({ user_id: userData.id }).into('notification_settings');
+      return userData;
     });
     if (!newUser) return null;
     return new User(newUser);

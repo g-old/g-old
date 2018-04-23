@@ -26,7 +26,7 @@ import {
   getProposalErrorMessage,
   getFolloweeVotesByPoll,
   getFollowees,
-  getSubscriptionsUpdates,
+  getSubscriptionUpdates,
 } from '../../reducers';
 import FetchError from '../../components/FetchError';
 import StatementsContainer from '../../components/StatementsContainer';
@@ -287,7 +287,7 @@ const mapStateToProps = (state, { pollId, proposalId }) => ({
   followees: getFollowees(state),
   voteUpdates: getVoteUpdates(state, pollId),
   followeeVotes: getFolloweeVotesByPoll(state, pollId),
-  subscriptionStatus: getSubscriptionsUpdates(state),
+  subscriptionStatus: getSubscriptionUpdates(state),
 });
 
 const mapDispatch = {

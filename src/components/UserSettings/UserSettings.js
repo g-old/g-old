@@ -5,6 +5,8 @@ import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
 import EmailField from './EmailField';
+import Select from '../Select';
+import { locales } from '../../actions/intl';
 // import Select from '../Select';
 import {
   createValidator,
@@ -21,6 +23,7 @@ const fieldNames = [
   'passwordAgain',
   'name',
   'surname',
+  'locale',
 ];
 
 const messages = defineMessages({
@@ -145,6 +148,11 @@ const messages = defineMessages({
     defaultMessage: 'Surname',
     description: 'Surname',
   },
+  locale: {
+    id: 'label.locale',
+    defaultMessage: 'Language',
+    description: 'Label locale',
+  },
 });
 
 const initState = {
@@ -162,9 +170,15 @@ const initState = {
     email: { touched: false },
     name: { touched: false },
     surname: { touched: false },
+    locale: { touched: false },
   },
   showEmailInput: false,
 };
+
+const availableLanguages = Object.keys(locales).map(code => ({
+  label: locales[code],
+  value: code,
+}));
 
 class UserSettings extends React.Component {
   static propTypes = {
@@ -174,6 +188,7 @@ class UserSettings extends React.Component {
       id: PropTypes.string.isRequired,
       name: PropTypes.string,
       surname: PropTypes.string,
+      locale: PropTypes.string,
     }).isRequired,
     updateUser: PropTypes.func.isRequired,
     resendEmail: PropTypes.func.isRequired,
@@ -191,7 +206,8 @@ class UserSettings extends React.Component {
     super(props);
     this.state = {
       ...initState,
-      invalidEmails: [this.props.user.email],
+      invalidEmails: [props.user.email],
+      locale: { label: locales[props.user.locale], value: props.user.locale },
     };
     this.onEditEmail = this.onEditEmail.bind(this);
     this.handleValidation = this.handleValidation.bind(this);
@@ -201,6 +217,7 @@ class UserSettings extends React.Component {
     this.handleEmailUpdate = this.handleEmailUpdate.bind(this);
     this.handlePasswordUpdate = this.handlePasswordUpdate.bind(this);
     this.handleNameUpdate = this.handleNameUpdate.bind(this);
+    this.handleLocaleUpdate = this.handleLocaleUpdate.bind(this);
     const testValues = {
       passwordOld: { fn: 'password' },
       password: { fn: 'password' },
@@ -208,6 +225,7 @@ class UserSettings extends React.Component {
       email: { fn: 'email' },
       name: { fn: 'name' },
       surname: { fn: 'name' },
+      locale: { fn: 'noCheck' },
     };
     this.Validator = createValidator(
       testValues,
@@ -216,6 +234,7 @@ class UserSettings extends React.Component {
         passwordAgain: passwordAgainValidation,
         email: emailValidation,
         name: nameValidation,
+        noCheck: () => {},
       },
       this,
       obj => obj.state,
@@ -225,7 +244,15 @@ class UserSettings extends React.Component {
     );
   }
 
-  componentWillReceiveProps({ updates, requestUpdates }) {
+  componentWillReceiveProps({ updates, requestUpdates, user }) {
+    if (user.locale !== this.props.user.locale) {
+      this.setState({
+        locale: {
+          label: locales[user.locale],
+          value: user.locale,
+        },
+      });
+    }
     if (requestUpdates) {
       if (requestUpdates.error === 'request-email-exists') {
         this.setState({
@@ -270,6 +297,17 @@ class UserSettings extends React.Component {
           passwordAgain: '',
           password: '',
           passwordOld: '',
+        });
+      }
+      if (updates.locale && updates.locale.success) {
+        this.setState({
+          localeSuccess: true,
+          localeError: false,
+        });
+      } else if (updates.locale && updates.locale.error) {
+        this.setState({
+          localeSuccess: false,
+          localeError: true,
         });
       }
       if (
@@ -379,6 +417,15 @@ class UserSettings extends React.Component {
     }
   }
 
+  handleLocaleUpdate() {
+    if (this.props.user.locale !== this.state.locale.value) {
+      this.props.updateUser({
+        id: this.props.user.id,
+        locale: this.state.locale.value,
+      });
+    }
+  }
+
   handleEmailUpdate() {
     if (this.handleValidation(['email'])) {
       const newEmail = this.state.email.trim().toLowerCase();
@@ -432,6 +479,9 @@ class UserSettings extends React.Component {
       ((updates.name && updates.name.success) ||
         (updates.surname && updates.surname.success));
     const namePending = updates && updates.name && updates.name.pending;
+
+    const localeSuccess = updates && (updates.locale && updates.locale.success);
+    const localePending = updates && updates.locale && updates.locale.pending;
     const {
       passwordOldError,
       passwordError,
@@ -439,6 +489,7 @@ class UserSettings extends React.Component {
       emailError,
       nameError,
       surnameError,
+      localeError,
     } = this.visibleErrors([...fieldNames, 'email']);
 
     let emailStatus = null;
@@ -456,6 +507,38 @@ class UserSettings extends React.Component {
       user.requests && user.requests.find(r => r.type === 'changeEmail');
     return (
       <Box column pad>
+        <legend>{<FormattedMessage {...messages.locale} />}</legend>
+        <fieldset>
+          <FormField
+            label={<FormattedMessage {...messages.locale} />}
+            error={localeError}
+          >
+            <Select
+              inField
+              options={availableLanguages}
+              onSearch={false}
+              value={this.state.locale}
+              onChange={e => {
+                this.handleValueChange({
+                  target: {
+                    name: 'locale',
+                    value: e.value,
+                  },
+                });
+              }}
+            />
+          </FormField>
+        </fieldset>
+        <Box justify>
+          {!localeSuccess && (
+            <Button
+              primary
+              disabled={localePending}
+              onClick={this.handleLocaleUpdate}
+              label={<FormattedMessage {...messages.change} />}
+            />
+          )}
+        </Box>
         <legend>{<FormattedMessage {...messages.nameHeading} />}</legend>
         <fieldset>
           <FormField

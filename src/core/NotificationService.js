@@ -147,10 +147,13 @@ class NotificationService {
         if (selector[1] == 0) {
           // means no group
           // PROPBLEM : ALSO GUESTS GET NOTIFIED!! -if they have notificationsettings
-          return this.dbConnector('notification_settings').select(
-            'notification_settings.user_id as userId',
-            'notification_settings.settings as settings',
-          );
+          return this.dbConnector('notification_settings')
+            .innerJoin('users', 'users.id', 'notifications_settings.user_id')
+            .select(
+              'notification_settings.user_id as userId',
+              'notification_settings.settings as settings',
+              'users.locale as locale',
+            );
         }
         // workteams
         return this.dbConnector('user_work_teams')
@@ -160,16 +163,20 @@ class NotificationService {
             'notification_settings.user_id',
             'user_work_teams.user_id',
           )
+          .innerJoin('users', 'users.id', 'notifications_settings.user_id')
           .select(
             'notification_settings.user_id as userId',
             'notification_settings.settings as settings',
+            'users.locale as locale',
           );
       case TargetType.USER: // messages
         return this.dbConnector('notification_settings')
           .where({ user_id: selector[1] })
+          .innerJoin('users', 'users.id', 'notifications_settings.user_id')
           .select(
             'notification_settings.user_id as userId',
             'notification_settings.settings as settings',
+            'users.locale as locale',
           );
       case TargetType.PROPOSAL:
       case TargetType.DISCUSSION: {
@@ -183,12 +190,14 @@ class NotificationService {
             'notification_settings.user_id',
             'subscriptions.user_id',
           )
+          .innerJoin('users', 'users.id', 'notifications_settings.user_id')
           .select(
             'notification_settings.user_id as userId',
             'notification_settings.settings as settings',
             'subscriptions.subscription_type as subscriptionType',
             'subscriptions.target_type as targetType',
             'subscriptions.target_id as targetId',
+            'users.locale as locale',
           );
       }
       default:
@@ -261,6 +270,15 @@ class NotificationService {
         }, {});
 
         const objects = await this.loadObjects(groupedByType);
+        // load locales
+        /* await this.dbConnector('users')
+          .whereIn('id', [
+            ...webpushData.subscriberIds.values(),
+            ...emailData.subscriberIds.values(),
+          ])
+          .pluck('locale');
+*/
+        // TODO Add locale
 
         await this.notifyPushServices({
           webpush: { ...webpushData, allObjects: objects },
@@ -306,13 +324,12 @@ class NotificationService {
       };
     }
     switch (subscriber.subscriptionType) {
+      // state updates + followee activitis
       case SubscriptionType.FOLLOWEES: {
         if (activities.length) {
-          // filter proposals and discussions aut
+          // filter discussions out
           const followeeActivities = activities.filter(
-            activity =>
-              activity.type !== ActivityType.PROPOSAL &&
-              activity.type !== ActivityType.DISCUSSION,
+            activity => activity.type !== ActivityType.DISCUSSION,
           );
           const followerActivities = await this.checkIfFollowing(
             subscriber,

@@ -11,6 +11,9 @@ const UserInputType = new GraphQLInputObjectType({
     groups: {
       type: GraphQLInt,
     },
+    locale: {
+      type: String,
+    },
     surname: {
       type: String,
     },
