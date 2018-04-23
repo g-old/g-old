@@ -18,12 +18,14 @@ const handlePageInfo = (state, action) => {
 
 const createList = filter => {
   const handleStateChange = (state, action) => {
-    const { state: updatedState, id } = action.payload.entities.proposals[
-      action.payload.result
-    ];
+    const proposal = action.payload.entities.proposals[action.payload.result];
+    let updatedState = proposal.state;
+    if (updatedState === 'voting') {
+      updatedState = 'active';
+    }
     return updatedState === filter
-      ? [...new Set([...state, id])]
-      : state.filter(pId => pId !== id);
+      ? [...new Set([...state, proposal.id])]
+      : state.filter(pId => pId !== proposal.id);
   };
   const ids = (state = [], action) => {
     switch (action.type) {

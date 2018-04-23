@@ -297,7 +297,7 @@ export function loadProposalsList({ state, first, after, tagId, workTeamId }) {
         filter: state,
         pagination: data.proposalConnection.pageInfo,
         savePageInfo: after != null,
-        pageIndex: `${state}$${tagId}`,
+        pageIndex: `${state}$${tagId || ''}`,
       });
     } catch (error) {
       dispatch({
