@@ -22,10 +22,10 @@ pipeline:
     secrets: [ docker_username, docker_password ]
     build_args:
       - DRONE_BUILD_NUMBER=${DRONE_BUILD_NUMBER}
-      - DRONE_COMMIT=${DRONE_COMMIT}
+      - DRONE_BRANCH=${DRONE_BRANCH}
     when:
       event: push
-      branch: dev
+      branch: [ dev, testing ]
 
   publish-live:
     image: plugins/docker
@@ -34,6 +34,7 @@ pipeline:
     secrets: [ docker_username, docker_password ]
     build_args:
       - DRONE_BUILD_NUMBER=${DRONE_BUILD_NUMBER}
+      - DRONE_BRANCH=${DRONE_TAG}
     when:
       event: tag
 
@@ -51,4 +52,4 @@ pipeline:
     when:
       status: [ success, failure ]
 
-branches: [ dev ]
+branches: [ dev, testing ]
