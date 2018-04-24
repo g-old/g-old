@@ -28,7 +28,7 @@ const createComment = {
         {
           targetType: TargetType.DISCUSSION,
           targetId,
-          SubscriptionType: SubscriptionType.REPLIES,
+          subscriptionType: SubscriptionType.REPLIES,
         },
         loaders,
       );

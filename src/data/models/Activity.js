@@ -14,6 +14,15 @@ export const ActivityType = {
   REQUEST: 'request',
   SURVEY: 'survey',
 };
+export const ActivityVerb = {
+  CREATE: 'create',
+  UPDATE: 'update',
+  DELETE: 'delete',
+  CLOSE: 'close',
+  ACCEPT: 'accept',
+  REJECT: 'reject',
+};
+
 class Activity {
   constructor(data) {
     this.id = data.id;

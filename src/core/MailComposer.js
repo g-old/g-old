@@ -76,6 +76,10 @@ class MailComposer {
       t: key => this.translations[key][locale],
     });
   }
+  getNotificationMail(user, message, sender, locale) {
+    console.error('TO IMPLEMENT');
+    return this.getMessageMail(user, message, sender, locale);
+  }
 
   loadAllTemplates() {
     fs.readdirSync(this.baseDir).forEach(template => {

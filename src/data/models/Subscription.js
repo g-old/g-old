@@ -103,7 +103,10 @@ class Subscription {
   static async update(viewer, data) {
     if (!data || !data.id) return null;
     if (!canMutate(viewer, data, Models.SUBSCRIPTION)) return null;
-    const newData = { updated_at: new Date() };
+    const newData = {
+      updated_at: new Date(),
+      subscription_type: data.subscriptionType,
+    };
     const updatedSubscription = await knex.transaction(async trx => {
       const [subscription = null] = await knex('subscriptions')
         .where({ id: data.id })

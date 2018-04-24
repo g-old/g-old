@@ -13,14 +13,14 @@ class MessageService {
     messageRepo = throwIfMissing('Message respository'),
     mailComposer = throwIfMissing('Mail composer'),
     tokenService = throwIfMissing('Token service'),
-    // dbConnector = throwIfMissing('Database connector'),
+    dbConnector = throwIfMissing('Database connector'),
     //  eventSrc = throwIfMissing('Event source'),
   ) {
     this.mailer = mailService;
     this.msgRepo = messageRepo;
     this.mailComposer = mailComposer;
     this.tokens = tokenService;
-    // this.dbConnector = dbConnector;
+    this.dbConnector = dbConnector;
     //  this.events = eventSrc;
     this.protocol = __DEV__ ? 'http' : 'https';
     if (!__DEV__) {
@@ -352,18 +352,17 @@ class MessageService {
   }
 
   async sendBatchMessages(data) {
-    const receiverIds = data.subscriberIds.values();
+    const receiverIds = [...data.subscriberIds.values()];
     // or pass  in, bc wee need it for push too
     const receiverData = await this.dbConnector('users')
       .whereIn('id', receiverIds)
       .select('id', 'email', 'locale');
-
     const groupedByLocale = receiverData.reduce(
-      (acc, pos) => {
-        (acc.byLocale[receiverData[pos.locale]] =
-          acc.byLocale[receiverData[pos.locale]] || {})[receiverData[pos.id]] =
-          receiverData[pos];
-        acc.byId[receiverData[pos].id] = receiverData.pos;
+      (acc, userData) => {
+        (acc.byLocale[userData.locale] = acc.byLocale[userData.locale] || {})[
+          userData.id
+        ] = userData;
+        acc.byId[userData.id] = userData;
         return acc;
       },
       { byLocale: {}, byId: {} },
@@ -374,13 +373,12 @@ class MessageService {
     // group activities by type
 
     await Object.keys(data.activities).map(async activityId => {
-      const { activity } = data[activityId];
-
+      const { activity } = data.activities[activityId];
       switch (activity.type) {
         case ActivityType.PROPOSAL:
         case ActivityType.SURVEY:
         case ActivityType.DISCUSSION:
-          data[activityId].subscribers.reduce((acc, sId) => {
+          data.activities[activityId].subscribers.reduce((acc, sId) => {
             // get all by locale
             Object.keys(groupedByLocale.byLocale).map(locale => {
               // get all users/emails  with this locale
@@ -388,7 +386,6 @@ class MessageService {
               if (groupedByLocale.byLocale[locale][sId]) {
                 receiver.push(groupedByLocale.byLocale[locale][sId].email);
               }
-
               const message = this.mailComposer.getNotificationMail(
                 receiver,
                 {
@@ -398,6 +395,7 @@ class MessageService {
                 { name: 'gold' },
                 locale,
               );
+
               return this.send(message, receiver, TransportType.EMAIL);
             });
             return acc;

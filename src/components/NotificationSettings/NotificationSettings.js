@@ -34,6 +34,7 @@ const FIELDS = [
   'update',
   'reply',
   'message',
+  'statement',
 ];
 
 const mergeSettings = values => {
@@ -106,6 +107,7 @@ class NotificationSettings extends React.Component {
     update: PropTypes.func.isRequired,
     user: PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      notificationSettings: PropTypes.shape({}),
     }).isRequired,
     updates: PropTypes.shape({}).isRequired,
   };
@@ -120,10 +122,22 @@ class NotificationSettings extends React.Component {
 
   handleSubmission(values) {
     const inputs = mergeSettings(values);
-    if (inputs) {
+    const { notificationSettings } = this.props.user;
+    const mergedSettings = Object.keys(notificationSettings).reduce(
+      (acc, key) => {
+        if (notificationSettings[key] && acc[key]) {
+          acc[key] = { ...notificationSettings[key], ...acc[key] };
+        } else if (notificationSettings[key]) {
+          acc[key] = notificationSettings[key];
+        }
+        return acc;
+      },
+      inputs,
+    );
+    if (mergedSettings) {
       this.props.update({
         id: this.props.user.id,
-        notificationSettings: JSON.stringify(inputs),
+        notificationSettings: JSON.stringify(mergedSettings),
       });
     }
   }

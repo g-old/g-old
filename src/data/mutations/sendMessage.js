@@ -1,9 +1,10 @@
 import { GraphQLNonNull, GraphQLBoolean } from 'graphql';
 import MessageInput from '../types/MessageInputType';
-import { canAccess } from '../../organization';
-import { EmailType } from '../../core/BackgroundService';
-import { sendJob } from '../../core/childProcess';
-import User from '../models/User';
+import Message from '../models/Message';
+import Activity, { ActivityType, ActivityVerb } from '../models/Activity';
+import { TargetType } from '../models/Subscription';
+
+import knex from '../knex';
 
 const sendMessage = {
   type: new GraphQLNonNull(GraphQLBoolean),
@@ -13,10 +14,46 @@ const sendMessage = {
     },
   },
   resolve: async (data, { message }, { viewer, loaders }) => {
+    const msg = JSON.parse(message.message);
+    const newMessage = await Message.create(
+      viewer,
+      {
+        type: 'msg', // event or msg
+        msg: msg.msg,
+        title: message.subject,
+
+        /* info: {
+        targetType:
+          receiver.type === 'team' ? TargetType.GROUP : TargetType.USER,
+        targetId: receiver.id,
+      }, */
+      },
+      loaders,
+    );
+
+    if (!newMessage) return null;
+    const activity = await Activity.create(viewer, {
+      verb: ActivityVerb.CREATE,
+      type: ActivityType.MESSAGE,
+      objectId: newMessage.id,
+      content: {
+        ...newMessage,
+        targetType:
+          message.receiver.type === 'team' ? TargetType.GROUP : TargetType.USER,
+        targetId: message.receiver.id,
+      },
+    });
+    if (!activity) {
+      await knex('messages')
+        .where({ id: newMessage.id })
+        .del();
+      return false;
+    }
+    return true; // TODO return message
+    /*
     switch (message.type) {
       case 'email': {
         // eslint-disable-next-line no-bitwise
-        if (!canAccess(viewer, 'MessagePanel')) return false;
         if (!message.receiverId || !message.message) return false;
 
         const receiver = await User.gen(viewer, message.receiverId, loaders);
@@ -56,7 +93,7 @@ const sendMessage = {
 
       default:
         throw Error(`Message type not recognized: ${message.type}`);
-    }
+    } */
   },
 };
 

@@ -27,7 +27,7 @@ const push = async (subscriptionData, msg) => {
 
     const messages = subscriptions.map(sub =>
       webPush
-        .sendMessage(
+        .sendNotification(
           sub,
           JSON.stringify({
             body: msg.body,
@@ -158,11 +158,13 @@ const resourceByLocale = {
   },
 };
 
+// TODO get ids notificationids for links // ref = webpush, id = nid
 const getProposalLink = proposal => {
   if (proposal.poll_two_id && proposal.poll_one_id) {
-    return `/proposal/${proposal.poll_one_id}/${proposal.poll_two_id}`;
+    return `/proposal/${proposal.id}/${proposal.poll_two_id}`;
   }
-  return `/proposal/${proposal.poll_two_id || proposal.poll_one_id}`;
+  return `/proposal/${proposal.id}/${proposal.poll_two_id ||
+    proposal.poll_one_id}`;
 };
 
 const getCommentLink = (comment, groupId) => {
@@ -174,80 +176,99 @@ const getCommentLink = (comment, groupId) => {
   }?comment=${parent || comment.id}${child ? `&child=${child}` : ''}`;
 };
 
-const notifyMultiple = async data => {
+const notifyMultiple = async (viewer, data) => {
   // group by type&locale - get diff message by type , diff link
-
-  const userIds = data.subscriberIds.values();
-  const subscriptionData = await knex('subscriptions')
+  const userIds = [...data.subscriberIds.values()];
+  const subscriptionData = await knex('webpush_subscriptions')
     .whereIn('user_id', userIds)
     .select();
 
+  if (!subscriptionData.length) {
+    return;
+  }
+
   let message;
   let title;
-  let locale;
+  // let locale;
   let link;
 
   Object.keys(data.activities).map(activityId => {
-    const { activity, subscribers } = data.activities[activityId];
+    const { activity } = data.activities[activityId];
+    const { subscriberByLocale } = data;
     const object = data.allObjects[activity.type][activity.objectId];
-    switch (activity.type) {
-      case ActivityType.SURVEY:
-        title = resourceByLocale[locale][activity.type];
-        message = object.title;
-        // problem if notifieing open votation
-        link = getProposalLink(object);
-        break;
-      case ActivityType.DISCUSSION:
-        title = resourceByLocale[locale][activity.type];
-        // problem if notifieing open votation
-        message = object.title;
 
-        link = `/workteams/${object.work_team_id}/discussions/${object.id}`;
-        break;
-      case ActivityType.PROPOSAL:
-        // get resources
+    // for all subscribers by locale
 
-        title = resourceByLocale[locale][activity.type];
-        message = object.title;
+    return Object.keys(subscriberByLocale).map(locale => {
+      switch (activity.type) {
+        case ActivityType.SURVEY:
+          title = resourceByLocale[locale][activity.type];
+          message = object.title;
+          // problem if notifieing open votation
+          link = getProposalLink(object);
+          break;
+        case ActivityType.DISCUSSION:
+          title = resourceByLocale[locale][activity.type];
+          // problem if notifieing open votation
+          message = object.title;
 
-        link = getProposalLink(object);
-        // recipients are data-activities
-        break;
+          link = `/workteams/${object.work_team_id}/discussions/${object.id}`;
+          break;
+        case ActivityType.PROPOSAL:
+          // get resources
+          title = resourceByLocale[locale][activity.type];
 
-      case ActivityType.STATEMENT:
-        message = 'Dont know how to get';
-        // Diff between reply and new ?
+          message = object.title;
 
-        title = resourceByLocale[locale][activity.type];
-        link = getCommentLink(object, 'Noidea');
-        break;
+          link = getProposalLink(object);
+          // recipients are data-activities
+          break;
 
-      case ActivityType.COMMENT:
-        message = 'Dont know how to get';
-        // Diff between reply and new ?
+        case ActivityType.STATEMENT: {
+          const proposal =
+            data.allObjects[ActivityType.PROPOSAL][activity.targetId];
+          message = proposal.title;
+          // Diff between reply and new ?
 
-        title = resourceByLocale[locale][activity.type];
-        link = getCommentLink(object, 'Noidea');
-        break;
+          title = resourceByLocale[locale][activity.type];
+          //
+          link = `/proposal/${proposal.id}/${object.poll_id}`;
+          break;
+        }
 
-      case ActivityType.MESSAGE:
-        title = resourceByLocale[locale][activity.type];
-        link = `/message/${activity.objectId}`;
-        break;
-      default:
-        throw new Error(`Type not recognized ${activity.type}`);
-    }
-    // TODO
-    const activitySubscribers = subscribers.map(id =>
-      // eslint-disable-next-line eqeqeq
-      subscriptionData.find(susbcription => susbcription.user_id == id),
-    );
+        case ActivityType.COMMENT:
+          message = 'Dont know how to get';
+          // Diff between reply and new ?
 
-    return push(activitySubscribers, {
-      body: message.length > 40 ? `${message.slice(0, 36)}...` : message,
-      link,
-      title,
-      tag: activity.type,
+          title = resourceByLocale[locale][activity.type];
+          link = getCommentLink(object, 'Noidea');
+          break;
+
+        case ActivityType.MESSAGE:
+          title = resourceByLocale[locale][activity.type];
+          link = `/message/${activity.objectId}`;
+          message = object.title;
+          break;
+        default:
+          throw new Error(`Type not recognized ${activity.type}`);
+      }
+      // TODO
+
+      const activitySubscribers = subscriberByLocale[locale].map(id => {
+        const res = subscriptionData.find(
+          // eslint-disable-next-line eqeqeq
+          subscription => subscription.user_id == id,
+        );
+
+        return res;
+      });
+
+      return push(activitySubscribers, {
+        body: message.length > 40 ? `${message.slice(0, 36)}...` : message,
+        link,
+        title,
+        tag: activity.type,
+      });
     });
   });
 
@@ -297,8 +318,8 @@ async function processMessages(message) {
       case 'batchMailing': {
         log.info('BATCHMAIL ;DATA', { message });
         result = await root.BackgroundService.handleEmails(
-          message.data,
           EmailType.TEST_BATCH,
+          message.data,
         );
         break;
       }

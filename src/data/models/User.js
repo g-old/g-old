@@ -13,6 +13,7 @@ const NOTIFICATION_FIELDS = [
   'update',
   'reply',
   'message',
+  'statement',
 ];
 
 class User {

@@ -79,13 +79,15 @@ class UserNotification extends React.Component {
                 {...messages.statementNew}
                 values={{
                   author: `${activity.actor.name} ${activity.actor.surname}`,
-                  topic: info.proposalTitle,
+                  topic: info && info.proposalTitle,
                 }}
               />
             ),
             path:
               activity.object &&
-              `/proposal/${info.proposalId}/${activity.object.pollId}${param}`,
+              `/proposal/${info && info.proposalId}/${
+                activity.object.pollId
+              }${param}`,
           };
         }
         return 'To implement';

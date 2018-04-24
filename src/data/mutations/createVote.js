@@ -27,7 +27,7 @@ const createVote = {
         {
           targetType: TargetType.PROPOSAL,
           targetId,
-          SubscriptionType: SubscriptionType.UPDATES,
+          subscriptionType: SubscriptionType.UPDATES,
         },
         loaders,
       );

@@ -33,6 +33,7 @@ const messageService = new MessageService(
   messagesRepo,
   mailComposer,
   tokenService,
+  knex,
 );
 const notificationService = new NotificationService({
   eventManager: EventManager,

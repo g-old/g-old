@@ -25,6 +25,7 @@ export const subscriptionFields = `
 id
 targetType
 targetId
+subscriptionType
 `;
 
 const createSubscriptionMutation = `

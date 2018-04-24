@@ -67,7 +67,7 @@ class BackgroundService {
         return this.messager.sendBatchMessages(emailData);
       }
       default: {
-        throw new Error('Email type not recognizes');
+        throw new Error('Email type not recognized');
       }
     }
   }

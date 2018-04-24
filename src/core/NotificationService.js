@@ -93,32 +93,38 @@ class NotificationService {
       this.activityQueue.push(activity);
     }
   }
-  groupByTargetAndEventType(activities) {
-    return activities.reduce((agg, activity) => {
-      const compoundKey =
-        activity.targetType + this.delimiter + activity.targetId;
-      if (agg[compoundKey]) {
-        agg[compoundKey].activities.push(activity);
-      } else {
-        // eslint-disable-next-line no-param-reassign
-        agg[compoundKey] = {
-          activities: [activity],
-          targetType: activity.targetType,
-          targetId: activity.targetId,
-        };
-      }
-      return agg;
-    }, {});
+  groupBySubject(activities) {
+    return activities.reduce(
+      (acc, activity) => {
+        const compoundKey =
+          activity.targetType + this.delimiter + activity.targetId;
+        if (acc.bySubject[compoundKey]) {
+          acc.bySubject[compoundKey].activityIds.push(activity.id);
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          acc.bySubject[compoundKey] = {
+            activityIds: [activity.id],
+            targetType: activity.targetType,
+            targetId: activity.targetId,
+          };
+        }
+        if (!acc.byId[activity.id]) {
+          acc.byId[activity.id] = activity;
+        }
+        return acc;
+      },
+      { bySubject: {}, byId: {} },
+    );
   }
 
-  async findSubscribers(groupedActivities) {
-    const promises = Object.keys(groupedActivities).map(async key => {
+  async addSubscribers(groupedActivities) {
+    const promises = Object.keys(groupedActivities.bySubject).map(async key => {
       const subscribers = await this.loadSubscriptions([
-        groupedActivities[key].targetType,
-        groupedActivities[key].targetId,
+        groupedActivities.bySubject[key].targetType,
+        groupedActivities.bySubject[key].targetId,
       ]);
       // eslint-disable-next-line no-param-reassign
-      groupedActivities[key].subscribers = subscribers;
+      groupedActivities.bySubject[key].subscribers = subscribers;
     });
     await Promise.all(promises);
     return groupedActivities;
@@ -148,7 +154,7 @@ class NotificationService {
           // means no group
           // PROPBLEM : ALSO GUESTS GET NOTIFIED!! -if they have notificationsettings
           return this.dbConnector('notification_settings')
-            .innerJoin('users', 'users.id', 'notifications_settings.user_id')
+            .innerJoin('users', 'users.id', 'notification_settings.user_id')
             .select(
               'notification_settings.user_id as userId',
               'notification_settings.settings as settings',
@@ -163,7 +169,7 @@ class NotificationService {
             'notification_settings.user_id',
             'user_work_teams.user_id',
           )
-          .innerJoin('users', 'users.id', 'notifications_settings.user_id')
+          .innerJoin('users', 'users.id', 'notification_settings.user_id')
           .select(
             'notification_settings.user_id as userId',
             'notification_settings.settings as settings',
@@ -172,7 +178,7 @@ class NotificationService {
       case TargetType.USER: // messages
         return this.dbConnector('notification_settings')
           .where({ user_id: selector[1] })
-          .innerJoin('users', 'users.id', 'notifications_settings.user_id')
+          .innerJoin('users', 'users.id', 'notification_settings.user_id')
           .select(
             'notification_settings.user_id as userId',
             'notification_settings.settings as settings',
@@ -190,7 +196,7 @@ class NotificationService {
             'notification_settings.user_id',
             'subscriptions.user_id',
           )
-          .innerJoin('users', 'users.id', 'notifications_settings.user_id')
+          .innerJoin('users', 'users.id', 'notification_settings.user_id')
           .select(
             'notification_settings.user_id as userId',
             'notification_settings.settings as settings',
@@ -209,15 +215,16 @@ class NotificationService {
     const allObjects = {};
     const promises = Object.keys(data).map(async type => {
       const objData = await this.dbConnector(mapTypeToTable[type])
-        .whereIn('id', data[type].values())
+        .whereIn('id', [...data[type].values()])
         .select();
       allObjects[type] = objData.reduce((acc, obj) => {
         acc[obj.id] = obj;
-        return obj;
+        return acc;
       }, {});
     });
     await Promise.all(promises);
     //
+    return allObjects;
   }
 
   async batchProcessing() {
@@ -229,8 +236,8 @@ class NotificationService {
         this.activityQueue.length,
       );
       if (activities.length) {
-        const groupedActivities = this.groupByTargetAndEventType(activities);
-        const activitiesAndSubscribers = await this.findSubscribers(
+        const groupedActivities = this.groupBySubject(activities);
+        const activitiesAndSubscribers = await this.addSubscribers(
           groupedActivities,
         );
 
@@ -247,25 +254,43 @@ class NotificationService {
           emailData,
         } = this.getAndGroupNotifications(notificationData);
 
-        await this.dbConnector.batchInsert(
-          'notifications',
-          notifications,
-          this.maxBatchSize,
-        );
+        const notificationIds = await this.dbConnector
+          .batchInsert('notifications', notifications, this.maxBatchSize)
+          .returning('id');
+        // TODO add notificationIds
+        console.info(notificationIds);
 
         // load all objects for webpush/email
         const allActivities = Object.keys(emailData.activities)
           .map(id => emailData.activities[id])
           .concat(
             Object.keys(webpushData.activities).map(
-              id => webpushData.activitiess[id],
+              id => webpushData.activities[id],
             ),
           );
 
-        const groupedByType = allActivities.reduce((acc, activity) => {
-          (acc[activity.type] = acc[activity.type] || new Set()).add(
+        const groupedByType = allActivities.reduce((acc, activityData) => {
+          const { activity } = activityData;
+          acc[activity.type] = (acc[activity.type] || new Set()).add(
             activity.objectId,
           );
+          if (activity.type === ActivityType.STATEMENT) {
+            // get subjectId from activity
+            // add it to types to load
+            if (acc[ActivityType.PROPOSAL]) {
+              acc[ActivityType.PROPOSAL].add(activity.targetId);
+            } else {
+              acc[ActivityType.PROPOSAL] = new Set([activity.targetId]);
+            }
+          } else if (activity.type === ActivityType.COMMENT) {
+            // add it to types to load
+            if (acc[ActivityType.DISCUSSION]) {
+              acc[ActivityType.DISCUSSION].add(activity.targetId);
+            } else {
+              acc[ActivityType.DISCUSSION] = new Set([activity.targetId]);
+            }
+          }
+
           return acc;
         }, {});
 
@@ -279,7 +304,6 @@ class NotificationService {
           .pluck('locale');
 */
         // TODO Add locale
-
         await this.notifyPushServices({
           webpush: { ...webpushData, allObjects: objects },
           email: { ...emailData, allObjects: objects },
@@ -298,12 +322,13 @@ class NotificationService {
   }
 
   async combineData(groupedActivities) {
-    const proms = Object.keys(groupedActivities).map(compoundKey => {
-      const data = groupedActivities[compoundKey];
+    const proms = Object.keys(groupedActivities.bySubject).map(compoundKey => {
+      const data = groupedActivities.bySubject[compoundKey];
       const promises = data.subscribers.map(subscriber =>
         this.mergeNotifyableActivitiesWithSubscribers(
           subscriber,
-          data.activities,
+          data.activityIds,
+          groupedActivities.byId,
         ),
       );
       return Promise.all(promises);
@@ -312,7 +337,12 @@ class NotificationService {
     return data.reduce((acc, curr) => acc.concat(curr), []);
   }
 
-  async mergeNotifyableActivitiesWithSubscribers(subscriber, activities) {
+  async mergeNotifyableActivitiesWithSubscribers(
+    subscriber,
+    activityIds,
+    allActivities,
+  ) {
+    const activities = activityIds.map(aId => allActivities[aId]);
     if (
       !subscriber.subscriptionType ||
       subscriber.subscriptionType === SubscriptionType.ALL
@@ -413,17 +443,38 @@ class NotificationService {
       followeeSet.has(Number(activity.actorId)),
     );
   }
+  /*
+
+  type PushResult = {
+    activities: string[]
+  }
+
+  type NotificationResult = {
+    emailData:PushResult,
+    webpushData:PushResult,
+
+  } */
 
   // eslint-disable-next-line class-methods-use-this
   getAndGroupNotifications(notificationData) {
     const now = new Date();
     const resultSet = {
-      emailData: { activities: {}, subscriberIds: new Set() },
-      webpushData: { activities: {}, subscriberIds: new Set() },
+      emailData: {
+        activities: {},
+        subscriberIds: new Set(),
+        subscriberById: {},
+        subscriberByLocale: {},
+      },
+      webpushData: {
+        activities: {},
+        subscriberIds: new Set(),
+        subscriberById: {},
+        subscriberByLocale: {},
+      },
       notifications: [],
     };
 
-    return notificationData.reduce((acc, data) => {
+    const result = notificationData.reduce((acc, data) => {
       if (data.subscriber && data.activities) {
         data.activities.forEach(a => {
           acc.notifications.push({
@@ -433,6 +484,7 @@ class NotificationService {
           });
           if (data.subscriber.settings[a.type]) {
             // TODO normalize activities with Map aId: a, aId: [userIds]
+
             if (data.subscriber.settings[a.type].email) {
               if (acc.emailData.activities[a.id]) {
                 acc.emailData.activities[a.id].subscribers.push(
@@ -445,8 +497,13 @@ class NotificationService {
                 };
               }
               acc.emailData.subscriberIds.add(data.subscriber.userId);
+              acc.emailData.subscriberById[data.subscriber.userId] =
+                data.subscriber;
+
               // acc.email.push({ userId: data.subscriber.userId, activity: a });
-            } else if (data.subscriber.settings[a.type].webpush) {
+            }
+            // allow both notification methods combined
+            if (data.subscriber.settings[a.type].webpush) {
               if (acc.webpushData.activities[a.id]) {
                 acc.webpushData.activities[a.id].subscribers.push(
                   data.subscriber.userId,
@@ -457,13 +514,31 @@ class NotificationService {
                   activity: a,
                 };
               }
-              acc.emailData.subscriberIds.add(data.subscriber.userId);
+              acc.webpushData.subscriberIds.add(data.subscriber.userId);
+              acc.webpushData.subscriberById[data.subscriber.userId] =
+                data.subscriber;
             }
           }
         });
       }
       return acc;
     }, resultSet);
+
+    // group by locale
+    const groupedByLocale = [
+      ...result.webpushData.subscriberIds.values(),
+    ].reduce((acc, sId) => {
+      const user = result.webpushData.subscriberById[sId];
+
+      if (acc.webpushData.subscriberByLocale[user.locale]) {
+        acc.webpushData.subscriberByLocale[user.locale].push(user.userId);
+      } else {
+        acc.webpushData.subscriberByLocale[user.locale] = [user.userId];
+      }
+      return acc;
+    }, result);
+
+    return groupedByLocale;
   }
 }
 
