@@ -52,6 +52,7 @@
     "files": [
       "src/components/AccountDetails/AccountDetails.js",
       "src/components/DiscussionInput/DiscussionInput.js",
+      "src/components/FormValidation/FormValidation.js",
       "src/components/Login/Login.js",
       "src/components/NotificationInput/NotificationInput.js",
       "src/components/ProposalActions/ProposalActions.js",
@@ -62,7 +63,8 @@
       "src/components/WorkTeamForm/WorkTeamForm.js",
       "src/components/WorkTeamInput/WorkTeamInput.js",
       "src/components/WorkTeamManager/WorkTeamManager.js",
-      "src/routes/passwordRecovery/PasswordRecovery.js"
+      "src/routes/passwordRecovery/PasswordRecovery.js",
+      "src/routes/passwordReset/PasswordReset.js"
     ]
   },
   {
@@ -102,8 +104,8 @@
   },
   {
     "id": "proposal.rejected",
-    "description": "Proposal can be voted from now on",
-    "defaultMessage": "Voting open",
+    "description": "Proposal got rejected",
+    "defaultMessage": "Rejected",
     "message": "",
     "files": ["src/components/Activity/Activity.js"]
   },
@@ -194,7 +196,7 @@
   {
     "id": "label.edited",
     "description": "Comment edited",
-    "defaultMessage": "edited {time}",
+    "defaultMessage": "{time} (edited)",
     "message": "",
     "files": ["src/components/Comment/Comment.js"]
   },
@@ -277,6 +279,7 @@
     "message": "",
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
+      "src/components/FormValidation/FormValidation.js",
       "src/components/ProposalInput/ProposalInput.js",
       "src/components/TagForm/TagForm.js",
       "src/components/WorkTeamForm/WorkTeamForm.js",
@@ -320,7 +323,7 @@
     "description": "Title of help section",
     "defaultMessage": "What to do next",
     "message": "",
-    "files": ["src/components/Help/Help.js"]
+    "files": ["src/components/InfoPage/InfoPage.js"]
   },
   {
     "id": "action.error",
@@ -340,6 +343,7 @@
     "defaultMessage": "Cancel",
     "message": "",
     "files": [
+      "src/components/ConfirmLayer/ConfirmLayer.js",
       "src/components/ImageUpload/ImageUpload.js",
       "src/components/Poll/Poll.js",
       "src/components/UserSettings/EmailField.js",
@@ -373,6 +377,7 @@
     "defaultMessage": "Your email address seems to be invalid",
     "message": "",
     "files": [
+      "src/components/FormValidation/FormValidation.js",
       "src/components/Login/Login.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/EmailField.js",
@@ -590,6 +595,7 @@
     "defaultMessage": "Email address already in use",
     "message": "",
     "files": [
+      "src/components/FormValidation/FormValidation.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
@@ -692,7 +698,10 @@
     "description": "Short command to invoke deletion",
     "defaultMessage": "Delete",
     "message": "",
-    "files": ["src/components/SupervisionPanel/SupervisionPanel.js"]
+    "files": [
+      "src/components/ConfirmLayer/ConfirmLayer.js",
+      "src/components/SupervisionPanel/SupervisionPanel.js"
+    ]
   },
   {
     "id": "commands.more",
@@ -878,13 +887,6 @@
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
-    "id": "signup.error-empty",
-    "description": "Help for empty fields",
-    "defaultMessage": "You can't leave this empty",
-    "message": "",
-    "files": ["src/routes/passwordReset/PasswordReset.js"]
-  },
-  {
     "id": "signup.error-passwordMismatch",
     "description": "Help for mismatching passwords",
     "defaultMessage": "These passwords don't match. Try again?",
@@ -933,20 +935,6 @@
     "defaultMessage": "Unlock viewer",
     "message": "",
     "files": ["src/components/GroupManager/GroupManager.js"]
-  },
-  {
-    "id": "action.cancel",
-    "description": "Label",
-    "defaultMessage": "Cancel",
-    "message": "",
-    "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
-  },
-  {
-    "id": "action.delete",
-    "description": "Label",
-    "defaultMessage": "Delete",
-    "message": "",
-    "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
   },
   {
     "id": "action.leave",
@@ -1030,7 +1018,7 @@
     "id": "settings.verificationCall",
     "description": "Notification to verify mail address",
     "defaultMessage":
-      "Confirm your email address. A confirmation message was sent to \"{email}\"",
+      "Confirm your email address. A confirmation message was sent to ({email})",
     "message": "",
     "files": ["src/routes/account/AccountContainer.js"]
   },
@@ -1136,5 +1124,54 @@
     "defaultMessage": "Surveys",
     "message": "",
     "files": ["src/components/Navigation/Navigation.js"]
+  },
+  {
+    "id": "faq",
+    "description": "FAQ label",
+    "defaultMessage": "Frequently asked questions",
+    "message": "",
+    "files": ["src/components/InfoPage/InfoPage.js"]
+  },
+  {
+    "id": "privacy",
+    "description": "Privacy label",
+    "defaultMessage": "Privacy",
+    "message": "",
+    "files": ["src/components/InfoPage/InfoPage.js"]
+  },
+  {
+    "id": "coordinator",
+    "description": "Label coordinator",
+    "defaultMessage": "Coordinator",
+    "message": "",
+    "files": ["src/components/WorkTeam/WorkTeam.js"]
+  },
+  {
+    "id": "form.error-min",
+    "description": "Min",
+    "defaultMessage": "Enter atleast {value} chars or numbers",
+    "message": "",
+    "files": ["src/components/FormValidation/FormValidation.js"]
+  },
+  {
+    "id": "label.login",
+    "description": "Label login",
+    "defaultMessage": "Log In",
+    "message": "",
+    "files": ["src/components/Login/Login.js"]
+  },
+  {
+    "id": "label.signup",
+    "description": "Label signup",
+    "defaultMessage": "Sign Up",
+    "message": "",
+    "files": ["src/routes/home/Home.js"]
+  },
+  {
+    "id": "label.or",
+    "description": "Label or",
+    "defaultMessage": "OR",
+    "message": "",
+    "files": ["src/routes/home/Home.js"]
   }
 ]

@@ -11,12 +11,13 @@ function ProposalStatusRow({ proposal = {}, state, onClickMenu }) {
   /* eslint-disable react/no-danger */
   /* eslint-disable jsx-a11y/click-events-have-key-events */
   /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+  if (!proposal) return null;
   const endTime = proposal.pollTwo
     ? proposal.pollTwo.closedAt
     : proposal.pollOne.closedAt;
 
   return (
-    <TableRow className={s.row} onClick={() => onClickMenu('EDIT')}>
+    <TableRow className={s.row} onClick={() => onClickMenu('EDIT', proposal)}>
       <td style={{ minWidth: '84px' }}>{proposal.title}</td>
 
       <td>
@@ -36,12 +37,6 @@ ProposalStatusRow.propTypes = {
   onClickMenu: PropTypes.func.isRequired,
   state: PropTypes.string.isRequired,
   proposal: PropTypes.shape({}).isRequired,
-};
-
-ProposalStatusRow.defaultProps = {
-  checked: null,
-  processor: null,
-  deniedAt: null,
 };
 
 export default withStyles(s)(ProposalStatusRow);

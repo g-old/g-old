@@ -23,6 +23,7 @@ import Responsive from '../../core/Responsive';
 
 class WorkTeamContainer extends React.Component {
   static propTypes = {
+    user: PropTypes.shape({}).isRequired,
     workTeamData: PropTypes.shape({
       id: PropTypes.string,
       discussions: PropTypes.arrayOf(PropTypes.shape({})),
@@ -113,7 +114,7 @@ class WorkTeamContainer extends React.Component {
   }
 
   render() {
-    const { workTeamData = {} } = this.props;
+    const { workTeamData = {}, user } = this.props;
     const { smallSize } = this.state;
     let sidebar;
     let content;
@@ -155,6 +156,7 @@ class WorkTeamContainer extends React.Component {
           onJoin={this.props.joinWorkTeam}
           onLeave={this.props.leaveWorkTeam}
           onDeleteRequest={this.props.deleteRequest}
+          user={user}
         />
       );
     }

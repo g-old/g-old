@@ -126,7 +126,12 @@ function proposalReadControl(viewer, data) {
 }
 
 function proposalWriteControl(viewer, data) {
-  if (viewer.permissions & PermissionsSchema[Groups.RELATOR]) {
+  if (data.workTeamId) {
+    if (data.isCoordinator) {
+      return true;
+    }
+    return viewer.permissions & PermissionsSchema[Groups.ADMIN];
+  } else if (viewer.permissions & PermissionsSchema[Groups.RELATOR]) {
     if (data.id && data.state) {
       // updates
       if (viewer.permissions & Permissions.MODIFY_PROPOSALS) {
@@ -151,6 +156,12 @@ function statementReadControl(viewer, data) {
 }
 
 function statementWriteControl(viewer, data) {
+  if (
+    data.proposal.state === 'survey' &&
+    viewer.permissions & Permissions.TAKE_SURVEYS
+  ) {
+    return checkIfMember(viewer, data.proposal);
+  }
   if (viewer.permissions & Permissions.MODIFY_OWN_STATEMENTS) {
     return checkIfMember(viewer, data.proposal);
   }
@@ -207,8 +218,10 @@ function pollWriteControl(viewer, data) {
       return false;
     }
     return true;
+  } else if (data.isCoordinator) {
+    return true;
   }
-  return false;
+  return viewer.permissions & PermissionsSchema[Groups.ADMIN];
 }
 
 function voteReadControl(viewer, data) {
@@ -283,11 +296,15 @@ function discussionReadControl(viewer, data) {
   if (viewer.wtMemberships.includes(data.work_team_id)) {
     return true;
   }
-
   return false;
 }
 function discussionWriteControl(viewer, data) {
-  if (viewer.permissions & Permissions.PUBLISH_DISCUSSIONS) {
+  if (data.workTeamId) {
+    if (data.isCoordinator) {
+      return true;
+    }
+    return viewer.permissions & PermissionsSchema[Groups.ADMIN];
+  } else if (viewer.permissions & Permissions.PUBLISH_DISCUSSIONS) {
     return true;
   }
   return false;
@@ -307,7 +324,7 @@ function commentWriteControl(viewer, data) {
     // TODO check group etc
     if (viewer.wtMemberships.includes(data.discussion.workTeamId)) {
       // eslint-disable-line
-      return true;
+      return (viewer.permissions & Permissions.MAKE_COMMENT) > 0;
     }
   }
   // eslint-disable-next-line eqeqeq

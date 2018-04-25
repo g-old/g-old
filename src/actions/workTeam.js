@@ -79,6 +79,16 @@ const workTeamsWithMembers = `query{
       }
     }}`;
 
+const memberQuery = `query($id:ID!){
+    workTeam(id:$id){
+      id
+      displayName
+      members{
+        ${userFields}
+      }
+    }
+    }`;
+
 const wtDetails = `
 name
 lldName
@@ -154,10 +164,10 @@ const workTeamQuery = `query($id:ID! $state:String){
   }
 }`;
 
-const proposalStatusQuery = `query($id:ID!){
+const proposalStatusQuery = `query($id:ID! $first:Int){
   workTeam(id:$id){
     id
-    linkedProposalConnection{
+    linkedProposalConnection(first:$first){
       pageInfo{
         endCursor
         hasNextPage
@@ -193,6 +203,17 @@ const joinWorkTeamMutationWithDetails = `mutation($id:ID, $memberId:ID){
   joinWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     ${workTeamFields}
     ${wtDetails}
+      requestConnection(type:"joinWT" filterBy:[{filter:CONTENT_ID id:$id}]){
+        pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          ${requestFields}
+        }
+      }
+    }
   }
 }`;
 
@@ -242,6 +263,16 @@ const leaveWorkTeamMutation = `mutation($id:ID, $memberId:ID){
     }
   }
 }`;
+
+const dePaginate = (data, resourceName) => {
+  let resources = [];
+  const connectionName = `${resourceName}Connection`;
+  if (data[connectionName]) {
+    resources = data[connectionName].edges.map(p => p.node);
+    data[`${resourceName}s`] = resources; // eslint-disable-line no-param-reassign
+  }
+  return data;
+};
 
 export function loadWorkTeams(withMembers) {
   return async (dispatch, getState, { graphqlRequest }) => {
@@ -310,7 +341,10 @@ export function joinWorkTeam(workTeamData, details) {
         proposals = data.joinWorkTeam.proposalConnection.edges.map(p => p.node);
       }
       data.joinWorkTeam.proposals = proposals;
-      const normalizedData = normalize(data.joinWorkTeam, workTeamSchema);
+      const normalizedData = normalize(
+        dePaginate(data.joinWorkTeam, 'request'),
+        workTeamSchema,
+      );
 
       dispatch({ type: JOIN_WORKTEAM_SUCCESS, payload: normalizedData });
     } catch (e) {
@@ -377,13 +411,35 @@ export function loadWorkTeam({ id, state = 'active' }, details) {
     }
   };
 }
-export function loadProposalStatus({ id }) {
+
+export function loadWorkTeamMembers({ id }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: LOAD_WORKTEAM_START,
     });
     try {
-      const { data } = await graphqlRequest(proposalStatusQuery, { id });
+      const { data } = await graphqlRequest(memberQuery, { id });
+
+      // TODO make paginable
+      const normalizedData = normalize(data.workTeam, workTeamSchema);
+
+      dispatch({ type: LOAD_WORKTEAM_SUCCESS, payload: normalizedData });
+    } catch (e) {
+      dispatch({
+        type: LOAD_WORKTEAM_ERROR,
+        message: e.message || 'Something went wrong',
+      });
+    }
+  };
+}
+
+export function loadProposalStatus({ id, first }) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: LOAD_WORKTEAM_START,
+    });
+    try {
+      const { data } = await graphqlRequest(proposalStatusQuery, { id, first });
       const proposals = data.workTeam.linkedProposalConnection.edges.map(
         p => p.node,
       );

@@ -12,7 +12,7 @@ async function action({ store, path }, { id }) {
   if (!user) {
     return { redirect: `/?redirect=${path}` };
   } else if (!canAccess(user, title)) {
-    return { redirect: '/' };
+    return { redirect: `/workteams/${id}` };
   }
   if (!process.env.BROWSER) {
     await store.dispatch(loadWorkTeam({ id }, true));
@@ -24,7 +24,7 @@ async function action({ store, path }, { id }) {
     title,
     component: (
       <Layout>
-        <WorkTeamManagement id={id} />
+        <WorkTeamManagement id={id} user={user} />
       </Layout>
     ),
   };

@@ -1,0 +1,3 @@
+# usage example:
+# ./knex src/knexfile.js migrate:latest
+node -r dotenv-extended/config node_modules/knex/bin/cli.js --knexfile $1 $2

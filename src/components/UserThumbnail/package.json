@@ -1,0 +1,6 @@
+{
+  "name": "UserThumbnail",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./UserThumbnail.js"
+}
