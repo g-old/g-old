@@ -238,6 +238,20 @@ if (__DEV__) {
 
         break;
       }
+      case 'proposalNotification': {
+        message = root.MailComposer.getProposalNotificationMail({
+          user: req.user,
+          message: {
+            content: `<div class="Proposal-body-18nlW"><p>Is there a ****way ****to insert a string with html tags into a handlebars template without getting the tags escaped in the outcoming string?</p>
+<p>template.js:</p>
+</div>`,
+          },
+          sender: req.user,
+          title: 'Title of the proposal',
+          locale: req.language,
+        });
+        break;
+      }
       default: {
         message = { html: '<h1>No template found</h1>' };
       }

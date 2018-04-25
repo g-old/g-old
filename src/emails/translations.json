@@ -101,5 +101,15 @@
     "de-DE": "Persönliche Nachricht für Sie von g-old.org",
     "it-IT": "Messaggio personale per Lei da g-old.org",
     "lld-IT": "Messaje personal per Vos da g-old.org"
+  },
+  "proposalNotificationSubject": {
+    "de-DE": "Neuer Beschluss auf g-old.org",
+    "it-IT": "",
+    "lld-IT": ""
+  },
+  "clickProposalLink": {
+    "de-DE": "Abstimmen",
+    "it-IT": "",
+    "lld-IT": ""
   }
 }

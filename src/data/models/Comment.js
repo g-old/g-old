@@ -152,6 +152,7 @@ class Comment {
       return null;
     }
 
+    let workTeamId;
     const commentInDB = await knex.transaction(async trx => {
       const statusOK = await knex('comments')
         .where({ id: data.id })
@@ -166,11 +167,12 @@ class Comment {
           .forUpdate()
           .decrement('num_replies', 1);
       } else {
-        await knex('discussions')
+        [workTeamId = null] = await knex('discussions')
           .where({ id: oldComment.discussion_id })
           .transacting(trx)
           .forUpdate()
-          .decrement('num_comments', oldComment.num_replies + 1); // TODO check if correct
+          .decrement('num_comments', oldComment.num_replies + 1)
+          .returning('work_team_id'); // TODO check if correct
       }
 
       if (statusOK) {
@@ -179,7 +181,17 @@ class Comment {
       }
       return statusOK;
     });
-    return commentInDB ? new Comment(commentInDB) : null;
+    const comment = commentInDB ? new Comment(commentInDB) : null;
+    if (comment && workTeamId) {
+      EventManager.publish('onCommentDeleted', {
+        viewer,
+        comment,
+        subjectId: data.discussionId,
+        groupId: workTeamId,
+        info: { workTeamId },
+      });
+    }
+    return comment;
   }
 }
 

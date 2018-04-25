@@ -1,3 +1,4 @@
+// @flow
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
@@ -24,6 +25,14 @@ export const ActivityVerb = {
 };
 
 class Activity {
+  id: number | string;
+  actorId: number | string;
+  verb: string;
+  objectId: number | string;
+  type: string;
+  content: {};
+  createdAt: string;
+
   constructor(data) {
     this.id = data.id;
     this.actorId = data.actor_id;
@@ -68,4 +77,5 @@ class Activity {
     return newActivity;
   }
 }
+
 export default Activity;

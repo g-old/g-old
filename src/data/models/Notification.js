@@ -1,5 +1,8 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import { ActivityVerb } from './Activity';
+import EventManager from '../../core/EventManager';
+import log from '../../logger';
 
 class Notification {
   constructor(data) {
@@ -83,5 +86,39 @@ class Notification {
     return updatedIds;
   }
 }
+
+EventManager.subscribe('onStatementDeleted', ({ statement }) =>
+  knex('activities')
+    .where({ object_id: statement.id, verb: ActivityVerb.CREATE })
+    .pluck('id')
+    .then(([aId]) => {
+      if (aId) {
+        return knex('notifications')
+          .where({ activity_id: aId })
+          .del();
+      }
+      return Promise.resolve();
+    })
+    .catch(err => {
+      log.error({ err }, 'Notification deletion failed');
+    }),
+);
+
+EventManager.subscribe('onCommentDeleted', ({ comment }) =>
+  knex('activities')
+    .where({ object_id: comment.id, verb: ActivityVerb.CREATE })
+    .pluck('id')
+    .then(([aId]) => {
+      if (aId) {
+        return knex('notifications')
+          .where({ activity_id: aId })
+          .del();
+      }
+      return Promise.resolve();
+    })
+    .catch(err => {
+      log.error({ err }, 'Notification deletion failed');
+    }),
+);
 
 export default Notification;

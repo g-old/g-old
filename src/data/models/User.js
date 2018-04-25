@@ -143,7 +143,7 @@ class User {
     if (data.notificationSettings) {
       // validate
       let validatedSettings;
-      if (data.notificationSettings.length < 256) {
+      if (data.notificationSettings.length < 1024) {
         const parsedSettings = JSON.parse(data.notificationSettings);
         // check keys
         validatedSettings = Object.keys(parsedSettings).reduce(

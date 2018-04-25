@@ -56,6 +56,7 @@ class MessageService {
         if (message.html) {
           result = await this.mailer.sendEmail({
             ...message,
+            recipient: receiver,
             isMultiple: true,
           });
         } else {
@@ -352,12 +353,14 @@ class MessageService {
   }
 
   async sendBatchMessages(data) {
-    const receiverIds = [...data.subscriberIds.values()];
+    /*  const receiverIds = [...data.subscriberIds.values()];
     // or pass  in, bc wee need it for push too
     const receiverData = await this.dbConnector('users')
       .whereIn('id', receiverIds)
       .select('id', 'email', 'locale');
-    const groupedByLocale = receiverData.reduce(
+
+    console.log('DATA EMAIL', { data });
+   const groupedByLocale = receiverData.reduce(
       (acc, userData) => {
         (acc.byLocale[userData.locale] = acc.byLocale[userData.locale] || {})[
           userData.id
@@ -366,7 +369,7 @@ class MessageService {
         return acc;
       },
       { byLocale: {}, byId: {} },
-    );
+    ); */
 
     // get all activities . objects
 
@@ -378,30 +381,47 @@ class MessageService {
         case ActivityType.PROPOSAL:
         case ActivityType.SURVEY:
         case ActivityType.DISCUSSION:
-          data.activities[activityId].subscribers.reduce((acc, sId) => {
-            // get all by locale
-            Object.keys(groupedByLocale.byLocale).map(locale => {
-              // get all users/emails  with this locale
-              const receiver = [];
-              if (groupedByLocale.byLocale[locale][sId]) {
-                receiver.push(groupedByLocale.byLocale[locale][sId].email);
-              }
-              const message = this.mailComposer.getNotificationMail(
-                receiver,
-                {
-                  content:
-                    data.allObjects[activity.type][activity.objectId].body,
-                },
-                { name: 'gold' },
-                locale,
-              );
+          // data.activities[activityId].subscribers.reduce((acc, sId) => {
+          // get all by locale
+          Object.keys(data.subscriberByLocale).map(locale => {
+            // get all users/emails  with this locale
 
-              return this.send(message, receiver, TransportType.EMAIL);
+            let receiver;
+            if (data.subscriberByLocale[locale]) {
+              receiver = data.subscriberByLocale[locale].map(
+                sId => data.subscriberById[sId].email,
+              );
+            }
+            const proposal = data.allObjects[activity.type][activity.objectId];
+            const link = `/proposal/${proposal.id}/${proposal.poll_two_id ||
+              proposal.poll_one_id}`;
+            const message = this.mailComposer.getProposalNotificationMail({
+              receiver,
+              message: {
+                content: proposal.body,
+              },
+              sender: { name: 'gold' },
+              title: proposal.title,
+              locale,
+              link,
             });
-            return acc;
-          }, {});
+
+            return this.send(message, receiver, TransportType.EMAIL);
+          });
+          // return acc;
+          //  }, {});
 
           break;
+
+        case ActivityType.STATEMENT: {
+          break;
+        }
+        case ActivityType.COMMENT: {
+          break;
+        }
+        case ActivityType.MESSAGE: {
+          break;
+        }
 
         default:
           break;

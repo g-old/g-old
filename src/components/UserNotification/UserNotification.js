@@ -120,6 +120,9 @@ class UserNotification extends React.Component {
       }
       case 'comment': {
         if (activity.verb === 'create') {
+          if (!activity.object) {
+            return { message: 'No object', path: '' };
+          }
           const parent = activity.object.parentId;
           const child = parent ? activity.object.id : null;
           return {

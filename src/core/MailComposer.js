@@ -67,6 +67,24 @@ class MailComposer {
       t: key => this.translations[key][locale],
     });
   }
+  getProposalNotificationMail({
+    user,
+    message,
+    sender,
+    title,
+    link,
+    locale = 'de-DE',
+  }) {
+    return this.render('proposalNotification', {
+      name: user.name,
+      sender: `${sender.name} ${sender.surname}`,
+      title,
+      ...(message.subject && { subject: message.subject }),
+      message: message.content,
+      link,
+      t: key => this.translations[key][locale],
+    });
+  }
   getMessageMail(user, message, sender, locale = 'de-DE') {
     return this.render('message', {
       name: user.name,

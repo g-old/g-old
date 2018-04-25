@@ -74,6 +74,7 @@ class MailService {
   }
   async sendEmail(message) {
     const notOkay = this.checkMessage(message);
+
     if (notOkay) {
       return { success: false, errors: notOkay };
     }

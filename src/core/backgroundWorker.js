@@ -1,3 +1,4 @@
+// @flow
 import knex from '../data/knex';
 import webPush from '../webPush';
 import log from '../logger';
@@ -7,6 +8,7 @@ import createLoaders from '../data/dataLoader';
 import root from '../compositionRoot';
 import { EmailType } from './BackgroundService';
 import { ActivityType } from '../data/models/Activity';
+import type { NotificationSet } from './NotificationService';
 
 const handleMessages = async (viewer, messageData, receiver) =>
   circularFeedMessage({
@@ -176,7 +178,7 @@ const getCommentLink = (comment, groupId) => {
   }?comment=${parent || comment.id}${child ? `&child=${child}` : ''}`;
 };
 
-const notifyMultiple = async (viewer, data) => {
+const notifyMultiple = async (viewer, data: NotificationSet) => {
   // group by type&locale - get diff message by type , diff link
   const userIds = [...data.subscriberIds.values()];
   const subscriptionData = await knex('webpush_subscriptions')
