@@ -24,12 +24,14 @@ export const ActivityVerb = {
   REJECT: 'reject',
 };
 
+export type tActivityType = $Values<typeof ActivityType>;
+
 class Activity {
   id: number | string;
   actorId: number | string;
-  verb: string;
+  verb: $Values<typeof ActivityVerb>;
   objectId: number | string;
-  type: string;
+  type: tActivityType;
   content: {};
   createdAt: string;
 

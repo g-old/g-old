@@ -1,10 +1,33 @@
+// @flow
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
 
+type ID = string | number;
+export type CommentProps = {
+  id: ID,
+  author_id: ID,
+  discussion_id: ID,
+  content: string,
+  parent_id: ID,
+  num_replies: number,
+  created_at: string,
+  updated_at: string,
+  edited_at: string,
+};
+
 const MAX_CONTENT_LENGTH = 10000;
 class Comment {
-  constructor(data) {
+  id: ID;
+  authorId: ID;
+  discussionId: ID;
+  content: string;
+  parentId: ID;
+  numReplies: number;
+  createdAt: string;
+  updatedAt: string;
+  editedAt: string;
+  constructor(data: CommentProps) {
     this.id = data.id;
     this.authorId = data.author_id;
     this.discussionId = data.discussion_id;

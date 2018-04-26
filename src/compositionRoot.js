@@ -38,6 +38,7 @@ const messageService = new MessageService(
 const notificationService = new NotificationService({
   eventManager: EventManager,
   dbConnector: knex,
+  mailComposer,
 });
 const backgroundService = new BackgroundService(messageService);
 export default {

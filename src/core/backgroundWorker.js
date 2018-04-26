@@ -195,8 +195,7 @@ const notifyMultiple = async (viewer, data: NotificationSet) => {
   let link;
 
   Object.keys(data.activities).map(activityId => {
-    const { activity } = data.activities[activityId];
-    const { subscriberByLocale } = data;
+    const { activity, subscriberByLocale } = data.activities[activityId];
     const object = data.allObjects[activity.type][activity.objectId];
 
     // for all subscribers by locale
@@ -238,13 +237,16 @@ const notifyMultiple = async (viewer, data: NotificationSet) => {
           break;
         }
 
-        case ActivityType.COMMENT:
-          message = 'Dont know how to get';
+        case ActivityType.COMMENT: {
+          const discussion =
+            data.allObjects[ActivityType.COMMENT][activity.targetId];
+          message = discussion.title;
           // Diff between reply and new ?
 
           title = resourceByLocale[locale][activity.type];
           link = getCommentLink(object, 'Noidea');
           break;
+        }
 
         case ActivityType.MESSAGE:
           title = resourceByLocale[locale][activity.type];

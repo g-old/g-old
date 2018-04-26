@@ -67,10 +67,11 @@ class MailComposer {
       t: key => this.translations[key][locale],
     });
   }
-  getProposalNotificationMail({
+  getProposalMail({
     user,
     message,
     sender,
+    date,
     title,
     link,
     locale = 'de-DE',
@@ -82,6 +83,27 @@ class MailComposer {
       ...(message.subject && { subject: message.subject }),
       message: message.content,
       link,
+      date,
+      t: key => this.translations[key][locale],
+    });
+  }
+  getStatementMail({
+    user,
+    message,
+    sender,
+    date,
+    title,
+    link,
+    locale = 'de-DE',
+  }) {
+    return this.render('statementNotification', {
+      name: user.name,
+      sender: `${sender.name} ${sender.surname}`,
+      title,
+      ...(message.subject && { subject: message.subject }),
+      text: message.content,
+      link,
+      date,
       t: key => this.translations[key][locale],
     });
   }
@@ -94,10 +116,10 @@ class MailComposer {
       t: key => this.translations[key][locale],
     });
   }
-  getNotificationMail(user, message, sender, locale) {
+  /* getNotificationMail(user, message, sender, locale) {
     console.error('TO IMPLEMENT');
     return this.getMessageMail(user, message, sender, locale);
-  }
+  } */
 
   loadAllTemplates() {
     fs.readdirSync(this.baseDir).forEach(template => {
