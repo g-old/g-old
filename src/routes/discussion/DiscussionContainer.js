@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { findDOMNode } from 'react-dom';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import WorkteamHeader from '../../components/WorkteamHeader';
 import s from './DiscussionContainer.css';
 // import { defineMessages, FormattedMessage } from 'react-intl';
 // import history from '../../history';
@@ -134,15 +135,28 @@ class DiscussionContainer extends React.Component {
       if (!discussion.comments) return <span>NOTHING TO SEE</span>;
       return (
         <div>
-          <Box tag="article" column pad align padding="medium">
-            {/* <CheckBox
+          <Box tag="article" column pad align>
+            <div
+              style={{
+                display: 'flex',
+                width: '100%',
+                flexDirection: 'column',
+              }}
+            >
+              <WorkteamHeader
+                displayName={discussion.workTeam.displayName}
+                id={discussion.workTeam.id}
+                logo={discussion.workTeam.logo}
+              />
+              {/* <CheckBox
               toggle
               checked={discussion.subscribed}
               label={discussion.subscribed ? 'ON' : 'OFF'}
               onChange={this.handleSubscription}
               disabled={isFetching}
             /> */}
-            <Discussion {...discussion} />
+              <Discussion {...discussion} />
+            </div>
             <Box tag="section" column pad fill className={s.commentsSection}>
               <Comment
                 asInput

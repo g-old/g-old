@@ -49,6 +49,11 @@ ${discussionFields}
   author{
     ${authorFields}
   }
+  workTeam{
+    id
+    displayName
+    logo
+  }
   comments{
     id
     content
