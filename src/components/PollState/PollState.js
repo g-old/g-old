@@ -1,5 +1,4 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './PollState.css';
@@ -7,23 +6,24 @@ import VotesList from '../VotesList';
 import Value from '../Value';
 import { ICONS } from '../../constants';
 
-class PollState extends React.Component {
-  static propTypes = {
-    pollId: PropTypes.string.isRequired,
-    compact: PropTypes.bool,
-    allVoters: PropTypes.number.isRequired,
-    upvotes: PropTypes.number.isRequired,
-    downvotes: PropTypes.number,
-    threshold: PropTypes.number,
-    unipolar: PropTypes.bool.isRequired,
-    votes: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.string })),
-    getVotes: PropTypes.func,
-    updates: PropTypes.shape({
-      isPending: PropTypes.bool,
-      error: PropTypes.node,
-    }),
-  };
+// @flow
+type Props = {
+  pollId: string,
+  compact?: boolean,
+  allVoters: number,
+  upvotes: number,
+  downvotes?: number,
+  threshold?: number,
+  unipolar: boolean,
+  votes?: { id: string }[],
+  getVotes?: () => void,
+  updates?: {
+    isPending: boolean,
+    error: React.Node,
+  },
+};
 
+class PollState extends React.Component<Props> {
   static defaultProps = {
     compact: false,
     downvotes: 0,

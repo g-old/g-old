@@ -11,7 +11,7 @@ import UserType from './UserType';
 export type tVoteType = {
   __typename: 'VoteDL',
   id: number,
-  position: string,
+  position: 'pro' | 'con',
   voter: typeof UserType,
   pollId: number,
 };

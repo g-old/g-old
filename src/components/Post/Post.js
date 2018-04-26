@@ -10,7 +10,6 @@ import s from './Post.css';
 import Avatar from '../Avatar';
 import Comment from '../Comment';
 import Label from '../Label';
-import ProposalPreview from '../ProposalPreview';
 import DiscussionPreview from '../DiscussionPreview';
 import Box from '../Box';
 
@@ -23,6 +22,8 @@ import { type tProposalType } from '../../data/types/ProposalDLType';
 import { type tVoteType } from '../../data/types/VoteDLType';
 import { type tDiscussionType } from '../../data/types/DiscussionType';
 import { type tWorkTeam } from '../../data/types/WorkTeamType';
+import PollState from '../PollState/PollState';
+import StatementsContainer from '../StatementsContainer/StatementsContainer';
 
 const messages = defineMessages({
   followeeVote: {
@@ -99,6 +100,7 @@ class Post extends React.Component<Props> {
   onProposalClick({ proposalId, pollId }) {
     history.push(`/proposal/${proposalId}/${pollId}`);
   }
+
   renderGroupHeader(info, title) {
     return (
       <Box align between className={s.groupHeader}>
@@ -192,8 +194,40 @@ class Post extends React.Component<Props> {
     const result = {};
     switch (subject.__typename) { // eslint-disable-line
       case 'ProposalDL': {
+        const proposal: tProposalType = subject;
+        const poll = proposal.activePoll;
         result.content = (
-          <ProposalPreview proposal={subject} onClick={this.onProposalClick} />
+          <div>
+            <span // eslint-disable-line
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                this.onProposalClick({
+                  proposalId: proposal.id,
+                  pollId: poll.id,
+                });
+              }}
+            >
+              {subject.title}
+            </span>
+            <PollState
+              compact
+              pollId={poll.id}
+              allVoters={poll.allVoters}
+              upvotes={poll.upvotes}
+              downvotes={poll.downvotes}
+              unipolar={poll.mode.unipolar}
+              threshold={poll.threshold}
+              thresholdRef={poll.mode.thresholdRef}
+              votes={poll.votes}
+            />
+            <StatementsContainer
+              hideOwnStatement
+              followees={proposal.activePoll.followees}
+              poll={proposal.activePoll}
+              user={{ id: 0 }}
+              filter="all"
+            />
+          </div>
         );
         let header = getProposalVerb(verb, subject);
         if (subject.workTeamId) {

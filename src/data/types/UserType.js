@@ -21,9 +21,7 @@ const canSee = (viewer, data) =>
 /* eslint-enable */
 
 // @flow
-/* tUserType needs to be defined before the UserType object, because it is recursive
- * (contains a UserType array) */
-type tUserType = {
+export type tUserType = {
   id: number,
   name: string,
   surname: string,
@@ -41,7 +39,7 @@ type tUserType = {
   workTeams: typeof WorkTeamType[],
 };
 
-const UserType: tUserType = new ObjectType({
+const UserType = new ObjectType({
   name: 'User',
   fields: () => ({
     // we need a lazy evaluated fn , bc we use UserType, which has to be defined

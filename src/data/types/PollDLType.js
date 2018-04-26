@@ -18,6 +18,27 @@ import Vote from '../models/Vote';
 import knex from '../knex';
 import PollingMode from '../models/PollingMode';
 
+// @flow
+export type tPollType = {
+  id: number,
+  secret: boolean,
+  threshold: number,
+  endTime: string,
+  start_time: string,
+  closedAt: string,
+  mode: tPollingModeType,
+  ownVote: tVoteType,
+  likedStatements: tStatementType[],
+  votes: tVoteType[],
+  allVoters: number,
+  upvotes: number,
+  downvotes: number,
+  followees: tVoteType[],
+  statements: tStatementType[],
+  ownStatement: tStatementType,
+  createdAt: string,
+};
+
 const PollType = new ObjectType({
   name: 'PollDL',
   fields: () => ({

@@ -8,9 +8,9 @@ import {
   GraphQLBoolean,
 } from 'graphql';
 import TagType from './TagType';
-import PollType from './PollDLType';
+import PollType, { tPollType } from './PollDLType';
 import User from '../models/User';
-import UserType from './UserType';
+import UserType, { tUserType } from './UserType';
 import Poll from '../models/Poll';
 import Tag from '../models/Tag';
 
@@ -26,10 +26,10 @@ export type tProposalType = {
   title: string,
   tags: TagType[],
   workTeamId: number,
-  pollOne: PollType,
-  pollTwo: PollType,
-  activePoll: PollType,
-  spokesman: UserType,
+  pollOne: tPollType,
+  pollTwo: tPollType,
+  activePoll: tPollType,
+  spokesman: tUserType,
   state: string,
   votes: number,
   publishedAt: string,
