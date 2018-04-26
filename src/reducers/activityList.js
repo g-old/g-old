@@ -33,7 +33,7 @@ const isFetching = (state = false, action) => {
 const errorMessage = (state = null, action) => {
   switch (action.type) {
     case LOAD_FEED_ERROR:
-      return action.message;
+      return action.payload.error;
     case LOAD_FEED_START:
     case LOAD_FEED_SUCCESS:
       return null;

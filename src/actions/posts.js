@@ -87,6 +87,7 @@ query($userId:ID){
           author {
             ${userFields}
           }
+          text
           position
           createdAt
           updatedAt
