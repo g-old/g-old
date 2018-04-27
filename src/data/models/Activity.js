@@ -14,6 +14,7 @@ export const ActivityType = {
   COMMENT: 'comment',
   REQUEST: 'request',
   SURVEY: 'survey',
+  USER: 'user',
 };
 export const ActivityVerb = {
   CREATE: 'create',
@@ -25,6 +26,7 @@ export const ActivityVerb = {
 };
 
 export type tActivityType = $Values<typeof ActivityType>;
+export type tActivityVerb = $Values<typeof ActivityVerb>;
 
 class Activity {
   id: number | string;

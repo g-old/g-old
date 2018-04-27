@@ -192,6 +192,19 @@ if (__DEV__) {
   // A route for testing email templates
   app.get('/:email(email|emails)/:template', (req, res) => {
     let message;
+    const loremIpsum = `
+            Id eligendi esse error officia iure esse rerum qui eius.
+            Quo mollitia ut ut dolores quia odio et beatae perspiciatis.
+            Corporis et mollitia molestiae doloribus inventore laudantium quia.
+            Maxime et sunt ipsa maxime autem.
+            Voluptatibus est deleniti et eum.
+            In at fuga et odio. Aut quod odit voluptatibus molestiae voluptatem et quia.
+            Dolorum natus deleniti fugiat ut accusamus.
+`;
+    const actor = {
+      fullName: `${req.user.name} ${req.user.surname}`,
+      thumbnail: req.user.thumbnail,
+    };
     switch (req.params.template) {
       case 'welcome': {
         message = root.MailComposer.getWelcomeMail(
@@ -228,37 +241,13 @@ if (__DEV__) {
 
         break;
       }
-      case 'message': {
-        message = root.MailComposer.getMessageMail(
-          req.user,
-          { content: 'This is a message' },
-          req.user,
-          req.language,
-        );
 
-        break;
-      }
       case 'proposalNotification': {
         message = root.MailComposer.getProposalMail({
-          user: req.user,
-          message: {
-            content: `
-            Id eligendi esse error officia iure esse rerum qui eius. Quo mollitia ut ut dolores quia odio et beatae perspiciatis. Corporis et mollitia molestiae doloribus inventore laudantium quia.
- 
-Maxime et sunt ipsa maxime autem. Voluptatibus est deleniti et eum. In at fuga et odio. Aut quod odit voluptatibus molestiae voluptatem et quia. Dolorum natus deleniti fugiat ut accusamus.
- 
-Error et fugit rerum consequatur ut voluptate excepturi voluptatum. Asperiores cupiditate ut nam incidunt aperiam libero error omnis dolorum. Consequuntur cumque quos possimus.
- 
-Distinctio non numquam repellat quibusdam asperiores sit est quia necessitatibus. Ut dolor reiciendis enim numquam exercitationem quia laudantium iusto minima. Et sit impedit debitis. Beatae aut aut.
- 
-Illum consequatur optio molestiae id aliquam qui voluptatem aut. Quam quam magnam occaecati a provident cum quis natus accusamus. Dicta consectetur quidem voluptas beatae voluptas temporibus ipsa.
- 
-Eos consectetur animi sint. Enim quo est deleniti ut est. Sint dolorem rem non cum omnis. Aut perspiciatis non neque et nihil fugiat. Est accusamus harum.
-`,
+          proposal: {
+            body: loremIpsum,
+            title: 'Title of the proposal',
           },
-          sender: req.user,
-          title: 'Title of the proposal',
-          date: 'NOW',
           locale: req.language,
         });
         break;
@@ -266,17 +255,33 @@ Eos consectetur animi sint. Enim quo est deleniti ut est. Sint dolorem rem non c
 
       case 'statementNotification': {
         message = root.MailComposer.getStatementMail({
-          user: req.user,
-          message: {
-            content: `
-            Id eligendi esse error officia iure esse rerum qui eius. Quo mollitia ut ut dolores quia odio et beatae perspiciatis. Corporis et mollitia molestiae doloribus inventore laudantium quia.
- 
-Maxime et sunt ipsa maxime autem. Voluptatibus est deleniti et eum. In at fuga et odio. Aut quod odit voluptatibus molestiae voluptatem et quia. Dolorum natus deleniti fugiat ut accusamus.
- 
-`,
+          statement: {
+            body: loremIpsum,
+            position: 'pro',
           },
-          sender: req.user,
-          title: 'Title of the proposal',
+          author: actor,
+          proposalTitle: 'Title of the proposal',
+          locale: req.language,
+        });
+        break;
+      }
+      case 'commentNotification': {
+        message = root.MailComposer.getCommentMail({
+          author: actor,
+          comment: {
+            content: loremIpsum,
+          },
+          discussionTitle: 'Title of the discussion',
+          locale: req.language,
+        });
+        break;
+      }
+
+      case 'messageNotification': {
+        message = root.MailComposer.getMessageMail({
+          sender: actor,
+          message: loremIpsum,
+          title: 'The subject',
           locale: req.language,
         });
         break;

@@ -15,7 +15,7 @@ exports.up = function(knex, Promise) {
       .then(() =>
         knex.schema.raw(`   ALTER TABLE "activities"
      ADD CONSTRAINT "activities_type_check"
-     CHECK (type IN ('proposal', 'statement', 'like', 'vote', 'poll', 'message','discussion','comment', 'request', 'survey'))`),
+     CHECK (type IN ('proposal', 'statement', 'like', 'vote', 'poll', 'message','discussion','comment', 'request', 'survey', 'user'))`),
       ),
   ]);
 };

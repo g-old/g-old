@@ -1,3 +1,4 @@
+// @flow
 import bcrypt from 'bcrypt';
 import knex from '../knex';
 import { validateEmail } from '../../core/helpers';
@@ -16,8 +17,21 @@ const NOTIFICATION_FIELDS = [
   'statement',
 ];
 
+export type UserProps = {
+  id: ID,
+  name: string,
+  surname: string,
+  email: string,
+  groups: number,
+  thumbnail: string,
+  emailVerified: boolean,
+  last_login_at: string,
+  created_at: string,
+  canVoteSince: ?string,
+  locale: Locale,
+};
 class User {
-  constructor(data) {
+  constructor(data: UserProps) {
     this.id = data.id;
     this.name = data.name;
     this.surname = data.surname;

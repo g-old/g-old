@@ -8,10 +8,10 @@
     padding-top: 0;
     word-break: break-word;">{{title}}
     </div>
-<div style="border-left: 4px solid #8cc800; padding: 0.4em;">
+<div style=" {{#if pro}}border-left: 4px solid #8cc800 {{else}} border-right: 4px solid  #ff324d {{/if}};  padding: 0.4em;">
   <div>
-    <img style="margin-right:4px;" class="statement-avatar" src="https://api.adorable.io/avatars/32/user_1user_1.io.png" alt="IMG">
-    <span style = "font-weight:600; vertical-align: top;">user_1 user_1</span>
+    <img style="margin-right:4px;" class="statement-avatar" src="{{thumbnail}}"alt="IMG">
+    <span style = "font-weight:600; vertical-align: top;">{{name}}</span>
 
   </div>
   <div style="width: 100%;">

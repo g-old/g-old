@@ -1,3 +1,4 @@
+// @flow
 import Poll from './Poll';
 import Vote from './Vote';
 import knex from '../knex';
@@ -7,8 +8,21 @@ import Proposal from './Proposal';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
 
+type ID = string | number;
+export type StatementProps = {
+  id: ID,
+  author_id: ID,
+  body: string,
+  position: 'pro' | 'con',
+  likes: number,
+  vote_id: ID,
+  poll_id: ID,
+  created_at: string,
+  updated_at: string,
+  deleted_at: string,
+};
 class Statement {
-  constructor(data) {
+  constructor(data: StatementProps) {
     this.id = data.id;
     this.author_id = data.author_id;
     this.text = data.body;

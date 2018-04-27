@@ -1,8 +1,13 @@
+// @flow
 import path from 'path';
 import fs from 'fs';
 import Module from 'module';
 import { throwIfMissing } from './utils';
 import translations from '../emails/translations.json';
+import type { CommentProps } from '../data/models/Comment';
+import type { ProposalProps } from '../data/models/Proposal';
+// import type { DiscussionProps } from '../data/models/Discussion';
+import type { StatementProps } from '../data/models/Statement';
 
 // taken from https://github.com/kriasoft/nodejs-api-starter/blob/master/src/email.js
 function loadTemplate(filename, renderer) {
@@ -12,7 +17,43 @@ function loadTemplate(filename, renderer) {
   return renderer.template(m.exports);
 }
 
+type Template = { subject: any => string, html: any => string };
+type Translations = { [string]: [string] };
+export type EmailHTML = { subject: string, html: string };
+type Actor = { fullName: string, thumbnail: ?string };
+type StatementMailProps = {
+  statement: StatementProps,
+  author: Actor,
+  proposalTitle: string,
+  link: string,
+  locale: Locale,
+};
+type MessageMailProps = {
+  message: string,
+  sender: Actor,
+  title: string,
+  locale: Locale,
+};
+type ProposalMailProps = {
+  proposal: ProposalProps,
+  link: string,
+  locale: Locale,
+};
+
+type CommentMailProps = {
+  comment: CommentProps,
+  author: Actor,
+  link: string,
+  discussionTitle: string,
+  locale: Locale,
+};
+
 class MailComposer {
+  renderer: any;
+  templates: Map<string, Template>;
+  translations: Translations;
+  baseDir: string;
+
   constructor(
     renderEngine = throwIfMissing('Template render engine'),
     templateDir,
@@ -28,7 +69,7 @@ class MailComposer {
     this.baseDir = path.resolve(__dirname, templateDir || dir);
     this.renderer = renderEngine;
     this.translations = MailComposer.loadTranslations();
-    this.getWelcomeMail = this.getWelcomeMail.bind(this);
+    // this.getWelcomeMail = this.getWelcomeMail.bind(this);
 
     this.renderer.registerHelper('t', (key, options) =>
       options.data.root.t(key),
@@ -67,59 +108,63 @@ class MailComposer {
       t: key => this.translations[key][locale],
     });
   }
-  getProposalMail({
-    user,
-    message,
-    sender,
-    date,
-    title,
-    link,
-    locale = 'de-DE',
-  }) {
+  getProposalMail({ proposal, link, locale = 'de-DE' }: ProposalMailProps) {
     return this.render('proposalNotification', {
-      name: user.name,
-      sender: `${sender.name} ${sender.surname}`,
-      title,
-      ...(message.subject && { subject: message.subject }),
-      message: message.content,
+      title: proposal.title,
+      text: proposal.body,
       link,
-      date,
       t: key => this.translations[key][locale],
     });
   }
+
   getStatementMail({
-    user,
-    message,
-    sender,
-    date,
-    title,
+    statement,
+    author,
+    proposalTitle,
     link,
     locale = 'de-DE',
-  }) {
+  }: StatementMailProps) {
     return this.render('statementNotification', {
-      name: user.name,
-      sender: `${sender.name} ${sender.surname}`,
-      title,
-      ...(message.subject && { subject: message.subject }),
-      text: message.content,
+      name: author.fullName,
+      position: statement.position,
+      title: proposalTitle,
+      text: statement.body,
+      thumbnail: author.thumbnail,
       link,
-      date,
       t: key => this.translations[key][locale],
     });
   }
-  getMessageMail(user, message, sender, locale = 'de-DE') {
-    return this.render('message', {
-      name: user.name,
-      sender: `${sender.name} ${sender.surname}`,
-      ...(message.subject && { subject: message.subject }),
-      message: message.content,
+  getMessageMail({
+    message,
+    title,
+    sender,
+    locale = 'de-DE',
+  }: MessageMailProps) {
+    return this.render('messageNotification', {
+      sender: sender.fullName,
+      subject: title,
+      message,
+      thumbnail: sender.thumbnail,
       t: key => this.translations[key][locale],
     });
   }
-  /* getNotificationMail(user, message, sender, locale) {
-    console.error('TO IMPLEMENT');
-    return this.getMessageMail(user, message, sender, locale);
-  } */
+
+  getCommentMail({
+    comment,
+    author,
+    link,
+    discussionTitle,
+    locale,
+  }: CommentMailProps) {
+    return this.render('commentNotification', {
+      name: author.fullName,
+      title: discussionTitle,
+      text: comment.content,
+      thumbnail: author.thumbnail,
+      link,
+      t: key => this.translations[key][locale],
+    });
+  }
 
   loadAllTemplates() {
     fs.readdirSync(this.baseDir).forEach(template => {
@@ -138,7 +183,7 @@ class MailComposer {
     });
   }
 
-  render(name, context) {
+  render(name, context): EmailHTML {
     if (!this.templates.size) {
       this.loadAllTemplates();
     }
