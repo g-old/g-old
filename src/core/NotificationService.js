@@ -13,6 +13,7 @@ import type { DiscussionProps } from '../data/models/Discussion';
 import type { StatementProps } from '../data/models/Statement';
 import type { UserProps } from '../data/models/User';
 import type { EmailHTML } from './MailComposer';
+import type PubSub from './pubsub';
 
 // TODO write Dataloaders for batching
 let timer;
@@ -63,7 +64,7 @@ type GroupedActivities = {
 type SubsForActivity = {
   subscriberIds: ID[],
   activity: EActivity,
-  subscriberByLocale: { [Locale]: ID[] },
+  subscriberByLocale: { [?Locale]: ID[] },
 };
 export type NotificationSet = {
   activities: { [ID]: SubsForActivity },
@@ -82,22 +83,22 @@ type GroupedNotifications = {
   allObjects: { [tActivityType]: ResourceMap },
   notifications: RawNotification[],
 };
-type pushArgs = { webpush: NotificationSet, email: NotificationSet };
-type PushMessage = {
+export type PushData = {
   body: string,
   link: string,
   title: string,
   tag: tActivityType,
 };
-type PushMessageResult = {
-  message: PushMessage,
+type PushMessage = {
+  message: PushData,
   receiverIds: ID[],
 };
-type Email = {
+export type PushMessages = PushMessage[];
+export type Email = {
   htmlContent: EmailHTML,
   receivers: string[],
 };
-type EmailResult = Email[];
+export type Emails = Email[];
 type PayloadType = { activity: EActivity, subjectId?: ID };
 
 const filterReplies = (parents, activities) => {
@@ -124,17 +125,19 @@ const mapTypeToTable: { [tActivityType]: tActivityType } = {
 
 const fillWithData = (
   object: GroupedNotifications,
-  transportName: string,
+  transportName: 'webpushData' | 'emailData',
   activity: EActivity,
   user: Subscriber,
 ): void => {
   const store = object[transportName];
   if (store.activities[activity.id]) {
     store.activities[activity.id].subscriberIds.push(user.id);
-    if (store.activities.subscriberByLocale[user.locale]) {
-      store.activities.subscriberByLocale[user.locale].push(user.id);
+    if (store.activities[activity.id].subscriberByLocale[user.locale]) {
+      store.activities[activity.id].subscriberByLocale[user.locale].push(
+        user.id,
+      );
     } else {
-      store.activities.subscriberByLocale[user.locale] = [user.id];
+      store.activities[activity.id].subscriberByLocale[user.locale] = [user.id];
     }
   } else {
     store.activities[activity.id] = {
@@ -224,6 +227,12 @@ const getProposalLink = (proposal: ProposalProps): string => {
     proposal.poll_one_id}`;
 };
 
+const getStatementLink = (proposalId: ID, pollId: ID) =>
+  `/proposal/${proposalId}/${pollId}`;
+
+const getDiscussionLink = (discussion: DiscussionProps): string =>
+  `/workteams/${discussion.work_team_id}/discussions/${discussion.id}`;
+
 const generatePushMessage = (
   activity: EActivity,
   subscriberIds: ID[],
@@ -246,10 +255,7 @@ const generatePushMessage = (
       title = resourceByLocale[locale][activity.type];
       // problem if notifieing open votation
       message = activityObject.title;
-
-      link = `/workteams/${activityObject.work_team_id}/discussions/${
-        activityObject.id
-      }`;
+      link = getDiscussionLink(activityObject);
       break;
     case ActivityType.PROPOSAL:
       // get resources
@@ -270,7 +276,7 @@ const generatePushMessage = (
 
       title = resourceByLocale[locale][activity.type];
       //
-      link = `/proposal/${proposal.id}/${activityObject.poll_id}`;
+      link = getStatementLink(proposal.id, activityObject.poll_id);
       break;
     }
 
@@ -306,10 +312,13 @@ const generatePushMessage = (
   }); */
 
   return {
-    body: message.length > 40 ? `${message.slice(0, 36)}...` : message,
-    link,
-    title,
-    tag: activity.type,
+    message: {
+      body: message.length > 40 ? `${message.slice(0, 36)}...` : message,
+      link,
+      title,
+      tag: activity.type,
+    },
+    receiverIds: subscriberIds,
   };
 };
 
@@ -317,6 +326,7 @@ type NotificationProps = {
   maxBatchSize?: number,
   batchingWindow?: number,
   mailComposer: MailComposer,
+  pubsub: PubSub,
 };
 
 class NotificationService {
@@ -326,6 +336,7 @@ class NotificationService {
   maxBatchSize: number;
   batchingWindow: number;
   dbConnector: any;
+  PubSub: PubSub;
   MailComposer: MailComposer;
   filterActivity: (payload: PayloadType) => void;
   loadSubscriptions: Selector => Promise<Subscriber[]>;
@@ -340,6 +351,7 @@ class NotificationService {
     eventManager = throwIfMissing('EventManager'),
     dbConnector = throwIfMissing('Database connection'),
     mailComposer = throwIfMissing('MailComposer'),
+    pubsub = throwIfMissing('PubSub'),
     // sseEmitter = throwIfMissing('SSE-Emitter'),
     maxBatchSize,
     batchingWindow,
@@ -347,12 +359,14 @@ class NotificationService {
     this.EventManager = eventManager;
     this.dbConnector = dbConnector;
     this.MailComposer = mailComposer;
+    this.PubSub = pubsub;
     this.activityQueue = [];
     this.delimiter = '#';
     this.maxBatchSize = maxBatchSize || 500;
     this.batchingWindow = batchingWindow || 1000 * 10;
     this.filterActivity = this.filterActivity.bind(this);
     this.loadSubscriptions = this.loadSubscriptions.bind(this);
+    this.generateEmail = this.generateEmail.bind(this);
     this.mergeNotifyableActivitiesWithSubscribers = this.mergeNotifyableActivitiesWithSubscribers.bind(
       this,
     );
@@ -464,6 +478,10 @@ class NotificationService {
       log.error({ err }, 'NotificationService failed ');
       await this.processQueue();
     }
+  }
+
+  async getOnlineUsers() {
+    return new Set([...this.PubSub.getOnlineUsers().values()]);
   }
 
   loadSubscriptions(selector: Selector): Promise<Subscriber[]> {
@@ -579,14 +597,16 @@ class NotificationService {
 
         // console.log(' NEW GROUPED NOTIFICATIONS', { webpushData, emailData });
 
-        const emails: EmailResult = generateData(
+        const emails: Emails = generateData(
           emailData.activities,
           allObjects,
           emailData.subscriberById,
           this.generateEmail,
         );
 
-        const pushMessages: PushMessageResult = generateData(
+        // BETTER on CLIENTSIDE!
+        // const onlineSubscribers = this.getOnlineUsers();
+        const pushMessages: PushMessages = generateData(
           webpushData.activities,
           allObjects,
           webpushData.subscriberById,
@@ -599,22 +619,7 @@ class NotificationService {
         // TODO add notificationIds
         console.info(notificationIds);
 
-        // generate pushData
-
-        // generateEmailData
-
-        /* await this.dbConnector('users')
-          .whereIn('id', [
-            ...webpushData.subscriberIds.values(),
-            ...emailData.subscriberIds.values(),
-          ])
-          .pluck('locale');
-*/
-        // TODO Add locale
-        await this.notifyPushServices({
-          webpush: { pushMessages },
-          email: { emails },
-        });
+        await this.notifyPushServices(emails, pushMessages);
       }
 
       // const endTime = process.hrtime(startTime);
@@ -731,27 +736,26 @@ class NotificationService {
     const receivers = subscriberIds.map(sId => subscriberById[sId].email);
 
     switch (activity.type) {
-      case ActivityType.DISCUSSION:
+      case ActivityType.DISCUSSION: {
+        const link = getDiscussionLink(activityObject);
+        const emailHTML = this.MailComposer.getDiscussionMail({
+          discussion: activityObject,
+          link,
+          locale,
+        });
+        return { htmlContent: emailHTML, receivers };
+      }
       case ActivityType.SURVEY:
       case ActivityType.PROPOSAL: {
-        const link = `/proposal/${
-          activityObject.id
-        }/${activityObject.poll_two_id || activityObject.poll_one_id}`;
-        const message = this.MailComposer.getProposalNotificationMail({
-          receivers,
-          message: {
-            content: activityObject.body || activityObject.content,
-          },
-          sender: { name: 'gold' },
-          title: activityObject.title,
+        const link = getProposalLink(activityObject);
+        const message = this.MailComposer.getProposalMail({
+          proposal: activityObject,
           locale,
           link,
         });
 
         return { htmlContent: message, receivers };
       }
-      // return acc;
-      //  }, {});
 
       case ActivityType.STATEMENT: {
         // $FlowFixMe
@@ -759,7 +763,7 @@ class NotificationService {
           objects[ActivityType.PROPOSAL][activity.targetId];
         // $FlowFixMe
         const author: UserProps = objects[ActivityType.USER][activity.actorId];
-        const link = `/proposal/${proposal.id}/${activityObject.poll_id}`;
+        const link = getStatementLink(proposal.id, activityObject.poll_id);
         const emailHTML = this.MailComposer.getStatementMail({
           statement: activityObject,
           proposalTitle: proposal.title,
@@ -773,35 +777,39 @@ class NotificationService {
         return { htmlContent: emailHTML, receivers };
       }
       case ActivityType.COMMENT: {
-        const discussion = objects[ActivityType.DISCUSSION][activity.targetId];
         // $FlowFixMe
+        const discussion: DiscussionProps =
+          objects[ActivityType.DISCUSSION][activity.targetId];
+        // $FlowFixMe
+        const author: UserProps = objects[ActivityType.USER][activity.actorId];
+
         const link = getCommentLink(activityObject, discussion.work_team_id);
-        const message = this.MailComposer.getProposalNotificationMail({
-          receivers,
-          message: {
-            content: activityObject.content,
+        const emailHTML = this.MailComposer.getCommentMail({
+          comment: activityObject,
+          author: {
+            fullName: `${author.name} ${author.surname}`,
+            thumbnail: author.thumbnail,
           },
-          sender: {
-            name: 'gold',
-          },
+          discussionTitle: discussion.title,
           locale,
           link,
         });
-        return { htmlContent: message, receivers };
+        return { htmlContent: emailHTML, receivers };
       }
       case ActivityType.MESSAGE: {
-        const link = `/message/${activity.objectId}`;
+        // $FlowFixMe
+        const author: UserProps = objects[ActivityType.USER][activity.actorId];
 
-        const message = this.MailComposer.getProposalNotificationMail({
-          receivers,
-          message: {
-            content: activityObject.msg,
+        const emailHTML = this.MailComposer.getMessageMail({
+          message: activityObject.msg,
+          sender: {
+            fullName: `${author.name} ${author.surname}`,
+            thumbnail: author.thumbnail,
           },
-          sender: { name: 'gold' },
           locale,
-          link,
+          title: activityObject.subject,
         });
-        return { htmlContent: message, receivers };
+        return { htmlContent: emailHTML, receivers };
       }
 
       default:
@@ -810,18 +818,18 @@ class NotificationService {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async notifyPushServices({ webpush, email }: pushArgs) {
-    if (email) {
+  async notifyPushServices(emails?: Emails, pushMessages?: PushMessages) {
+    if (emails) {
       const job = {
         type: 'batchMailing',
-        data: email,
+        data: emails,
       };
       await sendJob(job);
     }
-    if (webpush) {
+    if (pushMessages) {
       const job = {
         type: 'batchPushing',
-        data: webpush,
+        data: pushMessages,
       };
       await sendJob(job);
     }
@@ -876,6 +884,18 @@ class NotificationService {
         } else {
           acc[ActivityType.DISCUSSION] = new Set([activity.targetId]);
         }
+        if (acc[ActivityType.USER]) {
+          acc[ActivityType.USER].add(activity.actorId);
+        } else {
+          acc[ActivityType.USER] = new Set([activity.actorId]);
+        }
+      } else if (activity.type === ActivityType.MESSAGE) {
+        // add it to types to load
+        if (acc[ActivityType.USER]) {
+          acc[ActivityType.USER].add(activity.actorId);
+        } else {
+          acc[ActivityType.USER] = new Set([activity.actorId]);
+        }
       }
 
       return acc;
@@ -894,14 +914,12 @@ class NotificationService {
         activities: {},
         subscriberIds: new Set(),
         subscriberById: {},
-        subscriberByLocale: {},
         allObjects: {},
       },
       webpushData: {
         activities: {},
         subscriberIds: new Set(),
         subscriberById: {},
-        subscriberByLocale: {},
         allObjects: {},
       },
       notifications: [],
@@ -922,13 +940,11 @@ class NotificationService {
             // TODO normalize activities with Map aId: a, aId: [userIds]
 
             if (settings[activity.type].email) {
-              if (resultSet.emailData.activities[activity.id]) {
-                fillWithData(resultSet, 'emailData', activity, user);
-              }
-              // allow both notification methods combined
-              if (data.subscriber.settings[activity.type].webpush) {
-                fillWithData(resultSet, 'webpushData', activity, user);
-              }
+              fillWithData(resultSet, 'emailData', activity, user);
+            }
+            // allow both notification methods combined
+            if (settings[activity.type].webpush) {
+              fillWithData(resultSet, 'webpushData', activity, user);
             }
           }
         });

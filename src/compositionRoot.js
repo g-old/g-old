@@ -12,6 +12,7 @@ import TokenService from './core/TokenService';
 import BackgroundService from './core/BackgroundService';
 import NotificationService from './core/NotificationService';
 import { createToken } from './core/tokens';
+import PubSub from './core/pubsub';
 
 const env = process.env.NODE_ENV || 'development';
 const mailOptions = config.mailer;
@@ -35,10 +36,12 @@ const messageService = new MessageService(
   tokenService,
   knex,
 );
+const pubsub = new PubSub();
 const notificationService = new NotificationService({
   eventManager: EventManager,
   dbConnector: knex,
   mailComposer,
+  pubsub,
 });
 const backgroundService = new BackgroundService(messageService);
 export default {
@@ -50,4 +53,5 @@ export default {
   MessageService: messageService,
   BackgroundService: backgroundService,
   NotificationService: notificationService,
+  PubSub: pubsub,
 };

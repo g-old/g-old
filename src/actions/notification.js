@@ -49,6 +49,7 @@ const notificationFields = `
       id
       activity{
         id
+        createdAt
         object{
            __typename
           ...on StatementDL{

@@ -6,7 +6,7 @@ import { throwIfMissing } from './utils';
 import translations from '../emails/translations.json';
 import type { CommentProps } from '../data/models/Comment';
 import type { ProposalProps } from '../data/models/Proposal';
-// import type { DiscussionProps } from '../data/models/Discussion';
+import type { DiscussionProps } from '../data/models/Discussion';
 import type { StatementProps } from '../data/models/Statement';
 
 // taken from https://github.com/kriasoft/nodejs-api-starter/blob/master/src/email.js
@@ -45,6 +45,12 @@ type CommentMailProps = {
   author: Actor,
   link: string,
   discussionTitle: string,
+  locale: Locale,
+};
+
+type DiscussionMailProps = {
+  discussion: DiscussionProps,
+  link: string,
   locale: Locale,
 };
 
@@ -116,6 +122,18 @@ class MailComposer {
       t: key => this.translations[key][locale],
     });
   }
+  getDiscussionMail({
+    discussion,
+    link,
+    locale = 'de-DE',
+  }: DiscussionMailProps) {
+    return this.render('proposalNotification', {
+      title: discussion.title,
+      text: discussion.content,
+      link,
+      t: key => this.translations[key][locale],
+    });
+  }
 
   getStatementMail({
     statement,
@@ -183,7 +201,7 @@ class MailComposer {
     });
   }
 
-  render(name, context): EmailHTML {
+  render(name: string, context: { [string]: any }): EmailHTML {
     if (!this.templates.size) {
       this.loadAllTemplates();
     }

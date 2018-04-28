@@ -1,6 +1,9 @@
+// @flow
 import { throwIfMissing } from './utils';
 import log from '../logger';
-import { ActivityType } from '../data/models/Activity';
+import type MailService from './MailService';
+import type MailComposer from './MailComposer';
+import type { Emails } from './NotificationService';
 
 export const TransportType = {
   EMAIL: 1,
@@ -8,6 +11,8 @@ export const TransportType = {
 };
 
 class MessageService {
+  mailer: MailService;
+  mailComposer: MailComposer;
   constructor(
     mailService = throwIfMissing('Email service'),
     messageRepo = throwIfMissing('Message respository'),
@@ -334,12 +339,15 @@ class MessageService {
   }
   async sendEmailMessage(user, message, sender, locale) {
     try {
-      const personalizedMail = this.mailComposer.getMessageMail(
-        user,
-        message,
-        sender,
+      const personalizedMail = this.mailComposer.getMessageMail({
+        title: message.subject,
+        message: message.content,
+        sender: {
+          fullName: `${sender.name} ${sender.surname}`,
+          thumbnail: sender.thumbnail,
+        },
         locale,
-      );
+      });
       const finalMessage = MessageService.createHTMLMessage(
         personalizedMail,
         user.email,
@@ -352,7 +360,9 @@ class MessageService {
     }
   }
 
-  async sendBatchMessages(data) {
+  async sendBatchMessages(data: Emails) {
+    return this.mailer.sendAllEmails(data);
+
     /*  const receiverIds = [...data.subscriberIds.values()];
     // or pass  in, bc wee need it for push too
     const receiverData = await this.dbConnector('users')
@@ -374,7 +384,7 @@ class MessageService {
     // get all activities . objects
 
     // group activities by type
-
+    /*
     await Object.keys(data.activities).map(async activityId => {
       const { activity } = data.activities[activityId];
       switch (activity.type) {
@@ -428,10 +438,11 @@ class MessageService {
       }
     });
   }
-  /*
+
   sendPasswordLinkMessage() {}
   sendEmailChangedMessage() {}
   sendMembershipChangedMessage() {}
   */
+  }
 }
 export default MessageService;

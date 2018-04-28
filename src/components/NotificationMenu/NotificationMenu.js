@@ -162,7 +162,7 @@ NotificationMenu.contextTypes = {
   insertCss: PropTypes.func,
 };
 const mapPropsToState = state => ({
-  notifications: getAllNotifications(state),
+  notifications: getAllNotifications(state).slice(0, 10),
   user: getSessionUser(state),
 });
 const mapDispatch = {

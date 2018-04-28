@@ -7,8 +7,7 @@ import { circularFeedMessage } from './feed';
 import createLoaders from '../data/dataLoader';
 import root from '../compositionRoot';
 import { EmailType } from './BackgroundService';
-import { ActivityType } from '../data/models/Activity';
-import type { NotificationSet } from './NotificationService';
+import type { PushMessages, PushData } from './NotificationService';
 
 const handleMessages = async (viewer, messageData, receiver) =>
   circularFeedMessage({
@@ -19,7 +18,7 @@ const handleMessages = async (viewer, messageData, receiver) =>
     loaders: createLoaders(),
   });
 
-const push = async (subscriptionData, msg) => {
+const push = async (subscriptionData, msg: PushData) => {
   let result;
   try {
     const subscriptions = subscriptionData.map(s => ({
@@ -29,15 +28,7 @@ const push = async (subscriptionData, msg) => {
 
     const messages = subscriptions.map(sub =>
       webPush
-        .sendNotification(
-          sub,
-          JSON.stringify({
-            body: msg.body,
-            link: msg.link,
-            title: msg.title,
-            tag: msg.tag,
-          }),
-        )
+        .sendNotification(sub, JSON.stringify(msg))
         .then(response => {
           log.info({ pushService: response });
           if (response.statusCode !== 201) {
@@ -133,152 +124,32 @@ const notifyProposalCreation = async proposal => {
   });
 };
 
-const resourceByLocale = {
-  'de-DE': {
-    [ActivityType.PROPOSAL]: 'Neuer Beschluss',
-    [ActivityType.DISCUSSION]: 'Neue Diskussion',
-    [ActivityType.SURVEY]: 'Neue Umfrage',
-    [ActivityType.COMMENT]: 'Neuer Kommentar',
-    [ActivityType.STATEMENT]: 'Neues Statement',
-    [ActivityType.MESSAGE]: 'Neue Nachricht',
-  },
-  'it-IT': {
-    [ActivityType.PROPOSAL]: 'Nuova proposta',
-    [ActivityType.DISCUSSION]: 'Nuova discussione',
-    [ActivityType.SURVEY]: 'Nuovo sondaggio',
-    [ActivityType.COMMENT]: 'Nuovo commento',
-    [ActivityType.STATEMENT]: 'Nuovo statement',
-    [ActivityType.MESSAGE]: 'Nuovo messagio',
-  },
-  'lld-IT': {
-    [ActivityType.PROPOSAL]: 'Nuova proposta',
-    [ActivityType.DISCUSSION]: 'Nuova discussione',
-    [ActivityType.SURVEY]: 'Nuovo sondaggio',
-    [ActivityType.COMMENT]: 'Nuovo commento',
-    [ActivityType.STATEMENT]: 'Nuovo statement',
-    [ActivityType.MESSAGE]: 'Nuovo messagio',
-  },
-};
-
-// TODO get ids notificationids for links // ref = webpush, id = nid
-const getProposalLink = proposal => {
-  if (proposal.poll_two_id && proposal.poll_one_id) {
-    return `/proposal/${proposal.id}/${proposal.poll_two_id}`;
-  }
-  return `/proposal/${proposal.id}/${proposal.poll_two_id ||
-    proposal.poll_one_id}`;
-};
-
-const getCommentLink = (comment, groupId) => {
-  const parent = comment.parent_id;
-  const child = parent ? comment.id : null;
-
-  return `/workteams/${groupId}/discussions/${
-    comment.discussion_id
-  }?comment=${parent || comment.id}${child ? `&child=${child}` : ''}`;
-};
-
-const notifyMultiple = async (viewer, data: NotificationSet) => {
+const notifyMultiple = async (viewer, data: PushMessages) => {
   // group by type&locale - get diff message by type , diff link
-  const userIds = [...data.subscriberIds.values()];
+  const userIds = data.reduce((acc, curr) => acc.concat(curr.receiverIds), []);
+
   const subscriptionData = await knex('webpush_subscriptions')
     .whereIn('user_id', userIds)
     .select();
 
   if (!subscriptionData.length) {
-    return;
+    return true;
   }
 
-  let message;
-  let title;
-  // let locale;
-  let link;
+  const promises = data.map(pushMessage => {
+    const subscriptions = pushMessage.receiverIds.map(id => {
+      const res = subscriptionData.find(
+        // eslint-disable-next-line eqeqeq
+        subscription => subscription.user_id === id,
+      );
 
-  Object.keys(data.activities).map(activityId => {
-    const { activity, subscriberByLocale } = data.activities[activityId];
-    const object = data.allObjects[activity.type][activity.objectId];
-
-    // for all subscribers by locale
-
-    return Object.keys(subscriberByLocale).map(locale => {
-      switch (activity.type) {
-        case ActivityType.SURVEY:
-          title = resourceByLocale[locale][activity.type];
-          message = object.title;
-          // problem if notifieing open votation
-          link = getProposalLink(object);
-          break;
-        case ActivityType.DISCUSSION:
-          title = resourceByLocale[locale][activity.type];
-          // problem if notifieing open votation
-          message = object.title;
-
-          link = `/workteams/${object.work_team_id}/discussions/${object.id}`;
-          break;
-        case ActivityType.PROPOSAL:
-          // get resources
-          title = resourceByLocale[locale][activity.type];
-
-          message = object.title;
-
-          link = getProposalLink(object);
-          // recipients are data-activities
-          break;
-
-        case ActivityType.STATEMENT: {
-          const proposal =
-            data.allObjects[ActivityType.PROPOSAL][activity.targetId];
-          message = proposal.title;
-          // Diff between reply and new ?
-
-          title = resourceByLocale[locale][activity.type];
-          //
-          link = `/proposal/${proposal.id}/${object.poll_id}`;
-          break;
-        }
-
-        case ActivityType.COMMENT: {
-          const discussion =
-            data.allObjects[ActivityType.COMMENT][activity.targetId];
-          message = discussion.title;
-          // Diff between reply and new ?
-
-          title = resourceByLocale[locale][activity.type];
-          link = getCommentLink(object, 'Noidea');
-          break;
-        }
-
-        case ActivityType.MESSAGE:
-          title = resourceByLocale[locale][activity.type];
-          link = `/message/${activity.objectId}`;
-          message = object.title;
-          break;
-        default:
-          throw new Error(`Type not recognized ${activity.type}`);
-      }
-      // TODO
-
-      const activitySubscribers = subscriberByLocale[locale].map(id => {
-        const res = subscriptionData.find(
-          // eslint-disable-next-line eqeqeq
-          subscription => subscription.user_id == id,
-        );
-
-        return res;
-      });
-
-      return push(activitySubscribers, {
-        body: message.length > 40 ? `${message.slice(0, 36)}...` : message,
-        link,
-        title,
-        tag: activity.type,
-      });
+      return res;
     });
+
+    return push(subscriptions, pushMessage.message);
   });
 
-  // get subdata - for all, 1 query
-
-  // split in groups dh by activity
+  return Promise.all(promises);
 };
 
 async function processMessages(message) {
@@ -305,7 +176,7 @@ async function processMessages(message) {
       }
       case 'batchPushing': {
         log.info('Starting webpush BATCH');
-        result = notifyMultiple(message.viewer, message.data, createLoaders());
+        result = notifyMultiple(message.viewer, message.data);
 
         break;
       }

@@ -1,8 +1,10 @@
+// @flow
 import { validate, execute, parse } from 'graphql';
 import { EventEmitter } from 'events';
 import log from '../logger';
 import { canAccess } from '../organization';
 import EventManager from './EventManager';
+import type PubSub from './pubsub';
 // import { getArgumentValues } from 'graphql/execution/values';
 // import { createAsyncIterator, forAwaitEach, isAsyncIterable } from 'iterall';
 
@@ -33,6 +35,7 @@ function contextFilter(rootValue, context) {
 }
 
 export class SubscriptionManager {
+  pubsub: PubSub;
   constructor(options) {
     this.schema = options.schema;
     this.subscriptions = {};
@@ -110,10 +113,12 @@ export class SubscriptionManager {
         })
         .catch(error => options.callback(error));
 
-    return this.pubsub.subscribe(subscriptionName, onMessage).then(id => {
-      this.subscriptions[externalSubscriptionId] = id;
-      return externalSubscriptionId;
-    });
+    return this.pubsub
+      .subscribe(subscriptionName, onMessage, options.context.viewer.id)
+      .then(id => {
+        this.subscriptions[externalSubscriptionId] = id;
+        return externalSubscriptionId;
+      });
   }
 
   unsubscribe(subId) {

@@ -48,7 +48,6 @@ import BWorker, { sendJob } from './core/childProcess';
 import { checkToken } from './core/tokens';
 import log from './logger';
 import { SubscriptionManager, SubscriptionServer } from './core/sse';
-import PubSub from './core/pubsub';
 import responseTiming from './core/timing';
 import { Groups, Permissions } from './organization';
 import EventManager from './core/EventManager';
@@ -65,7 +64,7 @@ process.on('unhandledRejection', (reason, p) => {
   }
 });
 
-const pubsub = new PubSub();
+const pubsub = root.PubSub;
 
 worker(pubsub);
 BWorker.start(path.resolve(__dirname, 'backgroundWorker.js'));

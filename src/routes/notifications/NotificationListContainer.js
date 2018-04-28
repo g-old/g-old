@@ -70,7 +70,9 @@ class NotificationsListContainer extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  notifications: getAllNotifications(state),
+  notifications: getAllNotifications(state).sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+  ),
   notificationsStatus: getNotificationsStatus(state, 'all'),
 });
 
