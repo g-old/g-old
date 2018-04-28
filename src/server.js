@@ -300,9 +300,12 @@ app.post(
   }),
 );
 
-app.post('/login', passport.authenticate('local'), (req, res) => {
+app.post('/login', passport.authenticate('local'), async (req, res) => {
+  const [count] = await knex('notifications')
+    .where({ user_id: req.user.id, read: false })
+    .count('id');
   res.status(200).json({
-    user: req.session.passport.user,
+    user: { ...req.session.passport.user, unreadNotifications: count.count },
     redirect: '/feed',
   });
 });
@@ -685,7 +688,13 @@ app.get('*', async (req, res, next) => {
     let normalizedData = { entities: {}, result: null };
     let recaptchaKey;
     if (req.user) {
-      normalizedData = normalize(req.user, userSchema);
+      const [count] = await knex('notifications')
+        .where({ user_id: req.user.id, read: false })
+        .count('id');
+      normalizedData = normalize(
+        { ...req.user, unreadNotifications: count.count },
+        userSchema,
+      );
     } else {
       recaptchaKey = recaptchaKeys.siteKey;
     }
