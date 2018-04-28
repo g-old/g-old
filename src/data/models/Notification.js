@@ -78,12 +78,11 @@ class Notification {
   static async batchUpdate(viewer) {
     if (!viewer) return null;
 
-    const updatedIds = await knex('notifications')
+    const updated = await knex('notifications')
       .where({ user_id: viewer.id, read: false })
-      .update({ read: true })
-      .returning('id');
+      .update({ read: true });
 
-    return updatedIds;
+    return !!updated;
   }
 }
 

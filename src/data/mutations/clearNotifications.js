@@ -1,13 +1,11 @@
-import { GraphQLNonNull, GraphQLList, GraphQLID } from 'graphql';
+import { GraphQLNonNull, GraphQLBoolean } from 'graphql';
 import Notification from '../models/Notification';
 
 const clearNotifications = {
-  type: new GraphQLNonNull(new GraphQLList(GraphQLID)),
+  type: new GraphQLNonNull(GraphQLBoolean),
 
-  resolve: async (data, args, { viewer }) => {
-    const ids = await Notification.batchUpdate(viewer, {});
-    return ids;
-  },
+  resolve: async (data, args, { viewer }) =>
+    Notification.batchUpdate(viewer, {}),
 };
 
 export default clearNotifications;

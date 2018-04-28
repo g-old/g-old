@@ -25,6 +25,7 @@ import {
 import { genStatusIndicators } from '../core/helpers';
 import { pollFieldsForList } from './proposal';
 import { messageFields } from './message';
+import { getSessionUser } from '../reducers';
 
 const userFields = `
 id
@@ -309,16 +310,24 @@ export function loadNotificationList({ first, after, userId }) {
 
 export function clearNotifications() {
   return async (dispatch, getState, { graphqlRequest }) => {
+    const { id } = getSessionUser(getState());
     dispatch({
       type: CLEAR_NOTIFICATIONS_START,
     });
     try {
       const { data } = await graphqlRequest(clearNotificationsMutation);
-
-      dispatch({
-        type: CLEAR_NOTIFICATIONS_SUCCESS,
-        payload: data.clearNotifications,
-      });
+      if (data.clearNotifications) {
+        dispatch({
+          type: CLEAR_NOTIFICATIONS_SUCCESS,
+          payload: { userId: id },
+        });
+      } else {
+        dispatch({
+          type: CLEAR_NOTIFICATIONS_ERROR,
+          payload: {},
+          message: 'Something went wrong',
+        });
+      }
     } catch (error) {
       dispatch({
         type: CLEAR_NOTIFICATIONS_ERROR,

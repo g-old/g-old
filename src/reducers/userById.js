@@ -27,6 +27,7 @@ import {
   DELETE_REQUEST_SUCCESS,
   LOAD_MESSAGE_SUCCESS,
   UPDATE_NOTIFICATION_SUCCESS,
+  CLEAR_NOTIFICATIONS_SUCCESS,
 } from '../constants';
 
 const handleUsers = (state, action) => {
@@ -118,6 +119,14 @@ export default function byId(state = {}, action) {
     case FETCH_USER_SUCCESS: {
       // bc of permissions
       return handleUsers(state, action);
+    }
+
+    case CLEAR_NOTIFICATIONS_SUCCESS: {
+      const { userId } = action.payload;
+      return {
+        ...state,
+        [userId]: { ...state[userId], unreadNotifications: 0 },
+      };
     }
 
     case UPDATE_NOTIFICATION_SUCCESS: {

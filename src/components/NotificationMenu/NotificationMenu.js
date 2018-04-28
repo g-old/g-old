@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
@@ -18,6 +19,14 @@ import {
   loadNotificationList,
   clearNotifications,
 } from '../../actions/notification';
+
+const messages = defineMessages({
+  markRead: {
+    id: 'label.markRead',
+    defaultMessage: 'Mark all as read',
+    description: 'Label mark as read',
+  },
+});
 
 class NotificationMenu extends React.Component {
   static propTypes = {
@@ -110,14 +119,25 @@ class NotificationMenu extends React.Component {
     }
   }
   renderNotifications() {
+    const { notifications, user: { unreadNotifications } } = this.props;
+    let markReadBtn;
+    if (unreadNotifications > 0) {
+      markReadBtn = (
+        <Button
+          onClick={this.onMarkAsRead}
+          label={<FormattedMessage {...messages.markRead} />}
+          plain
+        />
+      );
+    }
     return (
       <Box column fill>
         <Box between>
           <Label>Notifications</Label>
-          <Button onClick={this.onMarkAsRead} label="Mark all as read" plain />
+          {markReadBtn}
         </Box>
         <List>
-          {this.props.notifications.map(n => (
+          {notifications.map(n => (
             <ListItem>
               <Notification {...n} />
             </ListItem>

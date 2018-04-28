@@ -66,6 +66,11 @@ const messages = defineMessages({
     defaultMessage: 'was proposed!',
     description: 'Status message for notifications',
   },
+  revoked: {
+    id: 'notifications.proposal.revoked',
+    defaultMessage: 'was revoked!',
+    description: 'Status message for notifications',
+  },
 });
 
 class UserNotification extends React.Component {
