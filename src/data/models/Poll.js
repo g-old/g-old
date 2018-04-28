@@ -78,7 +78,9 @@ class Poll {
           numVoter = await knex('user_work_teams')
             .transacting(trx)
             .where({ work_team_id: data.workTeamId })
-            .count('id');
+            .join('users', 'users.id', 'user_work_teams.user_id') // bc also viewers can be members
+            .whereRaw('users.groups & ? > 0', [Permissions.VOTE]) // TODO whitelist
+            .count('users.id');
         } else {
           numVoter = await trx
             .whereRaw('groups & ? > 0', [Permissions.VOTE]) // TODO whitelist

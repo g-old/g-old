@@ -4,9 +4,8 @@ import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import Accordion from '../../components/Accordion';
 import Button from '../../components/Button';
-import Heading from '../../components/Heading';
 import Box from '../../components/Box';
-import { ICONS } from '../../constants';
+import WorkteamHeader from '../../components/WorkteamHeader';
 import AccordionPanel from '../../components/AccordionPanel';
 import {
   loadWorkTeam,
@@ -325,30 +324,7 @@ class WorkTeamManagement extends React.Component {
     return (
       <Box column>
         {/* eslint-disable-next-line */}
-        <div onClick={() => history.push(`/workteams/${workTeam.id}`)}>
-          <Heading tag="h3">
-            {workTeam.logo ? (
-              'IMPLEMENT LOGO'
-            ) : (
-              <svg
-                version="1.1"
-                viewBox="0 0 24 24"
-                role="img"
-                width="48px"
-                height="48px"
-                aria-label="cloud"
-              >
-                <path
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  d={ICONS.workteam}
-                />
-              </svg>
-            )}
-            {workTeam && workTeam.displayName}
-          </Heading>
-        </div>
+      <WorkteamHeader id= {workTeam.id} displayName= {workTeam.displayName} logo= {workTeam.logo} />
         <Tabs>
           <Tab title={<FormattedMessage {...messages.discussions} />}>
             <Accordion>

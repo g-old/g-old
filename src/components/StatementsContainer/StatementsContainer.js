@@ -67,9 +67,6 @@ class StatementsContainer extends React.Component {
 
   static defaultProps = {
     statements: [],
-    ownVote: null,
-    ownStatement: null,
-    likedStatements: [],
     hideOwnStatement: false,
   };
 
@@ -107,7 +104,8 @@ class StatementsContainer extends React.Component {
         ownStatementsNode = (
           <Statement
             user={user}
-            key={'0000'}
+            pollClosed={this.props.poll.closedAt}
+            key="0000"
             updates={updates['0000']}
             {...data}
             onCreate={this.props.createStatement}
@@ -119,6 +117,7 @@ class StatementsContainer extends React.Component {
       if (ownStatement && !hideOwnStatement) {
         ownStatementsNode = (
           <Statement
+            pollClosed={this.props.poll.closedAt}
             user={user}
             onSubmit={this.handleStatementSubmission}
             key={ownStatement.id}

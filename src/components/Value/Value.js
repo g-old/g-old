@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import cn from 'classnames';
 import s from './Value.css';
 
 class Value extends React.Component {
@@ -10,6 +11,7 @@ class Value extends React.Component {
     value: PropTypes.number,
     units: PropTypes.string,
     trendIcon: PropTypes.node,
+    onClick: PropTypes.func,
   };
 
   static defaultProps = {
@@ -18,15 +20,29 @@ class Value extends React.Component {
     value: null,
     units: null,
     trendIcon: null,
+    onClick: null,
   };
   render() {
-    const { label, icon, value, units, trendIcon } = this.props;
+    const { label, icon, value, units, trendIcon, onClick } = this.props;
 
-    const contentNode = <div> {icon}<span className={s.value}>{value}</span> {units}</div>;
+    const contentNode = (
+      <div>
+        {icon}
+        <span className={s.value}>{value}</span> {units}
+      </div>
+    );
 
     return (
-      <div className={s.container}>
-        <div className={s.valueContainer}>{contentNode} {trendIcon}</div>{label}
+      // eslint-disable-next-line
+      <div
+        role="button"
+        className={cn(s.container, onClick && s.clickable)}
+        onClick={onClick}
+      >
+        <div className={s.valueContainer}>
+          {contentNode} {trendIcon}
+        </div>
+        {label}
       </div>
     );
   }
