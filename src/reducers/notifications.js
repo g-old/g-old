@@ -6,7 +6,11 @@ import {
   notification as notificationSchema,
 } from './../store/schema';
 
-import { LOAD_NOTIFICATIONS_SUCCESS } from '../constants';
+import {
+  LOAD_NOTIFICATIONS_START,
+  LOAD_NOTIFICATIONS_SUCCESS,
+  LOAD_NOTIFICATIONS_ERROR,
+} from '../constants';
 
 const handlePageInfo = (state, action) => {
   if (state.endCursor && !action.savePageInfo) {
@@ -16,6 +20,38 @@ const handlePageInfo = (state, action) => {
 };
 
 const initialState = { ids: [] };
+
+const status = (
+  state = { pending: false, success: false, error: null },
+  action,
+) => {
+  switch (action.type) {
+    case LOAD_NOTIFICATIONS_START: {
+      return {
+        pending: true,
+        error: null,
+        success: false,
+      };
+    }
+    case LOAD_NOTIFICATIONS_SUCCESS: {
+      return {
+        pending: false,
+        error: null,
+        success: true,
+      };
+    }
+    case LOAD_NOTIFICATIONS_ERROR:
+      return {
+        pending: false,
+        error: action.message,
+        success: false,
+      };
+
+    default:
+      return state;
+  }
+};
+
 const all = (state = initialState, action) => {
   switch (action.type) {
     case LOAD_NOTIFICATIONS_SUCCESS: {
@@ -49,6 +85,7 @@ export default combineReducers({
   byId,
   all,
   pageInfo,
+  status,
 });
 
 const hydrateList = (state, data, entities) =>
@@ -69,8 +106,8 @@ const hydrateList = (state, data, entities) =>
   );
 
 export const getStatus = state => ({
-  error: state.all.errorMessage,
-  pending: state.all.pending,
+  error: state.status.error,
+  pending: state.status.pending,
   pageInfo: state.pageInfo,
 });
 const hydrateEntity = (data, entities) =>

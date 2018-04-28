@@ -12,9 +12,14 @@ import Drop from '../Drop';
 import List from '../List';
 import ListItem from '../ListItem';
 import Notification from '../UserNotification';
-import { getAllNotifications, getSessionUser } from '../../reducers';
+import {
+  getAllNotifications,
+  getSessionUser,
+  getNotificationsStatus,
+} from '../../reducers';
 import Link from '../Link';
 import Label from '../Label';
+import Spinner from '../Spinner';
 import {
   loadNotificationList,
   clearNotifications,
@@ -25,6 +30,11 @@ const messages = defineMessages({
     id: 'label.markRead',
     defaultMessage: 'Mark all as read',
     description: 'Label mark as read',
+  },
+  notificationsLink: {
+    id: 'label.notificationsLink',
+    defaultMessage: 'See all notifications',
+    description: 'Label notifications link',
   },
 });
 
@@ -37,6 +47,7 @@ class NotificationMenu extends React.Component {
     }),
     notifications: PropTypes.arrayOf(PropTypes.shape({})),
     clearNotifications: PropTypes.func.isRequired,
+    status: PropTypes.shape({}).isRequired,
   };
   static defaultProps = {
     user: null,
@@ -119,7 +130,7 @@ class NotificationMenu extends React.Component {
     }
   }
   renderNotifications() {
-    const { notifications, user: { unreadNotifications } } = this.props;
+    const { notifications, user: { unreadNotifications }, status } = this.props;
     let markReadBtn;
     if (unreadNotifications > 0) {
       markReadBtn = (
@@ -130,10 +141,15 @@ class NotificationMenu extends React.Component {
         />
       );
     }
+    let loadingAnimation;
+    if (status.pending && !notifications.length) {
+      loadingAnimation = <Spinner />;
+    }
     return (
       <Box column fill>
         <Box between>
           <Label>Notifications</Label>
+          <div className={s.center}>{loadingAnimation}</div>
           {markReadBtn}
         </Box>
         <List>
@@ -144,7 +160,9 @@ class NotificationMenu extends React.Component {
           ))}
         </List>
         {/* eslint-disable-next-line */}
-        <Link to="/notifications">See all Notifications</Link>
+        <Link to="/notifications">
+          <FormattedMessage {...messages.notificationsLink} />
+        </Link>
       </Box>
     );
   }
@@ -184,6 +202,7 @@ NotificationMenu.contextTypes = {
 const mapPropsToState = state => ({
   notifications: getAllNotifications(state).slice(0, 10),
   user: getSessionUser(state),
+  status: getNotificationsStatus(state),
 });
 const mapDispatch = {
   loadNotificationList,
