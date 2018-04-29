@@ -173,6 +173,12 @@ function statementReadControl(viewer, data) {
 }
 
 function statementWriteControl(viewer, data) {
+  if (
+    data.proposal.state === 'survey' &&
+    viewer.permissions & Permissions.TAKE_SURVEYS
+  ) {
+    return checkIfMember(viewer, data.proposal);
+  }
   if (viewer.permissions & Permissions.MODIFY_OWN_STATEMENTS) {
     return checkIfMember(viewer, data.proposal);
   }
@@ -335,7 +341,7 @@ function commentWriteControl(viewer, data) {
     // TODO check group etc
     if (viewer.wtMemberships.includes(data.discussion.workTeamId)) {
       // eslint-disable-line
-      return true;
+      return (viewer.permissions & Permissions.MAKE_COMMENT) > 0;
     }
   }
   // eslint-disable-next-line eqeqeq

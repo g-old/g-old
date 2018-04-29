@@ -19,6 +19,10 @@
   align-items: center;
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 .valueContainer svg {
   display: inline-block;
   fill: #666;

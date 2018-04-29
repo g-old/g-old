@@ -6,6 +6,7 @@ import PollingMode from './PollingMode';
 import { dedup } from '../../core/helpers';
 import { computeNextState } from '../../core/worker';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import { Permissions } from '../../organization';
 import EventManager from '../../core/EventManager';
 import log from '../../logger';
 
@@ -460,7 +461,8 @@ class Proposal {
 
   async isVotable(viewer) {
     if (['proposed', 'voting', 'survey'].indexOf(this.state) !== -1 && viewer) {
-      if (this.workTeamId) {
+      // eslint-disable-next-line no-bitwise
+      if (this.workTeamId && viewer.permissions & Permissions.VOTE) {
         // TODO try to find a better way since it cannot be cached easily and voting isF common
         const [data = null] = await knex('user_work_teams')
           .where({ user_id: viewer.id, work_team_id: this.workTeamId })

@@ -15,9 +15,9 @@ import Button from '../Button';
 
 const messages = defineMessages({
   delete: {
-    id: 'action.delete',
+    id: 'commands.delete',
     defaultMessage: 'Delete',
-    description: 'Label',
+    description: 'Short command to invoke deletion',
   },
   leave: {
     id: 'action.leave',
@@ -25,9 +25,9 @@ const messages = defineMessages({
     description: 'Label',
   },
   cancel: {
-    id: 'action.cancel',
+    id: 'commands.cancel',
     defaultMessage: 'Cancel',
-    description: 'Label',
+    description: 'Short command to cancel a operation',
   },
   confirm: {
     id: 'header.confirmation',

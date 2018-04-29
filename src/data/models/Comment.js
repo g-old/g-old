@@ -63,7 +63,6 @@ class Comment {
     if (!discussion) {
       return null;
     }
-
     if (
       !canMutate(
         viewer,
@@ -77,6 +76,7 @@ class Comment {
     ) {
       return null;
     }
+
     let workTeamId;
     const commentInDB = await knex.transaction(async trx => {
       const content = data.content.substring(0, MAX_CONTENT_LENGTH);

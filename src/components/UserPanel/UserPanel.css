@@ -1,29 +1,3 @@
-.coordinator {
-  text-align: right;
-}
-
-.team {
-  text-align: left;
-}
-
-.members {
-  text-align: center;
-}
-
-.workTeams {
-  width: 100%;
-
-  th,
-  td {
-    border-bottom: 1px solid #ddd;
-  }
-
-  tr {
-    height: 3em;
-    vertical-align: center;
-  }
-}
-
 .userList {
   width: 100%;
 

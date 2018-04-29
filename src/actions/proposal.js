@@ -300,7 +300,7 @@ export function loadProposalsList({ state, first, after, tagId, workTeamId }) {
         filter: state,
         pagination: data.proposalConnection.pageInfo,
         savePageInfo: after != null,
-        pageIndex: `${state}$${tagId}`,
+        pageIndex: `${state}$${tagId || ''}`,
       });
     } catch (error) {
       dispatch({
@@ -322,6 +322,14 @@ export function loadProposalsList({ state, first, after, tagId, workTeamId }) {
 export function createProposal(proposalData) {
   return async (dispatch, getState, { graphqlRequest }) => {
     const virtualId = '0000';
+    if (process.env.BROWSER) {
+      const state = getState();
+      const isPending = getIsProposalFetching(state, virtualId);
+
+      if (isPending) {
+        return false;
+      }
+    }
     dispatch({
       type: CREATE_PROPOSAL_START,
       id: virtualId,

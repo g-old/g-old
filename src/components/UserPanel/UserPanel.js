@@ -16,7 +16,7 @@ import Button from '../Button';
 import FormField from '../FormField';
 import Layer from '../Layer';
 import UserListEntry from './UserListEntry';
-import { Permissions, Groups } from '../../organization';
+import { Groups } from '../../organization';
 
 // import history from '../../history';
 
@@ -24,7 +24,6 @@ import {
   getVisibleUsers,
   getUsersStatus,
   getSessionUser,
-  getWorkTeams,
 } from '../../reducers';
 
 const messages = defineMessages({
@@ -50,19 +49,15 @@ class UserPanel extends React.Component {
     findUser: PropTypes.func.isRequired,
     userArray: PropTypes.arrayOf(PropTypes.object).isRequired,
     user: PropTypes.shape({
-      id: PropTypes.string,
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       permissions: PropTypes.number,
     }).isRequired,
-    createWorkTeam: PropTypes.func.isRequired,
-    loadWorkTeams: PropTypes.func.isRequired,
-    workTeams: PropTypes.arrayOf(PropTypes.shape({})),
     notifyUser: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     guestArray: null,
     viewerArray: null,
-    workTeams: null,
   };
   constructor(props) {
     super(props);
@@ -107,78 +102,6 @@ class UserPanel extends React.Component {
     );
   }
 
-  renderWorkTeams(teams) {
-    return (
-      <table className={s.workTeams}>
-        <thead>
-          <tr>
-            <th className={s.team}>Name</th>
-            <th className={s.members}>Members</th>
-            <th className={s.coordinator}>Coordinator</th>
-          </tr>
-        </thead>
-        <tbody>
-          {teams &&
-            teams.map(t => (
-              <tr>
-                <td className={s.team}>{t.name}</td>
-                <td className={s.members}>
-                  {t.members &&
-                    t.members.map(m => (
-                      <img
-                        style={{ height: '1em', width: '1em' }}
-                        alt="member"
-                        src={m.thumbnail}
-                      />
-                    ))}
-                </td>
-                <td className={s.coordinator}>
-                  {t.coordinator && (
-                    <span>
-                      {`${t.coordinator.name} ${t.coordinator.surname}`}
-                      <img
-                        style={{ height: '1em', width: '1em' }}
-                        alt="coordinator"
-                        src={t.coordinator.thumbnail}
-                      />
-                      {/* eslint-disable no-bitwise */}
-                      {// eslint-disable-next-line eqeqeq
-                      (this.props.user.id == t.coordinator.id ||
-                        (this.props.user.permissions &
-                          Permissions.NOTIFY_GROUPS) >
-                          0) && (
-                        <Button
-                          plain
-                          icon={
-                            <svg
-                              version="1.1"
-                              viewBox="0 0 24 24"
-                              width="24px"
-                              height="24px"
-                              role="img"
-                              aria-label="mail"
-                            >
-                              <path
-                                fill="none"
-                                stroke="#000"
-                                strokeWidth="2"
-                                d="M1,5 L12,14 L23,5 M1,20 L23,20 L23,4 L1,4 L1,20 L1,20 Z"
-                              />
-                            </svg>
-                          }
-                          onClick={() => alert('to implement')}
-                        />
-                      )}
-                      {/* eslint-enable no-bitwise */}
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-    );
-  }
   render() {
     const {
       guestArrayStatus,
@@ -295,7 +218,6 @@ const mapStateToProps = state => ({
   viewerArrayStatus: getUsersStatus(state, VIEWERS),
   userArray: getVisibleUsers(state, 'all'),
   user: getSessionUser(state),
-  workTeams: getWorkTeams(state),
 });
 
 const mapDispatch = {

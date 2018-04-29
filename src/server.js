@@ -714,7 +714,7 @@ app.get('*', async (req, res, next) => {
       system: {
         webPushKey: config.webpush.publicKey,
         recaptchaKey, // will be null if user is logged in
-        droneCommit: process.env.DRONE_COMMIT || (__DEV__ ? 'dev' : null),
+        droneBranch: process.env.DRONE_BRANCH || (__DEV__ ? 'dev' : null), // branch or tag
         droneBuild: process.env.DRONE_BUILD_NUMBER || (__DEV__ ? 'dev' : null),
       },
     };

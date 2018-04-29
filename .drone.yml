@@ -22,16 +22,19 @@ pipeline:
     secrets: [ docker_username, docker_password ]
     build_args:
       - DRONE_BUILD_NUMBER=${DRONE_BUILD_NUMBER}
-      - DRONE_COMMIT=${DRONE_COMMIT}
+      - DRONE_BRANCH=${DRONE_BRANCH}
     when:
       event: push
-      branch: dev
+      branch: [ dev, testing ]
 
   publish-live:
     image: plugins/docker
     repo: tobiasmayr/gold
     auto_tag: true
     secrets: [ docker_username, docker_password ]
+    build_args:
+      - DRONE_BUILD_NUMBER=${DRONE_BUILD_NUMBER}
+      - DRONE_BRANCH=${DRONE_TAG}
     when:
       event: tag
 
@@ -43,4 +46,10 @@ pipeline:
     volumes:
       - /tmp/cache:/cache
 
-branches: [ dev ]
+  telegram:
+    image: appleboy/drone-telegram
+    secrets: [ telegram_token, telegram_to ]
+    when:
+      status: [ success, failure ]
+
+branches: [ dev, testing ]

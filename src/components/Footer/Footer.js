@@ -11,23 +11,23 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import LanguageSwitcher from '../LanguageSwitcher';
-import { getDroneCommit, getDroneBuild } from '../../reducers';
+import { getDroneBranch, getDroneBuild } from '../../reducers';
 import s from './Footer.css';
 
 class Footer extends React.Component {
   render() {
     const state = this.context.store.getState();
     const build = getDroneBuild(state);
-    const commit = getDroneCommit(state);
+    const branch = getDroneBranch(state);
 
     return (
       <div className={s.root}>
         <div className={s.container}>
           <span className={s.text}> © G O L D </span>
-          {commit && (
+          {branch && (
             <span className={s.buildinfo}>
               <img src="/git.png" alt="#" style={{ height: '1em' }} />
-              <span> {commit.substring(0, 9)}</span>
+              <span> {branch}</span>
             </span>
           )}
           {build && (

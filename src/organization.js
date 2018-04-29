@@ -40,6 +40,7 @@ export const Permissions = {
   CREATE_WORKTEAMS: 16777216,
   MANAGE_WORKTEAMS: 33554432,
   PUBLISH_DISCUSSIONS: 67108864,
+  MAKE_COMMENT: 134217728,
 };
 
 /* Add new groups here - DON'T FORGET TO UPDATE THE SCHEMA */
@@ -70,6 +71,7 @@ const viewerMask =
   Permissions.VIEW_PROPOSALS |
   Permissions.VIEW_STATEMENTS |
   Permissions.VIEW_VOTES |
+  Permissions.MAKE_COMMENT |
   Permissions.TAKE_SURVEYS;
 
 /* Voters */
