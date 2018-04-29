@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { loadWorkTeamMembers } from '../../actions/workTeam';
-import { getWorkTeam, getWorkTeamStatus } from '../../reducers';
+import { loadGroupMembers } from '../../actions/group';
+import { getGroup, getGroupStatus } from '../../reducers';
 import List from '../../components/List';
 import ListItem from '../../components/ListItem';
 import Avatar from '../../components/Avatar';
@@ -32,19 +32,19 @@ const handleItemClick = id => {
 // TODO don't user List component - onClick is not cheap
 class AccountList extends React.Component {
   static propTypes = {
-    loadWorkTeamMembers: PropTypes.func.isRequired,
-    workTeam: PropTypes.shape({
+    loadGroupMembers: PropTypes.func.isRequired,
+    group: PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     }).isRequired,
     status: PropTypes.shape({}).isRequired,
   };
   render() {
-    const { status, workTeam } = this.props;
-    const memberList = workTeam.members || [];
+    const { status, group } = this.props;
+    const memberList = group.members || [];
     return (
       <Box pad column>
         <Heading tag="h2">
-          <FormattedMessage {...messages.members} /> {workTeam.displayName}
+          <FormattedMessage {...messages.members} /> {group.displayName}
         </Heading>
         {status.pending && !memberList.length && <p>Loading...</p>}
         {!status.pending &&
@@ -54,8 +54,8 @@ class AccountList extends React.Component {
           <FetchError
             message={status.error}
             onRetry={() =>
-              this.props.loadWorkTeamMembers({
-                id: this.props.workTeam.id,
+              this.props.loadGroupMembers({
+                id: this.props.group.id,
               })
             }
           />
@@ -78,12 +78,12 @@ class AccountList extends React.Component {
 }
 
 const mapStateToProps = (state, { id }) => ({
-  workTeam: getWorkTeam(state, id),
-  status: getWorkTeamStatus(state),
+  group: getGroup(state, id),
+  status: getGroupStatus(state),
 });
 
 const mapDispatch = {
-  loadWorkTeamMembers,
+  loadGroupMembers,
 };
 
 export default connect(mapStateToProps, mapDispatch)(AccountList);

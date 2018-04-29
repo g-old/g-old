@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from '../../components/Layout';
 import { getSessionUser } from '../../reducers';
-import { loadWorkTeamMembers } from '../../actions/workTeam';
+import { loadGroupMembers } from '../../actions/group';
 import MemberListContainer from './MemberListContainer';
 import { canAccess } from '../../organization';
 
@@ -20,13 +20,13 @@ async function action({ store, path }, { id }) {
   if (process.env.BROWSER) {
     store.dispatch(
       // eslint-disable-next-line no-bitwise
-      loadWorkTeamMembers({ id }),
+      loadGroupMembers({ id }),
     );
   }
 
   return {
     title,
-    chunks: ['workteam'],
+    chunks: ['group'],
     component: (
       <Layout>
         <MemberListContainer id={id} />

@@ -192,31 +192,31 @@ const routes = {
       ],
     },
     {
-      path: '/admin/workteam/create',
+      path: '/admin/group/create',
       load: () => import(/* webpackChunkName: 'admin' */ './groupCreate'),
     },
     {
-      path: '/workteams',
-      load: () => import(/* webpackChunkName: 'workteam' */ './groupList'),
+      path: '/groups',
+      load: () => import(/* webpackChunkName: 'group' */ './groupList'),
     },
     {
-      path: '/workteams/:id',
-      load: () => import(/* webpackChunkName: 'workteam' */ './group'),
+      path: '/groups/:id',
+      load: () => import(/* webpackChunkName: 'group' */ './group'),
     },
     {
-      path: '/workteams/:id/discussions/:id',
-      load: () => import(/* webpackChunkName: 'workteam' */ './discussion'),
+      path: '/groups/:id/discussions/:id',
+      load: () => import(/* webpackChunkName: 'group' */ './discussion'),
     },
     {
-      path: '/workteams/:id/members',
-      load: () => import(/* webpackChunkName: 'workteam' */ './memberList'),
+      path: '/groups/:id/members',
+      load: () => import(/* webpackChunkName: 'group' */ './memberList'),
     },
     {
-      path: '/workteams/:id/admin',
+      path: '/groups/:id/admin',
       load: () => import(/* webpackChunkName: 'admin' */ './groupManager'),
     },
     {
-      path: '/workteams/:id/edit',
+      path: '/groups/:id/edit',
       load: () => import(/* webpackChunkName: 'admin' */ './groupEdit'),
     },
     {

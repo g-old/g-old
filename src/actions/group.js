@@ -130,6 +130,16 @@ const proposalFields = `
     pollOne ${pollFieldsForList}
     pollTwo ${pollFieldsForList}`;
 
+const memberQuery = `query($id:ID!){
+    workTeam(id:$id){
+      id
+      displayName
+      members{
+        ${userFields}
+      }
+    }
+    }`;
+
 const groupQuery = `query($id:ID! $state:String){
   group(id:$id){
     ${groupFields}
@@ -421,6 +431,27 @@ export function updateGroup(group) {
     } catch (e) {
       dispatch({
         type: UPDATE_GROUP_ERROR,
+        message: e.message || 'Something went wrong',
+      });
+    }
+  };
+}
+
+export function loadGroupMembers({ id }) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: LOAD_GROUP_START,
+    });
+    try {
+      const { data } = await graphqlRequest(memberQuery, { id });
+
+      // TODO make paginable
+      const normalizedData = normalize(data.group, groupSchema);
+
+      dispatch({ type: LOAD_GROUP_SUCCESS, payload: normalizedData });
+    } catch (e) {
+      dispatch({
+        type: LOAD_GROUP_ERROR,
         message: e.message || 'Something went wrong',
       });
     }
