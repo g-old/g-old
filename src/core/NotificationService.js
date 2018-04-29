@@ -64,7 +64,7 @@ type GroupedActivities = {
 type SubsForActivity = {
   subscriberIds: ID[],
   activity: EActivity,
-  subscriberByLocale: { [?Locale]: ID[] },
+  subscriberByLocale: { [Locale]: ID[] },
 };
 export type NotificationSet = {
   activities: { [ID]: SubsForActivity },
@@ -662,6 +662,15 @@ class NotificationService {
       !subscriber.subscriptionType ||
       subscriber.subscriptionType === SubscriptionType.ALL
     ) {
+      // Proposal state change to voting is filtered out!
+      if (!subscriber.subscriptionType) {
+        return {
+          subscriber,
+          activities: activities.filter(
+            a => a.actorId !== subscriber.id && a.verb === ActivityVerb.CREATE,
+          ),
+        };
+      }
       return {
         subscriber,
         activities: activities.filter(a => a.actorId !== subscriber.id),
@@ -672,13 +681,25 @@ class NotificationService {
       case SubscriptionType.FOLLOWEES: {
         // filter discussions out
         const followeeActivities = activities.filter(
-          activity => activity.type !== ActivityType.DISCUSSION,
+          activity => activity.type === ActivityType.STATEMENT,
+        );
+        const stateUpdates = activities.filter(
+          a =>
+            a.verb === ActivityVerb.UPDATE &&
+            [
+              ActivityType.PROPOSAL,
+              ActivityType.DISCUSSION,
+              ActivityType.SURVEY,
+            ].includes(a.type),
         );
         const followerActivities = await this.checkIfFollowing(
           subscriber,
           followeeActivities,
         );
-        return { subscriber, activities: followerActivities };
+        return {
+          subscriber,
+          activities: followerActivities.concat(stateUpdates),
+        };
       }
 
       case SubscriptionType.REPLIES: {
@@ -709,7 +730,7 @@ class NotificationService {
           subscriber,
           activities: activities.filter(
             a =>
-              a.verb === 'update' &&
+              a.verb === ActivityVerb.UPDATE &&
               [
                 ActivityType.PROPOSAL,
                 ActivityType.DISCUSSION,

@@ -29,13 +29,14 @@ export type tActivityType = $Values<typeof ActivityType>;
 export type tActivityVerb = $Values<typeof ActivityVerb>;
 
 class Activity {
-  id: number | string;
-  actorId: number | string;
+  id: ID;
+  actorId: ID;
   verb: $Values<typeof ActivityVerb>;
-  objectId: number | string;
-  type: tActivityType;
+  objectId: ID;
+  type: ID;
   content: {};
   createdAt: string;
+  subjectId: ID;
 
   constructor(data) {
     this.id = data.id;
@@ -45,6 +46,7 @@ class Activity {
     this.objectId = data.object_id;
     this.content = data.content;
     this.createdAt = data.created_at;
+    this.subjectId = data.subject_id;
   }
   static async gen(viewer, id, { activities }) {
     const data = await activities.load(id);
@@ -64,6 +66,7 @@ class Activity {
       object_id: data.objectId,
       content: JSON.stringify(data.content),
       created_at: new Date(),
+      subject_id: data.subjectId,
     };
     const [activity = null] = await knex('activities')
       .insert(newData)
