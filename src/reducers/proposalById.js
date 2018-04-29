@@ -12,6 +12,7 @@ import {
   JOIN_WORKTEAM_SUCCESS,
   LOAD_NOTIFICATIONS_SUCCESS,
   CREATE_SUBSCRIPTION_SUCCESS,
+  DELETE_SUBSCRIPTION_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -64,6 +65,16 @@ export default function byId(state = {}, action) {
         return {
           ...state,
           [sub.targetId]: { ...state[sub.targetId], subscription: sub.id },
+        };
+      }
+      return state;
+    }
+    case DELETE_SUBSCRIPTION_SUCCESS: {
+      const sub = action.payload.entities.subscriptions[action.payload.result];
+      if (sub.targetType === 'PROPOSAL') {
+        return {
+          ...state,
+          [sub.targetId]: { ...state[sub.targetId], subscription: null },
         };
       }
       return state;

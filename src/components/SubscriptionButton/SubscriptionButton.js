@@ -14,7 +14,7 @@ const messages = defineMessages({
   },
   subscribed: {
     id: 'subscribed',
-    defaultMessage: 'Subscribed',
+    defaultMessage: 'Subscribed ({subType})',
     description: 'Label subscribed',
   },
   confirm: {
@@ -54,7 +54,7 @@ class SubscriptionButton extends React.Component {
     onSubscribe: PropTypes.func.isRequired,
     intl: intlShape.isRequired,
     targetType: PropTypes.oneOf(['DISCUSSION', 'PROPOSAL']).isRequired,
-    status: PropTypes.shape({}).isRequired,
+    status: PropTypes.shape({ pending: PropTypes.bool }).isRequired,
   };
   static defaultProps = {
     subscription: null,
@@ -67,22 +67,27 @@ class SubscriptionButton extends React.Component {
 
   handleValueChange(e) {
     if (e) {
-      this.props.onSubscribe({
-        subscriptionType: e.option.value,
-        targetType: this.props.targetType || 'PROPOSAL',
-      });
+      if (!this.props.status.pending) {
+        this.props.onSubscribe({
+          subscriptionType: e.option.value,
+          targetType: this.props.targetType || 'PROPOSAL',
+        });
 
-      this.setState({ ...e.option });
+        this.setState({ ...e.option });
+      }
     }
   }
 
   render() {
     const { subscription, intl, status = {} } = this.props;
-    const { value, label } = this.state;
+    const { label } = this.state;
     let displayLabel;
     if (subscription) {
-      displayLabel = intl.formatMessage({ ...messages.subscribed });
-    } else if (value) {
+      displayLabel = intl.formatMessage(
+        { ...messages.subscribed },
+        { subType: subscription.subscriptionType },
+      );
+    } else if (status.pending) {
       displayLabel = intl.formatMessage(
         { ...messages.confirm },
         { subType: label },

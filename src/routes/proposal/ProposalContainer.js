@@ -167,6 +167,7 @@ class ProposalContainer extends React.Component {
       followees,
       subscriptionStatus,
     } = this.props;
+    const showSubscription = ['proposed', 'voting'].includes(proposal.state);
     const { filter } = this.state;
     if (isFetching && !proposal) {
       return <p>{'Loading...'} </p>;
@@ -244,12 +245,14 @@ class ProposalContainer extends React.Component {
         <div>
           <Box column pad>
             <Proposal {...proposal} />
-            <SubscriptionButton
-              status={subscriptionStatus}
-              targetType="PROPOSAL"
-              onSubscribe={this.handleSubscription}
-              subscription={proposal.subscription}
-            />
+            {showSubscription && (
+              <SubscriptionButton
+                status={subscriptionStatus}
+                targetType="PROPOSAL"
+                onSubscribe={this.handleSubscription}
+                subscription={proposal.subscription}
+              />
+            )}
             <Poll
               {...poll}
               canVote={proposal.canVote}

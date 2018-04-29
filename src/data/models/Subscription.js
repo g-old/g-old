@@ -125,13 +125,11 @@ class Subscription {
     if (!data || !data.id) return null;
     if (!canMutate(viewer, data, Models.SUBSCRIPTION)) return null;
 
-    const deletedSubscription = await knex.transaction(async trx => {
-      await knex('subscriptions')
-        .where({ id: data.id })
-        .transacting(trx)
-        .forUpdate()
-        .del();
-    });
+    const [deletedSubscription] = await knex('subscriptions')
+      .where({ id: data.id })
+      .forUpdate()
+      .del()
+      .returning('*');
 
     return deletedSubscription ? new Subscription(deletedSubscription) : null;
   }
