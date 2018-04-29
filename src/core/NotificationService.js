@@ -121,6 +121,7 @@ const mapTypeToTable: { [tActivityType]: tActivityType } = {
   [ActivityType.STATEMENT]: 'statements',
   [ActivityType.COMMENT]: 'comments',
   [ActivityType.MESSAGE]: 'messages',
+  [ActivityType.USER]: 'users',
 };
 
 const fillWithData = (

@@ -123,7 +123,8 @@ class NotificationSettings extends React.Component {
   handleSubmission(values) {
     const inputs = mergeSettings(values);
     const { notificationSettings } = this.props.user;
-    const mergedSettings = Object.keys(notificationSettings).reduce(
+
+    const mergedSettings = Object.keys(notificationSettings || {}).reduce(
       (acc, key) => {
         if (notificationSettings[key] && acc[key]) {
           acc[key] = { ...notificationSettings[key], ...acc[key] };

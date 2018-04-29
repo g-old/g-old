@@ -30,6 +30,7 @@ import {
 } from '../store/schema';
 import { getProposalsIsFetching, getIsProposalFetching } from '../reducers';
 import { getFilter } from '../core/helpers';
+import { subscriptionFields } from './subscription';
 
 const userFields = `
         id
@@ -115,9 +116,8 @@ const query = `
   query ($id:ID $pollId: ID) {
     proposalDL (id:$id pollId:$pollId) {
       ${proposal}
-      subscribed
       subscription{
-        id
+        ${subscriptionFields}
       }
       canVote
     }

@@ -21,10 +21,15 @@ const handleMessages = async (viewer, messageData, receiver) =>
 const push = async (subscriptionData, msg: PushData) => {
   let result;
   try {
-    const subscriptions = subscriptionData.map(s => ({
-      endpoint: s.endpoint,
-      keys: { auth: s.auth, p256dh: s.p256dh },
-    }));
+    const subscriptions = [];
+    subscriptionData.forEach(s => {
+      if (s) {
+        subscriptions.push({
+          endpoint: s.endpoint,
+          keys: { auth: s.auth, p256dh: s.p256dh },
+        });
+      }
+    });
 
     const messages = subscriptions.map(sub =>
       webPush
