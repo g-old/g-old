@@ -1,3 +1,4 @@
+// @flow
 import {
   Permissions,
   Groups,
@@ -7,24 +8,35 @@ import {
 /* eslint-disable no-bitwise */
 // TODO make object
 export const Models = {
-  USER: 1,
-  PROPOSAL: 2,
-  STATEMENT: 4,
-  FLAG: 8,
-  S_LIKE: 16,
-  POLL: 32,
-  VOTE: 64,
-  NOTIFICATION: 128,
-  GROUP: 256,
-  ACTIVITY: 512,
-  DISCUSSION: 1024,
-  COMMENT: 2048,
-  REQUEST: 4096,
-  TAG: 8192,
+  USER: 'USER',
+  PROPOSAL: 'PROPOSAL',
+  STATEMENT: 'STATEMENT',
+  FLAG: 'FLAG',
+  S_LIKE: 'S_LIKE',
+  POLL: 'POLL',
+  VOTE: 'VOTE',
+  NOTIFICATION: 'NOTIFICATION',
+  GROUP: 'GROUP',
+  ACTIVITY: 'ACTIVITY',
+  DISCUSSION: 'DISCUSSION',
+  COMMENT: 'COMMENT',
+  REQUEST: 'REQUEST',
+  TAG: 'TAG',
+  PHASE: 'PHASE',
 };
+
+type tModel = $Keys<typeof Models>;
 
 /* GENERATOR_FN */
 /* eslint-disable no-unused-vars */
+function phaseReadControl(viewer, data) {
+  console.error('Access control for Phase not implemented');
+  return true;
+}
+function phaseWriteControl(viewer, data) {
+  console.error('Access control for Phase not implemented');
+  return true;
+}
 function assetReadControl(viewer, data) {
   console.error('Access control for Asset not implemented');
   return true;
@@ -140,7 +152,7 @@ function proposalWriteControl(viewer, data) {
     viewer.rights[data.groupId].proposal.includes('writeSameGroup')
   ) {
     return true;
-  } else if (viewer.rights.plattform) {
+  } else if (viewer.rights.platform) {
     console.error('TEST_ ALLOW');
     return true;
   }
@@ -338,6 +350,10 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
+  [Models.PHASE]: {
+    [ATypes.WRITE]: phaseWriteControl,
+    [ATypes.READ]: phaseReadControl,
+  },
   [Models.ASSET]: {
     [ATypes.WRITE]: assetWriteControl,
     [ATypes.READ]: assetReadControl,
@@ -404,8 +420,20 @@ const accessFilter = {
   },
 };
 
-export const canMutate = (viewer, data, model) =>
-  accessFilter[model][ATypes.WRITE](viewer, data);
+export const canMutate = (viewer, data, model): boolean =>
+  true || accessFilter[model][ATypes.WRITE](viewer, data);
 
-export const canSee = (viewer, data, model) =>
-  accessFilter[model][ATypes.READ](viewer, data);
+export const canSee = (viewer, data, model): boolean =>
+  true || accessFilter[model][ATypes.READ](viewer, data);
+
+type PermissionErrorInfo = { viewer: {}, data?: {}, model: tModel };
+
+export class PermissionError extends Error {
+  info: PermissionErrorInfo;
+  message: string;
+  constructor(info: PermissionErrorInfo) {
+    super();
+    this.info = info;
+    this.message = 'Permission error';
+  }
+}

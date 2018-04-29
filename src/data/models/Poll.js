@@ -54,14 +54,14 @@ class Poll {
   /* eslint-enable class-methods-use-this */
   static async create(viewer, data, loaders) {
     // authorize
-    if (!canMutate(viewer, data, Models.POLL)) return null;
 
+    if (!canMutate(viewer, data, Models.POLL)) return null;
     // validate
     if (!data.polling_mode_id) return null;
     if (!data.threshold) return null;
     if (!data.end_time) return null;
-    if (!data.group_id) return null;
-    if (!data.phase_id) return null;
+    if (!data.groupId) return null;
+    if (!data.phaseId) return null;
 
     // create
     const newPollId = await knex.transaction(async trx => {

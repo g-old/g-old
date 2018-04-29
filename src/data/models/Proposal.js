@@ -1,7 +1,9 @@
+// @flow
 import knex from '../knex';
 import Poll from './Poll';
 import User from './User';
 import PollingMode from './PollingMode';
+import Phase, { PhaseState } from './Phase';
 import { dedup } from '../../core/helpers';
 import { computeNextState } from '../../core/worker';
 import { canSee, canMutate, Models } from '../../core/accessControl';
@@ -300,10 +302,7 @@ class Proposal {
   static async create(viewer, data, loaders) {
     // throw Error('TestError');
     // authorize
-    const isCoordinator = await checkIfCoordinator(viewer, data);
-
-    if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL))
-      return null;
+    if (!canMutate(viewer, { ...data }, Models.PROPOSAL)) return null;
 
     // validate
     if (!data.text) return null;
@@ -316,6 +315,7 @@ class Proposal {
       { ...data.poll, ...(data.groupId && { groupId: data.groupId }) },
       loaders,
     );
+
     const additionalData = {};
     if (data.spokesmanId) {
       const spokesman = await User.gen(viewer, data.spokesmanId, loaders);
@@ -326,7 +326,6 @@ class Proposal {
 
     // tags
     const { existingTags, newTags } = await validateTags(data.tags);
-
     const newProposalId = await knex.transaction(async trx => {
       // eslint-disable-next-line
       let pId = data.poll.mode.id;
@@ -341,19 +340,13 @@ class Proposal {
         pId = pMode.id;
       }
 
-      if (!['survey', 'proposed', 'voting'].includes(data.state)) {
-        throw new Error('State is missing');
-      }
-      const { state } = data;
-
-      const [id = null] = await trx
+      const [id]: number[] = await trx
         .insert(
           {
             author_id: viewer.id,
             title: data.title,
             text_html: data.text,
             text: 'implement text extraction',
-            state,
             ...additionalData,
             created_at: new Date(),
           },
@@ -392,48 +385,28 @@ class Proposal {
       }
 
       // create initial phase
-      /*
-      const [initialPhase = null] = await knex('phases')
-        .insert({ proposal_id: id })
-        .returning('*');
 
-      const [poll = null] = await Poll.create(
+      const initialPhase = await Phase.create(
+        viewer,
+        {
+          proposalId: id,
+          createdAt: new Date().toDateString(),
+          state: PhaseState.active,
+        },
+        trx,
+      );
+
+      const poll = await Poll.create(
         viewer,
         { phase_id: initialPhase.id, group_id: data.groupId },
         loaders,
       );
+      if (!poll) {
+        throw new Error('TO IMPLEMENT CHECK');
+      }
 
       // is nextGroupId
 
-      if (data.nextGroupId) {
-        const [nextPhase = null] = await knex('phases')
-          .insert({ proposal_id: id })
-          .returning('*');
-
-        const [nextPoll = null] = await Poll.create(
-          viewer,
-          { phase_id: nextPhase.id, group_id: data.groupId },
-          loaders,
-        );
-
-        // update initialPhase
-
-        await knex('phases')
-          .where({ id: initialPhase.id })
-          .update({ next_phase_id: nextPhase.id })
-          .returning('*');
-      }
-
-      // update proposals currentPhase - or let scheduler do this
-      await knex('proposals')
-        .where({ id })
-        .update({ current_phase_id: initialPhase.id });
-*/
-      /* if (data.groupId) {
-        await knex('groups')
-          .where({ id: data.groupId })
-          .increment('num_proposals', 1);
-      } */
       return id;
     });
 
