@@ -1,4 +1,9 @@
-import { Permissions, Groups, AccessMasks } from '../organization';
+import {
+  Permissions,
+  Groups,
+  AccessMasks,
+  PermissionsSchema,
+} from '../organization';
 /* eslint-disable no-bitwise */
 // TODO make object
 export const Models = {
@@ -150,6 +155,12 @@ function statementReadControl(viewer, data) {
 }
 
 function statementWriteControl(viewer, data) {
+  if (
+    data.proposal.state === 'survey' &&
+    viewer.permissions & Permissions.TAKE_SURVEYS
+  ) {
+    return checkIfMember(viewer, data.proposal);
+  }
   if (viewer.permissions & Permissions.MODIFY_OWN_STATEMENTS) {
     return checkIfMember(viewer, data.proposal);
   }
@@ -206,8 +217,10 @@ function pollWriteControl(viewer, data) {
   } else if (viewer.rights.plattform) {
     console.error('TEST_ ALLOW');
     return true;
+  } else if (data.isCoordinator) {
+    return true;
   }
-  return false;
+  return viewer.permissions & PermissionsSchema[Groups.ADMIN];
 }
 
 function voteReadControl(viewer, data) {
@@ -282,11 +295,15 @@ function discussionReadControl(viewer, data) {
   if (viewer.wtMemberships.includes(data.group_id)) {
     return true;
   }
-
   return false;
 }
 function discussionWriteControl(viewer, data) {
-  if (viewer.permissions & Permissions.PUBLISH_DISCUSSIONS) {
+  if (data.workTeamId) {
+    if (data.isCoordinator) {
+      return true;
+    }
+    return viewer.permissions & PermissionsSchema[Groups.ADMIN];
+  } else if (viewer.permissions & Permissions.PUBLISH_DISCUSSIONS) {
     return true;
   }
   return false;
@@ -306,7 +323,7 @@ function commentWriteControl(viewer, data) {
     // TODO check group etc
     if (viewer.wtMemberships.includes(data.discussion.groupId)) {
       // eslint-disable-line
-      return true;
+      return (viewer.permissions & Permissions.MAKE_COMMENT) > 0;
     }
   }
   // eslint-disable-next-line eqeqeq

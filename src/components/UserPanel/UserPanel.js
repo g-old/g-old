@@ -16,7 +16,7 @@ import Button from '../Button';
 import FormField from '../FormField';
 import Layer from '../Layer';
 import UserListEntry from './UserListEntry';
-import { Permissions, Groups } from '../../organization';
+import { Groups } from '../../organization';
 
 // import history from '../../history';
 
@@ -50,7 +50,7 @@ class UserPanel extends React.Component {
     findUser: PropTypes.func.isRequired,
     userArray: PropTypes.arrayOf(PropTypes.object).isRequired,
     user: PropTypes.shape({
-      id: PropTypes.string,
+      id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       permissions: PropTypes.number,
     }).isRequired,
     createGroup: PropTypes.func.isRequired,

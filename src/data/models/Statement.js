@@ -3,6 +3,7 @@ import Vote from './Vote';
 import knex from '../knex';
 import User from './User';
 import Proposal from './Proposal';
+import { Groups } from '../../organization';
 
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
@@ -51,6 +52,13 @@ class Statement {
     const deletedStatement = await knex.transaction(async function(trx) {
       const statementInDB = await Statement.gen(viewer, data.id, loaders);
       if (!statementInDB) throw Error('Statement does not exist!');
+      const poll = await Poll.gen(viewer, statementInDB.pollId, loaders);
+      if (poll && poll.closedAt) {
+        // eslint-disable-next-line no-bitwise
+        if (!(viewer.groups & (Groups.MODERATOR > 0))) {
+          throw new Error('Poll is closed');
+        }
+      }
       // eslint-disable-next-line eqeqeq
       if (statementInDB.author_id != viewer.id)
         throw Error('Permission denied');
@@ -98,6 +106,12 @@ class Statement {
     if (!canMutate(viewer, { ...data, proposal }, Models.STATEMENT))
       return null;
 
+    // dont allow mutations when poll is closed
+    const poll = await Poll.gen(viewer, statementInDB.pollId, loaders);
+
+    if (poll && poll.closedAt) {
+      throw new Error('Poll is closed');
+    }
     // update
     // eslint-disable-next-line prefer-arrow-callback
     const updatedId = await knex.transaction(async function(trx) {

@@ -10,6 +10,7 @@ import s from './Statement.css';
 import { ICONS } from '../../constants';
 import Notification from '../Notification';
 import { Permissions } from '../../organization';
+import EditMenu from './EditMenu';
 
 import Menu from '../Menu';
 import Button from '../Button';
@@ -41,13 +42,6 @@ const messages = defineMessages({
     description: 'Btn to collapse statements',
   },
 });
-const EditMenu = props => <div>{props.children}</div>;
-EditMenu.propTypes = {
-  children: PropTypes.element,
-};
-EditMenu.defaultProps = {
-  children: null,
-};
 
 class Statement extends React.Component {
   static propTypes = {
@@ -57,6 +51,7 @@ class Statement extends React.Component {
       id: PropTypes.string.isRequired,
     }).isRequired,
     pollId: PropTypes.string.isRequired,
+    pollClosed: PropTypes.bool,
     text: PropTypes.string.isRequired,
     likes: PropTypes.number.isRequired,
     author: PropTypes.shape({
@@ -97,7 +92,6 @@ class Statement extends React.Component {
     ownLike: null,
     ownStatement: false,
     asInput: false,
-    menuOpen: false,
     deletedAt: null,
     onFlagging: null,
     onDelete: null,
@@ -112,6 +106,7 @@ class Statement extends React.Component {
     followees: null,
     updates: null,
     onProfileClick: null,
+    pollClosed: null,
   };
 
   constructor(props) {
@@ -269,6 +264,7 @@ class Statement extends React.Component {
       isFollowee,
       deletedAt,
       updates,
+      pollClosed,
       onProfileClick,
     } = this.props;
     let canLike;
@@ -299,99 +295,16 @@ class Statement extends React.Component {
     let menu = null;
     if (ownStatement || asInput) {
       menu = (
-        <EditMenu>
-          {!deletedAt && (
-            <span style={{ marginRight: '0.5em' }}>
-              {this.state.edit ? (
-                <span>
-                  <Button
-                    plain
-                    onClick={this.onTextSubmit}
-                    disabled={!hasMinimumInput}
-                    icon={
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="24px"
-                        height="24px"
-                        role="img"
-                      >
-                        <polyline
-                          fill="none"
-                          stroke="#000"
-                          strokeWidth="2"
-                          points={ICONS.check}
-                        />
-                      </svg>
-                    }
-                  />
-
-                  <Button
-                    plain
-                    onClick={this.onEndEditing}
-                    disabled={this.props.asInput && !hasMinimumInput}
-                    icon={
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="24px"
-                        height="24px"
-                        role="img"
-                      >
-                        <path
-                          fill="none"
-                          stroke="#000"
-                          strokeWidth="2"
-                          d={ICONS.delete}
-                        />
-                      </svg>
-                    }
-                  />
-                </span>
-              ) : (
-                <Button
-                  plain
-                  onClick={this.onEditStatement}
-                  icon={
-                    <svg
-                      version="1.1"
-                      viewBox="0 0 24 24"
-                      width="24px"
-                      height="24px"
-                      role="img"
-                    >
-                      <path
-                        fill="none"
-                        stroke="#000"
-                        strokeWidth="2"
-                        d={ICONS.edit}
-                      />
-                    </svg>
-                  }
-                />
-              )}
-              {!asInput && (
-                <Button
-                  plain
-                  onClick={this.onDeleteStatement}
-                  icon={
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="24px"
-                      height="24px"
-                      role="img"
-                    >
-                      <path
-                        fill="none"
-                        stroke="#000"
-                        strokeWidth="2"
-                        d={ICONS.trash}
-                      />
-                    </svg>
-                  }
-                />
-              )}
-            </span>
-          )}
-        </EditMenu>
+        <EditMenu
+          isInput={ownStatement || asInput}
+          onTextSubmit={this.onTextSubmit}
+          onEndEditing={this.onEndEditing}
+          onEdit={this.onEditStatement}
+          onDelete={this.onDeleteStatement}
+          isEditing={this.state.edit}
+          disabled={deletedAt || pollClosed}
+          enableSubmit={hasMinimumInput}
+        />
       );
     } else if (canFlag || canFollow || canDelete) {
       menu = (
@@ -506,6 +419,7 @@ class Statement extends React.Component {
       >
         {/* eslint-disable jsx-a11y/interactive-supports-focus */}
         {!inactive && (
+          // eslint-disable-next-line
           <div
             role="button"
             style={{ cursor: onProfileClick ? 'pointer' : 'auto' }}

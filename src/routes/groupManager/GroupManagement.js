@@ -4,9 +4,7 @@ import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import Accordion from '../../components/Accordion';
 import Button from '../../components/Button';
-import Heading from '../../components/Heading';
 import Box from '../../components/Box';
-import { ICONS } from '../../constants';
 import AccordionPanel from '../../components/AccordionPanel';
 import { loadGroup, joinGroup, loadProposalStatus } from '../../actions/group';
 import {
@@ -39,6 +37,8 @@ import Tab from '../../components/Tab';
 import RequestsList from '../../components/RequestsList';
 import Request from '../../components/Request';
 import AssetsTable from '../../components/AssetsTable';
+import { Groups } from '../../organization';
+import history from '../../history';
 
 // import FetchError from '../../components/FetchError';
 const messages = defineMessages({
@@ -131,6 +131,7 @@ const pollOptions = [
 ];
 class GroupManagement extends React.Component {
   static propTypes = {
+    user: PropTypes.shape({}).isRequired,
     id: PropTypes.string.isRequired,
     loadRequestList: PropTypes.func.isRequired,
     deleteRequest: PropTypes.func.isRequired,
@@ -201,12 +202,28 @@ class GroupManagement extends React.Component {
   }
 
   // eslint-disable-next-line
-  onProposalClick() {
-    alert('TO IMPLEMENT');
+  onProposalClick(e, data) {
+    const proposal = data && data.proposal; // why??
+    if (proposal) {
+      const poll = proposal.pollTwo || proposal.pollOne;
+      history.push(`/proposal/${proposal.id}/${poll && poll.id}`);
+    }
+    console.error('TO IMPLEMENT');
     // should open proposalManager
     // then you can handle actions from there
   }
+  canAccess() {
+    const { user } = this.props;
+    return (
+      /* eslint-disable */
+      user.groups & Groups.ADMIN ||
+      (workTeam.coordinator && workTeam.coordinator.id == user.id)
+    ); /* eslint-enable */
+  }
   render() {
+    if (!this.canAccess()) {
+      return <div>ACCESS DENIED</div>;
+    }
     const {
       groupUpdates = {},
       requestUpdates = {},
@@ -217,6 +234,7 @@ class GroupManagement extends React.Component {
       pageInfo = {},
       proposals = [],
     } = this.props;
+
     let content;
     if (this.state.showRequest) {
       const updates = this.state.joining ? groupUpdates : requestUpdates;
@@ -291,35 +309,13 @@ class GroupManagement extends React.Component {
             checkedIndices={[]}
             assets={this.props.group.linkedProposals || []}
             row={ProposalStatusRow}
-            tableHeaders={['title', 'lastPoll', 'state', 'closed at', '', '']}
+            tableHeaders={['title', 'lastPoll', 'state', 'closed at']}
           />
         </AccordionPanel>,
       ];
     }
     return (
       <Box column>
-        <Heading tag="h3">
-          {group.logo ? (
-            'IMPLEMENT LOGO'
-          ) : (
-            <svg
-              version="1.1"
-              viewBox="0 0 24 24"
-              role="img"
-              width="48px"
-              height="48px"
-              aria-label="cloud"
-            >
-              <path
-                fill="none"
-                stroke="#000"
-                strokeWidth="2"
-                d={ICONS.workteam}
-              />
-            </svg>
-          )}
-          {group && group.displayName}
-        </Heading>
         <Tabs>
           <Tab title={<FormattedMessage {...messages.discussions} />}>
             <Accordion>
@@ -334,7 +330,7 @@ class GroupManagement extends React.Component {
           <Tab title={<FormattedMessage {...messages.proposals} />}>
             <Accordion>
               <AccordionPanel
-                heading="Create proposal"
+                heading={<FormattedMessage {...messages.proposalInput} />}
                 onActive={() => {
                   this.props.loadTags();
                 }}
@@ -346,7 +342,9 @@ class GroupManagement extends React.Component {
                   defaultPollValues={defaultPollValues}
                 />
               </AccordionPanel>
-              <AccordionPanel heading="Manage proposals">
+              <AccordionPanel
+                heading={<FormattedMessage {...messages.proposalManager} />}
+              >
                 <ProposalsManager
                   proposals={this.props.group.proposals || []}
                   groupId={this.props.id}

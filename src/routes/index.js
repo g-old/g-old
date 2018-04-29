@@ -208,6 +208,10 @@ const routes = {
       load: () => import(/* webpackChunkName: 'workteam' */ './discussion'),
     },
     {
+      path: '/workteams/:id/members',
+      load: () => import(/* webpackChunkName: 'workteam' */ './memberList'),
+    },
+    {
       path: '/workteams/:id/admin',
       load: () => import(/* webpackChunkName: 'admin' */ './groupManager'),
     },

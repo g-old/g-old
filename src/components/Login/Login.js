@@ -45,6 +45,11 @@ const messages = defineMessages({
     defaultMessage: 'Login attempt failed',
     description: 'Failed login',
   },
+  login: {
+    id: 'label.login',
+    defaultMessage: 'Log In',
+    description: 'Label login',
+  },
 });
 
 class Login extends React.Component {
@@ -174,7 +179,7 @@ class Login extends React.Component {
         <Button
           fill
           primary
-          label="Log In"
+          label={<FormattedMessage {...messages.login} />}
           onClick={this.handleLogin}
           disabled={status.login && status.login.pending}
         />

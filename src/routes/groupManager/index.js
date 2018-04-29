@@ -12,7 +12,7 @@ async function action({ store, path }, { id }) {
   if (!user) {
     return { redirect: `/?redirect=${path}` };
   } else if (!canAccess(user, title)) {
-    return { redirect: '/' };
+    return { redirect: `/workteams/${id}` };
   }
   if (!process.env.BROWSER) {
     await store.dispatch(loadGroup({ id }, true));

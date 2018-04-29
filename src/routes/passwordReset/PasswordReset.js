@@ -33,13 +33,14 @@ const messages = defineMessages({
     description: 'Reset Password',
   },
   empty: {
-    id: 'signup.error-empty',
-    defaultMessage: "You can't leave this empty",
+    id: 'form.error-empty',
     description: 'Help for empty fields',
+    defaultMessage: "You can't leave this empty",
   },
   shortPassword: {
     id: 'signup.error-shortPassword',
-    defaultMessage: 'Short passwords are easy to guess. Try one with at least 6 characters ',
+    defaultMessage:
+      'Short passwords are easy to guess. Try one with at least 6 characters ',
     description: 'Help for short passwords',
   },
   passwordMismatch: {
@@ -123,10 +124,13 @@ class PasswordReset extends React.Component {
   }
   handleValueChange(e) {
     const field = e.target.name;
-    const value = e.target.value;
+    const { value } = e.target;
     if (this.state.errors[field].touched) {
       this.setState({
-        errors: { ...this.state.errors, [field]: { ...this.state.errors[field], touched: false } },
+        errors: {
+          ...this.state.errors,
+          [field]: { ...this.state.errors[field], touched: false },
+        },
       });
     }
     this.setState({ [field]: value });
@@ -153,7 +157,9 @@ class PasswordReset extends React.Component {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
       if (this.state.errors[curr].touched) {
-        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+        acc[err] = (
+          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
+        );
       }
       return acc;
     }, {});
@@ -165,12 +171,17 @@ class PasswordReset extends React.Component {
     if (updates && updates.password && updates.password.success) {
       content = <div> YOU ARE LOGGED IN!</div>;
     } else {
-      const { passwordError, passwordAgainError } = this.visibleErrors(formFields);
+      const { passwordError, passwordAgainError } = this.visibleErrors(
+        formFields,
+      );
       content = (
         <Box column pad>
           <h1> Reset Password</h1>
           <div>
-            <FormField label={<FormattedMessage {...messages.password} />} error={passwordError}>
+            <FormField
+              label={<FormattedMessage {...messages.password} />}
+              error={passwordError}
+            >
               <input
                 id="password"
                 type="password"
@@ -201,14 +212,15 @@ class PasswordReset extends React.Component {
             label={<FormattedMessage {...messages.reset} />}
             onClick={this.onSubmit}
           />
-
         </Box>
       );
     }
     return (
       <div className={s.root}>
         <div className={s.container}>
-          {this.state.error && <Notification type={'error'} message={updates.password.error} />}
+          {this.state.error && (
+            <Notification type="error" message={updates.password.error} />
+          )}
           {content}
         </div>
       </div>
@@ -223,4 +235,6 @@ const mapStateToProps = state => ({
   updates: getAccountUpdates(state, 'pw'),
 });
 
-export default connect(mapStateToProps, mapDispatch)(withStyles(s)(PasswordReset));
+export default connect(mapStateToProps, mapDispatch)(
+  withStyles(s)(PasswordReset),
+);

@@ -13,7 +13,7 @@ import {
   //  discussionList as discussionListSchema,
   //  tagArray as tagArraySchema,
 } from '../store/schema';
-import { getIsDiscussionFetching } from '../reducers';
+import { getIsDiscussionFetching, getDiscussionUpdates } from '../reducers';
 
 const discussionFields = `
 id
@@ -48,6 +48,11 @@ ${discussionFields}
   content
   author{
     ${authorFields}
+  }
+  workTeam{
+    id
+    displayName
+    logo
   }
   comments{
     id
@@ -141,6 +146,14 @@ export function loadDiscussion({ id, parentId }) {
 export function createDiscussion(discussion) {
   return async (dispatch, getState, { graphqlRequest }) => {
     const virtualId = '0000';
+    if (process.env.BROWSER) {
+      const state = getState();
+      const updates = getDiscussionUpdates(state, virtualId);
+
+      if (updates.pending) {
+        return false;
+      }
+    }
     dispatch({
       type: CREATE_DISCUSSION_START,
       id: virtualId,

@@ -49,17 +49,19 @@ class ProposalListView extends React.Component {
   }
   render() {
     const { proposals, pageInfo, isFetching, onProposalClick } = this.props;
-
     return (
       <div>
         <div className={s.list}>
-          {proposals.map(proposal => (
-            <ProposalPreview
-              key={proposal.id}
-              proposal={proposal}
-              onClick={onProposalClick}
-            />
-          ))}
+          {proposals.map(
+            proposal =>
+              proposal && (
+                <ProposalPreview
+                  key={proposal.id}
+                  proposal={proposal}
+                  onClick={onProposalClick}
+                />
+              ),
+          )}
         </div>
         {pageInfo.hasNextPage && (
           <Button

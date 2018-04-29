@@ -22,17 +22,6 @@
   word-break: break-word;
 }
 
-.spokesman {
-  display: flex;
-  cursor: pointer;
-
-  img {
-    width: 1em;
-    height: 1em;
-    margin: 0.1em;
-  }
-}
-
 /*
 .title {
   font-size: 1.5em;

@@ -1,3 +1,0 @@
-
-### [Ladin]?
-Ein Beschluss ist ...

@@ -233,12 +233,12 @@ class Vote {
     const proposal = await Proposal.genByPoll(viewer, data.pollId, loaders);
 
     if (!canMutate(viewer, { ...data, proposal }, Models.VOTE)) return null;
+
     const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
 
     if (!poll || !poll.isVotable()) return null;
 
     if (!proposal || !await proposal.isVotable(viewer)) return null;
-    //
 
     let position = data.position === 1 ? 'pro' : 'con';
 

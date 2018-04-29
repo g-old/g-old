@@ -40,7 +40,6 @@ class Comment {
     if (!discussion) {
       return null;
     }
-
     if (
       !canMutate(
         viewer,

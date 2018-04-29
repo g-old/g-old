@@ -139,6 +139,17 @@ const validateStateChange = async (
   return true;
 };
 
+const checkIfCoordinator = async (viewer, data) => {
+  if (data.workTeamId) {
+    const [coordinatorId] = await knex('work_teams')
+      .where({ id: data.workTeamId })
+      .pluck('coordinator_id');
+    // eslint-disable-next-line
+    return coordinatorId && coordinatorId == viewer.id;
+  }
+  return false;
+};
+
 class Proposal {
   constructor(data) {
     this.id = data.id;
@@ -187,8 +198,11 @@ class Proposal {
   // TODO make member method
   static async update(viewer, data, loaders) {
     // throw Error('TESTERROR');
+    const isCoordinator = await checkIfCoordinator(viewer, data);
+
     // authorize
-    if (!canMutate(viewer, data, Models.PROPOSAL)) return null;
+    if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL))
+      return null;
     // validate
     if (!data.id) return null;
     const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
@@ -234,13 +248,17 @@ class Proposal {
           polling_mode_id: pId,
           ...pollData,
         };
-        const pollTwo = await Poll.create(viewer, pollTwoData, loaders);
+        const pollTwo = await Poll.create(
+          viewer,
+          { ...pollTwoData, isCoordinator },
+          loaders,
+        );
         if (!pollTwo) throw Error('No pollTwo provided');
         // update/close pollOne
         // TODO check first if not already closed?
         const pollOne = await Poll.update(
           viewer,
-          { id: proposalInDB.pollOne_id, closedAt: new Date() },
+          { id: proposalInDB.pollOne_id, closedAt: new Date(), isCoordinator },
           loaders,
         );
         if (!pollOne) throw Error('No pollOne provided');
@@ -282,8 +300,10 @@ class Proposal {
   static async create(viewer, data, loaders) {
     // throw Error('TestError');
     // authorize
+    const isCoordinator = await checkIfCoordinator(viewer, data);
 
-    if (!canMutate(viewer, data, Models.PROPOSAL)) return null;
+    if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL))
+      return null;
 
     // validate
     if (!data.text) return null;
@@ -384,7 +404,7 @@ class Proposal {
       );
 
       // is nextGroupId
-     
+
       if (data.nextGroupId) {
         const [nextPhase = null] = await knex('phases')
           .insert({ proposal_id: id })

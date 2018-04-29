@@ -1,0 +1,19 @@
+@import '../variables';
+
+.root {
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--color-accent-3-shade);
+  color: #666;
+
+  > *:not(:last-child) {
+    margin-right: 0.5rem;
+  }
+
+  img {
+    width: 1em;
+    height: 1em;
+  }
+}
