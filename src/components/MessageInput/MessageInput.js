@@ -5,7 +5,6 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import Box from '../Box';
 import FormField from '../FormField';
 import Button from '../Button';
-import CheckBox from '../CheckBox';
 import { nameValidation, createValidator } from '../../core/validation';
 
 const formFields = ['subject', 'messageText'];
@@ -29,7 +28,6 @@ class MessageInput extends React.Component {
     updates: PropTypes.shape({
       pending: PropTypes.bool,
     }).isRequired,
-    types: PropTypes.arrayOf(PropTypes.string).isRequired,
     notifyGroup: PropTypes.bool,
   };
 
@@ -55,10 +53,6 @@ class MessageInput extends React.Component {
         },
       },
     };
-
-    if (props.types.length) {
-      this.state[props.types[0]] = true;
-    }
 
     const testValues = {
       subject: { fn: 'text' },
@@ -92,7 +86,7 @@ class MessageInput extends React.Component {
           title: subject,
         }),
         subject,
-        type: this.props.types.find(type => this.state[type] === true),
+        type: 'message',
         receiverId,
         receiver: {
           type: this.props.notifyGroup ? 'team' : 'user',
@@ -117,14 +111,7 @@ class MessageInput extends React.Component {
       }
 
       default: {
-        newState = this.props.types.reduce((acc, curr) => {
-          if (curr !== e.target.name) {
-            acc[curr] = false;
-          } else {
-            acc[curr] = true;
-          }
-          return acc;
-        }, {});
+        newState = undefined;
       }
     }
     this.setState(newState);
@@ -152,27 +139,6 @@ class MessageInput extends React.Component {
     const { subjectError, messageTextError } = this.visibleErrors(formFields);
     return (
       <Box column pad>
-        <FormField label="Type">
-          {this.props.types &&
-            this.props.types.map(t => (
-              <CheckBox
-                name={t}
-                checked={this.state[t]}
-                label={t}
-                onChange={this.handleValueChange}
-                disabled={this.props.types.length < 2}
-              />
-            ))}
-        </FormField>
-        <FormField>
-          <CheckBox
-            name="event"
-            checked={false}
-            label="Event"
-            onChange={this.handleValueChange}
-            disabled
-          />
-        </FormField>
         <fieldset>
           <FormField label="Subject" error={subjectError}>
             <input

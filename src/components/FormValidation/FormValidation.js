@@ -175,13 +175,14 @@ class FormValidation extends React.Component {
 
   componentWillReceiveProps({ data }) {
     if (data !== this.props.data) {
-      this.state = {
+      const newState = {
         ...genInitialState(this.formFields, {
           ...this.state,
           ...(data && data),
           ...(data.names && { ...data.names }),
         }),
       };
+      this.setState(newState);
     }
   }
 

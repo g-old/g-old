@@ -167,6 +167,7 @@ class User {
             );
             if (!validatedKey) {
               errors.push(`Wrong key in NotificationSettings: ${settingField}`);
+              return acc;
             }
             const params = parsedSettings[validatedKey];
             const validatedParams = {};
@@ -184,19 +185,31 @@ class User {
         );
       }
 
-      const [settings] = await knex('notification_settings')
+      const [settingsData] = await knex('notification_settings')
         .where({ user_id: data.id })
         .select('settings');
-
+      const { settings } = settingsData;
       if (settings) {
         // merge
         const newSettings = NOTIFICATION_FIELDS.reduce((acc, key) => {
           if (key in settings && key in validatedSettings) {
+            // update
             const mergedValues = {
               ...settings[key],
               ...validatedSettings[key],
             };
-            acc[key] = mergedValues;
+
+            // filter disabled settings out
+            // TODO enable when settings ui can handle it
+            /*   Object.keys(mergedValues).forEach(property => {
+              if (!mergedValues[property]) {
+                delete mergedValues[property];
+              }
+            });
+            */
+            if (Object.keys(mergedValues).length) {
+              acc[key] = mergedValues;
+            }
           } else if (key in settings) {
             acc[key] = settings[key];
           } else {
@@ -204,7 +217,6 @@ class User {
           }
           return acc;
         }, {});
-
         await knex('notification_settings')
           .where({ user_id: data.id })
           .update({ settings: newSettings, updated_at: new Date() });

@@ -190,7 +190,7 @@ class UserNotification extends React.Component {
         if (activity.verb === 'create') {
           message = (
             <React.Fragment>
-              <FormattedMessage {...messages[activity.object.state]} />{' '}
+              <FormattedMessage {...messages.messageNew} />{' '}
               <span className={s.important}>{`${activity.actor.name} ${
                 activity.actor.surname
               }`}</span>

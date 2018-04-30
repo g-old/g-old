@@ -216,7 +216,6 @@ class AccountDetails extends React.Component {
             receiverId={id}
             notifyUser={this.props.notifyUser}
             updates={this.props.updates && this.props.updates.message}
-            types={['email', 'message']}
           />
         </AccordionPanel>
       );
