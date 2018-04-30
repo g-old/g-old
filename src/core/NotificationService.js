@@ -7,6 +7,7 @@ import { SubscriptionType, TargetType } from '../data/models/Subscription';
 import { ActivityType, ActivityVerb } from '../data/models/Activity';
 import type { tActivityType, tActivityVerb } from '../data/models/Activity';
 import MailComposer from './MailComposer';
+import { Groups } from '../organization';
 import type { CommentProps } from '../data/models/Comment';
 import type { ProposalProps } from '../data/models/Proposal';
 import type { DiscussionProps } from '../data/models/Discussion';
@@ -493,6 +494,7 @@ class NotificationService {
           // PROPBLEM : ALSO GUESTS GET NOTIFIED!! -if they have notificationsettings
           return this.dbConnector('notification_settings')
             .innerJoin('users', 'users.id', 'notification_settings.user_id')
+            .whereRaw('users.groups & ? > 0', [Groups.VIEWER]) // no guests!
             .select(
               'notification_settings.user_id as id',
               'notification_settings.settings as settings',

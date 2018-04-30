@@ -24,6 +24,11 @@ const messages = defineMessages({
     defaultMessage: 'Push',
     description: 'Push label',
   },
+  save: {
+    id: 'action.save',
+    description: 'Label',
+    defaultMessage: 'Save',
+  },
 });
 
 const FIELDS = [
@@ -135,7 +140,7 @@ class NotificationSettings extends React.Component {
       },
       inputs,
     );
-    if (mergedSettings) {
+    if (mergedSettings && Object.keys(mergedSettings).length) {
       this.props.update({
         id: this.props.user.id,
         notificationSettings: JSON.stringify(mergedSettings),
@@ -150,6 +155,7 @@ class NotificationSettings extends React.Component {
     return (
       <Box column align>
         <FormValidation
+          updatePending={updates.pending}
           data={flattenSettings(notificationSettings || {})}
           validations={validations}
           submit={this.handleSubmission}
@@ -207,9 +213,8 @@ class NotificationSettings extends React.Component {
                   onClick={onSubmit}
                   disabled={updates.pending}
                   primary
-                  label="Save"
-                />{' '}
-                <Button label="Cancel" onClick={this.onCancel} />
+                  label={<FormattedMessage {...messages.save} />}
+                />
               </div>
             </Form>
           )}
