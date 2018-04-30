@@ -18,7 +18,9 @@ exports.up = function(knex, Promise) {
               .pluck('id')
               .then(ids =>
                 ids.map(id =>
-                  knex('notification_settings').insert({ user_id: id }),
+                  knex('notification_settings')
+                    .insert({ user_id: id })
+                    .return(),
                 ),
               ),
           );
