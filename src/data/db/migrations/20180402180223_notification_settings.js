@@ -5,7 +5,10 @@ exports.up = function(knex, Promise) {
         return knex.schema
           .createTable('notification_settings', table => {
             table.increments();
-            table.integer('user_id').notNullable();
+            table
+              .integer('user_id')
+              .unique()
+              .notNullable();
             table
               .foreign('user_id')
               .references('users.id')
