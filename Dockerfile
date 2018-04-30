@@ -19,4 +19,4 @@ ARG DRONE_BUILD_NUMBER=
 ENV DRONE_BUILD_NUMBER=${DRONE_BUILD_NUMBER}
 
 ENV LOGFILE ./logfile
-CMD node -r dotenv-extended/config ./node_modules/knex/bin/cli.js --knexfile ./src/knexfile.js migrate:latest && node server.js -- --release 2>&1 | tee -a $LOGFILE
+CMD node -r dotenv-extended/config ./node_modules/knex/bin/cli.js --knexfile ./db/knexfile.js migrate:latest && node server.js -- --release 2>&1 | tee -a $LOGFILE
