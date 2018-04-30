@@ -45,11 +45,11 @@ async function copy() {
 
     copyDir('src/data/db', 'build/db'),
     copyFile('.env.defaults', 'build/.env.defaults'),
-    copyFile('src/config.js', 'build/config.js'),
     copyFile('src/core/serviceworker.js', 'build/public/serviceworker.js'),
   ]);
 
-  await copyFile('src/knexfile.js', 'build/knexfile.js');
+  wait copyFile('src/config.js', 'build/db/config.js'),
+  await copyFile('src/knexfile.js', 'build/db/knexfile.js');
   await copyFile(
     'src/emails/translations.json',
     'build/emails/translations.json',
