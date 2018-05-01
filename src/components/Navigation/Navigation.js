@@ -130,7 +130,7 @@ class Navigation extends React.Component {
   }
   render() {
     return (
-      <span role="navigation">
+      <span role="navigation" style={{ margin: '0 0.2em' }}>
         <div className={s.navBar}>{this.getMenu()}</div>
 
         <div className={s.menu}>
