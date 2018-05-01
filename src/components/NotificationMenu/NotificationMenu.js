@@ -87,10 +87,13 @@ class NotificationMenu extends React.Component {
       // createPortal(this.renderNotifications(), container);
       // container.insertBefore(this.control, sibling);
       this.drop = new Drop(container, this.renderNotifications(), {
-        align: { top: 'bottom', left: 'left' },
+        align: { top: 'bottom', right: 'right' },
         context: this.context,
         responsive: false,
         className: s.drop,
+        /* make the Drop exactly 400px wide (will still respect windowWidth) */
+        minWidth: 400,
+        maxWidth: 400,
       });
     } else if (dropActive && prevState.dropActive) {
       this.drop.render(this.renderNotifications());
@@ -154,7 +157,7 @@ class NotificationMenu extends React.Component {
         </Box>
         <List>
           {notifications.map(n => (
-            <ListItem>
+            <ListItem key={n}>
               <Notification {...n} />
             </ListItem>
           ))}
