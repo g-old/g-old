@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import FormValidation from '../FormValidation';
 import Form from '../Form';
@@ -10,8 +9,6 @@ import CheckBox from '../CheckBox';
 import Notification from '../Notification';
 import Button from '../Button';
 import Box from '../Box';
-
-import { createSubscription } from '../../actions/subscription';
 
 const messages = defineMessages({
   email: {
@@ -115,14 +112,30 @@ class NotificationSettings extends React.Component {
       notificationSettings: PropTypes.shape({}),
     }).isRequired,
     updates: PropTypes.shape({}).isRequired,
+    pushSubscription: PropTypes.shape({}),
+    onPushSubChange: PropTypes.func.isRequired,
+    disableSubscription: PropTypes.bool,
   };
-  static defaultProps = {};
+  static defaultProps = { pushSubscription: null, disableSubscription: null };
   constructor(props) {
     super(props);
     this.handleSubmission = this.handleSubmission.bind(this);
-    this.state = {};
+
+    this.state = {
+      notificationSettings: props.user.notificationSettings || {},
+    };
 
     this.validations = generateValidations(FIELDS);
+  }
+
+  componentWillReceiveProps({ user, updates }, oldProps) {
+    if (user !== oldProps.user) {
+      if (!(updates && updates.pending)) {
+        this.setState({
+          notificationSettings: user.notificationSettings || {},
+        });
+      }
+    }
   }
 
   handleSubmission(values) {
@@ -141,6 +154,7 @@ class NotificationSettings extends React.Component {
       inputs,
     );
     if (mergedSettings && Object.keys(mergedSettings).length) {
+      this.setState({ notificationSettings: mergedSettings });
       this.props.update({
         id: this.props.user.id,
         notificationSettings: JSON.stringify(mergedSettings),
@@ -150,7 +164,8 @@ class NotificationSettings extends React.Component {
 
   render() {
     const { error } = this.state;
-    const { updates = {}, user: { notificationSettings } } = this.props;
+    const { updates = {}, pushSubscription, disableSubscription } = this.props;
+    const { notificationSettings } = this.state;
     const validations = this.validations();
     return (
       <Box column align>
@@ -163,6 +178,16 @@ class NotificationSettings extends React.Component {
           {({ values, handleValueChanges, onSubmit }) => (
             <Form>
               <legend>Notifications</legend>
+              <FormField label="WebPush" error={pushSubscription.error}>
+                <CheckBox
+                  toggle
+                  checked={pushSubscription.isPushEnabled}
+                  label={pushSubscription.isPushEnabled ? 'ON' : 'OFF'}
+                  onChange={this.props.onPushSubChange}
+                  disabled={disableSubscription || pushSubscription.pending}
+                />
+              </FormField>
+
               <Label>Proposals and Surveys</Label>
               <fieldset>
                 <FormField label="New Proposals">
@@ -223,7 +248,5 @@ class NotificationSettings extends React.Component {
     );
   }
 }
-const mapDispatch = {
-  createSubscription,
-};
-export default connect(null, mapDispatch)(NotificationSettings);
+
+export default NotificationSettings;

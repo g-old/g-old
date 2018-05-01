@@ -36,10 +36,8 @@ import Accordion from '../../components/Accordion';
 import AccordionPanel from '../../components/AccordionPanel';
 import ImageUpload from '../../components/ImageUpload';
 import Box from '../../components/Box';
-import FormField from '../../components/FormField';
 import Button from '../../components/Button';
 import { isPushAvailable } from '../../core/helpers';
-import CheckBox from '../../components/CheckBox';
 import { ICONS } from '../../constants';
 import ActivityLog from '../../components/ActivityLog';
 import Notification from '../../components/Notification';
@@ -365,18 +363,6 @@ class AccountContainer extends React.Component {
 
           <Box column flex>
             {followeeContainer}
-
-            <FormField label="WebPush" error={subscription.error}>
-              <CheckBox
-                toggle
-                checked={subscription.isPushEnabled}
-                label={subscription.isPushEnabled ? 'ON' : 'OFF'}
-                onChange={this.handleWPSubscription}
-                disabled={
-                  this.state.disableSubscription || subscription.pending
-                }
-              />
-            </FormField>
             <Accordion openMulti>
               <AccordionPanel
                 heading={<FormattedMessage {...messages.settings} />}
@@ -410,6 +396,10 @@ class AccountContainer extends React.Component {
                 <NotificationSettings
                   user={this.props.user}
                   update={this.props.updateUser}
+                  updates={updates && updates.notificationSettings}
+                  pushSubscription={subscription}
+                  onPushSubChange={this.handleWPSubscription}
+                  disableSubscription={this.state.disableSubscription}
                 />
               </AccordionPanel>
             </Accordion>

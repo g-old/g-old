@@ -200,13 +200,12 @@ class User {
             };
 
             // filter disabled settings out
-            // TODO enable when settings ui can handle it
-            /*   Object.keys(mergedValues).forEach(property => {
+            Object.keys(mergedValues).forEach(property => {
               if (!mergedValues[property]) {
                 delete mergedValues[property];
               }
             });
-            */
+
             if (Object.keys(mergedValues).length) {
               acc[key] = mergedValues;
             }
