@@ -37,8 +37,10 @@ class Header extends React.Component {
           <span className={s.brand}>
             <FormattedMessage {...messages.bannerTitle} />
           </span>
-          <Navigation />
-          <NotificationMenu />
+          <div className={s.right}>
+            <Navigation />
+            <NotificationMenu />
+          </div>
         </div>
       </div>
     );
