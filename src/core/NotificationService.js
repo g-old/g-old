@@ -393,11 +393,22 @@ class NotificationService {
         }
         break;
 
-      case ActivityType.DISCUSSION:
-      case ActivityType.SURVEY: // not used yet
-      case ActivityType.PROPOSAL:
+      case ActivityType.DISCUSSION: {
         activity.targetType = TargetType.GROUP;
         activity.targetId = activity.groupId ? activity.groupId : 0;
+        data = activity;
+        break;
+      }
+
+      case ActivityType.SURVEY: // not used yet
+      case ActivityType.PROPOSAL:
+        if (activity.verb === ActivityVerb.CREATE) {
+          activity.targetType = TargetType.GROUP;
+          activity.targetId = activity.groupId ? activity.groupId : 0;
+        } else {
+          activity.targetType = TargetType.PROPOSAL;
+          activity.targetId = activity.objectId;
+        }
         data = activity;
         break;
 
@@ -500,7 +511,8 @@ class NotificationService {
               'notification_settings.settings as settings',
               'users.locale as locale',
               'users.email as email',
-            );
+            )
+            .then();
         }
         // workteams
         return this.dbConnector('user_work_teams')

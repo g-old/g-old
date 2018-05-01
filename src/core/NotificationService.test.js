@@ -1,3 +1,4 @@
+// @flow
 /* eslint-env jest */
 
 import NotificationService from './NotificationService';
@@ -16,10 +17,15 @@ const mockDbConnector = getFn => ({
   },
 });
 
+const mockComposer = () => ({});
+const mockPubSub = () => ({});
+
 const setupService = getFn => {
   const service = new NotificationService({
     dbConnector: mockDbConnector(getFn),
     eventManager: mockEventManager(),
+    mailComposer: mockComposer(),
+    pubsub: mockPubSub(),
   });
   service.processQueue = () => {};
 
@@ -136,23 +142,23 @@ describe('NotificationService', () => {
     const subscriber = generateWithSettings({
       subscriptionType: SubscriptionType.UPDATES,
     });
-    const proposalActivities = [
-      { type: ActivityType.PROPOSAL, verb: 'update' },
-      { type: ActivityType.PROPOSAL, verb: 'create' },
-      { type: ActivityType.PROPOSAL, verb: 'update' },
-    ];
+    const activityMap = {
+      1: { type: ActivityType.PROPOSAL, verb: 'update' },
+      2: { type: ActivityType.PROPOSAL, verb: 'create' },
+      3: { type: ActivityType.PROPOSAL, verb: 'update' },
+      4: { type: ActivityType.STATEMENT, verb: 'update', authorId: 1 },
+      5: { type: ActivityType.STATEMENT, verb: 'create', authorId: 2 },
+      6: { type: ActivityType.PROPOSAL, verb: 'create', authorId: 1 },
+    };
+
     const updateActivities = await service.mergeNotifyableActivitiesWithSubscribers(
       subscriber,
-      proposalActivities,
+      [1, 2, 3],
+      activityMap,
     );
 
     expect(updateActivities.activities.length).toBe(2);
 
-    const statementActivities = [
-      { type: ActivityType.STATEMENT, verb: 'update', authorId: 1 },
-      { type: ActivityType.STATEMENT, verb: 'create', authorId: 2 },
-      { type: ActivityType.PROPOSAL, verb: 'create', authorId: 1 },
-    ];
     const onlyFollowers = generateWithSettings({
       subscriptionType: SubscriptionType.FOLLOWEES,
       settings: { proposal: { webpush: true } },
@@ -162,10 +168,11 @@ describe('NotificationService', () => {
 
     const followerActivities = await service.mergeNotifyableActivitiesWithSubscribers(
       onlyFollowers,
-      statementActivities,
+      [1, 4, 5, 6],
+      activityMap,
     );
 
-    expect(followerActivities.activities.length).toBe(1);
+    expect(followerActivities.activities.length).toBe(2);
   });
 
   test('Get notifications for email and webpush', async () => {
