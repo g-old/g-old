@@ -15,6 +15,7 @@ exports.up = function(knex, Promise) {
           table.boolean('unipolar').notNullable();
           table.boolean('with_statements').notNullable();
           table.enu('threshold_ref', ['all', 'voters']).notNullable();
+          table.timestamp('deleted_at');
           table.timestamps();
         });
       }

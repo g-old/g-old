@@ -30,7 +30,6 @@ exports.up = function(knex, Promise) {
           table.foreign('spokesman_id').references('users.id');
 
           table.timestamp('deleted_at');
-          table.timestamp('notified_at');
           table.timestamps();
         });
       }

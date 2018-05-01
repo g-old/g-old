@@ -6,9 +6,39 @@ import PollingMode from './PollingMode';
 import Phase, { PhaseState } from './Phase';
 import { dedup } from '../../core/helpers';
 import { computeNextState } from '../../core/worker';
-import { canSee, canMutate, Models } from '../../core/accessControl';
+import {
+  canSee,
+  canMutate,
+  Models,
+  PermissionError,
+} from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
+import type { PollInput } from './Poll';
 import log from '../../logger';
+import { ValidationError } from '../../core/utils';
+
+type ID = number | string;
+type ProposalState =
+  | 'proposed'
+  | 'voting'
+  | 'accepted'
+  | 'rejected'
+  | 'revoked'
+  | 'deleted'
+  | 'survey';
+
+type MutationResult = {
+  errors?: $ReadOnlyArray<Class<Error>>,
+  data?: Proposal, // eslint-disable-line
+};
+
+type ProposalInput = {
+  id?: ID,
+  poll?: PollInput,
+};
+
+const extractTextSummary = (string: string) =>
+  string.replace(/<\/?[^>]+>/gi, ' ');
 
 const validateTags = async tags => {
   let existingTags;
@@ -42,9 +72,9 @@ const validateTags = async tags => {
   return { existingTags, newTags };
 };
 
-const validateDates = ({ poll }) => {
+const validateDates = (poll: PollInput) => {
   const serverTime = new Date();
-  const startTime =
+  let startTime =
     poll && poll.startTime ? new Date(poll.startTime) : serverTime;
   if (!startTime.getMonth || typeof startTime.getMonth !== 'function')
     return null;
@@ -57,56 +87,55 @@ const validateDates = ({ poll }) => {
     endTime.setDate(startTime.getDate() + 3);
   }
   if (!endTime.getMonth || typeof endTime.getMonth !== 'function') return null;
-  if (startTime < serverTime || startTime >= endTime)
-    throw Error('DateTime wrong');
+  if (startTime < serverTime) {
+    startTime = serverTime;
+  }
+  if (startTime >= endTime) {
+    return null;
+  }
   return { startTime, endTime };
 };
 
 // TODO  implement this  in Poll create instead
-const validatePoll = async (viewer, poll, loaders) => {
+const validatePoll = async (viewer, poll: PollInput, loaders) => {
   if (!poll) return {};
   let pollingMode;
   let createPollingMode = false;
-  let pollingModeData;
-  let isSurvey = false;
-  if (poll.mode && poll.mode.id) {
-    pollingMode = await PollingMode.gen(viewer, poll.mode.id, loaders);
+  const isSurvey = false;
+  if (poll.pollingModeId) {
+    // use this pollingmode
+    pollingMode = await PollingMode.gen(viewer, poll.pollingModeId, loaders);
 
-    if (!pollingMode) throw Error('PollingMode not found');
-    // check if modifications
-    const { id, ...props } = poll.mode;
-    const keys = Object.keys(props);
-    if (keys.length > 0) {
-      // check if values are different
-      const diff = keys.reduce((acc, curr) => {
-        if (props[curr] !== pollingMode[curr]) {
-          // eslint-disable-next-line no-param-reassign
-          acc += 1;
-        }
-        return acc;
-      }, 0);
-      createPollingMode = diff > 0;
-      pollingModeData = { ...pollingMode, ...props };
-      if (pollingMode.name === 'survey') {
-        isSurvey = true;
-        pollingModeData.thresholdRef = 'voters';
-      }
+    if (!pollingMode) {
+      throw new ValidationError({
+        fields: ['pollingModeId'],
+        model: Models.PROPOSAL,
+      });
     }
+  } else {
+    // create a new one
+    createPollingMode = true;
   }
-  const { startTime, endTime } = validateDates({ poll });
+
+  const validDates = validateDates({ poll });
+  if (!validDates) {
+    throw new ValidationError({
+      fields: ['endTime', 'startTime'],
+      model: Models.PROPOSAL,
+    });
+  }
   let { threshold } = poll;
   if (isSurvey) {
     threshold = 100;
   }
-  const pollData = {
-    secret: poll.secret || false,
-    start_time: startTime,
-    end_time: endTime,
+  const pollData: PollInput = {
+    ...poll,
+    startTime: validDates.startTime.toDateString(),
+    endTime: validDates.endTime.toDateString(),
     threshold: threshold || 50,
-    ...(poll.groupId && { groupId: poll.groupId }),
   };
 
-  return { pollData, pollingModeData, createPollingMode };
+  return { pollData, createPollingMode };
 };
 
 const validateStateChange = async (
@@ -153,19 +182,32 @@ const checkIfCoordinator = async (viewer, data) => {
 };
 
 class Proposal {
+  id: ID;
+  authorId: ID;
+  title: string;
+  text: string;
+  textHtml: string;
+  currentPhaseId: ID;
+  state: ProposalState;
+  votes: number;
+  spokesmanId: ID;
+  deletedAt: string;
+  createdAt: string;
+  updatedAt: string;
+
   constructor(data) {
     this.id = data.id;
-    this.author_id = data.author_id;
+    this.authorId = data.author_id;
     this.title = data.title;
-    this.body = data.body;
+    this.text = data.text;
+    this.textHtml = data.text_html;
+    this.spokesmanId = data.spokesman_id;
     this.votes = data.votes;
-    this.pollOne_id = data.poll_one_id;
-    this.pollTwo_id = data.poll_two_id;
     this.state = data.state;
     this.createdAt = data.created_at;
     this.spokesmanId = data.spokesman_id;
-    this.notifiedAt = data.notified_at;
-    this.groupId = data.group_id;
+    this.updatedAt = data.updated_at;
+    this.deletedAt = data.deleted_at;
   }
   static async gen(viewer, id, { proposals }) {
     const data = await proposals.load(id);
@@ -299,65 +341,62 @@ class Proposal {
     return proposal;
   }
 
-  static async create(viewer, data, loaders) {
+  static async create(viewer, data: ProposalInput, loaders): MutationResult {
     // throw Error('TestError');
     // authorize
-    if (!canMutate(viewer, { ...data }, Models.PROPOSAL)) return null;
+    if (!canMutate(viewer, { ...data }, Models.PROPOSAL)) {
+      throw new PermissionError({ viewer, data, model: Models.PROPOSAL });
+    }
 
     // validate
     if (!data.text) return null;
     if (!data.title) return null;
-    const {
-      /* pollData */ pollingModeData,
-      createPollingMode,
-    } = await validatePoll(
+    const { pollData, createPollingMode } = await validatePoll(
       viewer,
       { ...data.poll, ...(data.groupId && { groupId: data.groupId }) },
       loaders,
     );
 
-    const additionalData = {};
+    const newValues = { created_at: new Date() };
     if (data.spokesmanId) {
       const spokesman = await User.gen(viewer, data.spokesmanId, loaders);
       if (spokesman) {
-        additionalData.spokesman_id = spokesman.id;
+        newValues.spokesman_id = spokesman.id;
       }
+    }
+    if (data.textHtml) {
+      newValues.text_html = data.textHtml;
+      newValues.text = extractTextSummary(data.textHtml);
+    }
+    if (data.title) {
+      newValues.title = data.title;
     }
 
     // tags
     const { existingTags, newTags } = await validateTags(data.tags);
-    const newProposalId = await knex.transaction(async trx => {
+    const newProposal = await knex.transaction(async trx => {
       // eslint-disable-next-line
       let pId = data.poll.mode.id;
       // TODO check if they get reverted in case of rollback
-      if (createPollingMode && pollingModeData) {
-        const pMode = await PollingMode.create(
-          viewer,
-          pollingModeData,
-          loaders,
-        );
+      if (createPollingMode) {
+        const pMode = await PollingMode.create(viewer, loaders);
         if (!pMode) throw Error('PollingMode failed');
         pId = pMode.id;
       }
 
-      const [id]: number[] = await trx
-        .insert(
-          {
-            author_id: viewer.id,
-            title: data.title,
-            text_html: data.text,
-            text: 'implement text extraction',
-            ...additionalData,
-            created_at: new Date(),
-          },
-          'id',
-        )
-        .into('proposals');
+      // TODO further
+
+      const [proposal] = await knex('proposals')
+        .transacting(trx)
+        .insert(newValues)
+        .returning('*');
 
       // tags
       if (existingTags && existingTags.length) {
         await trx
-          .insert(existingTags.map(t => ({ proposal_id: id, tag_id: t.id })))
+          .insert(
+            existingTags.map(t => ({ proposal_id: proposal.id, tag_id: t.id })),
+          )
           .into('proposal_tags');
 
         // update counts
@@ -378,7 +417,9 @@ class Proposal {
           .returning('id');
         await Promise.all(
           ids.map(tId =>
-            trx.insert({ proposal_id: id, tag_id: tId }).into('proposal_tags'),
+            trx
+              .insert({ proposal_id: proposal.id, tag_id: tId })
+              .into('proposal_tags'),
           ),
         );
         //
@@ -389,7 +430,7 @@ class Proposal {
       const initialPhase = await Phase.create(
         viewer,
         {
-          proposalId: id,
+          proposalId: proposal.id,
           createdAt: new Date().toDateString(),
           state: PhaseState.active,
         },
@@ -398,7 +439,7 @@ class Proposal {
 
       const poll = await Poll.create(
         viewer,
-        { phase_id: initialPhase.id, group_id: data.groupId },
+        { phase_id: initialPhase.id, group_id: data.groupId, ...pollData },
         loaders,
       );
       if (!poll) {
@@ -407,11 +448,11 @@ class Proposal {
 
       // is nextGroupId
 
-      return id;
+      return proposal.id;
     });
 
-    if (!newProposalId) return null;
-    const proposal = await Proposal.gen(viewer, newProposalId, loaders);
+    if (!newProposal) return null;
+    const proposal = await Proposal.gen(viewer, newProposal, loaders);
 
     if (proposal) {
       EventManager.publish('onProposalCreated', {

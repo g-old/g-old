@@ -1,26 +1,81 @@
+// @flow
 import knex from '../knex';
 import PollingMode from './PollingMode';
-import { canSee, canMutate, Models } from '../../core/accessControl';
+import {
+  canSee,
+  canMutate,
+  Models,
+  PermissionError,
+} from '../../core/accessControl';
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
   return true;
 }
+type ID = string | number;
+
+type PollProps = {
+  id: ID,
+  group_id: ID,
+  phase_id: ID,
+  polling_mode_id: ID,
+  threshold: number,
+  start_time: string,
+  end_time: string,
+  num_voter: number,
+  votes_cache: Array<number>,
+  created_at: string,
+  updated_at?: string,
+  closed_at?: string,
+  secret?: boolean,
+};
+
+export type PollInput = {
+  id?: ID,
+  pollingModeId?: ID,
+  groupId?: ID,
+  phaseId?: ID,
+  secret?: boolean,
+  threshold?: number,
+  startTime?: string,
+  endTime?: string,
+  threshold?: number,
+  numVoter?: number,
+  votesCache?: Array<number>,
+};
 
 class Poll {
-  constructor(data) {
+  id: ID;
+  pollingModeId: ID;
+  groupId: ID;
+  phaseId: ID;
+  secret: boolean;
+  threshold: number;
+  startTime: string;
+  endTime: string;
+  threshold: number;
+  numVoter: number;
+  votesCache: Array<number>;
+  createdAt: string;
+  updatedAt: string;
+  closedAt: string;
+
+  constructor(data: PollProps) {
     this.id = data.id;
+    this.phaseId = data.phase_id;
+    this.groupId = data.group_id;
     this.pollingModeId = data.polling_mode_id;
-    this.secret = data.secret;
+    this.secret = data.secret || false;
     this.threshold = data.threshold;
-    this.upvotes = data.upvotes;
-    this.downvotes = data.downvotes;
+    this.votesCache = data.votes_cache;
     this.numVoter = data.num_voter;
-    this.start_time = data.start_time;
+    this.startTime = data.start_time;
     this.endTime = data.end_time;
     this.closedAt = data.closed_at;
+    this.createdAt = data.created_at;
+    this.updatedAt = data.updated_at;
   }
-  static async gen(viewer, id, { polls }) {
+  static async gen(viewer, id: ID, { polls }): Promise<?Poll> {
     if (!id) return null;
     const data = await polls.load(id);
     if (data === null) return null;
@@ -52,24 +107,22 @@ class Poll {
     return true;
   }
   /* eslint-enable class-methods-use-this */
-  static async create(viewer, data, loaders) {
+  static async create(viewer, data: PollInput, loaders): Promise<Poll> {
     // authorize
 
-    if (!canMutate(viewer, data, Models.POLL)) return null;
-    // validate
-    if (!data.polling_mode_id) return null;
-    if (!data.threshold) return null;
-    if (!data.end_time) return null;
-    if (!data.groupId) return null;
-    if (!data.phaseId) return null;
-
+    if (!canMutate(viewer, data, Models.POLL)) {
+      throw new PermissionError({ viewer, data, model: Models.POLL });
+    }
     // create
-    const newPollId = await knex.transaction(async trx => {
-      const pollingMode = await PollingMode.gen(
-        viewer,
-        data.polling_mode_id,
-        loaders,
-      );
+    const newPoll = await knex.transaction(async trx => {
+      let pollingMode;
+      if (data.pollingModeId) {
+        pollingMode = await PollingMode.gen(
+          viewer,
+          data.pollingModeId,
+          loaders,
+        );
+      }
       if (!pollingMode) throw Error('No valid PollingMode provided');
       let numVoter = 0;
 
@@ -77,7 +130,7 @@ class Poll {
         // TODO change completely in case of group model
 
         // SELECT * FROM reports WHERE data->'objects' @> '[{"src":"foo.png"}]';
-
+        // TODO canvotesince check !!!!
         numVoter = await knex('user_groups')
           .transacting(trx)
           .where({ group_id: data.groupId })
@@ -87,21 +140,24 @@ class Poll {
         numVoter = Number(numVoter[0].count);
         if (numVoter < 1) throw Error('Not enough user');
       }
+      const newValues = {
+        group_id: data.groupId,
+        phase_id: data.phaseId,
+        polling_mode_id: pollingMode.id,
+        end_time: data.endTime,
+        ...(data.startTime && { start_time: data.startTime }),
+        secret: data.secret,
+        threshold: data.threshold,
+        num_voter: numVoter,
+        created_at: new Date().toDateString(),
+      };
 
-      const id = await trx
-        .insert(
-          {
-            ...data,
-            num_voter: numVoter,
-            created_at: new Date(),
-          },
-          'id',
-        )
-        .into('polls');
-      return id[0];
+      const [poll] = await knex('polls')
+        .insert(newValues)
+        .returning('*');
+      return poll;
     });
-    if (!newPollId) return null;
-    return Poll.gen(viewer, newPollId, loaders) || null;
+    return new Poll(newPoll);
   }
 
   static async update(viewer, data, loaders) {

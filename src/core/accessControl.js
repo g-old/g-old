@@ -23,12 +23,21 @@ export const Models = {
   REQUEST: 'REQUEST',
   TAG: 'TAG',
   PHASE: 'PHASE',
+  POLLINGMODE: 'POLLINGMODE',
 };
 
-type tModel = $Keys<typeof Models>;
+export type tModel = $Keys<typeof Models>;
 
 /* GENERATOR_FN */
 /* eslint-disable no-unused-vars */
+function pollingModeReadControl(viewer, data) {
+  console.error('Access control for PollingMode not implemented');
+  return true;
+}
+function pollingModeWriteControl(viewer, data) {
+  console.error('Access control for PollingMode not implemented');
+  return true;
+}
 function phaseReadControl(viewer, data) {
   console.error('Access control for Phase not implemented');
   return true;
@@ -350,6 +359,10 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
+  [Models.POLLING_MODE]: {
+    [ATypes.WRITE]: pollingModeWriteControl,
+    [ATypes.READ]: pollingModeReadControl,
+  },
   [Models.PHASE]: {
     [ATypes.WRITE]: phaseWriteControl,
     [ATypes.READ]: phaseReadControl,

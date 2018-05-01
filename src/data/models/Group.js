@@ -1,9 +1,16 @@
+// @flow
 import knex from '../knex';
 import User from './User';
 import Request from './Request';
 import Proposal from './Proposal';
+import PollingMode from './PollingMode';
 
-import { canSee, canMutate, Models } from '../../core/accessControl';
+import {
+  canSee,
+  canMutate,
+  Models,
+  PermissionError,
+} from '../../core/accessControl';
 import { Groups } from '../../organization';
 
 async function validateCoordinator(viewer, id, loaders) {
@@ -269,8 +276,9 @@ class Group {
         { ...data, id: data.parentGroupId || 'platform' },
         Models.GROUP,
       )
-    )
-      return null;
+    ) {
+      throw new PermissionError({ viewer, data, model: Models.GROUP });
+    }
 
     if (!data) return null;
     if (!data.names) return null;
@@ -300,10 +308,43 @@ class Group {
 
     const group = await knex.transaction(async trx => {
       // await Group.checkForMainTeam(newData.main, trx);
-      const [groupData = null] = await trx
+      const [groupData] = await trx
         .insert(newData)
         .into('groups')
         .returning('*');
+
+      // if goldMode
+
+      if (groupData.gold_mode) {
+        // create pollingmodes if no inheritables exist;
+
+        // how decide if can use?
+
+        //
+        // TODO certain pollingmodes settings cannot be changed but deleted
+        await PollingMode.create(
+          viewer,
+          {
+            names: { 'de-DE': 'Abstimmungsanfrage' },
+            ownerId: groupData.id,
+            inheritable: true,
+            unipolar: true,
+            thresholdRef: 'all',
+          },
+          trx,
+        );
+        await PollingMode.create(
+          viewer,
+          {
+            names: { 'de-DE': 'Abstimmung' },
+            ownerId: groupData.id,
+            inheritable: true,
+            unipolar: false,
+            thresholdRef: 'voters',
+          },
+          trx,
+        );
+      }
 
       if (!groupData) {
         throw new Error('Could not create group');

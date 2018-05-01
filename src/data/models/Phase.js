@@ -73,16 +73,15 @@ class Phase {
       ...(data.previousId && { previous_id: data.previousId }),
       state: data.state || PhaseState.TODO,
     };
-    let query;
-    if (trx) {
-      query = knex('phases')
-        .insert(newData)
-        .transacting(trx);
-    } else {
-      query = knex('phases').insert(newData);
-    }
 
-    const phaseInDB: PhaseProps = await query.returning('*');
+    const [phaseInDB]: PhaseProps = await knex('phases')
+      .modify(queryBuilder => {
+        if (trx) {
+          queryBuilder.transacting(trx);
+        }
+      })
+      .insert(newData)
+      .returning('*');
 
     return new Phase(phaseInDB);
   }
