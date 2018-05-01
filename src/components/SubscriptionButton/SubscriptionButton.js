@@ -105,40 +105,47 @@ class SubscriptionButton extends React.Component {
       defaultOption = 'UPDATES';
     }
 
+    const options = [];
+    if (subscription) {
+      options.push({
+        label: intl.formatMessage({
+          ...messages.delete,
+        }),
+        value: 'DELETE',
+      });
+    }
+    options.push(
+      {
+        label: intl.formatMessage({
+          ...messages.all,
+        }),
+        value: 'ALL',
+      },
+      {
+        label: intl.formatMessage({
+          ...messages.followees,
+        }),
+        value: 'FOLLOWEES',
+      },
+      {
+        label: intl.formatMessage({
+          ...messages[messageKey],
+        }),
+        value: defaultOption,
+      },
+    );
+
     return (
       <Box>
         {status.error}
         <Select
-          options={[
-            subscription && {
-              label: intl.formatMessage({
-                ...messages.delete,
-              }),
-              value: 'DELETE',
-            },
-            {
-              label: intl.formatMessage({
-                ...messages.all,
-              }),
-              value: 'ALL',
-            },
-            {
-              label: intl.formatMessage({
-                ...messages.followees,
-              }),
-              value: 'FOLLOWEES',
-            },
-            {
-              label: intl.formatMessage({
-                ...messages[messageKey],
-              }),
-              value: defaultOption,
-            },
-          ]}
+          options={options}
           onSearch={false}
           value={{
             label: displayLabel,
-            value: this.state.value || defaultOption,
+            value:
+              (subscription && subscription.subscriptionType) ||
+              this.state.value,
           }}
           onChange={this.handleValueChange}
         />

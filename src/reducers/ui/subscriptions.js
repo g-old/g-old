@@ -55,4 +55,4 @@ const subscriptions = (state = initState, action) => {
 };
 export default subscriptions;
 
-export const getStatus = (state, id) => state[id] || {};
+export const getStatus = state => state.mutation || {};
