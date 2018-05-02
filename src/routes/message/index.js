@@ -23,6 +23,8 @@ async function action({ store, path, query }, { id }) {
       await store.dispatch(updateNotification({ id: query.id, read: true }));
     }
     // ignore if not
+  } else if (query && query.ref === 'push') {
+    await store.dispatch(updateNotification({ id: query.id, read: true }));
   }
   return {
     title,

@@ -19,6 +19,7 @@ import type PubSub from './pubsub';
 // TODO write Dataloaders for batching
 let timer;
 
+type Referrer = 'push' | 'email';
 type EActivity = {
   id: ID,
   verb: tActivityVerb,
@@ -93,8 +94,10 @@ export type PushData = {
 type PushMessage = {
   message: PushData,
   receiverIds: ID[],
+  activityId: ID,
 };
 export type PushMessages = PushMessage[];
+
 export type Email = {
   htmlContent: EmailHTML,
   receivers: string[],
@@ -212,28 +215,47 @@ const resourceByLocale: { [Locale]: { [tActivityType]: string } } = {
   },
 };
 
-const getCommentLink = (comment: CommentProps, groupId: ID): string => {
+const getCommentLink = (
+  comment: CommentProps,
+  groupId: ID,
+  referrer: Referrer,
+): string => {
   const parent = comment.parent_id;
   const child = parent ? comment.id : null;
 
   return `/workteams/${groupId}/discussions/${
     comment.discussion_id
-  }?comment=${parent || comment.id}${child ? `&child=${child}` : ''}`;
+  }?comment=${parent || comment.id}${
+    child ? `&child=${child}` : ''
+  }&ref=${referrer}&id=`;
 };
 
-const getProposalLink = (proposal: ProposalProps): string => {
+const getProposalLink = (
+  proposal: ProposalProps,
+  referrer: Referrer,
+): string => {
   if (proposal.poll_two_id && proposal.poll_one_id) {
-    return `/proposal/${proposal.id}/${proposal.poll_two_id}`;
+    return `/proposal/${proposal.id}/${
+      proposal.poll_two_id
+    }?ref=${referrer}&id=`;
   }
   return `/proposal/${proposal.id}/${proposal.poll_two_id ||
-    proposal.poll_one_id}`;
+    proposal.poll_one_id}?ref=${referrer}&id=`;
 };
 
-const getStatementLink = (proposalId: ID, pollId: ID) =>
-  `/proposal/${proposalId}/${pollId}`;
+const getStatementLink = (proposalId: ID, pollId: ID, referrer: Referrer) =>
+  `/proposal/${proposalId}/${pollId}?ref=${referrer}&id=`;
 
-const getDiscussionLink = (discussion: DiscussionProps): string =>
-  `/workteams/${discussion.work_team_id}/discussions/${discussion.id}`;
+const getDiscussionLink = (
+  discussion: DiscussionProps,
+  referrer: Referrer,
+): string =>
+  `/workteams/${discussion.work_team_id}/discussions/${
+    discussion.id
+  }?ref=${referrer}&id=`;
+
+const getMessageLink = (messageId: ID, referrer) =>
+  `/message/${messageId}?ref${referrer}&id=`;
 
 const generatePushMessage = (
   activity: EActivity,
@@ -246,18 +268,20 @@ const generatePushMessage = (
   let title;
   let message;
   let link;
+  const referrer = 'push';
+
   switch (activity.type) {
     case ActivityType.SURVEY:
       title = resourceByLocale[locale][activity.type];
       message = activityObject.title;
       // problem if notifieing open votation
-      link = getProposalLink(activityObject);
+      link = getProposalLink(activityObject, referrer);
       break;
     case ActivityType.DISCUSSION:
       title = resourceByLocale[locale][activity.type];
       // problem if notifieing open votation
       message = activityObject.title;
-      link = getDiscussionLink(activityObject);
+      link = getDiscussionLink(activityObject, referrer);
       break;
     case ActivityType.PROPOSAL:
       // get resources
@@ -265,7 +289,7 @@ const generatePushMessage = (
 
       message = activityObject.title;
 
-      link = getProposalLink(activityObject);
+      link = getProposalLink(activityObject, referrer);
       // recipients are data-activities
       break;
 
@@ -278,7 +302,7 @@ const generatePushMessage = (
 
       title = resourceByLocale[locale][activity.type];
       //
-      link = getStatementLink(proposal.id, activityObject.poll_id);
+      link = getStatementLink(proposal.id, activityObject.poll_id, referrer);
       break;
     }
 
@@ -290,18 +314,20 @@ const generatePushMessage = (
       // Diff between reply and new ?
 
       title = resourceByLocale[locale][activity.type];
-      link = getCommentLink(activityObject, discussion.work_team_id);
+      link = getCommentLink(activityObject, discussion.work_team_id, referrer);
       break;
     }
 
     case ActivityType.MESSAGE:
       title = resourceByLocale[locale][activity.type];
-      link = `/message/${activity.objectId}`;
+      link = getMessageLink(activity.objectId, referrer);
       message = activityObject.title;
       break;
     default:
       throw new Error(`Type not recognized ${activity.type}`);
   }
+
+  // for each subsriber we save
   // TODO
 
   /* const activitySubscribers = subscriberByLocale[locale].map(id => {
@@ -316,11 +342,12 @@ const generatePushMessage = (
   return {
     message: {
       body: message.length > 40 ? `${message.slice(0, 36)}...` : message,
-      link,
       title,
+      link,
       tag: activity.type,
     },
     receiverIds: subscriberIds,
+    activityId: activity.id,
   };
 };
 
@@ -612,6 +639,24 @@ class NotificationService {
 
         // console.log(' NEW GROUPED NOTIFICATIONS', { webpushData, emailData });
 
+        const notificationIds: ID[] = await this.dbConnector
+          .batchInsert('notifications', notifications, this.maxBatchSize)
+          .returning('id');
+        // TODO add notificationIds
+        console.info(notificationIds);
+        // TODO add nIds to push + emailmessages
+
+        let counter = 0;
+        const notificationIdLookup = notifications.reduce(
+          (acc, notification) => {
+            acc[`${notification.activity_id}$${notification.user_id}`] =
+              notificationIds[counter];
+            counter += 1;
+            return acc;
+          },
+          {},
+        );
+
         const emails: Emails = generateData(
           emailData.activities,
           allObjects,
@@ -628,13 +673,10 @@ class NotificationService {
           generatePushMessage,
         );
 
-        const notificationIds = await this.dbConnector
-          .batchInsert('notifications', notifications, this.maxBatchSize)
-          .returning('id');
-        // TODO add notificationIds
-        console.info(notificationIds);
-
-        await this.notifyPushServices(emails, pushMessages);
+        await this.notifyPushServices(emails, {
+          messages: pushMessages,
+          notificationIds: notificationIdLookup,
+        });
       }
 
       // const endTime = process.hrtime(startTime);
@@ -770,10 +812,10 @@ class NotificationService {
     objects: { [tActivityType]: ResourceMap },
   ): Email {
     const receivers = subscriberIds.map(sId => subscriberById[sId].email);
-
+    const referrer = 'email';
     switch (activity.type) {
       case ActivityType.DISCUSSION: {
-        const link = getDiscussionLink(activityObject);
+        const link = getDiscussionLink(activityObject, referrer);
         const emailHTML = this.MailComposer.getDiscussionMail({
           discussion: activityObject,
           link,
@@ -783,7 +825,7 @@ class NotificationService {
       }
       case ActivityType.SURVEY:
       case ActivityType.PROPOSAL: {
-        const link = getProposalLink(activityObject);
+        const link = getProposalLink(activityObject, referrer);
         const message = this.MailComposer.getProposalMail({
           proposal: activityObject,
           locale,
@@ -799,7 +841,11 @@ class NotificationService {
           objects[ActivityType.PROPOSAL][activity.targetId];
         // $FlowFixMe
         const author: UserProps = objects[ActivityType.USER][activity.actorId];
-        const link = getStatementLink(proposal.id, activityObject.poll_id);
+        const link = getStatementLink(
+          proposal.id,
+          activityObject.poll_id,
+          referrer,
+        );
         const emailHTML = this.MailComposer.getStatementMail({
           statement: activityObject,
           proposalTitle: proposal.title,
@@ -819,7 +865,11 @@ class NotificationService {
         // $FlowFixMe
         const author: UserProps = objects[ActivityType.USER][activity.actorId];
 
-        const link = getCommentLink(activityObject, discussion.work_team_id);
+        const link = getCommentLink(
+          activityObject,
+          discussion.work_team_id,
+          referrer,
+        );
         const emailHTML = this.MailComposer.getCommentMail({
           comment: activityObject,
           author: {
@@ -854,7 +904,13 @@ class NotificationService {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async notifyPushServices(emails?: Emails, pushMessages?: PushMessages) {
+  async notifyPushServices(
+    emails?: Emails,
+    pushMessages?: {
+      messages: PushMessages,
+      notificationIds: { [string]: ID },
+    },
+  ) {
     if (emails) {
       const job = {
         type: 'batchMailing',
