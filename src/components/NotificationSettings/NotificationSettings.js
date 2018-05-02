@@ -88,20 +88,15 @@ const generateValidations = fields => {
   };
 };
 
-const renderCheckBox = (fullName, type, values, changeFn) => (
+const renderCheckBox = (fullName, type, values, changeFn, disabled) => (
   <CheckBox
-    checked={values[fullName]}
+    disabled={disabled}
+    checked={disabled ? false : values[fullName]}
     label={<FormattedMessage {...messages[type]} />}
     name={fullName}
     onChange={changeFn}
     s
   />
-);
-const renderCheckBoxPair = (resource, values, changeFn) => (
-  <Box pad>
-    {renderCheckBox(`${resource}email`, 'email', values, changeFn)}
-    {renderCheckBox(`${resource}webpush`, 'push', values, changeFn)}
-  </Box>
 );
 
 class NotificationSettings extends React.Component {
@@ -112,7 +107,7 @@ class NotificationSettings extends React.Component {
       notificationSettings: PropTypes.shape({}),
     }).isRequired,
     updates: PropTypes.shape({}).isRequired,
-    pushSubscription: PropTypes.shape({}),
+    pushSubscription: PropTypes.shape({ isPushEnabled: PropTypes.bool }),
     onPushSubChange: PropTypes.func.isRequired,
     disableSubscription: PropTypes.bool,
   };
@@ -126,6 +121,7 @@ class NotificationSettings extends React.Component {
     };
 
     this.validations = generateValidations(FIELDS);
+    this.renderCheckBoxPair = this.renderCheckBoxPair.bind(this);
   }
 
   componentWillReceiveProps({ user, updates }, oldProps) {
@@ -140,9 +136,9 @@ class NotificationSettings extends React.Component {
 
   handleSubmission(values) {
     const inputs = mergeSettings(values);
-    const { notificationSettings } = this.props.user;
+    const { notificationSettings } = this.state;
 
-    const mergedSettings = Object.keys(notificationSettings || {}).reduce(
+    let mergedSettings = Object.keys(notificationSettings || {}).reduce(
       (acc, key) => {
         if (notificationSettings[key] && acc[key]) {
           acc[key] = { ...notificationSettings[key], ...acc[key] };
@@ -154,12 +150,47 @@ class NotificationSettings extends React.Component {
       inputs,
     );
     if (mergedSettings && Object.keys(mergedSettings).length) {
+      if (
+        this.props.disableSubscription ||
+        !this.props.pushSubscription.isPushEnabled
+      ) {
+        mergedSettings = Object.keys(mergedSettings).reduce((acc, field) => {
+          if (field in mergedSettings) {
+            if (mergedSettings[field].email) {
+              acc[field] = { email: true };
+            }
+          }
+          return acc;
+        }, {});
+      }
       this.setState({ notificationSettings: mergedSettings });
       this.props.update({
         id: this.props.user.id,
         notificationSettings: JSON.stringify(mergedSettings),
       });
     }
+  }
+  renderCheckBoxPair(resource, values, changeFn) {
+    const { disableSubscription, pushSubscription } = this.props;
+    let disabled = false;
+    if (disableSubscription) {
+      // not available
+      disabled = true;
+    } else if (!pushSubscription.isPushEnabled) {
+      disabled = true;
+    }
+    return (
+      <Box pad>
+        {renderCheckBox(`${resource}email`, 'email', values, changeFn)}
+        {renderCheckBox(
+          `${resource}webpush`,
+          'push',
+          values,
+          changeFn,
+          disabled,
+        )}
+      </Box>
+    );
   }
 
   render() {
@@ -191,42 +222,70 @@ class NotificationSettings extends React.Component {
               <Label>Proposals and Surveys</Label>
               <fieldset>
                 <FormField label="New Proposals">
-                  {renderCheckBoxPair('proposal', values, handleValueChanges)}
+                  {this.renderCheckBoxPair(
+                    'proposal',
+                    values,
+                    handleValueChanges,
+                  )}
                 </FormField>
                 <FormField label="New Surveys">
-                  {renderCheckBoxPair('survey', values, handleValueChanges)}
+                  {this.renderCheckBoxPair(
+                    'survey',
+                    values,
+                    handleValueChanges,
+                  )}
                 </FormField>
               </fieldset>
               <Label>on watched proposals/surveys</Label>
               <fieldset>
                 <FormField label="State updates">
-                  {renderCheckBoxPair('update', values, handleValueChanges)}
+                  {this.renderCheckBoxPair(
+                    'update',
+                    values,
+                    handleValueChanges,
+                  )}
                 </FormField>
                 <FormField label="Statements">
-                  {renderCheckBoxPair('statement', values, handleValueChanges)}
+                  {this.renderCheckBoxPair(
+                    'statement',
+                    values,
+                    handleValueChanges,
+                  )}
                 </FormField>
               </fieldset>
               <Label>Discussions</Label>
 
               <fieldset>
                 <FormField label="New Discussions">
-                  {renderCheckBoxPair('discussion', values, handleValueChanges)}
+                  {this.renderCheckBoxPair(
+                    'discussion',
+                    values,
+                    handleValueChanges,
+                  )}
                 </FormField>
               </fieldset>
               <Label>on watched discussions</Label>
               <fieldset>
                 <FormField label="Comments">
-                  {renderCheckBoxPair('comment', values, handleValueChanges)}
+                  {this.renderCheckBoxPair(
+                    'comment',
+                    values,
+                    handleValueChanges,
+                  )}
                 </FormField>
                 <FormField label="Replies">
-                  {renderCheckBoxPair('reply', values, handleValueChanges)}
+                  {this.renderCheckBoxPair('reply', values, handleValueChanges)}
                 </FormField>
               </fieldset>
               <Label>Messages</Label>
 
               <fieldset>
                 <FormField label="Messages">
-                  {renderCheckBoxPair('message', values, handleValueChanges)}
+                  {this.renderCheckBoxPair(
+                    'message',
+                    values,
+                    handleValueChanges,
+                  )}
                 </FormField>
               </fieldset>
 
@@ -236,7 +295,7 @@ class NotificationSettings extends React.Component {
               <div>
                 <Button
                   onClick={onSubmit}
-                  disabled={updates.pending}
+                  disabled={updates.pending || pushSubscription.pending}
                   primary
                   label={<FormattedMessage {...messages.save} />}
                 />
