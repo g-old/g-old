@@ -176,7 +176,14 @@ class Comment {
     }
 
     let workTeamId;
+    let replyIds;
     const commentInDB = await knex.transaction(async trx => {
+      // search for replies - pass ids as eventprops;
+      if (!oldComment.parent_id) {
+        replyIds = await knex('comments')
+          .where({ parent_id: oldComment.id })
+          .pluck('id');
+      }
       const statusOK = await knex('comments')
         .where({ id: data.id })
         .transacting(trx)
@@ -211,7 +218,7 @@ class Comment {
         comment,
         subjectId: data.discussionId,
         groupId: workTeamId,
-        info: { workTeamId },
+        info: { workTeamId, replyIds },
       });
     }
     return comment;

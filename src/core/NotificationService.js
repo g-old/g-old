@@ -307,7 +307,7 @@ const generatePushMessage = (
     }
 
     case ActivityType.COMMENT: {
-      const discussion: DiscussionProps = (objects[ActivityType.COMMENT][
+      const discussion: DiscussionProps = (objects[ActivityType.DISCUSSION][
         activity.targetId
       ]: any);
       message = discussion.title;
