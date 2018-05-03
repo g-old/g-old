@@ -227,7 +227,7 @@ const getCommentLink = (
     comment.discussion_id
   }?comment=${parent || comment.id}${
     child ? `&child=${child}` : ''
-  }&ref=${referrer}&id=`;
+  }&ref=${referrer}&refId=`;
 };
 
 const getProposalLink = (
@@ -237,14 +237,14 @@ const getProposalLink = (
   if (proposal.poll_two_id && proposal.poll_one_id) {
     return `/proposal/${proposal.id}/${
       proposal.poll_two_id
-    }?ref=${referrer}&id=`;
+    }?ref=${referrer}&refId=`;
   }
   return `/proposal/${proposal.id}/${proposal.poll_two_id ||
-    proposal.poll_one_id}?ref=${referrer}&id=`;
+    proposal.poll_one_id}?ref=${referrer}&refId=`;
 };
 
 const getStatementLink = (proposalId: ID, pollId: ID, referrer: Referrer) =>
-  `/proposal/${proposalId}/${pollId}?ref=${referrer}&id=`;
+  `/proposal/${proposalId}/${pollId}?ref=${referrer}&refId=`;
 
 const getDiscussionLink = (
   discussion: DiscussionProps,
@@ -252,10 +252,10 @@ const getDiscussionLink = (
 ): string =>
   `/workteams/${discussion.work_team_id}/discussions/${
     discussion.id
-  }?ref=${referrer}&id=`;
+  }?ref=${referrer}&refId=`;
 
 const getMessageLink = (messageId: ID, referrer) =>
-  `/message/${messageId}?ref${referrer}&id=`;
+  `/message/${messageId}?ref${referrer}&refId=`;
 
 const generatePushMessage = (
   activity: EActivity,
@@ -815,7 +815,8 @@ class NotificationService {
     const referrer = 'email';
     switch (activity.type) {
       case ActivityType.DISCUSSION: {
-        const link = getDiscussionLink(activityObject, referrer);
+        let link = getDiscussionLink(activityObject, referrer);
+        link += activity.id;
         const emailHTML = this.MailComposer.getDiscussionMail({
           discussion: activityObject,
           link,
@@ -825,7 +826,8 @@ class NotificationService {
       }
       case ActivityType.SURVEY:
       case ActivityType.PROPOSAL: {
-        const link = getProposalLink(activityObject, referrer);
+        let link = getProposalLink(activityObject, referrer);
+        link += activity.id;
         const message = this.MailComposer.getProposalMail({
           proposal: activityObject,
           locale,
@@ -841,11 +843,12 @@ class NotificationService {
           objects[ActivityType.PROPOSAL][activity.targetId];
         // $FlowFixMe
         const author: UserProps = objects[ActivityType.USER][activity.actorId];
-        const link = getStatementLink(
+        let link = getStatementLink(
           proposal.id,
           activityObject.poll_id,
           referrer,
         );
+        link += activity.id;
         const emailHTML = this.MailComposer.getStatementMail({
           statement: activityObject,
           proposalTitle: proposal.title,
@@ -865,11 +868,12 @@ class NotificationService {
         // $FlowFixMe
         const author: UserProps = objects[ActivityType.USER][activity.actorId];
 
-        const link = getCommentLink(
+        let link = getCommentLink(
           activityObject,
           discussion.work_team_id,
           referrer,
         );
+        link += activity.id;
         const emailHTML = this.MailComposer.getCommentMail({
           comment: activityObject,
           author: {

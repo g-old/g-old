@@ -41,22 +41,25 @@ class Notification {
   }
 
   static async update(viewer, data) {
-    if (!data || !data.id) return null;
+    if (!data || !(data.id || data.activityId)) return null;
     if (!canMutate(viewer, data, Models.NOTIFICATION)) return null;
     const newData = { updated_at: new Date() };
     if ('read' in data) {
       newData.read = data.read;
     }
-    const updatedNotification = await knex.transaction(async trx => {
-      const [notification = null] = await knex('notifications')
-        .where({ id: data.id })
-        .transacting(trx)
-        .forUpdate()
-        .update(newData)
-        .returning('*');
-
-      return notification;
-    });
+    const [updatedNotification] = await knex('notifications')
+      .modify(queryBuilder => {
+        if (data.id) {
+          queryBuilder.where({ id: data.id });
+        } else {
+          queryBuilder.where({
+            activity_id: data.activityId,
+            user_id: viewer.id,
+          });
+        }
+      })
+      .update(newData)
+      .returning('*');
 
     return updatedNotification ? new Notification(updatedNotification) : null;
   }

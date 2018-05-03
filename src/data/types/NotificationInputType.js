@@ -9,10 +9,13 @@ const NotificationInputType = new GraphQLInputObjectType({
   name: 'NotificationInput',
   fields: {
     id: {
-      type: new GraphQLNonNull(ID),
+      type: ID,
     },
     read: {
       type: new GraphQLNonNull(GraphQLBoolean),
+    },
+    activityId: {
+      type: ID,
     },
   },
 });

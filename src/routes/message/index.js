@@ -24,7 +24,11 @@ async function action({ store, path, query }, { id }) {
     }
     // ignore if not
   } else if (query && query.ref === 'push') {
-    await store.dispatch(updateNotification({ id: query.id, read: true }));
+    await store.dispatch(updateNotification({ id: query.refId, read: true }));
+  } else if (query && query.ref === 'email') {
+    await store.dispatch(
+      updateNotification({ activityId: query.refId, read: true }),
+    );
   }
   return {
     title,
