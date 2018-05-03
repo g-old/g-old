@@ -20,6 +20,7 @@ import {
   getIsDiscussionFetching,
   getDiscussionError,
   getCommentUpdates,
+  getSubscriptionUpdates,
 } from '../../reducers';
 import {
   createSubscription,
@@ -73,6 +74,7 @@ class DiscussionContainer extends React.Component {
     createSubscription: PropTypes.func.isRequired,
     updateSubscription: PropTypes.func.isRequired,
     deleteSubscription: PropTypes.func.isRequired,
+    subscriptionStatus: PropTypes.shape({}).isRequired,
   };
   static defaultProps = {
     errorMessage: null,
@@ -157,6 +159,7 @@ class DiscussionContainer extends React.Component {
       user,
       commentId,
       childId,
+      subscriptionStatus,
     } = this.props;
     if (isFetching && !discussion) {
       return <p>{'Loading...'} </p>;
@@ -199,6 +202,7 @@ class DiscussionContainer extends React.Component {
                 onSubscribe={this.handleSubscription}
                 subscription={discussion.subscription}
                 targetType="DISCUSSION"
+                status={subscriptionStatus}
               />
             </div>
             <Box tag="section" column pad fill className={s.commentsSection}>
@@ -273,6 +277,7 @@ const mapStateToProps = (state, { id }) => ({
   isFetching: getIsDiscussionFetching(state, id),
   errorMessage: getDiscussionError(state, id),
   updates: getCommentUpdates(state),
+  subscriptionStatus: getSubscriptionUpdates(state),
 });
 
 const mapDispatch = {

@@ -70,6 +70,7 @@ export const discussion = new schema.Entity('discussions', {
   author: user,
   comments: [comment],
   ownComment: comment,
+  subscription,
 });
 export const unionSchema = new schema.Union(
   {
