@@ -82,9 +82,10 @@ class UserNotification extends React.Component {
   static defaultProps = {};
   computeData() {
     const { activity, id } = this.props;
+    let message = <span>Not found</span>;
+    if (!activity.object) return { message };
     const info = JSON.parse(activity.info);
     const param = `?ref=notification&id=${id}`;
-    let message = '';
     let path = '';
     let thumbnail = '/tile.png';
     // console.log('ACtivity', { activity });
@@ -142,6 +143,7 @@ class UserNotification extends React.Component {
             path = `/proposal/${activity.object.id}/${activePoll.id}${param}`;
           }
         }
+
         break;
       }
       case 'comment': {
@@ -173,12 +175,11 @@ class UserNotification extends React.Component {
       case 'discussion': {
         if (activity.verb === 'create') {
           message = (
-            <FormattedMessage
-              {...messages.discussionNew}
-              values={{
-                title: activity.object.title,
-              }}
-            />
+            <React.Fragment>
+              <FormattedMessage {...messages.discussionNew} />{' '}
+              <span className={s.important}>{activity.object.title}</span>{' '}
+              <span className={s.important}>{info && info.title}</span>
+            </React.Fragment>
           );
           path = `/workteams/${activity.workTeamId}/discussions/${
             activity.object.id

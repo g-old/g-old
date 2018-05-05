@@ -480,7 +480,7 @@ class NotificationService {
 
       case ActivityType.DISCUSSION: {
         activity.targetType = TargetType.GROUP;
-        activity.targetId = activity.groupId ? activity.groupId : 0;
+        activity.targetId = activity.subjectId || 0;
         data = activity;
         break;
       }
@@ -489,7 +489,7 @@ class NotificationService {
       case ActivityType.PROPOSAL:
         if (activity.verb === ActivityVerb.CREATE) {
           activity.targetType = TargetType.GROUP;
-          activity.targetId = activity.groupId ? activity.groupId : 0;
+          activity.targetId = activity.subjectId || 0;
         } else {
           activity.targetType = TargetType.PROPOSAL;
           activity.targetId = activity.objectId;
@@ -601,7 +601,7 @@ class NotificationService {
         }
         // workteams
         return this.dbConnector('user_work_teams')
-          .where({ group_id: selector[1] })
+          .where({ work_team_id: selector[1] })
           .innerJoin(
             'notification_settings',
             'notification_settings.user_id',

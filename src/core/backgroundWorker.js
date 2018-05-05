@@ -222,7 +222,7 @@ const notifyMultiple = async (
 };
 
 async function processMessages(message) {
-  log.info({ message }, 'Job received');
+  // log.info({ message }, 'Job received');
   let result = null;
   try {
     switch (message.type) {
@@ -286,8 +286,8 @@ async function processMessages(message) {
       default:
         throw Error(`Job type not recognized: ${message.type}`);
     }
-  } catch (e) {
-    log.error(e);
+  } catch (err) {
+    log.error({ err });
   }
   return result;
 }

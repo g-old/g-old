@@ -82,6 +82,7 @@ class Discussion {
         viewer,
         discussion,
         groupId: discussion.workTeamId,
+        subjectId: discussion.workTeamId,
       });
     }
     return discussion;

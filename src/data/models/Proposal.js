@@ -315,6 +315,7 @@ class Proposal {
         proposal,
         ...(newValues.state && { info: { newState: newValues.state } }),
         ...(data.workTeamId && { groupId: data.workTeamId }),
+        subjectId: data.workTeamId,
       });
     }
     return proposal;
@@ -439,6 +440,7 @@ class Proposal {
         viewer,
         proposal,
         ...(data.workTeamId && { groupId: data.workTeamId }),
+        subjectId: data.workTeamId,
       });
     }
     return proposal;
