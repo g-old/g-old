@@ -1,8 +1,9 @@
 // @flow
+// import fs from 'fs';
 import { throwIfMissing } from './utils';
 import log from '../logger';
 import { sendJob } from './childProcess';
-
+// import config from '../config';
 import { SubscriptionType, TargetType } from '../data/models/Subscription';
 import { ActivityType, ActivityVerb } from '../data/models/Activity';
 import type { tActivityType, tActivityVerb } from '../data/models/Activity';
@@ -18,6 +19,7 @@ import type PubSub from './pubsub';
 
 // TODO write Dataloaders for batching
 let timer;
+// const MESSAGES_DIR = process.env.MESSAGES_DIR || join(__dirname, './messages');
 
 type Referrer = 'push' | 'email';
 type EActivity = {
@@ -96,6 +98,13 @@ type PushMessage = {
   receiverIds: ID[],
   activityId: ID,
 };
+
+type LocaleDictionary = {
+  [Locale]: {
+    [string]: { [string]: string } | string,
+  },
+};
+
 export type PushMessages = PushMessage[];
 
 export type Email = {
@@ -155,6 +164,8 @@ const fillWithData = (
   store.subscriberById[user.id] = user;
 };
 
+// const readFile = Promise.promisify(fs.readFile);
+
 const generateData = (
   activities: { [ID]: SubsForActivity },
   objects: { [tActivityType]: ResourceMap },
@@ -188,9 +199,16 @@ const generateData = (
   return result;
 };
 
-const resourceByLocale: { [Locale]: { [tActivityType]: string } } = {
+// TODO load translations in
+const resourceByLocale: LocaleDictionary = {
   'de-DE': {
-    [ActivityType.PROPOSAL]: 'Neuer Beschluss',
+    [ActivityType.PROPOSAL]: {
+      proposed: 'Neuer Beschluss',
+      voting: 'Abstimmung eröffnet',
+      revoked: 'Beschluss zurückgezogen',
+      rejected: 'Beschluss abgelehnt',
+      accepted: 'Beschluss angenommen',
+    },
     [ActivityType.DISCUSSION]: 'Neue Diskussion',
     [ActivityType.SURVEY]: 'Neue Umfrage',
     [ActivityType.COMMENT]: 'Neuer Kommentar',
@@ -198,7 +216,13 @@ const resourceByLocale: { [Locale]: { [tActivityType]: string } } = {
     [ActivityType.MESSAGE]: 'Neue Nachricht',
   },
   'it-IT': {
-    [ActivityType.PROPOSAL]: 'Nuova proposta',
+    [ActivityType.PROPOSAL]: {
+      proposed: 'Nuova proposta',
+      voting: 'Votazione aperta',
+      revoked: 'Proposta ritirata',
+      rejected: 'Proposta rigettata',
+      accepted: 'Proposta accettata',
+    },
     [ActivityType.DISCUSSION]: 'Nuova discussione',
     [ActivityType.SURVEY]: 'Nuovo sondaggio',
     [ActivityType.COMMENT]: 'Nuovo commento',
@@ -206,7 +230,13 @@ const resourceByLocale: { [Locale]: { [tActivityType]: string } } = {
     [ActivityType.MESSAGE]: 'Nuovo messagio',
   },
   'lld-IT': {
-    [ActivityType.PROPOSAL]: 'Nuova proposta',
+    [ActivityType.PROPOSAL]: {
+      proposed: 'Nuova proposta',
+      voting: 'Votazione aperta',
+      revoked: 'Proposta ritirata',
+      rejected: 'Proposta rigettata',
+      accepted: 'Proposta accettata',
+    },
     [ActivityType.DISCUSSION]: 'Nuova discussione',
     [ActivityType.SURVEY]: 'Nuovo sondaggio',
     [ActivityType.COMMENT]: 'Nuovo commento',
@@ -285,7 +315,7 @@ const generatePushMessage = (
       break;
     case ActivityType.PROPOSAL:
       // get resources
-      title = resourceByLocale[locale][activity.type];
+      title = resourceByLocale[locale][activity.type][activityObject.state];
 
       message = activityObject.title;
 
@@ -366,6 +396,7 @@ class NotificationService {
   batchingWindow: number;
   dbConnector: any;
   PubSub: PubSub;
+  linkPrefix: string;
   MailComposer: MailComposer;
   filterActivity: (payload: PayloadType) => void;
   loadSubscriptions: Selector => Promise<Subscriber[]>;
@@ -374,8 +405,17 @@ class NotificationService {
     ID[],
     ActivityMap,
   ) => Promise<RelevantActivities>;
+  generateEmail: (
+    activity: EActivity,
+    subscriberIds: ID[],
+    activityObject: any,
+    locale: Locale,
+    subscriberById: SubscriberMap,
+    objects: { [tActivityType]: ResourceMap },
+  ) => Email;
   batchProcessing: () => void;
   processQueue: () => void;
+
   constructor({
     eventManager = throwIfMissing('EventManager'),
     dbConnector = throwIfMissing('Database connection'),
@@ -396,6 +436,13 @@ class NotificationService {
     this.filterActivity = this.filterActivity.bind(this);
     this.loadSubscriptions = this.loadSubscriptions.bind(this);
     this.generateEmail = this.generateEmail.bind(this);
+    if (!__DEV__) {
+      if (!process.env.HOST) {
+        throw new Error('HOST environment variable not set!');
+      }
+    }
+    this.linkPrefix = `${__DEV__ ? 'http' : 'https'}://${process.env.HOST ||
+      'localhost:3000'}`;
     this.mergeNotifyableActivitiesWithSubscribers = this.mergeNotifyableActivitiesWithSubscribers.bind(
       this,
     );
@@ -408,6 +455,17 @@ class NotificationService {
   registerListener() {
     this.EventManager.subscribe('onActivityCreated', this.filterActivity);
   }
+
+  /* async loadTranslations() {
+   // TODO
+    const promises = config.locales.map(async locale => {
+      this.translations[locale] = await readFile(
+        join(MESSAGES_DIR, `${locale}.json`),
+      );
+    });
+    await Promise.all(promises);
+  }
+*/
   filterActivity(payload: PayloadType): void {
     let data;
     const { activity, subjectId } = payload;
@@ -816,7 +874,7 @@ class NotificationService {
     switch (activity.type) {
       case ActivityType.DISCUSSION: {
         let link = getDiscussionLink(activityObject, referrer);
-        link += activity.id;
+        link = this.linkPrefix + link + activity.id;
         const emailHTML = this.MailComposer.getDiscussionMail({
           discussion: activityObject,
           link,
@@ -827,7 +885,7 @@ class NotificationService {
       case ActivityType.SURVEY:
       case ActivityType.PROPOSAL: {
         let link = getProposalLink(activityObject, referrer);
-        link += activity.id;
+        link = this.linkPrefix + link + activity.id;
         const message = this.MailComposer.getProposalMail({
           proposal: activityObject,
           locale,
@@ -848,7 +906,7 @@ class NotificationService {
           activityObject.poll_id,
           referrer,
         );
-        link += activity.id;
+        link = this.linkPrefix + link + activity.id;
         const emailHTML = this.MailComposer.getStatementMail({
           statement: activityObject,
           proposalTitle: proposal.title,
@@ -873,7 +931,7 @@ class NotificationService {
           discussion.work_team_id,
           referrer,
         );
-        link += activity.id;
+        link = this.linkPrefix + link + activity.id;
         const emailHTML = this.MailComposer.getCommentMail({
           comment: activityObject,
           author: {

@@ -22,7 +22,13 @@ let Transporter;
 if (env === 'production' || env === USE_SENDGRID) {
   Transporter = require('./core/SendGridTransporter').default; // eslint-disable-line global-require
 } else {
-  Transporter = nodemailer.createTransport(mailOptions.config);
+  Transporter = nodemailer.createTransport({
+    ...mailOptions.config,
+    logger: true,
+    debug: __DEV__,
+    service: 'Ethereal',
+    requireTLS: false,
+  });
 }
 
 const messagesRepo = {};

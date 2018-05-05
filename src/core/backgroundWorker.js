@@ -128,6 +128,13 @@ const notifyProposalCreation = async proposal => {
     tag: 'proposal',
   });
 };
+// https://hackernoon.com/functional-javascript-resolving-promises-sequentially-7aac18c4431e
+const promiseSerial = funcs =>
+  funcs.reduce(
+    (promise, func) =>
+      promise.then(result => func().then(Array.prototype.concat.bind(result))),
+    Promise.resolve([]),
+  );
 
 const notifyMultiple = async (
   viewer,
@@ -195,7 +202,23 @@ const notifyMultiple = async (
     //  return push(subscriptions, pushMessage.message);
   );
 
-  return Promise.all(promises);
+  // execute promises in batches
+
+  const promiseBatches = [];
+  const end = promises.length;
+  let counter = 0;
+  for (let i = 0; i < end; i += 1) {
+    if (i % 5) {
+      promiseBatches.push(Promise.all(promises.slice(counter, 5)));
+    }
+    counter += 1;
+  }
+  promiseBatches.push(Promise.all(promises.slice(counter)));
+
+  return promiseSerial(promiseBatches).catch(err => {
+    log.error({ err });
+  });
+  // return Promise.all(promises);
 };
 
 async function processMessages(message) {
