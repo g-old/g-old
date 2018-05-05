@@ -14,7 +14,11 @@ async function action({ store, path, query }, { id, pollId }) {
   const user = getSessionUser(state);
   let proposalId = id;
   if (!user) {
-    return { redirect: `/?redirect=${path}` };
+    let redirect = `/?redirect=${path}`;
+    if (query.ref) {
+      redirect += `&ref=${query.ref}&refId=${query.refId}`;
+    }
+    return { redirect };
   } else if (!canAccess(user, title)) {
     return { redirect: '/' };
   }

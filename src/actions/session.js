@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { normalize } from 'normalizr';
+import queryString from 'query-string';
 import { user as userSchema } from '../store/schema';
 
 import {
@@ -13,7 +14,6 @@ import {
 } from '../constants';
 
 import { createSSESub, closeSSE } from './sseSubs';
-import { locales } from './intl';
 
 // import fetch from '../core/fetch';
 
@@ -82,14 +82,25 @@ export function login(data) {
       return acc;
     }, {});
     let redirect = null;
-    if (
-      history.location.search &&
-      history.location.search.indexOf('=') !== -1
-    ) {
-      const newPath = history.location.search.split('=')[1];
+    const query = queryString.parse(history.location.search);
+    if (query.locale) {
+      delete query.locale;
+    }
+    if (query.redirect) {
+      redirect = `${query.redirect}`;
+      delete query.redirect;
+      redirect += `?${queryString.stringify(query)}`;
+      /* redirect = `${query.redirect}`;
 
-      // don't redirect on language selection
-      if (!locales[newPath]) redirect = newPath;
+      if (query.ref) {
+        redirect += `?${queryString.stringify({
+          ref: query.ref,
+          refId: query.refId,
+        })}`;
+      }
+      if(query.comment){
+
+      } */
     }
     dispatch({
       type: SESSION_LOGIN_START,

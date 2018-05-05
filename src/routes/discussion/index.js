@@ -12,7 +12,17 @@ async function action({ store, path, query }, { id }) {
   const state = store.getState();
   const user = getSessionUser(state);
   if (!user) {
-    return { redirect: `/?redirect=${path}` };
+    let redirect = `/?redirect=${path}`;
+    if (query.comment) {
+      redirect += `&comment=${query.comment}`;
+    }
+    if (query.child) {
+      redirect += `&child=${query.child}`;
+    }
+    if (query.ref) {
+      redirect += `&ref=${query.ref}&refId=${query.refId}`;
+    }
+    return { redirect };
   } else if (!canAccess(user, title)) {
     return { redirect: '/' };
   }
