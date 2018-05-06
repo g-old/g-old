@@ -221,6 +221,7 @@ class Proposal {
     // authorize
     if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL))
       return null;
+
     // validate
     if (!data.id) return null;
     const proposalInDB = await Proposal.gen(viewer, data.id, loaders);

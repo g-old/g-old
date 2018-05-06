@@ -197,8 +197,8 @@ mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $ta
 `;
 
 const updateProposalMutation = `
-mutation($id:ID  $poll:PollInput $state:ProposalState ){
-  updateProposal (proposal:{ id:$id poll:$poll state:$state }){
+mutation($id:ID  $poll:PollInput $state:ProposalState $workTeamId:ID ){
+  updateProposal (proposal:{ id:$id poll:$poll state:$state workTeamId:$workTeamId}){
     ${proposal}
     tags{
       id

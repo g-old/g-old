@@ -100,6 +100,7 @@ const proposalFields = `
     title
     state
     body
+    workTeamId
     pollOne {${pollFieldsForList}}
     pollTwo {${pollFieldsForList}}`;
 
