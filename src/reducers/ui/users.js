@@ -68,14 +68,17 @@ const users = (state = {}, action) => {
     case CREATE_VEMAIL_SUCCESS: {
       const { id } = action; // Is initial id!
       const current = state[id];
-      const newState = getSuccessState(current, action);
-      return {
-        ...state,
-        [id]: {
-          ...state[id],
-          ...newState,
-        },
-      };
+      if (current) {
+        const newState = getSuccessState(current, action);
+        return {
+          ...state,
+          [id]: {
+            ...state[id],
+            ...newState,
+          },
+        };
+      }
+      return state;
     }
 
     default:
