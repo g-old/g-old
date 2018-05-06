@@ -3,6 +3,7 @@ import knex from '../knex';
 import Poll from './Poll';
 import User from './User';
 import PollingMode from './PollingMode';
+import { TargetType } from './Subscription';
 import { dedup } from '../../core/helpers';
 import { computeNextState } from '../../core/worker';
 import { canSee, canMutate, Models } from '../../core/accessControl';
@@ -494,8 +495,8 @@ export default Proposal;
 EventManager.subscribe('onProposalUpdated', async ({ proposal }) => {
   if (['accepted', 'rejected', 'revoked'].includes(proposal.state)) {
     try {
-      await knex('proposal_user_subscriptions')
-        .where({ proposal_id: proposal.id })
+      await knex('subscriptions')
+        .where({ target_type: TargetType.PROPOSAL, target_id: proposal.id })
         .del();
     } catch (err) {
       log.error({ err }, 'Subscription deletion failed');
