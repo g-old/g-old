@@ -117,10 +117,11 @@ class ProposalContainer extends React.Component {
   }
 
   handleVoting(data, method, info) {
+    const { proposal } = this.props;
     switch (method) {
       case 'create': {
         let targetId;
-        if (!this.props.proposal.subscription) {
+        if (!proposal.subscription && !proposal.state === 'survey') {
           targetId = this.props.proposal.id;
         }
         this.props.createVote({ ...data, targetId });
