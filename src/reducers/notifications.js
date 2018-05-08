@@ -12,7 +12,7 @@ import {
   LOAD_NOTIFICATIONS_ERROR,
 } from '../constants';
 
-const handlePageInfo = (state, action) => {
+const handlePageInfo = (state = {}, action) => {
   if (state.endCursor && !action.savePageInfo) {
     return state;
   }
@@ -55,12 +55,16 @@ const status = (
 const all = (state = initialState, action) => {
   switch (action.type) {
     case LOAD_NOTIFICATIONS_SUCCESS: {
-      return action.payload.entities.notifications
-        ? {
-            ...state,
-            ids: [...new Set([...action.payload.result, ...state.ids])],
-          }
-        : state;
+      if (action.payload.entities.notifications) {
+        if (action.newQuery) {
+          return { ...state, ids: action.payload.result };
+        }
+        return {
+          ...state,
+          ids: [...new Set([...action.payload.result, ...state.ids])],
+        };
+      }
+      return state;
     }
 
     default:

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import Heading from '../../components/Heading';
-
+import Select from '../../components/Select';
 import Button from '../../components/Button';
 
 import List from '../../components/List';
@@ -36,13 +36,75 @@ class NotificationsListContainer extends React.Component {
     notifications: null,
     notificationsStatus: null,
   };
+  constructor(props) {
+    super(props);
+    this.state = { filter: [], filterDirty: false };
+    this.loadNotifications = this.loadNotifications.bind(this);
+  }
+
+  loadNotifications(event, after) {
+    const { user } = this.props;
+    this.props.loadNotificationList(
+      { after, userId: user.id, filterBy: this.state.filter.map(f => f.value) },
+      this.state.filterDirty,
+    );
+
+    if (!after) {
+      this.setState({ filterDirty: false });
+    }
+  }
   render() {
-    const { notificationsStatus, user } = this.props;
+    const { notificationsStatus } = this.props;
+    const active = this.state.filter.length > 0;
     return (
       <Box tag="article" pad column>
         <Heading tag="h2">
           <FormattedMessage {...messages.notifications} />
         </Heading>
+        <Box>
+          <Button
+            disabled={!active || notificationsStatus.pending}
+            onClick={this.loadNotifications}
+            plain
+            icon={
+              <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                <polygon
+                  fill={active ? '#eee7f5' : 'none'}
+                  opacity={active ? 1 : 0.2}
+                  stroke="#000"
+                  strokeWidth="2"
+                  points="3 6 10 13 10 21 14 21 14 13 21 6 21 3 3 3"
+                />
+              </svg>
+            }
+          />{' '}
+          <Select
+            multiple
+            value={this.state.filter}
+            onChange={e =>
+              this.state.filter.find(f => f.value === e.option.value)
+                ? this.setState({
+                    filterDirty: true,
+                    filter: this.state.filter.filter(
+                      f => f.value !== e.option.value,
+                    ),
+                  })
+                : this.setState({
+                    filterDirty: true,
+                    filter: [...this.state.filter, e.option],
+                  })
+            }
+            options={[
+              { label: 'read', value: 'READ' },
+              { label: 'unread', value: 'UNREAD' },
+              { label: 'proposal', value: 'PROPOSAL' },
+              { label: 'comment', value: 'COMMENT' },
+              { label: 'message', value: 'MESSAGE' },
+              { label: 'discussion', value: 'DISCUSSION' },
+              { label: 'statement', value: 'STATEMENT' },
+            ]}
+          />
+        </Box>
         <List>
           {this.props.notifications.map(n => (
             <ListItem>
@@ -54,13 +116,9 @@ class NotificationsListContainer extends React.Component {
           <Button
             primary
             disabled={notificationsStatus.pending}
-            onClick={() => {
-              this.props.loadNotificationList({
-                after: notificationsStatus.pageInfo.endCursor,
-                union: true,
-                userId: user.id,
-              });
-            }}
+            onClick={e =>
+              this.loadNotifications(e, notificationsStatus.pageInfo.endCursor)
+            }
             label={<FormattedMessage {...messages.loadMore} />}
           />
         )}
@@ -71,7 +129,7 @@ class NotificationsListContainer extends React.Component {
 
 const mapStateToProps = state => ({
   notifications: getAllNotifications(state).sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+    (a, b) => new Date(b.activity.createdAt) - new Date(a.activity.createdAt),
   ),
   notificationsStatus: getNotificationsStatus(state, 'all'),
 });

@@ -127,8 +127,8 @@ const deleteNotificationMutation = `
 `;
 
 const notificationConnection = `
-query ($first:Int $after:String $userId:ID) {
-  notificationConnection (first:$first after:$after userId:$userId) {
+query ($first:Int $after:String $userId:ID,$filterBy:[NotificationFilterParams]) {
+  notificationConnection (first:$first after:$after userId:$userId filterBy:$filterBy) {
     pageInfo{
       endCursor
       hasNextPage
@@ -271,7 +271,10 @@ export function deleteNotification(notification) {
   };
 }
 
-export function loadNotificationList({ first, after, userId }) {
+export function loadNotificationList(
+  { first, after, userId, filterBy },
+  filterChanged = true,
+) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
 
@@ -284,6 +287,7 @@ export function loadNotificationList({ first, after, userId }) {
         first,
         after,
         userId,
+        filterBy,
       });
       const notifications = data.notificationConnection.edges.map(u => u.node);
       const normalizedData = normalize(notifications, notificationListSchema);
@@ -291,7 +295,8 @@ export function loadNotificationList({ first, after, userId }) {
         type: LOAD_NOTIFICATIONS_SUCCESS,
         payload: normalizedData,
         pagination: data.notificationConnection.pageInfo,
-        savePageInfo: after != null,
+        savePageInfo: true,
+        newQuery: filterChanged,
       });
     } catch (error) {
       dispatch({
