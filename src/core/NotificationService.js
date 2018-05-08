@@ -5,7 +5,7 @@ import log from '../logger';
 import { sendJob } from './childProcess';
 // import config from '../config';
 import { SubscriptionType, TargetType } from '../data/models/Subscription';
-import { ActivityType, ActivityVerb } from '../data/models/Activity';
+import Activity, { ActivityType, ActivityVerb } from '../data/models/Activity';
 import type { tActivityType, tActivityVerb } from '../data/models/Activity';
 import MailComposer from './MailComposer';
 import { Groups } from '../organization';
@@ -113,6 +113,27 @@ export type Email = {
 };
 export type Emails = Email[];
 type PayloadType = { activity: EActivity, subjectId?: ID };
+
+// https://www.thecodeship.com/web-development/alternative-to-javascript-evil-setinterval/
+function interval(func, wait) {
+  let stop = false;
+  const interv = (function ival(w) {
+    function executor() {
+      if (!stop) {
+        setTimeout(interv, w);
+        try {
+          func.call(null);
+        } catch (e) {
+          stop = true;
+          throw e;
+        }
+      }
+    }
+    return executor;
+  })(wait);
+
+  setTimeout(interv, wait);
+}
 
 const filterReplies = (parents, activities) => {
   const result = [];
@@ -400,6 +421,7 @@ class NotificationService {
   dbConnector: any;
   PubSub: PubSub;
   linkPrefix: string;
+  lastActivityId: ID;
   MailComposer: MailComposer;
   filterActivity: (payload: PayloadType) => void;
   loadSubscriptions: Selector => Promise<Subscriber[]>;
@@ -418,6 +440,9 @@ class NotificationService {
   ) => Email;
   batchProcessing: () => void;
   processQueue: () => void;
+  start: () => void;
+  recover: () => void;
+  getLastProcessedActivityId: () => ID;
 
   constructor({
     eventManager = throwIfMissing('EventManager'),
@@ -435,7 +460,7 @@ class NotificationService {
     this.activityQueue = [];
     this.delimiter = '#';
     this.maxBatchSize = maxBatchSize || 500;
-    this.batchingWindow = batchingWindow || 1000 * 10;
+    this.batchingWindow = batchingWindow || 1000 * 30;
     this.filterActivity = this.filterActivity.bind(this);
     this.loadSubscriptions = this.loadSubscriptions.bind(this);
     this.generateEmail = this.generateEmail.bind(this);
@@ -451,8 +476,8 @@ class NotificationService {
     );
     this.processQueue = this.processQueue.bind(this);
     this.batchProcessing = this.batchProcessing.bind(this);
-    this.registerListener();
-    this.processQueue();
+    // this.registerListener();
+    // this.processQueue();
   }
 
   registerListener() {
@@ -526,9 +551,10 @@ class NotificationService {
     }
   }
 
-  groupBySubject(activities: EActivity[]): GroupedActivities {
-    return activities.reduce(
-      (acc, activity) => {
+  groupBySubject(activityMap: ActivityMap): GroupedActivities {
+    return Object.keys(activityMap).reduce(
+      (acc, id) => {
+        const activity = activityMap[id];
         const compoundKey =
           activity.targetType + this.delimiter + activity.targetId;
         if (acc.bySubject[compoundKey]) {
@@ -550,6 +576,54 @@ class NotificationService {
     );
   }
 
+  async start() {
+    // subscribe
+    this.registerListener();
+    await this.initStore();
+
+    // only needed if indipendent service
+    await this.recover();
+
+    this.processQueue();
+  }
+
+  async initStore() {
+    const [data] = await this.dbConnector('store')
+      .where({ type: 'inbox' })
+      .count('type');
+    if (data.count <= 0) {
+      await this.dbConnector('store').insert({
+        type: 'inbox',
+        last_processed_activity_id: 0,
+        created_at: new Date(),
+      });
+    }
+  }
+
+  async recover() {
+    this.lastActivityId = await this.getLastProcessedActivityId();
+    if (this.lastActivityId) {
+      await this.loadActivities();
+    }
+  }
+
+  async getLastProcessedActivityId(): Promise<ID> {
+    const [id] = await this.dbConnector('store')
+      .where({ type: 'inbox' })
+      .limit('1')
+      .pluck('last_processed_activity_id');
+    return id;
+  }
+
+  async loadActivities() {
+    const activities = await this.dbConnector('activities')
+      .where('id', '>', this.lastActivityId)
+      .select('*');
+    activities.forEach(activityData => {
+      this.filterActivity({ activity: new Activity(activityData) });
+    });
+  }
+
   async addSubscribers(
     groupedActivities: GroupedActivities,
   ): Promise<GroupedActivities> {
@@ -565,7 +639,7 @@ class NotificationService {
     return groupedActivities;
   }
 
-  async processQueue() {
+  async processQueue2() {
     try {
       // await this.batchProcessing();
       if (timer) {
@@ -577,7 +651,20 @@ class NotificationService {
       }
     } catch (err) {
       log.error({ err }, 'NotificationService failed ');
-      await this.processQueue();
+      // means complete batch could be wasted -
+      await this.recover();
+      this.processQueue();
+    }
+  }
+  async processQueue() {
+    try {
+      log.info('Starting batchprocessing');
+      interval(this.batchProcessing, this.batchingWindow);
+    } catch (err) {
+      log.error({ err }, 'NotificationService failed ');
+      // means complete batch could be wasted -
+      await this.recover();
+      this.processQueue();
     }
   }
 
@@ -671,15 +758,21 @@ class NotificationService {
   }
 
   async batchProcessing() {
-    // const startTime = process.hrtime();
-    // console.log('BATCH -activities', this.activityQueue);
+    //  const startTime = process.hrtime();
+    //  console.log('BATCH -activities', this.activityQueue);
     try {
       const activities = this.activityQueue.splice(
         0,
         this.activityQueue.length,
       );
-      if (activities.length) {
-        const groupedActivities = this.groupBySubject(activities);
+      // makes dictionary
+      const activityMap: ActivityMap = activities.reduce((acc, activity) => {
+        acc[activity.id] = activity;
+        return acc;
+      }, {});
+
+      if (Object.keys(activityMap).length) {
+        const groupedActivities = this.groupBySubject(activityMap);
         const activitiesAndSubscribers = await this.addSubscribers(
           groupedActivities,
         );
@@ -703,6 +796,18 @@ class NotificationService {
         const notificationIds: ID[] = await this.dbConnector
           .batchInsert('notifications', notifications, this.maxBatchSize)
           .returning('id');
+
+        // mark as processed
+        const lastId = Math.max(
+          ...Object.keys(activityMap).map(id => Number(id)),
+        );
+        // console.log('LASTID', { lastId });
+        await this.dbConnector('store')
+          .where({ type: 'inbox' })
+          .update({
+            last_processed_activity_id: lastId,
+            updated_at: new Date(),
+          });
         // TODO add notificationIds
         console.info(notificationIds);
         // TODO add nIds to push + emailmessages

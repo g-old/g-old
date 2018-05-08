@@ -65,6 +65,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 const pubsub = root.PubSub;
+root.NotificationService.start();
 
 worker(pubsub);
 BWorker.start(path.resolve(__dirname, 'backgroundWorker.js'));

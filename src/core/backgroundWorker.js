@@ -132,7 +132,7 @@ const notifyProposalCreation = async proposal => {
 const promiseSerial = funcs =>
   funcs.reduce(
     (promise, func) =>
-      promise.then(result => func().then(Array.prototype.concat.bind(result))),
+      promise.then(result => func.then(Array.prototype.concat.bind(result))),
     Promise.resolve([]),
   );
 
@@ -208,13 +208,15 @@ const notifyMultiple = async (
   const end = promises.length;
   let counter = 0;
   for (let i = 0; i < end; i += 1) {
-    if (i % 5) {
+    if (i % 5 === 0) {
       promiseBatches.push(Promise.all(promises.slice(counter, 5)));
     }
     counter += 1;
   }
-  promiseBatches.push(Promise.all(promises.slice(counter)));
-
+  const remainingPromises = promises.slice(counter);
+  if (remainingPromises.length) {
+    promiseBatches.push(Promise.all(remainingPromises));
+  }
   return promiseSerial(promiseBatches).catch(err => {
     log.error({ err });
   });
