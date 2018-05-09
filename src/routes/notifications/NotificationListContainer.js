@@ -12,6 +12,7 @@ import Box from '../../components/Box';
 import Notification from '../../components/UserNotification';
 import { loadNotificationList } from '../../actions/notification';
 import { getAllNotifications, getNotificationsStatus } from '../../reducers';
+import NotificationSkeleton from '../../components/UserNotificationSkeleton';
 
 const messages = defineMessages({
   loadMore: {
@@ -56,6 +57,37 @@ class NotificationsListContainer extends React.Component {
   render() {
     const { notificationsStatus } = this.props;
     const active = this.state.filter.length > 0;
+    let notificationList;
+    if (notificationsStatus.pending && !this.props.notifications.length) {
+      let n = 1;
+      // eslint-disable-next-line
+      const placeHolder = Array.apply(null, {
+        length: 10,
+        // eslint-disable-next-line
+      }).map(() => ({
+        id: (n += 1),
+      }));
+      notificationList = (
+        <List>
+          {placeHolder.map(() => (
+            <ListItem>
+              <NotificationSkeleton />
+            </ListItem>
+          ))}
+        </List>
+      );
+    } else {
+      notificationList = (
+        <List>
+          {this.props.notifications.map(n => (
+            <ListItem>
+              <Notification {...n} />
+            </ListItem>
+          ))}
+        </List>
+      );
+    }
+
     return (
       <Box tag="article" pad column>
         <Heading tag="h2">
@@ -105,13 +137,7 @@ class NotificationsListContainer extends React.Component {
             ]}
           />
         </Box>
-        <List>
-          {this.props.notifications.map(n => (
-            <ListItem>
-              <Notification {...n} />
-            </ListItem>
-          ))}
-        </List>
+        {notificationList}
         {notificationsStatus.pageInfo.hasNextPage && (
           <Button
             primary

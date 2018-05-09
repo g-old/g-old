@@ -17,7 +17,7 @@ const messages = defineMessages({
   notifications: {
     id: 'label.notifications',
     defaultMessage: 'Notifications',
-    description: 'Label notifications',
+    description: 'Notifications label',
   },
   markRead: {
     id: 'label.markRead',
