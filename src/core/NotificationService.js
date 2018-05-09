@@ -460,7 +460,7 @@ class NotificationService {
     this.activityQueue = [];
     this.delimiter = '#';
     this.maxBatchSize = maxBatchSize || 500;
-    this.batchingWindow = batchingWindow || 1000 * 30;
+    this.batchingWindow = batchingWindow || 1000 * 10;
     this.filterActivity = this.filterActivity.bind(this);
     this.loadSubscriptions = this.loadSubscriptions.bind(this);
     this.generateEmail = this.generateEmail.bind(this);
@@ -852,6 +852,7 @@ class NotificationService {
 
       // SSE all new notifications to active users - only count of new notifications
     } catch (err) {
+      // TODO: recover?
       log.error({ err }, err.message);
     }
   }
