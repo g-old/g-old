@@ -1,42 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { defineMessages, FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './NotificationMenu.css';
-import Box from '../Box';
 import { ICONS } from '../../constants';
-import Button from '../Button';
 import Drop from '../Drop';
-import List from '../List';
-import ListItem from '../ListItem';
 import Notification from '../UserNotification';
+import NotificationSkeleton from '../UserNotificationSkeleton';
 import {
   getAllNotifications,
   getSessionUser,
   getNotificationsStatus,
 } from '../../reducers';
-import Link from '../Link';
-import Label from '../Label';
-import Spinner from '../Spinner';
 import {
   loadNotificationList,
   clearNotifications,
 } from '../../actions/notification';
-
-const messages = defineMessages({
-  markRead: {
-    id: 'label.markRead',
-    defaultMessage: 'Mark all as read',
-    description: 'Label mark as read',
-  },
-  notificationsLink: {
-    id: 'label.notificationsLink',
-    defaultMessage: 'See all notifications',
-    description: 'Label notifications link',
-  },
-});
+import NotificationDrop from '../NotificationDrop/NotificationDrop';
 
 class NotificationMenu extends React.Component {
   static propTypes = {
@@ -133,40 +114,29 @@ class NotificationMenu extends React.Component {
     }
   }
   renderNotifications() {
-    const { notifications, user: { unreadNotifications }, status } = this.props;
-    let markReadBtn;
-    if (unreadNotifications > 0) {
-      markReadBtn = (
-        <Button
-          onClick={this.onMarkAsRead}
-          label={<FormattedMessage {...messages.markRead} />}
-          plain
+    const { notifications, status } = this.props;
+    if (status.pending && !notifications.length) {
+      let n = 1;
+      /* eslint-disable */
+      const placeHolder = Array.apply(null, {
+        length: 5,
+      }).map(() => ({ id: n++ }));
+      /* eslint-enable */
+      return (
+        <NotificationDrop
+          notifications={placeHolder}
+          showSpinner={false}
+          notificationComponent={NotificationSkeleton}
         />
       );
     }
-    let loadingAnimation;
-    if (status.pending && !notifications.length) {
-      loadingAnimation = <Spinner />;
-    }
+
     return (
-      <Box column fill>
-        <Box between>
-          <Label>Notifications</Label>
-          <div className={s.center}>{loadingAnimation}</div>
-          {markReadBtn}
-        </Box>
-        <List>
-          {notifications.map(n => (
-            <ListItem key={n}>
-              <Notification {...n} />
-            </ListItem>
-          ))}
-        </List>
-        {/* eslint-disable-next-line */}
-        <Link to="/notifications">
-          <FormattedMessage {...messages.notificationsLink} />
-        </Link>
-      </Box>
+      <NotificationDrop
+        notifications={notifications}
+        showSpinner={status.pending}
+        notificationComponent={Notification}
+      />
     );
   }
 

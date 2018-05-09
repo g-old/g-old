@@ -25,8 +25,3 @@
   stroke: #fff;
   background-color: #f00;
 }
-
-.center {
-  display: flex;
-  justify-content: center;
-}
