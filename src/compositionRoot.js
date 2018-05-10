@@ -32,7 +32,9 @@ if (env === USE_SENDGRID) {
 }
 
 const messagesRepo = {};
-const mailService = new MailService(Transporter);
+const mailService = new MailService(Transporter, {
+  defaultSender: mailOptions.sender,
+});
 const mailComposer = new MailComposer(handlebars);
 const tokenService = new TokenService(createToken);
 const messageService = new MessageService(

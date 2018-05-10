@@ -119,7 +119,7 @@ class MailService {
     }
     try {
       const messageData = {
-        from: message.sender || this.DEFAULT_SENDER,
+        from: this.DEFAULT_SENDER,
         to: message.isMultiple ? [message.recipient] : message.recipient,
         subject: message.subject || '',
         [content]: message[content],
