@@ -422,6 +422,7 @@ class NotificationService {
   PubSub: PubSub;
   linkPrefix: string;
   lastActivityId: ID;
+  sendEmails: boolean;
   MailComposer: MailComposer;
   filterActivity: (payload: PayloadType) => void;
   loadSubscriptions: Selector => Promise<Subscriber[]>;
@@ -461,9 +462,12 @@ class NotificationService {
     this.delimiter = '#';
     this.maxBatchSize = maxBatchSize || 500;
     this.batchingWindow = batchingWindow || 1000 * 10;
+    const env = process.env.NODE_ENV || 'development';
+    this.sendEmails = env === 'development';
     this.filterActivity = this.filterActivity.bind(this);
     this.loadSubscriptions = this.loadSubscriptions.bind(this);
     this.generateEmail = this.generateEmail.bind(this);
+
     if (!__DEV__) {
       if (!process.env.HOST) {
         throw new Error('HOST environment variable not set!');
@@ -822,13 +826,15 @@ class NotificationService {
           },
           {},
         );
-
-        const emails: Emails = generateData(
-          emailData.activities,
-          allObjects,
-          emailData.subscriberById,
-          this.generateEmail,
-        );
+        let emails;
+        if (this.sendEmails) {
+          emails = generateData(
+            emailData.activities,
+            allObjects,
+            emailData.subscriberById,
+            this.generateEmail,
+          );
+        }
 
         // BETTER on CLIENTSIDE!
         // const onlineSubscribers = this.getOnlineUsers();
