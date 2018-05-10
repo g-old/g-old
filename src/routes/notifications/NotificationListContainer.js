@@ -41,18 +41,29 @@ class NotificationsListContainer extends React.Component {
     super(props);
     this.state = { filter: [], filterDirty: false };
     this.loadNotifications = this.loadNotifications.bind(this);
+    this.resetFilter = this.resetFilter.bind(this);
   }
 
   loadNotifications(event, after) {
-    const { user } = this.props;
-    this.props.loadNotificationList(
-      { after, userId: user.id, filterBy: this.state.filter.map(f => f.value) },
-      this.state.filterDirty,
-    );
+    const { user, notificationsStatus } = this.props;
+    if (!notificationsStatus.pending) {
+      this.props.loadNotificationList(
+        {
+          after,
+          userId: user.id,
+          filterBy: this.state.filter.map(f => f.value),
+        },
+        this.state.filterDirty,
+      );
 
-    if (!after) {
-      this.setState({ filterDirty: false });
+      if (!after) {
+        this.setState({ filterDirty: false });
+      }
     }
+  }
+
+  resetFilter() {
+    this.setState({ filterDirty: true, filter: [] }, this.loadNotifications);
   }
   render() {
     const { notificationsStatus } = this.props;
@@ -96,7 +107,7 @@ class NotificationsListContainer extends React.Component {
         <Box>
           <Button
             disabled={!active || notificationsStatus.pending}
-            onClick={this.loadNotifications}
+            onClick={this.resetFilter}
             plain
             icon={
               <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
@@ -115,16 +126,22 @@ class NotificationsListContainer extends React.Component {
             value={this.state.filter}
             onChange={e =>
               this.state.filter.find(f => f.value === e.option.value)
-                ? this.setState({
-                    filterDirty: true,
-                    filter: this.state.filter.filter(
-                      f => f.value !== e.option.value,
-                    ),
-                  })
-                : this.setState({
-                    filterDirty: true,
-                    filter: [...this.state.filter, e.option],
-                  })
+                ? this.setState(
+                    {
+                      filterDirty: true,
+                      filter: this.state.filter.filter(
+                        f => f.value !== e.option.value,
+                      ),
+                    },
+                    this.loadNotifications,
+                  )
+                : this.setState(
+                    {
+                      filterDirty: true,
+                      filter: [...this.state.filter, e.option],
+                    },
+                    this.loadNotifications,
+                  )
             }
             options={[
               { label: 'read', value: 'READ' },
