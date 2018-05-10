@@ -123,7 +123,7 @@ class NotificationsListContainer extends React.Component {
           />{' '}
           <Select
             multiple
-            value={this.state.filter}
+            value={this.state.filter.length ? this.state.filter : ''}
             onChange={e =>
               this.state.filter.find(f => f.value === e.option.value)
                 ? this.setState(
