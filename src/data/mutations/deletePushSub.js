@@ -22,6 +22,15 @@ const deletePushSub = {
       await knex('webpush_subscriptions')
         .where({ endpoint: subscription.endpoint, user_id: viewer.id })
         .del();
+
+      // check if user has remaining subscriptions
+      const [subscriptionData] = await knex('webpush_subscriptions')
+        .where({ user_id: viewer.id })
+        .count('id');
+      if (subscriptionData.count > 0) {
+        return JSON.stringify({ error: false });
+      }
+
       const [settingsData] = await knex('notification_settings')
         .where({ user_id: viewer.id })
         .select('settings');

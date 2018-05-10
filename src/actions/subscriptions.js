@@ -194,21 +194,23 @@ export function deleteWebPushSub() {
           id: user.id,
         });
 
-        const normalizedUser = normalize(
-          {
-            id: user.id,
-            groups: user.groups,
-            notificationSettings: result.settings || {},
-          },
-          userSchema,
-        );
+        if (result.settings) {
+          const normalizedUser = normalize(
+            {
+              id: user.id,
+              groups: user.groups,
+              notificationSettings: result.settings || {},
+            },
+            userSchema,
+          );
 
-        dispatch({
-          type: UPDATE_USER_SUCCESS,
-          payload: normalizedUser,
-          properties: {}, // for reducer
-          id: user.id,
-        });
+          dispatch({
+            type: UPDATE_USER_SUCCESS,
+            payload: normalizedUser,
+            properties: {}, // for reducer
+            id: user.id,
+          });
+        }
       } else {
         // throw Error('Subscription could not been deleted');
         console.error('Subscription data could not been deleted ');
