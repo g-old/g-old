@@ -64,7 +64,7 @@ const all = (state = initialState, action) => {
           ids: [...new Set([...action.payload.result, ...state.ids])],
         };
       }
-      return action.newQuey ? { ...state, ids: [] } : state;
+      return action.newQuery ? { ...state, ids: [] } : state;
     }
 
     default:
