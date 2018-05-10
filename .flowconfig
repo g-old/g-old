@@ -4,6 +4,9 @@
 .*/node_modules
 .*/public
 
+[libs]
+./flow-typed
+
 [include]
 
 [options]

@@ -1,13 +1,36 @@
 // Taken from https://github.com/grommet/grommet/blob/master/src/js/utils/Drop.js
 
 /* eslint-disable no-mixed-operators */
+// @flow
 import React from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
 import DropContents from '../DropContents';
 import { findScrollParents, findVisibleParent } from '../../core/helpers';
 
+type tOptions = {
+  align: {
+    top?: 'top' | 'bottom',
+    bottom?: 'top' | 'bottom',
+    left?: 'left' | 'right',
+    right?: 'left' | 'right',
+  },
+  minWidth?: number,
+  maxWidth?: number,
+  responsive?: boolean,
+  className?: string,
+  context: any,
+};
 class Drop {
-  constructor(control, content, options) {
+  control: any;
+  content: any;
+  options: tOptions;
+  state: {
+    container: any,
+    control: any,
+    options: tOptions,
+  };
+
+  constructor(control: any, content: any, options: tOptions) {
     const { context } = options;
 
     // bind functions to instance
@@ -89,7 +112,11 @@ class Drop {
     this.place();
   }
   place() {
-    const { control, container, options: { align, responsive } } = this.state;
+    const {
+      control,
+      container,
+      options: { align, responsive, minWidth, maxWidth },
+    } = this.state;
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
 
@@ -104,8 +131,11 @@ class Drop {
     const containerRect = container.getBoundingClientRect();
 
     // determine width
+    // the width will never be bigger than maxWidth or windowWidth
+    // under that constraint, we try to make the Drop at least minWidth wide
     const width = Math.min(
-      Math.max(controlRect.width, containerRect.width),
+      Math.max(controlRect.width, containerRect.width, minWidth || 0),
+      maxWidth || windowWidth,
       windowWidth,
     );
     //

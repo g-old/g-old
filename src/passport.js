@@ -81,8 +81,10 @@ passport.serializeUser((user, done) => {
     return knex('user_work_teams')
       .where({ user_id: user.id })
       .select('work_team_id')
+      .then(ids => ids)
       .then(ids => {
         const wtMemberships = ids.map(data => data.work_team_id);
+
         const sessionUser = {
           id: user.id,
           name: user.name,

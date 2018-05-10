@@ -20,10 +20,14 @@ import {
   JOIN_WORKTEAM_SUCCESS,
   LOAD_DISCUSSIONS_SUCCESS,
   LOAD_DISCUSSION_SUCCESS,
+  LOAD_NOTIFICATIONS_SUCCESS,
   LOAD_REPLIES_SUCCESS,
   LOAD_REQUESTS_SUCCESS,
   CREATE_REQUEST_SUCCESS,
   DELETE_REQUEST_SUCCESS,
+  LOAD_MESSAGE_SUCCESS,
+  UPDATE_NOTIFICATION_SUCCESS,
+  CLEAR_NOTIFICATIONS_SUCCESS,
 } from '../constants';
 
 const handleUsers = (state, action) => {
@@ -73,6 +77,7 @@ export default function byId(state = {}, action) {
   switch (action.type) {
     case LOAD_FEED_SUCCESS:
     case LOAD_PROPOSAL_SUCCESS:
+    case LOAD_NOTIFICATIONS_SUCCESS:
     case LOAD_PROPOSAL_LIST_SUCCESS:
     case LOAD_VOTES_SUCCESS:
     case CREATE_STATEMENT_SUCCESS:
@@ -89,6 +94,7 @@ export default function byId(state = {}, action) {
     case LOAD_REPLIES_SUCCESS:
     case LOAD_REQUESTS_SUCCESS:
     case LOAD_WORKTEAM_SUCCESS:
+    case LOAD_MESSAGE_SUCCESS:
     case SESSION_LOGIN_SUCCESS: {
       return merge({}, state, action.payload.entities.users);
     }
@@ -113,6 +119,25 @@ export default function byId(state = {}, action) {
     case FETCH_USER_SUCCESS: {
       // bc of permissions
       return handleUsers(state, action);
+    }
+
+    case CLEAR_NOTIFICATIONS_SUCCESS: {
+      const { userId } = action.payload;
+      return {
+        ...state,
+        [userId]: { ...state[userId], unreadNotifications: 0 },
+      };
+    }
+
+    case UPDATE_NOTIFICATION_SUCCESS: {
+      const { userId } = action;
+      return {
+        ...state,
+        [userId]: {
+          ...state[userId],
+          unreadNotifications: state[userId].unreadNotifications - 1,
+        },
+      };
     }
     default:
       return state;

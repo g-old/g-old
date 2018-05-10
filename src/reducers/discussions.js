@@ -20,6 +20,7 @@ const hydrateDiscussions = (state, data, entities) =>
       discussions: state.byId,
       users: entities.users.byId,
       comments: entities.comments.byId,
+      subscriptions: entities.subscriptions.byId,
     },
   );
 

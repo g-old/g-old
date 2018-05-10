@@ -37,12 +37,12 @@ module.exports = {
   dbConfig: process.env.DATABASE_URL,
   mailer: {
     config: {
-      jsonTransport: process.env.MAILER_JSONTRANSPORT, // stream output to console
+      jsonTransport: process.env.MAILER_JSONTRANSPORT === 'true', // stream output to console
       // https://nodemailer.com/smtp/
       // gmail example, no pooling used!
       host: process.env.MAILER_HOST,
       port: process.env.MAILER_PORT,
-      secure: process.env.MAILER_SECURE,
+      secure: process.env.MAILER_SECURE === 'true',
       auth: {
         user: process.env.MAILER_USER,
         pass: process.env.MAILER_PASSWORD,

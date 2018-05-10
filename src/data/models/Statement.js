@@ -1,3 +1,4 @@
+// @flow
 import Poll from './Poll';
 import Vote from './Vote';
 import knex from '../knex';
@@ -8,8 +9,21 @@ import { Groups } from '../../organization';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
 
+type ID = string | number;
+export type StatementProps = {
+  id: ID,
+  author_id: ID,
+  body: string,
+  position: 'pro' | 'con',
+  likes: number,
+  vote_id: ID,
+  poll_id: ID,
+  created_at: string,
+  updated_at: string,
+  deleted_at: string,
+};
 class Statement {
-  constructor(data) {
+  constructor(data: StatementProps) {
     this.id = data.id;
     this.author_id = data.author_id;
     this.text = data.body;
@@ -75,6 +89,8 @@ class Statement {
       EventManager.publish('onStatementDeleted', {
         viewer,
         statement: deletedStatement,
+        subjectId: proposal.id,
+
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },
@@ -135,6 +151,7 @@ class Statement {
       EventManager.publish('onStatementUpdated', {
         viewer,
         statement,
+        subjectId: proposal.id,
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },
@@ -198,6 +215,7 @@ class Statement {
       EventManager.publish('onStatementCreated', {
         viewer,
         statement,
+        subjectId: proposal.id,
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },

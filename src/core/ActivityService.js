@@ -127,6 +127,7 @@ class ActivityService {
         objectId: payload[resourceType] && payload[resourceType].id,
         verb: event.eventType,
         workTeamId: payload.groupId,
+        subjectId: payload.subjectId,
       };
       try {
         const newActivity = await this.store.create(

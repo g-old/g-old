@@ -48,6 +48,7 @@ async function copy() {
     copyFile('src/core/serviceworker.js', 'build/public/serviceworker.js'),
   ]);
 
+  await copyFile('src/config.js', 'build/db/config.js');
   await copyFile('src/knexfile.js', 'build/db/knexfile.js');
   await copyFile(
     'src/emails/translations.json',

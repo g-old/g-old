@@ -1,0 +1,6 @@
+{
+  "name": "Skeleton",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Skeleton.js"
+}

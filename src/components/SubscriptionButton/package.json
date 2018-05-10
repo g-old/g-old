@@ -1,0 +1,6 @@
+{
+  "name": "SubscriptionButton",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./SubscriptionButton.js"
+}

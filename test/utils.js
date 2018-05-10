@@ -14,6 +14,12 @@ const uniqueData = () => {
 
 const getUnique = uniqueData();
 
+let INITIAL_ID = 0;
+export const getUniqueId = () => {
+  INITIAL_ID += 1;
+  return INITIAL_ID;
+};
+
 export const clearDB = async () => {
   if (process.env.NODE_ENV !== 'test') {
     throw Error('Use only in testing environments!');

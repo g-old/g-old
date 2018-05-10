@@ -7,7 +7,7 @@ import roles from './roles';
 import tags, * as fromTags from './tags';
 import pollingModes from './pollingModes';
 import votes from './votes';
-import notifications from './notifications';
+import messages, * as fromMessages from './messages';
 import statementLikes from './statementLikes';
 import flaggedStatements, * as fromFlaggedStatements from './flaggedStatements';
 import activities, * as fromActivities from './activities';
@@ -19,10 +19,14 @@ import comments, * as fromComments from './comments';
 import requests, * as fromRequests from './requests';
 import proposalStatus from './proposalStatus';
 
+import subscriptions, * as fromSubscriptions from './subscriptions';
+import notifications, * as fromNotifications from './notifications';
 /* GENERATOR */
 
 export default combineReducers({
   /* GENERATOR_COMBINED */
+  notifications,
+  subscriptions,
   requests,
   users,
   statements,
@@ -37,7 +41,7 @@ export default combineReducers({
   activities,
   followees,
   workTeams,
-  notifications,
+  messages,
   logs,
   discussions,
   comments,
@@ -45,6 +49,21 @@ export default combineReducers({
 });
 
 /* GENERATOR_EXPORTS */
+
+export const getMessage = (state, id) =>
+  fromMessages.getEntity(state.messages, id, state);
+
+export const getNotification = (state, id) =>
+  fromNotifications.getEntity(state.notifications, id, state);
+
+export const getAllNotifications = state =>
+  fromNotifications.getAll(state.notifications, state);
+
+export const getNotificationsStatus = (state, filter) =>
+  fromNotifications.getStatus(state.notifications, filter);
+export const getSubscription = (state, id) =>
+  fromSubscriptions.getEntity(state.subscriptions, id, state);
+
 export const getRequest = (state, id) =>
   fromRequests.getEntity(state.requests, id, state);
 

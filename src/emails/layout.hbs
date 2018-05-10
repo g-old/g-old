@@ -4,6 +4,7 @@
 <head>
   <meta name="viewport" content="width=device-width" />
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Work+Sans" rel="stylesheet">
   <title>Email from g-old.org</title>
   <style>
     /* -------------------------------------
@@ -156,6 +157,13 @@
       width: 100%;
     }
 
+    .title{
+    font-size: 2rem;
+    font-weight: 300;
+    padding-top: 0;
+    word-break: break-word;
+    }
+
     .btn>tbody>tr>td {
       padding-bottom: 15px;
     }
@@ -266,6 +274,103 @@
       border: 0;
       border-bottom: 1px solid #f6f6f6;
       Margin: 20px 0;
+    }
+
+    /* proposal styles */
+
+    .proposal-root{
+      margin: 20px auto;
+      width: 100%;
+      font-family: "Work Sans", "Segoe UI", "HelveticaNeue-Light", sans-serif;
+
+    }
+  .proposal-container{
+        margin: 0 auto;
+        border: solid 1px gray;
+        padding: 1em;
+      }
+  .proposal-state{
+      text-align: right;
+    float: right;
+    font-size: 0.8em;
+    font-style: italic;
+    .status{
+      width: 100%;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    margin-top: 4px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    border-radius: 4px;
+    }
+
+    .proposal-accepted{
+      fill: #8cc800;
+    }
+    .proposal-status-icon{
+      width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    padding-top: 4px;
+    }
+
+    .proposal-headline {
+      font-size: 2rem;
+    font-weight: 300;
+    padding-top: 0;
+    word-break: break-word;
+    }
+
+    .date{
+      font-size: 0.8em;
+    font-style: italic;
+    }
+    .proposal-body{
+          padding-top: 1em;
+    }
+
+
+    /* statement styles */
+
+    .statement-root{
+      display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    padding: 0.4em;
+    margin: 0.1em 0.1em 0;
+    font-size: 0.9em;
+    color: #000;
+    }
+    .pro{
+    background-color: #fafffa;
+    border-right: 0;
+    border-color: #8cc800;
+    }
+
+    .statement-avatar{
+      margin-right: 0.4em;
+    width: 2.2em;
+    height: 2.2em;
+    }
+
+    .statement-header{
+      display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    }
+
+    .statement-text{
+          line-height: 1.3em;
+    width: 100%;
+    display: inline-block;
     }
 
     /* -------------------------------------

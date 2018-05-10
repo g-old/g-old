@@ -122,6 +122,9 @@ class ProposalsManager extends React.Component {
     this.props.updateProposal({
       id: this.state.currentProposal,
       state: newState,
+      ...(this.state.currentProposal.workTeamId && {
+        workTeamId: this.state.currentProposal.workTeamId,
+      }),
     });
     this.setState({ currentProposal: null });
   }
@@ -170,6 +173,9 @@ class ProposalsManager extends React.Component {
           thresholdRef,
         },
       },
+      ...(this.state.currentProposal.workTeamId && {
+        workTeamId: this.state.currentProposal.workTeamId,
+      }),
     });
   }
   toggleSettings() {

@@ -1,10 +1,33 @@
+// @flow
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
 
+type ID = string | number;
+export type CommentProps = {
+  id: ID,
+  author_id: ID,
+  discussion_id: ID,
+  content: string,
+  parent_id: ID,
+  num_replies: number,
+  created_at: string,
+  updated_at: string,
+  edited_at: string,
+};
+
 const MAX_CONTENT_LENGTH = 10000;
 class Comment {
-  constructor(data) {
+  id: ID;
+  authorId: ID;
+  discussionId: ID;
+  content: string;
+  parentId: ID;
+  numReplies: number;
+  createdAt: string;
+  updatedAt: string;
+  editedAt: string;
+  constructor(data: CommentProps) {
     this.id = data.id;
     this.authorId = data.author_id;
     this.discussionId = data.discussion_id;
@@ -93,6 +116,7 @@ class Comment {
       EventManager.publish('onCommentCreated', {
         viewer,
         comment,
+        subjectId: data.discussionId,
         groupId: workTeamId,
         info: { workTeamId },
       });
@@ -151,7 +175,15 @@ class Comment {
       return null;
     }
 
+    let workTeamId;
+    let replyIds;
     const commentInDB = await knex.transaction(async trx => {
+      // search for replies - pass ids as eventprops;
+      if (!oldComment.parent_id) {
+        replyIds = await knex('comments')
+          .where({ parent_id: oldComment.id })
+          .pluck('id');
+      }
       const statusOK = await knex('comments')
         .where({ id: data.id })
         .transacting(trx)
@@ -165,11 +197,12 @@ class Comment {
           .forUpdate()
           .decrement('num_replies', 1);
       } else {
-        await knex('discussions')
+        [workTeamId = null] = await knex('discussions')
           .where({ id: oldComment.discussion_id })
           .transacting(trx)
           .forUpdate()
-          .decrement('num_comments', oldComment.num_replies + 1); // TODO check if correct
+          .decrement('num_comments', oldComment.num_replies + 1)
+          .returning('work_team_id'); // TODO check if correct
       }
 
       if (statusOK) {
@@ -178,7 +211,17 @@ class Comment {
       }
       return statusOK;
     });
-    return commentInDB ? new Comment(commentInDB) : null;
+    const comment = commentInDB ? new Comment(commentInDB) : null;
+    if (comment && workTeamId) {
+      EventManager.publish('onCommentDeleted', {
+        viewer,
+        comment,
+        subjectId: data.discussionId,
+        groupId: workTeamId,
+        info: { workTeamId, replyIds },
+      });
+    }
+    return comment;
   }
 }
 

@@ -13,6 +13,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Header.css';
 import Navigation from '../Navigation';
 import UserStatus from '../UserStatus';
+import NotificationMenu from '../NotificationMenu';
 
 const messages = defineMessages({
   brand: {
@@ -36,13 +37,10 @@ class Header extends React.Component {
           <span className={s.brand}>
             <FormattedMessage {...messages.bannerTitle} />
           </span>
-          <Navigation />
-          {/*  <div className={s.banner}>
-             <h1 className={s.bannerTitle}>
-              <FormattedMessage {...messages.bannerTitle} />
-            </h1>
-            {'Government by OnLine Democracy'}
-          </div> */}
+          <div className={s.right}>
+            <Navigation />
+            <NotificationMenu />
+          </div>
         </div>
       </div>
     );

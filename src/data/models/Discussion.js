@@ -1,6 +1,20 @@
+// @flow
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
+
+type ID = number | string;
+export type DiscussionProps = {
+  id: ID,
+  title: string,
+  author_id: ID,
+  work_team_id: ID,
+  content: string,
+  num_comments: number,
+  created_at: string,
+  updated_at: string,
+  closed_at: string,
+};
 
 const checkIfCoordinator = async (viewer, data) => {
   if (data.workTeamId) {
@@ -14,7 +28,7 @@ const checkIfCoordinator = async (viewer, data) => {
 };
 
 class Discussion {
-  constructor(data) {
+  constructor(data: DiscussionProps) {
     this.id = data.id;
     this.title = data.title;
     this.authorId = data.author_id;
@@ -68,6 +82,7 @@ class Discussion {
         viewer,
         discussion,
         groupId: discussion.workTeamId,
+        subjectId: discussion.workTeamId,
       });
     }
     return discussion;

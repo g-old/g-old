@@ -43,7 +43,7 @@ import proposalConnection from './queries/proposalConnection';
 import flagConnection from './queries/flagConnection';
 import createPushSub from './mutations/createPushSub';
 import deletePushSub from './mutations/deletePushSub';
-import notify from './mutations/sendNotification';
+import notify from './mutations/sendMessage';
 import activities from './subscriptions/activities';
 import createWorkTeam from './mutations/createWorkTeam';
 import joinWorkTeam from './mutations/joinWorkTeam';
@@ -69,6 +69,16 @@ import updateWorkTeam from './mutations/updateWorkTeam';
 import createTag from './mutations/createTag';
 import updateTag from './mutations/updateTag';
 import deleteTag from './mutations/deleteTag';
+import createSubscription from './mutations/createSubscription';
+import updateSubscription from './mutations/updateSubscription';
+import deleteSubscription from './mutations/deleteSubscription';
+import subscriptionConnection from './queries/subscriptionConnection';
+import createNotification from './mutations/createNotification';
+import updateNotification from './mutations/updateNotification';
+import deleteNotification from './mutations/deleteNotification';
+import notificationConnection from './queries/notificationConnection';
+import clearNotifications from './mutations/clearNotifications';
+import message from './queries/message';
 /* GENERATOR */
 
 const schema = new Schema({
@@ -96,6 +106,9 @@ const schema = new Schema({
       discussion,
       comments,
       requestConnection,
+      subscriptionConnection,
+      notificationConnection,
+      message,
       /* GENERATOR_QUERIES */
     },
   }),
@@ -137,6 +150,13 @@ const schema = new Schema({
       createTag,
       updateTag,
       deleteTag,
+      createSubscription,
+      updateSubscription,
+      deleteSubscription,
+      createNotification,
+      updateNotification,
+      deleteNotification,
+      clearNotifications,
       /* GENERATOR_MUTATIONS */
     },
   }),

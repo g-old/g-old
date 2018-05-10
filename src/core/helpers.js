@@ -247,3 +247,32 @@ export function findVisibleParent(element) {
   }
   return null;
 }
+
+export const createStaticCopyFn = keys => {
+  const keyValues = keys.map(key => `"${key}": obj.${key},`);
+  const body = [`return {`].concat(keyValues, `};`);
+  // eslint-disable-next-line no-new-func
+  return new Function('obj', body.join(''));
+};
+
+// from :http://learnjsdata.com/combine_data.html
+export const join = (lookupTable, mainTable, lookupKey, mainKey, select) => {
+  const l = lookupTable.length;
+  const m = mainTable.length;
+  const lookupIndex = [];
+  const output = [];
+  // eslint-disable-next-line
+  for (let i = 0; i < l; i++) {
+    // loop through l items
+    const row = lookupTable[i];
+    lookupIndex[row[lookupKey]] = row; // create an index for lookup table
+  }
+  // eslint-disable-next-line
+  for (let j = 0; j < m; j++) {
+    // loop through m items
+    const y = mainTable[j];
+    const x = lookupIndex[y[mainKey]]; // get corresponding row from lookupTable
+    output.push(select(y, x)); // select only the columns you need
+  }
+  return output;
+};

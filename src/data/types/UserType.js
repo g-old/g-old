@@ -11,6 +11,8 @@ import knex from '../knex';
 
 import WorkTeamType from './WorkTeamType';
 import WorkTeam from '../models/WorkTeam';
+import NotificationType from './NotificationType';
+import Notification from '../models/Notification';
 import User from '../models/User';
 import requestConnection from '../queries/requestConnection';
 import { Permissions } from '../../organization';
@@ -36,6 +38,9 @@ const UserType = new ObjectType({
       resolve(data, args, { viewer }) {
         return canSee(viewer, data) ? data.email : null;
       },
+    },
+    locale: {
+      type: GraphQLString,
     },
     thumbnail: {
       type: GraphQLString,
@@ -123,6 +128,39 @@ const UserType = new ObjectType({
         }
         return null;
       },
+    },
+
+    notifications: {
+      type: new GraphQLList(NotificationType),
+      resolve: (parent, args, { viewer, loaders }) => {
+        if (viewer) {
+          return knex('notifications')
+            .where({ user_id: parent.id, read: false })
+            .pluck('id')
+            .then(ids => ids.map(id => Notification.gen(viewer, id, loaders)));
+        }
+        return [];
+      },
+    },
+    unreadNotifications: {
+      type: GraphQLInt,
+      resolve: (parent, args, { viewer }) =>
+        viewer
+          ? knex('notifications')
+              .where({ user_id: parent.id, read: false })
+              .count('id')
+              .then(([count]) => count.count)
+          : 0,
+    },
+    notificationSettings: {
+      type: GraphQLString,
+      resolve: (parent, agrs, { viewer }) =>
+        viewer
+          ? knex('notification_settings')
+              .where({ user_id: parent.id })
+              .select('settings')
+              .then(([data]) => JSON.stringify(data.settings || {}))
+          : {},
     },
   }),
 });

@@ -1,7 +1,9 @@
+// @flow
 import knex from '../knex';
 import Poll from './Poll';
 import User from './User';
 import PollingMode from './PollingMode';
+import { TargetType } from './Subscription';
 import { dedup } from '../../core/helpers';
 import { computeNextState } from '../../core/worker';
 import { canSee, canMutate, Models } from '../../core/accessControl';
@@ -9,6 +11,21 @@ import { Permissions } from '../../organization';
 import EventManager from '../../core/EventManager';
 import log from '../../logger';
 
+type ID = string | number;
+export type ProposalProps = {
+  id: ID,
+  author_id: ID,
+  title: string,
+  body: string,
+  votes: number,
+  poll_one_id: ID,
+  poll_two_id: ID,
+  state: string,
+  created_at: string,
+  spokesman_id: ID,
+  notified_at: string,
+  work_team_id: ID,
+};
 const validateTags = async tags => {
   let existingTags;
   let newTags;
@@ -152,7 +169,8 @@ const checkIfCoordinator = async (viewer, data) => {
 };
 
 class Proposal {
-  constructor(data) {
+  id: ID;
+  constructor(data: ProposalProps) {
     this.id = data.id;
     this.author_id = data.author_id;
     this.title = data.title;
@@ -204,6 +222,7 @@ class Proposal {
     // authorize
     if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL))
       return null;
+
     // validate
     if (!data.id) return null;
     const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
@@ -293,7 +312,13 @@ class Proposal {
 
     const proposal = await Proposal.gen(viewer, proposalId, loaders);
     if (proposal) {
-      EventManager.publish('onProposalUpdated', { viewer, proposal });
+      EventManager.publish('onProposalUpdated', {
+        viewer,
+        proposal,
+        ...(newValues.state && { info: { newState: newValues.state } }),
+        ...(data.workTeamId && { groupId: data.workTeamId }),
+        subjectId: data.workTeamId,
+      });
     }
     return proposal;
   }
@@ -417,6 +442,7 @@ class Proposal {
         viewer,
         proposal,
         ...(data.workTeamId && { groupId: data.workTeamId }),
+        subjectId: data.workTeamId,
       });
     }
     return proposal;
@@ -469,8 +495,8 @@ export default Proposal;
 EventManager.subscribe('onProposalUpdated', async ({ proposal }) => {
   if (['accepted', 'rejected', 'revoked'].includes(proposal.state)) {
     try {
-      await knex('proposal_user_subscriptions')
-        .where({ proposal_id: proposal.id })
+      await knex('subscriptions')
+        .where({ target_type: TargetType.PROPOSAL, target_id: proposal.id })
         .del();
     } catch (err) {
       log.error({ err }, 'Subscription deletion failed');

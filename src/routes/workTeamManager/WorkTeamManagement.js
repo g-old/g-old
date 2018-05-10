@@ -92,6 +92,16 @@ const messages = defineMessages({
     defaultMessage: 'Settings',
     description: 'Label for settings',
   },
+  createDiscussion: {
+    id: 'discussion.create',
+    defaultMessage: 'Create discussion',
+    description: 'Label for Manager',
+  },
+  requests: {
+    id: 'label.requests',
+    defaultMessage: 'Requests',
+    description: 'Label request',
+  },
 });
 const defaultPollValues = {
   1: {
@@ -324,11 +334,17 @@ class WorkTeamManagement extends React.Component {
     return (
       <Box column>
         {/* eslint-disable-next-line */}
-      <WorkteamHeader id= {workTeam.id} displayName= {workTeam.displayName} logo= {workTeam.logo} />
+        <WorkteamHeader
+          id={workTeam.id}
+          displayName={workTeam.displayName}
+          logo={workTeam.logo}
+        />
         <Tabs>
           <Tab title={<FormattedMessage {...messages.discussions} />}>
             <Accordion>
-              <AccordionPanel heading="Create discussion">
+              <AccordionPanel
+                heading={<FormattedMessage {...messages.createDiscussion} />}
+              >
                 <DiscussionInput
                   workTeamId={this.props.id}
                   updates={discussionUpdates}
@@ -364,7 +380,9 @@ class WorkTeamManagement extends React.Component {
               {mainTeamView}
             </Accordion>
           </Tab>
-          <Tab title="Requests">{content}</Tab>
+          <Tab title={<FormattedMessage {...messages.requests} />}>
+            {content}
+          </Tab>
           <Tab title={<FormattedMessage {...messages.settings} />}>
             <Button label="Edit" />
             {'TODO WORKTEAMEDIT'}

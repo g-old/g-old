@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import { normalize } from 'normalizr';
 import { urlBase64ToUint8Array } from '../core/helpers';
 import {
   CREATE_PSUB_START,
@@ -8,8 +9,10 @@ import {
   DELETE_PSUB_SUCCESS,
   DELETE_PSUB_ERROR,
   CHECK_PSUB_STATUS,
+  UPDATE_USER_SUCCESS,
 } from '../constants';
 import { getSessionUser, getWebPushKey } from '../reducers';
+import { user as userSchema } from '../store/schema';
 
 const createPushSub = `mutation($endpoint:String! $p256dh:String! $auth:String!){
 createPushSub (subscription:{endpoint:$endpoint p256dh:$p256dh auth:$auth})
@@ -177,17 +180,37 @@ export function deleteWebPushSub() {
     try {
       const deleted = await deletePushSubscription();
       if (!deleted || !deleted.status) throw Error('Unsubscribing failed');
+
       const { data } = await graphqlRequest(
         deletePushSub,
         deleted.subscription,
       );
-      const result = data.deletePushSub;
-      if (result) {
+      const result = data.deletePushSub ? JSON.parse(data.deletePushSub) : null;
+
+      if (result && !result.error) {
         dispatch({
           type: DELETE_PSUB_SUCCESS,
           payload: { pending: false, isPushEnabled: false, error: null },
           id: user.id,
         });
+
+        if (result.settings) {
+          const normalizedUser = normalize(
+            {
+              id: user.id,
+              groups: user.groups,
+              notificationSettings: result.settings || {},
+            },
+            userSchema,
+          );
+
+          dispatch({
+            type: UPDATE_USER_SUCCESS,
+            payload: normalizedUser,
+            properties: {}, // for reducer
+            id: user.id,
+          });
+        }
       } else {
         // throw Error('Subscription could not been deleted');
         console.error('Subscription data could not been deleted ');

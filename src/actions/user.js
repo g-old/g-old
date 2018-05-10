@@ -24,9 +24,8 @@ import {
 import { getUsersStatus } from '../reducers';
 import { requestFields } from './request';
 
-const userFields = `
+export const userFields = `
   id,
-  groups,
   name,
   surname,
   thumbnail,
@@ -41,6 +40,7 @@ query ($group:Int $after:String $union:Boolean) {
     edges{
       node{
     ${userFields}
+    groups
     createdAt,
     lastLogin,
     emailVerified,
@@ -74,6 +74,9 @@ query ($id:ID!) {
     numStatements
     numFollowers
     numLikes
+    locale
+    unreadNotifications
+    notificationSettings
     workTeams{
       ${workTeam}
     }
@@ -92,6 +95,7 @@ query ($id:ID!) {
       }
     }
     ${userFields}
+    groups
 
   }
 }
@@ -112,11 +116,14 @@ query ($id:ID!) {
 `;
 
 const updateUserMutation = `
-mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $password:String, $passwordOld:String, $followee:ID,){
-  updateUser ( user:{id:$id name:$name, surname:$surname, groups:$groups, email:$email, password:$password passwordOld:$passwordOld followee:$followee }){
+mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $password:String, $passwordOld:String, $followee:ID, $notificationSettings:String $locale:String){
+  updateUser ( user:{id:$id name:$name, surname:$surname, groups:$groups, email:$email, password:$password passwordOld:$passwordOld followee:$followee notificationSettings:$notificationSettings locale:$locale }){
     user{${userFields}
+    groups
+    locale
     email,
     emailVerified,
+    notificationSettings
     followees{
       id,
       name,
@@ -132,7 +139,9 @@ mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $pass
 const deleteUserMutation = `
 mutation($id:ID){
   deleteUser(user:{id:$id}){
-    user{${userFields}}
+    user{${userFields}
+    groups
+  }
     errors
 
   }
@@ -142,6 +151,7 @@ const userSearch = `
 query ($term:String) {
   searchUser (term:$term) {
   ${userFields}
+  groups
   }
 }
 `;
@@ -158,6 +168,14 @@ const depaginate = (resource, response) => {
     };
   }
   return response;
+};
+
+const objectifySettings = userData => {
+  if (userData && userData.notificationSettings) {
+    // eslint-disable-next-line
+    userData.notificationSettings = JSON.parse(userData.notificationSettings);
+  }
+  return userData;
 };
 
 export function loadUserList({ group, first, after, union = false }) {
@@ -311,7 +329,11 @@ export function updateUser(user) {
         });
         return false;
       }
-      const normalizedData = normalize(data.updateUser.user, userSchema);
+
+      const normalizedData = normalize(
+        objectifySettings(data.updateUser.user),
+        userSchema,
+      );
       dispatch({
         type: UPDATE_USER_SUCCESS,
         payload: normalizedData,
@@ -377,7 +399,7 @@ export function fetchUser({ id }) {
     try {
       const { data } = await graphqlRequest(userQuery, { id });
       const normalizedData = normalize(
-        depaginate('request', data.user),
+        objectifySettings(depaginate('request', data.user)),
         userSchema,
       );
       dispatch({

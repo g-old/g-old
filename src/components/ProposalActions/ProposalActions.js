@@ -94,7 +94,10 @@ class ProposalActions extends React.Component {
     intl: PropTypes.shape({}).isRequired,
     onFinish: PropTypes.func.isRequired,
     error: PropTypes.shape({}),
-    proposal: PropTypes.shape({ id: PropTypes.string }).isRequired,
+    proposal: PropTypes.shape({
+      id: PropTypes.string,
+      workTeamId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    }).isRequired,
     pending: PropTypes.bool,
     success: PropTypes.bool,
   };
@@ -197,7 +200,13 @@ class ProposalActions extends React.Component {
   }
 
   handleStateChange() {
-    this.props.updateProposal({ id: this.props.proposal.id, state: 'revoked' });
+    this.props.updateProposal({
+      id: this.props.proposal.id,
+      state: 'revoked',
+      ...(this.props.proposal.workTeamId && {
+        workTeamId: this.props.proposal.workTeamId,
+      }),
+    });
   }
 
   handleOnSubmit() {
@@ -244,6 +253,9 @@ class ProposalActions extends React.Component {
             thresholdRef,
           },
         },
+        ...(this.props.proposal.workTeamId && {
+          workTeamId: this.props.proposal.workTeamId,
+        }),
       });
     }
   }

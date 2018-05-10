@@ -14,6 +14,8 @@ import CommentType from './CommentType';
 import Comment from '../models/Comment';
 import UserType from './UserType';
 import User from '../models/User';
+import SubscriptionType from './SubscriptionType';
+import Subscription, { TargetType } from '../models/Subscription';
 
 const DiscussionType = new ObjectType({
   name: 'Discussion',
@@ -76,6 +78,18 @@ const DiscussionType = new ObjectType({
         }
         return [];
       },
+    },
+    subscription: {
+      type: SubscriptionType,
+      resolve: async (parent, args, { viewer, loaders }) =>
+        knex('subscriptions')
+          .where({
+            target_id: parent.id,
+            user_id: viewer.id,
+            target_type: TargetType.DISCUSSION,
+          })
+          .pluck('id')
+          .then(([id]) => Subscription.gen(viewer, id, loaders)),
     },
 
     numComments: {

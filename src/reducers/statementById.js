@@ -13,10 +13,12 @@ import {
   UPDATE_FLAGGEDSTMT_SUCCESS,
   LOAD_FEED_SUCCESS,
   SSE_UPDATE_SUCCESS,
+  LOAD_NOTIFICATIONS_SUCCESS,
 } from '../constants';
 
 export default function statements(state = {}, action) {
   switch (action.type) {
+    case LOAD_NOTIFICATIONS_SUCCESS:
     case LOAD_PROPOSAL_SUCCESS:
       return merge({}, state, action.payload.entities.statements);
     case LOAD_PROPOSAL_LIST_SUCCESS: {
@@ -24,7 +26,9 @@ export default function statements(state = {}, action) {
     }
     case DELETE_VOTE_SUCCESS: {
       const voteId = action.payload.result;
-      const ownStatementId = Object.keys(state).find(id => state[id].vote === voteId);
+      const ownStatementId = Object.keys(state).find(
+        id => state[id].vote === voteId,
+      );
       if (!ownStatementId) return state;
       // eslint-disable-next-line no-unused-vars
       const { ownStatementId: omit, ...other } = state;
@@ -33,7 +37,8 @@ export default function statements(state = {}, action) {
     case SSE_UPDATE_SUCCESS: {
       const stmts = action.payload.entities.statements;
       if (!stmts) return state;
-      const activity = action.payload.entities.activities[action.payload.result];
+      const activity =
+        action.payload.entities.activities[action.payload.result];
       if (activity.type === 'statement' && activity.verb === 'delete') {
         // check first if in store
         /*  if (state[activity.objectId]) {
@@ -67,7 +72,8 @@ export default function statements(state = {}, action) {
       return other;
     } */
     case CREATE_LIKE_SUCCESS: {
-      const like = action.payload.entities.statementLikes[action.payload.result];
+      const like =
+        action.payload.entities.statementLikes[action.payload.result];
       return {
         ...state,
         [like.statementId]: {
@@ -77,7 +83,8 @@ export default function statements(state = {}, action) {
       };
     }
     case DELETE_LIKE_SUCCESS: {
-      const like = action.payload.entities.statementLikes[action.payload.result];
+      const like =
+        action.payload.entities.statementLikes[action.payload.result];
       return {
         ...state,
         [like.statementId]: {

@@ -257,6 +257,38 @@ const getCommentsById = commentIds =>
       );
   });
 
+const getSubscriptionsById = subscriptionIds =>
+  new Promise(resolve => {
+    knex('subscriptions')
+      .whereIn('id', subscriptionIds)
+      .select()
+      .then(data =>
+        resolve(
+          subscriptionIds.map(
+            id =>
+              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
+              new Error(`Row not found: ${id}`),
+          ),
+        ),
+      );
+  });
+
+const getNotificationsById = notificationIds =>
+  new Promise(resolve => {
+    knex('notifications')
+      .whereIn('id', notificationIds)
+      .select()
+      .then(data =>
+        resolve(
+          notificationIds.map(
+            id =>
+              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
+              new Error(`Row not found: ${id}`),
+          ),
+        ),
+      );
+  });
+
 function createLoaders() {
   return {
     users: new DataLoader(ids => getUsersById(ids)),
@@ -274,6 +306,8 @@ function createLoaders() {
     comments: new DataLoader(ids => getCommentsById(ids)),
     discussions: new DataLoader(ids => getDiscussionsById(ids)),
     workTeams: new DataLoader(ids => getWorkTeamsById(ids)),
+    subscriptions: new DataLoader(ids => getSubscriptionsById(ids)),
+    notifications: new DataLoader(ids => getNotificationsById(ids)),
   };
 }
 

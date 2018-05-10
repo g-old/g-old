@@ -36,6 +36,11 @@
   color: rgba(255, 255, 255, 0.35);
 }
 
+.right {
+  display: flex;
+  align-items: center;
+}
+
 @media only screen and (max-width: 50em) {
   .brand {
     display: none;

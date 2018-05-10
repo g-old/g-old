@@ -1,0 +1,6 @@
+{
+  "name": "NotificationSettings",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./NotificationSettings.js"
+}

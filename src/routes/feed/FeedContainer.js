@@ -12,6 +12,7 @@ import {
 import s from './FeedContainer.css';
 import FetchError from '../../components/FetchError';
 import Activity from '../../components/Activity';
+import ActivitySkeleton from '../../components/ActivitySkeleton';
 
 class FeedContainer extends React.Component {
   static propTypes = {
@@ -37,7 +38,16 @@ class FeedContainer extends React.Component {
   render() {
     const { activities, isFetching, errorMessage, locale } = this.props;
     if (isFetching && !activities.length) {
-      return <p> Loading ... </p>;
+      let n = 1;
+      // eslint-disable-next-line
+      const placeHolder = Array.apply(null, { length: 5 }).map(() => ({
+        id: (n += 1),
+      }));
+      return (
+        <div className={cn(s.container)}>
+          {placeHolder.map(() => <ActivitySkeleton />)}
+        </div>
+      );
     }
 
     if (errorMessage && !activities.length) {

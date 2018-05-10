@@ -1,7 +1,28 @@
+// @flow
 import { throwIfMissing } from './utils';
 import log from '../logger';
+import type { Emails, Email } from './NotificationService';
+
+type Receiver = Array | string;
+type RawEmail = {
+  from: string,
+  to: Receiver,
+  html: string,
+  text?: ?string,
+  subject: ?string,
+  isMultiple?: boolean,
+};
+type CallBack = (error?: mixed, result?: {}) => any;
+interface Transporter {
+  sendMail: (message: RawEmail, cb: CallBack) => Promise<any>;
+  close: () => void;
+}
 
 class MailService {
+  mailer: Transporter;
+  MAX_CONTENT_LENGTH: number;
+  DEFAULT_SENDER: string;
+  MAX_RECEIVERS: number;
   constructor(transporter = throwIfMissing('Transport layer'), options = {}) {
     this.mailer = transporter;
     this.MAX_CONTENT_LENGTH = options.maxContentLength || 10000;
@@ -54,6 +75,7 @@ class MailService {
 
     return errors.length ? errors : false;
   }
+
   send(mail) {
     return new Promise((resolve, reject) => {
       this.mailer.sendMail(mail, (err, data) => {
@@ -63,8 +85,31 @@ class MailService {
       });
     });
   }
+  sendMultiple(mail: Email) {
+    return new Promise((resolve, reject) => {
+      this.mailer.sendMail(
+        {
+          from: this.DEFAULT_SENDER,
+          to: mail.receivers,
+          subject: mail.htmlContent.subject,
+          html: mail.htmlContent.html,
+          isMultiple: true,
+        },
+        (err, data) => {
+          this.mailer.close();
+          if (err) reject(err);
+          resolve(data);
+        },
+      );
+    }).then(data => {
+      if (__DEV__) {
+        console.info(data);
+      }
+    });
+  }
   async sendEmail(message) {
     const notOkay = this.checkMessage(message);
+
     if (notOkay) {
       return { success: false, errors: notOkay };
     }
@@ -73,12 +118,15 @@ class MailService {
       content = 'html';
     }
     try {
-      const data = await this.send({
-        from: message.sender || this.DEFAULT_SENDER,
-        to: message.recipient,
+      const messageData = {
+        from: this.DEFAULT_SENDER,
+        to: message.isMultiple ? [message.recipient] : message.recipient,
         subject: message.subject || '',
         [content]: message[content],
-      });
+        ...(message.isMultiple && { isMultiple: true }),
+      };
+
+      const data = await this.send(messageData);
 
       // TODO notify success
       // TODO bulk mails
@@ -96,6 +144,9 @@ class MailService {
       };
     }
     return { success: true };
+  }
+  async sendAllEmails(emails: Emails) {
+    return emails.forEach(mail => this.sendMultiple(mail));
   }
 }
 

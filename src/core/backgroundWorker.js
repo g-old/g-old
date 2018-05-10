@@ -1,39 +1,39 @@
+// @flow
 import knex from '../data/knex';
 import webPush from '../webPush';
 import log from '../logger';
 import Proposal from '../data/models/Proposal';
-import { circularFeedNotification } from './feed';
+import { circularFeedMessage } from './feed';
 import createLoaders from '../data/dataLoader';
 import root from '../compositionRoot';
+import { EmailType } from './BackgroundService';
+import type { PushMessages, PushData } from './NotificationService';
 
-const handleNotifications = async (viewer, notificationData, receiver) =>
-  circularFeedNotification({
+const handleMessages = async (viewer, messageData, receiver) =>
+  circularFeedMessage({
     viewer,
-    data: notificationData,
+    data: messageData,
     verb: 'create',
     receiver,
     loaders: createLoaders(),
   });
 
-const push = async (subscriptionData, msg) => {
+const push = async (subscriptionData, msg: PushData) => {
   let result;
   try {
-    const subscriptions = subscriptionData.map(s => ({
-      endpoint: s.endpoint,
-      keys: { auth: s.auth, p256dh: s.p256dh },
-    }));
+    const subscriptions = [];
+    subscriptionData.forEach(s => {
+      if (s) {
+        subscriptions.push({
+          endpoint: s.endpoint,
+          keys: { auth: s.auth, p256dh: s.p256dh },
+        });
+      }
+    });
 
-    const notifications = subscriptions.map(sub =>
+    const messages = subscriptions.map(sub =>
       webPush
-        .sendNotification(
-          sub,
-          JSON.stringify({
-            body: msg.body,
-            link: msg.link,
-            title: msg.title,
-            tag: msg.tag,
-          }),
-        )
+        .sendNotification(sub, JSON.stringify(msg))
         .then(response => {
           log.info({ pushService: response });
           if (response.statusCode !== 201) {
@@ -52,9 +52,9 @@ const push = async (subscriptionData, msg) => {
         }),
     );
 
-    result = await Promise.all(notifications);
+    result = await Promise.all(messages);
   } catch (e) {
-    log.error({ err: e }, 'Notification failed');
+    log.error({ err: e }, 'Message failed');
   }
   return result;
 };
@@ -128,28 +128,132 @@ const notifyProposalCreation = async proposal => {
     tag: 'proposal',
   });
 };
+// https://hackernoon.com/functional-javascript-resolving-promises-sequentially-7aac18c4431e
+const promiseSerial = funcs =>
+  funcs.reduce(
+    (promise, func) =>
+      promise.then(result => func.then(Array.prototype.concat.bind(result))),
+    Promise.resolve([]),
+  );
 
-async function handleMessages(data) {
-  log.info({ data }, 'Job received');
+const notifyMultiple = async (
+  viewer,
+  data: { messages: PushMessages, notificationIds: { [string]: ID } },
+) => {
+  // group by type&locale - get diff message by type , diff link
+  const userIds = data.messages.reduce(
+    (acc, curr) => acc.concat(curr.receiverIds),
+    [],
+  );
+
+  const subscriptionData = await knex('webpush_subscriptions')
+    .whereIn('user_id', userIds)
+    .select();
+
+  if (!subscriptionData.length) {
+    return true;
+  }
+
+  const promises = data.messages.map(
+    pushMessage =>
+      pushMessage.receiverIds.map(id => {
+        const subscriptionDetails = subscriptionData.find(
+          // eslint-disable-next-line eqeqeq
+          subscription => subscription.user_id === id,
+        );
+        if (subscriptionDetails) {
+          const { message } = pushMessage;
+          message.link +=
+            data.notificationIds[`${pushMessage.activityId}$${id}`];
+          return webPush
+            .sendNotification(
+              {
+                endpoint: subscriptionDetails.endpoint,
+                keys: {
+                  auth: subscriptionDetails.auth,
+                  p256dh: subscriptionDetails.p256dh,
+                },
+              },
+              JSON.stringify(message),
+            )
+            .then(response => {
+              log.info({ pushService: response });
+              if (response.statusCode !== 201) {
+                log.warn({ pushService: response });
+              }
+            })
+            .catch(err => {
+              if (err.statusCode === 410) {
+                log.error(
+                  { pushService: err },
+                  'Subscription should be deleted',
+                );
+                return knex('webpush_subscriptions')
+                  .where({ endpoint: subscriptionDetails.endpoint })
+                  .del();
+              }
+              log.error(err, 'Subscription no longer valid');
+              return Promise.resolve();
+            });
+        }
+
+        return Promise.resolve();
+      }),
+    //  return push(subscriptions, pushMessage.message);
+  );
+
+  // execute promises in batches
+
+  const promiseBatches = [];
+  const end = promises.length;
+  let counter = 0;
+  for (let i = 0; i < end; i += 1) {
+    if (i % 5 === 0) {
+      promiseBatches.push(Promise.all(promises.slice(counter, 5)));
+    }
+    counter += 1;
+  }
+  const remainingPromises = promises.slice(counter);
+  if (remainingPromises.length) {
+    promiseBatches.push(Promise.all(remainingPromises));
+  }
+  return promiseSerial(promiseBatches).catch(err => {
+    log.error({ err });
+  });
+  // return Promise.all(promises);
+};
+
+async function processMessages(message) {
+  // log.info({ message }, 'Job received');
   let result = null;
   try {
-    switch (data.type) {
+    switch (message.type) {
       case 'webpush': {
         log.info('Starting webpush');
 
-        result = notifyProposalCreation(data.data);
+        result = notifyProposalCreation(message.data);
 
         break;
       }
       case 'webpushforstatementsTEST': {
         log.info('Starting webpush');
-        result = notifyNewStatements(data.viewer, data.data, createLoaders());
+        result = notifyNewStatements(
+          message.viewer,
+          message.data,
+          createLoaders(),
+        );
+
+        break;
+      }
+      case 'batchPushing': {
+        log.info('Starting webpush BATCH');
+        result = notifyMultiple(message.viewer, message.data);
 
         break;
       }
       case 'mail': {
         log.info('Starting mail');
-        const mailData = data.data;
+        const mailData = message.data;
         result = await root.BackgroundService.handleEmails(
           mailData.mailType,
           mailData,
@@ -157,11 +261,20 @@ async function handleMessages(data) {
         break;
       }
 
-      case 'notification': {
-        result = handleNotifications(
-          data.data.viewer,
-          data.data,
-          data.data.receiver,
+      case 'batchMailing': {
+        log.info('BATCHMAIL');
+        result = await root.BackgroundService.handleEmails(
+          EmailType.TEST_BATCH,
+          message.data,
+        );
+        break;
+      }
+
+      case 'message': {
+        result = handleMessages(
+          message.data.viewer,
+          message.data,
+          message.data.receiver,
         );
         break;
       }
@@ -173,14 +286,14 @@ async function handleMessages(data) {
       }
 
       default:
-        throw Error(`Job type not recognized: ${data.type}`);
+        throw Error(`Job type not recognized: ${message.type}`);
     }
-  } catch (e) {
-    log.error(e);
+  } catch (err) {
+    log.error({ err });
   }
   return result;
 }
-process.on('message', handleMessages);
+process.on('message', processMessages);
 function onClosing(code, signal) {
   log.warn({ signal }, 'Worker closing');
   this.kill();

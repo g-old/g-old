@@ -68,6 +68,10 @@ ${discussionFields}
 const discussionQuery = `query($id:ID $parentId:ID){
   discussion(id:$id parentId:$parentId){
   ${discussionFragment}
+  subscription{
+    id
+    subscriptionType
+  }
   }
 }`;
 

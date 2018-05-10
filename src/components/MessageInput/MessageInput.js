@@ -5,10 +5,9 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import Box from '../Box';
 import FormField from '../FormField';
 import Button from '../Button';
-import CheckBox from '../CheckBox';
 import { nameValidation, createValidator } from '../../core/validation';
 
-const formFields = ['subject', 'notificationText'];
+const formFields = ['subject', 'messageText'];
 const messages = defineMessages({
   notify: {
     id: 'account.notify',
@@ -22,14 +21,13 @@ const messages = defineMessages({
     description: 'Help for empty fields',
   },
 });
-class NotificationInput extends React.Component {
+class MessageInput extends React.Component {
   static propTypes = {
     receiverId: PropTypes.string.isRequired,
     notifyUser: PropTypes.func.isRequired,
     updates: PropTypes.shape({
       pending: PropTypes.bool,
     }).isRequired,
-    types: PropTypes.arrayOf(PropTypes.string).isRequired,
     notifyGroup: PropTypes.bool,
   };
 
@@ -45,24 +43,20 @@ class NotificationInput extends React.Component {
     this.onNotify = this.onNotify.bind(this);
     this.state = {
       subject: '',
-      notificationText: '',
+      messageText: '',
       errors: {
         subject: {
           touched: false,
         },
-        notificationText: {
+        messageText: {
           touched: false,
         },
       },
     };
 
-    if (props.types.length) {
-      this.state[props.types[0]] = true;
-    }
-
     const testValues = {
       subject: { fn: 'text' },
-      notificationText: { fn: 'text' },
+      messageText: { fn: 'text' },
     };
     this.Validator = createValidator(
       testValues,
@@ -76,23 +70,23 @@ class NotificationInput extends React.Component {
 
   componentWillReceiveProps({ updates }) {
     if (updates && updates.success) {
-      this.setState({ subject: '', notificationText: '' });
+      this.setState({ subject: '', messageText: '' });
     }
   }
 
   onNotify() {
     if (this.handleValidation(formFields)) {
-      const message = this.state.notificationText.trim();
+      const message = this.state.messageText.trim();
       const subject = this.state.subject ? this.state.subject.trim() : null;
-      const receiverId = this.props.receiverId;
+      const { receiverId } = this.props;
       this.props.notifyUser({
         message: JSON.stringify({
-          notificationType: 'msg',
+          messageType: 'msg',
           msg: message,
           title: subject,
         }),
         subject,
-        type: this.props.types.find(type => this.state[type] === true),
+        type: 'message',
         receiverId,
         receiver: {
           type: this.props.notifyGroup ? 'team' : 'user',
@@ -111,20 +105,13 @@ class NotificationInput extends React.Component {
     switch (e.target.name) {
       case 'event':
       case 'subject':
-      case 'notificationText': {
+      case 'messageText': {
         newState = { [e.target.name]: e.target.value };
         break;
       }
 
       default: {
-        newState = this.props.types.reduce((acc, curr) => {
-          if (curr !== e.target.name) {
-            acc[curr] = false;
-          } else {
-            acc[curr] = true;
-          }
-          return acc;
-        }, {});
+        newState = undefined;
       }
     }
     this.setState(newState);
@@ -149,32 +136,9 @@ class NotificationInput extends React.Component {
   }
 
   render() {
-    const { subjectError, notificationTextError } = this.visibleErrors(
-      formFields,
-    );
+    const { subjectError, messageTextError } = this.visibleErrors(formFields);
     return (
       <Box column pad>
-        <FormField label="Type">
-          {this.props.types &&
-            this.props.types.map(t => (
-              <CheckBox
-                name={t}
-                checked={this.state[t]}
-                label={t}
-                onChange={this.handleValueChange}
-                disabled={this.props.types.length < 2}
-              />
-            ))}
-        </FormField>
-        <FormField>
-          <CheckBox
-            name={'event'}
-            checked={false}
-            label={'Event'}
-            onChange={this.handleValueChange}
-            disabled
-          />
-        </FormField>
         <fieldset>
           <FormField label="Subject" error={subjectError}>
             <input
@@ -185,11 +149,11 @@ class NotificationInput extends React.Component {
               onChange={this.handleValueChange}
             />
           </FormField>
-          <FormField label="Text" error={notificationTextError}>
+          <FormField label="Text" error={messageTextError}>
             <textarea
-              name="notificationText"
+              name="messageText"
               onBlur={this.handleBlur}
-              value={this.state.notificationText}
+              value={this.state.messageText}
               onChange={this.handleValueChange}
             />
           </FormField>
@@ -206,4 +170,4 @@ class NotificationInput extends React.Component {
   }
 }
 
-export default NotificationInput;
+export default MessageInput;

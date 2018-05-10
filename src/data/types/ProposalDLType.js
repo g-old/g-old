@@ -13,7 +13,8 @@ import User from '../models/User';
 import UserType from './UserType';
 import Poll from '../models/Poll';
 import Tag from '../models/Tag';
-
+import Subscription, { TargetType } from '../models/Subscription';
+import SubscriptionType from './SubscriptionType';
 import knex from '../knex';
 
 const ProposalType = new ObjectType({
@@ -91,6 +92,19 @@ const ProposalType = new ObjectType({
           .count('id');
         return count[0].count === '1';
       },
+    },
+
+    subscription: {
+      type: SubscriptionType,
+      resolve: async (parent, args, { viewer, loaders }) =>
+        knex('subscriptions')
+          .where({
+            target_id: parent.id,
+            user_id: viewer.id,
+            target_type: TargetType.PROPOSAL,
+          })
+          .pluck('id')
+          .then(([id]) => Subscription.gen(viewer, id, loaders)),
     },
     canVote: {
       type: GraphQLBoolean,

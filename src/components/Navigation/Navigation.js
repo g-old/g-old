@@ -130,8 +130,9 @@ class Navigation extends React.Component {
   }
   render() {
     return (
-      <div role="navigation">
+      <span role="navigation" style={{ margin: '0 0.2em' }}>
         <div className={s.navBar}>{this.getMenu()}</div>
+
         <div className={s.menu}>
           <Menu
             withControl
@@ -158,7 +159,7 @@ class Navigation extends React.Component {
             {this.getMenu()}
           </Menu>
         </div>
-      </div>
+      </span>
     );
   }
 }

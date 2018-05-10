@@ -1,0 +1,40 @@
+{{#extend "layout"}}
+
+  {{#content "main"}}
+
+  <div class="proposal-root">
+    <div class="proposal-container">
+
+      <div style= "font-size: 2rem;
+    font-weight: 300;
+    padding-top: 0;
+    word-break: break-word;">
+        {{title}}
+      </div>
+      <div class="proposal-body">
+        {{{text}}}
+      </div>
+    </div>
+  </div>
+
+            <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
+              <tbody>
+                <tr>
+                  <td align="left">
+                    <table border="0" cellpadding="0" cellspacing="0">
+                      <tbody>
+                        <tr>
+                          <td>
+                            <a href="{{link}}" target="_blank">{{t "clickProposalLink"}}</a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+  {{/content}}
+
+{{/extend}}

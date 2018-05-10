@@ -9,6 +9,11 @@ import {
   deleteProposalSub,
 } from '../../actions/proposal';
 import {
+  createSubscription,
+  updateSubscription,
+  deleteSubscription,
+} from '../../actions/subscription';
+import {
   createVote,
   updateVote,
   deleteVote,
@@ -21,6 +26,7 @@ import {
   getProposalErrorMessage,
   getFolloweeVotesByPoll,
   getFollowees,
+  getSubscriptionUpdates,
 } from '../../reducers';
 import FetchError from '../../components/FetchError';
 import StatementsContainer from '../../components/StatementsContainer';
@@ -29,7 +35,7 @@ import Box from '../../components/Box';
 import Button from '../../components/Button';
 import Poll from '../../components/Poll';
 import Filter from '../../components/Filter';
-import CheckBox from '../../components/CheckBox';
+import SubscriptionButton from '../../components/SubscriptionButton';
 
 const messages = defineMessages({
   voting: {
@@ -46,10 +52,11 @@ const messages = defineMessages({
 class ProposalContainer extends React.Component {
   static propTypes = {
     proposal: PropTypes.shape({
-      pollOne: PropTypes.shape({}),
-      pollTwo: PropTypes.shape({}),
+      pollOne: PropTypes.shape({ mode: PropTypes.shape({}) }),
+      pollTwo: PropTypes.shape({ mode: PropTypes.shape({}) }),
       id: PropTypes.string,
       subscribed: PropTypes.bool,
+      subscription: PropTypes.shape({}),
     }).isRequired,
     user: PropTypes.shape({}).isRequired,
     proposalId: PropTypes.number.isRequired,
@@ -66,9 +73,14 @@ class ProposalContainer extends React.Component {
     followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     createProposalSub: PropTypes.func.isRequired,
     deleteProposalSub: PropTypes.func.isRequired,
+    createSubscription: PropTypes.func.isRequired,
+    deleteSubscription: PropTypes.func.isRequired,
+    updateSubscription: PropTypes.func.isRequired,
+    subscriptionStatus: PropTypes.shape({}),
   };
   static defaultProps = {
     errorMessage: null,
+    subscriptionStatus: null,
   };
   constructor(props) {
     super(props);
@@ -83,7 +95,8 @@ class ProposalContainer extends React.Component {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
     return (
       this.props.proposal &&
-      (this.props.proposal.pollOne || this.props.proposal.pollTwo)
+      ((this.props.proposal.pollOne && this.props.proposal.pollOne.mode) ||
+        (this.props.proposal.pollTwo && this.props.proposal.pollTwo.mode))
     );
   }
 
@@ -104,9 +117,16 @@ class ProposalContainer extends React.Component {
   }
 
   handleVoting(data, method, info) {
+    const { proposal } = this.props;
     switch (method) {
       case 'create': {
-        this.props.createVote(data);
+        let targetId;
+        if (!proposal.subscription) {
+          if (proposal.state !== 'survey') {
+            targetId = this.props.proposal.id;
+          }
+        }
+        this.props.createVote({ ...data, targetId });
         break;
       }
       case 'update': {
@@ -121,17 +141,36 @@ class ProposalContainer extends React.Component {
         throw Error('Unknown method');
     }
   }
-  handleSubscription() {
-    const { subscribed, id } = this.props.proposal;
-    if (subscribed) {
-      this.props.deleteProposalSub(id);
+  handleSubscription({ targetType, subscriptionType }) {
+    const { id, subscription } = this.props.proposal;
+    if (subscription && subscriptionType === 'DELETE') {
+      this.props.deleteSubscription({ id: subscription.id });
+    } else if (subscription) {
+      this.props.updateSubscription({
+        id: subscription.id,
+        targetType,
+        subscriptionType,
+        targetId: id,
+      });
     } else {
-      this.props.createProposalSub(id);
+      this.props.createSubscription({
+        targetType,
+        subscriptionType,
+        targetId: id,
+      });
     }
   }
 
   render() {
-    const { proposal, isFetching, errorMessage, user, followees } = this.props;
+    const {
+      proposal,
+      isFetching,
+      errorMessage,
+      user,
+      followees,
+      subscriptionStatus,
+    } = this.props;
+    const showSubscription = ['proposed', 'voting'].includes(proposal.state);
     const { filter } = this.state;
     if (isFetching && !proposal) {
       return <p>{'Loading...'} </p>;
@@ -208,14 +247,15 @@ class ProposalContainer extends React.Component {
       return (
         <div>
           <Box column pad>
-            <CheckBox
-              toggle
-              checked={proposal.subscribed}
-              label={proposal.subscribed ? 'ON' : 'OFF'}
-              onChange={this.handleSubscription}
-              disabled={isFetching}
-            />
             <Proposal {...proposal} />
+            {showSubscription && (
+              <SubscriptionButton
+                status={subscriptionStatus}
+                targetType="PROPOSAL"
+                onSubscribe={this.handleSubscription}
+                subscription={proposal.subscription}
+              />
+            )}
             <Poll
               {...poll}
               canVote={proposal.canVote}
@@ -253,6 +293,7 @@ const mapStateToProps = (state, { pollId, proposalId }) => ({
   followees: getFollowees(state),
   voteUpdates: getVoteUpdates(state, pollId),
   followeeVotes: getFolloweeVotesByPoll(state, pollId),
+  subscriptionStatus: getSubscriptionUpdates(state),
 });
 
 const mapDispatch = {
@@ -263,6 +304,9 @@ const mapDispatch = {
   getVotes,
   createProposalSub,
   deleteProposalSub,
+  createSubscription,
+  updateSubscription,
+  deleteSubscription,
 };
 
 export default connect(mapStateToProps, mapDispatch)(ProposalContainer);

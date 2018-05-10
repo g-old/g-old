@@ -20,7 +20,13 @@ import {
   getIsDiscussionFetching,
   getDiscussionError,
   getCommentUpdates,
+  getSubscriptionUpdates,
 } from '../../reducers';
+import {
+  createSubscription,
+  updateSubscription,
+  deleteSubscription,
+} from '../../actions/subscription';
 import FetchError from '../../components/FetchError';
 import Discussion from '../../components/Discussion';
 import Box from '../../components/Box';
@@ -29,6 +35,7 @@ import Box from '../../components/Box';
 // import CheckBox from '../../components/CheckBox';
 import Comment from '../../components/Comment';
 import history from '../../history';
+import SubscriptionButton from '../../components/SubscriptionButton';
 
 const handleProfileClick = ({ id }) => {
   if (id) history.push(`/accounts/${id}`);
@@ -37,6 +44,8 @@ class DiscussionContainer extends React.Component {
   static propTypes = {
     discussion: PropTypes.shape({
       comments: PropTypes.arrayOf(PropTypes.shape({})),
+      id: PropTypes.oneOfType(PropTypes.string, PropTypes.number),
+      subscription: PropTypes.shape({}),
     }).isRequired,
     user: PropTypes.shape({}).isRequired,
     proposalId: PropTypes.number.isRequired,
@@ -62,6 +71,10 @@ class DiscussionContainer extends React.Component {
     updates: PropTypes.shape({ '0000': PropTypes.shape({}) }).isRequired,
     childId: PropTypes.string,
     commentId: PropTypes.string.isRequired,
+    createSubscription: PropTypes.func.isRequired,
+    updateSubscription: PropTypes.func.isRequired,
+    deleteSubscription: PropTypes.func.isRequired,
+    subscriptionStatus: PropTypes.shape({}).isRequired,
   };
   static defaultProps = {
     errorMessage: null,
@@ -75,6 +88,7 @@ class DiscussionContainer extends React.Component {
     this.handleCommentCreation = this.handleCommentCreation.bind(this);
     this.handleCommentFetching = this.handleCommentFetching.bind(this);
     this.handleReply = this.handleReply.bind(this);
+    this.handleSubscription = this.handleSubscription.bind(this);
   }
 
   componentDidMount() {
@@ -99,7 +113,15 @@ class DiscussionContainer extends React.Component {
   }
 
   handleCommentCreation(data) {
-    this.props.createComment({ ...data, discussionId: this.props.id });
+    let targetId;
+    if (!this.props.discussion.subscription) {
+      targetId = this.props.discussion.id;
+    }
+    this.props.createComment({
+      ...data,
+      discussionId: this.props.id,
+      targetId,
+    });
   }
 
   handleCommentFetching({ parentId }) {
@@ -108,6 +130,25 @@ class DiscussionContainer extends React.Component {
 
   handleReply({ id }) {
     this.setState({ replying: id || '0000' }); // for main input
+  }
+  handleSubscription({ targetType, subscriptionType }) {
+    const { id, subscription } = this.props.discussion;
+    if (subscription && subscriptionType === 'DELETE') {
+      this.props.deleteSubscription({ id: subscription.id });
+    } else if (subscription) {
+      this.props.updateSubscription({
+        id: subscription.id,
+        targetType,
+        subscriptionType,
+        targetId: id,
+      });
+    } else {
+      this.props.createSubscription({
+        targetType,
+        subscriptionType,
+        targetId: id,
+      });
+    }
   }
 
   render() {
@@ -118,6 +159,7 @@ class DiscussionContainer extends React.Component {
       user,
       commentId,
       childId,
+      subscriptionStatus,
     } = this.props;
     if (isFetching && !discussion) {
       return <p>{'Loading...'} </p>;
@@ -156,6 +198,12 @@ class DiscussionContainer extends React.Component {
               disabled={isFetching}
             /> */}
               <Discussion {...discussion} />
+              <SubscriptionButton
+                onSubscribe={this.handleSubscription}
+                subscription={discussion.subscription}
+                targetType="DISCUSSION"
+                status={subscriptionStatus}
+              />
             </div>
             <Box tag="section" column pad fill className={s.commentsSection}>
               <Comment
@@ -229,6 +277,7 @@ const mapStateToProps = (state, { id }) => ({
   isFetching: getIsDiscussionFetching(state, id),
   errorMessage: getDiscussionError(state, id),
   updates: getCommentUpdates(state),
+  subscriptionStatus: getSubscriptionUpdates(state),
 });
 
 const mapDispatch = {
@@ -237,6 +286,9 @@ const mapDispatch = {
   loadComments,
   updateComment,
   deleteComment,
+  createSubscription,
+  updateSubscription,
+  deleteSubscription,
 };
 
 export default connect(mapStateToProps, mapDispatch)(

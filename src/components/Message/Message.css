@@ -1,0 +1,8 @@
+@import '../../components/variables.css';
+
+.root {
+  background-color: #ffd602;
+  color: #000;
+  padding: 1em;
+  border-radius: 1em;
+}

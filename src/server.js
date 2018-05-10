@@ -48,12 +48,11 @@ import BWorker, { sendJob } from './core/childProcess';
 import { checkToken } from './core/tokens';
 import log from './logger';
 import { SubscriptionManager, SubscriptionServer } from './core/sse';
-import PubSub from './core/pubsub';
 import responseTiming from './core/timing';
 import { Groups, Permissions } from './organization';
 import EventManager from './core/EventManager';
 import root from './compositionRoot';
-import { EmailTypes } from './core/BackgroundService';
+import { EmailType } from './core/BackgroundService';
 import Request from './data/models/Request';
 /* eslint-enable import/first */
 
@@ -65,7 +64,8 @@ process.on('unhandledRejection', (reason, p) => {
   }
 });
 
-const pubsub = new PubSub();
+const pubsub = root.PubSub;
+root.NotificationService.start();
 
 worker(pubsub);
 BWorker.start(path.resolve(__dirname, 'backgroundWorker.js'));
@@ -92,7 +92,7 @@ const sendMailJob = (viewer, { content }, mailType) => {
   }
 };
 
-EventManager.subscribe('onProposalCreated', ({ proposal, viewer }) => {
+/* EventManager.subscribe('onProposalCreated', ({ proposal, viewer }) => {
   if (!sendJob({ type: 'webpush', data: proposal })) {
     log.error(
       { viewer, job: { type: 'webpush', data: proposal } },
@@ -118,13 +118,13 @@ EventManager.subscribe('onStatementCreated', ({ statement, viewer }) => {
       'Could not send job to worker',
     );
   }
-});
+}); */
 
 EventManager.subscribe('sendVerificationMail', ({ request, viewer }) =>
-  sendMailJob(viewer, { content: request.content }, EmailTypes.VERIFICATION),
+  sendMailJob(viewer, { content: request.content }, EmailType.VERIFICATION),
 );
 EventManager.subscribe('sendWelcomeMail', ({ request, viewer }) =>
-  sendMailJob(viewer, { content: request.content }, EmailTypes.WELCOME),
+  sendMailJob(viewer, { content: request.content }, EmailType.WELCOME),
 );
 
 const app = express();
@@ -192,6 +192,19 @@ if (__DEV__) {
   // A route for testing email templates
   app.get('/:email(email|emails)/:template', (req, res) => {
     let message;
+    const loremIpsum = `
+            Id eligendi esse error officia iure esse rerum qui eius.
+            Quo mollitia ut ut dolores quia odio et beatae perspiciatis.
+            Corporis et mollitia molestiae doloribus inventore laudantium quia.
+            Maxime et sunt ipsa maxime autem.
+            Voluptatibus est deleniti et eum.
+            In at fuga et odio. Aut quod odit voluptatibus molestiae voluptatem et quia.
+            Dolorum natus deleniti fugiat ut accusamus.
+`;
+    const actor = {
+      fullName: `${req.user.name} ${req.user.surname}`,
+      thumbnail: req.user.thumbnail,
+    };
     switch (req.params.template) {
       case 'welcome': {
         message = root.MailComposer.getWelcomeMail(
@@ -228,14 +241,49 @@ if (__DEV__) {
 
         break;
       }
-      case 'message': {
-        message = root.MailComposer.getMessageMail(
-          req.user,
-          { content: 'This is a message' },
-          req.user,
-          req.language,
-        );
 
+      case 'proposalNotification': {
+        message = root.MailComposer.getProposalMail({
+          proposal: {
+            body: loremIpsum,
+            title: 'Title of the proposal',
+          },
+          locale: req.language,
+        });
+        break;
+      }
+
+      case 'statementNotification': {
+        message = root.MailComposer.getStatementMail({
+          statement: {
+            body: loremIpsum,
+            position: 'pro',
+          },
+          author: actor,
+          proposalTitle: 'Title of the proposal',
+          locale: req.language,
+        });
+        break;
+      }
+      case 'commentNotification': {
+        message = root.MailComposer.getCommentMail({
+          author: actor,
+          comment: {
+            content: loremIpsum,
+          },
+          discussionTitle: 'Title of the discussion',
+          locale: req.language,
+        });
+        break;
+      }
+
+      case 'messageNotification': {
+        message = root.MailComposer.getMessageMail({
+          sender: actor,
+          message: loremIpsum,
+          title: 'The subject',
+          locale: req.language,
+        });
         break;
       }
       default: {
@@ -253,9 +301,12 @@ app.post(
   }),
 );
 
-app.post('/login', passport.authenticate('local'), (req, res) => {
+app.post('/login', passport.authenticate('local'), async (req, res) => {
+  const [count] = await knex('notifications')
+    .where({ user_id: req.user.id, read: false })
+    .count('id');
   res.status(200).json({
-    user: req.session.passport.user,
+    user: { ...req.session.passport.user, unreadNotifications: count.count },
     redirect: '/feed',
   });
 });
@@ -307,7 +358,10 @@ app.post('/signup', (req, res) => {
       return null;
     })
     .then(() =>
-      User.create({ id: 1, groups: Groups.SYSTEM }, userData)
+      User.create(
+        { id: 1, groups: Groups.SYSTEM },
+        { ...userData, locale: req.language },
+      )
         .then(user => {
           if (!user) throw Error('User creation failed');
           EventManager.publish('sendWelcomeMail', {
@@ -394,7 +448,7 @@ app.post('/forgot', (req, res) => {
         const job = {
           type: 'mail',
           data: {
-            mailType: EmailTypes.RESET_REQUEST,
+            mailType: EmailType.RESET_REQUEST,
             lang: req.cookies.lang,
             address: user.email,
             viewer: user,
@@ -436,7 +490,7 @@ app.post('/reset/:token', (req, res) =>
         const job = {
           type: 'mail',
           data: {
-            mailType: EmailTypes.RESET_SUCCESS,
+            mailType: EmailType.RESET_SUCCESS,
             lang: req.cookies.lang,
             address: user.email,
             viewer: user,
@@ -635,7 +689,13 @@ app.get('*', async (req, res, next) => {
     let normalizedData = { entities: {}, result: null };
     let recaptchaKey;
     if (req.user) {
-      normalizedData = normalize(req.user, userSchema);
+      const [count] = await knex('notifications')
+        .where({ user_id: req.user.id, read: false })
+        .count('id');
+      normalizedData = normalize(
+        { ...req.user, unreadNotifications: count.count },
+        userSchema,
+      );
     } else {
       recaptchaKey = recaptchaKeys.siteKey;
     }

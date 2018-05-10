@@ -14,10 +14,10 @@ import GroupManager from '../GroupManager';
 import { Groups, AccessMasks, canAccess } from '../../organization';
 import ImageUpload from '../ImageUpload';
 import { uploadAvatar } from '../../actions/file';
-import { notifyUser } from '../../actions/notifications';
+import { notifyUser } from '../../actions/message';
 import ProfilePicture from '../ProfilePicture';
 import Box from '../Box';
-import NotificationInput from '../NotificationInput';
+import MessageInput from '../MessageInput';
 import Notification from '../Notification';
 import Label from '../Label';
 import s from './AccountDetails.css';
@@ -106,7 +106,7 @@ class AccountDetails extends React.Component {
     uploadAvatar: PropTypes.func.isRequired,
     updates: PropTypes.shape({
       dataUrl: PropTypes.string,
-      notification: PropTypes.shape({
+      message: PropTypes.shape({
         success: PropTypes.bool,
         pending: PropTypes.bool,
       }),
@@ -137,9 +137,6 @@ class AccountDetails extends React.Component {
     }
     if (updates.dataUrl && updates.dataUrl.success) {
       this.setState({ showUpload: false });
-    }
-    if (updates.notification && updates.notification.success) {
-      this.setState({ notificationText: '', subject: '' });
     }
   }
   onPromoteToViewer() {
@@ -210,16 +207,15 @@ class AccountDetails extends React.Component {
       );
     }
 
-    let NotificationPanel = <div />;
+    let MessagePanel = <div />;
     // eslint-disable-next-line no-bitwise
-    if (canAccess(user, 'NotificationPanel')) {
-      NotificationPanel = (
-        <AccordionPanel column pad heading={'Notify user'}>
-          <NotificationInput
+    if (canAccess(user, 'MessagePanel')) {
+      MessagePanel = (
+        <AccordionPanel column pad heading="Notify user">
+          <MessageInput
             receiverId={id}
             notifyUser={this.props.notifyUser}
-            updates={this.props.updates && this.props.updates.notification}
-            types={['email', 'notification']}
+            updates={this.props.updates && this.props.updates.message}
           />
         </AccordionPanel>
       );
@@ -256,13 +252,13 @@ class AccountDetails extends React.Component {
           </Label>
           {!avatarSet && (
             <Notification
-              type={'alert'}
+              type="alert"
               message={<FormattedMessage {...messages.avatarMissing} />}
             />
           )}
           {!emailVerified && (
             <Notification
-              type={'alert'}
+              type="alert"
               message={
                 <FormattedMessage {...messages.emailValidationMissing} />
               }
@@ -286,7 +282,7 @@ class AccountDetails extends React.Component {
             <Accordion column>
               {GroupPanel}
               {RightsPanel}
-              {NotificationPanel}
+              {MessagePanel}
             </Accordion>
             <Button
               onClick={this.handleDelete}

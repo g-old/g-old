@@ -1,12 +1,13 @@
 import { throwIfMissing } from './utils';
-import { TransportTypes } from './MessageService';
+import { TransportType } from './MessageService';
 
-export const EmailTypes = {
+export const EmailType = {
   WELCOME: 1,
   VERIFICATION: 2,
   RESET_REQUEST: 3,
   RESET_SUCCESS: 4,
   MESSAGE: 5,
+  TEST_BATCH: 6,
 };
 
 export const ContentTypes = {
@@ -22,16 +23,16 @@ class BackgroundService {
   }
 
   async handleEmails(mailType, emailData) {
-    const emailTransport = TransportTypes.EMAIL;
+    const emailTransport = TransportType.EMAIL;
     switch (mailType) {
-      case EmailTypes.WELCOME: {
+      case EmailType.WELCOME: {
         return this.messager.sendWelcomeMessage(
           emailData.viewer,
           emailTransport,
           emailData.lang,
         );
       }
-      case EmailTypes.VERIFICATION: {
+      case EmailType.VERIFICATION: {
         return this.messager.sendVerificationMessage(
           emailData.viewer,
           emailData.address,
@@ -39,21 +40,21 @@ class BackgroundService {
           emailData.lang,
         );
       }
-      case EmailTypes.RESET_REQUEST: {
+      case EmailType.RESET_REQUEST: {
         return this.messager.sendResetRequestMessage(
           emailData.viewer,
           emailTransport,
           emailData.lang,
         );
       }
-      case EmailTypes.RESET_SUCCESS: {
+      case EmailType.RESET_SUCCESS: {
         return this.messager.sendResetNotificationMessage(
           emailData.viewer,
           emailTransport,
           emailData.lang,
         );
       }
-      case EmailTypes.MESSAGE: {
+      case EmailType.MESSAGE: {
         return this.messager.sendMessage(
           emailData.recipient,
           { content: emailData.message, subject: emailData.subject },
@@ -62,8 +63,11 @@ class BackgroundService {
           emailData.lang,
         );
       }
+      case EmailType.TEST_BATCH: {
+        return this.messager.sendBatchMessages(emailData);
+      }
       default: {
-        throw new Error('Email type not recognizes');
+        throw new Error('Email type not recognized');
       }
     }
   }

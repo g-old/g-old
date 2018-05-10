@@ -1,3 +1,4 @@
+// @flow
 import bcrypt from 'bcrypt';
 import knex from '../knex';
 import { validateEmail } from '../../core/helpers';
@@ -5,8 +6,32 @@ import { canChangeGroups, calcRights, Groups } from '../../organization';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import log from '../../logger';
 
+const NOTIFICATION_FIELDS = [
+  'proposal',
+  'survey',
+  'comment',
+  'discussion',
+  'update',
+  'reply',
+  'message',
+  'statement',
+];
+
+export type UserProps = {
+  id: ID,
+  name: string,
+  surname: string,
+  email: string,
+  groups: number,
+  thumbnail: string,
+  emailVerified: boolean,
+  last_login_at: string,
+  created_at: string,
+  canVoteSince: ?string,
+  locale: Locale,
+};
 class User {
-  constructor(data) {
+  constructor(data: UserProps) {
     this.id = data.id;
     this.name = data.name;
     this.surname = data.surname;
@@ -17,6 +42,7 @@ class User {
     this.lastLogin = data.last_login_at;
     this.createdAt = data.created_at;
     this.canVoteSince = data.can_vote_since;
+    this.locale = data.locale;
   }
   static async gen(viewer, id, { users }) {
     if (!id) return null;
@@ -124,6 +150,82 @@ class User {
     }
     if (data.thumbnail) {
       newData.thumbnail = data.thumbnail;
+    }
+    if (data.locale && ['it-IT', 'de-DE', 'lld-IT'].includes(data.locale)) {
+      newData.locale = data.locale;
+    }
+    if (data.notificationSettings) {
+      // validate
+      let validatedSettings;
+      if (data.notificationSettings.length < 1024) {
+        const parsedSettings = JSON.parse(data.notificationSettings);
+        // check keys
+        validatedSettings = Object.keys(parsedSettings).reduce(
+          (acc, settingField) => {
+            const validatedKey = NOTIFICATION_FIELDS.find(
+              field => settingField === field,
+            );
+            if (!validatedKey) {
+              errors.push(`Wrong key in NotificationSettings: ${settingField}`);
+              return acc;
+            }
+            const params = parsedSettings[validatedKey];
+            const validatedParams = {};
+            if ('email' in params) {
+              validatedParams.email = !!params.email;
+            }
+            if ('webpush' in params) {
+              validatedParams.webpush = !!params.webpush;
+            }
+            acc[validatedKey] = validatedParams;
+            return acc;
+          },
+
+          {},
+        );
+      }
+
+      const [settingsData] = await knex('notification_settings')
+        .where({ user_id: data.id })
+        .select('settings');
+      const { settings } = settingsData;
+      if (settings) {
+        // merge
+        const newSettings = NOTIFICATION_FIELDS.reduce((acc, key) => {
+          if (key in settings && key in validatedSettings) {
+            // update
+            const mergedValues = {
+              ...settings[key],
+              ...validatedSettings[key],
+            };
+
+            // filter disabled settings out
+            Object.keys(mergedValues).forEach(property => {
+              if (!mergedValues[property]) {
+                delete mergedValues[property];
+              }
+            });
+
+            if (Object.keys(mergedValues).length) {
+              acc[key] = mergedValues;
+            }
+          } else if (key in settings) {
+            acc[key] = settings[key];
+          } else {
+            acc[key] = validatedSettings[key];
+          }
+          return acc;
+        }, {});
+        await knex('notification_settings')
+          .where({ user_id: data.id })
+          .update({ settings: newSettings, updated_at: new Date() });
+      } else {
+        await knex('notification_settings').insert({
+          user_id: data.id,
+          settings: validatedSettings,
+          created_at: new Date(),
+        });
+      }
     }
     if (data.password) {
       if (data.passwordOld) {
@@ -274,13 +376,15 @@ class User {
       password_hash: hash,
       groups: Groups.GUEST,
       created_at: new Date(),
+      locale: data.locale,
     };
     const newUser = await knex.transaction(async trx => {
-      const uData = await trx
+      const [userData = null] = await trx
         .insert(newUserData)
         .into('users')
         .returning('*');
-      return uData[0];
+      await trx.insert({ user_id: userData.id }).into('notification_settings');
+      return userData;
     });
     if (!newUser) return null;
     return new User(newUser);

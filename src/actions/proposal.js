@@ -30,6 +30,7 @@ import {
 } from '../store/schema';
 import { getProposalsIsFetching, getIsProposalFetching } from '../reducers';
 import { getFilter } from '../core/helpers';
+import { subscriptionFields } from './subscription';
 
 const userFields = `
         id
@@ -115,13 +116,15 @@ const query = `
   query ($id:ID $pollId: ID) {
     proposalDL (id:$id pollId:$pollId) {
       ${proposal}
-      subscribed
+      subscription{
+        ${subscriptionFields}
+      }
       canVote
     }
   }
 `;
 
-export const pollFieldsForList = `{
+export const pollFieldsForList = `
   id
   upvotes
   downvotes
@@ -136,7 +139,7 @@ export const pollFieldsForList = `{
     unipolar
     thresholdRef
   }
-}
+
 `;
 
 const tagsQuery = `
@@ -171,8 +174,8 @@ query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID) {
           id
           count
         }
-        pollOne ${pollFieldsForList}
-        pollTwo ${pollFieldsForList}
+        pollOne {${pollFieldsForList}}
+        pollTwo {${pollFieldsForList}}
       }
 
       }
@@ -194,8 +197,8 @@ mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $ta
 `;
 
 const updateProposalMutation = `
-mutation($id:ID  $poll:PollInput $state:ProposalState ){
-  updateProposal (proposal:{ id:$id poll:$poll state:$state }){
+mutation($id:ID  $poll:PollInput $state:ProposalState $workTeamId:ID ){
+  updateProposal (proposal:{ id:$id poll:$poll state:$state workTeamId:$workTeamId}){
     ${proposal}
     tags{
       id

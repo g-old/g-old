@@ -20,6 +20,12 @@ const routes = {
       load: () => import(/* webpackChunkName: 'home' */ './home'),
     },
     {
+      path: '/notifications',
+      load: () =>
+        import(/* webpackChunkName: 'notifications' */ './notifications'),
+    },
+
+    {
       path: '/feed',
       load: () => import(/* webpackChunkName: 'feed' */ './feed'),
     },
@@ -58,6 +64,10 @@ const routes = {
     {
       path: '/admin',
       load: () => import(/* webpackChunkName: 'admin' */ './admin'),
+    },
+    {
+      path: '/message/:id',
+      load: () => import(/* webpackChunkName: 'message' */ './message'),
     },
     {
       path: '/admin/workteam/create',

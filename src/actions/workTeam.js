@@ -100,8 +100,9 @@ const proposalFields = `
     title
     state
     body
-    pollOne ${pollFieldsForList}
-    pollTwo ${pollFieldsForList}`;
+    workTeamId
+    pollOne {${pollFieldsForList}}
+    pollTwo {${pollFieldsForList}}`;
 
 const workTeamWithDetails = `query($id:ID!){
     workTeam(id:$id) {

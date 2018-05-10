@@ -11,6 +11,9 @@ const UserInputType = new GraphQLInputObjectType({
     groups: {
       type: GraphQLInt,
     },
+    locale: {
+      type: String,
+    },
     surname: {
       type: String,
     },
@@ -32,6 +35,9 @@ const UserInputType = new GraphQLInputObjectType({
 
     followee: {
       type: ID,
+    },
+    notificationSettings: {
+      type: String,
     },
 
     id: {

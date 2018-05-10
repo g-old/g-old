@@ -21,6 +21,11 @@ const messages = defineMessages({
     defaultMessage: 'Frequently asked questions',
     description: 'FAQ label',
   },
+  contact: {
+    id: 'contact',
+    defaultMessage: 'Contact',
+    description: 'Contact label',
+  },
 });
 
 class Help extends React.Component {
@@ -50,7 +55,13 @@ class Help extends React.Component {
     const firstStepsPromise = this.handleLoading('firstSteps');
     const helpPromise = this.handleLoading('help');
     const privacyPromise = this.handleLoading('privacy');
-    await Promise.all([firstStepsPromise, helpPromise, privacyPromise]);
+    const contactPromise = this.handleLoading('contact');
+    await Promise.all([
+      firstStepsPromise,
+      helpPromise,
+      privacyPromise,
+      contactPromise,
+    ]);
   }
   handleLoading(filename) {
     return new Promise(resolve => {
@@ -71,27 +82,22 @@ class Help extends React.Component {
   }
   render() {
     return (
-      <Accordion openMulti active={this.props.firstSteps ? 0 : -1}>
-        <AccordionPanel
-          heading={<FormattedMessage {...messages.firstSteps} />}
-          active={this.state.panel === 'firstSteps'}
-        >
+      <Accordion active={this.props.firstSteps ? 0 : -1}>
+        <AccordionPanel heading={<FormattedMessage {...messages.firstSteps} />}>
           {!this.state.firstSteps && (
             <FormattedMessage {...messages.firstSteps} />
           )}
           {this.state.firstSteps && <Page {...this.state.firstSteps} />}
         </AccordionPanel>
-        <AccordionPanel
-          heading={<FormattedMessage {...messages.faq} />}
-          active={this.state.panel === 'help'}
-        >
+        <AccordionPanel heading={<FormattedMessage {...messages.faq} />}>
           {!this.state.help && <FormattedMessage {...messages.faq} />}
           {this.state.help && <Page {...this.state.help} />}
         </AccordionPanel>
-        <AccordionPanel
-          heading={<FormattedMessage {...messages.privacy} />}
-          active={this.state.panel === 'help'}
-        >
+        <AccordionPanel heading={<FormattedMessage {...messages.contact} />}>
+          {!this.state.contact && <FormattedMessage {...messages.contact} />}
+          {this.state.contact && <Page {...this.state.contact} />}
+        </AccordionPanel>
+        <AccordionPanel heading={<FormattedMessage {...messages.privacy} />}>
           {!this.state.privacy && <FormattedMessage {...messages.privacy} />}
           {this.state.privacy && <Page {...this.state.privacy} />}
         </AccordionPanel>

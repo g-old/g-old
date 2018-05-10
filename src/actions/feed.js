@@ -8,6 +8,7 @@ import {
 
 import { activityArray as activitiesSchema } from '../store/schema';
 import { getFeedIsFetching, getSessionUser } from '../reducers';
+import { pollFieldsForList } from './proposal';
 
 const userFields = `
 id
@@ -28,10 +29,8 @@ ${userFields}
 }
 `;
 
-const feed = `
-query($userId:ID){
-  feed (userId:$userId) {
-  id
+export const activityFields = `
+id
   type
   objectId
   verb
@@ -70,36 +69,11 @@ query($userId:ID){
       votes
       workTeamId
       pollOne {
-        id
-        upvotes
-        downvotes
-        threshold
-        start_time
-        endTime
-        allVoters
-        closedAt
-        mode{
-          id
-          withStatements
-          unipolar
-          thresholdRef
-        }
+        ${pollFieldsForList}
       }
       pollTwo {
-        id
-        upvotes
-        downvotes
-        threshold
-        start_time
-        endTime
-        allVoters
-        closedAt
-        mode{
-          id
-          withStatements
-          unipolar
-          thresholdRef
-        }
+        ${pollFieldsForList}
+
       }
     }
     ... on StatementDL {
@@ -132,7 +106,7 @@ query($userId:ID){
         thumbnail
       }
     }
-    ... on Notification {
+    ... on Message {
       id
       sender {
         name
@@ -143,7 +117,11 @@ query($userId:ID){
       msg
       title
     }
-  }
+  }`;
+const feed = `
+query($userId:ID){
+  feed (userId:$userId) {
+  ${activityFields}
 }
 }
 `;

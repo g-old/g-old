@@ -1,0 +1,6 @@
+@import '../variables';
+
+.center {
+  display: flex;
+  justify-content: center;
+}

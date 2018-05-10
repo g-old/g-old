@@ -8,6 +8,7 @@ import {
   SSE_UPDATE_SUCCESS,
   LOAD_WORKTEAM_SUCCESS,
   JOIN_WORKTEAM_SUCCESS,
+  LOAD_NOTIFICATIONS_SUCCESS,
 } from '../constants';
 
 export default function pollingModes(state = {}, action) {
@@ -18,6 +19,7 @@ export default function pollingModes(state = {}, action) {
     case UPDATE_PROPOSAL_SUCCESS:
     case JOIN_WORKTEAM_SUCCESS:
     case LOAD_WORKTEAM_SUCCESS:
+    case LOAD_NOTIFICATIONS_SUCCESS:
     case LOAD_PROPOSAL_LIST_SUCCESS: {
       return merge({}, state, action.payload.entities.pollingModes);
     }

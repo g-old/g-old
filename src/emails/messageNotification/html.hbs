@@ -1,0 +1,32 @@
+{{#extend "layout"}}
+
+  {{#content "main"}}
+
+  <div class="proposal-root">
+    <div style="background-color: #ffd602;
+    color: #000;
+    padding: 1em;
+    border-radius: 1em;" >
+   <div><label style="font-weight: 300;
+    cursor: inherit;
+    font-size: 19px;
+    font-size: 1.1875rem;
+    line-height: 1.26316;">{{subject}}</label></div>
+    <div style="margin-bottom: 1.5em;">{{message}}</div>
+
+    <div style="padding: 0.1em 0.3em;
+    border-radius: 4px;
+    background-color: #eee7f5;
+    color: #666;">
+    <img style="width: 1em;
+    height: 1em; margin-right:0.5rem; vertical-align:middle" src="{{thumbnail}}" />
+    <span>{{sender}}</span>
+    </div>
+    </div>
+  </div>
+
+
+
+  {{/content}}
+
+{{/extend}}

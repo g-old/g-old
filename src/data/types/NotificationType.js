@@ -1,40 +1,34 @@
-import { GraphQLID, GraphQLNonNull, GraphQLString, GraphQLObjectType as ObjectType } from 'graphql';
+import {
+  GraphQLString as String,
+  GraphQLObjectType as ObjectType,
+  GraphQLID as ID,
+  GraphQLBoolean,
+} from 'graphql';
 
-import UserType from './UserType';
+import Activity from '../models/Activity';
+import ActivityType from './ActivityType';
 
 const NotificationType = new ObjectType({
   name: 'Notification',
-
-  fields: {
+  fields: () => ({
     id: {
-      type: new GraphQLNonNull(GraphQLID),
+      type: ID,
     },
-    msg: {
-      type: GraphQLString,
+    activity: {
+      type: ActivityType,
+      resolve: (parent, args, { viewer, loaders }) =>
+        Activity.gen(viewer, parent.activityId, loaders),
     },
-
-    title: {
-      type: GraphQLString,
+    read: {
+      type: GraphQLBoolean,
     },
-
-    date: {
-      type: GraphQLString,
-    },
-
-    sender: {
-      type: UserType,
-    },
-
-    location: {
-      type: GraphQLString,
-    },
-    type: {
-      type: GraphQLString,
-    },
-
     createdAt: {
-      type: GraphQLString,
+      type: String,
     },
-  },
+    updatedAt: {
+      type: String,
+    },
+  }),
 });
+
 export default NotificationType;

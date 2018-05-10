@@ -3,7 +3,7 @@ import proposals, * as fromProposal from './ui/proposals';
 import statements, * as fromStatement from './ui/statements';
 import users, * as fromUser from './ui/users';
 import polls, * as fromPoll from './ui/polls';
-import subscription, * as fromSubscription from './ui/subscription';
+import subscription, * as fromPushSubscription from './ui/subscription';
 import activityCounter, * as fromActivityCounter from './ui/activities';
 import loading from './ui/loading';
 import pageInfo, * as fromPageInfo from './ui/pageInfo';
@@ -13,10 +13,14 @@ import requests, * as fromRequest from './ui/requests';
 import workTeams, * as fromWorkTeam from './ui/workTeams';
 import discussions, * as fromDiscussion from './ui/discussions';
 import tags, * as fromTag from './ui/tags';
+import subscriptions, * as fromSubscription from './ui/subscriptions';
+import notifications, * as fromNotification from './ui/notifications';
 /* GENERATOR_IMPORTS */
 
 const uiReducer = combineReducers({
   /* GENERATOR_COMBINE */
+  notifications,
+  subscriptions,
   requests,
   proposals,
   polls,
@@ -40,6 +44,10 @@ export default (state, action) => {
 };
 
 /* GENERATOR_EXPORTS */
+export const getNotificationUpdates = state =>
+  fromNotification.getStatus(state.notifications);
+export const getSubscriptionUpdates = state =>
+  fromSubscription.getStatus(state.subscriptions);
 export const getTagUpdates = state => fromTag.getStatus(state.tags);
 export const getRequestUpdates = state => fromRequest.getStatus(state.requests);
 export const getWorkTeamUpdates = (state, id) =>
@@ -115,7 +123,7 @@ export const getAccountUpdates = (state, id) =>
   fromUser.getStatus(state.users, id) || {};
 
 export const getSubscription = state =>
-  fromSubscription.getStatus(state.subscription);
+  fromPushSubscription.getStatus(state.subscription);
 
 export const getActivityCounter = state =>
   fromActivityCounter.getCounter(state.activityCounter);

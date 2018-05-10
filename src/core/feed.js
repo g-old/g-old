@@ -1,10 +1,11 @@
 /* eslint-disable import/prefer-default-export */
 import Activity from '../data/models/Activity';
-import Notification from '../data/models/Notification';
-import WorkTeam from '../data/models/WorkTeam';
+import Message from '../data/models/Message';
+// import WorkTeam from '../data/models/WorkTeam';
 import knex from '../data/knex';
 import log from '../logger';
-import User from '../data/models/User';
+// import User from '../data/models/User';
+import { TargetType } from '../data/models/Subscription';
 
 const maxFeedLength = 30;
 
@@ -20,11 +21,10 @@ class FeedManager{
 */
 async function pushToLog(userId, activityId) {
   try {
-    let userActivities = await knex('feeds')
+    let [userActivities = null] = await knex('feeds')
       .where({ user_id: userId })
       .select('activity_ids');
 
-    userActivities = userActivities[0];
     if (!userActivities) {
       return knex('feeds').insert({
         user_id: userId,
@@ -46,7 +46,7 @@ async function pushToLog(userId, activityId) {
   } catch (err) {
     log.error(
       { err, data: { userId, activityId } },
-      'Notification insertion failed',
+      'Message insertion failed',
     );
     return Promise.resolve();
   }
@@ -144,7 +144,7 @@ export async function insertIntoWorkTeamFeeds(
   return result;
 }
 
-export async function circularFeedNotification({
+export async function circularFeedMessage({
   viewer,
   data,
   verb,
@@ -157,28 +157,42 @@ export async function circularFeedNotification({
   }
   const result = null;
   try {
-    const notification = await Notification.create(viewer, {
-      type: data.notificationType, // event or msg
-      msg: data.msg,
-      title: data.title,
-      date: data.date,
-      location: data.location,
-    });
-
-    if (!notification) return null;
+    const message = await Message.create(
+      viewer,
+      {
+        type: data.messageType, // event or msg
+        msg: data.msg,
+        title: data.title,
+        date: data.date,
+        location: data.location,
+        /* info: {
+        targetType:
+          receiver.type === 'team' ? TargetType.GROUP : TargetType.USER,
+        targetId: receiver.id,
+      }, */
+      },
+      loaders,
+    );
+    if (!message) return null;
     const activity = await Activity.create(viewer, {
       verb,
-      type: 'notification',
-      objectId: notification.id,
-      content: notification,
+      type: 'message',
+      objectId: message.id,
+      content: {
+        ...message,
+        targetType:
+          receiver.type === 'team' ? TargetType.GROUP : TargetType.USER,
+        targetId: receiver.id,
+      },
     });
     if (!activity) {
-      await knex('notifications')
-        .where({ id: notification.id })
+      await knex('messages')
+        .where({ id: message.id })
         .del();
       return result;
     }
-    let res;
+    return result;
+    /* let res;
     if (receiver.type === 'team') {
       const team = await WorkTeam.gen(viewer, receiver.id);
       if (!team) {
@@ -186,8 +200,8 @@ export async function circularFeedNotification({
           `Team not found: Receiver: ${JSON.stringify(receiver)}`,
         );
       }
-      res = await team.circularFeedNotification(viewer, activity, pushToLog);
-      log.info(`Notification sent to team ${team.name}`);
+      res = await team.circularFeedMessage(viewer, activity, pushToLog);
+      log.info(`Message sent to team ${team.name}`);
     } else if (receiver.type === 'user') {
       // get user
       const recipient = await User.gen(viewer, receiver.id, loaders);
@@ -199,14 +213,14 @@ export async function circularFeedNotification({
     }
     if (!res) {
       // delete all
-      await knex('notifications')
-        .where({ id: notification.id })
+      await knex('messages')
+        .where({ id: message.id })
         .del();
       await knex('activities')
         .where({ id: activity.id })
         .del();
     }
-    return res;
+    return res; */
   } catch (err) {
     log.error(
       { err, args: { viewer, data, verb, receiver } },

@@ -2,6 +2,7 @@ import merge from 'lodash.merge';
 import {
   LOAD_PROPOSAL_LIST_SUCCESS,
   LOAD_PROPOSAL_SUCCESS,
+  LOAD_NOTIFICATIONS_SUCCESS,
   LOAD_VOTES_SUCCESS,
   CREATE_VOTE_SUCCESS,
   UPDATE_VOTE_SUCCESS,
@@ -106,6 +107,7 @@ export default function polls(state = {}, action) {
           votes: [...action.payload.result], // TODO merge!
         },
       };
+    case LOAD_NOTIFICATIONS_SUCCESS:
     case UPDATE_PROPOSAL_SUCCESS:
     case CREATE_PROPOSAL_SUCCESS:
     case JOIN_WORKTEAM_SUCCESS:

@@ -10,7 +10,9 @@ import MailService from './core/MailService';
 import MessageService from './core/MessageService';
 import TokenService from './core/TokenService';
 import BackgroundService from './core/BackgroundService';
+import NotificationService from './core/NotificationService';
 import { createToken } from './core/tokens';
+import PubSub from './core/pubsub';
 
 const env = process.env.NODE_ENV || 'development';
 const mailOptions = config.mailer;
@@ -20,11 +22,19 @@ let Transporter;
 if (env === 'production' || env === USE_SENDGRID) {
   Transporter = require('./core/SendGridTransporter').default; // eslint-disable-line global-require
 } else {
-  Transporter = nodemailer.createTransport(mailOptions.config);
+  Transporter = nodemailer.createTransport({
+    ...mailOptions.config,
+    logger: true,
+    debug: __DEV__,
+    service: 'Ethereal',
+    requireTLS: false,
+  });
 }
 
 const messagesRepo = {};
-const mailService = new MailService(Transporter);
+const mailService = new MailService(Transporter, {
+  defaultSender: mailOptions.sender,
+});
 const mailComposer = new MailComposer(handlebars);
 const tokenService = new TokenService(createToken);
 const messageService = new MessageService(
@@ -32,7 +42,15 @@ const messageService = new MessageService(
   messagesRepo,
   mailComposer,
   tokenService,
+  knex,
 );
+const pubsub = new PubSub();
+const notificationService = new NotificationService({
+  eventManager: EventManager,
+  dbConnector: knex,
+  mailComposer,
+  pubsub,
+});
 const backgroundService = new BackgroundService(messageService);
 export default {
   ActivityService: new ActivityService(
@@ -42,4 +60,6 @@ export default {
   MailComposer: mailComposer,
   MessageService: messageService,
   BackgroundService: backgroundService,
+  NotificationService: notificationService,
+  PubSub: pubsub,
 };

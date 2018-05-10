@@ -1,47 +1,39 @@
-import { GraphQLNonNull } from 'graphql';
+import { GraphQLNonNull, GraphQLID } from 'graphql';
 import CommentInput from '../types/CommentInputType';
 import CommentType from '../types/CommentType';
 import Comment from '../models/Comment';
-// import { sendJob } from '../../core/childProcess';
-// import log from '../../logger';
-// import { insertIntoFeed } from '../../core/feed';
+import Subscription, {
+  TargetType,
+  SubscriptionType,
+} from '../models/Subscription';
+import WithSubscriptionResultType from '../types/WithSubscriptionResultType';
 
 const createComment = {
-  type: new GraphQLNonNull(CommentType),
+  type: new GraphQLNonNull(new WithSubscriptionResultType(CommentType)),
   args: {
     comment: {
       type: CommentInput,
       description: 'Create a new comment',
     },
+    targetId: {
+      type: GraphQLID,
+    },
   },
-  resolve: async (data, { comment }, { viewer, loaders }) => {
+  resolve: async (data, { comment, targetId }, { viewer, loaders }) => {
     const newComment = await Comment.create(viewer, comment, loaders);
-    /*
-    if (newComment) {
-      const activityId = await insertIntoFeed(
+    let subscription;
+    if (newComment && targetId) {
+      subscription = await Subscription.create(
+        viewer,
         {
-          viewer,
-          data: {
-            type: 'comment',
-            content: newComment,
-            objectId: newComment.id,
-          },
-          verb: 'create',
+          targetType: TargetType.DISCUSSION,
+          targetId,
+          subscriptionType: SubscriptionType.REPLIES,
         },
-        true,
+        loaders,
       );
-      if (activityId) {
-        pubsub.publish('activities', { id: activityId });
-      }
-      if (!sendJob({ type: 'webpush', data: newComment })) {
-        log.error(
-          { viewer, job: { type: 'webpush', data: newComment } },
-          'Could not send job to worker',
-        );
-      }
     }
-*/
-    return newComment;
+    return { resource: newComment, subscription };
   },
 };
 

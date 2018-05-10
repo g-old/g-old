@@ -141,7 +141,7 @@ class Select extends React.Component {
         className: s.drop,
       });
     } else if (dropActive && prevState.dropActive) {
-      // this.drop.render(this.renderOptions());
+      this.drop.render(this.renderOptions());
       // TODO check why this throws
     }
   }
