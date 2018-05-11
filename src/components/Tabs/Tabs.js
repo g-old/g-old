@@ -7,8 +7,14 @@ import s from './Tabs.css';
 
 class Tabs extends React.Component {
   static propTypes = {
+    // eslint-disable-next-line react/require-default-props
     activeIndex: PropTypes.number,
     children: PropTypes.node,
+    onActive: PropTypes.func,
+  };
+  static defaultProps = {
+    children: null,
+    onActive: null,
   };
   constructor(props) {
     super(props);
@@ -30,6 +36,9 @@ class Tabs extends React.Component {
     // eslint-disable-next-line no-prototype-builtins
     if (!this.props.hasOwnProperty('activeIndex')) {
       this.setState({ activeIndex: index });
+    }
+    if (this.props.onActive) {
+      this.props.onActive(index);
     }
   }
 
@@ -65,9 +74,7 @@ class Tabs extends React.Component {
         <ul {...props} className={s.tabs}>
           {tabs}
         </ul>
-        <div role="tabpanel">
-          {activeContainer}
-        </div>
+        <div role="tabpanel">{activeContainer}</div>
       </div>
     );
   }

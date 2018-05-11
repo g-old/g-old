@@ -37,7 +37,10 @@ class Tab extends React.Component {
     return (
       <li {...props} id={id} className={s.tab}>
         <Button plain onClick={this.onTabClick}>
-          <label className={cn(s.tab_label, active && s.active)} htmlFor="tabButton">
+          <label
+            className={cn(s.tab_label, active && s.active)}
+            htmlFor="tabButton"
+          >
             {title}
           </label>
         </Button>
