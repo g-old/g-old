@@ -2,4 +2,4 @@
 component: ContentPage
 ---
 
-Contact address : Josefs email address
+Contact address : joe.pedevilla@gmail.com
