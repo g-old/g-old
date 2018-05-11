@@ -114,7 +114,7 @@ class NotificationMenu extends React.Component {
     }
   }
   renderNotifications() {
-    const { notifications, status } = this.props;
+    const { notifications, status, user } = this.props;
     if (status.pending && !notifications.length) {
       let n = 1;
       /* eslint-disable */
@@ -125,8 +125,10 @@ class NotificationMenu extends React.Component {
       return (
         <NotificationDrop
           notifications={placeHolder}
+          unreadNotifications={user.unreadNotifications}
           showSpinner={false}
           notificationComponent={NotificationSkeleton}
+          onMarkAsRead={this.onMarkAsRead}
         />
       );
     }
@@ -134,8 +136,10 @@ class NotificationMenu extends React.Component {
     return (
       <NotificationDrop
         notifications={notifications}
+        unreadNotifications={user.unreadNotifications}
         showSpinner={status.pending}
         notificationComponent={Notification}
+        onMarkAsRead={this.onMarkAsRead}
       />
     );
   }

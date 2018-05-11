@@ -1384,14 +1384,14 @@
     "description": "Label mark as read",
     "defaultMessage": "Mark all as read",
     "message": "",
-    "files": ["src/components/NotificationMenu/NotificationMenu.js"]
+    "files": ["src/components/NotificationDrop/NotificationDrop.js"]
   },
   {
     "id": "label.notificationsLink",
     "description": "Label notifications link",
     "defaultMessage": "See all notifications",
-    "message": "",
-    "files": ["src/components/NotificationMenu/NotificationMenu.js"]
+    "message": "Alle anzeigen",
+    "files": ["src/components/NotificationDrop/NotificationDrop.js"]
   },
   {
     "id": "notificationType.email",
@@ -1467,35 +1467,35 @@
     "id": "notifications.comment.new",
     "description": "Status message for notifications",
     "defaultMessage": "wrote a comment on",
-    "message": "",
+    "message": "hat kommentiert auf",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.discussion.new",
     "description": "Status message for notifications",
     "defaultMessage": "New discussion published:",
-    "message": "",
+    "message": "Neue Diskussion:",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.message.new",
     "description": "Status message for notifications",
     "defaultMessage": "You got a message from",
-    "message": "",
+    "message": "Neue Nachricht von",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.accepted",
     "description": "Status message for notifications",
     "defaultMessage": "got accepted!",
-    "message": "",
+    "message": "wurde angenommen",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.new",
     "description": "Status message for notifications",
     "defaultMessage": "New proposal published:",
-    "message": "",
+    "message": "Neuer Beschluss:",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1509,77 +1509,87 @@
     "id": "notifications.proposal.rejected",
     "description": "Status message for notifications",
     "defaultMessage": "was rejected!",
-    "message": "",
+    "message": "wurde abgelehnt",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.revoked",
     "description": "Status message for notifications",
     "defaultMessage": "was revoked!",
-    "message": "",
+    "message": "wurde zurückgezogen",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.voting",
     "description": "Status message for notifications",
     "defaultMessage": "opened voting phase!",
-    "message": "",
+    "message": "hat die Abstimmung eröffnet",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.statement.new",
     "description": "Status message for notifications",
     "defaultMessage": "wrote a statement on",
-    "message": "",
+    "message": "hat geantwortet auf",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.survey.closed",
     "description": "Status message for notifications",
     "defaultMessage": "was closed",
-    "message": "",
+    "message": "wurde gschlossen",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.survey.new",
     "description": "Status message for notifications",
     "defaultMessage": "New survey published:",
-    "message": "",
+    "message": "Neue Umfrage:",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "label.locale",
     "description": "Label locale",
     "defaultMessage": "Language",
-    "message": "",
+    "message": "Spracheinstellung",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
     "id": "notifications",
     "description": "Label for notification link",
     "defaultMessage": "Notifications",
-    "message": "",
+    "message": "Benachrichtigungen",
     "files": ["src/components/UserStatus/UserStatus.js"]
   },
   {
     "id": "label.notifications",
     "description": "Notifications label",
     "defaultMessage": "Notifications",
-    "message": "",
-    "files": ["src/routes/notifications/NotificationListContainer.js"]
+    "message": "Benachrichtigungen",
+    "files": [
+      "src/components/NotificationDrop/NotificationDrop.js",
+      "src/routes/notifications/NotificationListContainer.js"
+    ]
   },
   {
     "id": "discussion.create",
     "description": "Label for Manager",
     "defaultMessage": "Create discussion",
-    "message": "",
+    "message": "Neue Diskussion erstellen",
     "files": ["src/routes/workTeamManager/WorkTeamManagement.js"]
   },
   {
     "id": "label.requests",
     "description": "Label request",
     "defaultMessage": "Requests",
-    "message": "",
+    "message": "Anfragen",
     "files": ["src/routes/workTeamManager/WorkTeamManagement.js"]
+  },
+  {
+    "id": "contact",
+    "description": "Contact label",
+    "defaultMessage": "Contact",
+    "message": "",
+    "files": ["src/components/InfoPage/InfoPage.js"]
   }
 ]

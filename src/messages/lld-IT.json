@@ -1305,14 +1305,14 @@
     "description": "Label mark as read",
     "defaultMessage": "Mark all as read",
     "message": "",
-    "files": ["src/components/NotificationMenu/NotificationMenu.js"]
+    "files": ["src/components/NotificationDrop/NotificationDrop.js"]
   },
   {
     "id": "label.notificationsLink",
     "description": "Label notifications link",
     "defaultMessage": "See all notifications",
     "message": "",
-    "files": ["src/components/NotificationMenu/NotificationMenu.js"]
+    "files": ["src/components/NotificationDrop/NotificationDrop.js"]
   },
   {
     "id": "notificationType.email",
@@ -1487,7 +1487,10 @@
     "description": "Notifications label",
     "defaultMessage": "Notifications",
     "message": "",
-    "files": ["src/routes/notifications/NotificationListContainer.js"]
+    "files": [
+      "src/components/NotificationDrop/NotificationDrop.js",
+      "src/routes/notifications/NotificationListContainer.js"
+    ]
   },
   {
     "id": "discussion.create",
@@ -1502,5 +1505,12 @@
     "defaultMessage": "Requests",
     "message": "",
     "files": ["src/routes/workTeamManager/WorkTeamManagement.js"]
+  },
+  {
+    "id": "contact",
+    "description": "Contact label",
+    "defaultMessage": "Contact",
+    "message": "",
+    "files": ["src/components/InfoPage/InfoPage.js"]
   }
 ]

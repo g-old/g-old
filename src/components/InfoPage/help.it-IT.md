@@ -93,7 +93,7 @@ I sondaggi sono **aperti a tutti gli utenti** e hanno principalmente due scopi:
 
 ### Utenti
 
-Gli utenti sono tutti gli iscritti alla piattaforma. Si possono iscrivere tutti gli attivisti, simpatizzanti e interessati al Movimento 5 Stelle della provincia di Bolzano. All’interno della piattaforma gli utenti possono avere ruoli diversi, definiti meglio nella sezione “Profili”.
+Gli utenti sono tutti gli iscritti alla piattaforma. Si possono iscrivere tutti gli attivisti, simpatizzanti e interessati al Movimento 5 Stelle della provincia di Bolzano. All’interno della piattaforma gli utenti possono avere ruoli diversi. (**_-> Profili_**).
 
 ### V
 

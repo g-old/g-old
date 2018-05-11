@@ -36,12 +36,13 @@ const NotificationDrop = ({
   unreadNotifications,
   showSpinner,
   notificationComponent,
+  onMarkAsRead,
 }) => {
   let markReadBtn;
   if (unreadNotifications > 0) {
     markReadBtn = (
       <Button
-        onClick={this.onMarkAsRead}
+        onClick={onMarkAsRead}
         label={<FormattedMessage {...messages.markRead} />}
         plain
       />
@@ -86,6 +87,7 @@ NotificationDrop.propTypes = {
   unreadNotifications: PropTypes.number,
   showSpinner: PropTypes.bool,
   notificationComponent: PropTypes.node.isRequired,
+  onMarkAsRead: PropTypes.func.isRequired,
 };
 NotificationDrop.defaultProps = {
   notifications: null,
