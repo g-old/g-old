@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
+import { isPushAvailable } from '../../core/helpers';
 import FormValidation from '../FormValidation';
 import Form from '../Form';
 import FormField from '../FormField';
@@ -25,6 +26,16 @@ const messages = defineMessages({
     id: 'action.save',
     description: 'Label',
     defaultMessage: 'Save',
+  },
+  notifications: {
+    id: 'label.notifications',
+    description: 'Notifications label',
+    defaultMessage: 'Notifications',
+  },
+  availability: {
+    id: 'help.pushavailability',
+    description: 'Notice',
+    defaultMessage: '(available only in Chrome and Firefox browsers)',
   },
 });
 
@@ -208,17 +219,28 @@ class NotificationSettings extends React.Component {
         >
           {({ values, handleValueChanges, onSubmit }) => (
             <Form>
-              <legend>Notifications</legend>
-              <FormField label="WebPush" error={pushSubscription.error}>
-                <CheckBox
-                  toggle
-                  checked={pushSubscription.isPushEnabled}
-                  label={pushSubscription.isPushEnabled ? 'ON' : 'OFF'}
-                  onChange={this.props.onPushSubChange}
-                  disabled={disableSubscription || pushSubscription.pending}
-                />
-              </FormField>
-
+              <legend>
+                <FormattedMessage {...messages.notifications} />
+              </legend>
+              <fieldset>
+                <FormField
+                  label="WebPush"
+                  error={pushSubscription.error}
+                  help={
+                    !isPushAvailable() && (
+                      <FormattedMessage {...messages.availability} />
+                    )
+                  }
+                >
+                  <CheckBox
+                    toggle
+                    checked={pushSubscription.isPushEnabled}
+                    label={pushSubscription.isPushEnabled ? 'ON' : 'OFF'}
+                    onChange={this.props.onPushSubChange}
+                    disabled={disableSubscription || pushSubscription.pending}
+                  />
+                </FormField>
+              </fieldset>
               <Label>Proposals and Surveys</Label>
               <fieldset>
                 <FormField label="New Proposals">
