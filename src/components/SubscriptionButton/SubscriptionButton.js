@@ -22,22 +22,22 @@ const messages = defineMessages({
     defaultMessage: 'Subscribing for {subType}',
     description: 'Label okay',
   },
-  all: {
+  ALL: {
     id: 'subscriptionType.all',
     defaultMessage: 'All',
     description: 'Subscribe for all available events',
   },
-  followees: {
+  FOLLOWEES: {
     id: 'subscriptionType.followees',
     defaultMessage: 'Followees',
     description: 'Subscribe for  events of followees',
   },
-  updates: {
+  UPDATES: {
     id: 'subscriptionType.updates',
     defaultMessage: 'State updates',
     description: 'Subscribe for state updates',
   },
-  replies: {
+  REPLIES: {
     id: 'subscriptionType.replies',
     defaultMessage: 'Replies',
     description: 'Subscribe for replies',
@@ -80,17 +80,29 @@ class SubscriptionButton extends React.Component {
 
   render() {
     const { subscription, intl, status = {} } = this.props;
-    const { label } = this.state;
+    const { value } = this.state;
     let displayLabel;
     if (subscription) {
       displayLabel = intl.formatMessage(
         { ...messages.subscribed },
-        { subType: subscription.subscriptionType },
+        {
+          subType: intl
+            .formatMessage({
+              ...messages[subscription.subscriptionType],
+            })
+            .toUpperCase(),
+        },
       );
     } else if (status.pending) {
       displayLabel = intl.formatMessage(
         { ...messages.confirm },
-        { subType: label },
+        {
+          subType: intl
+            .formatMessage({
+              ...messages[value],
+            })
+            .toUpperCase(),
+        },
       );
     } else {
       displayLabel = intl.formatMessage({ ...messages.subscribe });
@@ -98,10 +110,10 @@ class SubscriptionButton extends React.Component {
     let messageKey;
     let defaultOption;
     if (this.props.targetType === 'DISCUSSION') {
-      messageKey = 'replies';
+      messageKey = 'REPLIES';
       defaultOption = 'REPLIES';
     } else {
-      messageKey = 'updates';
+      messageKey = 'UPDATES';
       defaultOption = 'UPDATES';
     }
 
@@ -117,13 +129,13 @@ class SubscriptionButton extends React.Component {
     options.push(
       {
         label: intl.formatMessage({
-          ...messages.all,
+          ...messages.ALL,
         }),
         value: 'ALL',
       },
       {
         label: intl.formatMessage({
-          ...messages.followees,
+          ...messages.FOLLOWEES,
         }),
         value: 'FOLLOWEES',
       },

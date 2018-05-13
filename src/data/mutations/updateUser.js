@@ -7,10 +7,10 @@ import {
 import UserInputType from '../types/UserInputType';
 import User from '../models/User';
 import UserType from '../types/UserType';
-import { sendJob } from '../../core/childProcess';
+// import { sendJob } from '../../core/childProcess';
 // import log from '../../logger';
 // import { getProtocol } from '../../core/helpers';
-import { Groups } from '../../organization';
+// import { Groups } from '../../organization';
 // import { EmailTypes } from '../../core/BackgroundService';
 
 const updateSession = (req, user) =>
@@ -26,7 +26,7 @@ const updateSession = (req, user) =>
   );
 
 /* eslint-disable no-bitwise */
-const getUpdatedGroup = (oldGroups, updatedGroups) => {
+/* const getUpdatedGroup = (oldGroups, updatedGroups) => {
   let groupDiff = oldGroups ^ updatedGroups;
   let added = true;
   if ((oldGroups & updatedGroups) !== oldGroups) {
@@ -42,9 +42,9 @@ const getUpdatedGroup = (oldGroups, updatedGroups) => {
   }, []);
 
   return { added, names: groups };
-};
+}; */
 /* eslint-enable no-bitwise */
-
+/*
 const notifyRoleChange = (viewer, user, message) => {
   const job = {
     type: 'notification',
@@ -58,7 +58,7 @@ const notifyRoleChange = (viewer, user, message) => {
   };
   return sendJob(job);
 };
-
+*/
 const updateUser = {
   type: new GraphQLNonNull(
     new GraphQLObjectType({
@@ -81,7 +81,8 @@ const updateUser = {
         // TODO better check!
 
         if (result.oldUser) {
-          const groups = getUpdatedGroup(
+          // TODO implement message compatible variant
+          /* const groups = getUpdatedGroup(
             result.oldUser.groups,
             result.user.groups,
           );
@@ -94,7 +95,7 @@ const updateUser = {
                   }, you are now member of the group ${groups.names.join(',')}`
                 : `You got removed from the group ${groups.names.join(',')}`
             }`,
-          });
+          }); */
           delete result.oldUser;
         }
       }
