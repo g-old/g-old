@@ -814,13 +814,6 @@
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
-    "id": "settings.workTeams",
-    "description": "Workteam",
-    "defaultMessage": "Workteams",
-    "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
     "id": "userSettings.oldPW",
     "description": "Current account password for form label",
     "defaultMessage": "Enter your current password",
@@ -1358,19 +1351,13 @@
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
-    "id": "notifications",
-    "description": "Label for notification link",
-    "defaultMessage": "Notifications",
-    "message": "",
-    "files": ["src/components/UserStatus/UserStatus.js"]
-  },
-  {
     "id": "label.notifications",
     "description": "Notifications label",
     "defaultMessage": "Notifications",
     "message": "",
     "files": [
       "src/components/NotificationDrop/NotificationDrop.js",
+      "src/components/NotificationSettings/NotificationSettings.js",
       "src/routes/notifications/NotificationListContainer.js"
     ]
   },
@@ -1394,5 +1381,19 @@
     "defaultMessage": "Contact",
     "message": "",
     "files": ["src/components/InfoPage/InfoPage.js"]
+  },
+  {
+    "id": "help.pushavailability",
+    "description": "Notice",
+    "defaultMessage": "(available only in Chrome and Firefox browsers)",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.notificationSettings",
+    "description": "Label for notification settings",
+    "defaultMessage": "Notification settings",
+    "message": "",
+    "files": ["src/routes/account/AccountContainer.js"]
   }
 ]

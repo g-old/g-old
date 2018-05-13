@@ -318,7 +318,7 @@
     "id": "proposal.voting",
     "description": "Proposal can be voted from now on",
     "defaultMessage": "Voting open",
-    "message": "",
+    "message": "Votazione aperta",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
@@ -891,17 +891,10 @@
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
-    "id": "settings.workTeams",
-    "description": "Workteam",
-    "defaultMessage": "Workteams",
-    "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
     "id": "userSettings.oldPW",
     "description": "Current account password for form label",
     "defaultMessage": "Enter your current password",
-    "message": "",
+    "message": "Inserisci la tua password attuale",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
@@ -1078,7 +1071,7 @@
     "id": "settings.email.requestCreated",
     "description": "Notification that a request has been created",
     "defaultMessage": "Check your email ({email}) to confirm.",
-    "message": "",
+    "message": "Controlla la tua casella di posta ({email}) per confirmare ",
     "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
@@ -1256,14 +1249,14 @@
     "id": "label.markRead",
     "description": "Label mark as read",
     "defaultMessage": "Mark all as read",
-    "message": "",
+    "message": "Segna tutte come già lette",
     "files": ["src/components/NotificationDrop/NotificationDrop.js"]
   },
   {
     "id": "label.notificationsLink",
     "description": "Label notifications link",
     "defaultMessage": "See all notifications",
-    "message": "",
+    "message": "Mostra tutte",
     "files": ["src/components/NotificationDrop/NotificationDrop.js"]
   },
   {
@@ -1291,28 +1284,28 @@
     "id": "subscribe",
     "description": "Label subscribe",
     "defaultMessage": "Subscribe",
-    "message": "",
+    "message": "Iscriviti",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
     "id": "subscribed",
     "description": "Label subscribed",
     "defaultMessage": "Subscribed ({subType})",
-    "message": "",
+    "message": "Iscritto ({subType})",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
     "id": "subscriptionType.all",
     "description": "Subscribe for all available events",
     "defaultMessage": "All",
-    "message": "",
+    "message": "Tutto",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
     "id": "subscriptionType.delete",
     "description": "Deleting subscription",
     "defaultMessage": "Unsubscribe",
-    "message": "",
+    "message": "Anulla l'iscrizione",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
@@ -1326,7 +1319,7 @@
     "id": "subscriptionType.replies",
     "description": "Subscribe for replies",
     "defaultMessage": "Replies",
-    "message": "",
+    "message": "Risposte",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
@@ -1340,107 +1333,101 @@
     "id": "notifications.comment.new",
     "description": "Status message for notifications",
     "defaultMessage": "wrote a comment on",
-    "message": "",
+    "message": "ha commentato su",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.discussion.new",
     "description": "Status message for notifications",
     "defaultMessage": "New discussion published:",
-    "message": "",
+    "message": "Nuova discussione:",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.message.new",
     "description": "Status message for notifications",
     "defaultMessage": "You got a message from",
-    "message": "",
+    "message": "Messagio da",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.accepted",
     "description": "Status message for notifications",
     "defaultMessage": "got accepted!",
-    "message": "",
+    "message": "è stato accettato",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.new",
     "description": "Status message for notifications",
     "defaultMessage": "New proposal published:",
-    "message": "",
+    "message": "Nuova proposta:",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.proposed",
     "description": "Status message for notifications",
     "defaultMessage": "was proposed!",
-    "message": "",
+    "message": "è stato proposto",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.rejected",
     "description": "Status message for notifications",
     "defaultMessage": "was rejected!",
-    "message": "",
+    "message": "è stato rigettato",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.revoked",
     "description": "Status message for notifications",
     "defaultMessage": "was revoked!",
-    "message": "",
+    "message": "è stato revocato",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.voting",
     "description": "Status message for notifications",
     "defaultMessage": "opened voting phase!",
-    "message": "",
+    "message": "ha aperto la votazione",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.statement.new",
     "description": "Status message for notifications",
     "defaultMessage": "wrote a statement on",
-    "message": "",
+    "message": "ha scritto una dichiarazione su",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.survey.closed",
     "description": "Status message for notifications",
     "defaultMessage": "was closed",
-    "message": "",
+    "message": "è terminato",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.survey.new",
     "description": "Status message for notifications",
     "defaultMessage": "New survey published:",
-    "message": "",
+    "message": "Nuovo sondaggio:",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "label.locale",
     "description": "Label locale",
     "defaultMessage": "Language",
-    "message": "",
+    "message": "Impostazioni lingua",
     "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
-    "id": "notifications",
-    "description": "Label for notification link",
-    "defaultMessage": "Notifications",
-    "message": "",
-    "files": ["src/components/UserStatus/UserStatus.js"]
   },
   {
     "id": "label.notifications",
     "description": "Notifications label",
     "defaultMessage": "Notifications",
-    "message": "",
+    "message": "Notifiche",
     "files": [
       "src/components/NotificationDrop/NotificationDrop.js",
+      "src/components/NotificationSettings/NotificationSettings.js",
       "src/routes/notifications/NotificationListContainer.js"
     ]
   },
@@ -1448,14 +1435,14 @@
     "id": "discussion.create",
     "description": "Label for Manager",
     "defaultMessage": "Create discussion",
-    "message": "",
+    "message": "Crea una discussione",
     "files": ["src/routes/workTeamManager/WorkTeamManagement.js"]
   },
   {
     "id": "label.requests",
     "description": "Label request",
     "defaultMessage": "Requests",
-    "message": "",
+    "message": "Richieste",
     "files": ["src/routes/workTeamManager/WorkTeamManagement.js"]
   },
   {
@@ -1464,5 +1451,19 @@
     "defaultMessage": "Contact",
     "message": "",
     "files": ["src/components/InfoPage/InfoPage.js"]
+  },
+  {
+    "id": "help.pushavailability",
+    "description": "Notice",
+    "defaultMessage": "(available only in Chrome and Firefox browsers)",
+    "message": "(disponibile solo nei browser Chrome e Firefox)",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.notificationSettings",
+    "description": "Label for notification settings",
+    "defaultMessage": "Notification settings",
+    "message": "Impostazioni di notifica",
+    "files": ["src/routes/account/AccountContainer.js"]
   }
 ]

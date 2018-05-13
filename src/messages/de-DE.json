@@ -1057,8 +1057,7 @@
     "id": "settings.workTeams",
     "description": "Workteam",
     "defaultMessage": "Workteams",
-    "message": "Arbeitsgruppen",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "message": "Arbeitsgruppen"
   },
   {
     "id": "join",
@@ -1355,7 +1354,7 @@
     "id": "form.error-min",
     "description": "Min",
     "defaultMessage": "Enter atleast {value} chars or numbers",
-    "message": "",
+    "message": "Mindestens {value} Zeichen eingeben",
     "files": ["src/components/FormValidation/FormValidation.js"]
   },
   {
@@ -1397,7 +1396,7 @@
     "id": "notificationType.email",
     "description": "Label email",
     "defaultMessage": "Email",
-    "message": "",
+    "message": "E-Mail",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
@@ -1411,35 +1410,35 @@
     "id": "confirm",
     "description": "Label okay",
     "defaultMessage": "Subscribing for {subType}",
-    "message": "",
+    "message": "Abonniere ({subType})",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
     "id": "subscribe",
     "description": "Label subscribe",
     "defaultMessage": "Subscribe",
-    "message": "",
+    "message": "Abonnieren",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
     "id": "subscribed",
     "description": "Label subscribed",
     "defaultMessage": "Subscribed ({subType})",
-    "message": "",
+    "message": "({subType}) abonniert",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
     "id": "subscriptionType.all",
     "description": "Subscribe for all available events",
     "defaultMessage": "All",
-    "message": "",
+    "message": "Alles",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
     "id": "subscriptionType.delete",
     "description": "Deleting subscription",
     "defaultMessage": "Unsubscribe",
-    "message": "",
+    "message": "Abo beenden",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
@@ -1453,14 +1452,14 @@
     "id": "subscriptionType.replies",
     "description": "Subscribe for replies",
     "defaultMessage": "Replies",
-    "message": "",
+    "message": "Antworten",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
     "id": "subscriptionType.updates",
     "description": "Subscribe for state updates",
     "defaultMessage": "State updates",
-    "message": "",
+    "message": "Änderungen",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
@@ -1502,7 +1501,7 @@
     "id": "notifications.proposal.proposed",
     "description": "Status message for notifications",
     "defaultMessage": "was proposed!",
-    "message": "",
+    "message": "wurde vorgeschlagen!",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1558,8 +1557,7 @@
     "id": "notifications",
     "description": "Label for notification link",
     "defaultMessage": "Notifications",
-    "message": "Benachrichtigungen",
-    "files": ["src/components/UserStatus/UserStatus.js"]
+    "message": "Benachrichtigungen"
   },
   {
     "id": "label.notifications",
@@ -1568,6 +1566,7 @@
     "message": "Benachrichtigungen",
     "files": [
       "src/components/NotificationDrop/NotificationDrop.js",
+      "src/components/NotificationSettings/NotificationSettings.js",
       "src/routes/notifications/NotificationListContainer.js"
     ]
   },
@@ -1589,7 +1588,21 @@
     "id": "contact",
     "description": "Contact label",
     "defaultMessage": "Contact",
-    "message": "",
+    "message": "Kontakt",
     "files": ["src/components/InfoPage/InfoPage.js"]
+  },
+  {
+    "id": "help.pushavailability",
+    "description": "Notice",
+    "defaultMessage": "(available only in Chrome and Firefox browsers)",
+    "message": "(nur für Chrome und Firefox Browser verfügbar)",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.notificationSettings",
+    "description": "Label for notification settings",
+    "defaultMessage": "Notification settings",
+    "message": "Benachrichtigungseinstellungen",
+    "files": ["src/routes/account/AccountContainer.js"]
   }
 ]
