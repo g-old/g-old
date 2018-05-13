@@ -63,6 +63,12 @@ const messages = defineMessages({
     defaultMessage: 'Followees',
     description: 'Followees',
   },
+
+  notificationSettings: {
+    id: 'label.notificationSettings',
+    defaultMessage: 'Notification settings',
+    description: 'Label for notification settings',
+  },
 });
 
 const renderFollowee = (data, fn, del) => (
@@ -392,7 +398,11 @@ class AccountContainer extends React.Component {
               >
                 {displayLog}
               </AccordionPanel>
-              <AccordionPanel heading="NotificationSettings">
+              <AccordionPanel
+                heading={
+                  <FormattedMessage {...messages.notificationSettings} />
+                }
+              >
                 <NotificationSettings
                   user={this.props.user}
                   update={this.props.updateUser}

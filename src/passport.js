@@ -30,8 +30,12 @@ passport.use(
       usernameField: 'email',
       passwordField: 'password',
     },
-    (email, password, done) =>
-      knex('users')
+    (emailField, password, done) => {
+      if (typeof emailField !== 'string' || emailField.length > 254) {
+        done(null, false);
+      }
+      const email = emailField.trim().toLowerCase();
+      return knex('users')
         .where({ email })
         .returning([
           'id',
@@ -62,7 +66,8 @@ passport.use(
         .catch(error => {
           log.error({ err: error }, 'User log in failed');
           return done(error);
-        }),
+        });
+    },
   ),
 );
 

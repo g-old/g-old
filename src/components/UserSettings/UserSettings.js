@@ -128,11 +128,6 @@ const messages = defineMessages({
     defaultMessage: 'Password',
     description: 'Heading of password section',
   },
-  workteams: {
-    id: 'settings.workTeams',
-    defaultMessage: 'Workteams',
-    description: 'Workteam',
-  },
   nameHeading: {
     id: 'label.name',
     defaultMessage: 'Name',

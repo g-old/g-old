@@ -3,4 +3,14 @@
 .center {
   display: flex;
   justify-content: center;
+  position: absolute;
+  left: 1em;
+}
+
+.header {
+  align-items: center;
+  padding: 1em;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #d0cdcd;
 }

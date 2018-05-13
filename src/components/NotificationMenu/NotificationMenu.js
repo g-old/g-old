@@ -70,8 +70,9 @@ class NotificationMenu extends React.Component {
       this.drop = new Drop(container, this.renderNotifications(), {
         align: { top: 'bottom', right: 'right' },
         context: this.context,
-        responsive: false,
+        responsive: true,
         className: s.drop,
+        containerClassName: s.container,
         /* make the Drop exactly 400px wide (will still respect windowWidth) */
         minWidth: 400,
         maxWidth: 400,

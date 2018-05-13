@@ -7,16 +7,24 @@
 
 .unread {
   background-color: beige;
-  border: 2px solid #f00;
+  border: 2px solid #ff324d80;
+  border-radius: 6px;
+  margin: 0 0.5em;
 }
 
 .container {
   display: flex;
+  align-items: center;
+  margin: 0 1em;
 
   img {
     width: 42px;
     height: 42px;
   }
+}
+
+.unread .container {
+  margin: 0 0.5em;
 }
 
 .content {

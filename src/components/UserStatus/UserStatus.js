@@ -19,11 +19,6 @@ const messages = defineMessages({
     defaultMessage: 'Profile',
     description: 'Label for profile link',
   },
-  notifications: {
-    id: 'notifications',
-    defaultMessage: 'Notifications',
-    description: 'Label for notification link',
-  },
 });
 
 const onVisitProfile = e => {
