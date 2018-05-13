@@ -11,7 +11,6 @@ import ListItem from '../ListItem';
 // import Notification from '../UserNotification';
 import Spinner from '../Spinner';
 import Link from '../Link';
-import Label from '../Label';
 
 const messages = defineMessages({
   notifications: {
@@ -43,6 +42,7 @@ const NotificationDrop = ({
     markReadBtn = (
       <Button
         onClick={onMarkAsRead}
+        disabled={showSpinner}
         label={<FormattedMessage {...messages.markRead} />}
         plain
       />
@@ -60,19 +60,19 @@ const NotificationDrop = ({
 
   return (
     <Box column fill>
-      <Box between>
-        <Label>
+      <div>
+        <div className={s.header}>
+          {spinner}
           <FormattedMessage {...messages.notifications} />
-        </Label>
-        {spinner}
-        {markReadBtn}
-      </Box>
-      <List>
-        {notifications.map(n => (
-          <ListItem key={n.id}>{<Component {...n} />}</ListItem>
-        ))}
-      </List>
-      <div style={{ marginBottom: '1.5em' }}>
+          {markReadBtn}
+        </div>
+        <List>
+          {notifications.map(n => (
+            <ListItem key={n.id}>{<Component {...n} />}</ListItem>
+          ))}
+        </List>
+      </div>
+      <div style={{ marginBottom: '1.5em', textAlign: 'center' }}>
         {/* eslint-disable-next-line */}
         <Link to="/notifications">
           <FormattedMessage {...messages.notificationsLink} />

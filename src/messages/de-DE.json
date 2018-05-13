@@ -1383,7 +1383,7 @@
     "id": "label.markRead",
     "description": "Label mark as read",
     "defaultMessage": "Mark all as read",
-    "message": "",
+    "message": "Alle als gelesen markieren",
     "files": ["src/components/NotificationDrop/NotificationDrop.js"]
   },
   {
