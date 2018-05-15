@@ -225,6 +225,46 @@ const generateData = (
   return result;
 };
 
+const userStatusTranslations = {
+  'de-DE': {
+    roleAdded: (name, role, helpText) => `Hallo ${name},\n
+    wird haben Sie als ${role} freigeschalten.\n${helpText}`,
+    roleLost: (name, role) => `Hallo ${name},\n
+    Sie sind nun nicht mehr ${role}.\n`,
+    MODERATOR: 'Als MODERATOR können Sie Beiträge löschen',
+    MEMBER_MANAGER: 'Als MEMBER_MANAGER können Sie Mitglieder betreuen ',
+    RELATOR:
+      'Als RELATOR können Sie Beschlüsse auf der Plattform veröffentlichen',
+    VIEWER:
+      'Als VIEWER können Sie alle Aktivitäten auf unserer Plattform verfolgen, bei Umfragen abstimmen und mitdiskutieren',
+    VOTER: 'Als VOTER haben sie das Recht, bei Beschlüssen abzustimmen',
+    subject: 'Wichtig - Ihre Profileinstellungen wurden verändert',
+  },
+
+  'it-IT': {
+    roleAdded: (name, role, helpText) => `Ciao ${name},\n
+    hai ricevuto il profile di ${role}.\n${helpText}`,
+    roleLost: (name, role) => `Ciao ${name},\n
+    non sei più ${role}.\n`,
+    RELATOR:
+      'Come RELATOR puoi pubblicare proposte e sondaggi, indire delle votazioni e avviare delle discussioni',
+    VIEWER: 'Come VIEWER puoi leggere tutto e partecipare ai sondaggi',
+    VOTER: 'Come VOTER puoi leggere, commentare e votare',
+    subject: 'Attenzione - il suo profile è stato cambiato',
+  },
+  'lld-IT': {
+    roleAdded: (name, role, helpText) => `Ciao ${name},\n
+    hai ricevuto il profile di ${role}.\n${helpText}`,
+    roleLost: (name, role) => `Ciao ${name},\n
+    non sei più ${role}.\n`,
+    RELATOR:
+      'Come RELATOR puoi pubblicare proposte e sondaggi, indire delle votazioni e avviare delle discussioni',
+    VIEWER: 'Come VIEWER puoi leggere tutto e partecipare ai sondaggi',
+    VOTER: 'Come VOTER puoi leggere, commentare e votare',
+    subject: 'Attenzione - il tuo profile è stato cambiato',
+  },
+};
+
 // TODO load translations in
 const resourceByLocale: LocaleDictionary = {
   'de-DE': {
@@ -1107,6 +1147,24 @@ class NotificationService {
         });
         return { htmlContent: emailHTML, receivers };
       }
+      case ActivityType.USER: {
+        const author: UserProps = objects[ActivityType.USER][activity.actorId];
+        const role = activity.content.diff[0];
+        const helpText = userStatusTranslations[locale][role];
+        const message = userStatusTranslations[locale][
+          activity.content.added ? 'roleAdded' : 'roleLost'
+        ](activityObject.name, activity.content.diff[0], helpText);
+        const emailHTML = this.MailComposer.getMessageMail({
+          message,
+          sender: {
+            fullName: `${author.name} ${author.surname}`,
+            thumbnail: author.thumbnail,
+          },
+          locale,
+          title: userStatusTranslations[locale].subject,
+        });
+        return { htmlContent: emailHTML, receivers };
+      }
 
       default:
         throw new Error(`ActivityType not recognized : ${activity.type}`);
@@ -1198,6 +1256,12 @@ class NotificationService {
         } else {
           acc[ActivityType.USER] = new Set([activity.actorId]);
         }
+      } else if (activity.type === ActivityType.USER) {
+        if (acc[ActivityType.USER]) {
+          acc[ActivityType.USER].add(activity.actorId);
+        } else {
+          acc[ActivityType.USER] = new Set([activity.actorId]);
+        }
       }
 
       return acc;
@@ -1238,6 +1302,13 @@ class NotificationService {
             created_at: now,
           });
           const { settings } = user;
+          if (
+            activity.type === ActivityType.USER &&
+            activity.verb === ActivityVerb.UPDATE
+          ) {
+            // notify via mail - also without subscription
+            fillWithData(resultSet, 'emailData', activity, user);
+          }
           if (settings[activity.type]) {
             // TODO normalize activities with Map aId: a, aId: [userIds]
 
