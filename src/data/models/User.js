@@ -2,9 +2,15 @@
 import bcrypt from 'bcrypt';
 import knex from '../knex';
 import { validateEmail } from '../../core/helpers';
-import { canChangeGroups, calcRights, Groups } from '../../organization';
+import {
+  canChangeGroups,
+  calcRights,
+  Groups,
+  getUpdatedGroup,
+} from '../../organization';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import log from '../../logger';
+import EventManager from '../../core/EventManager';
 
 const NOTIFICATION_FIELDS = [
   'proposal',
@@ -31,6 +37,17 @@ export type UserProps = {
   locale: Locale,
 };
 class User {
+  id: ID;
+  name: string;
+  surname: string;
+  email: string;
+  groups: number;
+  thumbnail: string;
+  emailVerified: boolean;
+  lastLogin: string;
+  createdAt: string;
+  canVoteSince: ?string;
+
   constructor(data: UserProps) {
     this.id = data.id;
     this.name = data.name;
@@ -270,9 +287,9 @@ class User {
     }
 
     // update
-    let updatedId = null;
+    let updatedUserData = null;
     try {
-      updatedId = await knex.transaction(async trx => {
+      updatedUserData = await knex.transaction(async trx => {
         // TODO log certain actions in a separate table (role changes, rights, deletions)
 
         if (data.followee) {
@@ -308,13 +325,14 @@ class User {
           }
         }
 
-        await trx
+        const [updatedUser: UserProps = null] = await trx
           .where({
             id: data.id,
           })
           .update(newData)
-          .into('users');
-        return data.id;
+          .into('users')
+          .returning('*');
+        return updatedUser;
       });
     } catch (err) {
       if (err.code === '23505') {
@@ -325,11 +343,36 @@ class User {
       log.error({ err, viewer, data }, 'Update failed');
       return { user: null, errors };
     }
-    if (!updatedId) return null;
+    if (!updatedUserData) return null;
     // invalidate cache
-    loaders.users.clear(updatedId);
+    loaders.users.clear(updatedUserData.id);
     // updates session store;
-    const updatedUser = await User.gen(viewer, data.id, loaders);
+    const updatedUser = updatedUserData ? new User(updatedUserData) : null;
+    //
+    if (updatedUser) {
+      if (viewer.id !== updatedUser.id) {
+        if (newData.groups && userInDB) {
+          const updatedGroup = getUpdatedGroup(
+            userInDB.groups,
+            updatedUser.groups,
+          );
+          EventManager.publish('onUserUpdated', {
+            viewer,
+            user: {
+              ...updatedUser,
+              changedField: 'groups',
+              changedValue: updatedGroup.value,
+              added: updatedGroup.added,
+              diff: updatedGroup.names,
+            },
+            subjectId: updatedUser.id,
+          });
+        }
+      }
+    }
+
+    //
+
     if (viewer.id !== updatedUser.id) {
       if (newData.groups) {
         await updatedUser.modifySessions();

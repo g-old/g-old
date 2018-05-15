@@ -74,6 +74,10 @@ const notificationFields = `
           ${commentFields}
            }
 
+           ... on User {
+             ${userFields}
+           }
+
           ... on Discussion {
           id
           createdAt

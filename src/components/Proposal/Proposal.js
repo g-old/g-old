@@ -52,6 +52,7 @@ class Proposal extends React.Component {
           {this.props.spokesman && (
             <div>
               <UserThumbnail
+                marked
                 label={<FormattedMessage {...messages.spokesman} />}
                 user={this.props.spokesman}
               />

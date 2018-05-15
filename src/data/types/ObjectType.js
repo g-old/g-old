@@ -13,6 +13,8 @@ import CommentType from './CommentType';
 import Comment from '../models/Comment';
 import RequestType from './RequestType';
 import Request from '../models/Request';
+import UserType from './UserType';
+import User from '../models/User';
 
 const ObjectType = new GraphQLUnionType({
   name: 'FeedObject',
@@ -25,6 +27,7 @@ const ObjectType = new GraphQLUnionType({
     DiscussionType,
     CommentType,
     RequestType,
+    UserType,
   ],
   resolveType: value => {
     if (value instanceof Proposal) {
@@ -48,6 +51,9 @@ const ObjectType = new GraphQLUnionType({
     }
     if (value instanceof Request) {
       return RequestType;
+    }
+    if (value instanceof User) {
+      return UserType;
     }
     return null;
   },

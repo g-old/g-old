@@ -1,6 +1,6 @@
 import knex from '../knex';
 import User from './User';
-import Activity from './Activity';
+import Activity, { ActivityType } from './Activity';
 
 // https://github.com/clux/decay/blob/master/decay.js
 /* function rankStatements(likes, date) {
@@ -102,6 +102,10 @@ const aggregateActivities = (activities, viewer) =>
       }
       if (curr.type === 'message') {
         // dont't include other notifications!
+        return agg;
+      }
+      if (curr.type === ActivityType.USER && curr.actorId !== viewer.id) {
+        // don't include admin tasks in their follower feeds
         return agg;
       }
       if (curr.type === 'vote') {

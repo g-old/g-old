@@ -71,6 +71,16 @@ const messages = defineMessages({
     defaultMessage: 'was revoked!',
     description: 'Status message for notifications',
   },
+  roleAdded: {
+    id: 'notifications.user.update.roleAdded',
+    defaultMessage: 'You got a new role: ',
+    description: 'Status message for notifications',
+  },
+  roleLost: {
+    id: 'notifications.user.update.roleLost',
+    defaultMessage: 'You lost your role: ',
+    description: 'Status message for notifications',
+  },
 });
 
 class UserNotification extends React.Component {
@@ -198,6 +208,21 @@ class UserNotification extends React.Component {
             </React.Fragment>
           );
           path = `/message/${activity.object.id}${param}`;
+        }
+
+        break;
+      }
+      case 'user': {
+        if (activity.verb === 'update') {
+          message = (
+            <React.Fragment>
+              <FormattedMessage
+                {...messages[`role${info.added ? 'Added' : 'Lost'}`]}
+              />{' '}
+              <span className={s.important}>{`${info.diff.join(', ')}`}</span>
+            </React.Fragment>
+          );
+          path = `/account`;
         }
 
         break;

@@ -32,7 +32,12 @@ type EActivity = {
   subjectId?: ID,
   groupId?: ID,
   objectId: ID,
-  content: { parentId?: ID, targetId?: ID, targetType?: tActivityType },
+  content: {
+    parentId?: ID,
+    targetId?: ID,
+    targetType?: tActivityType,
+    changedField?: string,
+  },
 };
 type NotificationType = 'webpush' | 'email';
 type Subscriber = {
@@ -267,6 +272,18 @@ const resourceByLocale: LocaleDictionary = {
     [ActivityType.STATEMENT]: 'Nuovo statement',
     [ActivityType.MESSAGE]: 'Nuovo messagio',
   },
+};
+
+const notifyPredicate = (activity: EActivity, subscriber: Subscriber) => {
+  if (activity.actorId !== subscriber.id) {
+    if (
+      activity.type === ActivityType.USER ||
+      activity.verb === ActivityVerb.CREATE
+    ) {
+      return true;
+    }
+  }
+  return false;
 };
 
 const getCommentLink = (
@@ -544,6 +561,20 @@ class NotificationService {
           data = activity;
         }
         break;
+
+      case ActivityType.USER:
+        if (activity.verb === ActivityVerb.UPDATE) {
+          if (
+            activity.subjectId &&
+            activity.content.changedField &&
+            activity.content.changedField === 'groups'
+          ) {
+            activity.targetId = activity.subjectId;
+            activity.targetType = TargetType.USER;
+            data = activity;
+          }
+        }
+        break;
       default:
         return;
     }
@@ -708,7 +739,7 @@ class NotificationService {
             'users.locale as locale',
             'users.email as email',
           );
-      case TargetType.USER: // messages
+      case TargetType.USER: // messages, status notifications
         return this.dbConnector('notification_settings')
           .where({ user_id: selector[1] })
           .innerJoin('users', 'users.id', 'notification_settings.user_id')
@@ -763,7 +794,7 @@ class NotificationService {
 
   async batchProcessing() {
     //  const startTime = process.hrtime();
-    //  console.log('BATCH -activities', this.activityQueue);
+    // console.log('BATCH -activities', this.activityQueue);
     try {
       const activities = this.activityQueue.splice(
         0,
@@ -795,7 +826,11 @@ class NotificationService {
           allObjects,
         } = await this.getAndGroupNotifications(notificationData);
 
-        // console.log(' NEW GROUPED NOTIFICATIONS', { webpushData, emailData });
+        /*  console.log(' NEW GROUPED NOTIFICATIONS', {
+          webpushData,
+          emailData,
+          notifications,
+        }); */
 
         const notificationIds: ID[] = await this.dbConnector
           .batchInsert('notifications', notifications, this.maxBatchSize)
@@ -895,9 +930,7 @@ class NotificationService {
       if (!subscriber.subscriptionType) {
         return {
           subscriber,
-          activities: activities.filter(
-            a => a.actorId !== subscriber.id && a.verb === ActivityVerb.CREATE,
-          ),
+          activities: activities.filter(a => notifyPredicate(a, subscriber)),
         };
       }
       return {

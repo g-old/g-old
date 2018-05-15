@@ -321,6 +321,7 @@ class AccountContainer extends React.Component {
           date={a.createdAt}
           verb={a.verb}
           content={a.object}
+          info={a.info}
         />
       ));
     } else if (logPending) {

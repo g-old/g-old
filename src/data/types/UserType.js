@@ -5,6 +5,7 @@ import {
   GraphQLBoolean,
   GraphQLList,
   GraphQLInt,
+  GraphQLNonNull,
 } from 'graphql';
 
 import knex from '../knex';
@@ -26,7 +27,7 @@ const UserType = new ObjectType({
   name: 'User',
   fields: () => ({
     // we need a lazy evaluated fn , bc we use UserType, which has to be defined
-    id: { type: ID },
+    id: { type: new GraphQLNonNull(ID) },
     name: {
       type: GraphQLString,
     },

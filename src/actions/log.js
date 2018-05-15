@@ -37,6 +37,7 @@ query($userId:ID){
   objectId
   verb
   createdAt
+  info
   actor {
     id
     name
@@ -114,6 +115,9 @@ query($userId:ID){
     }
     ... on Comment {
       ${commentFields}
+    }
+        ... on User {
+      ${userFields}
     }
     ... on Message {
       id

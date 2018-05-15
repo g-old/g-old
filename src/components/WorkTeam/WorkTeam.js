@@ -295,6 +295,7 @@ class WorkTeam extends React.Component {
         <Heading tag="h2">{displayName}</Heading>
         <Box>
           <UserThumbnail
+            marked
             label={<FormattedMessage {...messages.coordinator} />}
             user={coordinator}
           />
