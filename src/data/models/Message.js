@@ -1,15 +1,27 @@
+// @flow
+
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 // import EventManager from '../../core/EventManager';
 
+type ReceiverType = 'user' | 'group';
 class Message {
+  receiverType: ReceiverType;
+  id: ID;
+  msgHtml: string;
+  subject: string;
+  senderId: ID;
+  to: [ID];
+  msg: string;
+  createdAt: string;
+
   constructor(data) {
     this.id = data.id;
-    this.type = data.type;
-    this.date = data.date;
-    this.location = data.location;
+    this.receiverType = data.receiver_type;
     this.msg = data.msg;
-    this.title = data.title;
+    this.msgHtml = data.msg_html;
+    this.to = data.to;
+    this.subject = data.subject;
     this.senderId = data.sender_id;
     this.createdAt = data.created_at;
   }

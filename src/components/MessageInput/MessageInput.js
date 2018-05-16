@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
@@ -5,6 +6,8 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import Box from '../Box';
 import FormField from '../FormField';
 import Button from '../Button';
+import FormValidation from '../FormValidation';
+import Editor from '../MarkdownEditor';
 import { nameValidation, createValidator } from '../../core/validation';
 
 const formFields = ['subject', 'messageText'];
@@ -137,35 +140,49 @@ class MessageInput extends React.Component {
 
   render() {
     const { subjectError, messageTextError } = this.visibleErrors(formFields);
+    const { updates = {} } = this.props;
     return (
-      <Box column pad>
-        <fieldset>
-          <FormField label="Subject" error={subjectError}>
-            <input
-              name="subject"
-              type="text"
-              onBlur={this.handleBlur}
-              value={this.state.subject}
-              onChange={this.handleValueChange}
-            />
-          </FormField>
-          <FormField label="Text" error={messageTextError}>
-            <textarea
+      <FormValidation
+        updatePending={updates && updates.pending}
+        validations={{ text: {}, subject: {} }}
+        submit={this.onNotify}
+      >
+        {({ values, handleValueChanges, onSubmit }) => (
+          <Box column pad>
+            <fieldset>
+              <FormField label="Subject" error={subjectError}>
+                <input
+                  name="subject"
+                  type="text"
+                  onBlur={this.handleBlur}
+                  value={values.subject}
+                  onChange={handleValueChanges}
+                />
+              </FormField>
+              <FormField label="Text" error={messageTextError}>
+                <Editor
+                  value={values.text}
+                  name="text"
+                  onChange={handleValueChanges}
+                />
+                {/* <textarea
               name="messageText"
               onBlur={this.handleBlur}
               value={this.state.messageText}
               onChange={this.handleValueChange}
+            /> */}
+              </FormField>
+            </fieldset>
+            <Button
+              fill
+              primary
+              onClick={onSubmit}
+              pending={this.props.updates && this.props.updates.pending}
+              label={<FormattedMessage {...messages.notify} />}
             />
-          </FormField>
-        </fieldset>
-        <Button
-          fill
-          primary
-          onClick={this.onNotify}
-          pending={this.props.updates && this.props.updates.pending}
-          label={<FormattedMessage {...messages.notify} />}
-        />
-      </Box>
+          </Box>
+        )}
+      </FormValidation>
     );
   }
 }
