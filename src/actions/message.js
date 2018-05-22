@@ -14,8 +14,8 @@ import { message as messageSchema } from '../store/schema';
 import { userFields } from './user';
 
 const notify = `
-mutation($message:String! $receiverId:ID! $type:Transport! $subject:String $receiver:ReceiverInput){
-  notify (message: {message:$message receiverId:$receiverId type:$type subject:$subject receiver:$receiver})
+mutation($message:MessageInput){
+  notify(message:$message)
 }`;
 
 export const messageFields = `
@@ -24,7 +24,7 @@ sender{
   ${userFields}
 }
 msg
-title
+subject
 `;
 
 const messageQuery = `
@@ -45,7 +45,7 @@ export function notifyUser(messageData) {
     });
 
     try {
-      const { data } = await graphqlRequest(notify, messageData);
+      const { data } = await graphqlRequest(notify, { message: messageData });
 
       if (!data.notify) {
         throw Error('Message failed');

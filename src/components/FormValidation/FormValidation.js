@@ -195,7 +195,7 @@ class FormValidation extends React.Component {
       const newValues = getChangedFields(
         this.formFields,
         this.state,
-        this.props.data,
+        this.props.data || {},
       );
       if (this.props.submit) {
         this.props.submit(newValues);

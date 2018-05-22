@@ -106,17 +106,7 @@ id
         thumbnail
       }
     }
-    ... on Message {
-      id
-      sender {
-        name
-        surname
-        thumbnail
-        id
-      }
-      msg
-      title
-    }
+
   }`;
 const feed = `
 query($userId:ID){

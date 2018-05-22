@@ -8,9 +8,7 @@ import FormField from '../FormField';
 import Button from '../Button';
 import FormValidation from '../FormValidation';
 import Editor from '../MarkdownEditor';
-import { nameValidation, createValidator } from '../../core/validation';
 
-const formFields = ['subject', 'messageText'];
 const messages = defineMessages({
   notify: {
     id: 'account.notify',
@@ -32,134 +30,66 @@ class MessageInput extends React.Component {
       pending: PropTypes.bool,
     }).isRequired,
     notifyGroup: PropTypes.bool,
+    recipients: PropTypes.arrayOf(PropTypes.string),
+    recipientType: PropTypes.oneOfType(['USER', 'GROUP']).isRequired,
   };
 
   static defaultProps = {
     notifyGroup: null,
+    recipients: null,
   };
   constructor(props) {
     super(props);
-    this.handleBlur = this.handleBlur.bind(this);
-    this.handleValidation = this.handleValidation.bind(this);
-    this.handleValueChange = this.handleValueChange.bind(this);
-    this.visibleErrors = this.visibleErrors.bind(this);
     this.onNotify = this.onNotify.bind(this);
-    this.state = {
-      subject: '',
-      messageText: '',
-      errors: {
-        subject: {
-          touched: false,
-        },
-        messageText: {
-          touched: false,
-        },
-      },
-    };
-
-    const testValues = {
-      subject: { fn: 'text' },
-      messageText: { fn: 'text' },
-    };
-    this.Validator = createValidator(
-      testValues,
-      {
-        text: nameValidation,
-      },
-      this,
-      obj => obj.state,
-    );
   }
 
-  componentWillReceiveProps({ updates }) {
-    if (updates && updates.success) {
-      this.setState({ subject: '', messageText: '' });
-    }
-  }
-
-  onNotify() {
-    if (this.handleValidation(formFields)) {
-      const message = this.state.messageText.trim();
-      const subject = this.state.subject ? this.state.subject.trim() : null;
-      const { receiverId } = this.props;
-      this.props.notifyUser({
-        message: JSON.stringify({
-          messageType: 'msg',
-          msg: message,
-          title: subject,
-        }),
+  onNotify(values) {
+    const subject = values.subject && values.subject.trim();
+    const { recipients, recipientType } = this.props;
+    this.props.notifyUser({
+      message: JSON.stringify({
+        recipientType,
+        recipients,
+        ...(!values.text.html.length && { message: values.text.rawInput }),
+        messageHtml: values.text.html,
         subject,
-        type: 'message',
-        receiverId,
-        receiver: {
-          type: this.props.notifyGroup ? 'team' : 'user',
-          id: receiverId,
-        },
-      });
-    }
-  }
-  handleValidation(fields) {
-    const validated = this.Validator(fields);
-    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
-    return validated.failed === 0;
-  }
-  handleValueChange(e) {
-    let newState;
-    switch (e.target.name) {
-      case 'event':
-      case 'subject':
-      case 'messageText': {
-        newState = { [e.target.name]: e.target.value };
-        break;
-      }
-
-      default: {
-        newState = undefined;
-      }
-    }
-    this.setState(newState);
-  }
-  handleBlur(e) {
-    const field = e.target.name;
-    if (this.state[field]) {
-      this.handleValidation([field]);
-    }
-  }
-
-  visibleErrors(errorNames) {
-    return errorNames.reduce((acc, curr) => {
-      const err = `${curr}Error`;
-      if (this.state.errors[curr].touched) {
-        acc[err] = (
-          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
-        );
-      }
-      return acc;
-    }, {});
+      }),
+    });
   }
 
   render() {
-    const { subjectError, messageTextError } = this.visibleErrors(formFields);
-    const { updates = {} } = this.props;
+    const { updates = {}, recipients = [] } = this.props;
+
     return (
       <FormValidation
         updatePending={updates && updates.pending}
-        validations={{ text: {}, subject: {} }}
+        validations={{ text: {}, subject: {}, recipients }}
         submit={this.onNotify}
       >
-        {({ values, handleValueChanges, onSubmit }) => (
+        {({ values, handleValueChanges, onSubmit, onBlur, errorMessages }) => (
           <Box column pad>
             <fieldset>
-              <FormField label="Subject" error={subjectError}>
+              {!recipients.length && (
+                <FormField label="Receivers">
+                  <input
+                    name="receivers"
+                    type="text"
+                    onBlur={onBlur}
+                    value={values.receivers}
+                    onChange={handleValueChanges}
+                  />
+                </FormField>
+              )}
+              <FormField label="Subject" error={errorMessages.subjectError}>
                 <input
                   name="subject"
                   type="text"
-                  onBlur={this.handleBlur}
+                  onBlur={onBlur}
                   value={values.subject}
                   onChange={handleValueChanges}
                 />
               </FormField>
-              <FormField label="Text" error={messageTextError}>
+              <FormField label="Text" error={errorMessages.textError}>
                 <Editor
                   value={values.text}
                   name="text"

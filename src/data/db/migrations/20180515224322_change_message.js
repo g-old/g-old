@@ -5,7 +5,7 @@ exports.up = function(knex, Promise) {
         .json('to')
         .notNullable()
         .defaultsTo('[]');
-      table.enu('receiver_type', ['group', 'user']);
+      table.enu('recipient_type', ['group', 'user']);
       table.text('msg_html');
       table.renameColumn('title', 'subject');
       table.dropColumn('location');

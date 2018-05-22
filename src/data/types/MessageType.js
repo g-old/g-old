@@ -2,9 +2,10 @@ import {
   GraphQLID,
   GraphQLNonNull,
   GraphQLString,
+  GraphQLList,
   GraphQLObjectType as ObjectType,
 } from 'graphql';
-
+import RecipientType from './RecipientType';
 import UserType from './UserType';
 import User from '../models/User';
 
@@ -19,12 +20,13 @@ const MessageType = new ObjectType({
       type: GraphQLString,
     },
 
-    title: {
+    subject: {
       type: GraphQLString,
     },
-
-    date: {
-      type: GraphQLString,
+    receivers: {
+      type: new GraphQLList(UserType),
+      resovle: (parent, args, { viewer, loaders }) =>
+        parent.to.map(id => User.gen(viewer, id, loaders)),
     },
 
     sender: {
@@ -34,11 +36,8 @@ const MessageType = new ObjectType({
       },
     },
 
-    location: {
-      type: GraphQLString,
-    },
-    type: {
-      type: GraphQLString,
+    recipientType: {
+      type: RecipientType,
     },
 
     createdAt: {

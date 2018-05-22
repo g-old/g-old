@@ -4,9 +4,9 @@ import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 // import EventManager from '../../core/EventManager';
 
-type ReceiverType = 'user' | 'group';
+type RecipientType = 'user' | 'group';
 class Message {
-  receiverType: ReceiverType;
+  recipientType: RecipientType;
   id: ID;
   msgHtml: string;
   subject: string;
@@ -17,7 +17,7 @@ class Message {
 
   constructor(data) {
     this.id = data.id;
-    this.receiverType = data.receiver_type;
+    this.recipientType = data.recipient_type;
     this.msg = data.msg;
     this.msgHtml = data.msg_html;
     this.to = data.to;
@@ -35,7 +35,13 @@ class Message {
   }
 
   static async create(viewer, data, loaders, trx) {
-    if (!data || !data.type || !data.msg /* || data.info */) return null;
+    if (
+      !data ||
+      !(data.message || data.messageHtml) ||
+      !data.recipientType ||
+      !data.recipients /* || data.info */
+    )
+      return null;
     if (!canMutate(viewer, data, Models.MESSAGE)) return null;
 
     let message;

@@ -1,10 +1,12 @@
 import {
   GraphQLString as String,
   GraphQLInputObjectType,
-  GraphQLEnumType,
   GraphQLNonNull,
   GraphQLID,
+  GraphQLList,
 } from 'graphql';
+
+import RecipientType from './RecipientType';
 
 const MessageInputType = new GraphQLInputObjectType({
   name: 'MessageInput',
@@ -12,53 +14,17 @@ const MessageInputType = new GraphQLInputObjectType({
     message: {
       type: new GraphQLNonNull(String),
     },
+    messageHtml: {
+      type: String,
+    },
     subject: {
       type: String,
     },
 
-    receiver: {
-      type: new GraphQLInputObjectType({
-        name: 'ReceiverInput',
-        fields: {
-          type: {
-            type: new GraphQLEnumType({
-              name: 'ReceiverType',
-              values: {
-                team: {
-                  value: 'team',
-                  description: 'Notify team',
-                },
-
-                user: {
-                  value: 'user',
-                  description: 'Notify user',
-                },
-              },
-            }),
-          },
-          id: {
-            type: GraphQLID,
-          },
-        },
-      }),
+    recipients: {
+      type: new GraphQLList(GraphQLID),
     },
-    receiverId: { type: new GraphQLNonNull(GraphQLID) },
-
-    type: {
-      type: new GraphQLEnumType({
-        name: 'Transport',
-        values: {
-          email: {
-            value: 'email',
-            description: 'Message by email',
-          },
-          message: {
-            value: 'message',
-            description: 'Message by message in feed',
-          },
-        },
-      }),
-    },
+    recipientType: { type: RecipientType },
   },
 });
 export default MessageInputType;

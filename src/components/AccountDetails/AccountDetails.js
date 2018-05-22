@@ -213,7 +213,8 @@ class AccountDetails extends React.Component {
       MessagePanel = (
         <AccordionPanel column pad heading="Notify user">
           <MessageInput
-            receiverId={id}
+            recipients={[id]}
+            recipientType="USER"
             notifyUser={this.props.notifyUser}
             updates={this.props.updates && this.props.updates.message}
           />
