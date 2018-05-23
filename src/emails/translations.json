@@ -116,5 +116,11 @@
     "de-DE": "Nachricht ansehen",
     "it-IT": "",
     "lld-IT": ""
+  },
+
+  "heading": {
+    "de-DE": "Das haben Sie verpasst...",
+    "it-IT": "",
+    "lld-IT": ""
   }
 }

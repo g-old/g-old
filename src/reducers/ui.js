@@ -15,6 +15,8 @@ import discussions, * as fromDiscussion from './ui/discussions';
 import tags, * as fromTag from './ui/tags';
 import subscriptions, * as fromSubscription from './ui/subscriptions';
 import notifications, * as fromNotification from './ui/notifications';
+import messages, * as fromMessage from './ui/messages';
+
 /* GENERATOR_IMPORTS */
 
 const uiReducer = combineReducers({
@@ -34,6 +36,7 @@ const uiReducer = combineReducers({
   workTeams,
   discussions,
   tags,
+  messages,
 });
 export default (state, action) => {
   if (action.type === SESSION_LOGOUT_SUCCESS) {
@@ -44,6 +47,8 @@ export default (state, action) => {
 };
 
 /* GENERATOR_EXPORTS */
+export const getMessageUpdates = state => fromMessage.getStatus(state.messages);
+
 export const getNotificationUpdates = state =>
   fromNotification.getStatus(state.notifications);
 export const getSubscriptionUpdates = state =>

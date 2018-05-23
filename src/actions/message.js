@@ -2,9 +2,9 @@
 
 import { normalize } from 'normalizr';
 import {
-  SEND_MESSAGE_START,
-  SEND_MESSAGE_SUCCESS,
-  SEND_MESSAGE_ERROR,
+  CREATE_MESSAGE_START,
+  CREATE_MESSAGE_SUCCESS,
+  CREATE_MESSAGE_ERROR,
   LOAD_MESSAGE_START,
   LOAD_MESSAGE_SUCCESS,
   LOAD_MESSAGE_ERROR,
@@ -13,9 +13,9 @@ import { genStatusIndicators } from '../core/helpers';
 import { message as messageSchema } from '../store/schema';
 import { userFields } from './user';
 
-const notify = `
+const createMessageMutation = `
 mutation($message:MessageInput){
-  notify(message:$message)
+  createMessage(message:$message)
 }`;
 
 export const messageFields = `
@@ -36,29 +36,29 @@ query($id:ID!) {
 }
 `;
 
-export function notifyUser(message) {
+export function createMessage(message) {
   return async (dispatch, getState, { graphqlRequest }) => {
     const properties = genStatusIndicators(['message']);
     dispatch({
-      type: SEND_MESSAGE_START,
+      type: CREATE_MESSAGE_START,
       id: message.recipients[0],
       properties,
     });
 
     try {
-      const { data } = await graphqlRequest(notify, { message });
+      const { data } = await graphqlRequest(createMessageMutation, { message });
 
-      if (!data.notify) {
+      if (!data.createMessage) {
         throw Error('Message failed');
       }
       dispatch({
-        type: SEND_MESSAGE_SUCCESS,
+        type: CREATE_MESSAGE_SUCCESS,
         id: message.recipients[0],
         properties,
       });
     } catch (error) {
       dispatch({
-        type: SEND_MESSAGE_ERROR,
+        type: CREATE_MESSAGE_ERROR,
         payload: {
           error,
         },

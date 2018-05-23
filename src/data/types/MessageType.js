@@ -6,8 +6,11 @@ import {
   GraphQLObjectType as ObjectType,
 } from 'graphql';
 import RecipientType from './RecipientType';
+import RecipientTypeEnum from './RecipientTypeEnum';
+
 import UserType from './UserType';
 import User from '../models/User';
+import WorkTeam from '../models/WorkTeam';
 
 const MessageType = new ObjectType({
   name: 'Message',
@@ -27,9 +30,16 @@ const MessageType = new ObjectType({
       type: GraphQLString,
     },
     recipients: {
-      type: new GraphQLList(UserType),
-      resovle: (parent, args, { viewer, loaders }) =>
-        parent.recipients.map(id => User.gen(viewer, id, loaders)),
+      type: new GraphQLList(RecipientType),
+      resolve: (parent, args, { viewer, loaders }) => {
+        let Model;
+        if (parent.recipientType === 'group') {
+          Model = WorkTeam;
+        } else {
+          Model = User;
+        }
+        return parent.recipients.map(id => Model.gen(viewer, id, loaders));
+      },
     },
 
     sender: {
@@ -40,7 +50,7 @@ const MessageType = new ObjectType({
     },
 
     recipientType: {
-      type: RecipientType,
+      type: RecipientTypeEnum,
     },
 
     createdAt: {

@@ -127,8 +127,18 @@ query($userId:ID){
         thumbnail
         id
       }
-      message
-      messageHtml
+      recipients{
+        __typename
+        ... on User{
+        ${userFields}
+        }
+        ... on WorkTeam{
+          id
+          displayName
+          logo
+        }
+
+      }
       subject
     }
     ... on Request {

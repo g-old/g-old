@@ -57,8 +57,16 @@ export const workTeam = new schema.Entity('workTeams', {
   proposals: [proposal],
   linkedProposals: [proposalStatus],
 });
+export const recipient = new schema.Union(
+  {
+    User: user,
+    WorkTeam: workTeam,
+  },
+  '__typename',
+);
 export const message = new schema.Entity('messages', {
   sender: user,
+  recipients: [recipient],
 });
 export const comment = new schema.Entity('comments');
 comment.define({
@@ -85,6 +93,7 @@ export const unionSchema = new schema.Union(
   },
   '__typename',
 );
+
 export const activity = new schema.Entity('activities', {
   actor: user,
   object: unionSchema,

@@ -2,7 +2,7 @@ import { GraphQLNonNull, GraphQLBoolean } from 'graphql';
 import MessageInput from '../types/MessageInputType';
 import Message from '../models/Message';
 
-const sendMessage = {
+const createMessage = {
   type: new GraphQLNonNull(GraphQLBoolean),
   args: {
     message: {
@@ -18,4 +18,4 @@ const sendMessage = {
   },
 };
 
-export default sendMessage;
+export default createMessage;

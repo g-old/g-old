@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import Accordion from '../../components/Accordion';
-import Button from '../../components/Button';
 import Box from '../../components/Box';
 import WorkteamHeader from '../../components/WorkteamHeader';
 import AccordionPanel from '../../components/AccordionPanel';
@@ -34,6 +33,7 @@ import {
   getProposalsErrorMessage,
   getProposalsPage,
   getVisibleProposals,
+  getMessageUpdates,
 } from '../../reducers';
 import DiscussionInput from '../../components/DiscussionInput';
 import ProposalInput from '../../components/ProposalInput';
@@ -44,6 +44,8 @@ import Request from '../../components/Request';
 import AssetsTable from '../../components/AssetsTable';
 import { Groups } from '../../organization';
 import history from '../../history';
+import MessageInput from '../../components/MessageInput';
+import { createMessage } from '../../actions/message';
 
 // import FetchError from '../../components/FetchError';
 const messages = defineMessages({
@@ -51,6 +53,11 @@ const messages = defineMessages({
     id: 'proposalInput',
     defaultMessage: 'Create a new proposal',
     description: 'Creating new proposal',
+  },
+  messages: {
+    id: 'label.messages',
+    defaultMessage: 'Messages',
+    description: 'Messages label',
   },
   proposalManager: {
     id: 'proposalManager',
@@ -165,6 +172,8 @@ class WorkTeamManagement extends React.Component {
     errorMessage: PropTypes.string,
     pageInfo: PropTypes.shape({}),
     proposalUpdates: PropTypes.shape({}),
+    createMessage: PropTypes.func.isRequired,
+    messageUpdates: PropTypes.shape({}),
   };
 
   static defaultProps = {
@@ -177,6 +186,7 @@ class WorkTeamManagement extends React.Component {
     errorMessage: null,
     proposals: null,
     pageInfo: null,
+    messageUpdates: null,
   };
   constructor(props) {
     super(props);
@@ -383,9 +393,13 @@ class WorkTeamManagement extends React.Component {
           <Tab title={<FormattedMessage {...messages.requests} />}>
             {content}
           </Tab>
-          <Tab title={<FormattedMessage {...messages.settings} />}>
-            <Button label="Edit" />
-            {'TODO WORKTEAMEDIT'}
+          <Tab title={<FormattedMessage {...messages.messages} />}>
+            <MessageInput
+              recipients={[this.props.id]}
+              recipientType="GROUP"
+              notifyUser={this.props.createMessage}
+              updates={this.props.messageUpdates}
+            />
           </Tab>
         </Tabs>
       </Box>
@@ -403,6 +417,7 @@ const mapStateToProps = (state, { id }) => ({
   errorMessage: getProposalsErrorMessage(state, 'pending'),
   pageInfo: getProposalsPage(state, 'pending'),
   proposals: getVisibleProposals(state, 'pending'),
+  messageUpdates: getMessageUpdates(state),
 });
 
 const mapDispatch = {
@@ -415,6 +430,7 @@ const mapDispatch = {
   loadTags,
   loadProposalsList,
   loadProposalStatus,
+  createMessage,
 };
 
 export default connect(mapStateToProps, mapDispatch)(WorkTeamManagement);

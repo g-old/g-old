@@ -21,6 +21,8 @@ export default combineReducers({
 
 /* GENERATOR */
 
+export const getMessageUpdates = state => fromUi.getMessageUpdates(state.ui);
+
 export const getMessage = (state, id) =>
   fromEntity.getMessage(state.entities, id);
 

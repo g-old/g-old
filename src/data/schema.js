@@ -43,7 +43,7 @@ import proposalConnection from './queries/proposalConnection';
 import flagConnection from './queries/flagConnection';
 import createPushSub from './mutations/createPushSub';
 import deletePushSub from './mutations/deletePushSub';
-import notify from './mutations/sendMessage';
+import createMessage from './mutations/createMessage';
 import activities from './subscriptions/activities';
 import createWorkTeam from './mutations/createWorkTeam';
 import joinWorkTeam from './mutations/joinWorkTeam';
@@ -133,7 +133,7 @@ const schema = new Schema({
       solveFlag,
       createPushSub,
       deletePushSub,
-      notify,
+      createMessage,
       createWorkTeam,
       joinWorkTeam,
       leaveWorkTeam,

@@ -5,7 +5,7 @@ import {
   GraphQLList,
 } from 'graphql';
 
-import RecipientType from './RecipientType';
+import RecipientTypeEnum from './RecipientTypeEnum';
 
 const MessageInputType = new GraphQLInputObjectType({
   name: 'MessageInput',
@@ -23,7 +23,7 @@ const MessageInputType = new GraphQLInputObjectType({
     recipients: {
       type: new GraphQLList(GraphQLID),
     },
-    recipientType: { type: RecipientType },
+    recipientType: { type: RecipientTypeEnum },
   },
 });
 export default MessageInputType;

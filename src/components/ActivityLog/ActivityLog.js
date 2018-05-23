@@ -9,6 +9,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import s from './ActivityLog.css';
 import UserThumbnail from '../UserThumbnail';
+import Label from '../Label';
 import Avatar from '../Avatar';
 import Statement from '../Statement';
 import { ICONS } from '../../constants';
@@ -169,8 +170,13 @@ class ActivityLog extends React.Component {
       case 'Message': {
         activity = (
           <div>
-            <h3>{content.subject}</h3>
-            {content.messageHtml}
+            <Label>{`Subject: ${content.subject}`}</Label>
+            <div>
+              <div>Recipients: </div>
+              {content.recipients.map(recipient => (
+                <UserThumbnail user={recipient} marked={false} />
+              ))}
+            </div>
           </div>
         );
         break;
