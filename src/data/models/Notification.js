@@ -90,6 +90,28 @@ class Notification {
   }
 }
 
+function deleteNotifications(comment) {
+  return knex('activities')
+    .where({
+      object_id: comment.id,
+      type: ActivityType.COMMENT,
+      verb: ActivityVerb.CREATE,
+    })
+    .limit(1) // TODO reply notifications
+    .pluck('id')
+    .then(([aId]) => {
+      if (aId) {
+        return knex('notifications')
+          .where({ activity_id: aId })
+          .del();
+      }
+      return Promise.resolve();
+    })
+    .catch(err => {
+      log.error({ err }, 'Notification deletion failed');
+    });
+}
+
 EventManager.subscribe('onStatementDeleted', ({ statement }) =>
   knex('activities')
     .where({
@@ -128,32 +150,15 @@ EventManager.subscribe('onCommentDeleted', ({ comment, info = {} }) => {
                   .del()
               : Promise.resolve(),
         )
+        .then(() => deleteNotifications(comment))
         .catch(err => {
           log.error({ err }, 'Notification deletion failed');
         });
     }
-    return Promise.resolve();
+    return deleteNotifications(comment);
   }
 
-  return knex('activities')
-    .where({
-      object_id: comment.id,
-      type: ActivityType.COMMENT,
-      verb: ActivityVerb.CREATE,
-    })
-    .limit(1) // TODO reply notifications
-    .pluck('id')
-    .then(([aId]) => {
-      if (aId) {
-        return knex('notifications')
-          .where({ activity_id: aId })
-          .del();
-      }
-      return Promise.resolve();
-    })
-    .catch(err => {
-      log.error({ err }, 'Notification deletion failed');
-    });
+  return deleteNotifications(comment);
 });
 
 export default Notification;
