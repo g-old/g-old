@@ -62,8 +62,8 @@ Per gli utenti della piattaforma sono previsti i seguenti profili
 * **_Utente di secondo livello (voter)_**: può leggere, commentare e votare.
 * **_Moderatore (moderator)_**: è un voter con il diritto aggiuntivo di poter eliminare commenti segnalati come offensivi o non rispettosi delle regole della piattaforma,
 * **_Relatore (relator)_**: può pubblicare proposte e sondaggi, indire delle votazioni e avviare delle discussioni.
-* **_Coordinatore di gruppo di lavoro (teamleader)_**: è relatore nel gruppo di lavoro da lui coordinato e può modificare il profilo degli utenti iscritti al proprio gruppo da viewer a voter e viceversa.
-* **_Coordinatore del consiglio_**: è relatore nel consiglio e in tutti gli altri gruppi di lavoro.
+* **_Coordinatore di gruppo di lavoro (teamleader)_**: è relatore nel gruppo di lavoro da lui coordinato.
+* **_Coordinatore del consiglio_**: è relatore nel consiglio e in tutti gli altri gruppi di lavoro e può modificare il profilo degli utenti iscritti p. es da viewer a voter e viceversa.
 
 ### Profilo utente
 
