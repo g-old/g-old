@@ -1305,7 +1305,7 @@
     "id": "subscriptionType.delete",
     "description": "Deleting subscription",
     "defaultMessage": "Unsubscribe",
-    "message": "Anulla l'iscrizione",
+    "message": "Annulla l'iscrizione",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {

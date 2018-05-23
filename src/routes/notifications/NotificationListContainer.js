@@ -101,7 +101,7 @@ class NotificationsListContainer extends React.Component {
 
     return (
       <Box tag="article" pad column>
-        <Heading tag="h2">
+        <Heading tag="h3">
           <FormattedMessage {...messages.notifications} />
         </Heading>
         <Box>
