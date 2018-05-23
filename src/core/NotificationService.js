@@ -225,6 +225,20 @@ const generateData = (
   return result;
 };
 
+const emailNotificationTranslations = {
+  'de-DE': {
+    message: 'hat Ihnen eine Nachricht geschrieben',
+    user: 'hat eine Einstellung verändert',
+  },
+  'it-IT': {
+    message: 'Translate: hat Ihnen eine Nachricht geschrieben',
+    user: 'Translate: hat eine Einstellung verändert',
+  },
+  'lld-IT': {
+    message: 'Translate: hat Ihnen eine Nachricht geschrieben',
+    user: 'Translate: hat eine Einstellung verändert',
+  },
+};
 const userStatusTranslations = {
   'de-DE': {
     roleAdded: (name, role, helpText) => `Hallo ${name},\n
@@ -1142,6 +1156,8 @@ class NotificationService {
             thumbnail: author.thumbnail,
           },
           locale,
+          link: this.linkPrefix + getMessageLink(activityObject.id, referrer),
+          notification: emailNotificationTranslations[locale][activity.type],
           title: activityObject.subject,
         });
         return { htmlContent: emailHTML, receivers };
@@ -1160,6 +1176,8 @@ class NotificationService {
             thumbnail: author.thumbnail,
           },
           locale,
+          link: `${this.linkPrefix}/`,
+          notification: emailNotificationTranslations[locale][activity.type],
           title: userStatusTranslations[locale].subject,
         });
         return { htmlContent: emailHTML, receivers };

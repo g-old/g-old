@@ -281,6 +281,8 @@ if (__DEV__) {
         message = root.MailComposer.getMessageMail({
           sender: actor,
           message: `${loremIpsum}<br> <strong> Okay  </strong></br>`,
+          notification: 'hat ihnen eine Nachricht geschrieben',
+          link: '/',
           title: 'The subject',
           locale: req.language,
         });

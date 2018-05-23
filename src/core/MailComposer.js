@@ -33,6 +33,8 @@ type MessageMailProps = {
   sender: Actor,
   title: string,
   locale: Locale,
+  notification: string,
+  link: string,
 };
 type ProposalMailProps = {
   proposal: ProposalProps,
@@ -156,12 +158,16 @@ class MailComposer {
     message,
     title,
     sender,
+    notification,
+    link,
     locale = 'de-DE',
   }: MessageMailProps) {
     return this.render('messageNotification', {
       sender: sender.fullName,
       subject: title,
       message,
+      notification,
+      link,
       thumbnail: sender.thumbnail,
       t: key => this.translations[key][locale],
     });
