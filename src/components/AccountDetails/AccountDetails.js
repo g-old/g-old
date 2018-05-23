@@ -279,17 +279,19 @@ class AccountDetails extends React.Component {
         </Box>
         {/* eslint-disable eqeqeq */}
         {user.id != id && (
-          <Box column pad flex className={s.details}>
+          <Box column flex className={s.details}>
             <Accordion column>
               {GroupPanel}
               {RightsPanel}
               {MessagePanel}
             </Accordion>
-            <Button
-              onClick={this.handleDelete}
-              primary
-              label={<FormattedMessage {...messages.delete} />}
-            />
+            <Box justify>
+              <Button
+                onClick={this.handleDelete}
+                primary
+                label={<FormattedMessage {...messages.delete} />}
+              />
+            </Box>
           </Box>
         )}
       </Box>

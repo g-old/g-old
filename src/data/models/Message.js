@@ -1,26 +1,27 @@
 // @flow
 
+import sanitize from 'sanitize-html';
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
-// import EventManager from '../../core/EventManager';
+import EventManager from '../../core/EventManager';
 
 type RecipientType = 'user' | 'group';
 class Message {
   recipientType: RecipientType;
   id: ID;
-  msgHtml: string;
+  messageHtml: string;
   subject: string;
   senderId: ID;
-  to: [ID];
+  recipients: [ID];
   msg: string;
   createdAt: string;
-
+  message: string;
   constructor(data) {
     this.id = data.id;
     this.recipientType = data.recipient_type;
-    this.msg = data.msg;
-    this.msgHtml = data.msg_html;
-    this.to = data.to;
+    this.message = data.message;
+    this.messageHtml = data.message_html;
+    this.recipients = data.recipients;
     this.subject = data.subject;
     this.senderId = data.sender_id;
     this.createdAt = data.created_at;
@@ -35,29 +36,110 @@ class Message {
   }
 
   static async create(viewer, data, loaders, trx) {
-    if (
-      !data ||
-      !(data.message || data.messageHtml) ||
-      !data.recipientType ||
-      !data.recipients /* || data.info */
-    )
+    if (!data) {
       return null;
+    }
     if (!canMutate(viewer, data, Models.MESSAGE)) return null;
-
     let message;
-    const newData = Object.keys(data).reduce(
-      (acc, curr) => {
-        if (!(curr in acc) && curr !== 'info') {
-          acc[curr] = data[curr];
-        }
-        return acc;
-      },
-      {
-        type: data.type,
-        msg: data.msg,
-        sender_id: viewer.id,
-      },
-    );
+    const newData = { created_at: new Date(), sender_id: viewer.id };
+    if (data.messageHtml) {
+      if (data.messageHtml.length > 10000) {
+        throw new Error('Message too long!');
+      }
+      newData.message_html = sanitize(data.messageHtml, {
+        allowedTags: [
+          'h3',
+          'h4',
+          'h5',
+          'h6',
+          'blockquote',
+          'p',
+          'a',
+          'ul',
+          'ol',
+          'nl',
+          'li',
+          'b',
+          'i',
+          'strong',
+          'em',
+          'strike',
+          'code',
+          'hr',
+          'br',
+          'div',
+          'table',
+          'thead',
+          'caption',
+          'tbody',
+          'tr',
+          'th',
+          'td',
+          'pre',
+          'iframe',
+          'img',
+        ],
+        allowedAttributes: {
+          a: ['href', 'name', 'target'],
+          // We don't currently allow img itself by default, but this
+          // would make sense if we did
+          img: ['src', 'style'],
+        },
+        // Lots of these won't come up by default because we don't allow them
+        selfClosing: [
+          'img',
+          'br',
+          'hr',
+          'area',
+          'base',
+          'basefont',
+          'input',
+          'link',
+          'meta',
+        ],
+        // URL schemes we permit
+        allowedSchemes: ['http', 'https', 'ftp', 'mailto'],
+        allowedSchemesByTag: {},
+        allowedSchemesAppliedToAttributes: ['href', 'src', 'cite'],
+        allowProtocolRelative: true,
+        allowedIframeHostnames: ['www.youtube.com', 'player.vimeo.com'],
+        transformTags: {
+          img(tagName, attribs) {
+            // My own custom magic goes here
+
+            return {
+              tagName: 'img',
+              attribs: {
+                ...attribs,
+                style: 'max-width: 100%',
+              },
+            };
+          },
+        },
+      });
+      if (!data.message) {
+        newData.message = 'n.m';
+      }
+    }
+    if (data.message) {
+      if (data.message.length > 10000) {
+        throw new Error('Message too long!');
+      }
+      newData.message = data.message;
+    }
+    if (data.recipientType) {
+      newData.recipient_type = data.recipientType;
+    }
+    if (data.recipients) {
+      if (data.recipients.length) {
+        newData.recipients = JSON.stringify(data.recipients);
+      } else {
+        throw new Error('Atleast one recipient required');
+      }
+    }
+    if (data.subject) {
+      newData.subject = data.subject;
+    }
 
     if (trx) {
       message = await knex('messages')
@@ -71,13 +153,13 @@ class Message {
     }
 
     message = message[0]; // eslint-disable-line
-
+    message = message ? new Message(message) : null;
     if (message) {
-      /* EventManager.publish('onMessageCreated', {
+      EventManager.publish('onMessageCreated', {
         viewer,
-        message: { ...message, targetType: data.info.targetType },
-        subjectId: data.info.targetId,
-      }); */
+        message: { ...message, targetType: message.recipientType },
+        subjectId: message.recipients[0],
+      });
     }
     return message ? new Message(message) : null;
   }

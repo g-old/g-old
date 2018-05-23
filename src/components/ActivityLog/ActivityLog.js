@@ -169,8 +169,8 @@ class ActivityLog extends React.Component {
       case 'Message': {
         activity = (
           <div>
-            <h3>{content.title}</h3>
-            {content.msg}
+            <h3>{content.subject}</h3>
+            {content.messageHtml}
           </div>
         );
         break;

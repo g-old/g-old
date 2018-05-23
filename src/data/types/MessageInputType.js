@@ -1,7 +1,6 @@
 import {
   GraphQLString as String,
   GraphQLInputObjectType,
-  GraphQLNonNull,
   GraphQLID,
   GraphQLList,
 } from 'graphql';
@@ -12,7 +11,7 @@ const MessageInputType = new GraphQLInputObjectType({
   name: 'MessageInput',
   fields: {
     message: {
-      type: new GraphQLNonNull(String),
+      type: String,
     },
     messageHtml: {
       type: String,

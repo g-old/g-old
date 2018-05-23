@@ -280,7 +280,7 @@ if (__DEV__) {
       case 'messageNotification': {
         message = root.MailComposer.getMessageMail({
           sender: actor,
-          message: loremIpsum,
+          message: `${loremIpsum}<br> <strong> Okay  </strong></br>`,
           title: 'The subject',
           locale: req.language,
         });

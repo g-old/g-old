@@ -23,7 +23,8 @@ id
 sender{
   ${userFields}
 }
-msg
+message
+messageHtml
 subject
 `;
 
@@ -35,24 +36,24 @@ query($id:ID!) {
 }
 `;
 
-export function notifyUser(messageData) {
+export function notifyUser(message) {
   return async (dispatch, getState, { graphqlRequest }) => {
     const properties = genStatusIndicators(['message']);
     dispatch({
       type: SEND_MESSAGE_START,
-      id: messageData.receiverId,
+      id: message.recipients[0],
       properties,
     });
 
     try {
-      const { data } = await graphqlRequest(notify, { message: messageData });
+      const { data } = await graphqlRequest(notify, { message });
 
       if (!data.notify) {
         throw Error('Message failed');
       }
       dispatch({
         type: SEND_MESSAGE_SUCCESS,
-        id: messageData.receiverId,
+        id: message.recipients[0],
         properties,
       });
     } catch (error) {
@@ -61,7 +62,7 @@ export function notifyUser(messageData) {
         payload: {
           error,
         },
-        id: messageData.receiverId,
+        id: message.recipients[0],
         properties,
         message: error.message || 'Something went wrong',
       });

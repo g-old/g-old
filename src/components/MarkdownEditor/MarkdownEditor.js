@@ -8,12 +8,13 @@ import Box from '../Box';
 import Button from '../Button';
 import { ICONS } from '../../constants';
 
+type InputValue = { rawInput: string, html: string };
 type ChangeEvent = {
-  target: { name: string, value: { rawInput: string, html: string } },
+  target: { name: string, value: InputValue },
 };
 type Props = {
   onChange: ChangeEvent => void,
-  value: string,
+  value: InputValue,
   name: string,
 };
 type State = {
@@ -96,7 +97,7 @@ class MarkdownEditor extends React.Component<Props, State> {
     });
   }
 
-  md: {};
+  md: { render: string => string };
 
   render() {
     const { value, name } = this.props;

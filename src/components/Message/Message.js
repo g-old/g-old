@@ -8,17 +8,23 @@ import UserThumbnail from '../UserThumbnail';
 
 class Message extends React.Component {
   static propTypes = {
-    title: PropTypes.string.isRequired,
-    msg: PropTypes.string.isRequired,
+    subject: PropTypes.string.isRequired,
+    message: PropTypes.string,
+    messageHtml: PropTypes.string,
     sender: PropTypes.shape({}).isRequired,
+  };
+  static defaultProps = {
+    message: null,
+    messageHtml: null,
   };
 
   render() {
-    const { title, msg, sender } = this.props;
+    const { subject, message, messageHtml, sender } = this.props;
     return (
       <Box column className={s.root} pad>
-        <Label>{title}</Label>
-        <div>{msg}</div>
+        <Label>{subject}</Label>
+        <div dangerouslySetInnerHTML={{ __html: messageHtml || message }} />
+
         <UserThumbnail user={sender} />
       </Box>
     );

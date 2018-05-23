@@ -5,4 +5,9 @@
   color: #000;
   padding: 1em;
   border-radius: 1em;
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
 }

@@ -111,5 +111,10 @@
     "de-DE": "Abstimmen",
     "it-IT": "",
     "lld-IT": ""
+  },
+  "clickMessageLink": {
+    "de-DE": "Nachricht ansehen",
+    "it-IT": "",
+    "lld-IT": ""
   }
 }

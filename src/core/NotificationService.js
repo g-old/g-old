@@ -595,9 +595,9 @@ class NotificationService {
         break;
 
       case ActivityType.MESSAGE:
-        if (activity.content.targetType && activity.content.targetId) {
+        if (activity.content.targetType) {
           activity.targetType = activity.content.targetType;
-          activity.targetId = activity.subjectId || activity.content.targetId;
+          activity.targetId = activity.subjectId;
           data = activity;
         }
         break;
@@ -1135,9 +1135,8 @@ class NotificationService {
       case ActivityType.MESSAGE: {
         // $FlowFixMe
         const author: UserProps = objects[ActivityType.USER][activity.actorId];
-
         const emailHTML = this.MailComposer.getMessageMail({
-          message: activityObject.msg,
+          message: activityObject.message_html || activityObject.message,
           sender: {
             fullName: `${author.name} ${author.surname}`,
             thumbnail: author.thumbnail,

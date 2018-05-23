@@ -127,8 +127,9 @@ query($userId:ID){
         thumbnail
         id
       }
-      msg
-      title
+      message
+      messageHtml
+      subject
     }
     ... on Request {
       ${requestFields}

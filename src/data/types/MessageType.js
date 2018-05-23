@@ -16,17 +16,20 @@ const MessageType = new ObjectType({
     id: {
       type: new GraphQLNonNull(GraphQLID),
     },
-    msg: {
+    message: {
+      type: GraphQLString,
+    },
+    messageHtml: {
       type: GraphQLString,
     },
 
     subject: {
       type: GraphQLString,
     },
-    receivers: {
+    recipients: {
       type: new GraphQLList(UserType),
       resovle: (parent, args, { viewer, loaders }) =>
-        parent.to.map(id => User.gen(viewer, id, loaders)),
+        parent.recipients.map(id => User.gen(viewer, id, loaders)),
     },
 
     sender: {

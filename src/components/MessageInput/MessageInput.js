@@ -41,19 +41,26 @@ class MessageInput extends React.Component {
   constructor(props) {
     super(props);
     this.onNotify = this.onNotify.bind(this);
+    this.state = { data: {} };
+  }
+
+  componentWillReceiveProps({ updates }) {
+    if (updates && updates.success) {
+      this.setState({
+        data: { text: { rawInput: '', html: '' }, subject: '', recipients: [] },
+      });
+    }
   }
 
   onNotify(values) {
     const subject = values.subject && values.subject.trim();
     const { recipients, recipientType } = this.props;
     this.props.notifyUser({
-      message: JSON.stringify({
-        recipientType,
-        recipients,
-        ...(!values.text.html.length && { message: values.text.rawInput }),
-        messageHtml: values.text.html,
-        subject,
-      }),
+      recipientType,
+      recipients,
+      ...(!values.text.html.length && { message: values.text.rawInput }),
+      messageHtml: values.text.html,
+      subject,
     });
   }
 
@@ -65,9 +72,10 @@ class MessageInput extends React.Component {
         updatePending={updates && updates.pending}
         validations={{ text: {}, subject: {}, recipients }}
         submit={this.onNotify}
+        data={this.state.data}
       >
         {({ values, handleValueChanges, onSubmit, onBlur, errorMessages }) => (
-          <Box column pad>
+          <Box column>
             <fieldset>
               {!recipients.length && (
                 <FormField label="Receivers">
@@ -95,12 +103,9 @@ class MessageInput extends React.Component {
                   name="text"
                   onChange={handleValueChanges}
                 />
-                {/* <textarea
-              name="messageText"
-              onBlur={this.handleBlur}
-              value={this.state.messageText}
-              onChange={this.handleValueChange}
-            /> */}
+              </FormField>
+              <FormField label="Preview">
+                <div dangerouslySetInnerHTML={{ __html: values.text.html }} />
               </FormField>
             </fieldset>
             <Button
