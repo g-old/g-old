@@ -43,7 +43,7 @@ class AccountList extends React.Component {
     const { userListStatus, userList } = this.props;
     return (
       <Box pad column>
-        <Heading tag="h2">
+        <Heading tag="h3">
           <FormattedMessage {...messages.users} />
         </Heading>
         {userListStatus.pending && !userList.length && <p>Loading...</p>}

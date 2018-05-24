@@ -15,7 +15,6 @@ import {
   passwordAgainValidation,
   emailValidation,
   nameValidation,
-  capitalizeFirstLetter,
 } from '../../core/validation';
 
 const messages = defineMessages({

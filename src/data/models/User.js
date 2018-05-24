@@ -30,6 +30,25 @@ export type UserProps = {
   canVoteSince: ?string,
   locale: Locale,
 };
+
+const sanitizeName = name =>
+  name
+    ? name
+        .split(' ')
+        .map(n => {
+          if (n.length < 4) {
+            return n.trim();
+          }
+          return (
+            n.charAt(0).toUpperCase() +
+            n
+              .slice(1)
+              .toLowerCase()
+              .trim()
+          );
+        })
+        .join(' ')
+    : name;
 class User {
   constructor(data: UserProps) {
     this.id = data.id;
@@ -143,10 +162,10 @@ class User {
       newData.email_verified = true;
     }
     if (data.name) {
-      newData.name = data.name.trim();
+      newData.name = sanitizeName(data.name);
     }
     if (data.surname) {
-      newData.surname = data.surname.trim();
+      newData.surname = sanitizeName(data.surname);
     }
     if (data.thumbnail) {
       newData.thumbnail = data.thumbnail;
@@ -351,9 +370,9 @@ class User {
     if (!canMutate(viewer, data, Models.USER)) return null;
     let { name, surname, email, password } = data;
 
-    name = name.trim();
-    if (!name) return null;
-    surname = surname.trim();
+    name = sanitizeName(name);
+
+    surname = sanitizeName(surname);
     if (!surname) return null;
     email = email.trim().toLowerCase();
     if (!email) return null;
