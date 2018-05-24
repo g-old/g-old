@@ -5,11 +5,16 @@ exports.up = function(knex, Promise) {
         .json('recipients')
         .notNullable()
         .defaultsTo('[]');
-      table.enu('recipient_type', ['group', 'user']);
-      table.text('message_html');
-      table.renameColumn('msg', 'message');
-
-      table.renameColumn('title', 'subject');
+      table
+        .enu('recipient_type', ['group', 'user'])
+        .defaultsTo('user')
+        .notNullable();
+      table.enu('message_type', ['note', 'meeting', 'report']);
+      table.jsonb('subject');
+      table.boolean('enforce_email');
+      table.integer('message_object_id');
+      table.dropColumn('msg');
+      table.dropColumn('title');
       table.dropColumn('location');
       table.dropColumn('date');
       table.dropColumn('type');
@@ -22,10 +27,13 @@ exports.down = function(knex, Promise) {
     knex.schema.table('messages', table => {
       table.dropColumn('recipients');
       table.dropColumn('recipient_type');
-      table.dropColumn('message_html');
-      table.renameColumn('subject', 'title');
-      table.renameColumn('message', 'msg');
+      table.dropColumn('enforce_email');
+      table.dropColumn('message_type');
+      table.dropColumn('message_object_id');
+      table.dropColumn('subject');
 
+      table.string('title');
+      table.text('msg');
       table.string('location');
       table.string('date');
       table.enu('type', ['msg', 'event']);

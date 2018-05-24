@@ -11,6 +11,10 @@ import RecipientTypeEnum from './RecipientTypeEnum';
 import UserType from './UserType';
 import User from '../models/User';
 import WorkTeam from '../models/WorkTeam';
+import MessageTypeEnum from './MessageTypeEnum';
+import MessageObjectType from './MessageObjectType';
+import Note from '../models/Note';
+import TranslationType from './TranslationType';
 
 const MessageType = new ObjectType({
   name: 'Message',
@@ -19,15 +23,39 @@ const MessageType = new ObjectType({
     id: {
       type: new GraphQLNonNull(GraphQLID),
     },
-    message: {
-      type: GraphQLString,
+    messageType: {
+      type: MessageTypeEnum,
     },
-    messageHtml: {
-      type: GraphQLString,
+    messageObject: {
+      type: MessageObjectType,
+      resolve(parent, args, { viewer, loaders }) {
+        switch (parent.messageType) {
+          case 'note':
+            return Note.gen(viewer, parent.objectId, loaders);
+
+          default:
+            throw new Error(
+              `MessageType not recognized: ${parent.messageType}`,
+            );
+        }
+      },
+    },
+
+    subjectTranslations: {
+      type: TranslationType,
+      resolve: parent => parent.subject,
     },
 
     subject: {
       type: GraphQLString,
+      resolve: (parent, args, params, { rootValue }) => {
+        const locale = rootValue.request.language;
+        if (parent.subject[locale]) {
+          return parent.subject[locale];
+        }
+        // find one translation that is not emty or default translation
+        return 'Not found';
+      },
     },
     recipients: {
       type: new GraphQLList(RecipientType),

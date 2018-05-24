@@ -23,10 +23,19 @@ export const Models = {
   REQUEST: 4096,
   TAG: 8192,
   MESSAGE: 16384,
+  NOTE: 32768,
 };
 
 /* GENERATOR_FN */
 /* eslint-disable no-unused-vars */
+function noteReadControl(viewer, data) {
+  console.error('Access control for Note not implemented');
+  return true;
+}
+function noteWriteControl(viewer, data) {
+  console.error('Access control for Note not implemented');
+  return true;
+}
 function notificationReadControl(viewer, data) {
   console.error('Access control for Notification not implemented');
   return true;
@@ -356,6 +365,10 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
+  [Models.NOTE]: {
+    [ATypes.WRITE]: noteWriteControl,
+    [ATypes.READ]: noteReadControl,
+  },
   [Models.NOTIFICATION]: {
     [ATypes.WRITE]: notificationWriteControl,
     [ATypes.READ]: notificationReadControl,

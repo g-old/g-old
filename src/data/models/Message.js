@@ -19,8 +19,8 @@ class Message {
   constructor(data) {
     this.id = data.id;
     this.recipientType = data.recipient_type;
-    this.message = data.message;
-    this.messageHtml = data.message_html;
+    this.messageType = data.message_type;
+    this.objectId = data.message_object_id;
     this.recipients = data.recipients;
     this.subject = data.subject;
     this.senderId = data.sender_id;
