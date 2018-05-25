@@ -2,144 +2,103 @@
 import knex from '../data/knex';
 import webPush from '../webPush';
 import log from '../logger';
-import Proposal from '../data/models/Proposal';
-import { circularFeedMessage } from './feed';
-import createLoaders from '../data/dataLoader';
 import root from '../compositionRoot';
 import { EmailType } from './BackgroundService';
-import type { PushMessages, PushData } from './NotificationService';
+import type { PushMessages } from './NotificationService';
 
-const handleMessages = async (viewer, messageData, receiver) =>
-  circularFeedMessage({
-    viewer,
-    data: messageData,
-    verb: 'create',
-    receiver,
-    loaders: createLoaders(),
-  });
-
-const push = async (subscriptionData, msg: PushData) => {
-  let result;
-  try {
-    const subscriptions = [];
-    subscriptionData.forEach(s => {
-      if (s) {
-        subscriptions.push({
-          endpoint: s.endpoint,
-          keys: { auth: s.auth, p256dh: s.p256dh },
-        });
-      }
-    });
-
-    const messages = subscriptions.map(sub =>
-      webPush
-        .sendNotification(sub, JSON.stringify(msg))
-        .then(response => {
-          log.info({ pushService: response });
-          if (response.statusCode !== 201) {
-            log.warn({ pushService: response });
-          }
-        })
-        .catch(err => {
-          if (err.statusCode === 410) {
-            log.error({ pushService: err }, 'Subscription should be deleted');
-            return knex('webpush_subscriptions')
-              .where({ endpoint: sub.endpoint })
-              .del();
-          }
-          log.error(err, 'Subscription no longer valid');
-          return Promise.resolve();
-        }),
-    );
-
-    result = await Promise.all(messages);
-  } catch (e) {
-    log.error({ err: e }, 'Message failed');
-  }
-  return result;
-};
-
-const notifyNewStatements = async (viewer, data, loaders) => {
-  // check proposal
-  const proposal = await Proposal.genByPoll(viewer, data.pollId, loaders);
-  if (!proposal) return null;
-  if (proposal.notifiedAt) {
-    if (
-      new Date(proposal.notifiedAt).getTime() >
-      new Date().getTime() - 60 * 60 * 1000
-    ) {
-      return null;
-    }
-  }
-
-  const subscriptionData = await knex
-    .from('proposal_user_subscriptions')
-    .where({ proposal_id: proposal.id })
-    .innerJoin(
-      'webpush_subscriptions',
-      'proposal_user_subscriptions.user_id',
-      'webpush_subscriptions.user_id',
-    )
-    .where('webpush_subscriptions.user_id', '!=', viewer.id)
-    .select();
-
-  const body =
-    proposal.title.length > 40
-      ? `${proposal.title.slice(0, 36)}...`
-      : proposal.title;
-  await push(subscriptionData, {
-    body,
-    link: `/proposal/${proposal.id}/${data.pollId}`,
-    title: 'NEW Statements!',
-    tag: 'statements',
-  });
-
-  const now = new Date();
-  return knex('proposals')
-    .where({ id: proposal.id })
-    .update({ notified_at: now, updated_at: now });
-};
-
-const notifyProposalCreation = async proposal => {
-  let subscriptionData;
-  if (proposal.workTeamId) {
-    subscriptionData = await knex('webpush_subscriptions')
-      .innerJoin(
-        'user_work_teams',
-        'webpush_subscriptions.user_id',
-        'user_work_teams.user_id',
-      )
-      .where('user_work_teams.work_team_id', '=', proposal.workTeamId)
-      .select();
-  } else {
-    subscriptionData = await knex('webpush_subscriptions').select();
-  }
-  const body =
-    proposal.title.length > 40
-      ? `${proposal.title.slice(0, 36)}...`
-      : proposal.title;
-  const pollId = proposal.pollTwo_id
-    ? proposal.pollTwo_id
-    : proposal.pollOne_id;
-  return push(subscriptionData, {
-    body,
-    link: `/proposal/${proposal.id}/${pollId}`,
-    title: 'NEW Proposal!',
-    tag: 'proposal',
-  });
-};
 // https://hackernoon.com/functional-javascript-resolving-promises-sequentially-7aac18c4431e
-const promiseSerial = funcs =>
+export const promiseSerial = funcs =>
   funcs.reduce(
     (promise, func) =>
-      promise.then(result => func.then(Array.prototype.concat.bind(result))),
+      promise.then(result => func().then(Array.prototype.concat.bind(result))),
     Promise.resolve([]),
   );
 
-const notifyMultiple = async (
-  viewer,
-  data: { messages: PushMessages, notificationIds: { [string]: ID } },
-) => {
+/*
+
+function runSerial(tasks) {
+  let result = Promise.resolve();
+  tasks.forEach(task => {
+    result = result.then(() => task());
+  });
+  return result;
+}
+*/
+
+export const executeInBatches = (data, fn, batchSize = 5) => {
+  if (!data.length) {
+    return [];
+  }
+  const pushFns = [];
+  const inputLength = data.length;
+
+  for (let i = 0; i < inputLength; i += batchSize) {
+    pushFns.push(() =>
+      Promise.all(data.slice(i, i + batchSize).map(d => fn(d))),
+    );
+  }
+  return promiseSerial(pushFns).catch(err => {
+    log.error({ err });
+  });
+};
+
+const createPushPromise = ({ subscriptionDetails, pushMessage, id }) => {
+  if (subscriptionDetails) {
+    const { message } = pushMessage;
+    return webPush
+      .sendNotification(
+        {
+          endpoint: subscriptionDetails.endpoint,
+          keys: {
+            auth: subscriptionDetails.auth,
+            p256dh: subscriptionDetails.p256dh,
+          },
+        },
+        JSON.stringify(message),
+      )
+      .then(response => {
+        if (response.statusCode !== 201) {
+          log.warn({
+            pushService: {
+              response,
+              userId: id,
+              subId: subscriptionDetails.id,
+            },
+          });
+        } else {
+          log.info(
+            {
+              pushService: { status: response.statusCode, userId: id },
+            },
+            'WebPush delivered!',
+          );
+        }
+      })
+      .catch(err => {
+        const addInfo = { userId: id, subId: subscriptionDetails.id };
+        const error = { err, ...addInfo };
+        if (err.statusCode === 410 || err.statusCode === 404) {
+          log.error(error, 'Subscription not found or gone');
+          return knex('webpush_subscriptions')
+            .where({ endpoint: subscriptionDetails.endpoint })
+            .del()
+            .then(() => {
+              log.warn(addInfo, 'Deleted subscription!');
+              // TODO notify user?
+            })
+            .catch(e =>
+              log.error({ err: e, ...addInfo }, 'Subscription deletion failed'),
+            );
+        }
+        log.error(error, 'Webpush failure');
+        return Promise.resolve();
+      });
+  }
+
+  return Promise.resolve();
+};
+
+const notifyMultiple = async (viewer, data: { messages: PushMessages }) => {
   // group by type&locale - get diff message by type , diff link
   const userIds = data.messages.reduce(
     (acc, curr) => acc.concat(curr.receiverIds),
@@ -149,78 +108,30 @@ const notifyMultiple = async (
   const subscriptionData = await knex('webpush_subscriptions')
     .whereIn('user_id', userIds)
     .select();
-
   if (!subscriptionData.length) {
     return true;
   }
 
-  const promises = data.messages.map(
-    pushMessage =>
-      pushMessage.receiverIds.map(id => {
-        const subscriptionDetails = subscriptionData.find(
-          // eslint-disable-next-line eqeqeq
-          subscription => subscription.user_id === id,
-        );
-        if (subscriptionDetails) {
-          const { message } = pushMessage;
-          message.link +=
-            data.notificationIds[`${pushMessage.activityId}$${id}`];
-          return webPush
-            .sendNotification(
-              {
-                endpoint: subscriptionDetails.endpoint,
-                keys: {
-                  auth: subscriptionDetails.auth,
-                  p256dh: subscriptionDetails.p256dh,
-                },
-              },
-              JSON.stringify(message),
-            )
-            .then(response => {
-              log.info({ pushService: response });
-              if (response.statusCode !== 201) {
-                log.warn({ pushService: response });
-              }
-            })
-            .catch(err => {
-              if (err.statusCode === 410) {
-                log.error(
-                  { pushService: err },
-                  'Subscription should be deleted',
-                );
-                return knex('webpush_subscriptions')
-                  .where({ endpoint: subscriptionDetails.endpoint })
-                  .del();
-              }
-              log.error(err, 'Subscription no longer valid');
-              return Promise.resolve();
-            });
-        }
+  const subData = [];
 
-        return Promise.resolve();
-      }),
-    //  return push(subscriptions, pushMessage.message);
-  );
-
-  // execute promises in batches
-
-  const promiseBatches = [];
-  const end = promises.length;
-  let counter = 0;
-  for (let i = 0; i < end; i += 1) {
-    if (i % 5 === 0) {
-      promiseBatches.push(Promise.all(promises.slice(counter, 5)));
-    }
-    counter += 1;
-  }
-  const remainingPromises = promises.slice(counter);
-  if (remainingPromises.length) {
-    promiseBatches.push(Promise.all(remainingPromises));
-  }
-  return promiseSerial(promiseBatches).catch(err => {
-    log.error({ err });
+  data.messages.forEach(pushMessage => {
+    pushMessage.receiverIds.forEach(rId => {
+      const subscriptionDetails = subscriptionData.filter(
+        // eslint-disable-next-line eqeqeq
+        subscription => subscription.user_id === rId,
+      );
+      // each user can have multiple subscriptions!
+      subscriptionDetails.forEach(details =>
+        subData.push({
+          subscriptionDetails: details,
+          pushMessage,
+          id: rId,
+        }),
+      );
+    });
   });
-  // return Promise.all(promises);
+
+  return executeInBatches(subData, createPushPromise, 1);
 };
 
 async function processMessages(message) {
@@ -228,25 +139,8 @@ async function processMessages(message) {
   let result = null;
   try {
     switch (message.type) {
-      case 'webpush': {
-        log.info('Starting webpush');
-
-        result = notifyProposalCreation(message.data);
-
-        break;
-      }
-      case 'webpushforstatementsTEST': {
-        log.info('Starting webpush');
-        result = notifyNewStatements(
-          message.viewer,
-          message.data,
-          createLoaders(),
-        );
-
-        break;
-      }
       case 'batchPushing': {
-        log.info('Starting webpush BATCH');
+        log.info('Starting webpush BATCH', message.data);
         result = notifyMultiple(message.viewer, message.data);
 
         break;
@@ -266,15 +160,6 @@ async function processMessages(message) {
         result = await root.BackgroundService.handleEmails(
           EmailType.TEST_BATCH,
           message.data,
-        );
-        break;
-      }
-
-      case 'message': {
-        result = handleMessages(
-          message.data.viewer,
-          message.data,
-          message.data.receiver,
         );
         break;
       }
