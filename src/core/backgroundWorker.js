@@ -99,6 +99,7 @@ const createPushPromise = ({ subscriptionDetails, pushMessage, id }) => {
 };
 
 const notifyMultiple = async (viewer, data: { messages: PushMessages }) => {
+  const BATCH_SIZE = 5;
   // group by type&locale - get diff message by type , diff link
   const userIds = data.messages.reduce(
     (acc, curr) => acc.concat(curr.receiverIds),
@@ -131,7 +132,7 @@ const notifyMultiple = async (viewer, data: { messages: PushMessages }) => {
     });
   });
 
-  return executeInBatches(subData, createPushPromise, 1);
+  return executeInBatches(subData, createPushPromise, BATCH_SIZE);
 };
 
 async function processMessages(message) {
