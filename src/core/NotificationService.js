@@ -572,8 +572,8 @@ class NotificationService {
     this.delimiter = '#';
     this.maxBatchSize = maxBatchSize || 500;
     this.batchingWindow = batchingWindow || 1000 * 10;
-    const env = process.env.NODE_ENV || 'development';
-    this.sendEmails = env === 'development';
+    // const env = process.env.NODE_ENV || 'development';
+    this.sendEmails = true; // env === 'development';
     this.filterActivity = this.filterActivity.bind(this);
     this.loadSubscriptions = this.loadSubscriptions.bind(this);
     this.generateEmail = this.generateEmail.bind(this);

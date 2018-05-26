@@ -19,7 +19,7 @@ const mailOptions = config.mailer;
 
 const USE_SENDGRID = 'test';
 let Transporter;
-if (env === 'production' || env === USE_SENDGRID) {
+if (env === USE_SENDGRID) {
   Transporter = require('./core/SendGridTransporter').default; // eslint-disable-line global-require
 } else {
   Transporter = nodemailer.createTransport({
