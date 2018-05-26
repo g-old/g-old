@@ -24,6 +24,7 @@ class MessageContainer extends React.Component {
           subject={subject}
           content={messageObject && messageObject.content}
           sender={sender}
+          replyable={messageObject && messageObject.replyable}
         />
       </Box>
     );

@@ -15,6 +15,7 @@ import MessageTypeEnum from './MessageTypeEnum';
 import MessageObjectType from './MessageObjectType';
 import Note from '../models/Note';
 import TranslationType from './TranslationType';
+import Communication from '../models/Communication';
 
 const localeMapper = { 'de-DE': 'de', 'it-IT': 'it', 'lld-IT': 'lld' };
 const MessageType = new ObjectType({
@@ -33,7 +34,8 @@ const MessageType = new ObjectType({
         switch (parent.messageType) {
           case 'note':
             return Note.gen(viewer, parent.objectId, loaders);
-
+          case 'communication':
+            return Communication.gen(viewer, parent.objectId, loaders);
           default:
             throw new Error(
               `MessageType not recognized: ${parent.messageType}`,

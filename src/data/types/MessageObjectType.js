@@ -7,7 +7,7 @@ import CommunicationType from './CommunicationType';
 const MessageObjectType = new GraphQLUnionType({
   name: 'MessageObject',
 
-  types: () => [NoteType],
+  types: () => [NoteType, CommunicationType],
   resolveType: value => {
     if (value instanceof Note) {
       return NoteType;

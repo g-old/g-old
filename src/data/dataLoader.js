@@ -303,6 +303,21 @@ const getNotesById = noteIds =>
         ),
       );
   });
+const getCommunicationsById = communicationIds =>
+  new Promise(resolve => {
+    knex('communications')
+      .whereIn('id', communicationIds)
+      .select()
+      .then(data =>
+        resolve(
+          communicationIds.map(
+            id =>
+              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
+              new Error(`Row not found: ${id}`),
+          ),
+        ),
+      );
+  });
 
 function createLoaders() {
   return {
@@ -324,6 +339,7 @@ function createLoaders() {
     subscriptions: new DataLoader(ids => getSubscriptionsById(ids)),
     notifications: new DataLoader(ids => getNotificationsById(ids)),
     notes: new DataLoader(ids => getNotesById(ids)),
+    communications: new DataLoader(ids => getCommunicationsById(ids)),
   };
 }
 

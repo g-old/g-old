@@ -29,6 +29,11 @@ messageObject{
     id
     content
   }
+  ... on Communication{
+    id
+    content
+    replyable
+  }
 }
 subject
 `;

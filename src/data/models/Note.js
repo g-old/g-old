@@ -3,7 +3,7 @@ import sanitize from 'sanitize-html';
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 
-const sanitizerOptions = {
+export const sanitizerOptions = {
   allowedTags: [
     'h3',
     'h4',
@@ -96,7 +96,7 @@ class Note {
     const newData = {
       created_at: new Date(),
     };
-    if (data.textHtml) {
+    if (data.textHtml && data.textHtml.length < 10000) {
       newData.text_html = Object.keys(data.textHtml).reduce((acc, locale) => {
         acc[locale] = sanitize(data.textHtml[locale], sanitizerOptions);
         return acc;

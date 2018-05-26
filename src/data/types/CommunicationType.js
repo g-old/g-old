@@ -24,6 +24,10 @@ const CommunicationType = new ObjectType({
     textRaw: {
       type: GraphQLString,
     },
+    content: {
+      type: GraphQLString,
+      resolve: parent => parent.textHtml || parent.textRaw,
+    },
 
     replyable: {
       type: GraphQLBoolean,

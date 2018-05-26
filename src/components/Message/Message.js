@@ -11,16 +11,21 @@ class Message extends React.Component {
     subject: PropTypes.string.isRequired,
     sender: PropTypes.shape({}).isRequired,
     content: PropTypes.string.isRequired,
+    replyable: PropTypes.bool,
+  };
+  static defaultProps = {
+    replyable: null,
   };
 
   render() {
-    const { subject, content, sender } = this.props;
+    const { subject, content, sender, replyable } = this.props;
     return (
       <Box column className={s.root} pad>
         <Label>{subject}</Label>
         <div dangerouslySetInnerHTML={{ __html: content }} />
 
         <UserThumbnail user={sender} />
+        {replyable && <textarea placeholder="Not working!" />}
       </Box>
     );
   }

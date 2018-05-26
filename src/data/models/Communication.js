@@ -1,5 +1,8 @@
+import sanitize from 'sanitize-html';
+
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import { sanitizerOptions } from './Note';
 
 class Communication {
   constructor(data) {
@@ -33,8 +36,8 @@ class Communication {
     if (data.textRaw) {
       newData.text_raw = data.textRaw;
     }
-    if (data.textHtml) {
-      newData.text_html = data.textHtml;
+    if (data.textHtml && data.textHtml.length < 10000) {
+      newData.text_html = sanitize(data.textHtml, sanitizerOptions);
     }
     if (data.replyable) {
       newData.replyable = data.replyable;
