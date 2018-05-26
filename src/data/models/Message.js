@@ -1,9 +1,10 @@
 // @flow
 
-import sanitize from 'sanitize-html';
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
+import Note from './Note';
+import Communication from './Communication';
 
 type RecipientType = 'user' | 'group';
 class Message {
@@ -42,91 +43,7 @@ class Message {
     if (!canMutate(viewer, data, Models.MESSAGE)) return null;
     let message;
     const newData = { created_at: new Date(), sender_id: viewer.id };
-    if (data.messageHtml) {
-      if (data.messageHtml.length > 10000) {
-        throw new Error('Message too long!');
-      }
-      newData.message_html = sanitize(data.messageHtml, {
-        allowedTags: [
-          'h3',
-          'h4',
-          'h5',
-          'h6',
-          'blockquote',
-          'p',
-          'a',
-          'ul',
-          'ol',
-          'nl',
-          'li',
-          'b',
-          'i',
-          'strong',
-          'em',
-          'strike',
-          'code',
-          'hr',
-          'br',
-          'div',
-          'table',
-          'thead',
-          'caption',
-          'tbody',
-          'tr',
-          'th',
-          'td',
-          'pre',
-          'iframe',
-          'img',
-        ],
-        allowedAttributes: {
-          a: ['href', 'name', 'target'],
-          // We don't currently allow img itself by default, but this
-          // would make sense if we did
-          img: ['src', 'style'],
-        },
-        // Lots of these won't come up by default because we don't allow them
-        selfClosing: [
-          'img',
-          'br',
-          'hr',
-          'area',
-          'base',
-          'basefont',
-          'input',
-          'link',
-          'meta',
-        ],
-        // URL schemes we permit
-        allowedSchemes: ['http', 'https', 'ftp', 'mailto'],
-        allowedSchemesByTag: {},
-        allowedSchemesAppliedToAttributes: ['href', 'src', 'cite'],
-        allowProtocolRelative: true,
-        allowedIframeHostnames: ['www.youtube.com', 'player.vimeo.com'],
-        transformTags: {
-          img(tagName, attribs) {
-            // My own custom magic goes here
 
-            return {
-              tagName: 'img',
-              attribs: {
-                ...attribs,
-                style: 'max-width: 100%',
-              },
-            };
-          },
-        },
-      });
-      if (!data.message) {
-        newData.message = 'n.m';
-      }
-    }
-    if (data.message) {
-      if (data.message.length > 10000) {
-        throw new Error('Message too long!');
-      }
-      newData.message = data.message;
-    }
     if (data.recipientType) {
       newData.recipient_type = data.recipientType;
     }
@@ -147,6 +64,23 @@ class Message {
         .insert(newData)
         .returning('*');
     } else {
+      await knex.transaction(async tra => {
+        let object;
+        if (data.messageType === 'note') {
+          object = await Note.create(viewer, data.note, loaders, tra);
+        } else if (data.messageType === 'communication') {
+          object = await Communication.create(
+            viewer,
+            data.communication,
+            loaders,
+            tra,
+          );
+        }
+
+        newData.message_object_id = object.id;
+        newData.message_type = data.messageType;
+      });
+
       message = await knex('messages')
         .insert(newData)
         .returning('*');

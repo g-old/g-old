@@ -9,8 +9,8 @@ const MessageTypeEnum = new GraphQLEnumType({
     NOTE: {
       value: 'note',
     },
-    REPORT: {
-      value: 'report',
+    COMMUNICATION: {
+      value: 'communication',
     },
   },
 });

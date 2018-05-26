@@ -288,6 +288,21 @@ const getNotificationsById = notificationIds =>
         ),
       );
   });
+const getNotesById = noteIds =>
+  new Promise(resolve => {
+    knex('notes')
+      .whereIn('id', noteIds)
+      .select()
+      .then(data =>
+        resolve(
+          noteIds.map(
+            id =>
+              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
+              new Error(`Row not found: ${id}`),
+          ),
+        ),
+      );
+  });
 
 function createLoaders() {
   return {
@@ -308,6 +323,7 @@ function createLoaders() {
     workTeams: new DataLoader(ids => getWorkTeamsById(ids)),
     subscriptions: new DataLoader(ids => getSubscriptionsById(ids)),
     notifications: new DataLoader(ids => getNotificationsById(ids)),
+    notes: new DataLoader(ids => getNotesById(ids)),
   };
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from '../../components/Layout';
-import { getSessionUser, getMessage, getNotification } from '../../reducers';
+import { getSessionUser, getNotification } from '../../reducers';
 import { loadMessage } from '../../actions/message';
 import { updateNotification } from '../../actions/notification';
 import MessageContainer from './MessageContainer';
@@ -15,7 +15,6 @@ async function action({ store, path, query }, { id }) {
   }
   await store.dispatch(loadMessage(id));
 
-  const message = getMessage(state, id);
   if (query && query.ref === 'notification') {
     // check if notification in store
     const notification = getNotification(state, query.id);
@@ -35,7 +34,7 @@ async function action({ store, path, query }, { id }) {
     chunks: ['message'],
     component: (
       <Layout>
-        <MessageContainer {...message} />
+        <MessageContainer id={id} />
       </Layout>
     ),
   };

@@ -216,6 +216,7 @@ class AccountDetails extends React.Component {
           <MessageInput
             recipients={[id]}
             recipientType="USER"
+            messageType="COMMUNICATION"
             notifyUser={this.props.createMessage}
             updates={this.props.messageUpdates}
           />

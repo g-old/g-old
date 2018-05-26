@@ -7,7 +7,9 @@ import Box from '../Box';
 import FormField from '../FormField';
 import Button from '../Button';
 import FormValidation from '../FormValidation';
-import Editor from '../MarkdownEditor';
+import Tabs from '../Tabs';
+import Tab from '../Tab';
+import InputMask from './InputMask';
 
 const messages = defineMessages({
   notify: {
@@ -32,11 +34,14 @@ class MessageInput extends React.Component {
     notifyGroup: PropTypes.bool,
     recipients: PropTypes.arrayOf(PropTypes.string),
     recipientType: PropTypes.oneOfType(['USER', 'GROUP']).isRequired,
+    messageType: PropTypes.oneOfType(['COMMUNICATION', 'NOTE']).isRequired,
+    parentId: PropTypes.string,
   };
 
   static defaultProps = {
     notifyGroup: null,
     recipients: null,
+    parentId: null,
   };
   constructor(props) {
     super(props);
@@ -47,30 +52,59 @@ class MessageInput extends React.Component {
   componentWillReceiveProps({ updates }) {
     if (updates && updates.success) {
       this.setState({
-        data: { text: { rawInput: '', html: '' }, subject: '', recipients: [] },
+        data: {
+          textDe: { rawInput: '', html: '' },
+          textIt: { rawInput: '', html: '' },
+          subjectDe: '',
+          subjectIT: '',
+          recipients: [],
+        },
       });
     }
   }
 
   onNotify(values) {
-    const subject = values.subject && values.subject.trim();
-    const { recipients, recipientType } = this.props;
+    const subject = { de: values.subjectDe, it: values.subjectIt };
+    const { recipients, recipientType, messageType, parentId } = this.props;
+
+    const object = {};
+    if (messageType === 'NOTE') {
+      object.note = {
+        textHtml: {
+          de: values.textDe.html,
+          it: values.textIt.html,
+        },
+        category: 'CIRCULAR',
+      };
+    } else if (messageType === 'COMMUNICATION') {
+      object.communication = {
+        parentId,
+        textHtml: values.textDe.html,
+        replyable: true,
+      };
+    }
     this.props.notifyUser({
       recipientType,
+      messageType,
+      ...object,
       recipients,
-      ...(!values.text.html.length && { message: values.text.rawInput }),
-      messageHtml: values.text.html,
       subject,
     });
   }
 
   render() {
-    const { updates = {}, recipients = [] } = this.props;
+    const { updates = {}, recipients = [], messageType } = this.props;
 
     return (
       <FormValidation
         updatePending={updates && updates.pending}
-        validations={{ text: {}, subject: {}, recipients }}
+        validations={{
+          textDe: {},
+          textIt: {},
+          subjectDe: {},
+          subjectIt: {},
+          recipients: {},
+        }}
         submit={this.onNotify}
         data={this.state.data}
       >
@@ -88,25 +122,34 @@ class MessageInput extends React.Component {
                   />
                 </FormField>
               )}
-              <FormField label="Subject" error={errorMessages.subjectError}>
-                <input
-                  name="subject"
-                  type="text"
-                  onBlur={onBlur}
-                  value={values.subject}
-                  onChange={handleValueChanges}
+              {messageType === 'COMMUNICATION' && (
+                <InputMask
+                  locale="De"
+                  values={values}
+                  handleValueChanges={handleValueChanges}
+                  errors={errorMessages}
                 />
-              </FormField>
-              <FormField label="Text" error={errorMessages.textError}>
-                <Editor
-                  value={values.text}
-                  name="text"
-                  onChange={handleValueChanges}
-                />
-              </FormField>
-              <FormField label="Preview">
-                <div dangerouslySetInnerHTML={{ __html: values.text.html }} />
-              </FormField>
+              )}
+              {messageType === 'NOTE' && (
+                <Tabs>
+                  <Tab title="Deutsch">
+                    <InputMask
+                      locale="De"
+                      values={values}
+                      handleValueChanges={handleValueChanges}
+                      errors={errorMessages}
+                    />
+                  </Tab>
+                  <Tab title="Italiano">
+                    <InputMask
+                      locale="It"
+                      values={values}
+                      handleValueChanges={handleValueChanges}
+                      errors={errorMessages}
+                    />
+                  </Tab>
+                </Tabs>
+              )}
             </fieldset>
             <Button
               fill

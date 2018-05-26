@@ -24,10 +24,19 @@ export const Models = {
   TAG: 8192,
   MESSAGE: 16384,
   NOTE: 32768,
+  COMMUNICATION: 65536,
 };
 
 /* GENERATOR_FN */
 /* eslint-disable no-unused-vars */
+function communicationReadControl(viewer, data) {
+  console.error('Access control for Communication not implemented');
+  return true;
+}
+function communicationWriteControl(viewer, data) {
+  console.error('Access control for Communication not implemented');
+  return true;
+}
 function noteReadControl(viewer, data) {
   console.error('Access control for Note not implemented');
   return true;
@@ -365,6 +374,10 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
+  [Models.COMMUNICATION]: {
+    [ATypes.WRITE]: communicationWriteControl,
+    [ATypes.READ]: communicationReadControl,
+  },
   [Models.NOTE]: {
     [ATypes.WRITE]: noteWriteControl,
     [ATypes.READ]: noteReadControl,

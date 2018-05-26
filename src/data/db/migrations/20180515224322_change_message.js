@@ -9,7 +9,7 @@ exports.up = function(knex, Promise) {
         .enu('recipient_type', ['group', 'user'])
         .defaultsTo('user')
         .notNullable();
-      table.enu('message_type', ['note', 'meeting', 'report']);
+      table.enu('message_type', ['note', 'meeting', 'communication']);
       table.jsonb('subject');
       table.boolean('enforce_email');
       table.integer('message_object_id');

@@ -16,6 +16,7 @@ import MessageObjectType from './MessageObjectType';
 import Note from '../models/Note';
 import TranslationType from './TranslationType';
 
+const localeMapper = { 'de-DE': 'de', 'it-IT': 'it', 'lld-IT': 'lld' };
 const MessageType = new ObjectType({
   name: 'Message',
 
@@ -50,11 +51,14 @@ const MessageType = new ObjectType({
       type: GraphQLString,
       resolve: (parent, args, params, { rootValue }) => {
         const locale = rootValue.request.language;
-        if (parent.subject[locale]) {
-          return parent.subject[locale];
+        if (parent.subject) {
+          if (parent.subject[localeMapper[locale]]) {
+            return parent.subject[localeMapper[locale]];
+          }
+          // find one translation that is not emty or default translation
+          return Object.keys(parent.subject).find(l => parent.subject[l]);
         }
-        // find one translation that is not emty or default translation
-        return 'Not found';
+        return null;
       },
     },
     recipients: {

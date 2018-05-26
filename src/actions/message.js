@@ -23,8 +23,13 @@ id
 sender{
   ${userFields}
 }
-message
-messageHtml
+messageType
+messageObject{
+  ... on Note{
+    id
+    content
+  }
+}
 subject
 `;
 

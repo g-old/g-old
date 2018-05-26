@@ -4,15 +4,15 @@ const TranslationType = new ObjectType({
   name: 'Translation',
 
   fields: () => ({
-    'de-DE': {
+    de: {
       type: GraphQLString,
     },
 
-    'it-IT': {
+    it: {
       type: GraphQLString,
     },
 
-    'lld-IT': {
+    lld: {
       type: GraphQLString,
     },
   }),

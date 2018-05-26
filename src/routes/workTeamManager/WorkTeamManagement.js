@@ -395,6 +395,7 @@ class WorkTeamManagement extends React.Component {
           </Tab>
           <Tab title={<FormattedMessage {...messages.messages} />}>
             <MessageInput
+              messageType="NOTE"
               recipients={[this.props.id]}
               recipientType="GROUP"
               notifyUser={this.props.createMessage}

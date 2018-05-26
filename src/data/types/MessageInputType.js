@@ -1,29 +1,30 @@
-import {
-  GraphQLString as String,
-  GraphQLInputObjectType,
-  GraphQLID,
-  GraphQLList,
-} from 'graphql';
+import { GraphQLInputObjectType, GraphQLID, GraphQLList } from 'graphql';
 
 import RecipientTypeEnum from './RecipientTypeEnum';
+import MessageTypeEnum from './MessageTypeEnum';
+import NoteInputType from './NoteInputType';
+import TranslationInputType from './TranslationInputType';
+import CommunicationInputType from './CommunicationInputType';
 
 const MessageInputType = new GraphQLInputObjectType({
   name: 'MessageInput',
   fields: {
-    message: {
-      type: String,
+    note: {
+      type: NoteInputType,
     },
-    messageHtml: {
-      type: String,
+    communication: {
+      type: CommunicationInputType,
     },
+
     subject: {
-      type: String,
+      type: TranslationInputType,
     },
 
     recipients: {
       type: new GraphQLList(GraphQLID),
     },
     recipientType: { type: RecipientTypeEnum },
+    messageType: { type: MessageTypeEnum },
   },
 });
 export default MessageInputType;
