@@ -31,7 +31,7 @@ type StatementMailProps = {
 type MessageMailProps = {
   message: string,
   sender: Actor,
-  title: string,
+  subject: string,
   locale: Locale,
   notification: string,
   link: string,
@@ -156,7 +156,7 @@ class MailComposer {
   }
   getMessageMail({
     message,
-    title,
+    subject,
     sender,
     notification,
     link,
@@ -164,7 +164,7 @@ class MailComposer {
   }: MessageMailProps) {
     return this.render('messageNotification', {
       sender: sender.fullName,
-      subject: title,
+      subject,
       message,
       notification,
       link,

@@ -71,8 +71,8 @@ class MessageInput extends React.Component {
     if (messageType === 'NOTE') {
       object.note = {
         textHtml: {
-          de: values.textDe.html,
-          it: values.textIt.html,
+          ...(values.textDe && { de: values.textDe.html }),
+          ...(values.textIt && { de: values.textIt.html }),
         },
         category: 'CIRCULAR',
       };

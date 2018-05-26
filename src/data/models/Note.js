@@ -96,12 +96,17 @@ class Note {
     const newData = {
       created_at: new Date(),
     };
-    if (data.textHtml && data.textHtml.length < 10000) {
+    if (data.textHtml) {
       newData.text_html = Object.keys(data.textHtml).reduce((acc, locale) => {
-        acc[locale] = sanitize(data.textHtml[locale], sanitizerOptions);
+        const text = data.textHtml[locale];
+
+        if (text.length < 10000) {
+          acc[locale] = sanitize(text, sanitizerOptions);
+        }
         return acc;
       }, {});
     }
+
     if (data.category) {
       newData.category = data.category;
     }

@@ -16,9 +16,8 @@ import type { StatementProps } from '../data/models/Statement';
 import type { UserProps } from '../data/models/User';
 import type { EmailHTML } from './MailComposer';
 import type PubSub from './pubsub';
-
+import type { MessageType } from '../data/models/Message';
 // TODO write Dataloaders for batching
-let timer;
 // const MESSAGES_DIR = process.env.MESSAGES_DIR || join(__dirname, './messages');
 
 type Referrer = 'push' | 'email';
@@ -37,8 +36,24 @@ type EActivity = {
     targetId?: ID,
     targetType?: tActivityType,
     changedField?: string,
+    messageType?: MessageType,
+    objectId?: ID,
   },
 };
+
+type DBTable =
+  | 'users'
+  | 'activities'
+  | 'communications'
+  | 'meetings'
+  | 'notes'
+  | 'proposals'
+  | 'statements'
+  | 'votes'
+  | 'messages'
+  | 'discussions'
+  | 'comments';
+
 type NotificationType = 'webpush' | 'email';
 type Subscriber = {
   id: ID,
@@ -57,8 +72,11 @@ type ResourceType =
   | StatementProps
   | UserProps;
 type ResourceMap = { [ID]: ResourceType };
+
+type ObjectMap = { [DBTable]: ResourceMap };
+
 type RelevantActivities = { subscriber: Subscriber, activities: EActivity[] };
-type GroupedActivityObjects = { [tActivityType]: { [ID]: ResourceType } };
+type GroupedActivityObjects = { [DBTable]: { [ID]: ResourceType } };
 type GroupedActivities = {
   bySubject: {
     [string]: {
@@ -89,7 +107,7 @@ type RawNotification = {
 type GroupedNotifications = {
   webpushData: NotificationSet,
   emailData: NotificationSet,
-  allObjects: { [tActivityType]: ResourceMap },
+  allObjects: ObjectMap,
   notifications: RawNotification[],
 };
 export type PushData = {
@@ -140,6 +158,12 @@ function interval(func, wait) {
   setTimeout(interv, wait);
 }
 
+const mapLocale = {
+  'de-DE': 'de',
+  'it-IT': 'it',
+  'lld-IT': 'lld',
+};
+
 const filterReplies = (parents, activities) => {
   const result = [];
   parents.forEach(p => {
@@ -153,7 +177,7 @@ const filterReplies = (parents, activities) => {
   return result;
 };
 
-const mapTypeToTable: { [tActivityType]: tActivityType } = {
+const mapTypeToTable: { [tActivityType]: DBTable } = {
   [ActivityType.PROPOSAL]: 'proposals',
   [ActivityType.DISCUSSION]: 'discussions',
   [ActivityType.SURVEY]: 'proposals',
@@ -161,6 +185,19 @@ const mapTypeToTable: { [tActivityType]: tActivityType } = {
   [ActivityType.COMMENT]: 'comments',
   [ActivityType.MESSAGE]: 'messages',
   [ActivityType.USER]: 'users',
+  communication: 'communications',
+  meeting: 'meetings',
+  note: 'notes',
+};
+type ShortLocale = 'de' | 'it' | 'lld';
+const getTranslatedMessage = (
+  subject: { [ShortLocale]: string },
+  locale: Locale,
+): ?string => {
+  if (subject[mapLocale[locale]]) {
+    return subject[mapLocale[locale]];
+  }
+  return subject[Object.keys(subject).find(l => subject[l]) || 'it'];
 };
 
 const fillWithData = (
@@ -194,7 +231,7 @@ const fillWithData = (
 
 const generateData = (
   activities: { [ID]: SubsForActivity },
-  objects: { [tActivityType]: ResourceMap },
+  objects: ObjectMap,
   subscriberById: SubscriberMap,
   makeFn: (
     activity: EActivity,
@@ -202,13 +239,14 @@ const generateData = (
     activityObject: ResourceType,
     locale: Locale,
     subscriberById: SubscriberMap,
-    objects: { [tActivityType]: ResourceMap },
+    objects: ObjectMap,
   ) => {},
 ): any => {
   const result = [];
   Object.keys(activities).forEach(activityId => {
     const { activity, subscriberByLocale } = activities[activityId];
-    const activityObject = objects[activity.type][activity.objectId];
+    const activityObject =
+      objects[mapTypeToTable[activity.type]][activity.objectId];
     Object.keys(subscriberByLocale).forEach(locale => {
       const subscriberIds = subscriberByLocale[locale];
       const data = makeFn(
@@ -239,6 +277,7 @@ const emailNotificationTranslations = {
     user: 'Translate: hat eine Einstellung verändert',
   },
 };
+/*
 const userStatusTranslations = {
   'de-DE': {
     roleAdded: (name, role, helpText) => `Hallo ${name},\n
@@ -278,7 +317,7 @@ const userStatusTranslations = {
     subject: 'Attenzione - il tuo profile è stato cambiato',
   },
 };
-
+*/
 // TODO load translations in
 const resourceByLocale: LocaleDictionary = {
   'de-DE': {
@@ -388,7 +427,7 @@ const generatePushMessage = (
   activityObject: any,
   locale: Locale,
   subscriberById: SubscriberMap,
-  objects: { [tActivityType]: ResourceMap },
+  objects: ObjectMap,
 ): PushMessage => {
   let title;
   let message;
@@ -419,7 +458,7 @@ const generatePushMessage = (
       break;
 
     case ActivityType.STATEMENT: {
-      const proposal: ProposalProps = (objects[ActivityType.PROPOSAL][
+      const proposal: ProposalProps = (objects.proposals[
         activity.targetId
       ]: any);
       message = proposal.title;
@@ -432,7 +471,7 @@ const generatePushMessage = (
     }
 
     case ActivityType.COMMENT: {
-      const discussion: DiscussionProps = (objects[ActivityType.DISCUSSION][
+      const discussion: DiscussionProps = (objects.discussions[
         activity.targetId
       ]: any);
       message = discussion.title;
@@ -446,7 +485,7 @@ const generatePushMessage = (
     case ActivityType.MESSAGE:
       title = resourceByLocale[locale][activity.type];
       link = getMessageLink(activity.objectId, referrer);
-      message = activityObject.title;
+      message = getTranslatedMessage(activityObject.subject, locale);
       break;
     default:
       throw new Error(`Type not recognized ${activity.type}`);
@@ -616,7 +655,7 @@ class NotificationService {
         }
         break;
 
-      case ActivityType.USER:
+      /* case ActivityType.USER:
         if (activity.verb === ActivityVerb.UPDATE) {
           if (
             activity.subjectId &&
@@ -628,7 +667,7 @@ class NotificationService {
             data = activity;
           }
         }
-        break;
+        break; */
       default:
         return;
     }
@@ -728,23 +767,6 @@ class NotificationService {
     return groupedActivities;
   }
 
-  async processQueue2() {
-    try {
-      // await this.batchProcessing();
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
-        log.info('Resetting notification timer ');
-      } else {
-        timer = setInterval(this.batchProcessing, this.batchingWindow);
-      }
-    } catch (err) {
-      log.error({ err }, 'NotificationService failed ');
-      // means complete batch could be wasted -
-      await this.recover();
-      this.processQueue();
-    }
-  }
   async processQueue() {
     try {
       log.info('Starting batchprocessing');
@@ -829,11 +851,11 @@ class NotificationService {
   }
 
   async loadObjects(data: {
-    [tActivityType]: Set<ID>,
+    [DBTable]: Set<ID>,
   }): Promise<GroupedActivityObjects> {
     const allObjects = {};
     const promises = Object.keys(data).map(async type => {
-      const objData = await this.dbConnector(mapTypeToTable[type])
+      const objData = await this.dbConnector(type)
         .whereIn('id', [...data[type].values()])
         .select();
       allObjects[type] = objData.reduce((acc, obj) => {
@@ -1069,7 +1091,7 @@ class NotificationService {
     activityObject: any,
     locale: Locale,
     subscriberById: SubscriberMap,
-    objects: { [tActivityType]: ResourceMap },
+    objects: ObjectMap,
   ): Email {
     const receivers = subscriberIds.map(sId => subscriberById[sId].email);
     const referrer = 'email';
@@ -1099,10 +1121,9 @@ class NotificationService {
 
       case ActivityType.STATEMENT: {
         // $FlowFixMe
-        const proposal: ProposalProps =
-          objects[ActivityType.PROPOSAL][activity.targetId];
+        const proposal: ProposalProps = objects.proposals[activity.targetId];
         // $FlowFixMe
-        const author: UserProps = objects[ActivityType.USER][activity.actorId];
+        const author: UserProps = objects.users[activity.actorId];
         let link = getStatementLink(
           proposal.id,
           activityObject.poll_id,
@@ -1124,9 +1145,9 @@ class NotificationService {
       case ActivityType.COMMENT: {
         // $FlowFixMe
         const discussion: DiscussionProps =
-          objects[ActivityType.DISCUSSION][activity.targetId];
+          objects.discussions[activity.targetId];
         // $FlowFixMe
-        const author: UserProps = objects[ActivityType.USER][activity.actorId];
+        const author: UserProps = objects.users[activity.actorId];
 
         let link = getCommentLink(
           activityObject,
@@ -1148,21 +1169,40 @@ class NotificationService {
       }
       case ActivityType.MESSAGE: {
         // $FlowFixMe
-        const author: UserProps = objects[ActivityType.USER][activity.actorId];
-        const emailHTML = this.MailComposer.getMessageMail({
-          message: activityObject.message_html || activityObject.message,
-          sender: {
-            fullName: `${author.name} ${author.surname}`,
-            thumbnail: author.thumbnail,
-          },
-          locale,
-          link: this.linkPrefix + getMessageLink(activityObject.id, referrer),
-          notification: emailNotificationTranslations[locale][activity.type],
-          title: activityObject.subject,
-        });
+        const author: UserProps = objects.users[activity.actorId];
+        let emailHTML = {
+          html: 'An error occured',
+          subject: 'System Notification Failure',
+        };
+        if (activity.content.messageType && activity.content.objectId) {
+          const messageObject =
+            objects[mapTypeToTable[activity.content.messageType]][
+              activity.content.objectId
+            ];
+          let message;
+          if (typeof messageObject.text_html === 'string') {
+            message = messageObject.text_html || messageObject.text_raw;
+          } else {
+            message = getTranslatedMessage(messageObject.text_html, locale);
+          }
+
+          emailHTML = this.MailComposer.getMessageMail({
+            message: message || 'Error - not message',
+            sender: {
+              fullName: `${author.name} ${author.surname}`,
+              thumbnail: author.thumbnail,
+            },
+            locale,
+            link: this.linkPrefix + getMessageLink(activityObject.id, referrer),
+            notification: emailNotificationTranslations[locale][activity.type],
+            subject:
+              getTranslatedMessage(activityObject.subject, locale) ||
+              'Info from GOLD',
+          });
+        }
         return { htmlContent: emailHTML, receivers };
       }
-      case ActivityType.USER: {
+      /* case ActivityType.USER: {
         const author: UserProps = objects[ActivityType.USER][activity.actorId];
         const role = activity.content.diff[0];
         const helpText = userStatusTranslations[locale][role];
@@ -1181,7 +1221,7 @@ class NotificationService {
           title: userStatusTranslations[locale].subject,
         });
         return { htmlContent: emailHTML, receivers };
-      }
+      } */
 
       default:
         throw new Error(`ActivityType not recognized : ${activity.type}`);
@@ -1235,55 +1275,63 @@ class NotificationService {
       );
 
     const groupedByType: {
-      [tActivityType]: Set<ID>,
+      [DBTable]: Set<ID>,
     } = allActivities.reduce((acc, activityData) => {
       const { activity } = activityData;
-      acc[activity.type] = (acc[activity.type] || new Set()).add(
-        activity.objectId,
-      );
+      acc[mapTypeToTable[activity.type]] = (
+        acc[activity.type] || new Set()
+      ).add(activity.objectId);
+
       if (activity.type === ActivityType.STATEMENT) {
         // get subjectId from activity
         // add it to types to load
-        if (acc[ActivityType.PROPOSAL]) {
-          acc[ActivityType.PROPOSAL].add(activity.targetId);
+        if (acc.proposals) {
+          acc.proposals.add(activity.targetId);
         } else {
-          acc[ActivityType.PROPOSAL] = new Set([activity.targetId]);
+          acc.proposals = new Set([activity.targetId]);
         }
-        if (acc[ActivityType.USER]) {
-          acc[ActivityType.USER].add(activity.actorId);
+        if (acc.users) {
+          acc.users.add(activity.actorId);
         } else {
-          acc[ActivityType.USER] = new Set([activity.actorId]);
+          acc.users = new Set([activity.actorId]);
         }
       } else if (activity.type === ActivityType.COMMENT) {
         // add it to types to load
-        if (acc[ActivityType.DISCUSSION]) {
-          acc[ActivityType.DISCUSSION].add(activity.targetId);
+        if (acc.discussions) {
+          acc.discussions.add(activity.targetId);
         } else {
-          acc[ActivityType.DISCUSSION] = new Set([activity.targetId]);
+          acc.discussions = new Set([activity.targetId]);
         }
-        if (acc[ActivityType.USER]) {
-          acc[ActivityType.USER].add(activity.actorId);
+        if (acc.users) {
+          acc.users.add(activity.actorId);
         } else {
-          acc[ActivityType.USER] = new Set([activity.actorId]);
+          acc.users = new Set([activity.actorId]);
         }
       } else if (activity.type === ActivityType.MESSAGE) {
-        // add it to types to load
-        if (acc[ActivityType.USER]) {
-          acc[ActivityType.USER].add(activity.actorId);
+        // load actor
+        if (acc.users) {
+          acc.users.add(activity.actorId);
         } else {
-          acc[ActivityType.USER] = new Set([activity.actorId]);
+          acc.users = new Set([activity.actorId]);
+        }
+        // load messageObject
+        const objectType = mapTypeToTable[activity.content.messageType];
+        const { objectId } = activity.content;
+        if (acc[objectType]) {
+          acc[objectType].add(objectId);
+        } else {
+          acc[objectType] = new Set([objectId]);
         }
       } else if (activity.type === ActivityType.USER) {
-        if (acc[ActivityType.USER]) {
-          acc[ActivityType.USER].add(activity.actorId);
+        if (acc.users) {
+          acc.users.add(activity.actorId);
         } else {
-          acc[ActivityType.USER] = new Set([activity.actorId]);
+          acc.users = new Set([activity.actorId]);
         }
       }
 
       return acc;
     }, {});
-
     return this.loadObjects(groupedByType);
   }
 

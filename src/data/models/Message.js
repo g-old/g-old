@@ -6,6 +6,8 @@ import EventManager from '../../core/EventManager';
 import Note from './Note';
 import Communication from './Communication';
 
+export type MessageType = 'communication' | 'note' | 'meeting';
+
 type RecipientType = 'user' | 'group';
 class Message {
   recipientType: RecipientType;
@@ -13,6 +15,8 @@ class Message {
   messageHtml: string;
   subject: string;
   senderId: ID;
+  messageType: MessageType;
+  objectId: ID;
   recipients: [ID];
   msg: string;
   createdAt: string;
@@ -91,7 +95,12 @@ class Message {
     if (message) {
       EventManager.publish('onMessageCreated', {
         viewer,
-        message: { ...message, targetType: message.recipientType },
+        message: {
+          ...message,
+          targetType: message.recipientType,
+          messageType: message.messageType,
+          objectId: message.objectId,
+        },
         subjectId: message.recipients[0],
       });
     }
