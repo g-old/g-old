@@ -28,6 +28,7 @@ if (env === USE_SENDGRID) {
     logger: true,
     debug: __DEV__,
     requireTLS: false,
+    ignoreTLS: true,
   });
 }
 
