@@ -30,22 +30,41 @@ async function action({ store, path, query }, { id }) {
     await store.dispatch(loadDiscussion({ id, parentId: query.comment }));
   } else {
     await store.dispatch(loadDiscussion({ id, parentId: query.comment }));
+    const referrer = ['email', 'push', 'notification'];
+    if (query && referrer.includes(query.ref)) {
+      if (query.ref === 'notification' && query.id) {
+        // check if notification in store
+        const notification = getNotification(state, query.id);
+        if (notification) {
+          if (!notification.read) {
+            store.dispatch(
+              updateNotification({
+                id: query.refId,
+                read: true,
+              }),
+            );
+          }
+        } else {
+          store.dispatch(
+            updateNotification({
+              id: query.refId,
+              read: true,
+            }),
+          );
+        }
+        // do nothing
+      } else {
+        // email or push referrer
+        store.dispatch(
+          updateNotification({
+            activityId: query.refId,
+            read: true,
+          }),
+        );
+      }
+    }
   }
 
-  if (query && query.ref === 'notification') {
-    // check if notification in store
-    const notification = getNotification(state, query.id);
-    if (notification && !notification.read) {
-      await store.dispatch(updateNotification({ id: query.id, read: true }));
-    }
-    // ignore if not
-  } else if (query && query.ref === 'push') {
-    await store.dispatch(updateNotification({ id: query.refId, read: true }));
-  } else if (query && query.ref === 'email') {
-    await store.dispatch(
-      updateNotification({ activityId: query.refId, read: true }),
-    );
-  }
   return {
     chunks: ['workteam'],
     title,

@@ -478,7 +478,9 @@ const generatePushMessage = (
       // Diff between reply and new ?
 
       title = resourceByLocale[locale][activity.type];
-      link = getCommentLink(activityObject, discussion.work_team_id, referrer);
+      link =
+        getCommentLink(activityObject, discussion.work_team_id, referrer) +
+        activity.id;
       break;
     }
 
@@ -927,16 +929,6 @@ class NotificationService {
         console.info(notificationIds);
         // TODO add nIds to push + emailmessages
 
-        let counter = 0;
-        const notificationIdLookup = notifications.reduce(
-          (acc, notification) => {
-            acc[`${notification.activity_id}$${notification.user_id}`] =
-              notificationIds[counter];
-            counter += 1;
-            return acc;
-          },
-          {},
-        );
         let emails;
         if (this.sendEmails) {
           emails = generateData(
@@ -958,7 +950,6 @@ class NotificationService {
 
         await this.notifyPushServices(emails, {
           messages: pushMessages,
-          notificationIds: notificationIdLookup,
         });
       }
 
@@ -1252,7 +1243,6 @@ class NotificationService {
     emails?: Emails,
     pushMessages?: {
       messages: PushMessages,
-      notificationIds: { [string]: ID },
     },
   ) {
     if (emails) {

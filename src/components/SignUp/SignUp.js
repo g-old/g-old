@@ -430,6 +430,12 @@ class SignUp extends React.Component {
           <Button primary fill disabled={this.state.captchaPending || pending}>
             <FormattedMessage {...messages.nextStep} />
           </Button>
+          <p>
+            By signing up you agree to our{' '}
+            <a target="_blank" href="/about">
+              Privacy Policy
+            </a>
+          </p>
         </Form>
         <Recaptcha
           ref={
