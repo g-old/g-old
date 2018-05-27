@@ -27,7 +27,6 @@ if (env === USE_SENDGRID) {
     pool: true,
     logger: true,
     debug: __DEV__,
-    service: 'Ethereal',
     requireTLS: false,
   });
 }
