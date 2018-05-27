@@ -48,6 +48,7 @@ module.exports = {
         pass: process.env.MAILER_PASSWORD,
       },
       service: process.env.MAILER_SERVICE,
+      ignoreTls: process.env.MAILER_IGNORE_TLS === 'true',
     },
     sender: process.env.MAILER_SENDER,
   },
