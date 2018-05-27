@@ -42,8 +42,8 @@ const messages = defineMessages({
     description: 'Status message for notifications',
   },
   messageNew: {
-    id: 'notifications.message.new',
-    defaultMessage: 'You got a message from',
+    id: 'notifications.message',
+    defaultMessage: 'Message from',
     description: 'Status message for notifications',
   },
   voting: {

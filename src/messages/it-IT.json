@@ -1347,8 +1347,7 @@
     "id": "notifications.message.new",
     "description": "Status message for notifications",
     "defaultMessage": "You got a message from",
-    "message": "Messagio da",
-    "files": ["src/components/UserNotification/UserNotification.js"]
+    "message": "Messagio da"
   },
   {
     "id": "notifications.proposal.accepted",
@@ -1465,5 +1464,33 @@
     "defaultMessage": "Notification settings",
     "message": "Impostazioni di notifica",
     "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "notifications.message",
+    "description": "Status message for notifications",
+    "defaultMessage": "You got a message from",
+    "message": "Messaggio da",
+    "files": ["src/components/UserNotification/UserNotification.js"]
+  },
+  {
+    "id": "notifications.user.update.roleAdded",
+    "description": "Status message for notifications",
+    "defaultMessage": "You got a new role:",
+    "message": "",
+    "files": ["src/components/UserNotification/UserNotification.js"]
+  },
+  {
+    "id": "notifications.user.update.roleLost",
+    "description": "Status message for notifications",
+    "defaultMessage": "You lost your role:",
+    "message": "",
+    "files": ["src/components/UserNotification/UserNotification.js"]
+  },
+  {
+    "id": "label.messages",
+    "description": "Messages label",
+    "defaultMessage": "Messages",
+    "message": "Messaggi",
+    "files": ["src/routes/workTeamManager/WorkTeamManagement.js"]
   }
 ]

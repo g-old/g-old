@@ -118,7 +118,7 @@ class MailService {
           html: mail.htmlContent.html,
         },
         (err, data) => {
-          this.mailer.close(); // don't close if pooling connections (production)?
+          // this.mailer.close(); // don't close if pooling connections (production)?
           if (err) reject(err);
           resolve(data);
         },
@@ -171,9 +171,19 @@ class MailService {
     return emails.forEach(mail => this.sendMultiple(mail));
   } */
   async sendAllEmails(emails: Emails) {
-    return emails.forEach(mail =>
-      mail.receivers.forEach(receiver => this.sendSingleMail(receiver, mail)),
+    const mailPromises = [];
+    emails.forEach(mail =>
+      mail.receivers.forEach(receiver =>
+        mailPromises.push(
+          this.sendSingleMail(receiver, mail).catch(e =>
+            log.error({ err: e }, 'Mail failed'),
+          ),
+        ),
+      ),
     );
+
+    await Promise.all(mailPromises);
+    this.mailer.close();
   }
 }
 
