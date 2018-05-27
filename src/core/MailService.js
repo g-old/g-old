@@ -107,6 +107,28 @@ class MailService {
       }
     });
   }
+
+  sendSingleMail(receiver: string, mail: Email) {
+    return new Promise((resolve, reject) => {
+      this.mailer.sendMail(
+        {
+          from: this.DEFAULT_SENDER,
+          to: receiver,
+          subject: mail.htmlContent.subject,
+          html: mail.htmlContent.html,
+        },
+        (err, data) => {
+          this.mailer.close(); // don't close if pooling connections (production)?
+          if (err) reject(err);
+          resolve(data);
+        },
+      );
+    }).then(data => {
+      if (__DEV__) {
+        console.info(data);
+      }
+    });
+  }
   async sendEmail(message) {
     const notOkay = this.checkMessage(message);
 
@@ -145,8 +167,13 @@ class MailService {
     }
     return { success: true };
   }
-  async sendAllEmails(emails: Emails) {
+  /* async sendAllEmails(emails: Emails) {
     return emails.forEach(mail => this.sendMultiple(mail));
+  } */
+  async sendAllEmails(emails: Emails) {
+    return emails.forEach(mail =>
+      mail.receivers.forEach(receiver => this.sendSingleMail(receiver, mail)),
+    );
   }
 }
 

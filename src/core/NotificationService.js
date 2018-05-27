@@ -507,7 +507,7 @@ const generatePushMessage = (
     message: {
       body: message.length > 40 ? `${message.slice(0, 36)}...` : message,
       title,
-      link,
+      link: link + activity.id,
       tag: activity.type,
     },
     receiverIds: subscriberIds,
@@ -1099,8 +1099,18 @@ class NotificationService {
       case ActivityType.DISCUSSION: {
         let link = getDiscussionLink(activityObject, referrer);
         link = this.linkPrefix + link + activity.id;
+        const text = `${resourceByLocale[locale][ActivityType.DISCUSSION]}: ${
+          activityObject.title
+        }`;
+
         const emailHTML = this.MailComposer.getDiscussionMail({
           discussion: activityObject,
+          sender: {
+            fullName: 'GOLD',
+            thumbnail: `${this.linkPrefix}/tile.png`,
+          },
+          notification: text,
+          subject: text,
           link,
           locale,
         });
@@ -1110,9 +1120,18 @@ class NotificationService {
       case ActivityType.PROPOSAL: {
         let link = getProposalLink(activityObject, referrer);
         link = this.linkPrefix + link + activity.id;
+        const text = `${
+          resourceByLocale[locale][ActivityType.PROPOSAL][activityObject.state]
+        }: ${activityObject.title}`;
         const message = this.MailComposer.getProposalMail({
+          sender: {
+            fullName: 'GOLD',
+            thumbnail: `${this.linkPrefix}/tile.png`,
+          },
           proposal: activityObject,
           locale,
+          notification: text,
+          subject: text,
           link,
         });
 
@@ -1367,13 +1386,13 @@ class NotificationService {
             created_at: now,
           });
           const { settings } = user;
-          if (
+          /* if (
             activity.type === ActivityType.USER &&
             activity.verb === ActivityVerb.UPDATE
           ) {
             // notify via mail - also without subscription
             fillWithData(resultSet, 'emailData', activity, user);
-          }
+          } */
           if (settings[activity.type]) {
             // TODO normalize activities with Map aId: a, aId: [userIds]
 

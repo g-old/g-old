@@ -40,6 +40,9 @@ type ProposalMailProps = {
   proposal: ProposalProps,
   link: string,
   locale: Locale,
+  subject: string,
+  notification: string,
+  sender: Actor,
 };
 
 type CommentMailProps = {
@@ -54,6 +57,9 @@ type DiscussionMailProps = {
   discussion: DiscussionProps,
   link: string,
   locale: Locale,
+  subject: string,
+  notification: string,
+  sender: Actor,
 };
 
 class MailComposer {
@@ -116,11 +122,22 @@ class MailComposer {
       t: key => this.translations[key][locale],
     });
   }
-  getProposalMail({ proposal, link, locale = 'de-DE' }: ProposalMailProps) {
+  getProposalMail({
+    proposal,
+    link,
+    locale = 'de-DE',
+    subject,
+    notification,
+    sender,
+  }: ProposalMailProps) {
     return this.render('proposalNotification', {
       title: proposal.title,
       text: proposal.body,
+      thumbnail: sender.thumbnail,
+      sender: sender.fullName,
       link,
+      subject,
+      notification,
       t: key => this.translations[key][locale],
     });
   }
@@ -128,11 +145,18 @@ class MailComposer {
     discussion,
     link,
     locale = 'de-DE',
+    sender,
+    subject,
+    notification,
   }: DiscussionMailProps) {
     return this.render('proposalNotification', {
       title: discussion.title,
       text: discussion.content,
       link,
+      subject,
+      sender: sender.fullName,
+      thumbnail: sender.thumbnail,
+      notification,
       t: key => this.translations[key][locale],
     });
   }

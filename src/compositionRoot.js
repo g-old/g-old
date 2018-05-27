@@ -24,6 +24,7 @@ if (env === USE_SENDGRID) {
 } else {
   Transporter = nodemailer.createTransport({
     ...mailOptions.config,
+    pool: true,
     logger: true,
     debug: __DEV__,
     service: 'Ethereal',
