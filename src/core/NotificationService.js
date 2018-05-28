@@ -1376,6 +1376,7 @@ class NotificationService {
             created_at: now,
           });
           const { settings } = user;
+
           /* if (
             activity.type === ActivityType.USER &&
             activity.verb === ActivityVerb.UPDATE
@@ -1387,6 +1388,8 @@ class NotificationService {
             // TODO normalize activities with Map aId: a, aId: [userIds]
 
             if (settings[activity.type].email) {
+              fillWithData(resultSet, 'emailData', activity, user);
+            } else if (activity.content.enforceEmail) {
               fillWithData(resultSet, 'emailData', activity, user);
             }
             // allow both notification methods combined
