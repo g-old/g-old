@@ -1,4 +1,9 @@
-import { GraphQLInputObjectType, GraphQLID, GraphQLList } from 'graphql';
+import {
+  GraphQLInputObjectType,
+  GraphQLID,
+  GraphQLList,
+  GraphQLBoolean,
+} from 'graphql';
 
 import RecipientTypeEnum from './RecipientTypeEnum';
 import MessageTypeEnum from './MessageTypeEnum';
@@ -18,6 +23,9 @@ const MessageInputType = new GraphQLInputObjectType({
 
     subject: {
       type: TranslationInputType,
+    },
+    enforceEmail: {
+      type: GraphQLBoolean,
     },
 
     recipients: {

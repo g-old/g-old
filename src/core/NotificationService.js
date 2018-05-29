@@ -1394,6 +1394,8 @@ class NotificationService {
             if (settings[activity.type].webpush) {
               fillWithData(resultSet, 'webpushData', activity, user);
             }
+          } else if (activity.content.enforceEmail) {
+            fillWithData(resultSet, 'emailData', activity, user);
           }
         });
       }

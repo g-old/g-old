@@ -23,11 +23,13 @@ class Message {
   msg: string;
   createdAt: string;
   message: string;
+  enforceEmail: boolean;
   constructor(data) {
     this.id = data.id;
     this.recipientType = data.recipient_type;
     this.messageType = data.message_type;
     this.objectId = data.message_object_id;
+    this.enforceEmail = data.enforce_email;
     this.recipients = data.recipients;
     this.subject = data.subject;
     this.senderId = data.sender_id;
@@ -62,6 +64,10 @@ class Message {
     }
     if (data.subject) {
       newData.subject = data.subject;
+    }
+
+    if (data.enforceEmail) {
+      newData.enforce_email = true;
     }
 
     if (trx) {

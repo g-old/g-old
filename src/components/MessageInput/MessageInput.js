@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
 import Box from '../Box';
+import CheckBox from '../CheckBox';
 import FormField from '../FormField';
 import Button from '../Button';
 import FormValidation from '../FormValidation';
@@ -11,10 +12,10 @@ import InputMask from './InputMask';
 import LocaleSelector from './LocaleSelector';
 
 const messages = defineMessages({
-  notify: {
-    id: 'account.notify',
-    defaultMessage: 'Notify user',
-    description: 'Contact user',
+  send: {
+    id: 'command.submit',
+    description: 'Short command for sending data to the server',
+    defaultMessage: 'Submit',
   },
 
   empty: {
@@ -67,6 +68,7 @@ class MessageInput extends React.Component {
           subjectde: '',
           subjectit: '',
           recipients: [],
+          enforceEmail: false,
         },
       });
     }
@@ -81,7 +83,7 @@ class MessageInput extends React.Component {
       object.note = {
         textHtml: {
           ...(values.textde && { de: values.textde.html }),
-          ...(values.textit && { de: values.textit.html }),
+          ...(values.textit && { it: values.textit.html }),
         },
         category: 'CIRCULAR',
       };
@@ -98,6 +100,7 @@ class MessageInput extends React.Component {
       ...object,
       recipients,
       subject,
+      enforceEmail: values.enforceEmail,
     });
   }
 
@@ -117,6 +120,7 @@ class MessageInput extends React.Component {
           subjectde: {},
           subjectit: {},
           recipients: {},
+          enforceEmail: {},
         }}
         submit={this.onNotify}
         data={this.state.data}
@@ -159,12 +163,24 @@ class MessageInput extends React.Component {
                 </div>
               )}
             </fieldset>
+            <fieldset>
+              <FormField>
+                <CheckBox
+                  toggle
+                  checked={values.enforceEmail}
+                  disabled={this.props.updates && this.props.updates.pending}
+                  label="Send Email"
+                  name="enforceEmail"
+                  onChange={handleValueChanges}
+                />
+              </FormField>
+            </fieldset>
             <Button
               fill
               primary
               onClick={onSubmit}
               pending={this.props.updates && this.props.updates.pending}
-              label={<FormattedMessage {...messages.notify} />}
+              label={<FormattedMessage {...messages.send} />}
             />
           </Box>
         )}
