@@ -1195,9 +1195,8 @@ class NotificationService {
           } else {
             message = getTranslatedMessage(messageObject.text_html, locale);
           }
-
           emailHTML = this.MailComposer.getMessageMail({
-            message: message || 'Error - not message',
+            message: message || 'Error - no message',
             sender: {
               fullName: `${author.name} ${author.surname}`,
               thumbnail: author.thumbnail,
@@ -1288,9 +1287,8 @@ class NotificationService {
     } = allActivities.reduce((acc, activityData) => {
       const { activity } = activityData;
       acc[mapTypeToTable[activity.type]] = (
-        acc[activity.type] || new Set()
+        acc[mapTypeToTable[activity.type]] || new Set()
       ).add(activity.objectId);
-
       if (activity.type === ActivityType.STATEMENT) {
         // get subjectId from activity
         // add it to types to load

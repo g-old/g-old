@@ -47,7 +47,7 @@ class Message {
       return null;
     }
     if (!canMutate(viewer, data, Models.MESSAGE)) return null;
-    let message;
+    let messageData;
     const newData = { created_at: new Date(), sender_id: viewer.id };
 
     if (data.recipientType) {
@@ -65,7 +65,7 @@ class Message {
     }
 
     if (trx) {
-      message = await knex('messages')
+      messageData = await knex('messages')
         .transacting(trx)
         .insert(newData)
         .returning('*');
@@ -95,13 +95,12 @@ class Message {
         newData.message_type = data.messageType;
       });
 
-      message = await knex('messages')
+      [messageData = null] = await knex('messages')
         .insert(newData)
         .returning('*');
     }
 
-    message = message[0]; // eslint-disable-line
-    message = message ? new Message(message) : null;
+    const message = messageData ? new Message(messageData) : null;
     if (message) {
       EventManager.publish('onMessageCreated', {
         viewer,
@@ -114,26 +113,35 @@ class Message {
         subjectId: message.recipients[0],
       });
     }
-    return message ? new Message(message) : null;
+    return message;
   }
 }
 
 export default Message;
 
+const helpNotice = {
+  de:
+    'Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an xxx@xxx.xx',
+  it:
+    'Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an xxx@xxx.xx',
+  lld:
+    'Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an xxx@xxx.xx',
+};
+
 const userStatusTranslations = {
   subject: {
-    Added: {
+    added: {
       de: 'Neue Rechte erhalten!',
       it: 'translate:Neue Rechte erhalten!',
       lld: 'tranlate: Neue Rechte erhalten!',
     },
-    Lost: {
+    lost: {
       de: 'Achtung, sie haben eine Berechtigung verloren!',
       it: 'translate:Achtung, sie haben eine Berechtigung verloren!',
       lld: 'translate: Achtung, sie haben eine Berechtigung verloren!',
     },
   },
-  VIEWERAdded: {
+  viewer_added: {
     de:
       'Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen und Beiträge, Beschlüsse sowie Diskussionen lesen.',
     it:
@@ -141,16 +149,19 @@ const userStatusTranslations = {
     lld:
       'translate: Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen und Beiträge, Beschlüsse sowie Diskussionen lesen.',
   },
-  VIEWERLost: {
-    de:
-      'Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. Wenn Sie glauben, das hier ein Fehler vorliegt, wenden sie sich bitte xxx oder schreiben Sie eine E-Mail an xxx@xxx.xx',
-    it:
-      'translate: Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. Wenn Sie glauben, das hier ein Fehler vorliegt, wenden sie sich bitte xxx oder schreiben Sie eine E-Mail an xxx@xxx.xx',
-    lld:
-      'translate: Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. Wenn Sie glauben, das hier ein Fehler vorliegt, wenden sie sich bitte xxx oder schreiben Sie eine E-Mail an xxx@xxx.xx',
+  viewer_lost: {
+    de: `Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. ${
+      helpNotice.de
+    }`,
+    it: `translate: Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. ${
+      helpNotice.it
+    }`,
+    lld: `translate: Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. ${
+      helpNotice.lld
+    }`,
   },
 
-  VOTERAdded: {
+  voter_added: {
     de:
       'Sie sind als Voter freigschalten worden. Ab sofort sind Sie uneingeschränktes Mitglied und können  an allen Abstimmungen teilnehmen, sowie Kommentare und Erklärungen verfassen.',
     it:
@@ -158,57 +169,57 @@ const userStatusTranslations = {
     lld:
       'translate: Sie sind als Voter freigschalten worden. Ab sofort sind Sie uneingeschränktes Mitglied und können  an allen Abstimmungen teilnehmen, sowie Kommentare und Erklärungen verfassen.',
   },
-  VOTERLost: {
+  voter_lost: {
+    de: `Sie sind ab jetzt kein stimmberechtigtes Mitglied der Plattform. ${
+      helpNotice.de
+    }`,
+    it: `translate: Sie sind ab jetzt kein stimmberechtigtes Mitglied der Plattform. ${
+      helpNotice.it
+    }`,
+    lld: `translate: Sie sind ab jetzt kein stimmberechtigtes Mitglied der Plattform. ${
+      helpNotice.lld
+    }`,
+  },
+
+  moderator_added: {
     de:
-      'Sie sind ab nun kein stimmberechtigtes Mitglied der Plattform.Wenn Sie glauben, das hier ein Fehler vorliegt, wenden sie sich bitte xxx oder schreiben Sie eine E-Mail an xxx@xxx.xx',
+      'Sie sind als Moderator freigeschalten worden. Ab sofort können Sie Kommentare und Erklärungen löschen.',
     it:
-      'translate:Sie sind ab nun kein stimmberechtigtes Mitglied der Plattform.Wenn Sie glauben, das hier ein Fehler vorliegt, wenden sie sich bitte xxx oder schreiben Sie eine E-Mail an xxx@xxx.xx',
+      'translate: Sie sind als Moderator freigeschalten worden. Ab sofort können Sie Kommentare und Erklärungen löschen.',
     lld:
-      'translate:Sie sind ab nun kein stimmberechtigtes Mitglied der Plattform.Wenn Sie glauben, das hier ein Fehler vorliegt, wenden sie sich bitte xxx oder schreiben Sie eine E-Mail an xxx@xxx.xx',
+      'translate: Sie sind als Moderator freigeschalten worden. Ab sofort können Sie Kommentare und Erklärungen löschen.',
+  },
+  moderator_lost: {
+    de: `Sie sind ab jetzt kein Moderator mehr. ${helpNotice.de}`,
+    it: `translate: Sie sind ab jetzt kein Moderator mehr. ${helpNotice.it}`,
+    lld: `translate: Sie sind ab jetzt kein Moderator mehr. ${helpNotice.lld}`,
   },
 
-  'de-DE': {
-    roleAdded: (name, role, helpText) => `Hallo ${name},\n
-    wird haben Sie als ${role} freigeschalten.\n${helpText}`,
-    roleLost: (name, role) => `Hallo ${name},\n
-    Sie sind nun nicht mehr ${role}.\n`,
-    MODERATOR: 'Als MODERATOR können Sie Beiträge löschen',
-    MEMBER_MANAGER: 'Als MEMBER_MANAGER können Sie Mitglieder betreuen ',
-    RELATOR:
-      'Als RELATOR können Sie Beschlüsse auf der Plattform veröffentlichen',
-    VIEWER:
-      'Als VIEWER können Sie alle Aktivitäten auf unserer Plattform verfolgen, bei Umfragen abstimmen und mitdiskutieren',
-    VOTER: 'Als VOTER haben sie das Recht, bei Beschlüssen abzustimmen',
-    subject: 'Wichtig - Ihre Profileinstellungen wurden verändert',
+  member_manager_added: {
+    de:
+      'Sie sind als "Member Manager" freigeschalten worden. Ab sofort können sie andere Benutzer freischalten.',
+    it:
+      'translate: Sie sind als "Member Manager" freigeschalten worden. Ab sofort können sie andere Benutzer freischalten.',
+    lld:
+      'translate: Sie sind als "Member Manager" freigeschalten worden. Ab sofort können sie andere Benutzer freischalten.',
   },
 
-  'it-IT': {
-    roleAdded: (name, role, helpText) => `Ciao ${name},\n
-    hai ricevuto il profile di ${role}.\n${helpText}`,
-    roleLost: (name, role) => `Ciao ${name},\n
-    non sei più ${role}.\n`,
-    RELATOR:
-      'Come RELATOR puoi pubblicare proposte e sondaggi, indire delle votazioni e avviare delle discussioni',
-    VIEWER: 'Come VIEWER puoi leggere tutto e partecipare ai sondaggi',
-    VOTER: 'Come VOTER puoi leggere, commentare e votare',
-    subject: 'Attenzione - il suo profile è stato cambiato',
-  },
-  'lld-IT': {
-    roleAdded: (name, role, helpText) => `Ciao ${name},\n
-    hai ricevuto il profile di ${role}.\n${helpText}`,
-    roleLost: (name, role) => `Ciao ${name},\n
-    non sei più ${role}.\n`,
-    RELATOR:
-      'Come RELATOR puoi pubblicare proposte e sondaggi, indire delle votazioni e avviare delle discussioni',
-    VIEWER: 'Come VIEWER puoi leggere tutto e partecipare ai sondaggi',
-    VOTER: 'Come VOTER puoi leggere, commentare e votare',
-    subject: 'Attenzione - il tuo profile è stato cambiato',
+  member_manager_lost: {
+    de: `Sie sind ab jetzt kein "Member Manager" mehr. ${helpNotice.de}`,
+    it: `translate: Sie sind ab jetzt kein "Member Manager" mehr. ${
+      helpNotice.it
+    }`,
+    lld: `translate: Sie sind ab jetzt kein "Member Manager" mehr. ${
+      helpNotice.lld
+    }`,
   },
 };
 
 EventManager.subscribe('onUserUpdated', async ({ user, viewer }) => {
   try {
-    const keyword = user.diff[0] + (user.added ? 'Added' : 'Lost');
+    const keyword = `${user.diff[0].toLowerCase()}_${
+      user.added ? 'added' : 'lost'
+    }`;
     const loaders = createLoaders();
     let note;
     if (user && user.changedField === 'groups') {
@@ -236,12 +247,12 @@ EventManager.subscribe('onUserUpdated', async ({ user, viewer }) => {
         viewer,
         {
           subject:
-            userStatusTranslations.subject[user.added ? 'Added' : 'Lost'],
+            userStatusTranslations.subject[user.added ? 'added' : 'lost'],
           sender: viewer,
           messageType: 'note',
           recipientType: 'user',
           recipients: [user.id],
-          enforceEmail: true,
+          enforceEmail: user.added,
           note: { id: note.id },
         },
         loaders,
