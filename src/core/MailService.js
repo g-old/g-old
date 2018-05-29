@@ -79,7 +79,7 @@ class MailService {
   send(mail) {
     return new Promise((resolve, reject) => {
       this.mailer.sendMail(mail, (err, data) => {
-        this.mailer.close();
+        // this.mailer.close();
         if (err) reject(err);
         resolve(data);
       });
@@ -96,7 +96,7 @@ class MailService {
           isMultiple: true,
         },
         (err, data) => {
-          this.mailer.close();
+          // this.mailer.close();
           if (err) reject(err);
           resolve(data);
         },
@@ -183,7 +183,7 @@ class MailService {
     );
 
     await Promise.all(mailPromises);
-    this.mailer.close();
+    // this.mailer.close();
   }
 }
 
