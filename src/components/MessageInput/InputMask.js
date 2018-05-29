@@ -9,7 +9,6 @@ const InputMask = ({ errors, onBlur, locale, handleValueChanges, values }) => {
 
   return (
     <fieldset>
-      {' '}
       <FormField label="Subject" error={errors[subjectName]}>
         <input
           name={subjectName}
@@ -27,8 +26,11 @@ const InputMask = ({ errors, onBlur, locale, handleValueChanges, values }) => {
         />
       </FormField>
       <FormField label="Preview">
-        <div dangerouslySetInnerHTML={{ __html: values[editorName].html }} />
-      </FormField>{' '}
+        <div
+          style={{ paddingLeft: '1.5em', paddingRight: '1.5em' }}
+          dangerouslySetInnerHTML={{ __html: values[editorName].html }}
+        />
+      </FormField>
     </fieldset>
   );
 };

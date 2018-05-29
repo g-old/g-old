@@ -102,7 +102,7 @@ class MarkdownEditor extends React.Component<Props, State> {
   render() {
     const { value, name } = this.props;
     return (
-      <Box column>
+      <React.Fragment>
         <Box pad>
           <Button onClick={this.onStrong} plain icon={<strong>A</strong>} />
           <Button onClick={this.onItalic} plain icon={<i>A</i>} />
@@ -135,7 +135,7 @@ class MarkdownEditor extends React.Component<Props, State> {
           onChange={this.onTextChange}
           onSelect={this.onTextSelect}
         />
-      </Box>
+      </React.Fragment>
     );
   }
 }

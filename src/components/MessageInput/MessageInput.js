@@ -7,9 +7,8 @@ import Box from '../Box';
 import FormField from '../FormField';
 import Button from '../Button';
 import FormValidation from '../FormValidation';
-import Tabs from '../Tabs';
-import Tab from '../Tab';
 import InputMask from './InputMask';
+import LocaleSelector from './LocaleSelector';
 
 const messages = defineMessages({
   notify: {
@@ -46,17 +45,27 @@ class MessageInput extends React.Component {
   constructor(props) {
     super(props);
     this.onNotify = this.onNotify.bind(this);
-    this.state = { data: {} };
+    this.state = {
+      data: {
+        textde: { rawInput: '', html: '' },
+        textit: { rawInput: '', html: '' },
+        subjectde: '',
+        subjectit: '',
+        recipients: [],
+      },
+      activeLocale: 'de',
+    };
+    this.handleLanguageSelection = this.handleLanguageSelection.bind(this);
   }
 
   componentWillReceiveProps({ updates }) {
     if (updates && updates.success) {
       this.setState({
         data: {
-          textDe: { rawInput: '', html: '' },
-          textIt: { rawInput: '', html: '' },
-          subjectDe: '',
-          subjectIT: '',
+          textde: { rawInput: '', html: '' },
+          textit: { rawInput: '', html: '' },
+          subjectde: '',
+          subjectit: '',
           recipients: [],
         },
       });
@@ -64,22 +73,22 @@ class MessageInput extends React.Component {
   }
 
   onNotify(values) {
-    const subject = { de: values.subjectDe, it: values.subjectIt };
+    const subject = { de: values.subjectde, it: values.subjectit };
     const { recipients, recipientType, messageType, parentId } = this.props;
 
     const object = {};
     if (messageType === 'NOTE') {
       object.note = {
         textHtml: {
-          ...(values.textDe && { de: values.textDe.html }),
-          ...(values.textIt && { de: values.textIt.html }),
+          ...(values.textde && { de: values.textde.html }),
+          ...(values.textit && { de: values.textit.html }),
         },
         category: 'CIRCULAR',
       };
     } else if (messageType === 'COMMUNICATION') {
       object.communication = {
         parentId,
-        textHtml: values.textDe.html,
+        textHtml: values.textde.html,
         replyable: true,
       };
     }
@@ -92,17 +101,21 @@ class MessageInput extends React.Component {
     });
   }
 
+  handleLanguageSelection(locale) {
+    this.setState({ activeLocale: locale });
+  }
+
   render() {
     const { updates = {}, recipients = [], messageType } = this.props;
-
+    const { activeLocale } = this.state;
     return (
       <FormValidation
         updatePending={updates && updates.pending}
         validations={{
-          textDe: {},
-          textIt: {},
-          subjectDe: {},
-          subjectIt: {},
+          textit: {},
+          textde: {},
+          subjectde: {},
+          subjectit: {},
           recipients: {},
         }}
         submit={this.onNotify}
@@ -124,31 +137,26 @@ class MessageInput extends React.Component {
               )}
               {messageType === 'COMMUNICATION' && (
                 <InputMask
-                  locale="De"
+                  locale="de"
                   values={values}
                   handleValueChanges={handleValueChanges}
                   errors={errorMessages}
                 />
               )}
               {messageType === 'NOTE' && (
-                <Tabs>
-                  <Tab title="Deutsch">
-                    <InputMask
-                      locale="De"
-                      values={values}
-                      handleValueChanges={handleValueChanges}
-                      errors={errorMessages}
-                    />
-                  </Tab>
-                  <Tab title="Italiano">
-                    <InputMask
-                      locale="It"
-                      values={values}
-                      handleValueChanges={handleValueChanges}
-                      errors={errorMessages}
-                    />
-                  </Tab>
-                </Tabs>
+                <div>
+                  <LocaleSelector
+                    activeLocale={activeLocale}
+                    onActivate={this.handleLanguageSelection}
+                    locales={['de', 'it']}
+                  />
+                  <InputMask
+                    locale={activeLocale}
+                    values={values}
+                    handleValueChanges={handleValueChanges}
+                    errors={errorMessages}
+                  />
+                </div>
               )}
             </fieldset>
             <Button

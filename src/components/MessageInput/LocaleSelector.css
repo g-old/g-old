@@ -1,0 +1,8 @@
+@import '../../components/variables.css';
+
+.lang {
+  display: flex;
+  list-style: none;
+  flex-wrap: wrap;
+  padding: 0;
+}
