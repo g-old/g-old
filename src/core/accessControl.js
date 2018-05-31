@@ -288,6 +288,8 @@ function messageWriteControl(viewer, data) {
     (Permissions.NOTIFY_GROUPS | Permissions.NOTIFY_ALL)
   ) {
     return true;
+  } else if (data.isReply) {
+    return true;
   }
   return false;
 }

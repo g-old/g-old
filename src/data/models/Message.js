@@ -48,6 +48,9 @@ class Message {
     if (!data) {
       return null;
     }
+    if (data.communication && data.communication.parentId) {
+      data.isReply = true; // eslint-disable-line no-param-reassign
+    }
     if (!canMutate(viewer, data, Models.MESSAGE)) return null;
     let messageData;
     const newData = { created_at: new Date(), sender_id: viewer.id };
