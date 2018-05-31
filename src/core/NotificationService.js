@@ -827,6 +827,17 @@ class NotificationService {
             'users.locale as locale',
             'users.email as email',
           );
+      case TargetType.ALL: {
+        return this.dbConnector('notification_settings')
+          .innerJoin('users', 'users.id', 'notification_settings.user_id')
+          .whereNull('users.deleted_at') // no guests!
+          .select(
+            'notification_settings.user_id as id',
+            'notification_settings.settings as settings',
+            'users.locale as locale',
+            'users.email as email',
+          );
+      }
       case TargetType.PROPOSAL:
       case TargetType.DISCUSSION: {
         return this.dbConnector('subscriptions')

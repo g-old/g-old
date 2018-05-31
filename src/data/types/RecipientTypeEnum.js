@@ -9,6 +9,9 @@ const RecipientType = new GraphQLEnumType({
     GROUP: {
       value: 'group',
     },
+    ALL: {
+      value: 'all',
+    },
   },
 });
 

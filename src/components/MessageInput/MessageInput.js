@@ -10,6 +10,7 @@ import Button from '../Button';
 import FormValidation from '../FormValidation';
 import InputMask from './InputMask';
 import LocaleSelector from './LocaleSelector';
+import Select from '../Select';
 
 const messages = defineMessages({
   send: {
@@ -76,7 +77,12 @@ class MessageInput extends React.Component {
 
   onNotify(values) {
     const subject = { de: values.subjectde, it: values.subjectit };
-    const { recipients, recipientType, messageType, parentId } = this.props;
+    const {
+      recipients = [],
+      recipientType,
+      messageType,
+      parentId,
+    } = this.props;
 
     const object = {};
     if (messageType === 'NOTE') {
@@ -95,10 +101,11 @@ class MessageInput extends React.Component {
       };
     }
     this.props.notifyUser({
-      recipientType,
+      recipientType:
+        (values.recipientType && values.recipientType.value) || recipientType,
       messageType,
       ...object,
-      recipients,
+      recipients: recipients || [],
       subject,
       enforceEmail: values.enforceEmail,
     });
@@ -109,7 +116,7 @@ class MessageInput extends React.Component {
   }
 
   render() {
-    const { updates = {}, recipients = [], messageType } = this.props;
+    const { updates = {}, messageType, recipientType } = this.props;
     const { activeLocale } = this.state;
     return (
       <FormValidation
@@ -120,25 +127,49 @@ class MessageInput extends React.Component {
           subjectde: {},
           subjectit: {},
           recipients: {},
+          recipientType: {
+            /*  ...(!recipientType && { args: { required: true } }), */
+          },
           enforceEmail: {},
         }}
         submit={this.onNotify}
         data={this.state.data}
       >
-        {({ values, handleValueChanges, onSubmit, onBlur, errorMessages }) => (
+        {({ values, handleValueChanges, onSubmit, errorMessages }) => (
           <Box column>
-            <fieldset>
-              {!recipients.length && (
-                <FormField label="Receivers">
-                  <input
-                    name="receivers"
-                    type="text"
-                    onBlur={onBlur}
-                    value={values.receivers}
-                    onChange={handleValueChanges}
+            {!recipientType && (
+              <fieldset>
+                <FormField label="RecipientType">
+                  <Select
+                    inField
+                    options={[
+                      { value: 'ALL', label: 'ALL' },
+                      { value: 'GROUP', label: 'GROUP' },
+                      { value: 'USER', label: 'USER' },
+                    ]}
+                    onSearch={false}
+                    value={values.recipientType}
+                    onChange={e => {
+                      handleValueChanges({
+                        target: { name: 'recipientType', value: e.value },
+                      });
+                    }}
                   />
                 </FormField>
-              )}
+              </fieldset>
+            )}
+            {/* (!recipients || !recipients.length) && (
+              <FormField label="Recipients">
+                <input
+                  name="recipients"
+                  type="text"
+                  onBlur={onBlur}
+                  value={values.recipients}
+                  onChange={handleValueChanges}
+                />
+              </FormField>
+            ) */}
+            <fieldset>
               {messageType === 'COMMUNICATION' && (
                 <InputMask
                   locale="de"

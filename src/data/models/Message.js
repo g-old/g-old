@@ -56,8 +56,8 @@ class Message {
       newData.recipient_type = data.recipientType;
     }
     if (data.recipients) {
-      if (data.recipients.length) {
-        newData.recipients = JSON.stringify(data.recipients);
+      if (data.recipients.length || data.recipientType === 'all') {
+        newData.recipients = JSON.stringify(data.recipients || []);
       } else {
         throw new Error('Atleast one recipient required');
       }

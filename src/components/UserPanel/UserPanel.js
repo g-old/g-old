@@ -17,13 +17,12 @@ import FormField from '../FormField';
 import Layer from '../Layer';
 import UserListEntry from './UserListEntry';
 import { Groups } from '../../organization';
-
-// import history from '../../history';
-
+import MessageInput from '../MessageInput';
 import {
   getVisibleUsers,
   getUsersStatus,
   getSessionUser,
+  getMessageUpdates,
 } from '../../reducers';
 
 const messages = defineMessages({
@@ -31,6 +30,11 @@ const messages = defineMessages({
     id: 'command.loadMore',
     defaultMessage: 'Load more',
     description: 'To get more data',
+  },
+  messages: {
+    id: 'label.messages',
+    defaultMessage: 'Messages',
+    description: 'Messages label',
   },
 });
 
@@ -53,6 +57,7 @@ class UserPanel extends React.Component {
       permissions: PropTypes.number,
     }).isRequired,
     createMessage: PropTypes.func.isRequired,
+    messageUpdates: PropTypes.shape({}).isRequired,
   };
 
   static defaultProps = {
@@ -134,6 +139,15 @@ class UserPanel extends React.Component {
         )}
         <div style={{ width: '100%' }}>
           <Accordion openMulti>
+            <AccordionPanel
+              heading={<FormattedMessage {...messages.messages} />}
+            >
+              <MessageInput
+                messageType="NOTE"
+                notifyUser={this.props.createMessage}
+                updates={this.props.messageUpdates}
+              />
+            </AccordionPanel>
             <AccordionPanel
               heading="Guest accounts"
               onActive={() => {
@@ -218,6 +232,7 @@ const mapStateToProps = state => ({
   viewerArrayStatus: getUsersStatus(state, VIEWERS),
   userArray: getVisibleUsers(state, 'all'),
   user: getSessionUser(state),
+  messageUpdates: getMessageUpdates(state),
 });
 
 const mapDispatch = {
