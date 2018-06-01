@@ -95,12 +95,12 @@ class MessageInput extends React.Component {
       };
     } else if (messageType === 'COMMUNICATION') {
       object.communication = {
-        parentId,
         textHtml: values.textde.html,
         replyable: true,
       };
     }
     this.props.notifyUser({
+      parentId,
       recipientType:
         (values.recipientType && values.recipientType.value) || recipientType,
       messageType,

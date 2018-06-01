@@ -33,7 +33,7 @@ async function action({ store, path, query }, { id }) {
         } else {
           store.dispatch(
             updateNotification({
-              id: query.refId,
+              id: query.id,
               read: true,
             }),
           );

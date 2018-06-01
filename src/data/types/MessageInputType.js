@@ -14,6 +14,9 @@ import CommunicationInputType from './CommunicationInputType';
 const MessageInputType = new GraphQLInputObjectType({
   name: 'MessageInput',
   fields: {
+    parentId: {
+      type: GraphQLID,
+    },
     note: {
       type: NoteInputType,
     },

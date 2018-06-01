@@ -34,6 +34,7 @@ class Message {
     this.subject = data.subject;
     this.senderId = data.sender_id;
     this.createdAt = data.created_at;
+    this.parentId = data.parent_id;
   }
 
   static async gen(viewer, id) {
@@ -48,7 +49,7 @@ class Message {
     if (!data) {
       return null;
     }
-    if (data.communication && data.communication.parentId) {
+    if (data.parentId) {
       data.isReply = true; // eslint-disable-line no-param-reassign
     }
     if (!canMutate(viewer, data, Models.MESSAGE)) return null;
@@ -67,6 +68,9 @@ class Message {
     }
     if (data.subject) {
       newData.subject = data.subject;
+    }
+    if (data.parentId) {
+      newData.parent_id = data.parentId;
     }
 
     if (data.enforceEmail) {

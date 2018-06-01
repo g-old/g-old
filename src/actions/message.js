@@ -20,6 +20,13 @@ mutation($message:MessageInput){
 
 export const messageFields = `
 id
+parents{
+  id
+  sender{
+  ${userFields}
+  }
+  createdAt
+}
 sender{
   ${userFields}
 }
