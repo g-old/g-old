@@ -243,6 +243,14 @@ class FormValidation extends React.Component {
   }
 
   renderChildren() {
+    const fields = getChangedFields(
+      this.formFields,
+      this.state,
+      this.props.data || {},
+    );
+
+    const inputChanged = Object.keys(fields).length > 0;
+
     return this.props.children({
       validate: this.handleValidate,
       errorMessages: this.visibleErrors(this.formFields),
@@ -251,6 +259,7 @@ class FormValidation extends React.Component {
       handleValueChanges: this.handleValueChanges,
       onSubmit: this.onSubmit,
       onBlur: this.handleBlur,
+      inputChanged,
     });
   }
   render() {

@@ -10,6 +10,7 @@ import CheckBox from '../CheckBox';
 import Notification from '../Notification';
 import Button from '../Button';
 import Box from '../Box';
+import Spinner from '../Spinner';
 
 const messages = defineMessages({
   email: {
@@ -151,9 +152,9 @@ class NotificationSettings extends React.Component {
 
     let mergedSettings = Object.keys(notificationSettings || {}).reduce(
       (acc, key) => {
-        if (notificationSettings[key] && acc[key]) {
+        if (key in notificationSettings && key in acc) {
           acc[key] = { ...notificationSettings[key], ...acc[key] };
-        } else if (notificationSettings[key]) {
+        } else if (key in notificationSettings) {
           acc[key] = notificationSettings[key];
         }
         return acc;
@@ -169,6 +170,8 @@ class NotificationSettings extends React.Component {
           if (field in mergedSettings) {
             if (mergedSettings[field].email) {
               acc[field] = { email: true };
+            } else {
+              acc[field] = { email: false };
             }
           }
           return acc;
@@ -217,14 +220,18 @@ class NotificationSettings extends React.Component {
           validations={validations}
           submit={this.handleSubmission}
         >
-          {({ values, handleValueChanges, onSubmit }) => (
+          {({ values, handleValueChanges, onSubmit, inputChanged }) => (
             <Form>
               <legend>
                 <FormattedMessage {...messages.notifications} />
               </legend>
               <fieldset>
                 <FormField
-                  label="WebPush"
+                  label={
+                    <span>
+                      WebPush {pushSubscription.pending && <Spinner />}
+                    </span>
+                  }
                   error={pushSubscription.error}
                   help={
                     !isPushAvailable() && (
@@ -317,7 +324,9 @@ class NotificationSettings extends React.Component {
               <div>
                 <Button
                   onClick={onSubmit}
-                  disabled={updates.pending || pushSubscription.pending}
+                  disabled={
+                    !inputChanged || updates.pending || pushSubscription.pending
+                  }
                   primary
                   label={<FormattedMessage {...messages.save} />}
                 />

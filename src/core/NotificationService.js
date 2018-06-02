@@ -419,7 +419,7 @@ const getDiscussionLink = (
   }?ref=${referrer}&refId=`;
 
 const getMessageLink = (messageId: ID, referrer) =>
-  `/message/${messageId}?ref${referrer}&refId=`;
+  `/message/${messageId}?ref=${referrer}&refId=`;
 
 const generatePushMessage = (
   activity: EActivity,

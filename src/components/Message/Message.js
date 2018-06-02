@@ -57,14 +57,14 @@ class Message extends React.Component {
   }
 
   render() {
-    const { subject, content, sender, replyable, updates } = this.props;
+    const { subject, content, sender, updates } = this.props;
     return (
       <Box column className={s.root} pad>
         <Label>{subject}</Label>
         <div dangerouslySetInnerHTML={{ __html: content }} />
 
         <UserThumbnail user={sender} />
-        {replyable && (
+        {false && (
           <FormValidation
             submit={this.sendReply}
             validations={{ text: { args: { required: true } } }}
