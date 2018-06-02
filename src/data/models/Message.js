@@ -37,10 +37,9 @@ class Message {
     this.parentId = data.parent_id;
   }
 
-  static async gen(viewer, id) {
-    const [data = null] = await knex('messages')
-      .where({ id })
-      .select();
+  static async gen(viewer, id, { messages }) {
+    const data = await messages.load(id);
+
     if (!data) return null;
     return canSee(viewer, data, Models.MESSAGE) ? new Message(data) : null;
   }

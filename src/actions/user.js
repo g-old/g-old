@@ -77,6 +77,13 @@ query ($id:ID!) {
     locale
     unreadNotifications
     notificationSettings
+    messages{
+      id
+      subject
+      sender{
+        ${userFields}
+      }
+    }
     workTeams{
       ${workTeam}
     }

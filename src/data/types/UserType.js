@@ -14,6 +14,8 @@ import WorkTeamType from './WorkTeamType';
 import WorkTeam from '../models/WorkTeam';
 import NotificationType from './NotificationType';
 import Notification from '../models/Notification';
+import MessageType from './MessageType';
+import Message from '../models/Message';
 import User from '../models/User';
 import requestConnection from '../queries/requestConnection';
 import { Permissions } from '../../organization';
@@ -131,12 +133,33 @@ const UserType = new ObjectType({
       },
     },
 
+    messages: {
+      type: new GraphQLList(MessageType),
+      resolve: (parent, args, { viewer, loaders }) =>
+        knex('messages')
+          .where({ sender_id: parent.id })
+          .whereNull('parent_id')
+          .pluck('id')
+          .then(data => data.map(mId => Message.gen(viewer, mId, loaders))),
+    },
+    messagesResp: {
+      type: new GraphQLList(MessageType),
+      resolve: (parent, args, { viewer, loaders }) =>
+        // const messages = knex.raw('SELECT id from messages');
+        knex('messages')
+          .where({ recipientType: parent.id })
+          .whereNull('parent_id')
+          .pluck('id')
+          .then(data => data.map(mId => Message.gen(viewer, mId, loaders))),
+    },
+
     notifications: {
       type: new GraphQLList(NotificationType),
       resolve: (parent, args, { viewer, loaders }) => {
         if (viewer) {
           return knex('notifications')
             .where({ user_id: parent.id, read: false })
+            .orderBy('created_at', 'desc')
             .pluck('id')
             .then(ids => ids.map(id => Notification.gen(viewer, id, loaders)));
         }

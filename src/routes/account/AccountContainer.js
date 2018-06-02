@@ -371,6 +371,10 @@ class AccountContainer extends React.Component {
           <Box column flex>
             {followeeContainer}
             <Accordion openMulti>
+              <AccordionPanel heading="Messages">
+                {user.messages &&
+                  user.messages.map(m => <div>{JSON.stringify(m)}</div>)}
+              </AccordionPanel>
               <AccordionPanel
                 heading={<FormattedMessage {...messages.settings} />}
               >
