@@ -322,14 +322,14 @@ class NotificationSettings extends React.Component {
                 {error && <Notification type="error" message={updates.error} />}
               </p>
               <div>
-                <Button
-                  onClick={onSubmit}
-                  disabled={
-                    !inputChanged || updates.pending || pushSubscription.pending
-                  }
-                  primary
-                  label={<FormattedMessage {...messages.save} />}
-                />
+                {inputChanged && (
+                  <Button
+                    onClick={onSubmit}
+                    disabled={updates.pending || pushSubscription.pending}
+                    primary
+                    label={<FormattedMessage {...messages.save} />}
+                  />
+                )}
               </div>
             </Form>
           )}

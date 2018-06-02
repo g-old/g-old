@@ -478,9 +478,7 @@ const generatePushMessage = (
       // Diff between reply and new ?
 
       title = resourceByLocale[locale][activity.type];
-      link =
-        getCommentLink(activityObject, discussion.work_team_id, referrer) +
-        activity.id;
+      link = getCommentLink(activityObject, discussion.work_team_id, referrer);
       break;
     }
 
