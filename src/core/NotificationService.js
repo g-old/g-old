@@ -267,14 +267,17 @@ const emailNotificationTranslations = {
   'de-DE': {
     message: 'hat Ihnen eine Nachricht geschrieben',
     user: 'hat eine Einstellung verändert',
+    statement: 'hat ein Statement geschrieben',
   },
   'it-IT': {
     message: 'Translate: hat Ihnen eine Nachricht geschrieben',
     user: 'Translate: hat eine Einstellung verändert',
+    statement: 'ha scritto una dichiarazione',
   },
   'lld-IT': {
     message: 'Translate: hat Ihnen eine Nachricht geschrieben',
     user: 'Translate: hat eine Einstellung verändert',
+    statement: 'Tranlate: hat ein Statement geschrieben',
   },
 };
 /*
@@ -1149,13 +1152,17 @@ class NotificationService {
           referrer,
         );
         link = this.linkPrefix + link + activity.id;
+        const notification =
+          emailNotificationTranslations[locale][activity.type];
+        const fullName = `${author.name} ${author.surname}`;
         const emailHTML = this.MailComposer.getStatementMail({
+          subject: proposal.title,
           statement: activityObject,
-          proposalTitle: proposal.title,
           author: {
-            fullName: `${author.name} ${author.surname}`,
+            fullName,
             thumbnail: author.thumbnail,
           },
+          notification,
           locale,
           link,
         });

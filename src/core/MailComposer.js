@@ -24,7 +24,8 @@ type Actor = { fullName: string, thumbnail: ?string };
 type StatementMailProps = {
   statement: StatementProps,
   author: Actor,
-  proposalTitle: string,
+  subject: string,
+  notification: string,
   link: string,
   locale: Locale,
 };
@@ -164,16 +165,18 @@ class MailComposer {
   getStatementMail({
     statement,
     author,
-    proposalTitle,
     link,
+    subject,
+    notification,
     locale = 'de-DE',
   }: StatementMailProps) {
     return this.render('statementNotification', {
-      name: author.fullName,
-      position: statement.position,
-      title: proposalTitle,
+      sender: author.fullName,
       text: statement.body,
       thumbnail: author.thumbnail,
+      subject,
+      pro: statement.position === 'pro',
+      notification,
       link,
       t: key => this.translations[key][locale],
     });
