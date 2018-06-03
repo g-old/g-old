@@ -560,6 +560,7 @@ class NotificationService {
   start: () => void;
   recover: () => void;
   getLastProcessedActivityId: () => ID;
+  purgeNotifications: ({ [string]: EActivity }) => any;
 
   constructor({
     eventManager = throwIfMissing('EventManager'),
@@ -583,6 +584,7 @@ class NotificationService {
     this.filterActivity = this.filterActivity.bind(this);
     this.loadSubscriptions = this.loadSubscriptions.bind(this);
     this.generateEmail = this.generateEmail.bind(this);
+    this.purgeNotifications = this.purgeNotifications.bind(this);
 
     if (!__DEV__) {
       if (!process.env.HOST) {
@@ -623,6 +625,8 @@ class NotificationService {
           activity.targetType = TargetType.PROPOSAL;
           activity.targetId = activity.subjectId || subjectId;
           data = activity;
+        } else if (activity.verb === ActivityVerb.DELETE) {
+          data = activity;
         }
         break;
 
@@ -649,6 +653,8 @@ class NotificationService {
         if (activity.verb === ActivityVerb.CREATE) {
           activity.targetType = TargetType.DISCUSSION;
           activity.targetId = activity.subjectId || subjectId;
+          data = activity;
+        } else if (activity.verb === ActivityVerb.DELETE) {
           data = activity;
         }
         break;
@@ -893,11 +899,20 @@ class NotificationService {
         0,
         this.activityQueue.length,
       );
-      // makes dictionary
-      const activityMap: ActivityMap = activities.reduce((acc, activity) => {
-        acc[activity.id] = activity;
-        return acc;
-      }, {});
+      // filter
+
+      // makes dictionary & filter deleted activities out
+      const deletedResources = {};
+      const activityMap: ActivityMap = activities
+        .reverse()
+        .reduce((acc, activity) => {
+          if (activity.verb === ActivityVerb.DELETE) {
+            deletedResources[activity.type + activity.objectId] = activity;
+          } else if (!deletedResources[activity.type + activity.objectId]) {
+            acc[activity.id] = activity;
+          }
+          return acc;
+        }, {});
 
       if (Object.keys(activityMap).length) {
         const groupedActivities = this.groupBySubject(activityMap);
@@ -968,6 +983,8 @@ class NotificationService {
         });
       }
 
+      await this.purgeNotifications(deletedResources);
+
       // const endTime = process.hrtime(startTime);
       // console.log('PROCESSING TIME:', endTime);
 
@@ -978,6 +995,50 @@ class NotificationService {
       // TODO: recover?
       log.error({ err }, err.message);
     }
+  }
+
+  purgeNotifications(deleteActivities: { [string]: EActivity }) {
+    // delete notifications of deleted resources;
+    const deletePromises = Object.keys(deleteActivities).map(key => {
+      const activity = deleteActivities[key];
+      if (activity.type === ActivityType.STATEMENT) {
+        return this.deleteNotifications(
+          activity.objectId,
+          ActivityType.STATEMENT,
+        );
+      } else if (activity.type === ActivityType.COMMENT) {
+        const comment = activity.content;
+        if (!comment.parentId && comment.replyIds) {
+          // search and delete reply notifications
+          if (comment.replyIds.length) {
+            // find all related activities
+            return this.dbConnector('activities')
+              .whereIn('object_id', comment.replyIds)
+              .pluck('id')
+              .then(
+                replyActivityIds =>
+                  replyActivityIds.length
+                    ? this.dbConnector('notifications')
+                        .whereIn('activity_id', replyActivityIds)
+                        .del()
+                    : Promise.resolve(),
+              )
+              .then(() =>
+                this.deleteNotifications(comment.id, ActivityType.COMMENT),
+              )
+              .catch(err => {
+                log.error({ err }, 'Notification deletion failed');
+              });
+          }
+          return this.deleteNotifications(comment.id, ActivityType.COMMENT);
+        }
+
+        return this.deleteNotifications(comment.id, ActivityType.COMMENT);
+      }
+      return Promise.resolve();
+    });
+
+    return Promise.all(deletePromises);
   }
 
   async combineData(
@@ -1091,6 +1152,31 @@ class NotificationService {
     }
   }
 
+  deleteNotifications(resourceId: ID, activityType: tActivityType) {
+    return this.dbConnector('activities')
+      .where({
+        object_id: resourceId,
+        type: activityType,
+        verb: ActivityVerb.CREATE,
+      })
+      .limit(1)
+      .pluck('id')
+      .then(([aId]) => {
+        if (aId) {
+          return this.dbConnector('notifications')
+            .where({ activity_id: aId })
+            .del();
+        }
+        return Promise.resolve();
+      })
+      .catch(err => {
+        log.error(
+          { err, resourceId, activityType },
+          'Notification deletion failed',
+        );
+      });
+  }
+
   generateEmail(
     activity: EActivity,
     subscriberIds: ID[],
@@ -1155,8 +1241,7 @@ class NotificationService {
           referrer,
         );
         link = this.linkPrefix + link + activity.id;
-        const notification =
-          emailNotificationTranslations[locale][activity.type];
+        const notification = emailNotificationTranslations[locale].statement;
         const fullName = `${author.name} ${author.surname}`;
         const emailHTML = this.MailComposer.getStatementMail({
           subject: proposal.title,
@@ -1188,7 +1273,7 @@ class NotificationService {
         const emailHTML = this.MailComposer.getCommentMail({
           comment: activityObject,
           subject: discussion.title,
-          notification: emailNotificationTranslations[locale][activity.type],
+          notification: emailNotificationTranslations[locale].comment,
           author: {
             fullName,
             thumbnail: author.thumbnail,

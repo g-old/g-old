@@ -215,7 +215,7 @@ class Comment {
     if (comment && workTeamId) {
       EventManager.publish('onCommentDeleted', {
         viewer,
-        comment,
+        comment: { ...comment, replyIds },
         subjectId: data.discussionId,
         groupId: workTeamId,
         info: { workTeamId, replyIds },
