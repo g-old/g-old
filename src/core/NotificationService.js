@@ -19,6 +19,29 @@ import type PubSub from './pubsub';
 import type { MessageType } from '../data/models/Message';
 // TODO write Dataloaders for batching
 // const MESSAGES_DIR = process.env.MESSAGES_DIR || join(__dirname, './messages');
+const emailNotificationTranslations = {
+  'de-DE': {
+    message: 'hat Ihnen eine Nachricht geschrieben',
+    user: 'hat eine Einstellung verändert',
+    statement: 'hat ein Statement geschrieben',
+    comment: 'hat einen Kommentar gschrieben',
+    teaser: 'Das haben sie verpasst ...',
+  },
+  'it-IT': {
+    message: 'Translate: hat Ihnen eine Nachricht geschrieben',
+    user: 'Translate: hat eine Einstellung verändert',
+    statement: 'ha scritto una dichiarazione',
+    comment: 'ha scritto un commento',
+    teaser: 'Questo non hai ancora visto ...',
+  },
+  'lld-IT': {
+    message: 'Translate: hat Ihnen eine Nachricht geschrieben',
+    user: 'Translate: hat eine Einstellung verändert',
+    statement: 'Tranlate: hat ein Statement geschrieben',
+    comment: 'Translate: hat einen Kommentar gschrieben',
+    teaser: 'Translate: Das haben sie verpasst ...',
+  },
+};
 
 type Referrer = 'push' | 'email';
 type EActivity = {
@@ -132,6 +155,7 @@ export type PushMessages = PushMessage[];
 
 export type Email = {
   htmlContent: EmailHTML,
+  text: string,
   receivers: string[],
 };
 export type Emails = Email[];
@@ -157,6 +181,19 @@ function interval(func, wait) {
 
   setTimeout(interv, wait);
 }
+
+const generatePlainTextMail = (
+  locale,
+  actorName,
+  notification,
+  title,
+  content,
+  link,
+) =>
+  `${
+    emailNotificationTranslations[locale].teaser
+  }\n\n${actorName} ${notification}\n\n${title}\n\n${content}\n\n${link}\n` +
+  `G O L D 2018 `;
 
 const mapLocale = {
   'de-DE': 'de',
@@ -263,67 +300,6 @@ const generateData = (
   return result;
 };
 
-const emailNotificationTranslations = {
-  'de-DE': {
-    message: 'hat Ihnen eine Nachricht geschrieben',
-    user: 'hat eine Einstellung verändert',
-    statement: 'hat ein Statement geschrieben',
-    comment: 'hat einen Kommentar gschrieben',
-  },
-  'it-IT': {
-    message: 'Translate: hat Ihnen eine Nachricht geschrieben',
-    user: 'Translate: hat eine Einstellung verändert',
-    statement: 'ha scritto una dichiarazione',
-    comment: 'ha scritto un commento',
-  },
-  'lld-IT': {
-    message: 'Translate: hat Ihnen eine Nachricht geschrieben',
-    user: 'Translate: hat eine Einstellung verändert',
-    statement: 'Tranlate: hat ein Statement geschrieben',
-    comment: 'Translate: hat einen Kommentar gschrieben',
-  },
-};
-/*
-const userStatusTranslations = {
-  'de-DE': {
-    roleAdded: (name, role, helpText) => `Hallo ${name},\n
-    wird haben Sie als ${role} freigeschalten.\n${helpText}`,
-    roleLost: (name, role) => `Hallo ${name},\n
-    Sie sind nun nicht mehr ${role}.\n`,
-    MODERATOR: 'Als MODERATOR können Sie Beiträge löschen',
-    MEMBER_MANAGER: 'Als MEMBER_MANAGER können Sie Mitglieder betreuen ',
-    RELATOR:
-      'Als RELATOR können Sie Beschlüsse auf der Plattform veröffentlichen',
-    VIEWER:
-      'Als VIEWER können Sie alle Aktivitäten auf unserer Plattform verfolgen, bei Umfragen abstimmen und mitdiskutieren',
-    VOTER: 'Als VOTER haben sie das Recht, bei Beschlüssen abzustimmen',
-    subject: 'Wichtig - Ihre Profileinstellungen wurden verändert',
-  },
-
-  'it-IT': {
-    roleAdded: (name, role, helpText) => `Ciao ${name},\n
-    hai ricevuto il profile di ${role}.\n${helpText}`,
-    roleLost: (name, role) => `Ciao ${name},\n
-    non sei più ${role}.\n`,
-    RELATOR:
-      'Come RELATOR puoi pubblicare proposte e sondaggi, indire delle votazioni e avviare delle discussioni',
-    VIEWER: 'Come VIEWER puoi leggere tutto e partecipare ai sondaggi',
-    VOTER: 'Come VOTER puoi leggere, commentare e votare',
-    subject: 'Attenzione - il suo profile è stato cambiato',
-  },
-  'lld-IT': {
-    roleAdded: (name, role, helpText) => `Ciao ${name},\n
-    hai ricevuto il profile di ${role}.\n${helpText}`,
-    roleLost: (name, role) => `Ciao ${name},\n
-    non sei più ${role}.\n`,
-    RELATOR:
-      'Come RELATOR puoi pubblicare proposte e sondaggi, indire delle votazioni e avviare delle discussioni',
-    VIEWER: 'Come VIEWER puoi leggere tutto e partecipare ai sondaggi',
-    VOTER: 'Come VOTER puoi leggere, commentare e votare',
-    subject: 'Attenzione - il tuo profile è stato cambiato',
-  },
-};
-*/
 // TODO load translations in
 const resourceByLocale: LocaleDictionary = {
   'de-DE': {
@@ -1206,7 +1182,18 @@ class NotificationService {
           link,
           locale,
         });
-        return { htmlContent: emailHTML, receivers };
+        return {
+          htmlContent: emailHTML,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            'GOLD',
+            text,
+            activityObject.title,
+            '',
+            link,
+          ),
+        };
       }
       case ActivityType.SURVEY:
       case ActivityType.PROPOSAL: {
@@ -1227,7 +1214,18 @@ class NotificationService {
           link,
         });
 
-        return { htmlContent: message, receivers };
+        return {
+          htmlContent: message,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            'GOLD',
+            text,
+            activityObject.title,
+            '',
+            link,
+          ),
+        };
       }
 
       case ActivityType.STATEMENT: {
@@ -1254,7 +1252,18 @@ class NotificationService {
           locale,
           link,
         });
-        return { htmlContent: emailHTML, receivers };
+        return {
+          htmlContent: emailHTML,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            fullName,
+            notification,
+            proposal.title,
+            activityObject.body,
+            link,
+          ),
+        };
       }
       case ActivityType.COMMENT: {
         // $FlowFixMe
@@ -1269,11 +1278,12 @@ class NotificationService {
           referrer,
         );
         link = this.linkPrefix + link + activity.id;
+        const notification = emailNotificationTranslations[locale].comment;
         const fullName = `${author.name} ${author.surname}`;
         const emailHTML = this.MailComposer.getCommentMail({
           comment: activityObject,
           subject: discussion.title,
-          notification: emailNotificationTranslations[locale].comment,
+          notification,
           author: {
             fullName,
             thumbnail: author.thumbnail,
@@ -1282,7 +1292,18 @@ class NotificationService {
           locale,
           link,
         });
-        return { htmlContent: emailHTML, receivers };
+        return {
+          htmlContent: emailHTML,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            fullName,
+            notification,
+            discussion.title,
+            activityObject.content,
+            link,
+          ),
+        };
       }
       case ActivityType.MESSAGE: {
         // $FlowFixMe
@@ -1291,6 +1312,10 @@ class NotificationService {
           html: 'An error occured',
           subject: 'System Notification Failure',
         };
+        let fullName;
+        let notification;
+        let subject;
+        let link;
         if (activity.content.messageType && activity.content.objectId) {
           const messageObject =
             objects[mapTypeToTable[activity.content.messageType]][
@@ -1302,43 +1327,40 @@ class NotificationService {
           } else {
             message = getTranslatedMessage(messageObject.text_html, locale);
           }
+          fullName = `${author.name} ${author.surname}`;
+          notification = emailNotificationTranslations[locale].message;
+          link =
+            this.linkPrefix +
+            getMessageLink(activityObject.id, referrer) +
+            activity.id;
+          subject =
+            getTranslatedMessage(activityObject.subject, locale) ||
+            'Info from GOLD';
           emailHTML = this.MailComposer.getMessageMail({
             message: message || 'Error - no message',
             sender: {
-              fullName: `${author.name} ${author.surname}`,
+              fullName,
               thumbnail: author.thumbnail,
             },
             locale,
-            link: this.linkPrefix + getMessageLink(activityObject.id, referrer),
-            notification: emailNotificationTranslations[locale][activity.type],
-            subject:
-              getTranslatedMessage(activityObject.subject, locale) ||
-              'Info from GOLD',
+            link,
+            notification,
+            subject,
           });
         }
-        return { htmlContent: emailHTML, receivers };
+        return {
+          htmlContent: emailHTML,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            fullName,
+            notification,
+            subject,
+            '',
+            link,
+          ),
+        };
       }
-      /* case ActivityType.USER: {
-        const author: UserProps = objects[ActivityType.USER][activity.actorId];
-        const role = activity.content.diff[0];
-        const helpText = userStatusTranslations[locale][role];
-        const message = userStatusTranslations[locale][
-          activity.content.added ? 'roleAdded' : 'roleLost'
-        ](activityObject.name, activity.content.diff[0], helpText);
-        const emailHTML = this.MailComposer.getMessageMail({
-          message,
-          sender: {
-            fullName: `${author.name} ${author.surname}`,
-            thumbnail: author.thumbnail,
-          },
-          locale,
-          link: `${this.linkPrefix}/`,
-          notification: emailNotificationTranslations[locale][activity.type],
-          title: userStatusTranslations[locale].subject,
-        });
-        return { htmlContent: emailHTML, receivers };
-      } */
-
       default:
         throw new Error(`ActivityType not recognized : ${activity.type}`);
     }

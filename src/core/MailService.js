@@ -116,6 +116,7 @@ class MailService {
           to: receiver,
           subject: mail.htmlContent.subject,
           html: mail.htmlContent.html,
+          text: mail.text,
         },
         (err, data) => {
           // this.mailer.close(); // don't close if pooling connections (production)?
