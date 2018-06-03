@@ -50,7 +50,8 @@ type CommentMailProps = {
   comment: CommentProps,
   author: Actor,
   link: string,
-  discussionTitle: string,
+  subject: string,
+  notification: string,
   locale: Locale,
 };
 
@@ -204,14 +205,16 @@ class MailComposer {
     comment,
     author,
     link,
-    discussionTitle,
+    notification,
+    subject,
     locale,
   }: CommentMailProps) {
     return this.render('commentNotification', {
-      name: author.fullName,
-      title: discussionTitle,
+      sender: author.fullName,
       text: comment.content,
       thumbnail: author.thumbnail,
+      notification,
+      subject,
       link,
       t: key => this.translations[key][locale],
     });
