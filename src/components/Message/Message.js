@@ -4,7 +4,6 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import s from './Message.css';
-import Label from '../Label';
 import Box from '../Box';
 import UserThumbnail from '../UserThumbnail';
 import FormValidation from '../FormValidation';
@@ -59,11 +58,17 @@ class Message extends React.Component {
   render() {
     const { subject, content, sender, updates } = this.props;
     return (
-      <Box column className={s.root} pad>
-        <Label>{subject}</Label>
-        <div dangerouslySetInnerHTML={{ __html: content }} />
-
-        <UserThumbnail user={sender} />
+      <Box column className={s.root}>
+        <div className={s.subject}>
+          <span>{subject}</span>
+        </div>
+        <div
+          className={s.content}
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+        <div className={s.content}>
+          <UserThumbnail user={sender} />
+        </div>
         {false && (
           <FormValidation
             submit={this.sendReply}
