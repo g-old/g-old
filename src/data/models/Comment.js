@@ -164,7 +164,6 @@ class Comment {
     if (!data || !data.id) return null;
     const oldComment = await comments.load(data.id);
     const discussion = await discussions.load(oldComment.discussion_id);
-
     if (
       !canMutate(
         viewer,
@@ -179,24 +178,31 @@ class Comment {
     let replyIds;
     const commentInDB = await knex.transaction(async trx => {
       // search for replies - pass ids as eventprops;
-      if (!oldComment.parent_id) {
-        replyIds = await knex('comments')
-          .where({ parent_id: oldComment.id })
-          .pluck('id');
-      }
+
       const statusOK = await knex('comments')
         .where({ id: data.id })
         .transacting(trx)
         .forUpdate()
         .del();
 
-      if (oldComment.parentId) {
+      if (oldComment.parent_id) {
         await knex('comments')
           .where({ id: oldComment.parent_id })
           .transacting(trx)
           .forUpdate()
           .decrement('num_replies', 1);
+        [workTeamId = null] = await knex('discussions')
+          .where({ id: oldComment.discussion_id })
+          .transacting(trx)
+          .forUpdate()
+          .decrement('num_comments', 1)
+          .returning('work_team_id'); // TODO check if correct
       } else {
+        // probably has replies
+        replyIds = await knex('comments')
+          .where({ parent_id: oldComment.id })
+          .pluck('id');
+
         [workTeamId = null] = await knex('discussions')
           .where({ id: oldComment.discussion_id })
           .transacting(trx)
