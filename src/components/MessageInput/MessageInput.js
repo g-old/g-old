@@ -11,6 +11,7 @@ import FormValidation from '../FormValidation';
 import InputMask from './InputMask';
 import LocaleSelector from './LocaleSelector';
 import Select from '../Select';
+import MessagesLayer from './MessagesLayer';
 
 const messages = defineMessages({
   send: {
@@ -58,6 +59,8 @@ class MessageInput extends React.Component {
       activeLocale: 'de',
     };
     this.handleLanguageSelection = this.handleLanguageSelection.bind(this);
+    this.handleSelection = this.handleSelection.bind(this);
+    this.onCloseLayer = this.onCloseLayer.bind(this);
   }
 
   componentWillReceiveProps({ updates }) {
@@ -110,55 +113,72 @@ class MessageInput extends React.Component {
       enforceEmail: values.enforceEmail,
     });
   }
+  onCloseLayer() {
+    this.setState({ layerOpen: false });
+  }
 
   handleLanguageSelection(locale) {
     this.setState({ activeLocale: locale });
+  }
+  handleSelection(message) {
+    this.setState({
+      data: {
+        textde: { rawInput: message.textHtml.de, html: '' },
+        textit: { rawInput: message.textHtml.it, html: '' },
+      },
+    });
+    this.onCloseLayer();
   }
 
   render() {
     const { updates = {}, messageType, recipientType } = this.props;
     const { activeLocale } = this.state;
     return (
-      <FormValidation
-        updatePending={updates && updates.pending}
-        validations={{
-          textit: {},
-          textde: {},
-          subjectde: {},
-          subjectit: {},
-          recipients: {},
-          recipientType: {
-            /*  ...(!recipientType && { args: { required: true } }), */
-          },
-          enforceEmail: {},
-        }}
-        submit={this.onNotify}
-        data={this.state.data}
-      >
-        {({ values, handleValueChanges, onSubmit, errorMessages }) => (
-          <Box column>
-            {!recipientType && (
-              <fieldset>
-                <FormField label="RecipientType">
-                  <Select
-                    inField
-                    options={[
-                      { value: 'ALL', label: 'ALL' },
-                      { value: 'GROUP', label: 'GROUP' },
-                      { value: 'USER', label: 'USER' },
-                    ]}
-                    onSearch={false}
-                    value={values.recipientType}
-                    onChange={e => {
-                      handleValueChanges({
-                        target: { name: 'recipientType', value: e.value },
-                      });
-                    }}
-                  />
-                </FormField>
-              </fieldset>
-            )}
-            {/* (!recipients || !recipients.length) && (
+      <React.Fragment>
+        <FormValidation
+          updatePending={updates && updates.pending}
+          validations={{
+            textit: {},
+            textde: {},
+            subjectde: {},
+            subjectit: {},
+            recipients: {},
+            recipientType: {
+              /*  ...(!recipientType && { args: { required: true } }), */
+            },
+            enforceEmail: {},
+          }}
+          submit={this.onNotify}
+          data={this.state.data}
+        >
+          {({ values, handleValueChanges, onSubmit, errorMessages }) => (
+            <Box column>
+              {!recipientType && (
+                <fieldset>
+                  <FormField label="RecipientType">
+                    <Select
+                      inField
+                      options={[
+                        { value: 'ALL', label: 'ALL' },
+                        { value: 'GROUP', label: 'GROUP' },
+                        { value: 'USER', label: 'USER' },
+                      ]}
+                      onSearch={false}
+                      value={values.recipientType}
+                      onChange={e => {
+                        handleValueChanges({
+                          target: { name: 'recipientType', value: e.value },
+                        });
+                      }}
+                    />
+                  </FormField>
+                </fieldset>
+              )}
+              <Button
+                label="Presets"
+                onClick={() => this.setState({ layerOpen: true })}
+              />
+              {/* (!recipients || !recipients.length) && (
               <FormField label="Recipients">
                 <input
                   name="recipients"
@@ -169,53 +189,60 @@ class MessageInput extends React.Component {
                 />
               </FormField>
             ) */}
-            <fieldset>
-              {messageType === 'COMMUNICATION' && (
-                <InputMask
-                  locale="de"
-                  values={values}
-                  handleValueChanges={handleValueChanges}
-                  errors={errorMessages}
-                />
-              )}
-              {messageType === 'NOTE' && (
-                <div>
-                  <LocaleSelector
-                    activeLocale={activeLocale}
-                    onActivate={this.handleLanguageSelection}
-                    locales={['de', 'it']}
-                  />
+              <fieldset>
+                {messageType === 'COMMUNICATION' && (
                   <InputMask
-                    locale={activeLocale}
+                    locale="de"
                     values={values}
                     handleValueChanges={handleValueChanges}
                     errors={errorMessages}
                   />
-                </div>
-              )}
-            </fieldset>
-            <fieldset>
-              <FormField>
-                <CheckBox
-                  toggle
-                  checked={values.enforceEmail}
-                  disabled={this.props.updates && this.props.updates.pending}
-                  label="Send Email"
-                  name="enforceEmail"
-                  onChange={handleValueChanges}
-                />
-              </FormField>
-            </fieldset>
-            <Button
-              fill
-              primary
-              onClick={onSubmit}
-              pending={this.props.updates && this.props.updates.pending}
-              label={<FormattedMessage {...messages.send} />}
-            />
-          </Box>
+                )}
+                {messageType === 'NOTE' && (
+                  <div>
+                    <LocaleSelector
+                      activeLocale={activeLocale}
+                      onActivate={this.handleLanguageSelection}
+                      locales={['de', 'it']}
+                    />
+                    <InputMask
+                      locale={activeLocale}
+                      values={values}
+                      handleValueChanges={handleValueChanges}
+                      errors={errorMessages}
+                    />
+                  </div>
+                )}
+              </fieldset>
+              <fieldset>
+                <FormField>
+                  <CheckBox
+                    toggle
+                    checked={values.enforceEmail}
+                    disabled={this.props.updates && this.props.updates.pending}
+                    label="Send Email"
+                    name="enforceEmail"
+                    onChange={handleValueChanges}
+                  />
+                </FormField>
+              </fieldset>
+              <Button
+                fill
+                primary
+                onClick={onSubmit}
+                pending={this.props.updates && this.props.updates.pending}
+                label={<FormattedMessage {...messages.send} />}
+              />
+            </Box>
+          )}
+        </FormValidation>
+        {this.state.layerOpen && (
+          <MessagesLayer
+            onClose={this.onCloseLayer}
+            onSelection={this.handleSelection}
+          />
         )}
-      </FormValidation>
+      </React.Fragment>
     );
   }
 }
