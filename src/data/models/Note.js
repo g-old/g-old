@@ -1,79 +1,7 @@
-import sanitize from 'sanitize-html';
-
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import sanitize from '../../core/htmlSanitizer';
 
-export const sanitizerOptions = {
-  allowedTags: [
-    'h3',
-    'h4',
-    'h5',
-    'h6',
-    'blockquote',
-    'p',
-    'a',
-    'ul',
-    'ol',
-    'nl',
-    'li',
-    'b',
-    'i',
-    'strong',
-    'em',
-    'strike',
-    'code',
-    'hr',
-    'br',
-    'div',
-    'table',
-    'thead',
-    'caption',
-    'tbody',
-    'tr',
-    'th',
-    'td',
-    'pre',
-    'iframe',
-    'img',
-  ],
-  allowedAttributes: {
-    a: ['href', 'name', 'target'],
-    // We don't currently allow img itself by default, but this
-    // would make sense if we did
-    img: ['src', 'style'],
-  },
-  // Lots of these won't come up by default because we don't allow them
-  selfClosing: [
-    'img',
-    'br',
-    'hr',
-    'area',
-    'base',
-    'basefont',
-    'input',
-    'link',
-    'meta',
-  ],
-  // URL schemes we permit
-  allowedSchemes: ['http', 'https', 'ftp', 'mailto'],
-  allowedSchemesByTag: {},
-  allowedSchemesAppliedToAttributes: ['href', 'src', 'cite'],
-  allowProtocolRelative: true,
-  allowedIframeHostnames: ['www.youtube.com', 'player.vimeo.com'],
-  transformTags: {
-    img(tagName, attribs) {
-      // My own custom magic goes here
-
-      return {
-        tagName: 'img',
-        attribs: {
-          ...attribs,
-          style: 'max-width: 100%',
-        },
-      };
-    },
-  },
-};
 class Note {
   constructor(data) {
     this.id = data.id;
@@ -101,7 +29,7 @@ class Note {
         const text = data.textHtml[locale];
 
         if (text.length < 10000) {
-          acc[locale] = sanitize(text, sanitizerOptions);
+          acc[locale] = sanitize(text);
         }
         return acc;
       }, {});
