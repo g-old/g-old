@@ -82,7 +82,7 @@ class MainEditor extends React.Component {
                   object: 'text',
                   leaves: [
                     {
-                      text: 'A line of text in a paragraph.',
+                      text: '',
                     },
                   ],
                 },
@@ -97,9 +97,10 @@ class MainEditor extends React.Component {
   }
 
   componentDidMount() {
-    const initialValue = localStorage.getItem('content') || '<p></p>';
     // eslint-disable-next-line react/no-did-mount-set-state
-    this.setState({ value: html.deserialize(initialValue) });
+    /*  this.setState({
+      value: html.deserialize(this.props.initialValue),
+    }); */
   }
 
   onChange = ({ value }) => {
@@ -107,7 +108,7 @@ class MainEditor extends React.Component {
     if (value.document !== this.state.value.document) {
       const string = html.serialize(value);
       this.props.onChange(string);
-      localStorage.setItem('content', string);
+      // localStorage.setItem('content', string);
     }
     this.setState({ value });
   };
@@ -289,6 +290,13 @@ class MainEditor extends React.Component {
     const { value } = this.state;
     return value.blocks.some(node => node.type === type);
   };
+
+  reset() {
+    this.setState({ value: html.deserialize('<p></p>') });
+  }
+  setInitialState(value) {
+    this.setState({ value: html.deserialize(value) });
+  }
 
   renderToolbar = () => (
     <Box>
@@ -476,7 +484,7 @@ class MainEditor extends React.Component {
   renderEditor() {
     return (
       <Editor
-        placeholder="Enter some rich text..."
+        placeholder="Enter somes text..."
         value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}

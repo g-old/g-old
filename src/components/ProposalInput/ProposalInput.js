@@ -134,6 +134,7 @@ class ProposalInput extends React.Component {
     this.state = {
       ...standardValues,
     };
+    this.storageKey = 'ProposalContent';
     this.onTextChange = this.onTextChange.bind(this);
     this.onTextSelect = this.onTextSelect.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -182,6 +183,11 @@ class ProposalInput extends React.Component {
     );
   }
 
+  componentDidMount() {
+    const initialValue = localStorage.getItem(this.storageKey) || '<p></p>';
+    this.editor.setInitialState(initialValue);
+  }
+
   componentWillReceiveProps({ success, errorMessage }) {
     if (success) {
       if (!this.props.success) {
@@ -190,6 +196,8 @@ class ProposalInput extends React.Component {
           success: true,
           clearSpokesman: true,
         });
+        this.resetEditor();
+        localStorage.setItem(this.storageKey, '<p></p>');
       } /* else if (!this.state.success) {
         this.setState({
           ...standardValues,
@@ -201,6 +209,7 @@ class ProposalInput extends React.Component {
     if (errorMessage) {
       this.setState({ error: !this.props.errorMessage });
     }
+    //
   }
 
   onTextChange(e) {
@@ -319,6 +328,10 @@ class ProposalInput extends React.Component {
         spokesmanId,
       });
     }
+  }
+
+  resetEditor() {
+    this.editor.reset();
   }
 
   handleSpokesmanValueChange(e) {
@@ -457,12 +470,16 @@ class ProposalInput extends React.Component {
             </FormField>
             <FormField error={bodyError} label="Body">
               <MainEditor
+                // eslint-disable-next-line
+                ref={elm => (this.editor = elm)}
+                initialValue={this.state.initialValue}
                 className={s.editor}
                 value={body}
                 onChange={value => {
                   this.handleValueChanges({
                     target: { name: 'body', value },
                   });
+                  localStorage.setItem(this.storageKey, value);
                 }}
               />
 
@@ -558,10 +575,7 @@ class ProposalInput extends React.Component {
                     title.trim().length < 3
                       ? 'Title is missing!'
                       : title.trim(),
-                  body:
-                    this.md.render(body).length < 3
-                      ? 'Body is missing'
-                      : this.md.render(body),
+                  body: body.length < 3 ? 'Body is missing' : body,
                   publishedAt: new Date(),
                   spokesman,
                 }}

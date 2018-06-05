@@ -68,6 +68,10 @@ export default [
             return <li>{children}</li>;
           case 'bulleted-list':
             return <ul>{children}</ul>;
+          case 'image': {
+            const src = obj.data.get('src');
+            return <img alt="img" src={src} />;
+          }
           default:
             throw new Error(`Type not recognized: ${obj.type}`);
         }
