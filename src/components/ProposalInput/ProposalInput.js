@@ -457,6 +457,7 @@ class ProposalInput extends React.Component {
             </FormField>
             <FormField error={bodyError} label="Body">
               <MainEditor
+                className={s.editor}
                 value={body}
                 onChange={value => {
                   this.handleValueChanges({

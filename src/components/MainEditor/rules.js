@@ -1,15 +1,17 @@
 import React from 'react';
 
 const BLOCK_TAGS = {
-  blockquote: 'quote',
+  blockquote: 'block-quote',
   p: 'paragraph',
   pre: 'code',
-  h1: 'heading_one',
+  h1: 'heading-one',
   h2: 'heading-two',
   h3: 'heading-three',
   h4: 'heading-four',
   h5: 'heading-five',
   h6: 'heading-six',
+  li: 'list-item',
+  ul: 'bulleted-list',
 };
 
 const MARK_TAGS = {
@@ -48,7 +50,7 @@ export default [
             );
           case 'paragraph':
             return <p>{children}</p>;
-          case 'quote':
+          case 'block-quote':
             return <blockquote>{children}</blockquote>;
           case 'heading-one':
             return <h1>{children}</h1>;
@@ -62,6 +64,10 @@ export default [
             return <h5>{children}</h5>;
           case 'heading-six':
             return <h6>{children}</h6>;
+          case 'list-item':
+            return <li>{children}</li>;
+          case 'bulleted-list':
+            return <ul>{children}</ul>;
           default:
             throw new Error(`Type not recognized: ${obj.type}`);
         }
@@ -127,7 +133,6 @@ export default [
             return <a {...props}>{children} </a>;
           }
           default:
-            throw new Error(`Type not recognized: ${obj.type}`);
         }
       }
       if (obj.type === 'image') {

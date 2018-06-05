@@ -6,6 +6,7 @@ import Html from 'slate-html-serializer';
 import rules from './rules';
 import Button from '../Button';
 import { ICONS } from '../../constants';
+import Box from '../Box';
 
 // plugin for tables https://github.com/GitbookIO/slate-edit-table
 
@@ -62,8 +63,11 @@ function wrapLink(change, href) {
 }
 
 class MainEditor extends React.Component {
-  static propTypes = { onChange: PropTypes.func.isRequired };
-  static defaultProps = {};
+  static propTypes = {
+    onChange: PropTypes.func.isRequired,
+    className: PropTypes.string,
+  };
+  static defaultProps = { className: null };
   constructor(props) {
     super(props);
     this.state = {
@@ -192,7 +196,7 @@ class MainEditor extends React.Component {
       case 'Enter':
         return this.onEnter(event, change);
       default:
-        throw new Error(`Type not recognized: ${event.key}`);
+        return undefined;
     }
   };
 
@@ -220,11 +224,11 @@ class MainEditor extends React.Component {
 
   onBackspace = (event, change) => {
     const { value } = change;
-    if (value.isExpanded) return false;
-    if (value.startOffset !== 0) return false;
+    if (value.isExpanded) return undefined;
+    if (value.startOffset !== 0) return undefined;
 
     const { startBlock } = value;
-    if (startBlock.type === 'paragraph') return false;
+    if (startBlock.type === 'paragraph') return undefined;
 
     event.preventDefault();
     change.setBlocks('paragraph');
@@ -238,12 +242,12 @@ class MainEditor extends React.Component {
 
   onEnter = (event, change) => {
     const { value } = change;
-    if (value.isExpanded) return false;
+    if (value.isExpanded) return undefined;
 
     const { startBlock, startOffset, endOffset } = value;
     if (startOffset === 0 && startBlock.text.length === 0)
       return this.onBackspace(event, change);
-    if (endOffset !== startBlock.text.length) return false;
+    if (endOffset !== startBlock.text.length) return undefined;
 
     if (
       startBlock.type !== 'heading-one' &&
@@ -254,7 +258,7 @@ class MainEditor extends React.Component {
       startBlock.type !== 'heading-six' &&
       startBlock.type !== 'block-quote'
     ) {
-      return false;
+      return undefined;
     }
 
     event.preventDefault();
@@ -287,19 +291,20 @@ class MainEditor extends React.Component {
   };
 
   renderToolbar = () => (
-    <div className="menu toolbar-menu">
+    <Box>
       {this.renderMarkButton('bold')}
       {this.renderMarkButton('italic')}
       {this.renderMarkButton('link')}
+      {this.renderMarkButton('underline')}
       {this.renderImageButton()}
-      {/* {this.renderMarkButton('underlined', 'format_underlined')}
+      {/* {this.renderMarkButton('underline', 'format_underline')}
       {this.renderMarkButton('code', 'code')}
       {this.renderBlockButton('heading-one', 'looks_one')}
       {this.renderBlockButton('heading-two', 'looks_two')}
       {this.renderBlockButton('block-quote', 'format_quote')}
       {this.renderBlockButton('numbered-list', 'format_list_numbered')}
   {this.renderBlockButton('bulleted-list', 'format_list_bulleted')} */}
-    </div>
+    </Box>
   );
 
   renderImageButton() {
@@ -331,6 +336,8 @@ class MainEditor extends React.Component {
         return <Button onClick={onMouseDown} plain icon={<strong>A</strong>} />;
       case 'italic':
         return <Button onClick={onMouseDown} plain icon={<em>A</em>} />;
+      case 'underline':
+        return <Button onClick={onMouseDown} plain icon={<u>U</u>} />;
       case 'link':
         return (
           <Button
@@ -405,7 +412,7 @@ class MainEditor extends React.Component {
         return <code {...attributes}>{children}</code>;
       case 'italic':
         return <em {...attributes}>{children}</em>;
-      case 'underlined':
+      case 'underline':
         return <u {...attributes}>{children}</u>;
       default:
         throw new Error(`Type not recognized: ${mark.type}`);
@@ -415,6 +422,8 @@ class MainEditor extends React.Component {
   renderNode = props => {
     const { attributes, children, node } = props;
     switch (node.type) {
+      case 'paragraph':
+        return <p {...attributes}>{children}</p>;
       case 'block-quote':
         return <blockquote {...attributes}>{children}</blockquote>;
       case 'bulleted-list':
@@ -447,7 +456,7 @@ class MainEditor extends React.Component {
       case 'image': {
         const src = node.data.get('src');
         const className = ''; // isSelected ? 'active' : null;
-        const style = { display: 'block' };
+        const style = { display: 'block', maxWidth: '100%', margin: '0 auto' };
         return (
           <img
             alt="img"
@@ -466,23 +475,21 @@ class MainEditor extends React.Component {
   /* eslint-enable class-methods-use-this */
   renderEditor() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some rich text..."
-          value={this.state.value}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
-          autoFocus
-        />
-      </div>
+      <Editor
+        placeholder="Enter some rich text..."
+        value={this.state.value}
+        onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
+        renderMark={this.renderMark}
+        autoFocus
+      />
     );
   }
 
   render() {
     return (
-      <div>
+      <div className={this.props.className}>
         {this.renderToolbar()}
         {this.renderEditor()}
       </div>
