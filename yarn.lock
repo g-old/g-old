@@ -10603,6 +10603,13 @@ slate-hotkeys@^0.1.2:
     is-hotkey "^0.1.1"
     slate-dev-environment "^0.1.2"
 
+slate-html-serializer@^0.6.3:
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/slate-html-serializer/-/slate-html-serializer-0.6.3.tgz#dba47103937199180c6d89585d20b7d83037b838"
+  dependencies:
+    slate-dev-logger "^0.1.39"
+    type-of "^2.0.1"
+
 slate-plain-serializer@^0.5.12:
   version "0.5.12"
   resolved "https://registry.yarnpkg.com/slate-plain-serializer/-/slate-plain-serializer-0.5.12.tgz#db782f855f6dc8ae52ab4cc76c68f02a238736a0"
