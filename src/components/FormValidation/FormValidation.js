@@ -198,7 +198,7 @@ class FormValidation extends React.Component {
         this.props.data || {},
       );
       if (this.props.submit) {
-        this.props.submit(newValues, options);
+        this.props.submit(newValues, this.state, options);
       }
     }
   }

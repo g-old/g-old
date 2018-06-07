@@ -14,6 +14,9 @@ import Select from '../Select';
 import MessagesLayer from './MessagesLayer';
 import Editor from '../MainEditor';
 import Message from '../Message';
+import { ICONS } from '../../constants';
+
+const EMPTY = '<p></p>';
 
 const messages = defineMessages({
   send: {
@@ -73,6 +76,13 @@ class MessageInput extends React.Component {
       '<p></p>';
 
     this.editor.setInitialState(initialValue);
+    // eslint-disable-next-line react/no-did-mount-set-state
+    this.setState({
+      data: {
+        textde: localStorage.getItem(`${this.storageKey}de`) || EMPTY,
+        textit: localStorage.getItem(`${this.storageKey}it`) || EMPTY,
+      },
+    });
   }
 
   componentWillReceiveProps({ updates }) {
@@ -81,7 +91,20 @@ class MessageInput extends React.Component {
     }
   }
 
-  onNotify(values, options) {
+  // TODO refactor
+  onNotify(newValues, initialValues, options) {
+    const values = Object.keys(initialValues).reduce((acc, curr) => {
+      if (curr in newValues) {
+        acc[curr] = newValues[curr];
+      } else if (curr in initialValues) {
+        if (initialValues[curr] !== EMPTY) {
+          acc[curr] = initialValues[curr];
+        }
+      }
+
+      return acc;
+    }, {});
+
     const subject = { de: values.subjectde, it: values.subjectit };
     const {
       recipients = [],
@@ -126,7 +149,7 @@ class MessageInput extends React.Component {
   handleLanguageSelection(locale) {
     this.setState({ activeLocale: locale });
     const initialValue =
-      localStorage.getItem(this.storageKey + locale) || '<p></p>';
+      localStorage.getItem(this.storageKey + locale) || EMPTY;
     this.editor.setInitialState(initialValue);
   }
   handleSelection(messageObject) {
@@ -141,7 +164,7 @@ class MessageInput extends React.Component {
     localStorage.setItem(`${this.storageKey}draftId`, messageObject.id);
 
     this.editor.setInitialState(
-      messageObject.textHtml[this.state.activeLocale],
+      messageObject.textHtml[this.state.activeLocale] || EMPTY,
     );
 
     this.onCloseLayer();
@@ -149,8 +172,8 @@ class MessageInput extends React.Component {
   }
   reset() {
     this.editor.reset();
-    localStorage.setItem(`${this.storageKey}de`, '<p></p>');
-    localStorage.setItem(`${this.storageKey}it`, '<p></p>');
+    localStorage.setItem(`${this.storageKey}de`, EMPTY);
+    localStorage.setItem(`${this.storageKey}it`, EMPTY);
     this.setState({
       data: {
         textde: '',
@@ -209,7 +232,24 @@ class MessageInput extends React.Component {
                 </fieldset>
               )}
               <Button
-                label="Presets"
+                plain
+                icon={
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24px"
+                    height="24px"
+                    role="img"
+                    aria-label="link"
+                  >
+                    <path
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      d={ICONS.template}
+                    />
+                  </svg>
+                }
+                label="Import draft"
                 onClick={() =>
                   this.setState({
                     layerOpen: true,
