@@ -187,6 +187,49 @@ class MessageInput extends React.Component {
     });
   }
 
+  renderTextInputs(handleValueChanges, activeLocale, values) {
+    const subject = `subject${activeLocale}`;
+    const editor = `text${activeLocale}`;
+    return (
+      <React.Fragment>
+        <fieldset>
+          <FormField label="subject">
+            <input
+              name={subject}
+              type="text"
+              value={values[subject]}
+              onChange={handleValueChanges}
+            />
+          </FormField>
+          <FormField>
+            <div style={{ padding: '0 1.5em' }}>
+              <Editor
+                ref={
+                  elm => (this.editor = elm) // eslint-disable-line
+                }
+                initialValue={this.state.initialValue}
+                onChange={value => {
+                  handleValueChanges({
+                    target: {
+                      name: editor,
+                      value,
+                    },
+                  });
+                  localStorage.setItem(this.storageKey + activeLocale, value);
+                }}
+              />
+            </div>
+          </FormField>
+        </fieldset>
+        <FormField label="Preview">
+          <div style={{ marginLeft: 'auto', marginRight: 'auto' }}>
+            <Message subject={values[subject]} content={values[editor]} />
+          </div>
+        </FormField>
+      </React.Fragment>
+    );
+  }
+
   render() {
     const { updates = {}, messageType, recipientType } = this.props;
     const { activeLocale } = this.state;
@@ -268,23 +311,12 @@ class MessageInput extends React.Component {
               </FormField>
             ) */}
               <fieldset>
-                {messageType === 'COMMUNICATION' && (
-                  <Editor
-                    ref={
-                      elm => (this.editor = elm) // eslint-disable-line
-                    }
-                    initialValue={this.state.initialValue}
-                    onChange={value => {
-                      handleValueChanges({
-                        target: { name: `text${activeLocale}`, value },
-                      });
-                      localStorage.setItem(
-                        this.storageKey + activeLocale,
-                        value,
-                      );
-                    }}
-                  />
-                )}
+                {messageType === 'COMMUNICATION' &&
+                  this.renderTextInputs(
+                    handleValueChanges,
+                    activeLocale,
+                    values,
+                  )}
                 {messageType === 'NOTE' && (
                   <div>
                     <LocaleSelector
@@ -292,52 +324,12 @@ class MessageInput extends React.Component {
                       onActivate={this.handleLanguageSelection}
                       locales={['de', 'it']}
                     />
-                    <fieldset>
-                      <FormField label="Subject">
-                        <input
-                          name={`subject${activeLocale}`}
-                          type="text"
-                          value={values[`subject${activeLocale}`]}
-                          onChange={handleValueChanges}
-                        />
-                      </FormField>
-                      <FormField>
-                        <Editor
-                          ref={
-                            elm => (this.editor = elm) // eslint-disable-line
-                          }
-                          initialValue={this.state.initialValue}
-                          onChange={value => {
-                            handleValueChanges({
-                              target: {
-                                name: `text${activeLocale}`,
-                                value,
-                              },
-                            });
-                            localStorage.setItem(
-                              this.storageKey + activeLocale,
-                              value,
-                            );
-                          }}
-                        />
-                      </FormField>
-                      <FormField label="Preview">
-                        <div
-                          style={{ marginLeft: 'auto', marginRight: 'auto' }}
-                        >
-                          <Message
-                            subject={values[`subject${activeLocale}`]}
-                            content={values[`text${activeLocale}`]}
-                          />
-                        </div>
-                      </FormField>
-                      {/* <InputMask
-                      locale={activeLocale}
-                      values={values}
-                      handleValueChanges={handleValueChanges}
-                      errors={errorMessages}
-                    /> */}
-                    </fieldset>
+
+                    {this.renderTextInputs(
+                      handleValueChanges,
+                      activeLocale,
+                      values,
+                    )}
                   </div>
                 )}
               </fieldset>
