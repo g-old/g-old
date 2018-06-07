@@ -8,9 +8,15 @@ import {
   LOAD_MESSAGE_START,
   LOAD_MESSAGE_SUCCESS,
   LOAD_MESSAGE_ERROR,
+  LOAD_MESSAGES_START,
+  LOAD_MESSAGES_ERROR,
+  LOAD_MESSAGES_SUCCESS,
 } from '../constants';
-import { genStatusIndicators } from '../core/helpers';
-import { message as messageSchema } from '../store/schema';
+import { genStatusIndicators, depaginate } from '../core/helpers';
+import {
+  message as messageSchema,
+  messageList as messageListSchema,
+} from '../store/schema';
 import { userFields } from './user';
 
 const createMessageMutation = `
@@ -42,6 +48,43 @@ const messageQuery = `
 query($id:ID!) {
   message(id:$id){
     ${messageFields}
+  }
+}
+`;
+
+const messageConnection = `
+query ($first:Int $after:String $userId:ID,$messageType:MessageTypeEnum, $isPublished:Boolean) {
+  messageConnection (first:$first after:$after userId:$userId messageType:$messageType, isPublished:$isPublished) {
+    pageInfo{
+      endCursor
+      hasNextPage
+    }
+    edges{
+      node{
+        id
+        messageType
+        messageObject{
+        ... on Note{
+              id
+              textHtml{
+                it
+                de
+              }
+              content
+              keyword
+              category
+              createdAt
+              updatedAt
+              isPublished
+          }
+         ... on Communication{
+               id
+               content
+              replyable
+          }
+        }
+      }
+    }
   }
 }
 `;
@@ -99,6 +142,35 @@ export function loadMessage(id) {
     } catch (error) {
       dispatch({
         type: LOAD_MESSAGE_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function loadMessages(args) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: LOAD_MESSAGES_START,
+    });
+
+    try {
+      const { data } = await graphqlRequest(messageConnection, args);
+      const depaginated = depaginate('message', data);
+      const normalizedData = normalize(depaginated.messages, messageListSchema);
+      dispatch({
+        type: LOAD_MESSAGES_SUCCESS,
+        payload: normalizedData,
+      });
+    } catch (error) {
+      dispatch({
+        type: LOAD_MESSAGES_ERROR,
         payload: {
           error,
         },

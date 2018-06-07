@@ -2,6 +2,7 @@ import {
   GraphQLID,
   GraphQLNonNull,
   GraphQLString,
+  GraphQLBoolean,
   GraphQLObjectType as ObjectType,
 } from 'graphql';
 import CategoryTypeEnum from './CategoryTypeEnum';
@@ -15,6 +16,10 @@ const NoteType = new ObjectType({
   fields: () => ({
     id: {
       type: new GraphQLNonNull(GraphQLID),
+    },
+
+    isPublished: {
+      type: GraphQLBoolean,
     },
 
     textHtml: {
@@ -40,6 +45,9 @@ const NoteType = new ObjectType({
     },
 
     createdAt: {
+      type: GraphQLString,
+    },
+    updatedAt: {
       type: GraphQLString,
     },
   }),

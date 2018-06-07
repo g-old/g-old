@@ -17,10 +17,6 @@ const CommunicationType = new ObjectType({
       type: GraphQLID,
     },
 
-    textHtml: {
-      type: GraphQLString,
-    },
-
     textRaw: {
       type: GraphQLString,
     },

@@ -8,10 +8,12 @@ import CheckBox from '../CheckBox';
 import FormField from '../FormField';
 import Button from '../Button';
 import FormValidation from '../FormValidation';
-import InputMask from './InputMask';
+// import InputMask from './InputMask';
 import LocaleSelector from './LocaleSelector';
 import Select from '../Select';
 import MessagesLayer from './MessagesLayer';
+import Editor from '../MainEditor';
+import Message from '../Message';
 
 const messages = defineMessages({
   send: {
@@ -47,38 +49,39 @@ class MessageInput extends React.Component {
   };
   constructor(props) {
     super(props);
+    const activeLocale = 'de';
     this.onNotify = this.onNotify.bind(this);
     this.state = {
       data: {
-        textde: { rawInput: '', html: '' },
-        textit: { rawInput: '', html: '' },
+        textde: '',
+        textit: '',
         subjectde: '',
         subjectit: '',
         recipients: [],
       },
-      activeLocale: 'de',
+      activeLocale,
     };
     this.handleLanguageSelection = this.handleLanguageSelection.bind(this);
     this.handleSelection = this.handleSelection.bind(this);
     this.onCloseLayer = this.onCloseLayer.bind(this);
+    this.storageKey = `Message${props.messageType}`; // TODO find better one
+  }
+
+  componentDidMount() {
+    const initialValue =
+      localStorage.getItem(this.storageKey + this.state.activeLocale) ||
+      '<p></p>';
+
+    this.editor.setInitialState(initialValue);
   }
 
   componentWillReceiveProps({ updates }) {
     if (updates && updates.success) {
-      this.setState({
-        data: {
-          textde: { rawInput: '', html: '' },
-          textit: { rawInput: '', html: '' },
-          subjectde: '',
-          subjectit: '',
-          recipients: [],
-          enforceEmail: false,
-        },
-      });
+      this.reset();
     }
   }
 
-  onNotify(values) {
+  onNotify(values, options) {
     const subject = { de: values.subjectde, it: values.subjectit };
     const {
       recipients = [],
@@ -86,20 +89,22 @@ class MessageInput extends React.Component {
       messageType,
       parentId,
     } = this.props;
+    const draftId = localStorage.getItem(`${this.storageKey}draftId`);
 
     const object = {};
     if (messageType === 'NOTE') {
       object.note = {
+        ...((this.state.draftId || draftId) && { id: this.state.draftId }),
         textHtml: {
-          ...(values.textde && { de: values.textde.html }),
-          ...(values.textit && { it: values.textit.html }),
+          ...(values.textde && { de: values.textde }),
+          ...(values.textit && { it: values.textit }),
         },
         category: 'CIRCULAR',
       };
     } else if (messageType === 'COMMUNICATION') {
       object.communication = {
         parentId,
-        textHtml: values.textde.html,
+        textHtml: values.textde,
         replyable: true,
       };
     }
@@ -110,6 +115,7 @@ class MessageInput extends React.Component {
       ...object,
       recipients: recipients || [],
       subject,
+      isDraft: options && options.draft,
       enforceEmail: values.enforceEmail,
     });
   }
@@ -119,15 +125,43 @@ class MessageInput extends React.Component {
 
   handleLanguageSelection(locale) {
     this.setState({ activeLocale: locale });
+    const initialValue =
+      localStorage.getItem(this.storageKey + locale) || '<p></p>';
+    this.editor.setInitialState(initialValue);
   }
-  handleSelection(message) {
+  handleSelection(messageObject) {
     this.setState({
       data: {
-        textde: { rawInput: message.textHtml.de, html: '' },
-        textit: { rawInput: message.textHtml.it, html: '' },
+        textde: messageObject.textHtml.de,
+        textit: messageObject.textHtml.it,
       },
     });
+    localStorage.setItem(`${this.storageKey}de`, messageObject.textHtml.de);
+    localStorage.setItem(`${this.storageKey}it`, messageObject.textHtml.it);
+    localStorage.setItem(`${this.storageKey}draftId`, messageObject.id);
+
+    this.editor.setInitialState(
+      messageObject.textHtml[this.state.activeLocale],
+    );
+
     this.onCloseLayer();
+    this.setState({ draftId: messageObject.id });
+  }
+  reset() {
+    this.editor.reset();
+    localStorage.setItem(`${this.storageKey}de`, '<p></p>');
+    localStorage.setItem(`${this.storageKey}it`, '<p></p>');
+    this.setState({
+      data: {
+        textde: '',
+        textit: '',
+        subjectde: '',
+        subjectit: '',
+        recipients: [],
+        enforceEmail: false,
+      },
+      draftId: null,
+    });
   }
 
   render() {
@@ -151,7 +185,7 @@ class MessageInput extends React.Component {
           submit={this.onNotify}
           data={this.state.data}
         >
-          {({ values, handleValueChanges, onSubmit, errorMessages }) => (
+          {({ values, handleValueChanges, onSubmit }) => (
             <Box column>
               {!recipientType && (
                 <fieldset>
@@ -176,7 +210,11 @@ class MessageInput extends React.Component {
               )}
               <Button
                 label="Presets"
-                onClick={() => this.setState({ layerOpen: true })}
+                onClick={() =>
+                  this.setState({
+                    layerOpen: true,
+                  })
+                }
               />
               {/* (!recipients || !recipients.length) && (
               <FormField label="Recipients">
@@ -191,11 +229,20 @@ class MessageInput extends React.Component {
             ) */}
               <fieldset>
                 {messageType === 'COMMUNICATION' && (
-                  <InputMask
-                    locale="de"
-                    values={values}
-                    handleValueChanges={handleValueChanges}
-                    errors={errorMessages}
+                  <Editor
+                    ref={
+                      elm => (this.editor = elm) // eslint-disable-line
+                    }
+                    initialValue={this.state.initialValue}
+                    onChange={value => {
+                      handleValueChanges({
+                        target: { name: `text${activeLocale}`, value },
+                      });
+                      localStorage.setItem(
+                        this.storageKey + activeLocale,
+                        value,
+                      );
+                    }}
                   />
                 )}
                 {messageType === 'NOTE' && (
@@ -205,12 +252,52 @@ class MessageInput extends React.Component {
                       onActivate={this.handleLanguageSelection}
                       locales={['de', 'it']}
                     />
-                    <InputMask
+                    <fieldset>
+                      <FormField label="Subject">
+                        <input
+                          name={`subject${activeLocale}`}
+                          type="text"
+                          value={values[`subject${activeLocale}`]}
+                          onChange={handleValueChanges}
+                        />
+                      </FormField>
+                      <FormField>
+                        <Editor
+                          ref={
+                            elm => (this.editor = elm) // eslint-disable-line
+                          }
+                          initialValue={this.state.initialValue}
+                          onChange={value => {
+                            handleValueChanges({
+                              target: {
+                                name: `text${activeLocale}`,
+                                value,
+                              },
+                            });
+                            localStorage.setItem(
+                              this.storageKey + activeLocale,
+                              value,
+                            );
+                          }}
+                        />
+                      </FormField>
+                      <FormField label="Preview">
+                        <div
+                          style={{ marginLeft: 'auto', marginRight: 'auto' }}
+                        >
+                          <Message
+                            subject={values[`subject${activeLocale}`]}
+                            content={values[`text${activeLocale}`]}
+                          />
+                        </div>
+                      </FormField>
+                      {/* <InputMask
                       locale={activeLocale}
                       values={values}
                       handleValueChanges={handleValueChanges}
                       errors={errorMessages}
-                    />
+                    /> */}
+                    </fieldset>
                   </div>
                 )}
               </fieldset>
@@ -226,13 +313,20 @@ class MessageInput extends React.Component {
                   />
                 </FormField>
               </fieldset>
-              <Button
-                fill
-                primary
-                onClick={onSubmit}
-                pending={this.props.updates && this.props.updates.pending}
-                label={<FormattedMessage {...messages.send} />}
-              />
+              <Box>
+                <Button
+                  primary
+                  onClick={onSubmit}
+                  pending={this.props.updates && this.props.updates.pending}
+                  label={<FormattedMessage {...messages.send} />}
+                />{' '}
+                <Button
+                  primary
+                  onClick={e => onSubmit(e, { draft: true })}
+                  pending={this.props.updates && this.props.updates.pending}
+                  label="Save as draft"
+                />
+              </Box>
             </Box>
           )}
         </FormValidation>

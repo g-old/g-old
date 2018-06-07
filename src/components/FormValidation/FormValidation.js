@@ -186,7 +186,7 @@ class FormValidation extends React.Component {
     }
   }
 
-  onSubmit(e) {
+  onSubmit(e, options) {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -198,7 +198,7 @@ class FormValidation extends React.Component {
         this.props.data || {},
       );
       if (this.props.submit) {
-        this.props.submit(newValues);
+        this.props.submit(newValues, options);
       }
     }
   }

@@ -26,6 +26,7 @@ const emailNotificationTranslations = {
     statement: 'hat ein Statement geschrieben',
     comment: 'hat einen Kommentar gschrieben',
     teaser: 'Das haben sie verpasst ...',
+    subject: 'Neue Nachricht',
   },
   'it-IT': {
     message: 'Translate: hat Ihnen eine Nachricht geschrieben',
@@ -33,6 +34,7 @@ const emailNotificationTranslations = {
     statement: 'ha scritto una dichiarazione',
     comment: 'ha scritto un commento',
     teaser: 'Questo non hai ancora visto ...',
+    subject: 'Nuovo messaggio',
   },
   'lld-IT': {
     message: 'Translate: hat Ihnen eine Nachricht geschrieben',
@@ -40,6 +42,7 @@ const emailNotificationTranslations = {
     statement: 'Tranlate: hat ein Statement geschrieben',
     comment: 'Translate: hat einen Kommentar gschrieben',
     teaser: 'Translate: Das haben sie verpasst ...',
+    subject: 'Translate: Nuovo messaggio',
   },
 };
 
@@ -467,7 +470,9 @@ const generatePushMessage = (
     case ActivityType.MESSAGE:
       title = resourceByLocale[locale][activity.type];
       link = getMessageLink(activity.objectId, referrer);
-      message = getTranslatedMessage(activityObject.subject, locale);
+      message =
+        getTranslatedMessage(activityObject, locale) ||
+        emailNotificationTranslations[locale].subject;
       break;
     default:
       throw new Error(`Type not recognized ${activity.type}`);
@@ -1335,7 +1340,7 @@ class NotificationService {
             activity.id;
           subject =
             getTranslatedMessage(activityObject.subject, locale) ||
-            'Info from GOLD';
+            emailNotificationTranslations[locale].subject;
           emailHTML = this.MailComposer.getMessageMail({
             message: message || 'Error - no message',
             sender: {

@@ -28,6 +28,10 @@ const MessageInputType = new GraphQLInputObjectType({
       type: GraphQLBoolean,
     },
 
+    isDraft: {
+      type: GraphQLBoolean,
+    },
+
     recipients: {
       type: new GraphQLList(GraphQLID),
     },

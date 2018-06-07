@@ -127,5 +127,6 @@ export const commentList = [comment];
 export const requestList = [request];
 export const subscriptionList = [subscription];
 export const notificationList = [notification];
+export const messageList = [message];
 
 /* GENERATOR */
