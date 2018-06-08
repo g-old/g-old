@@ -30,7 +30,7 @@ const emailNotificationTranslations = {
   },
   'it-IT': {
     message: 'Translate: hat Ihnen eine Nachricht geschrieben',
-    user: 'Translate: hat eine Einstellung verändert',
+    user: 'ha modificato il tuo profile',
     statement: 'ha scritto una dichiarazione',
     comment: 'ha scritto un commento',
     teaser: 'Questo non hai ancora visto ...',
