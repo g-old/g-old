@@ -175,14 +175,18 @@ class MainEditor extends React.Component {
       change.call(unwrapLink);
     } else if (value.isExpanded) {
       const href = window.prompt('Enter the URL of the link:', 'https://');
-      change.call(wrapLink, href);
+      if (href) {
+        change.call(wrapLink, href);
+      }
     } else {
       const href = window.prompt('Enter the URL of the link:', 'https://');
       const text = window.prompt('Enter the text for the link:');
-      change
-        .insertText(text)
-        .extend(0 - text.length)
-        .call(wrapLink, href);
+      if (href && text) {
+        change
+          .insertText(text)
+          .extend(0 - text.length)
+          .call(wrapLink, href);
+      }
     }
 
     this.onChange(change);

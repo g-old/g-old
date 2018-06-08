@@ -1,7 +1,7 @@
 .form {
   position: relative;
   max-width: 100%;
-  width: 30rem;
+  width: 30em;
 
   fieldset {
     min-width: 0;
