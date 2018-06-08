@@ -193,20 +193,22 @@ class FormValidation extends React.Component {
       e.stopPropagation();
     }
     const validationResult = this.validate(this.formFields);
+    const newState = {
+      errors: { ...this.state.errors, ...validationResult.errors },
+    };
     if (validationResult.failed === 0 || this.props.lazy) {
-      this.setState(
-        { errors: { ...this.state.errors, ...validationResult.errors } },
-        () => {
-          const newValues = getChangedFields(
-            this.formFields,
-            this.state,
-            this.props.data || {},
-          );
-          if (this.props.submit) {
-            this.props.submit(newValues, this.state, options);
-          }
-        },
-      );
+      this.setState(newState, () => {
+        const newValues = getChangedFields(
+          this.formFields,
+          this.state,
+          this.props.data || {},
+        );
+        if (this.props.submit) {
+          this.props.submit(newValues, this.state, options);
+        }
+      });
+    } else {
+      this.setState(newState);
     }
   }
 
