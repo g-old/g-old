@@ -141,12 +141,12 @@ const userStatusTranslations = {
   subject: {
     added: {
       de: 'Neue Rechte erhalten!',
-      it: 'translate:Neue Rechte erhalten!',
+      it: 'Il tuo profilo è stato aggiornato!',
       lld: 'tranlate: Neue Rechte erhalten!',
     },
     lost: {
       de: 'Achtung, sie haben eine Berechtigung verloren!',
-      it: 'translate:Achtung, sie haben eine Berechtigung verloren!',
+      it: 'Attenzione, il tuo ruolo è stato modificato!',
       lld: 'translate: Achtung, sie haben eine Berechtigung verloren!',
     },
   },
