@@ -34,7 +34,7 @@ const NoteType = new ObjectType({
           return parent.textHtml[localeMapper[locale]];
         }
         // find one translation that is not emty or default translation
-        return Object.keys(parent.textHtml).find(l => parent.textHtml[l]);
+        return Object.values(parent.textHtml).find(t => t);
       },
     },
     category: {

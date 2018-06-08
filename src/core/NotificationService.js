@@ -30,7 +30,7 @@ const emailNotificationTranslations = {
   },
   'it-IT': {
     message: 'Translate: hat Ihnen eine Nachricht geschrieben',
-    user: 'ha modificato il tuo profile',
+    user: 'ha modificato il tuo profilo',
     statement: 'ha scritto una dichiarazione',
     comment: 'ha scritto un commento',
     teaser: 'Questo non hai ancora visto ...',
@@ -237,7 +237,8 @@ const getTranslatedMessage = (
   if (subject[mapLocale[locale]]) {
     return subject[mapLocale[locale]];
   }
-  return subject[Object.keys(subject).find(l => subject[l]) || 'it'];
+  // return subject[Object.keys(subject).find(l => subject[l]) || 'it'];
+  return Object.values(subject).find(s => s);
 };
 
 const fillWithData = (
