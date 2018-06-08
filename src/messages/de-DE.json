@@ -352,6 +352,7 @@
       "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/FormValidation/FormValidation.js",
       "src/components/Login/Login.js",
+      "src/components/Message/Message.js",
       "src/components/MessageInput/MessageInput.js",
       "src/components/ProposalActions/ProposalActions.js",
       "src/components/ProposalInput/ProposalInput.js",
@@ -636,6 +637,7 @@
     "message": "Abschicken",
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
+      "src/components/Message/Message.js",
       "src/components/MessageInput/MessageInput.js",
       "src/components/ProposalInput/ProposalInput.js"
     ]
@@ -1628,6 +1630,94 @@
     "description": "Messages label",
     "defaultMessage": "Messages",
     "message": "Nachrichten",
-    "files": ["src/routes/workTeamManager/WorkTeamManagement.js"]
+    "files": [
+      "src/components/NotificationSettings/NotificationSettings.js",
+      "src/components/UserPanel/UserPanel.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
+  },
+  {
+    "id": "label.discussions",
+    "description": "Label discussions",
+    "defaultMessage": "Discussions",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.newDiscussions",
+    "description": "Label for notifications on new discussions",
+    "defaultMessage": "New Discussions",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.newProposals",
+    "description": "Label new proposals",
+    "defaultMessage": "New Proposals",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.newSurveys",
+    "description": "Label new surveys",
+    "defaultMessage": "New Surveys",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.notificationSettings.comments",
+    "description": "Label for notifications on new comments",
+    "defaultMessage": "Comments",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.notificationSettings.messages",
+    "description": "Label for notifications on new messages",
+    "defaultMessage": "Messages",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.notificationSettings.replies",
+    "description": "Label for notifications on new replies",
+    "defaultMessage": "Replies",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.notificationSettings.statements",
+    "description": "Label for notifications on new statements",
+    "defaultMessage": "Statements",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.onWatchedDiscussions",
+    "description": "Label for notifications on watched discussions",
+    "defaultMessage": "on watched discussions",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.onWatchedProposals",
+    "description": "Label for watched proposals/surveys",
+    "defaultMessage": "on watched proposals/surveys",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.proposalAndSurveys",
+    "description": "Label proposal and surveys",
+    "defaultMessage": "Proposals and Surveys",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.stateUpdates",
+    "description": "Label for state updates",
+    "defaultMessage": "State updates",
+    "message": "",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   }
 ]

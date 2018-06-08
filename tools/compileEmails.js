@@ -13,12 +13,13 @@ const compileEmail = filename => {
         .readFileSync(`src/emails/${file}`, 'utf8')
         .replace(/{{/g, '\\{{')
         .replace(/\\{{(#block|\/block)/g, '{{$1')
-        .replace(/-brand-/, process.env.HOST || 'localhost:3000')
+        .replace(/-brand-/, 'M5S - 5SB')
         .replace(
           /-webpage-/,
-          process.env.HOST
+          'https://m5sbz.g-old.org',
+          /*  process.env.HOST
             ? `https://${process.env.HOST}`
-            : 'http://localhost:3000',
+            : 'http://localhost:3000', */
         )
         .replace(
           /-address-/,
