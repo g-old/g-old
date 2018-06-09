@@ -149,7 +149,6 @@ class MessageInput extends React.Component {
       };
     } else if (messageType === 'COMMUNICATION') {
       object.communication = {
-        parentId,
         textHtml: values.textde,
         replyable: true,
       };

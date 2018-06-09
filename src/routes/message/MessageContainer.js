@@ -21,14 +21,23 @@ class MessageContainer extends React.Component {
   };
   render() {
     const {
-      message: { subject, messageObject, sender, id, parents },
+      message: { subject, messageObject, sender, id, parents, parentId },
       messageUpdates,
     } = this.props;
     return (
       <Box tag="article" column pad align padding="medium">
+        {parents &&
+          parents.map(p => (
+            <Message
+              subject={p.subject}
+              content={p.messageObject && p.messageObject.content}
+              sender={p.sender}
+            />
+          ))}
         <Message
           parents={parents}
           id={id}
+          parentId={parentId}
           updates={messageUpdates}
           subject={subject}
           content={messageObject && messageObject.content}

@@ -28,7 +28,7 @@ class Message extends React.Component {
     sender: PropTypes.shape({}).isRequired,
     content: PropTypes.string.isRequired,
     replyable: PropTypes.bool,
-    id: PropTypes.string.isRequired,
+    parentId: PropTypes.string.isRequired,
     onReply: PropTypes.func.isRequired,
     updates: PropTypes.shape({}).isRequired,
     parents: PropTypes.arrayOf(PropTypes.shape({})),
@@ -43,9 +43,9 @@ class Message extends React.Component {
   }
 
   sendReply(values) {
-    const { subject, id, sender } = this.props;
+    const { subject, sender, parentId } = this.props;
     this.props.onReply({
-      parentId: id,
+      parentId,
       recipientType: 'USER',
       messageType: 'COMMUNICATION',
       recipients: [sender.id],
@@ -58,7 +58,7 @@ class Message extends React.Component {
   }
 
   render() {
-    const { subject, content, sender, updates } = this.props;
+    const { subject, content, sender, updates, replyable } = this.props;
     return (
       <Box column className={s.root}>
         <div className={s.subject}>
@@ -71,7 +71,7 @@ class Message extends React.Component {
         <div className={s.content}>
           <UserThumbnail user={sender} />
         </div>
-        {false && (
+        {replyable && (
           <FormValidation
             submit={this.sendReply}
             validations={{ text: { args: { required: true } } }}

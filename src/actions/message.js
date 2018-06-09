@@ -26,11 +26,25 @@ mutation($message:MessageInput){
 
 export const messageFields = `
 id
+parentId,
 parents{
   id
   sender{
   ${userFields}
   }
+  subject
+  messageType
+  messageObject{
+  ... on Note{
+    id
+    content
+  }
+  ... on Communication{
+    id
+    content
+    replyable
+  }
+}
   createdAt
 }
 sender{

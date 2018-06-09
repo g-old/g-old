@@ -26,6 +26,9 @@ const MessageType = new ObjectType({
     id: {
       type: new GraphQLNonNull(GraphQLID),
     },
+    parentId: {
+      type: GraphQLID,
+    },
     messageType: {
       type: MessageTypeEnum,
     },
@@ -52,7 +55,7 @@ const MessageType = new ObjectType({
 
     parents: {
       type: new GraphQLList(MessageType),
-      resolve: (parent, args, { viewer, loaders }) =>
+      /* resolve: (parent, args, { viewer, loaders }) =>
         parent.parentId
           ? knex
               .raw(
@@ -62,7 +65,21 @@ const MessageType = new ObjectType({
               .then(data =>
                 data.rows.map(m => Message.gen(viewer, m.id, loaders)),
               )
-          : null,
+          : null, */
+
+      resolve: (parent, args, { viewer, loaders }) => {
+        if (parent.parentId) {
+          return knex('messages')
+            .where({
+              parent_id: parent.parentId,
+              message_type: parent.messageType,
+            })
+            .orderBy('created_at', 'asc')
+            .pluck('id')
+            .then(ids => ids.map(id => Message.gen(viewer, id, loaders)));
+        }
+        return null;
+      },
     },
 
     subject: {
