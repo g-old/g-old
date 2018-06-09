@@ -1640,84 +1640,84 @@
     "id": "label.discussions",
     "description": "Label discussions",
     "defaultMessage": "Discussions",
-    "message": "",
+    "message": "Diskussionen",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.newDiscussions",
     "description": "Label for notifications on new discussions",
     "defaultMessage": "New Discussions",
-    "message": "",
+    "message": "Neue Diskussionen",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.newProposals",
     "description": "Label new proposals",
     "defaultMessage": "New Proposals",
-    "message": "",
+    "message": "Neue Beschlüsse",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.newSurveys",
     "description": "Label new surveys",
     "defaultMessage": "New Surveys",
-    "message": "",
+    "message": "Neue Umfragen",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.notificationSettings.comments",
     "description": "Label for notifications on new comments",
     "defaultMessage": "Comments",
-    "message": "",
+    "message": "Kommentar",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.notificationSettings.messages",
     "description": "Label for notifications on new messages",
     "defaultMessage": "Messages",
-    "message": "",
+    "message": "Nachrichten",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.notificationSettings.replies",
     "description": "Label for notifications on new replies",
     "defaultMessage": "Replies",
-    "message": "",
+    "message": "Antworten",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.notificationSettings.statements",
     "description": "Label for notifications on new statements",
     "defaultMessage": "Statements",
-    "message": "",
+    "message": "Statements",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.onWatchedDiscussions",
     "description": "Label for notifications on watched discussions",
     "defaultMessage": "on watched discussions",
-    "message": "",
+    "message": "bei abonnierten Diskussionen",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.onWatchedProposals",
     "description": "Label for watched proposals/surveys",
     "defaultMessage": "on watched proposals/surveys",
-    "message": "",
+    "message": "bei abonnierten Beschlüssen/Umfragen",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.proposalAndSurveys",
     "description": "Label proposal and surveys",
     "defaultMessage": "Proposals and Surveys",
-    "message": "",
+    "message": "Beschlüsse und Umfragen",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.stateUpdates",
     "description": "Label for state updates",
     "defaultMessage": "State updates",
-    "message": "",
+    "message": "Aktualisierungen",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   }
 ]

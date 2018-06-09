@@ -131,7 +131,7 @@ class MessageInput extends React.Component {
     const subjectIt = values.subjectit.trim();
     const subject = {
       ...(subjectDe.length && { de: subjectDe }),
-      ...(subjectIt.length && { it: values.subjectIt }),
+      ...(subjectIt.length && { it: subjectIt }),
     };
 
     const draftId = localStorage.getItem(`${this.storageKey}draftId`);
