@@ -276,3 +276,17 @@ export const join = (lookupTable, mainTable, lookupKey, mainKey, select) => {
   }
   return output;
 };
+
+export const depaginate = (resource, response) => {
+  const conn = response[`${resource}Connection`];
+  if (conn) {
+    const key = `${resource}Connection`;
+    delete response[key];
+
+    return {
+      ...response,
+      [`${resource}s`]: conn.edges.map(p => p.node),
+    };
+  }
+  return response;
+};

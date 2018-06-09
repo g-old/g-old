@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { normalize } from 'normalizr';
-import { genStatusIndicators } from '../core/helpers';
+import { genStatusIndicators, depaginate } from '../core/helpers';
 import { user as userSchema, userList as userArray } from '../store/schema';
 import {
   LOAD_USERS_START,
@@ -162,20 +162,6 @@ query ($term:String) {
   }
 }
 `;
-
-const depaginate = (resource, response) => {
-  const conn = response[`${resource}Connection`];
-  if (conn) {
-    const key = `${resource}Connection`;
-    delete response[key];
-
-    return {
-      ...response,
-      [`${resource}s`]: conn.edges.map(p => p.node),
-    };
-  }
-  return response;
-};
 
 const objectifySettings = userData => {
   if (userData && userData.notificationSettings) {

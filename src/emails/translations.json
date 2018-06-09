@@ -7,13 +7,13 @@
   "signup": {
     "de-DE":
       " Wir freuen uns sehr, Sie hier auf unserer Plattform GOLD begrüßen zu dürfen!",
-    "it-IT": "Siamo lieti di accogliervi sulla Piattaforma  GOLD!",
+    "it-IT": "Siamo lieti di accoglierti sulla piattaforma  GOLD!",
     "lld-IT": "Con plajei Ves saludun sun la plataforma GOLD"
   },
   "explainConfirmation": {
     "de-DE":
       "Jetzt müssen Sie nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
-    "it-IT": "Attendiamo ancora la conferma del Suo indirizzo email.",
+    "it-IT": "Attendiamo ancora la conferma del tuo indirizzo email.",
     "lld-IT": "Al mancia ma plu la conferma de vosta miscion email."
   },
   "ctAConfirmation": {
@@ -40,7 +40,7 @@
     "de-DE":
       "Wir schicken Ihnen diese Email, da Sie (oder jemand anderes) das Passwort für ihr Konto zurücksetzen möchten.",
     "it-IT":
-      "Le mandiamo questa mail perchè Lei (o qualcun altro) ha chiesto di modificare la password del Suo account",
+      "Ti mandiamo questa mail perchè  hai (o qualcun altro al tuo posto ha) chiesto di modificare la password del tuo account",
     "lld-IT":
       "Ves manun chesta mail, ajache valgungn à damandé de mudé la password de vost account"
   },
@@ -53,7 +53,7 @@
     "de-DE":
       "Wenn die Anfrage nicht von ihnen kommt, ignorieren Sie bitte diese Email. Ihr Passwort bleibt dann unverändert.",
     "it-IT":
-      "Se non ha mandato Lei la richiesta, ignori questa mail. La Sua password non verrà modificata",
+      "Se non hai mandato tu la richiesta, ignora questa mail. La tua password non verrà modificata",
     "lld-IT":
       "Sce ne eis nia Vos damané le mudament dla password, no Ves cruziede. La password restarà la medema"
   },
@@ -61,7 +61,7 @@
     "de-DE":
       "Sie haben Ihre E-Mail-Adresse auf der Plattform GOLD geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
     "it-IT":
-      "Lei ha appena modificato l'indirizzo email della piattaforma GOLD. Per cortesia può confermare la correttezza dell'indirizzo e-mail?",
+      "Hai appena modificato l'indirizzo email della piattaforma GOLD. Per cortesia puoi confermare la correttezza dell'indirizzo e-mail?",
     "lld-IT":
       "Vos eis mudé la miscion e-mail dla paltaforma GOLD. Preibel podeis confermé la nueva miscion e-mail?"
   },
@@ -74,7 +74,7 @@
     "de-DE":
       "Wir möchten Ihnen mitteilen, dass Sie das Passwort für ihr Konto gerade erfolgreich geändert haben.",
     "it-IT":
-      "Le confermiamo che la Sua password è appena stata modificata correttamente.",
+      "Confermiamo che la tua password è appena stata modificata correttamente.",
     "lld-IT": "Vosta password é vegnuda mudeda coretamenter."
   },
   "GOLD password changed": {
@@ -84,7 +84,7 @@
   },
   "Visit our site?": {
     "de-DE": "Möchten sie uns besuchen?",
-    "it-IT": "Vuole visitare la nostra piattaforma",
+    "it-IT": "Vuoi visitare la nostra piattaforma",
     "lld-IT": "Voleis cialé ite te nosta plataforma?"
   },
   "Click here": {
@@ -93,24 +93,24 @@
     "lld-IT": "cliché chilò"
   },
   "Welcome on GOLD": {
-    "de-DE": "Herzlich willkommen auf g-old.org",
-    "it-IT": "Benvenuti su g-old.org",
-    "lld-IT": "Benvegnus sun g-old.org"
+    "de-DE": "Herzlich willkommen auf m5sbz.g-old.org",
+    "it-IT": "Benvenuti su m5sbz.g-old.org",
+    "lld-IT": "Benvegnus sun m5sbz.g-old.org"
   },
   "messageSubject": {
     "de-DE": "Persönliche Nachricht für Sie von g-old.org",
-    "it-IT": "Messaggio personale per Lei da g-old.org",
-    "lld-IT": "Messaje personal per Vos da g-old.org"
+    "it-IT": "Messaggio personale per te da m5sbz.g-old.org",
+    "lld-IT": "Messaje personal per Vos da m5sbz.g-old.org"
   },
   "proposalNotificationSubject": {
-    "de-DE": "Neuer Beschluss auf g-old.org",
-    "it-IT": "",
+    "de-DE": "Neuer Beschluss auf m5sbz.g-old.org",
+    "it-IT": "Nuova proposta su m5sbz.g-old.org",
     "lld-IT": ""
   },
   "clickProposalLink": {
     "de-DE": "Abstimmen",
-    "it-IT": "",
-    "lld-IT": ""
+    "it-IT": "Votazione",
+    "lld-IT": "Votazion"
   },
   "clickMessageLink": {
     "de-DE": "Nachricht ansehen",

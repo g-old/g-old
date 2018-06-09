@@ -1,78 +1,20 @@
-import sanitize from 'sanitize-html';
-
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import sanitize from '../../core/htmlSanitizer';
 
-export const sanitizerOptions = {
-  allowedTags: [
-    'h3',
-    'h4',
-    'h5',
-    'h6',
-    'blockquote',
-    'p',
-    'a',
-    'ul',
-    'ol',
-    'nl',
-    'li',
-    'b',
-    'i',
-    'strong',
-    'em',
-    'strike',
-    'code',
-    'hr',
-    'br',
-    'div',
-    'table',
-    'thead',
-    'caption',
-    'tbody',
-    'tr',
-    'th',
-    'td',
-    'pre',
-    'iframe',
-    'img',
-  ],
-  allowedAttributes: {
-    a: ['href', 'name', 'target'],
-    // We don't currently allow img itself by default, but this
-    // would make sense if we did
-    img: ['src', 'style'],
-  },
-  // Lots of these won't come up by default because we don't allow them
-  selfClosing: [
-    'img',
-    'br',
-    'hr',
-    'area',
-    'base',
-    'basefont',
-    'input',
-    'link',
-    'meta',
-  ],
-  // URL schemes we permit
-  allowedSchemes: ['http', 'https', 'ftp', 'mailto'],
-  allowedSchemesByTag: {},
-  allowedSchemesAppliedToAttributes: ['href', 'src', 'cite'],
-  allowProtocolRelative: true,
-  allowedIframeHostnames: ['www.youtube.com', 'player.vimeo.com'],
-  transformTags: {
-    img(tagName, attribs) {
-      // My own custom magic goes here
+const sanititzeTextnput = textHtml => {
+  const input = Object.keys(textHtml).reduce((acc, locale) => {
+    const text = textHtml[locale];
+    if (text.length < 10000 && text.length > 0) {
+      acc[locale] = sanitize(text);
+    }
+    return acc;
+  }, {});
 
-      return {
-        tagName: 'img',
-        attribs: {
-          ...attribs,
-          style: 'max-width: 100%',
-        },
-      };
-    },
-  },
+  if (Object.keys(input).length < 1) {
+    return null;
+  }
+  return input;
 };
 class Note {
   constructor(data) {
@@ -81,6 +23,8 @@ class Note {
     this.textHtml = data.text_html;
     this.keyword = data.keyword;
     this.createdAt = data.created_at;
+    this.updatedAt = data.updated_at;
+    this.isPublished = data.is_published;
   }
 
   static async gen(viewer, id, { notes }) {
@@ -97,14 +41,12 @@ class Note {
       created_at: new Date(),
     };
     if (data.textHtml) {
-      newData.text_html = Object.keys(data.textHtml).reduce((acc, locale) => {
-        const text = data.textHtml[locale];
-
-        if (text.length < 10000) {
-          acc[locale] = sanitize(text, sanitizerOptions);
-        }
-        return acc;
-      }, {});
+      const text = sanititzeTextnput(data.textHtml);
+      if (text) {
+        newData.text_html = text;
+      } else {
+        return null;
+      }
     }
 
     if (data.category) {
@@ -112,6 +54,9 @@ class Note {
     }
     if (data.keyword) {
       newData.keyword = data.keyword;
+    }
+    if ('isPublished' in data) {
+      newData.is_published = data.isPublished;
     }
 
     const [note = null] = await knex('notes')
@@ -126,6 +71,14 @@ class Note {
     if (!data || !data.id) return null;
     if (!canMutate(viewer, data, Models.NOTE)) return null;
     const newData = { updated_at: new Date() };
+    if (data.textHtml) {
+      const text = sanititzeTextnput(data.textHtml);
+      if (text) {
+        newData.text_html = text;
+      } else {
+        return null;
+      }
+    }
     const updatedNote = await knex.transaction(async trx => {
       const [note = null] = await knex('notes')
         .where({ id: data.id })

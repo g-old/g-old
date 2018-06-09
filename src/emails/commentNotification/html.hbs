@@ -3,6 +3,7 @@
   {{#content "main"}}
 
   <div class="proposal-root">
+
    <div style="font-size: 2rem;
     font-weight: 300;
     padding-top: 0;
@@ -11,7 +12,10 @@
 <div>
   <div>
     <img style="margin-right:4px;" class="statement-avatar" src="{{thumbnail}}"alt="IMG">
-    <span style = "font-weight:600; vertical-align: top;">{{name}}</span>
+      <span style="vertical-align: top;">
+        <strong style="vertical-align: top;"> {{sender}}</strong>
+        <a style="vertical-align: top;" href="{{link}}" target="_blank"> {{notification}} </a>
+      </span>
 
   </div>
   <div style="width: 100%;">
@@ -22,23 +26,7 @@
 </div>
   </div>
 
-            <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
-              <tbody>
-                <tr>
-                  <td align="left">
-                    <table border="0" cellpadding="0" cellspacing="0">
-                      <tbody>
-                        <tr>
-                          <td>
-                            <a href="{{link}}" target="_blank">{{t "clickProposalLink"}}</a>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+
 
   {{/content}}
 

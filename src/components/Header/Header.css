@@ -41,13 +41,13 @@
   align-items: center;
 }
 
-@media only screen and (max-width: 50em) {
+@media only screen and (max-width: 60em) {
   .brand {
     display: none;
   }
 }
 
-@media only screen and (max-width: 40em) {
+@media only screen and (max-width: 50em) {
   .brand {
     display: inherit;
   }

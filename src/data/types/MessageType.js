@@ -74,7 +74,7 @@ const MessageType = new ObjectType({
             return parent.subject[localeMapper[locale]];
           }
           // find one translation that is not emty or default translation
-          return Object.keys(parent.subject).find(l => parent.subject[l]);
+          return Object.values(parent.subject).find(s => s);
         }
         return null;
       },

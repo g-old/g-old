@@ -1,54 +1,62 @@
-{{#extend "layout"}}
+{{#extend "layout"}} {{#content "main"}}
 
-  {{#content "main"}}
-
-  <div class="proposal-root">
-    <h3>{{t "heading"}}</h3>
-    <div style="padding-bottom:1em;">
-      <table>
-        <tbody>
+<div class="proposal-root">
+  <div style="padding-bottom:1em;">
+    <table>
+      <tbody>
         <tr>
           <td style="width:50px;">
-              <img src={{thumbnail}} style="width: 42px; height:42px; vertical-align:top;">
+            <img src={{thumbnail}} style="width: 42px; height:42px; vertical-align:top;">
           </td>
           <td>
-<span>
-  <strong> {{sender}}</strong>
-<a href="{{link}}" target="_blank"> {{notification}} </a></span>
+            <span>
+              <strong> {{sender}}</strong>
+              <a href="{{link}}" target="_blank"> {{notification}} </a>
+            </span>
 
           </td>
         </tr>
 
-</tbody>
-      </table>
+      </tbody>
+    </table>
 
-    </div>
-    <div style="background-color: #ffd602;
+  </div>
+  <div style="width: 100%;
+    padding: 1em 0;
+    max-width: 35em;
     color: #000;
-    padding: 1em;
-    border-radius: 1em;
-    margin-bottom: 1.5em;" >
-   <div><label style="font-weight: 300;
-    cursor: inherit;
-    font-size: 19px;
-    font-size: 1.1875rem;
-    line-height: 1.26316;">{{subject}}</label></div>
-    <div style="margin-bottom: 1.5em;">{{{message}}}</div>
+    border-radius: 6px;
+    border: 1px solid #eee;
+    margin: 0 auto;">
+    <div style="font-weight: 600;
+    padding: 0.5em 1em;
+    background-color: #673ab7;
+    color: #fff;    margin-bottom: 24px;
+">
+      <span>{{subject}}</span>
+    </div>
+    <div style="margin-bottom:24px;padding: 0 1em;
+">
+      {{{message}}}
+    </div>
+    <div style="margin-bottom:24px; padding: 0em 1em;
+;">
 
-    <div style="padding: 0.1em 0.3em;
+
+
+      <div style="padding: 0.1em 0.3em;
     border-radius: 4px;
-    background-color: #eee7f5;
     color: #666;">
-    <img style="width: 1em;
-    height: 1em; margin-right:0.5rem; vertical-align:middle" src="{{thumbnail}}" />
-    <span>{{sender}}</span>
+        <img style="width: 1em;
+    height: 1em; margin-right:0.5rem; vertical-align:middle;" src="{{thumbnail}}" />
+        <span>{{sender}}</span>
+      </div>
     </div>
-    </div>
-
   </div>
 
 
+</div>
 
-  {{/content}}
 
-{{/extend}}
+
+{{/content}} {{/extend}}

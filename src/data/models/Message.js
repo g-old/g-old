@@ -133,39 +133,38 @@ export default Message;
 
 const helpNotice = {
   de:
-    'Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an xxx@xxx.xx',
-  it:
-    'Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an xxx@xxx.xx',
+    'Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an m5sbz@g-old.org',
+  it: 'Se ritieni che ci sia un errore, scrivi una mail a m5sbz@g-old.org',
   lld:
-    'Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an xxx@xxx.xx',
+    'Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an m5sbz@g-old.org',
 };
 
 const userStatusTranslations = {
   subject: {
     added: {
       de: 'Neue Rechte erhalten!',
-      it: 'translate:Neue Rechte erhalten!',
+      it: 'Il tuo profilo è stato aggiornato!',
       lld: 'tranlate: Neue Rechte erhalten!',
     },
     lost: {
       de: 'Achtung, sie haben eine Berechtigung verloren!',
-      it: 'translate:Achtung, sie haben eine Berechtigung verloren!',
+      it: 'Attenzione, il tuo ruolo è stato modificato!',
       lld: 'translate: Achtung, sie haben eine Berechtigung verloren!',
     },
   },
   viewer_added: {
     de:
-      'Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen und Beiträge, Beschlüsse sowie Diskussionen lesen.',
+      'Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen, Beiträge und Beschlüsse lesen sowie an Diskussionen teilnehmen.',
     it:
-      'translate: Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen und Beiträge, Beschlüsse sowie Diskussionen lesen.',
+      'Sei stato abilitato come Visitatore e da adesso puoi iscriverti ai gruppi di lavoro, partecipare ai sondaggi, leggere interventi, decisioni e partecipare alle discussioni.',
     lld:
-      'translate: Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen und Beiträge, Beschlüsse sowie Diskussionen lesen.',
+      'translate: Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen, Beiträge und Beschlüsse lesen sowie an Diskussionen teilnehmen.',
   },
   viewer_lost: {
     de: `Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. ${
       helpNotice.de
     }`,
-    it: `translate: Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. ${
+    it: `Non sei più abilitato come Visitatore (Viewer), per il momento non potrai più partecipare  alle attività della piattaforma. ${
       helpNotice.it
     }`,
     lld: `translate: Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. ${
@@ -177,7 +176,7 @@ const userStatusTranslations = {
     de:
       'Sie sind als Voter freigschalten worden. Ab sofort sind Sie uneingeschränktes Mitglied und können  an allen Abstimmungen teilnehmen, sowie Kommentare und Erklärungen verfassen.',
     it:
-      'translate: Sie sind als Voter freigschalten worden. Ab sofort sind Sie uneingeschränktes Mitglied und können  an allen Abstimmungen teilnehmen, sowie Kommentare und Erklärungen verfassen.',
+      'Sei stato abilitato come Votante (Voter) e da adesso puoi prendere parte a tutte le votazioni e partecipare inserendo sia commenti che dichiarazioni di voto.',
     lld:
       'translate: Sie sind als Voter freigschalten worden. Ab sofort sind Sie uneingeschränktes Mitglied und können  an allen Abstimmungen teilnehmen, sowie Kommentare und Erklärungen verfassen.',
   },
@@ -185,7 +184,7 @@ const userStatusTranslations = {
     de: `Sie sind ab jetzt kein stimmberechtigtes Mitglied der Plattform. ${
       helpNotice.de
     }`,
-    it: `translate: Sie sind ab jetzt kein stimmberechtigtes Mitglied der Plattform. ${
+    it: `Da questo momento non hai più il ruolo di Votante sulla piattaforma. ${
       helpNotice.it
     }`,
     lld: `translate: Sie sind ab jetzt kein stimmberechtigtes Mitglied der Plattform. ${
@@ -197,13 +196,13 @@ const userStatusTranslations = {
     de:
       'Sie sind als Moderator freigeschalten worden. Ab sofort können Sie Kommentare und Erklärungen löschen.',
     it:
-      'translate: Sie sind als Moderator freigeschalten worden. Ab sofort können Sie Kommentare und Erklärungen löschen.',
+      'Sei stato abilitato come moderatore. Da subito potrai cancellare commenti e dichiarazioni.',
     lld:
       'translate: Sie sind als Moderator freigeschalten worden. Ab sofort können Sie Kommentare und Erklärungen löschen.',
   },
   moderator_lost: {
     de: `Sie sind ab jetzt kein Moderator mehr. ${helpNotice.de}`,
-    it: `translate: Sie sind ab jetzt kein Moderator mehr. ${helpNotice.it}`,
+    it: `Da questo momento non sei più moderatore. ${helpNotice.it}`,
     lld: `translate: Sie sind ab jetzt kein Moderator mehr. ${helpNotice.lld}`,
   },
 
@@ -211,14 +210,14 @@ const userStatusTranslations = {
     de:
       'Sie sind als "Member Manager" freigeschalten worden. Ab sofort können sie andere Benutzer freischalten.',
     it:
-      'translate: Sie sind als "Member Manager" freigeschalten worden. Ab sofort können sie andere Benutzer freischalten.',
+      'Sei stato abilitato come gestore utenti ("Member Manger"). Da questo momento potrai accogliere nuovi utenti.',
     lld:
       'translate: Sie sind als "Member Manager" freigeschalten worden. Ab sofort können sie andere Benutzer freischalten.',
   },
 
   member_manager_lost: {
     de: `Sie sind ab jetzt kein "Member Manager" mehr. ${helpNotice.de}`,
-    it: `translate: Sie sind ab jetzt kein "Member Manager" mehr. ${
+    it: `Da questo momento non sei più un gestore utenti ("Member Manager"). ${
       helpNotice.it
     }`,
     lld: `translate: Sie sind ab jetzt kein "Member Manager" mehr. ${

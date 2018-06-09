@@ -1,14 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import {
-  defineMessages,
-  FormattedMessage,
-  FormattedRelative,
-} from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import s from './Message.css';
-import Label from '../Label';
 import Box from '../Box';
 import UserThumbnail from '../UserThumbnail';
 import FormValidation from '../FormValidation';
@@ -63,56 +58,46 @@ class Message extends React.Component {
   }
 
   render() {
-    const {
-      subject,
-      content,
-      sender,
-      replyable,
-      updates,
-      parents,
-    } = this.props;
+    const { subject, content, sender, updates } = this.props;
     return (
-      <Box column pad>
-        {parents &&
-          parents.map(m => (
-            <Box between className={s.root}>
-              <UserThumbnail user={m.sender} />
-              <FormattedRelative value={m.createdAt} />
-            </Box>
-          ))}
-        <Box column className={s.root} pad>
-          <Label>{subject}</Label>
-          <div dangerouslySetInnerHTML={{ __html: content }} />
-
+      <Box column className={s.root}>
+        <div className={s.subject}>
+          <span>{subject}</span>
+        </div>
+        <div
+          className={s.content}
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+        <div className={s.content}>
           <UserThumbnail user={sender} />
-          {replyable && (
-            <FormValidation
-              submit={this.sendReply}
-              validations={{ text: { args: { required: true } } }}
-              data={{ text: '' }}
-            >
-              {({ values, onSubmit, handleValueChanges }) => (
-                <Box column>
-                  <Textarea
-                    disabled={updates.pending}
-                    name="text"
-                    useCacheForDOMMeasurements
-                    placeholder="Not working"
-                    value={values.text}
-                    onChange={handleValueChanges}
-                    minRows={2}
-                  />
-                  <Button
-                    primary
-                    disabled={updates.pending}
-                    onClick={onSubmit}
-                    label={<FormattedMessage {...messages.send} />}
-                  />
-                </Box>
-              )}
-            </FormValidation>
-          )}
-        </Box>
+        </div>
+        {false && (
+          <FormValidation
+            submit={this.sendReply}
+            validations={{ text: { args: { required: true } } }}
+            data={{ text: '' }}
+          >
+            {({ values, onSubmit, handleValueChanges }) => (
+              <Box column>
+                <Textarea
+                  disabled={updates.pending}
+                  name="text"
+                  useCacheForDOMMeasurements
+                  placeholder="Not working"
+                  value={values.text}
+                  onChange={handleValueChanges}
+                  minRows={2}
+                />
+                <Button
+                  primary
+                  disabled={updates.pending}
+                  onClick={onSubmit}
+                  label={<FormattedMessage {...messages.send} />}
+                />
+              </Box>
+            )}
+          </FormValidation>
+        )}
       </Box>
     );
   }

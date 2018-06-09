@@ -117,13 +117,13 @@ class Navigation extends React.Component {
     const { activityCounter, path, user } = this.props;
 
     const links = [];
-    links.push(
-      makeLink({ id: 6, path: '/about', name: 'about' }, path, activityCounter),
-    );
 
     if (user && user.id) {
       links.push(contents.map(p => makeLink(p, path, activityCounter)));
     }
+    links.push(
+      makeLink({ id: 6, path: '/about', name: 'about' }, path, activityCounter),
+    );
     if (canAccess(user, 'Admin')) {
       links.push(
         makeLink(

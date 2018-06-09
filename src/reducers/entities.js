@@ -50,6 +50,9 @@ export default combineReducers({
 
 /* GENERATOR_EXPORTS */
 
+export const getAllMessages = state =>
+  fromMessages.getAll(state.messages, state);
+
 export const getMessage = (state, id) =>
   fromMessages.getEntity(state.messages, id, state);
 

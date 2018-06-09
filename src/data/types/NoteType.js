@@ -2,6 +2,7 @@ import {
   GraphQLID,
   GraphQLNonNull,
   GraphQLString,
+  GraphQLBoolean,
   GraphQLObjectType as ObjectType,
 } from 'graphql';
 import CategoryTypeEnum from './CategoryTypeEnum';
@@ -17,6 +18,10 @@ const NoteType = new ObjectType({
       type: new GraphQLNonNull(GraphQLID),
     },
 
+    isPublished: {
+      type: GraphQLBoolean,
+    },
+
     textHtml: {
       type: TranslationType,
     },
@@ -29,7 +34,7 @@ const NoteType = new ObjectType({
           return parent.textHtml[localeMapper[locale]];
         }
         // find one translation that is not emty or default translation
-        return Object.keys(parent.textHtml).find(l => parent.textHtml[l]);
+        return Object.values(parent.textHtml).find(t => t);
       },
     },
     category: {
@@ -40,6 +45,9 @@ const NoteType = new ObjectType({
     },
 
     createdAt: {
+      type: GraphQLString,
+    },
+    updatedAt: {
       type: GraphQLString,
     },
   }),

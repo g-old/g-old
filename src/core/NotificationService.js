@@ -19,6 +19,32 @@ import type PubSub from './pubsub';
 import type { MessageType } from '../data/models/Message';
 // TODO write Dataloaders for batching
 // const MESSAGES_DIR = process.env.MESSAGES_DIR || join(__dirname, './messages');
+const emailNotificationTranslations = {
+  'de-DE': {
+    message: 'hat Ihnen eine Nachricht geschrieben',
+    user: 'hat eine Einstellung verändert',
+    statement: 'hat ein Statement geschrieben',
+    comment: 'hat einen Kommentar gschrieben',
+    teaser: 'Das haben sie verpasst ...',
+    subject: 'Neue Nachricht',
+  },
+  'it-IT': {
+    message: 'Translate: hat Ihnen eine Nachricht geschrieben',
+    user: 'ha modificato il tuo profilo',
+    statement: 'ha scritto una dichiarazione',
+    comment: 'ha scritto un commento',
+    teaser: 'Questo non hai ancora visto ...',
+    subject: 'Nuovo messaggio',
+  },
+  'lld-IT': {
+    message: 'Translate: hat Ihnen eine Nachricht geschrieben',
+    user: 'Translate: hat eine Einstellung verändert',
+    statement: 'Tranlate: hat ein Statement geschrieben',
+    comment: 'Translate: hat einen Kommentar gschrieben',
+    teaser: 'Translate: Das haben sie verpasst ...',
+    subject: 'Translate: Nuovo messaggio',
+  },
+};
 
 type Referrer = 'push' | 'email';
 type EActivity = {
@@ -132,6 +158,7 @@ export type PushMessages = PushMessage[];
 
 export type Email = {
   htmlContent: EmailHTML,
+  text: string,
   receivers: string[],
 };
 export type Emails = Email[];
@@ -157,6 +184,19 @@ function interval(func, wait) {
 
   setTimeout(interv, wait);
 }
+
+const generatePlainTextMail = (
+  locale,
+  actorName,
+  notification,
+  title,
+  content,
+  link,
+) =>
+  `${
+    emailNotificationTranslations[locale].teaser
+  }\n\n${actorName} ${notification}\n\n${title}\n\n${content}\n\n${link}\n` +
+  `G O L D 2018 `;
 
 const mapLocale = {
   'de-DE': 'de',
@@ -197,7 +237,8 @@ const getTranslatedMessage = (
   if (subject[mapLocale[locale]]) {
     return subject[mapLocale[locale]];
   }
-  return subject[Object.keys(subject).find(l => subject[l]) || 'it'];
+  // return subject[Object.keys(subject).find(l => subject[l]) || 'it'];
+  return Object.values(subject).find(s => s);
 };
 
 const fillWithData = (
@@ -263,61 +304,6 @@ const generateData = (
   return result;
 };
 
-const emailNotificationTranslations = {
-  'de-DE': {
-    message: 'hat Ihnen eine Nachricht geschrieben',
-    user: 'hat eine Einstellung verändert',
-  },
-  'it-IT': {
-    message: 'Translate: hat Ihnen eine Nachricht geschrieben',
-    user: 'Translate: hat eine Einstellung verändert',
-  },
-  'lld-IT': {
-    message: 'Translate: hat Ihnen eine Nachricht geschrieben',
-    user: 'Translate: hat eine Einstellung verändert',
-  },
-};
-/*
-const userStatusTranslations = {
-  'de-DE': {
-    roleAdded: (name, role, helpText) => `Hallo ${name},\n
-    wird haben Sie als ${role} freigeschalten.\n${helpText}`,
-    roleLost: (name, role) => `Hallo ${name},\n
-    Sie sind nun nicht mehr ${role}.\n`,
-    MODERATOR: 'Als MODERATOR können Sie Beiträge löschen',
-    MEMBER_MANAGER: 'Als MEMBER_MANAGER können Sie Mitglieder betreuen ',
-    RELATOR:
-      'Als RELATOR können Sie Beschlüsse auf der Plattform veröffentlichen',
-    VIEWER:
-      'Als VIEWER können Sie alle Aktivitäten auf unserer Plattform verfolgen, bei Umfragen abstimmen und mitdiskutieren',
-    VOTER: 'Als VOTER haben sie das Recht, bei Beschlüssen abzustimmen',
-    subject: 'Wichtig - Ihre Profileinstellungen wurden verändert',
-  },
-
-  'it-IT': {
-    roleAdded: (name, role, helpText) => `Ciao ${name},\n
-    hai ricevuto il profile di ${role}.\n${helpText}`,
-    roleLost: (name, role) => `Ciao ${name},\n
-    non sei più ${role}.\n`,
-    RELATOR:
-      'Come RELATOR puoi pubblicare proposte e sondaggi, indire delle votazioni e avviare delle discussioni',
-    VIEWER: 'Come VIEWER puoi leggere tutto e partecipare ai sondaggi',
-    VOTER: 'Come VOTER puoi leggere, commentare e votare',
-    subject: 'Attenzione - il suo profile è stato cambiato',
-  },
-  'lld-IT': {
-    roleAdded: (name, role, helpText) => `Ciao ${name},\n
-    hai ricevuto il profile di ${role}.\n${helpText}`,
-    roleLost: (name, role) => `Ciao ${name},\n
-    non sei più ${role}.\n`,
-    RELATOR:
-      'Come RELATOR puoi pubblicare proposte e sondaggi, indire delle votazioni e avviare delle discussioni',
-    VIEWER: 'Come VIEWER puoi leggere tutto e partecipare ai sondaggi',
-    VOTER: 'Come VOTER puoi leggere, commentare e votare',
-    subject: 'Attenzione - il tuo profile è stato cambiato',
-  },
-};
-*/
 // TODO load translations in
 const resourceByLocale: LocaleDictionary = {
   'de-DE': {
@@ -419,7 +405,7 @@ const getDiscussionLink = (
   }?ref=${referrer}&refId=`;
 
 const getMessageLink = (messageId: ID, referrer) =>
-  `/message/${messageId}?ref${referrer}&refId=`;
+  `/message/${messageId}?ref=${referrer}&refId=`;
 
 const generatePushMessage = (
   activity: EActivity,
@@ -478,16 +464,16 @@ const generatePushMessage = (
       // Diff between reply and new ?
 
       title = resourceByLocale[locale][activity.type];
-      link =
-        getCommentLink(activityObject, discussion.work_team_id, referrer) +
-        activity.id;
+      link = getCommentLink(activityObject, discussion.work_team_id, referrer);
       break;
     }
 
     case ActivityType.MESSAGE:
       title = resourceByLocale[locale][activity.type];
       link = getMessageLink(activity.objectId, referrer);
-      message = getTranslatedMessage(activityObject.subject, locale);
+      message =
+        getTranslatedMessage(activityObject, locale) ||
+        emailNotificationTranslations[locale].subject;
       break;
     default:
       throw new Error(`Type not recognized ${activity.type}`);
@@ -556,6 +542,7 @@ class NotificationService {
   start: () => void;
   recover: () => void;
   getLastProcessedActivityId: () => ID;
+  purgeNotifications: ({ [string]: EActivity }) => any;
 
   constructor({
     eventManager = throwIfMissing('EventManager'),
@@ -579,6 +566,7 @@ class NotificationService {
     this.filterActivity = this.filterActivity.bind(this);
     this.loadSubscriptions = this.loadSubscriptions.bind(this);
     this.generateEmail = this.generateEmail.bind(this);
+    this.purgeNotifications = this.purgeNotifications.bind(this);
 
     if (!__DEV__) {
       if (!process.env.HOST) {
@@ -619,6 +607,8 @@ class NotificationService {
           activity.targetType = TargetType.PROPOSAL;
           activity.targetId = activity.subjectId || subjectId;
           data = activity;
+        } else if (activity.verb === ActivityVerb.DELETE) {
+          data = activity;
         }
         break;
 
@@ -645,6 +635,8 @@ class NotificationService {
         if (activity.verb === ActivityVerb.CREATE) {
           activity.targetType = TargetType.DISCUSSION;
           activity.targetId = activity.subjectId || subjectId;
+          data = activity;
+        } else if (activity.verb === ActivityVerb.DELETE) {
           data = activity;
         }
         break;
@@ -889,11 +881,20 @@ class NotificationService {
         0,
         this.activityQueue.length,
       );
-      // makes dictionary
-      const activityMap: ActivityMap = activities.reduce((acc, activity) => {
-        acc[activity.id] = activity;
-        return acc;
-      }, {});
+      // filter
+
+      // makes dictionary & filter deleted activities out
+      const deletedResources = {};
+      const activityMap: ActivityMap = activities
+        .reverse()
+        .reduce((acc, activity) => {
+          if (activity.verb === ActivityVerb.DELETE) {
+            deletedResources[activity.type + activity.objectId] = activity;
+          } else if (!deletedResources[activity.type + activity.objectId]) {
+            acc[activity.id] = activity;
+          }
+          return acc;
+        }, {});
 
       if (Object.keys(activityMap).length) {
         const groupedActivities = this.groupBySubject(activityMap);
@@ -964,6 +965,8 @@ class NotificationService {
         });
       }
 
+      await this.purgeNotifications(deletedResources);
+
       // const endTime = process.hrtime(startTime);
       // console.log('PROCESSING TIME:', endTime);
 
@@ -974,6 +977,50 @@ class NotificationService {
       // TODO: recover?
       log.error({ err }, err.message);
     }
+  }
+
+  purgeNotifications(deleteActivities: { [string]: EActivity }) {
+    // delete notifications of deleted resources;
+    const deletePromises = Object.keys(deleteActivities).map(key => {
+      const activity = deleteActivities[key];
+      if (activity.type === ActivityType.STATEMENT) {
+        return this.deleteNotifications(
+          activity.objectId,
+          ActivityType.STATEMENT,
+        );
+      } else if (activity.type === ActivityType.COMMENT) {
+        const comment = activity.content;
+        if (!comment.parentId && comment.replyIds) {
+          // search and delete reply notifications
+          if (comment.replyIds.length) {
+            // find all related activities
+            return this.dbConnector('activities')
+              .whereIn('object_id', comment.replyIds)
+              .pluck('id')
+              .then(
+                replyActivityIds =>
+                  replyActivityIds.length
+                    ? this.dbConnector('notifications')
+                        .whereIn('activity_id', replyActivityIds)
+                        .del()
+                    : Promise.resolve(),
+              )
+              .then(() =>
+                this.deleteNotifications(comment.id, ActivityType.COMMENT),
+              )
+              .catch(err => {
+                log.error({ err }, 'Notification deletion failed');
+              });
+          }
+          return this.deleteNotifications(comment.id, ActivityType.COMMENT);
+        }
+
+        return this.deleteNotifications(comment.id, ActivityType.COMMENT);
+      }
+      return Promise.resolve();
+    });
+
+    return Promise.all(deletePromises);
   }
 
   async combineData(
@@ -1087,6 +1134,31 @@ class NotificationService {
     }
   }
 
+  deleteNotifications(resourceId: ID, activityType: tActivityType) {
+    return this.dbConnector('activities')
+      .where({
+        object_id: resourceId,
+        type: activityType,
+        verb: ActivityVerb.CREATE,
+      })
+      .limit(1)
+      .pluck('id')
+      .then(([aId]) => {
+        if (aId) {
+          return this.dbConnector('notifications')
+            .where({ activity_id: aId })
+            .del();
+        }
+        return Promise.resolve();
+      })
+      .catch(err => {
+        log.error(
+          { err, resourceId, activityType },
+          'Notification deletion failed',
+        );
+      });
+  }
+
   generateEmail(
     activity: EActivity,
     subscriberIds: ID[],
@@ -1116,7 +1188,18 @@ class NotificationService {
           link,
           locale,
         });
-        return { htmlContent: emailHTML, receivers };
+        return {
+          htmlContent: emailHTML,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            'GOLD',
+            text,
+            activityObject.title,
+            '',
+            link,
+          ),
+        };
       }
       case ActivityType.SURVEY:
       case ActivityType.PROPOSAL: {
@@ -1137,7 +1220,18 @@ class NotificationService {
           link,
         });
 
-        return { htmlContent: message, receivers };
+        return {
+          htmlContent: message,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            'GOLD',
+            text,
+            activityObject.title,
+            '',
+            link,
+          ),
+        };
       }
 
       case ActivityType.STATEMENT: {
@@ -1151,17 +1245,31 @@ class NotificationService {
           referrer,
         );
         link = this.linkPrefix + link + activity.id;
+        const notification = emailNotificationTranslations[locale].statement;
+        const fullName = `${author.name} ${author.surname}`;
         const emailHTML = this.MailComposer.getStatementMail({
+          subject: proposal.title,
           statement: activityObject,
-          proposalTitle: proposal.title,
           author: {
-            fullName: `${author.name} ${author.surname}`,
+            fullName,
             thumbnail: author.thumbnail,
           },
+          notification,
           locale,
           link,
         });
-        return { htmlContent: emailHTML, receivers };
+        return {
+          htmlContent: emailHTML,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            fullName,
+            notification,
+            proposal.title,
+            activityObject.body,
+            link,
+          ),
+        };
       }
       case ActivityType.COMMENT: {
         // $FlowFixMe
@@ -1176,17 +1284,32 @@ class NotificationService {
           referrer,
         );
         link = this.linkPrefix + link + activity.id;
+        const notification = emailNotificationTranslations[locale].comment;
+        const fullName = `${author.name} ${author.surname}`;
         const emailHTML = this.MailComposer.getCommentMail({
           comment: activityObject,
+          subject: discussion.title,
+          notification,
           author: {
-            fullName: `${author.name} ${author.surname}`,
+            fullName,
             thumbnail: author.thumbnail,
           },
           discussionTitle: discussion.title,
           locale,
           link,
         });
-        return { htmlContent: emailHTML, receivers };
+        return {
+          htmlContent: emailHTML,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            fullName,
+            notification,
+            discussion.title,
+            activityObject.content,
+            link,
+          ),
+        };
       }
       case ActivityType.MESSAGE: {
         // $FlowFixMe
@@ -1195,6 +1318,10 @@ class NotificationService {
           html: 'An error occured',
           subject: 'System Notification Failure',
         };
+        let fullName;
+        let notification;
+        let subject;
+        let link;
         if (activity.content.messageType && activity.content.objectId) {
           const messageObject =
             objects[mapTypeToTable[activity.content.messageType]][
@@ -1206,43 +1333,40 @@ class NotificationService {
           } else {
             message = getTranslatedMessage(messageObject.text_html, locale);
           }
+          fullName = `${author.name} ${author.surname}`;
+          notification = emailNotificationTranslations[locale].message;
+          link =
+            this.linkPrefix +
+            getMessageLink(activityObject.id, referrer) +
+            activity.id;
+          subject =
+            getTranslatedMessage(activityObject.subject, locale) ||
+            emailNotificationTranslations[locale].subject;
           emailHTML = this.MailComposer.getMessageMail({
             message: message || 'Error - no message',
             sender: {
-              fullName: `${author.name} ${author.surname}`,
+              fullName,
               thumbnail: author.thumbnail,
             },
             locale,
-            link: this.linkPrefix + getMessageLink(activityObject.id, referrer),
-            notification: emailNotificationTranslations[locale][activity.type],
-            subject:
-              getTranslatedMessage(activityObject.subject, locale) ||
-              'Info from GOLD',
+            link,
+            notification,
+            subject,
           });
         }
-        return { htmlContent: emailHTML, receivers };
+        return {
+          htmlContent: emailHTML,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            fullName,
+            notification,
+            subject,
+            '',
+            link,
+          ),
+        };
       }
-      /* case ActivityType.USER: {
-        const author: UserProps = objects[ActivityType.USER][activity.actorId];
-        const role = activity.content.diff[0];
-        const helpText = userStatusTranslations[locale][role];
-        const message = userStatusTranslations[locale][
-          activity.content.added ? 'roleAdded' : 'roleLost'
-        ](activityObject.name, activity.content.diff[0], helpText);
-        const emailHTML = this.MailComposer.getMessageMail({
-          message,
-          sender: {
-            fullName: `${author.name} ${author.surname}`,
-            thumbnail: author.thumbnail,
-          },
-          locale,
-          link: `${this.linkPrefix}/`,
-          notification: emailNotificationTranslations[locale][activity.type],
-          title: userStatusTranslations[locale].subject,
-        });
-        return { htmlContent: emailHTML, receivers };
-      } */
-
       default:
         throw new Error(`ActivityType not recognized : ${activity.type}`);
     }

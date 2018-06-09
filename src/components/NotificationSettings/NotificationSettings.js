@@ -10,6 +10,7 @@ import CheckBox from '../CheckBox';
 import Notification from '../Notification';
 import Button from '../Button';
 import Box from '../Box';
+import Spinner from '../Spinner';
 
 const messages = defineMessages({
   email: {
@@ -36,6 +37,73 @@ const messages = defineMessages({
     id: 'help.pushavailability',
     description: 'Notice',
     defaultMessage: '(available only in Chrome and Firefox browsers)',
+  },
+  proposalsAndSurveys: {
+    id: 'label.proposalAndSurveys',
+    defaultMessage: 'Proposals and Surveys',
+    description: 'Label proposal and surveys',
+  },
+  newProposals: {
+    id: 'label.newProposals',
+    defaultMessage: 'New Proposals',
+    description: 'Label new proposals',
+  },
+  newSurveys: {
+    id: 'label.newSurveys',
+    defaultMessage: 'New Surveys',
+    description: 'Label new surveys',
+  },
+  onWatchedProposals: {
+    id: 'label.onWatchedProposals',
+    defaultMessage: 'on watched proposals/surveys',
+    description: 'Label for watched proposals/surveys',
+  },
+  stateUpdates: {
+    id: 'label.stateUpdates',
+    defaultMessage: 'State updates',
+    description: 'Label for state updates',
+  },
+  statements: {
+    id: 'label.notificationSettings.statements',
+    defaultMessage: 'Statements',
+    description: 'Label for notifications on new statements ',
+  },
+  discussions: {
+    id: 'label.discussions',
+    defaultMessage: 'Discussions',
+    description: 'Label discussions',
+  },
+
+  newDiscussions: {
+    id: 'label.newDiscussions',
+    defaultMessage: 'New Discussions',
+    description: 'Label for notifications on new discussions',
+  },
+  onWatchedDiscussions: {
+    id: 'label.onWatchedDiscussions',
+    defaultMessage: 'on watched discussions',
+    description: 'Label for notifications on watched discussions',
+  },
+  comments: {
+    id: 'label.notificationSettings.comments',
+    defaultMessage: 'Comments',
+    description: 'Label for notifications on new comments',
+  },
+  replies: {
+    id: 'label.notificationSettings.replies',
+    defaultMessage: 'Replies',
+    description: 'Label for notifications on new replies',
+  },
+
+  messages: {
+    id: 'label.messages',
+    defaultMessage: 'Messages',
+    description: 'Messages label',
+  },
+  onMessages: {
+    id: 'label.notificationSettings.messages',
+    defaultMessage: 'Messages',
+    description: 'Label for notifications on new messages',
   },
 });
 
@@ -151,9 +219,9 @@ class NotificationSettings extends React.Component {
 
     let mergedSettings = Object.keys(notificationSettings || {}).reduce(
       (acc, key) => {
-        if (notificationSettings[key] && acc[key]) {
+        if (key in notificationSettings && key in acc) {
           acc[key] = { ...notificationSettings[key], ...acc[key] };
-        } else if (notificationSettings[key]) {
+        } else if (key in notificationSettings) {
           acc[key] = notificationSettings[key];
         }
         return acc;
@@ -169,6 +237,8 @@ class NotificationSettings extends React.Component {
           if (field in mergedSettings) {
             if (mergedSettings[field].email) {
               acc[field] = { email: true };
+            } else {
+              acc[field] = { email: false };
             }
           }
           return acc;
@@ -217,14 +287,18 @@ class NotificationSettings extends React.Component {
           validations={validations}
           submit={this.handleSubmission}
         >
-          {({ values, handleValueChanges, onSubmit }) => (
+          {({ values, handleValueChanges, onSubmit, inputChanged }) => (
             <Form>
               <legend>
                 <FormattedMessage {...messages.notifications} />
               </legend>
               <fieldset>
                 <FormField
-                  label="WebPush"
+                  label={
+                    <span>
+                      WebPush {pushSubscription.pending && <Spinner />}
+                    </span>
+                  }
                   error={pushSubscription.error}
                   help={
                     !isPushAvailable() && (
@@ -241,16 +315,23 @@ class NotificationSettings extends React.Component {
                   />
                 </FormField>
               </fieldset>
-              <Label>Proposals and Surveys</Label>
+              <Label>
+                {' '}
+                <FormattedMessage {...messages.proposalsAndSurveys} />
+              </Label>
               <fieldset>
-                <FormField label="New Proposals">
+                <FormField
+                  label={<FormattedMessage {...messages.newProposals} />}
+                >
                   {this.renderCheckBoxPair(
                     'proposal',
                     values,
                     handleValueChanges,
                   )}
                 </FormField>
-                <FormField label="New Surveys">
+                <FormField
+                  label={<FormattedMessage {...messages.newSurveys} />}
+                >
                   {this.renderCheckBoxPair(
                     'survey',
                     values,
@@ -258,16 +339,22 @@ class NotificationSettings extends React.Component {
                   )}
                 </FormField>
               </fieldset>
-              <Label>on watched proposals/surveys</Label>
+              <Label>
+                <FormattedMessage {...messages.onWatchedProposals} />
+              </Label>
               <fieldset>
-                <FormField label="State updates">
+                <FormField
+                  label={<FormattedMessage {...messages.stateUpdates} />}
+                >
                   {this.renderCheckBoxPair(
                     'update',
                     values,
                     handleValueChanges,
                   )}
                 </FormField>
-                <FormField label="Statements">
+                <FormField
+                  label={<FormattedMessage {...messages.statements} />}
+                >
                   {this.renderCheckBoxPair(
                     'statement',
                     values,
@@ -275,10 +362,14 @@ class NotificationSettings extends React.Component {
                   )}
                 </FormField>
               </fieldset>
-              <Label>Discussions</Label>
+              <Label>
+                <FormattedMessage {...messages.discussions} />
+              </Label>
 
               <fieldset>
-                <FormField label="New Discussions">
+                <FormField
+                  label={<FormattedMessage {...messages.newDiscussions} />}
+                >
                   {this.renderCheckBoxPair(
                     'discussion',
                     values,
@@ -286,23 +377,27 @@ class NotificationSettings extends React.Component {
                   )}
                 </FormField>
               </fieldset>
-              <Label>on watched discussions</Label>
+              <Label>
+                <FormattedMessage {...messages.onWatchedDiscussions} />
+              </Label>
               <fieldset>
-                <FormField label="Comments">
+                <FormField label={<FormattedMessage {...messages.comments} />}>
                   {this.renderCheckBoxPair(
                     'comment',
                     values,
                     handleValueChanges,
                   )}
                 </FormField>
-                <FormField label="Replies">
+                <FormField label={<FormattedMessage {...messages.replies} />}>
                   {this.renderCheckBoxPair('reply', values, handleValueChanges)}
                 </FormField>
               </fieldset>
-              <Label>Messages</Label>
+              <Label>
+                <FormattedMessage {...messages.onMessages} />
+              </Label>
 
               <fieldset>
-                <FormField label="Messages">
+                <FormField label={<FormattedMessage {...messages.messages} />}>
                   {this.renderCheckBoxPair(
                     'message',
                     values,
@@ -315,12 +410,14 @@ class NotificationSettings extends React.Component {
                 {error && <Notification type="error" message={updates.error} />}
               </p>
               <div>
-                <Button
-                  onClick={onSubmit}
-                  disabled={updates.pending || pushSubscription.pending}
-                  primary
-                  label={<FormattedMessage {...messages.save} />}
-                />
+                {inputChanged && (
+                  <Button
+                    onClick={onSubmit}
+                    disabled={updates.pending || pushSubscription.pending}
+                    primary
+                    label={<FormattedMessage {...messages.save} />}
+                  />
+                )}
               </div>
             </Form>
           )}

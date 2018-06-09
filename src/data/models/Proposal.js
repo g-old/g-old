@@ -10,6 +10,7 @@ import { canSee, canMutate, Models } from '../../core/accessControl';
 import { Permissions } from '../../organization';
 import EventManager from '../../core/EventManager';
 import log from '../../logger';
+import sanitize from '../../core/htmlSanitizer';
 
 type ID = string | number;
 export type ProposalProps = {
@@ -385,7 +386,7 @@ class Proposal {
           {
             author_id: viewer.id,
             title: data.title,
-            body: data.text,
+            body: sanitize(data.text),
             [pollField]: pollOne.id,
             ...(data.workTeamId && { work_team_id: data.workTeamId }),
             state,

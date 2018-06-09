@@ -1,0 +1,6 @@
+{
+  "name": "MainEditor",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./MainEditor.js"
+}

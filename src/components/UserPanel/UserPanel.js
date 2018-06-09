@@ -143,6 +143,7 @@ class UserPanel extends React.Component {
               heading={<FormattedMessage {...messages.messages} />}
             >
               <MessageInput
+                draftMode
                 messageType="NOTE"
                 notifyUser={this.props.createMessage}
                 updates={this.props.messageUpdates}
