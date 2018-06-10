@@ -5,6 +5,8 @@ import Message from '../../components/Message';
 import Box from '../../components/Box';
 import { getMessage, getMessageUpdates } from '../../reducers';
 import { createMessage } from '../../actions/message';
+import List from '../../components/List';
+import ListItem from '../../components/ListItem';
 
 class MessageContainer extends React.Component {
   static propTypes = {
@@ -19,24 +21,48 @@ class MessageContainer extends React.Component {
   static defaultProps = {
     message: null,
   };
+
+  constructor(props) {
+    super(props);
+    this.state = { openMessages: [] };
+  }
   render() {
     const {
-      message: { subject, messageObject, sender, id, parents, parentId },
+      message: { subject, messageObject, sender, parents, parentId, createdAt },
       messageUpdates,
     } = this.props;
     return (
       <Box tag="article" column pad align padding="medium">
-        {parents &&
-          parents.map(p => (
-            <Message
-              subject={p.subject}
-              content={p.messageObject && p.messageObject.content}
-              sender={p.sender}
-            />
-          ))}
+        <div style={{ maxWidth: '35em', width: '100%' }}>
+          <List>
+            {parents &&
+              parents.map(p => (
+                <ListItem
+                  onClick={() =>
+                    this.setState({
+                      openMessages: this.state.openMessages.find(
+                        mId => mId === p.id,
+                      )
+                        ? this.state.openMessages.filter(mId => mId !== p.id)
+                        : this.state.openMessages.concat([p.id]),
+                    })
+                  }
+                >
+                  <Message
+                    createdAt={p.createdAt}
+                    preview={!this.state.openMessages.find(mId => mId === p.id)}
+                    subject={p.subject}
+                    content={p.messageObject && p.messageObject.content}
+                    sender={p.sender}
+                  />
+                </ListItem>
+              ))}
+          </List>
+        </div>
+
         <Message
+          createdAt={createdAt}
           parents={parents}
-          id={id}
           parentId={parentId}
           updates={messageUpdates}
           subject={subject}

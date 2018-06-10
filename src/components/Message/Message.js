@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import {
+  defineMessages,
+  FormattedMessage,
+  FormattedRelative,
+} from 'react-intl';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import s from './Message.css';
 import Box from '../Box';
@@ -32,10 +36,13 @@ class Message extends React.Component {
     onReply: PropTypes.func.isRequired,
     updates: PropTypes.shape({}).isRequired,
     parents: PropTypes.arrayOf(PropTypes.shape({})),
+    preview: PropTypes.bool,
+    createdAt: PropTypes.string.isRequired,
   };
   static defaultProps = {
     replyable: null,
     parents: null,
+    preview: null,
   };
   constructor(props) {
     super(props);
@@ -58,7 +65,24 @@ class Message extends React.Component {
   }
 
   render() {
-    const { subject, content, sender, updates, replyable } = this.props;
+    const {
+      subject,
+      content,
+      sender,
+      updates,
+      replyable,
+      preview,
+      createdAt,
+    } = this.props;
+    if (preview) {
+      // TODO extract to own component?
+      return (
+        <Box className={s.preview}>
+          <img alt="img" src={sender.thumbnail} />
+          <FormattedRelative value={createdAt} />
+        </Box>
+      );
+    }
     return (
       <Box column className={s.root}>
         <div className={s.subject}>
