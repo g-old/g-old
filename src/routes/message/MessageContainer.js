@@ -1,12 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import Message from '../../components/Message';
 import Box from '../../components/Box';
 import { getMessage, getMessageUpdates } from '../../reducers';
 import { createMessage } from '../../actions/message';
 import List from '../../components/List';
 import ListItem from '../../components/ListItem';
+import FormValidation from '../../components/FormValidation';
+import Button from '../../components/Button';
+import FormField from '../../components/FormField';
+
+const messages = defineMessages({
+  send: {
+    id: 'command.submit',
+    description: 'Short command for sending data to the server',
+    defaultMessage: 'Submit',
+  },
+
+  empty: {
+    id: 'form.error-empty',
+    defaultMessage: "You can't leave this empty",
+    description: 'Help for empty fields',
+  },
+});
 
 class MessageContainer extends React.Component {
   static propTypes = {
@@ -25,6 +44,22 @@ class MessageContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = { openMessages: [] };
+    this.sendReply = this.sendReply.bind(this);
+  }
+  sendReply(values) {
+    const { message } = this.props;
+    const { subject, sender, parentId } = message;
+    this.props.createMessage({
+      parentId,
+      recipientType: 'USER',
+      messageType: 'COMMUNICATION',
+      recipients: [sender.id],
+      subject: { de: `Re: ${subject}` },
+      communication: {
+        textHtml: values.text,
+        replyable: true,
+      },
+    });
   }
   render() {
     const {
@@ -71,6 +106,45 @@ class MessageContainer extends React.Component {
           replyable={messageObject && messageObject.replyable}
           onReply={this.props.createMessage}
         />
+        {messageObject &&
+          messageObject.replyable && (
+            <div
+              style={{
+                width: '100%',
+                maxWidth: '35em',
+                paddingTop: '2em',
+                borderTop: '2px solid #eee',
+              }}
+            >
+              <FormValidation
+                submit={this.sendReply}
+                validations={{ text: { args: { required: true } } }}
+                data={{ text: '' }}
+              >
+                {({ values, onSubmit, handleValueChanges }) => (
+                  <Box column>
+                    <FormField>
+                      <Textarea
+                        disabled={messageUpdates.pending}
+                        name="text"
+                        useCacheForDOMMeasurements
+                        placeholder="Not working"
+                        value={values.text}
+                        onChange={handleValueChanges}
+                        minRows={2}
+                      />
+                    </FormField>
+                    <Button
+                      primary
+                      disabled={messageUpdates.pending}
+                      onClick={onSubmit}
+                      label={<FormattedMessage {...messages.send} />}
+                    />
+                  </Box>
+                )}
+              </FormValidation>
+            </div>
+          )}
       </Box>
     );
   }
