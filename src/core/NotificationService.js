@@ -21,7 +21,7 @@ import type { MessageType } from '../data/models/Message';
 // const MESSAGES_DIR = process.env.MESSAGES_DIR || join(__dirname, './messages');
 const emailNotificationTranslations = {
   'de-DE': {
-    message: 'hat Ihnen eine Nachricht geschrieben',
+    message: 'hat dir eine Nachricht geschickt',
     user: 'hat eine Einstellung verändert',
     statement: 'hat ein Statement geschrieben',
     comment: 'hat einen Kommentar gschrieben',
@@ -29,7 +29,7 @@ const emailNotificationTranslations = {
     subject: 'Neue Nachricht',
   },
   'it-IT': {
-    message: 'Translate: hat Ihnen eine Nachricht geschrieben',
+    message: 'ti ha inviato un messaggio',
     user: 'ha modificato il tuo profilo',
     statement: 'ha scritto una dichiarazione',
     comment: 'ha scritto un commento',
@@ -37,12 +37,13 @@ const emailNotificationTranslations = {
     subject: 'Nuovo messaggio',
   },
   'lld-IT': {
-    message: 'Translate: hat Ihnen eine Nachricht geschrieben',
-    user: 'Translate: hat eine Einstellung verändert',
-    statement: 'Tranlate: hat ein Statement geschrieben',
-    comment: 'Translate: hat einen Kommentar gschrieben',
-    teaser: 'Translate: Das haben sie verpasst ...',
-    subject: 'Translate: Nuovo messaggio',
+    // TODO!
+    message: 'ti ha inviato un messaggio',
+    user: 'ha modificato il tuo profilo',
+    statement: 'ha scritto una dichiarazione',
+    comment: 'ha scritto un commento',
+    teaser: 'Questo non hai ancora visto ...',
+    subject: 'Nuovo messaggio',
   },
 };
 
@@ -314,6 +315,7 @@ const resourceByLocale: LocaleDictionary = {
       rejected: 'Beschluss abgelehnt',
       accepted: 'Beschluss angenommen',
       survey: 'Neue Umfrage',
+      waiting: 'Abstimmungsanfrage erfolgreich',
     },
     [ActivityType.DISCUSSION]: 'Neue Diskussion',
     [ActivityType.SURVEY]: 'Neue Umfrage',
@@ -329,12 +331,13 @@ const resourceByLocale: LocaleDictionary = {
       rejected: 'Proposta rigettata',
       accepted: 'Proposta accettata',
       survey: 'Nuovo  sondaggio',
+      waiting: 'Richiesta di votazione chiusa',
     },
     [ActivityType.DISCUSSION]: 'Nuova discussione',
     [ActivityType.SURVEY]: 'Nuovo sondaggio',
     [ActivityType.COMMENT]: 'Nuovo commento',
     [ActivityType.STATEMENT]: 'Nuovo statement',
-    [ActivityType.MESSAGE]: 'Nuovo messagio',
+    [ActivityType.MESSAGE]: 'Nuovo messaggio',
   },
   'lld-IT': {
     [ActivityType.PROPOSAL]: {
@@ -344,12 +347,13 @@ const resourceByLocale: LocaleDictionary = {
       rejected: 'Proposta rigettata',
       accepted: 'Proposta accettata',
       survey: 'Nuovo  sondaggio',
+      waiting: 'Richiesta di votazione chiusa',
     },
     [ActivityType.DISCUSSION]: 'Nuova discussione',
     [ActivityType.SURVEY]: 'Nuovo sondaggio',
     [ActivityType.COMMENT]: 'Nuovo commento',
     [ActivityType.STATEMENT]: 'Nuovo statement',
-    [ActivityType.MESSAGE]: 'Nuovo messagio',
+    [ActivityType.MESSAGE]: 'Nuovo messaggio',
   },
 };
 
@@ -435,7 +439,11 @@ const generatePushMessage = (
       break;
     case ActivityType.PROPOSAL:
       // get resources
-      title = resourceByLocale[locale][activity.type][activityObject.state];
+      if (activity.type === 'proposed' && activityObject.closed_at) {
+        title = resourceByLocale[locale][activity.type][activityObject.waiting];
+      } else {
+        title = resourceByLocale[locale][activity.type][activityObject.state];
+      }
 
       message = activityObject.title;
 
