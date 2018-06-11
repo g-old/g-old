@@ -75,6 +75,7 @@ const MessageType = new ObjectType({
               message_type: parent.messageType,
             })
             .where('created_at', '<', parent.createdAt)
+            .orWhere({ id: parent.parentId }) // load parent
             .orderBy('created_at', 'asc')
             .pluck('id')
             .then(ids => ids.map(id => Message.gen(viewer, id, loaders)));

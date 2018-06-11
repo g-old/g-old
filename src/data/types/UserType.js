@@ -137,8 +137,12 @@ const UserType = new ObjectType({
       type: new GraphQLList(MessageType),
       resolve: (parent, args, { viewer, loaders }) =>
         knex('messages')
-          .where({ sender_id: parent.id })
-          .whereNull('parent_id')
+          .where({
+            message_type: 'communication',
+            sender_id: parent.id,
+            parentId: null,
+          })
+          .orWhere({ message_type: 'notes', sender_id: parent.id })
           .pluck('id')
           .then(data => data.map(mId => Message.gen(viewer, mId, loaders))),
     },
@@ -147,7 +151,8 @@ const UserType = new ObjectType({
       resolve: (parent, args, { viewer, loaders }) =>
         // const messages = knex.raw('SELECT id from messages');
         knex('messages')
-          .where({ recipientType: parent.id })
+          .where({ recipient_type: 'user' })
+          .whereRaw('recipients ? ?', [Number(parent.id)])
           .whereNull('parent_id')
           .pluck('id')
           .then(data => data.map(mId => Message.gen(viewer, mId, loaders))),
