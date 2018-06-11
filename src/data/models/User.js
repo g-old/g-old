@@ -221,11 +221,11 @@ class User {
         );
       }
 
-      const [settingsData] = await knex('notification_settings')
+      const [settingsData = null] = await knex('notification_settings')
         .where({ user_id: data.id })
         .select('settings');
-      const { settings } = settingsData;
-      if (settings) {
+      if (settingsData && settingsData.settings) {
+        const { settings } = settingsData;
         // merge
         const newSettings = NOTIFICATION_FIELDS.reduce((acc, key) => {
           if (key in settings && key in validatedSettings) {

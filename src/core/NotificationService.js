@@ -231,14 +231,14 @@ const mapTypeToTable: { [tActivityType]: DBTable } = {
 };
 type ShortLocale = 'de' | 'it' | 'lld';
 const getTranslatedMessage = (
-  subject: { [ShortLocale]: string },
+  translations: { [ShortLocale]: string },
   locale: Locale,
 ): ?string => {
-  if (subject[mapLocale[locale]]) {
-    return subject[mapLocale[locale]];
+  if (translations[mapLocale[locale]]) {
+    return translations[mapLocale[locale]];
   }
   // return subject[Object.keys(subject).find(l => subject[l]) || 'it'];
-  return Object.values(subject).find(s => s);
+  return Object.values(translations).find(s => s);
 };
 
 const fillWithData = (
@@ -472,7 +472,7 @@ const generatePushMessage = (
       title = resourceByLocale[locale][activity.type];
       link = getMessageLink(activity.objectId, referrer);
       message =
-        getTranslatedMessage(activityObject, locale) ||
+        getTranslatedMessage(activityObject.subject, locale) ||
         emailNotificationTranslations[locale].subject;
       break;
     default:
@@ -490,7 +490,6 @@ const generatePushMessage = (
 
     return res;
   }); */
-
   return {
     message: {
       body: message.length > 40 ? `${message.slice(0, 36)}...` : message,
