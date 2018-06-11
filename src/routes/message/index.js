@@ -4,6 +4,7 @@ import { getSessionUser, getNotification } from '../../reducers';
 import { loadMessage } from '../../actions/message';
 import { updateNotification } from '../../actions/notification';
 import MessageContainer from './MessageContainer';
+import { createRedirectLink } from '../utils';
 
 const title = 'Message';
 
@@ -11,7 +12,7 @@ async function action({ store, path, query }, { id }) {
   const state = store.getState();
   const user = getSessionUser(state);
   if (!user) {
-    return { redirect: `/?redirect=${path}` };
+    return { redirect: createRedirectLink(path, query) };
   }
   await store.dispatch(loadMessage(id));
 
