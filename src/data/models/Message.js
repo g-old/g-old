@@ -2,6 +2,7 @@
 
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import WorkTeam from './WorkTeam';
 import EventManager from '../../core/EventManager';
 import Note from './Note';
 import Communication from './Communication';
@@ -50,6 +51,16 @@ class Message {
     }
     if (data.parentId) {
       data.isReply = true; // eslint-disable-line no-param-reassign
+    }
+    if (data.recipientType === 'group' && data.recipients.length) {
+      // check if viewer is coordinator of that group
+      if (data.recipients.length !== 1) {
+        throw new Error('Implement write control for multiple groups');
+      }
+      const workteam = await WorkTeam.gen(viewer, data.recipients[0], loaders);
+      if (workteam.coordinatorId === viewer.id) {
+        data.isCoordinator = true; // eslint-disable-line no-param-reassign
+      }
     }
     if (!canMutate(viewer, data, Models.MESSAGE)) return null;
     let messageData;

@@ -133,27 +133,44 @@ const UserType = new ObjectType({
       },
     },
 
-    messages: {
+    messagesSent: {
       type: new GraphQLList(MessageType),
       resolve: (parent, args, { viewer, loaders }) =>
         knex('messages')
           .where({
             message_type: 'communication',
             sender_id: parent.id,
-            parentId: null,
+            parent_id: null,
           })
           .orWhere({ message_type: 'notes', sender_id: parent.id })
+          .limit(10)
+          .orderBy('created_at', 'desc')
           .pluck('id')
           .then(data => data.map(mId => Message.gen(viewer, mId, loaders))),
     },
-    messagesResp: {
+    messagesReceived: {
       type: new GraphQLList(MessageType),
       resolve: (parent, args, { viewer, loaders }) =>
-        // const messages = knex.raw('SELECT id from messages');
         knex('messages')
           .where({ recipient_type: 'user' })
-          .whereRaw('recipients ? ?', [Number(parent.id)])
+          .whereRaw('recipients \\? ?', [parent.id])
           .whereNull('parent_id')
+          .orWhere({ recipient_type: 'group' })
+          .modify(queryBuilder => {
+            if (viewer.id === parent.id) {
+              queryBuilder.whereRaw('recipients \\?| ?', [
+                viewer.wtMemberships || [],
+              ]);
+            } else {
+              queryBuilder.whereRaw(
+                'recipients \\?| ARRAY(SELECT work_team_id::text from user_work_teams WHERE user_id = ?)',
+                [parent.id],
+              );
+            }
+          })
+          .orWhere({ recipient_type: 'all' })
+          .limit(10)
+          .orderBy('created_at', 'desc')
           .pluck('id')
           .then(data => data.map(mId => Message.gen(viewer, mId, loaders))),
     },

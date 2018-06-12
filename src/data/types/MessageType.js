@@ -3,6 +3,7 @@ import {
   GraphQLNonNull,
   GraphQLString,
   GraphQLList,
+  GraphQLInt,
   GraphQLObjectType as ObjectType,
 } from 'graphql';
 import RecipientType from './RecipientType';
@@ -55,18 +56,6 @@ const MessageType = new ObjectType({
 
     parents: {
       type: new GraphQLList(MessageType),
-      /* resolve: (parent, args, { viewer, loaders }) =>
-        parent.parentId
-          ? knex
-              .raw(
-                'with recursive parentmessages(id, parent_id) as ( select c.id, c.parent_id from messages c where c.id = ? union all select messages.id, messages.parent_id from messages join parentmessages on parentmessages.parent_id = messages.id) select * from parentmessages;',
-                [parent.parentId],
-              )
-              .then(data =>
-                data.rows.map(m => Message.gen(viewer, m.id, loaders)),
-              )
-          : null, */
-
       resolve: (parent, args, { viewer, loaders }) => {
         if (parent.parentId) {
           return knex('messages')
@@ -83,7 +72,16 @@ const MessageType = new ObjectType({
         return null;
       },
     },
-
+    numReplies: {
+      type: GraphQLInt,
+      resolve: parent =>
+        parent.messageType === 'communication'
+          ? knex('messages')
+              .where({ parent_id: parent.parentId || parent.id })
+              .count('id')
+              .then(([data]) => data.count)
+          : 0,
+    },
     subject: {
       type: GraphQLString,
       resolve: (parent, args, params, { rootValue }) => {

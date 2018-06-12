@@ -48,9 +48,9 @@ class MessageContainer extends React.Component {
   }
   sendReply(values) {
     const { message } = this.props;
-    const { subject, sender, parentId } = message;
+    const { subject, sender, parentId, id } = message;
     this.props.createMessage({
-      parentId,
+      parentId: parentId || id,
       recipientType: 'USER',
       messageType: 'COMMUNICATION',
       recipients: [sender.id],

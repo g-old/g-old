@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { FormattedRelative } from 'react-intl';
 import s from './Message.css';
 import Box from '../Box';
 import UserThumbnail from '../UserThumbnail';
+import MessagePreview from '../MessagePreview';
 
 class Message extends React.Component {
   static propTypes = {
@@ -22,12 +22,7 @@ class Message extends React.Component {
     const { subject, content, sender, preview, createdAt } = this.props;
     if (preview) {
       // TODO extract to own component?
-      return (
-        <Box className={s.preview}>
-          <img alt="img" src={sender.thumbnail} />
-          <FormattedRelative value={createdAt} />
-        </Box>
-      );
+      return <MessagePreview sender={sender} createdAt={createdAt} />;
     }
     return (
       <Box column className={s.root}>

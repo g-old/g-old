@@ -1,0 +1,31 @@
+@import '../variables';
+
+.preview {
+  display: flex;
+  width: 100%;
+  max-width: 35em;
+  align-items: center;
+  color: #666;
+  justify-content: space-between;
+
+  div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  img {
+    height: 2em;
+    width: 2em;
+    border-radius: 6px;
+    margin: 0 1em;
+  }
+}
+
+.subject {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 5em;
+  display: block;
+  overflow: hidden;
+}

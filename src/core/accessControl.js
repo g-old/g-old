@@ -288,7 +288,7 @@ function messageWriteControl(viewer, data) {
     (Permissions.NOTIFY_GROUPS | Permissions.NOTIFY_ALL)
   ) {
     return true;
-  } else if (data.isReply) {
+  } else if (data.isReply || data.isCoordinator) {
     return true;
   }
   return false;

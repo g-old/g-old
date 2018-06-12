@@ -265,7 +265,7 @@ class MessageInput extends React.Component {
       <div
         style={{
           margin: '0 auto',
-          width: messageType === 'NOTE' ? '45em' : '30em',
+          maxWidth: messageType === 'NOTE' ? '45em' : '30em',
         }}
       >
         <FormValidation

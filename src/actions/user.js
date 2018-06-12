@@ -64,6 +64,30 @@ const workTeam = `
     displayName
     logo
     `;
+
+const messageFields = `
+      id
+      messageType
+      subject
+      createdAt
+      sender{
+        ${userFields}
+      }
+    `;
+const messageQuery = `
+query($id:ID!){
+  user(id:$id){
+    id
+    messagesSent{
+     ${messageFields}
+    }
+    messagesReceived{
+     ${messageFields}
+     numReplies
+
+    }
+  }
+}`;
 const userQuery = `
 query ($id:ID!) {
   user (id:$id) {
@@ -77,13 +101,6 @@ query ($id:ID!) {
     locale
     unreadNotifications
     notificationSettings
-    messages{
-      id
-      subject
-      sender{
-        ${userFields}
-      }
-    }
     workTeams{
       ${workTeam}
     }
@@ -271,6 +288,32 @@ export function createUser(newUser, responseCode = null) {
         message: error.message || 'Something went wrong',
         id: initialId,
         properties,
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function loadMessages(id) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({ type: FETCH_USER_START });
+    try {
+      const { data } = await graphqlRequest(messageQuery, { id });
+      const normalizedData = normalize(data.user, userSchema);
+      dispatch({
+        type: FETCH_USER_SUCCESS,
+        payload: normalizedData,
+        filter: 'all',
+      });
+    } catch (error) {
+      dispatch({
+        type: FETCH_USER_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
       });
       return false;
     }

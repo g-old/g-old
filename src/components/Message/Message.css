@@ -18,26 +18,6 @@
   }
 }
 
-.preview {
-  width: 100%;
-  max-width: 35em;
-  align-items: center;
-  color: #666;
-  display: flex;
-  justify-content: space-between;
-
-  img {
-    height: 2em;
-    width: 2em;
-    border-radius: 6px;
-    margin-left: 1em;
-  }
-
-  span {
-    padding: 0.5em 1em;
-  }
-}
-
 .subject {
   font-weight: 600;
   padding: 0.5em 1em;
