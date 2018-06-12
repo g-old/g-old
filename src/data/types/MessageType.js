@@ -72,6 +72,20 @@ const MessageType = new ObjectType({
         return null;
       },
     },
+
+    replies: {
+      type: new GraphQLList(MessageType),
+      resolve: (parent, args, { viewer, loaders }) =>
+        knex('messages')
+          .where({
+            parent_id: parent.parentId || parent.id,
+            message_type: parent.messageType,
+          })
+          .where('created_at', '>', parent.createdAt)
+          .orderBy('created_at', 'asc')
+          .pluck('id')
+          .then(ids => ids.map(id => Message.gen(viewer, id, loaders))),
+    },
     numReplies: {
       type: GraphQLInt,
       resolve: parent =>

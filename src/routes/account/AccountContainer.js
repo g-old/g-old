@@ -388,6 +388,7 @@ class AccountContainer extends React.Component {
             {followeeContainer}
             <Accordion openMulti>
               <AccordionPanel
+                column
                 onActive={() => {
                   this.props.loadMessages(user.id);
                 }}

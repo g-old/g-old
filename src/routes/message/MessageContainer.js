@@ -5,7 +5,7 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import Message from '../../components/Message';
 import Box from '../../components/Box';
-import { getMessage, getMessageUpdates } from '../../reducers';
+import { getMessage, getMessageUpdates, getSessionUser } from '../../reducers';
 import { createMessage } from '../../actions/message';
 import List from '../../components/List';
 import ListItem from '../../components/ListItem';
@@ -61,40 +61,52 @@ class MessageContainer extends React.Component {
       },
     });
   }
+  renderMessages(messageList) {
+    return (
+      <div style={{ maxWidth: '35em', width: '100%' }}>
+        <List>
+          {messageList &&
+            messageList.map(msg => (
+              <ListItem
+                onClick={() =>
+                  this.setState({
+                    openMessages: this.state.openMessages.find(
+                      mId => mId === msg.id,
+                    )
+                      ? this.state.openMessages.filter(mId => mId !== msg.id)
+                      : this.state.openMessages.concat([msg.id]),
+                  })
+                }
+              >
+                <Message
+                  createdAt={msg.createdAt}
+                  preview={!this.state.openMessages.find(mId => mId === msg.id)}
+                  subject={msg.subject}
+                  content={msg.messageObject && msg.messageObject.content}
+                  sender={msg.sender}
+                />
+              </ListItem>
+            ))}
+        </List>
+      </div>
+    );
+  }
   render() {
     const {
-      message: { subject, messageObject, sender, parents, parentId, createdAt },
+      message: {
+        subject,
+        messageObject,
+        sender,
+        parents,
+        replies,
+        parentId,
+        createdAt,
+      },
       messageUpdates,
     } = this.props;
     return (
       <Box tag="article" column pad align padding="medium">
-        <div style={{ maxWidth: '35em', width: '100%' }}>
-          <List>
-            {parents &&
-              parents.map(p => (
-                <ListItem
-                  onClick={() =>
-                    this.setState({
-                      openMessages: this.state.openMessages.find(
-                        mId => mId === p.id,
-                      )
-                        ? this.state.openMessages.filter(mId => mId !== p.id)
-                        : this.state.openMessages.concat([p.id]),
-                    })
-                  }
-                >
-                  <Message
-                    createdAt={p.createdAt}
-                    preview={!this.state.openMessages.find(mId => mId === p.id)}
-                    subject={p.subject}
-                    content={p.messageObject && p.messageObject.content}
-                    sender={p.sender}
-                  />
-                </ListItem>
-              ))}
-          </List>
-        </div>
-
+        {this.renderMessages(parents)}
         <Message
           createdAt={createdAt}
           parents={parents}
@@ -106,6 +118,8 @@ class MessageContainer extends React.Component {
           replyable={messageObject && messageObject.replyable}
           onReply={this.props.createMessage}
         />
+        {this.renderMessages(replies)}
+
         {messageObject &&
           messageObject.replyable && (
             <div
@@ -121,9 +135,9 @@ class MessageContainer extends React.Component {
                 validations={{ text: { args: { required: true } } }}
                 data={{ text: '' }}
               >
-                {({ values, onSubmit, handleValueChanges }) => (
+                {({ values, onSubmit, handleValueChanges, errorMessages }) => (
                   <Box column>
-                    <FormField>
+                    <FormField label="Reply" error={errorMessages.textError}>
                       <Textarea
                         disabled={messageUpdates.pending}
                         name="text"
@@ -153,6 +167,7 @@ class MessageContainer extends React.Component {
 const mapStateToProps = (state, { id }) => ({
   message: getMessage(state, id),
   messageUpdates: getMessageUpdates(state),
+  user: getSessionUser(state),
 });
 
 const mapDispatch = {

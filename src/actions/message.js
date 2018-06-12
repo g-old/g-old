@@ -47,6 +47,26 @@ parents{
 }
   createdAt
 }
+replies{
+  id
+  sender{
+  ${userFields}
+  }
+  subject
+  messageType
+  messageObject{
+  ... on Note{
+    id
+    content
+  }
+  ... on Communication{
+    id
+    content
+    replyable
+  }
+}
+  createdAt
+}
 sender{
   ${userFields}
 }
