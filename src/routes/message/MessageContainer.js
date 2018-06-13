@@ -5,13 +5,14 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import Message from '../../components/Message';
 import Box from '../../components/Box';
-import { getMessage, getMessageUpdates, getSessionUser } from '../../reducers';
+import { getMessage, getMessageUpdates } from '../../reducers';
 import { createMessage } from '../../actions/message';
 import List from '../../components/List';
 import ListItem from '../../components/ListItem';
 import FormValidation from '../../components/FormValidation';
 import Button from '../../components/Button';
 import FormField from '../../components/FormField';
+import MessageChannel from './MessageChannel';
 
 const messages = defineMessages({
   send: {
@@ -46,6 +47,7 @@ class MessageContainer extends React.Component {
     this.state = { openMessages: [] };
     this.sendReply = this.sendReply.bind(this);
   }
+
   sendReply(values) {
     const { message } = this.props;
     const { subject, sender, parentId, id } = message;
@@ -93,32 +95,12 @@ class MessageContainer extends React.Component {
   }
   render() {
     const {
-      message: {
-        subject,
-        messageObject,
-        sender,
-        parents,
-        replies,
-        parentId,
-        createdAt,
-      },
+      message: { messageObject, parentId, id },
       messageUpdates,
     } = this.props;
     return (
       <Box tag="article" column pad align padding="medium">
-        {this.renderMessages(parents)}
-        <Message
-          createdAt={createdAt}
-          parents={parents}
-          parentId={parentId}
-          updates={messageUpdates}
-          subject={subject}
-          content={messageObject && messageObject.content}
-          sender={sender}
-          replyable={messageObject && messageObject.replyable}
-          onReply={this.props.createMessage}
-        />
-        {this.renderMessages(replies)}
+        <MessageChannel id={parentId || id} messageId={id} />
 
         {messageObject &&
           messageObject.replyable && (
@@ -142,7 +124,6 @@ class MessageContainer extends React.Component {
                         disabled={messageUpdates.pending}
                         name="text"
                         useCacheForDOMMeasurements
-                        placeholder="Not working"
                         value={values.text}
                         onChange={handleValueChanges}
                         minRows={2}
@@ -167,7 +148,6 @@ class MessageContainer extends React.Component {
 const mapStateToProps = (state, { id }) => ({
   message: getMessage(state, id),
   messageUpdates: getMessageUpdates(state),
-  user: getSessionUser(state),
 });
 
 const mapDispatch = {

@@ -20,11 +20,11 @@ export default combineReducers({
 });
 
 /* GENERATOR */
-
+export const getMessagesByChannel = (state, channelId) =>
+  fromEntity.getMessagesByChannel(state.entities, channelId);
 export const getMessageUpdates = state => fromUi.getMessageUpdates(state.ui);
 export const getAllMessages = state =>
   fromEntity.getAllMessages(state.entities);
-
 export const getMessage = (state, id) =>
   fromEntity.getMessage(state.entities, id);
 

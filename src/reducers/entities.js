@@ -49,6 +49,8 @@ export default combineReducers({
 });
 
 /* GENERATOR_EXPORTS */
+export const getMessagesByChannel = (state, channelId) =>
+  fromMessages.getByChannel(state.messages, channelId, state);
 
 export const getAllMessages = state =>
   fromMessages.getAll(state.messages, state);
