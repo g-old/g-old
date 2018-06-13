@@ -36,6 +36,7 @@ class Message {
     this.senderId = data.sender_id;
     this.createdAt = data.created_at;
     this.parentId = data.parent_id;
+    this.numReplies = data.num_replies;
   }
 
   static async gen(viewer, id, { messages }) {
@@ -116,11 +117,19 @@ class Message {
         }
 
         newData.message_type = data.messageType;
-      });
+        [messageData = null] = await knex('messages')
+          .transacting(tra)
+          .insert(newData)
+          .returning('*');
 
-      [messageData = null] = await knex('messages')
-        .insert(newData)
-        .returning('*');
+        if (newData.parent_id) {
+          await knex('messages')
+            .transacting(tra)
+            .forUpdate()
+            .where({ id: newData.parent_id })
+            .increment('num_replies', 1);
+        }
+      });
     }
 
     const message = messageData ? new Message(messageData) : null;

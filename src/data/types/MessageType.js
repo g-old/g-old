@@ -88,13 +88,6 @@ const MessageType = new ObjectType({
     },
     numReplies: {
       type: GraphQLInt,
-      resolve: parent =>
-        parent.messageType === 'communication'
-          ? knex('messages')
-              .where({ parent_id: parent.parentId || parent.id })
-              .count('id')
-              .then(([data]) => data.count)
-          : 0,
     },
     subject: {
       type: GraphQLString,
