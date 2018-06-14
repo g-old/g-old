@@ -1,7 +1,7 @@
 @import '../../components/variables.css';
 
 .root {
-  word-break: break-all;
+  word-break: break-word;
   width: 100%;
   padding: 1em 0;
   max-width: 35em;
