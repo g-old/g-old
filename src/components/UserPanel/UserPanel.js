@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './UserPanel.css';
-import { notifyUser } from '../../actions/message';
+import { createMessage } from '../../actions/message';
 import { updateUser, loadUserList, findUser } from '../../actions/user';
 import FetchError from '../FetchError';
 import AccountDetails from '../AccountDetails';
@@ -17,13 +17,12 @@ import FormField from '../FormField';
 import Layer from '../Layer';
 import UserListEntry from './UserListEntry';
 import { Groups } from '../../organization';
-
-// import history from '../../history';
-
+import MessageInput from '../MessageInput';
 import {
   getVisibleUsers,
   getUsersStatus,
   getSessionUser,
+  getMessageUpdates,
 } from '../../reducers';
 
 const messages = defineMessages({
@@ -31,6 +30,11 @@ const messages = defineMessages({
     id: 'command.loadMore',
     defaultMessage: 'Load more',
     description: 'To get more data',
+  },
+  messages: {
+    id: 'label.messages',
+    defaultMessage: 'Messages',
+    description: 'Messages label',
   },
 });
 
@@ -52,7 +56,8 @@ class UserPanel extends React.Component {
       id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       permissions: PropTypes.number,
     }).isRequired,
-    notifyUser: PropTypes.func.isRequired,
+    createMessage: PropTypes.func.isRequired,
+    messageUpdates: PropTypes.shape({}).isRequired,
   };
 
   static defaultProps = {
@@ -134,6 +139,16 @@ class UserPanel extends React.Component {
         )}
         <div style={{ width: '100%' }}>
           <Accordion openMulti>
+            <AccordionPanel
+              heading={<FormattedMessage {...messages.messages} />}
+            >
+              <MessageInput
+                draftMode
+                messageType="NOTE"
+                notifyUser={this.props.createMessage}
+                updates={this.props.messageUpdates}
+              />
+            </AccordionPanel>
             <AccordionPanel
               heading="Guest accounts"
               onActive={() => {
@@ -218,13 +233,14 @@ const mapStateToProps = state => ({
   viewerArrayStatus: getUsersStatus(state, VIEWERS),
   userArray: getVisibleUsers(state, 'all'),
   user: getSessionUser(state),
+  messageUpdates: getMessageUpdates(state),
 });
 
 const mapDispatch = {
   updateUser,
   loadUserList,
   findUser,
-  notifyUser,
+  createMessage,
 };
 
 export default connect(mapStateToProps, mapDispatch)(withStyles(s)(UserPanel));

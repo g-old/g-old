@@ -3,7 +3,12 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import { updateUser, fetchUser, fetchProfileData } from '../../actions/user';
+import {
+  updateUser,
+  fetchUser,
+  fetchProfileData,
+  loadMessages,
+} from '../../actions/user';
 import { verifyEmail } from '../../actions/verifyEmail';
 import { loadLogs } from '../../actions/log';
 import { createRequest, deleteRequest } from '../../actions/request';
@@ -19,6 +24,7 @@ import {
 } from '../../actions/workTeam';
 import { loadFeed } from '../../actions/feed';
 import { uploadAvatar } from '../../actions/file';
+import Label from '../../components/Label';
 import {
   getUser,
   getSessionUser,
@@ -45,6 +51,10 @@ import Profile from '../../components/UserProfile';
 import s from './AccountContainer.css';
 import Responsive from '../../core/Responsive';
 import NotificationSettings from '../../components/NotificationSettings';
+import MessagePreview from '../../components/MessagePreview/MessagePreview';
+import List from '../../components/List';
+import ListItem from '../../components/ListItem';
+import history from '../../history';
 
 const messages = defineMessages({
   settings: {
@@ -68,6 +78,11 @@ const messages = defineMessages({
     id: 'label.notificationSettings',
     defaultMessage: 'Notification settings',
     description: 'Label for notification settings',
+  },
+  messages: {
+    id: 'label.messages',
+    description: 'Messages label',
+    defaultMessage: 'Messages',
   },
 });
 
@@ -145,6 +160,7 @@ class AccountContainer extends React.Component {
     requestUpdates: PropTypes.shape({}).isRequired,
     deleteRequest: PropTypes.func.isRequired,
     createRequest: PropTypes.func.isRequired,
+    loadMessages: PropTypes.func.isRequired,
   };
   static defaultProps = {
     logs: null,
@@ -321,6 +337,7 @@ class AccountContainer extends React.Component {
           date={a.createdAt}
           verb={a.verb}
           content={a.object}
+          info={a.info}
         />
       ));
     } else if (logPending) {
@@ -370,6 +387,44 @@ class AccountContainer extends React.Component {
           <Box column flex>
             {followeeContainer}
             <Accordion openMulti>
+              <AccordionPanel
+                column
+                onActive={() => {
+                  this.props.loadMessages(user.id);
+                }}
+                heading={<FormattedMessage {...messages.messages} />}
+              >
+                <Label> Messages received</Label>
+                <List>
+                  {user.messagesReceived &&
+                    user.messagesReceived.map(m => (
+                      <ListItem
+                        onClick={() => history.push(`/message/${m.id}`)}
+                      >
+                        <MessagePreview
+                          sender={m.sender}
+                          subject={m.subject}
+                          createdAt={m.createdAt}
+                          numReplies={m.numReplies}
+                        />
+                      </ListItem>
+                    ))}
+                </List>
+                <Label> Messages sent</Label>
+
+                <List>
+                  {user.messagesSent &&
+                    user.messagesSent.map(m => (
+                      <ListItem>
+                        <MessagePreview
+                          sender={m.sender}
+                          subject={m.subject}
+                          createdAt={m.createdAt}
+                        />
+                      </ListItem>
+                    ))}
+                </List>
+              </AccordionPanel>
               <AccordionPanel
                 heading={<FormattedMessage {...messages.settings} />}
               >
@@ -435,6 +490,7 @@ const mapDispatch = {
   fetchProfileData,
   createRequest,
   deleteRequest,
+  loadMessages,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getUser(state, user.id) || user,

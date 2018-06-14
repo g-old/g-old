@@ -6,6 +6,7 @@ import { updateNotification } from '../../actions/notification';
 import ProposalContainer from './ProposalContainer';
 import { getSessionUser, getNotification } from '../../reducers';
 import { canAccess } from '../../organization';
+import { createRedirectLink } from '../utils';
 
 const title = 'Proposal';
 
@@ -14,11 +15,7 @@ async function action({ store, path, query }, { id, pollId }) {
   const user = getSessionUser(state);
   let proposalId = id;
   if (!user) {
-    let redirect = `/?redirect=${path}`;
-    if (query.ref) {
-      redirect += `&ref=${query.ref}&refId=${query.refId}`;
-    }
-    return { redirect };
+    return { redirect: createRedirectLink(path, query) };
   } else if (!canAccess(user, title)) {
     return { redirect: '/' };
   }
@@ -55,7 +52,7 @@ async function action({ store, path, query }, { id, pollId }) {
           if (!notification.read) {
             store.dispatch(
               updateNotification({
-                id: query.refId,
+                id: query.id,
                 read: true,
               }),
             );

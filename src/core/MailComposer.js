@@ -18,33 +18,40 @@ function loadTemplate(filename, renderer) {
 }
 
 type Template = { subject: any => string, html: any => string };
-type Translations = { [string]: [string] };
+type Translations = { [string]: { [Locale]: string } };
 export type EmailHTML = { subject: string, html: string };
 type Actor = { fullName: string, thumbnail: ?string };
 type StatementMailProps = {
   statement: StatementProps,
   author: Actor,
-  proposalTitle: string,
+  subject: string,
+  notification: string,
   link: string,
   locale: Locale,
 };
 type MessageMailProps = {
   message: string,
   sender: Actor,
-  title: string,
+  subject: string,
   locale: Locale,
+  notification: string,
+  link: string,
 };
 type ProposalMailProps = {
   proposal: ProposalProps,
   link: string,
   locale: Locale,
+  subject: string,
+  notification: string,
+  sender: Actor,
 };
 
 type CommentMailProps = {
   comment: CommentProps,
   author: Actor,
   link: string,
-  discussionTitle: string,
+  subject: string,
+  notification: string,
   locale: Locale,
 };
 
@@ -52,6 +59,9 @@ type DiscussionMailProps = {
   discussion: DiscussionProps,
   link: string,
   locale: Locale,
+  subject: string,
+  notification: string,
+  sender: Actor,
 };
 
 class MailComposer {
@@ -59,6 +69,11 @@ class MailComposer {
   templates: Map<string, Template>;
   translations: Translations;
   baseDir: string;
+  getWelcomeMailPlainText: (
+    user: { name: string },
+    link: string,
+    locale: Locale,
+  ) => string;
 
   constructor(
     renderEngine = throwIfMissing('Template render engine'),
@@ -92,6 +107,25 @@ class MailComposer {
       t: key => this.translations[key][locale],
     });
   }
+
+  getWelcomeMailPlainText(
+    user: { name: string },
+    link: string,
+    locale: Locale,
+  ) {
+    const text = `
+    ${this.translations.greeting[locale]} ${user.name}
+
+    ${this.translations.signup[locale]}
+    ${this.translations.clickLink[locale]}:
+    ${link}
+
+    ${this.translations.bestRegards[locale]}
+    Government by Online Democracy 2018
+`;
+    return text;
+  }
+
   getResetRequestMail(user, link, locale = 'de-DE') {
     return this.render('resetRequest', {
       name: user.name,
@@ -114,11 +148,22 @@ class MailComposer {
       t: key => this.translations[key][locale],
     });
   }
-  getProposalMail({ proposal, link, locale = 'de-DE' }: ProposalMailProps) {
+  getProposalMail({
+    proposal,
+    link,
+    locale = 'de-DE',
+    subject,
+    notification,
+    sender,
+  }: ProposalMailProps) {
     return this.render('proposalNotification', {
       title: proposal.title,
       text: proposal.body,
+      thumbnail: sender.thumbnail,
+      sender: sender.fullName,
       link,
+      subject,
+      notification,
       t: key => this.translations[key][locale],
     });
   }
@@ -126,11 +171,18 @@ class MailComposer {
     discussion,
     link,
     locale = 'de-DE',
+    sender,
+    subject,
+    notification,
   }: DiscussionMailProps) {
     return this.render('proposalNotification', {
       title: discussion.title,
       text: discussion.content,
       link,
+      subject,
+      sender: sender.fullName,
+      thumbnail: sender.thumbnail,
+      notification,
       t: key => this.translations[key][locale],
     });
   }
@@ -138,30 +190,36 @@ class MailComposer {
   getStatementMail({
     statement,
     author,
-    proposalTitle,
     link,
+    subject,
+    notification,
     locale = 'de-DE',
   }: StatementMailProps) {
     return this.render('statementNotification', {
-      name: author.fullName,
-      position: statement.position,
-      title: proposalTitle,
+      sender: author.fullName,
       text: statement.body,
       thumbnail: author.thumbnail,
+      subject,
+      pro: statement.position === 'pro',
+      notification,
       link,
       t: key => this.translations[key][locale],
     });
   }
   getMessageMail({
     message,
-    title,
+    subject,
     sender,
+    notification,
+    link,
     locale = 'de-DE',
   }: MessageMailProps) {
     return this.render('messageNotification', {
       sender: sender.fullName,
-      subject: title,
+      subject,
       message,
+      notification,
+      link,
       thumbnail: sender.thumbnail,
       t: key => this.translations[key][locale],
     });
@@ -171,14 +229,16 @@ class MailComposer {
     comment,
     author,
     link,
-    discussionTitle,
+    notification,
+    subject,
     locale,
   }: CommentMailProps) {
     return this.render('commentNotification', {
-      name: author.fullName,
-      title: discussionTitle,
+      sender: author.fullName,
       text: comment.content,
       thumbnail: author.thumbnail,
+      notification,
+      subject,
       link,
       t: key => this.translations[key][locale],
     });

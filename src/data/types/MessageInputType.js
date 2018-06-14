@@ -1,64 +1,45 @@
 import {
-  GraphQLString as String,
   GraphQLInputObjectType,
-  GraphQLEnumType,
-  GraphQLNonNull,
   GraphQLID,
+  GraphQLList,
+  GraphQLBoolean,
 } from 'graphql';
+
+import RecipientTypeEnum from './RecipientTypeEnum';
+import MessageTypeEnum from './MessageTypeEnum';
+import NoteInputType from './NoteInputType';
+import TranslationInputType from './TranslationInputType';
+import CommunicationInputType from './CommunicationInputType';
 
 const MessageInputType = new GraphQLInputObjectType({
   name: 'MessageInput',
   fields: {
-    message: {
-      type: new GraphQLNonNull(String),
+    parentId: {
+      type: GraphQLID,
     },
+    note: {
+      type: NoteInputType,
+    },
+    communication: {
+      type: CommunicationInputType,
+    },
+
     subject: {
-      type: String,
+      type: TranslationInputType,
+    },
+    enforceEmail: {
+      type: GraphQLBoolean,
     },
 
-    receiver: {
-      type: new GraphQLInputObjectType({
-        name: 'ReceiverInput',
-        fields: {
-          type: {
-            type: new GraphQLEnumType({
-              name: 'ReceiverType',
-              values: {
-                team: {
-                  value: 'team',
-                  description: 'Notify team',
-                },
-
-                user: {
-                  value: 'user',
-                  description: 'Notify user',
-                },
-              },
-            }),
-          },
-          id: {
-            type: GraphQLID,
-          },
-        },
-      }),
+    isDraft: {
+      type: GraphQLBoolean,
     },
-    receiverId: { type: new GraphQLNonNull(GraphQLID) },
 
-    type: {
-      type: new GraphQLEnumType({
-        name: 'Transport',
-        values: {
-          email: {
-            value: 'email',
-            description: 'Message by email',
-          },
-          message: {
-            value: 'message',
-            description: 'Message by message in feed',
-          },
-        },
-      }),
+    recipients: {
+      type: new GraphQLList(GraphQLID),
     },
+    recipientType: { type: RecipientTypeEnum },
+    messageType: { type: MessageTypeEnum },
   },
 });
 export default MessageInputType;

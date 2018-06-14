@@ -1,8 +1,5 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
-import { ActivityVerb, ActivityType } from './Activity';
-import EventManager from '../../core/EventManager';
-import log from '../../logger';
 
 class Notification {
   constructor(data) {
@@ -89,76 +86,5 @@ class Notification {
     return !!updated;
   }
 }
-
-function deleteNotifications(comment) {
-  return knex('activities')
-    .where({
-      object_id: comment.id,
-      type: ActivityType.COMMENT,
-      verb: ActivityVerb.CREATE,
-    })
-    .limit(1) // TODO reply notifications
-    .pluck('id')
-    .then(([aId]) => {
-      if (aId) {
-        return knex('notifications')
-          .where({ activity_id: aId })
-          .del();
-      }
-      return Promise.resolve();
-    })
-    .catch(err => {
-      log.error({ err }, 'Notification deletion failed');
-    });
-}
-
-EventManager.subscribe('onStatementDeleted', ({ statement }) =>
-  knex('activities')
-    .where({
-      object_id: statement.id,
-      type: ActivityType.COMMENT,
-      verb: ActivityVerb.CREATE,
-    })
-    .limit(1)
-    .pluck('id')
-    .then(([aId]) => {
-      if (aId) {
-        return knex('notifications')
-          .where({ activity_id: aId })
-          .del();
-      }
-      return Promise.resolve();
-    })
-    .catch(err => {
-      log.error({ err }, 'Notification deletion failed');
-    }),
-);
-
-EventManager.subscribe('onCommentDeleted', ({ comment, info = {} }) => {
-  if (!comment.parentdId && info.replyIds) {
-    // search and delete reply notifications
-    if (info.replyIds.length) {
-      // find all related activities
-      return knex('activities')
-        .whereIn('object_id', info.replyIds)
-        .pluck('id')
-        .then(
-          replyActivityIds =>
-            replyActivityIds.length
-              ? knex('notifications')
-                  .whereIn('activity_id', replyActivityIds)
-                  .del()
-              : Promise.resolve(),
-        )
-        .then(() => deleteNotifications(comment))
-        .catch(err => {
-          log.error({ err }, 'Notification deletion failed');
-        });
-    }
-    return deleteNotifications(comment);
-  }
-
-  return deleteNotifications(comment);
-});
 
 export default Notification;

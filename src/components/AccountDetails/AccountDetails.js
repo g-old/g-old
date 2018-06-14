@@ -5,7 +5,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 
 import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import { fetchUser, deleteUser } from '../../actions/user';
-import { getUser, getAccountUpdates } from '../../reducers';
+import { getUser, getAccountUpdates, getMessageUpdates } from '../../reducers';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
 import RightsManager from '../RightsManager';
@@ -14,7 +14,7 @@ import GroupManager from '../GroupManager';
 import { Groups, AccessMasks, canAccess } from '../../organization';
 import ImageUpload from '../ImageUpload';
 import { uploadAvatar } from '../../actions/file';
-import { notifyUser } from '../../actions/message';
+import { createMessage } from '../../actions/message';
 import ProfilePicture from '../ProfilePicture';
 import Box from '../Box';
 import MessageInput from '../MessageInput';
@@ -111,8 +111,9 @@ class AccountDetails extends React.Component {
         pending: PropTypes.bool,
       }),
     }).isRequired,
-    notifyUser: PropTypes.func.isRequired,
+    createMessage: PropTypes.func.isRequired,
     deleteUser: PropTypes.func.isRequired,
+    messageUpdates: PropTypes.shape({}).isRequired,
   };
 
   constructor(props) {
@@ -213,9 +214,11 @@ class AccountDetails extends React.Component {
       MessagePanel = (
         <AccordionPanel column pad heading="Notify user">
           <MessageInput
-            receiverId={id}
-            notifyUser={this.props.notifyUser}
-            updates={this.props.updates && this.props.updates.message}
+            recipients={[id]}
+            recipientType="USER"
+            messageType="COMMUNICATION"
+            notifyUser={this.props.createMessage}
+            updates={this.props.messageUpdates}
           />
         </AccordionPanel>
       );
@@ -278,17 +281,19 @@ class AccountDetails extends React.Component {
         </Box>
         {/* eslint-disable eqeqeq */}
         {user.id != id && (
-          <Box column pad flex className={s.details}>
+          <Box column flex className={s.details}>
             <Accordion column>
               {GroupPanel}
               {RightsPanel}
               {MessagePanel}
             </Accordion>
-            <Button
-              onClick={this.handleDelete}
-              primary
-              label={<FormattedMessage {...messages.delete} />}
-            />
+            <Box justify>
+              <Button
+                onClick={this.handleDelete}
+                primary
+                label={<FormattedMessage {...messages.delete} />}
+              />
+            </Box>
           </Box>
         )}
       </Box>
@@ -298,11 +303,12 @@ class AccountDetails extends React.Component {
 const mapStateToProps = (state, { accountId }) => ({
   accountData: getUser(state, accountId),
   updates: getAccountUpdates(state, accountId),
+  messageUpdates: getMessageUpdates(state),
 });
 const mapDispatch = {
   fetchUser,
   uploadAvatar,
-  notifyUser,
+  createMessage,
   deleteUser,
 };
 export default connect(mapStateToProps, mapDispatch)(

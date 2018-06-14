@@ -19,7 +19,7 @@
 
     body {
       background-color: #f6f6f6;
-      font-family: sans-serif;
+      font-family: "Work Sans", "Segoe UI", "HelveticaNeue-Light", sans-serif;
       -webkit-font-smoothing: antialiased;
       font-size: 14px;
       line-height: 1.4;
@@ -30,14 +30,14 @@
     }
 
     table {
-      border-collapse: separate;
+      border-collapse: collapse;
       mso-table-lspace: 0pt;
       mso-table-rspace: 0pt;
       width: 100%;
     }
 
     table td {
-      font-family: sans-serif;
+      font-family: "Work Sans", "Segoe UI", "HelveticaNeue-Light", sans-serif;
       font-size: 14px;
       vertical-align: top;
     }
@@ -55,7 +55,7 @@
 
     .container {
       display: block;
-      Margin: 0 auto !important;
+      margin: 0 auto !important;
       /* makes it centered */
       max-width: 580px;
       padding: 10px;
@@ -112,7 +112,7 @@
     h3,
     h4 {
       color: #000000;
-      font-family: sans-serif;
+      font-family: "Work Sans", "Segoe UI", "HelveticaNeue-Light", sans-serif;
       font-weight: 400;
       line-height: 1.4;
       margin: 0;
@@ -129,7 +129,7 @@
     p,
     ul,
     ol {
-      font-family: sans-serif;
+      font-family: "Work Sans", "Segoe UI", "HelveticaNeue-Light", sans-serif;
       font-size: 14px;
       font-weight: normal;
       margin: 0;
@@ -255,6 +255,30 @@
 
     .mb0 {
       margin-bottom: 0;
+    }
+
+    .header{
+      background-color: #e0b000;
+      padding: 0;
+      text-align: left;
+      vertical-align: top
+      height:3em;
+    }
+
+    .header-title{
+    font-size:14px;
+    font-weight:normal;
+    line-height:19px;
+    margin:0;
+    padding:1em;
+    text-align:center;
+    word-break:break-word
+    }
+
+    .brand{
+    font-size: 2.5em;
+    font-weight: 600;
+    color: hsla(0,0%,100%,.35);
     }
 
     .preheader {
@@ -467,7 +491,13 @@
             <!--This is preheader text. Some clients will show this text as a preview. !-->
           </span>
           <table class="main">
-
+            <tr class="header">
+              <td class= "header-title">
+                <div class="brand">
+                -brand-
+                </div>
+              </td>
+            </tr>
             <!-- START MAIN CONTENT AREA -->
             <tr>
               <td class="wrapper">
@@ -489,9 +519,9 @@
             <table border="0" cellpadding="0" cellspacing="0">
               <tr>
                 <td class="content-block">
-                  <span class="apple-link">GOLD, Hausnummer Straße, Ort IT PLZ</span>
+                  <span class="apple-link">-address-</span>
                   <br> {{t "Visit our site?" }}
-                  <a href="https://g-old.org">{{t "Click here" }}</a>.
+                  <a href="-webpage-">{{t "Click here" }}</a>.
                 </td>
               </tr>
             </table>
@@ -501,7 +531,7 @@
           <!-- END CENTERED WHITE CONTAINER -->
         </div>
       </td>
-      <td>&nbsp;</td>
+      <td></td>
     </tr>
   </table>
 </body>

@@ -43,7 +43,7 @@ import proposalConnection from './queries/proposalConnection';
 import flagConnection from './queries/flagConnection';
 import createPushSub from './mutations/createPushSub';
 import deletePushSub from './mutations/deletePushSub';
-import notify from './mutations/sendMessage';
+import createMessage from './mutations/createMessage';
 import activities from './subscriptions/activities';
 import createWorkTeam from './mutations/createWorkTeam';
 import joinWorkTeam from './mutations/joinWorkTeam';
@@ -79,6 +79,7 @@ import deleteNotification from './mutations/deleteNotification';
 import notificationConnection from './queries/notificationConnection';
 import clearNotifications from './mutations/clearNotifications';
 import message from './queries/message';
+import messageConnection from './queries/messageConnection';
 /* GENERATOR */
 
 const schema = new Schema({
@@ -109,6 +110,7 @@ const schema = new Schema({
       subscriptionConnection,
       notificationConnection,
       message,
+      messageConnection,
       /* GENERATOR_QUERIES */
     },
   }),
@@ -133,7 +135,7 @@ const schema = new Schema({
       solveFlag,
       createPushSub,
       deletePushSub,
-      notify,
+      createMessage,
       createWorkTeam,
       joinWorkTeam,
       leaveWorkTeam,

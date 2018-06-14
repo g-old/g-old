@@ -2,6 +2,8 @@ import { schema } from 'normalizr';
 
 export const role = new schema.Entity('roles');
 export const user = new schema.Entity('users');
+export const message = new schema.Entity('messages');
+
 export const request = new schema.Entity('requests', {
   requester: user,
   processor: user,
@@ -57,8 +59,18 @@ export const workTeam = new schema.Entity('workTeams', {
   proposals: [proposal],
   linkedProposals: [proposalStatus],
 });
-export const message = new schema.Entity('messages', {
+export const recipient = new schema.Union(
+  {
+    User: user,
+    WorkTeam: workTeam,
+  },
+  '__typename',
+);
+message.define({
   sender: user,
+  recipients: [recipient],
+  parents: [message],
+  replies: [message],
 });
 export const comment = new schema.Entity('comments');
 comment.define({
@@ -81,9 +93,11 @@ export const unionSchema = new schema.Union(
     Comment: comment,
     Discussion: discussion,
     Request: request,
+    User: user,
   },
   '__typename',
 );
+
 export const activity = new schema.Entity('activities', {
   actor: user,
   object: unionSchema,
@@ -97,6 +111,8 @@ user.define({
   workTeams: [workTeam],
   requests: [request],
   notifications: [notification],
+  // messagesSent: [message],
+  // messagesReceived: [message],
 });
 
 export const log = new schema.Entity('logs', {
@@ -117,5 +133,6 @@ export const commentList = [comment];
 export const requestList = [request];
 export const subscriptionList = [subscription];
 export const notificationList = [notification];
+export const messageList = [message];
 
 /* GENERATOR */

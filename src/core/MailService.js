@@ -79,7 +79,7 @@ class MailService {
   send(mail) {
     return new Promise((resolve, reject) => {
       this.mailer.sendMail(mail, (err, data) => {
-        this.mailer.close();
+        // this.mailer.close();
         if (err) reject(err);
         resolve(data);
       });
@@ -96,7 +96,30 @@ class MailService {
           isMultiple: true,
         },
         (err, data) => {
-          this.mailer.close();
+          // this.mailer.close();
+          if (err) reject(err);
+          resolve(data);
+        },
+      );
+    }).then(data => {
+      if (__DEV__) {
+        console.info(data);
+      }
+    });
+  }
+
+  sendSingleMail(receiver: string, mail: Email) {
+    return new Promise((resolve, reject) => {
+      this.mailer.sendMail(
+        {
+          from: this.DEFAULT_SENDER,
+          to: receiver,
+          subject: mail.htmlContent.subject,
+          html: mail.htmlContent.html,
+          text: mail.text,
+        },
+        (err, data) => {
+          // this.mailer.close(); // don't close if pooling connections (production)?
           if (err) reject(err);
           resolve(data);
         },
@@ -113,16 +136,14 @@ class MailService {
     if (notOkay) {
       return { success: false, errors: notOkay };
     }
-    let content = 'text';
-    if (message.html) {
-      content = 'html';
-    }
+
     try {
       const messageData = {
         from: this.DEFAULT_SENDER,
         to: message.isMultiple ? [message.recipient] : message.recipient,
         subject: message.subject || '',
-        [content]: message[content],
+        ...(message.html && { html: message.html }),
+        ...(message.text && { text: message.text }),
         ...(message.isMultiple && { isMultiple: true }),
       };
 
@@ -145,8 +166,23 @@ class MailService {
     }
     return { success: true };
   }
-  async sendAllEmails(emails: Emails) {
+  /* async sendAllEmails(emails: Emails) {
     return emails.forEach(mail => this.sendMultiple(mail));
+  } */
+  async sendAllEmails(emails: Emails) {
+    const mailPromises = [];
+    emails.forEach(mail =>
+      mail.receivers.forEach(receiver =>
+        mailPromises.push(
+          this.sendSingleMail(receiver, mail).catch(e =>
+            log.error({ err: e }, 'Mail failed'),
+          ),
+        ),
+      ),
+    );
+
+    await Promise.all(mailPromises);
+    // this.mailer.close();
   }
 }
 

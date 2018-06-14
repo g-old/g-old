@@ -5,6 +5,7 @@ import DiscussionContainer from './DiscussionContainer';
 import { getSessionUser, getNotification } from '../../reducers';
 import { canAccess } from '../../organization';
 import { updateNotification } from '../../actions/notification';
+import { createRedirectLink } from '../utils';
 
 const title = 'Discussion';
 
@@ -12,17 +13,7 @@ async function action({ store, path, query }, { id }) {
   const state = store.getState();
   const user = getSessionUser(state);
   if (!user) {
-    let redirect = `/?redirect=${path}`;
-    if (query.comment) {
-      redirect += `&comment=${query.comment}`;
-    }
-    if (query.child) {
-      redirect += `&child=${query.child}`;
-    }
-    if (query.ref) {
-      redirect += `&ref=${query.ref}&refId=${query.refId}`;
-    }
-    return { redirect };
+    return { redirect: createRedirectLink(path, query) };
   } else if (!canAccess(user, title)) {
     return { redirect: '/' };
   }
@@ -39,7 +30,7 @@ async function action({ store, path, query }, { id }) {
           if (!notification.read) {
             store.dispatch(
               updateNotification({
-                id: query.refId,
+                id: query.id,
                 read: true,
               }),
             );

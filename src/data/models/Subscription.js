@@ -21,6 +21,7 @@ export const TargetType = {
   DISCUSSION: 'discussion',
   GROUP: 'group',
   USER: 'user',
+  ALL: 'all',
 };
 
 class Subscription {

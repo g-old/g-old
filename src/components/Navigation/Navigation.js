@@ -68,7 +68,6 @@ const contents = [
   { id: 3, path: '/surveys', name: 'surveys' },
   { id: 4, path: '/workteams', name: 'workTeams' },
   { id: 5, path: '/accounts', name: 'users' },
-  { id: 6, path: '/about', name: 'about' },
 ];
 
 const makeLink = (linkData, currentPath, counter) => {
@@ -116,7 +115,15 @@ class Navigation extends React.Component {
   }
   getMenu() {
     const { activityCounter, path, user } = this.props;
-    const links = contents.map(p => makeLink(p, path, activityCounter));
+
+    const links = [];
+
+    if (user && user.id) {
+      links.push(contents.map(p => makeLink(p, path, activityCounter)));
+    }
+    links.push(
+      makeLink({ id: 6, path: '/about', name: 'about' }, path, activityCounter),
+    );
     if (canAccess(user, 'Admin')) {
       links.push(
         makeLink(

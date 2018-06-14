@@ -282,6 +282,7 @@ class Comment extends React.Component {
     this.setState({
       textArea: { val: this.props.content },
       editing: true,
+      open: true,
     });
   }
   toggleContent(e) {

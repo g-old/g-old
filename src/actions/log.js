@@ -37,6 +37,7 @@ query($userId:ID){
   objectId
   verb
   createdAt
+  info
   actor {
     id
     name
@@ -115,6 +116,9 @@ query($userId:ID){
     ... on Comment {
       ${commentFields}
     }
+        ... on User {
+      ${userFields}
+    }
     ... on Message {
       id
       sender {
@@ -123,8 +127,19 @@ query($userId:ID){
         thumbnail
         id
       }
-      msg
-      title
+      recipients{
+        __typename
+        ... on User{
+        ${userFields}
+        }
+        ... on WorkTeam{
+          id
+          displayName
+          logo
+        }
+
+      }
+      subject
     }
     ... on Request {
       ${requestFields}

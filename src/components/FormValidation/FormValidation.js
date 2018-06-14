@@ -114,8 +114,9 @@ class FormValidation extends React.Component {
     submit: PropTypes.func.isRequired,
     children: PropTypes.func.isRequired,
     names: PropTypes.shape({}),
+    lazy: PropTypes.boolean,
   };
-  static defaultProps = { data: null, names: null };
+  static defaultProps = { data: null, names: null, lazy: null };
 
   constructor(props) {
     super(props);
@@ -130,7 +131,7 @@ class FormValidation extends React.Component {
       (acc, fieldName) => {
         let key;
         if (props.validations[fieldName].fn) {
-          key = props.validations[fieldName].fn.name;
+          key = props.validations[fieldName].fn.name || `${fieldName}fn`;
         } else {
           key = fieldName;
         }
@@ -144,7 +145,7 @@ class FormValidation extends React.Component {
       (acc, fieldName) => {
         let key;
         if (props.validations[fieldName].fn) {
-          key = props.validations[fieldName].fn.name;
+          key = props.validations[fieldName].fn.name || `${fieldName}fn`;
         } else {
           key = fieldName;
         }
@@ -186,34 +187,43 @@ class FormValidation extends React.Component {
     }
   }
 
-  onSubmit(e) {
+  onSubmit(e, options) {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    if (this.validate(this.formFields)) {
-      const newValues = getChangedFields(
-        this.formFields,
-        this.state,
-        this.props.data,
-      );
-      if (this.props.submit) {
-        this.props.submit(newValues);
-      }
+    const validationResult = this.validate(this.formFields);
+    const newState = {
+      errors: { ...this.state.errors, ...validationResult.errors },
+    };
+    if (validationResult.failed === 0 || this.props.lazy) {
+      this.setState(newState, () => {
+        const newValues = getChangedFields(
+          this.formFields,
+          this.state,
+          this.props.data || {},
+        );
+        if (this.props.submit) {
+          this.props.submit(newValues, this.state, options);
+        }
+      });
+    } else {
+      this.setState(newState);
     }
   }
 
   handleBlur(e) {
     const field = e.target.name;
     if (this.state[field]) {
-      this.validate([field]);
+      const validationResult = this.validate([field]);
+      this.setState({
+        errors: { ...this.state.errors, ...validationResult.errors },
+      });
     }
   }
 
   validate(fields) {
-    const validated = this.Validator(fields);
-    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
-    return validated.failed === 0;
+    return this.Validator(fields);
   }
 
   visibleErrors(errorNames) {
@@ -243,6 +253,14 @@ class FormValidation extends React.Component {
   }
 
   renderChildren() {
+    const fields = getChangedFields(
+      this.formFields,
+      this.state,
+      this.props.data || {},
+    );
+
+    const inputChanged = Object.keys(fields).length > 0;
+
     return this.props.children({
       validate: this.handleValidate,
       errorMessages: this.visibleErrors(this.formFields),
@@ -251,6 +269,7 @@ class FormValidation extends React.Component {
       handleValueChanges: this.handleValueChanges,
       onSubmit: this.onSubmit,
       onBlur: this.handleBlur,
+      inputChanged,
     });
   }
   render() {

@@ -2,29 +2,110 @@
 
 import { normalize } from 'normalizr';
 import {
-  SEND_MESSAGE_START,
-  SEND_MESSAGE_SUCCESS,
-  SEND_MESSAGE_ERROR,
+  CREATE_MESSAGE_START,
+  CREATE_MESSAGE_SUCCESS,
+  CREATE_MESSAGE_ERROR,
   LOAD_MESSAGE_START,
   LOAD_MESSAGE_SUCCESS,
   LOAD_MESSAGE_ERROR,
+  LOAD_MESSAGES_START,
+  LOAD_MESSAGES_ERROR,
+  LOAD_MESSAGES_SUCCESS,
 } from '../constants';
-import { genStatusIndicators } from '../core/helpers';
-import { message as messageSchema } from '../store/schema';
+import { genStatusIndicators, depaginate } from '../core/helpers';
+import {
+  message as messageSchema,
+  messageList as messageListSchema,
+} from '../store/schema';
 import { userFields } from './user';
 
-const notify = `
-mutation($message:String! $receiverId:ID! $type:Transport! $subject:String $receiver:ReceiverInput){
-  notify (message: {message:$message receiverId:$receiverId type:$type subject:$subject receiver:$receiver})
+const createMessageMutation = `
+mutation($message:MessageInput){
+  createMessage(message:$message){
+    id
+     sender{
+  ${userFields}
+  }
+  subject
+    parentId
+    createdAt,
+    messageType,
+     messageObject{
+  ... on Note{
+    id
+    content
+  }
+  ... on Communication{
+    id
+    content
+    replyable
+  }
+}
+  }
 }`;
 
 export const messageFields = `
 id
+parentId,
+createdAt
+parents{
+  id
+  parentId
+  sender{
+  ${userFields}
+  }
+  subject
+  messageType
+  messageObject{
+  ... on Note{
+    id
+    content
+  }
+  ... on Communication{
+    id
+    content
+    replyable
+  }
+}
+  createdAt
+}
+replies{
+  id
+  sender{
+  ${userFields}
+  }
+  parentId
+  subject
+  messageType
+  messageObject{
+  ... on Note{
+    id
+    content
+  }
+  ... on Communication{
+    id
+    content
+    replyable
+  }
+}
+  createdAt
+}
 sender{
   ${userFields}
 }
-msg
-title
+messageType
+messageObject{
+  ... on Note{
+    id
+    content
+  }
+  ... on Communication{
+    id
+    content
+    replyable
+  }
+}
+subject
 `;
 
 const messageQuery = `
@@ -35,33 +116,72 @@ query($id:ID!) {
 }
 `;
 
-export function notifyUser(messageData) {
+const messageConnection = `
+query ($first:Int $after:String $userId:ID,$messageType:MessageTypeEnum, $isPublished:Boolean) {
+  messageConnection (first:$first after:$after userId:$userId messageType:$messageType, isPublished:$isPublished) {
+    pageInfo{
+      endCursor
+      hasNextPage
+    }
+    edges{
+      node{
+        id
+        messageType
+        messageObject{
+        ... on Note{
+              id
+              textHtml{
+                it
+                de
+              }
+              content
+              keyword
+              category
+              createdAt
+              updatedAt
+              isPublished
+          }
+         ... on Communication{
+               id
+               content
+              replyable
+          }
+        }
+      }
+    }
+  }
+}
+`;
+
+export function createMessage(message) {
   return async (dispatch, getState, { graphqlRequest }) => {
     const properties = genStatusIndicators(['message']);
     dispatch({
-      type: SEND_MESSAGE_START,
-      id: messageData.receiverId,
+      type: CREATE_MESSAGE_START,
+      id: message.recipients[0],
       properties,
     });
 
     try {
-      const { data } = await graphqlRequest(notify, messageData);
+      const { data } = await graphqlRequest(createMessageMutation, { message });
 
-      if (!data.notify) {
+      if (!data.createMessage) {
         throw Error('Message failed');
       }
+      const normalizedData = normalize(data.createMessage, messageSchema);
       dispatch({
-        type: SEND_MESSAGE_SUCCESS,
-        id: messageData.receiverId,
+        type: CREATE_MESSAGE_SUCCESS,
+        id: message.recipients[0],
         properties,
+        payload: normalizedData,
       });
     } catch (error) {
       dispatch({
-        type: SEND_MESSAGE_ERROR,
+        type: CREATE_MESSAGE_ERROR,
         payload: {
           error,
         },
-        id: messageData.receiverId,
+        id: message.recipients[0],
         properties,
         message: error.message || 'Something went wrong',
       });
@@ -88,6 +208,35 @@ export function loadMessage(id) {
     } catch (error) {
       dispatch({
         type: LOAD_MESSAGE_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function loadMessages(args) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({
+      type: LOAD_MESSAGES_START,
+    });
+
+    try {
+      const { data } = await graphqlRequest(messageConnection, args);
+      const depaginated = depaginate('message', data);
+      const normalizedData = normalize(depaginated.messages, messageListSchema);
+      dispatch({
+        type: LOAD_MESSAGES_SUCCESS,
+        payload: normalizedData,
+      });
+    } catch (error) {
+      dispatch({
+        type: LOAD_MESSAGES_ERROR,
         payload: {
           error,
         },

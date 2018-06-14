@@ -125,6 +125,7 @@ class MessageService {
   createResetLink(token) {
     return this.createLink(token, 'reset');
   }
+
   static createHTMLMessage(content, recipient) {
     return {
       recipient,
@@ -152,11 +153,17 @@ class MessageService {
               link,
               locale,
             );
+            // create plaintextmail
+            const text = this.mailComposer.getWelcomeMailPlainText(
+              user,
+              link,
+              locale,
+            );
             const finalMessage = MessageService.createHTMLMessage(
               personalizedMail,
               user.email,
             );
-            return this.send(finalMessage, user.email, type);
+            return this.send({ ...finalMessage, text }, user.email, type);
           }
           case TransportType.DATABASE: {
             throw new Error('To implement');

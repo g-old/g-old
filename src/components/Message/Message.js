@@ -2,24 +2,40 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Message.css';
-import Label from '../Label';
 import Box from '../Box';
 import UserThumbnail from '../UserThumbnail';
+import MessagePreview from '../MessagePreview';
 
 class Message extends React.Component {
   static propTypes = {
-    title: PropTypes.string.isRequired,
-    msg: PropTypes.string.isRequired,
+    subject: PropTypes.string.isRequired,
     sender: PropTypes.shape({}).isRequired,
+    content: PropTypes.string.isRequired,
+    preview: PropTypes.bool,
+    createdAt: PropTypes.string.isRequired,
+  };
+  static defaultProps = {
+    preview: null,
   };
 
   render() {
-    const { title, msg, sender } = this.props;
+    const { subject, content, sender, preview, createdAt } = this.props;
+    if (preview) {
+      // TODO extract to own component?
+      return <MessagePreview sender={sender} createdAt={createdAt} />;
+    }
     return (
-      <Box column className={s.root} pad>
-        <Label>{title}</Label>
-        <div>{msg}</div>
-        <UserThumbnail user={sender} />
+      <Box column className={s.root}>
+        <div className={s.subject}>
+          <span>{subject}</span>
+        </div>
+        <div
+          className={s.content}
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+        <div className={s.content}>
+          <UserThumbnail user={sender} />
+        </div>
       </Box>
     );
   }

@@ -26,6 +26,7 @@ import {
   CREATE_REQUEST_SUCCESS,
   DELETE_REQUEST_SUCCESS,
   LOAD_MESSAGE_SUCCESS,
+  LOAD_MESSAGES_SUCCESS,
   UPDATE_NOTIFICATION_SUCCESS,
   CLEAR_NOTIFICATIONS_SUCCESS,
 } from '../constants';
@@ -95,6 +96,7 @@ export default function byId(state = {}, action) {
     case LOAD_REQUESTS_SUCCESS:
     case LOAD_WORKTEAM_SUCCESS:
     case LOAD_MESSAGE_SUCCESS:
+    case LOAD_MESSAGES_SUCCESS:
     case SESSION_LOGIN_SUCCESS: {
       return merge({}, state, action.payload.entities.users);
     }

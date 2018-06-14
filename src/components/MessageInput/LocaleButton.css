@@ -1,0 +1,12 @@
+@import '../../components/variables.css';
+
+.active {
+  color: #fff;
+  background-color: var(--color-accent-3);
+}
+
+.label {
+  padding: 0.5em;
+  border-radius: 6px;
+  cursor: pointer;
+}

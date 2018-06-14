@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import MarkdownIt from 'markdown-it';
 import { defineMessages, FormattedMessage } from 'react-intl';
+import MainEditor from '../MainEditor';
 
 // import Calendar from '../Calendar';
 import { createProposal } from '../../actions/proposal';
@@ -24,7 +25,7 @@ import FormField from '../FormField';
 import Box from '../Box';
 import Layer from '../Layer';
 import Proposal from '../Proposal';
-import { ICONS } from '../../constants';
+// import { ICONS } from '../../constants';
 import {
   nameValidation,
   createValidator,
@@ -133,6 +134,7 @@ class ProposalInput extends React.Component {
     this.state = {
       ...standardValues,
     };
+    this.storageKey = 'ProposalContent';
     this.onTextChange = this.onTextChange.bind(this);
     this.onTextSelect = this.onTextSelect.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -181,6 +183,11 @@ class ProposalInput extends React.Component {
     );
   }
 
+  componentDidMount() {
+    const initialValue = localStorage.getItem(this.storageKey) || '<p></p>';
+    this.editor.setInitialState(initialValue);
+  }
+
   componentWillReceiveProps({ success, errorMessage }) {
     if (success) {
       if (!this.props.success) {
@@ -189,6 +196,8 @@ class ProposalInput extends React.Component {
           success: true,
           clearSpokesman: true,
         });
+        this.resetEditor();
+        localStorage.setItem(this.storageKey, '<p></p>');
       } /* else if (!this.state.success) {
         this.setState({
           ...standardValues,
@@ -200,6 +209,7 @@ class ProposalInput extends React.Component {
     if (errorMessage) {
       this.setState({ error: !this.props.errorMessage });
     }
+    //
   }
 
   onTextChange(e) {
@@ -295,7 +305,7 @@ class ProposalInput extends React.Component {
       this.props.createProposal({
         ...(this.props.workTeamId && { workTeamId: this.props.workTeamId }),
         title: title.trim(),
-        text: this.md.render(body),
+        text: body,
         state,
         poll: {
           startTime,
@@ -318,6 +328,10 @@ class ProposalInput extends React.Component {
         spokesmanId,
       });
     }
+  }
+
+  resetEditor() {
+    this.editor.reset();
   }
 
   handleSpokesmanValueChange(e) {
@@ -361,7 +375,7 @@ class ProposalInput extends React.Component {
       case 'body':
       case 'spokesman':
       case 'pollOption': {
-        value = e.target.value;
+        ({ value } = e.target);
         break;
       }
       case 'withStatements':
@@ -445,7 +459,7 @@ class ProposalInput extends React.Component {
               formErrors={pollErrors}
               handleBlur={this.handleBlur}
             />
-            <FormField label={'Title'} error={titleError}>
+            <FormField label="Title" error={titleError}>
               <input
                 name="title"
                 onBlur={this.handleBlur}
@@ -454,40 +468,30 @@ class ProposalInput extends React.Component {
                 onChange={this.handleValueChanges}
               />
             </FormField>
-            <FormField
-              error={bodyError}
-              label={'Body'}
-              help={
-                <Box pad>
-                  <Button
-                    onClick={this.onStrong}
-                    plain
-                    icon={<strong>A</strong>}
-                  />
+            <FormField error={bodyError} label="Body">
+              <MainEditor
+                // eslint-disable-next-line
+                ref={elm => (this.editor = elm)}
+                initialValue={this.state.initialValue}
+                className={s.editor}
+                value={body}
+                onChange={value => {
+                  this.handleValueChanges({
+                    target: { name: 'body', value },
+                  });
+                  localStorage.setItem(this.storageKey, value);
+                }}
+              />
+
+              {/*  <Button onClick={this.onStrong} plain icon={<strong>
+                        A
+                      </strong>} />
                   <Button onClick={this.onItalic} plain icon={<i>A</i>} />
-                  <Button
-                    plain
-                    onClick={this.onAddLink}
-                    icon={
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="24px"
-                        height="24px"
-                        role="img"
-                        aria-label="link"
-                      >
-                        <path
-                          fill="none"
-                          stroke="#000"
-                          strokeWidth="2"
-                          d={ICONS.link}
-                        />
-                      </svg>
-                    }
-                  />
-                </Box>
-              }
-            >
+                  <Button plain onClick={this.onAddLink} icon={<svg viewBox="0 0 24 24" width="24px" height="24px" role="img" aria-label="link">
+                        <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.link} />
+                      </svg>} />
+                </Box>}>
+
               <textarea
                 className={s.textInput}
                 name="body"
@@ -495,12 +499,12 @@ class ProposalInput extends React.Component {
                 onChange={this.handleValueChanges}
                 onSelect={this.onTextSelect}
                 onBlur={this.handleBlur}
-              />
+              /> */}
             </FormField>
 
             <FormField label="Tags">
               <TagInput
-                name={'tagInput'}
+                name="tagInput"
                 tags={this.state.currentTagIds.map(t => this.state.tags[t])}
                 availableTags={Object.keys(this.props.tags).map(
                   t => this.props.tags[t],
@@ -571,10 +575,7 @@ class ProposalInput extends React.Component {
                     title.trim().length < 3
                       ? 'Title is missing!'
                       : title.trim(),
-                  body:
-                    this.md.render(body).length < 3
-                      ? 'Body is missing'
-                      : this.md.render(body),
+                  body: body.length < 3 ? 'Body is missing' : body,
                   publishedAt: new Date(),
                   spokesman,
                 }}
@@ -596,7 +597,8 @@ class ProposalInput extends React.Component {
               }}
             />
           </Box>
-          {this.props.isPending && <span>{'...submitting'}</span>}
+
+          {this.props.isPending && <span>...submitting</span>}
           {this.state.error && (
             <Notification type="error" message={this.props.errorMessage} />
           )}

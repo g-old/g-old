@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { normalize } from 'normalizr';
-import { genStatusIndicators } from '../core/helpers';
+import { genStatusIndicators, depaginate } from '../core/helpers';
 import { user as userSchema, userList as userArray } from '../store/schema';
 import {
   LOAD_USERS_START,
@@ -64,6 +64,30 @@ const workTeam = `
     displayName
     logo
     `;
+
+const messageFields = `
+      id
+      messageType
+      subject
+      createdAt
+      sender{
+        ${userFields}
+      }
+    `;
+const messageQuery = `
+query($id:ID!){
+  user(id:$id){
+    id
+    messagesSent{
+     ${messageFields}
+    }
+    messagesReceived{
+     ${messageFields}
+     numReplies
+
+    }
+  }
+}`;
 const userQuery = `
 query ($id:ID!) {
   user (id:$id) {
@@ -155,20 +179,6 @@ query ($term:String) {
   }
 }
 `;
-
-const depaginate = (resource, response) => {
-  const conn = response[`${resource}Connection`];
-  if (conn) {
-    const key = `${resource}Connection`;
-    delete response[key];
-
-    return {
-      ...response,
-      [`${resource}s`]: conn.edges.map(p => p.node),
-    };
-  }
-  return response;
-};
 
 const objectifySettings = userData => {
   if (userData && userData.notificationSettings) {
@@ -278,6 +288,32 @@ export function createUser(newUser, responseCode = null) {
         message: error.message || 'Something went wrong',
         id: initialId,
         properties,
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function loadMessages(id) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    dispatch({ type: FETCH_USER_START });
+    try {
+      const { data } = await graphqlRequest(messageQuery, { id });
+      const normalizedData = normalize(data.user, userSchema);
+      dispatch({
+        type: FETCH_USER_SUCCESS,
+        payload: normalizedData,
+        filter: 'all',
+      });
+    } catch (error) {
+      dispatch({
+        type: FETCH_USER_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
       });
       return false;
     }

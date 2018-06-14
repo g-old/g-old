@@ -25,6 +25,14 @@ export const feedOptions = [
     events: [{ eventType: 'create', personalFeed: true }],
   },
   {
+    resourceName: 'user',
+    events: [{ eventType: 'update', personalFeed: true }],
+  },
+  {
+    resourceName: 'message',
+    events: [{ eventType: 'create', personalFeed: true }],
+  },
+  {
     resourceName: 'statement',
     events: [
       { eventType: 'create', systemFeed: true, personalFeed: true },

@@ -14,6 +14,7 @@ import Vote from '../models/Vote';
 import Discussion from '../models/Discussion';
 import Comment from '../models/Comment';
 import WorkTeam from '../models/WorkTeam';
+import { ActivityType as AType } from '../models/Activity';
 
 const addProposalInfo = async (viewer, loaders, pollId) => {
   if (!pollId) {
@@ -123,27 +124,30 @@ const ActivityType = new GraphQLObjectType({
     object: {
       type: ObjectType,
       resolve: async (parent, args, { viewer, loaders }) => {
-        if (parent.type === 'proposal') {
+        if (parent.type === AType.PROPOSAL) {
           if (parent.verb === 'update') {
             loaders.proposals.clear(parent.objectId);
             loaders.polls.clearAll(); // or specify
           }
           return Proposal.gen(viewer, parent.objectId, loaders);
         }
-        if (parent.type === 'statement') {
+        if (parent.type === AType.STATEMENT) {
           return getStatement(viewer, parent, loaders);
         }
-        if (parent.type === 'vote') {
+        if (parent.type === AType.VOTE) {
           return getVote(viewer, parent, loaders);
         }
-        if (parent.type === 'message') {
+        if (parent.type === AType.MESSAGE) {
           return Message.gen(viewer, parent.objectId, loaders);
         }
-        if (parent.type === 'discussion') {
+        if (parent.type === AType.DISCUSSION) {
           return Discussion.gen(viewer, parent.objectId, loaders);
         }
-        if (parent.type === 'comment') {
+        if (parent.type === AType.COMMENT) {
           return Comment.gen(viewer, parent.objectId, loaders);
+        }
+        if (parent.type === AType.USER) {
+          return User.gen(viewer, parent.objectId, loaders);
         }
         return null;
       },
@@ -155,7 +159,7 @@ const ActivityType = new GraphQLObjectType({
       type: GraphQLString,
       resolve: async (parent, args, { viewer, loaders }) => {
         switch (parent.type) {
-          case 'statement': {
+          case AType.STATEMENT: {
             const statement = await getStatement(viewer, parent, loaders);
             return addProposalInfo(
               viewer,
@@ -164,23 +168,31 @@ const ActivityType = new GraphQLObjectType({
               statement,
             );
           }
-          case 'vote': {
+          case AType.VOTE: {
             const vote = await getVote(viewer, parent, loaders);
             return addProposalInfo(viewer, loaders, vote && vote.pollId, vote);
           }
-          case 'proposal': {
+          case AType.PROPOSAL: {
             return addWorkTeamInfo(viewer, loaders, parent.content.workTeamId);
           }
 
-          case 'discussion': {
+          case AType.DISCUSSION: {
             return addWorkTeamInfo(viewer, loaders, parent.content.workTeamId);
           }
-          case 'comment': {
+          case AType.COMMENT: {
             return addDiscussionInfo(
               viewer,
               loaders,
               parent.content.discussionId,
             );
+          }
+
+          case AType.USER: {
+            return JSON.stringify({
+              added: parent.content.added,
+              changedField: parent.content.changedField,
+              diff: parent.content.diff,
+            });
           }
 
           default: {

@@ -8,11 +8,14 @@ import {
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import s from './ActivityLog.css';
+import UserThumbnail from '../UserThumbnail';
+import Label from '../Label';
 import Avatar from '../Avatar';
 import Statement from '../Statement';
 import { ICONS } from '../../constants';
 import Link from '../Link';
 import Comment from '../Comment';
+import Box from '../Box';
 
 const messages = defineMessages({
   joinWT: {
@@ -44,6 +47,7 @@ class ActivityLog extends React.Component {
     }),
     date: PropTypes.string.isRequired,
     verb: PropTypes.string.isRequired,
+    info: PropTypes.string.isRequired,
   };
   static defaultProps = {
     content: {},
@@ -166,8 +170,13 @@ class ActivityLog extends React.Component {
       case 'Message': {
         activity = (
           <div>
-            <h3>{content.title}</h3>
-            {content.msg}
+            <Label>{`Subject: ${content.subject}`}</Label>
+            <div>
+              <div>Recipients: </div>
+              {content.recipients.map(recipient => (
+                <UserThumbnail user={recipient} marked={false} />
+              ))}
+            </div>
           </div>
         );
         break;
@@ -175,6 +184,18 @@ class ActivityLog extends React.Component {
 
       case 'Comment': {
         activity = <Comment preview {...content} />;
+        break;
+      }
+      case 'User': {
+        const info = JSON.parse(this.props.info);
+        activity = (
+          <Box align>
+            <UserThumbnail user={content} marked={false} />{' '}
+            <span>
+              {`${info.added ? 'added to' : 'removed from'} ${info.diff}`}
+            </span>
+          </Box>
+        );
         break;
       }
 

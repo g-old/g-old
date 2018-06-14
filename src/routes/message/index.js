@@ -1,9 +1,10 @@
 import React from 'react';
 import Layout from '../../components/Layout';
-import { getSessionUser, getMessage, getNotification } from '../../reducers';
+import { getSessionUser, getNotification } from '../../reducers';
 import { loadMessage } from '../../actions/message';
 import { updateNotification } from '../../actions/notification';
 import MessageContainer from './MessageContainer';
+import { createRedirectLink } from '../utils';
 
 const title = 'Message';
 
@@ -11,11 +12,10 @@ async function action({ store, path, query }, { id }) {
   const state = store.getState();
   const user = getSessionUser(state);
   if (!user) {
-    return { redirect: `/?redirect=${path}` };
+    return { redirect: createRedirectLink(path, query) };
   }
   await store.dispatch(loadMessage(id));
 
-  const message = getMessage(state, id);
   if (process.env.BROWSER) {
     const referrer = ['email', 'push', 'notification'];
     if (query && referrer.includes(query.ref)) {
@@ -26,7 +26,7 @@ async function action({ store, path, query }, { id }) {
           if (!notification.read) {
             store.dispatch(
               updateNotification({
-                id: query.refId,
+                id: query.id,
                 read: true,
               }),
             );
@@ -34,7 +34,7 @@ async function action({ store, path, query }, { id }) {
         } else {
           store.dispatch(
             updateNotification({
-              id: query.refId,
+              id: query.id,
               read: true,
             }),
           );
@@ -56,7 +56,7 @@ async function action({ store, path, query }, { id }) {
     chunks: ['message'],
     component: (
       <Layout>
-        <MessageContainer {...message} />
+        <MessageContainer id={id} />
       </Layout>
     ),
   };

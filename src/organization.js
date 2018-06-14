@@ -1,3 +1,5 @@
+// @flow
+
 /* Rules:
   1) Nobody can change himself
   2) There is a set of privileged groups.
@@ -280,4 +282,22 @@ export const canChangeGroups = (actor, targetUser, updatedGroups) => {
     }
     return true;
   });
+};
+
+export const getUpdatedGroup = (oldGroups: number, updatedGroups: number) => {
+  let groupDiff = oldGroups ^ updatedGroups;
+  let added = true;
+  if ((oldGroups & updatedGroups) !== oldGroups) {
+    // remove group
+    added = false;
+    groupDiff &= ~updatedGroups; // get only new bits
+  }
+  const groups = Object.keys(Groups).reduce((acc, curr) => {
+    if (groupDiff & Groups[curr]) {
+      acc.push(curr);
+    }
+    return acc;
+  }, []);
+
+  return { added, names: groups, value: groupDiff };
 };

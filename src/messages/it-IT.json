@@ -223,10 +223,7 @@
     "description": "Contact user",
     "defaultMessage": "Notify user",
     "message": "Messaggio all'utente",
-    "files": [
-      "src/components/AccountDetails/AccountDetails.js",
-      "src/components/MessageInput/MessageInput.js"
-    ]
+    "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "account.workTeamMissing",
@@ -245,6 +242,7 @@
       "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/FormValidation/FormValidation.js",
       "src/components/Login/Login.js",
+      "src/components/Message/Message.js",
       "src/components/MessageInput/MessageInput.js",
       "src/components/ProposalActions/ProposalActions.js",
       "src/components/ProposalInput/ProposalInput.js",
@@ -428,6 +426,8 @@
     "message": "Invia",
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
+      "src/components/Message/Message.js",
+      "src/components/MessageInput/MessageInput.js",
       "src/components/ProposalInput/ProposalInput.js"
     ]
   },
@@ -1347,8 +1347,7 @@
     "id": "notifications.message.new",
     "description": "Status message for notifications",
     "defaultMessage": "You got a message from",
-    "message": "Messagio da",
-    "files": ["src/components/UserNotification/UserNotification.js"]
+    "message": "Messagio da"
   },
   {
     "id": "notifications.proposal.accepted",
@@ -1465,5 +1464,121 @@
     "defaultMessage": "Notification settings",
     "message": "Impostazioni di notifica",
     "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "notifications.message",
+    "description": "Status message for notifications",
+    "defaultMessage": "Message from",
+    "message": "Messaggio da",
+    "files": ["src/components/UserNotification/UserNotification.js"]
+  },
+  {
+    "id": "notifications.user.update.roleAdded",
+    "description": "Status message for notifications",
+    "defaultMessage": "You got a new role:",
+    "message": "",
+    "files": ["src/components/UserNotification/UserNotification.js"]
+  },
+  {
+    "id": "notifications.user.update.roleLost",
+    "description": "Status message for notifications",
+    "defaultMessage": "You lost your role:",
+    "message": "",
+    "files": ["src/components/UserNotification/UserNotification.js"]
+  },
+  {
+    "id": "label.messages",
+    "description": "Messages label",
+    "defaultMessage": "Messages",
+    "message": "Messaggi",
+    "files": [
+      "src/components/NotificationSettings/NotificationSettings.js",
+      "src/components/UserPanel/UserPanel.js",
+      "src/routes/workTeamManager/WorkTeamManagement.js"
+    ]
+  },
+  {
+    "id": "label.discussions",
+    "description": "Label discussions",
+    "defaultMessage": "Discussions",
+    "message": "Discussioni",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.newDiscussions",
+    "description": "Label for notifications on new discussions",
+    "defaultMessage": "New Discussions",
+    "message": "Nuove discussioni",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.newProposals",
+    "description": "Label new proposals",
+    "defaultMessage": "New Proposals",
+    "message": "Nuove proposte",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.newSurveys",
+    "description": "Label new surveys",
+    "defaultMessage": "New Surveys",
+    "message": "Nuovi sondaggi",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.notificationSettings.comments",
+    "description": "Label for notifications on new comments",
+    "defaultMessage": "Comments",
+    "message": "Commenti",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.notificationSettings.messages",
+    "description": "Label for notifications on new messages",
+    "defaultMessage": "Messages",
+    "message": "Messaggi",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.notificationSettings.replies",
+    "description": "Label for notifications on new replies",
+    "defaultMessage": "Replies",
+    "message": "Risposte",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.notificationSettings.statements",
+    "description": "Label for notifications on new statements",
+    "defaultMessage": "Statements",
+    "message": "Dichiarazioni di voto",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.onWatchedDiscussions",
+    "description": "Label for notifications on watched discussions",
+    "defaultMessage": "on watched discussions",
+    "message": "Riguardo alle discussioni seguite",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.onWatchedProposals",
+    "description": "Label for watched proposals/surveys",
+    "defaultMessage": "on watched proposals/surveys",
+    "message": "Riguardo a proposte/sondaggi seguiti",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.proposalAndSurveys",
+    "description": "Label proposal and surveys",
+    "defaultMessage": "Proposals and Surveys",
+    "message": "Proposte e sondaggi",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "label.stateUpdates",
+    "description": "Label for state updates",
+    "defaultMessage": "State updates",
+    "message": "Aggiornamenti",
+    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   }
 ]

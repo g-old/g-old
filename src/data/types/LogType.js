@@ -13,6 +13,7 @@ import Statement from '../models/Statement';
 import Vote from '../models/Vote';
 import Comment from '../models/Comment';
 import Request from '../models/Request';
+import { ActivityType } from '../models/Activity';
 
 const LogType = new GraphQLObjectType({
   name: 'Log',
@@ -70,6 +71,18 @@ const LogType = new GraphQLObjectType({
             return Message.gen(viewer, parent.objectId, loaders);
           }
 
+          case 'user': {
+            const data = parent.content;
+            return new User({
+              id: data.id,
+              name: data.name,
+              surname: data.surname,
+              groups: data.groups,
+              email: data.email,
+              thumbnail: data.thumbnail,
+            });
+          }
+
           case 'comment': {
             const c = parent.content;
             return new Comment({
@@ -103,6 +116,20 @@ const LogType = new GraphQLObjectType({
             throw new Error(`Log parent type not recognized: ${parent.type}`);
           }
         }
+      },
+    },
+    info: {
+      type: GraphQLString,
+      resolve(parent) {
+        if (parent.type === ActivityType.USER) {
+          return JSON.stringify({
+            changedField: parent.content.changedField,
+            changedValue: parent.content.changedValue,
+            diff: parent.content.diff,
+            added: parent.content.added,
+          });
+        }
+        return JSON.stringify({});
       },
     },
     createdAt: {

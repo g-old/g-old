@@ -23,6 +23,7 @@ class TableRow extends React.Component {
       {
         [s.selectable]: onClick,
       },
+      s.row,
       className,
     );
 

@@ -24,7 +24,6 @@ import {
 } from '../store/schema';
 import { genStatusIndicators } from '../core/helpers';
 import { pollFieldsForList } from './proposal';
-import { messageFields } from './message';
 import { getSessionUser } from '../reducers';
 
 const userFields = `
@@ -74,6 +73,10 @@ const notificationFields = `
           ${commentFields}
            }
 
+           ... on User {
+             ${userFields}
+           }
+
           ... on Discussion {
           id
           createdAt
@@ -86,9 +89,13 @@ const notificationFields = `
       }
     }
           ... on Message {
-        ${messageFields}
-
-    }
+              id
+              sender{
+                ${userFields}
+              }
+              messageType
+              subject
+            }
         }
         info
         type

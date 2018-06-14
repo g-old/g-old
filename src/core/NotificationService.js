@@ -16,10 +16,36 @@ import type { StatementProps } from '../data/models/Statement';
 import type { UserProps } from '../data/models/User';
 import type { EmailHTML } from './MailComposer';
 import type PubSub from './pubsub';
-
+import type { MessageType } from '../data/models/Message';
 // TODO write Dataloaders for batching
-let timer;
 // const MESSAGES_DIR = process.env.MESSAGES_DIR || join(__dirname, './messages');
+const emailNotificationTranslations = {
+  'de-DE': {
+    message: 'hat dir eine Nachricht geschickt',
+    user: 'hat eine Einstellung verändert',
+    statement: 'hat ein Statement geschrieben',
+    comment: 'hat einen Kommentar gschrieben',
+    teaser: 'Das haben sie verpasst ...',
+    subject: 'Neue Nachricht',
+  },
+  'it-IT': {
+    message: 'ti ha inviato un messaggio',
+    user: 'ha modificato il tuo profilo',
+    statement: 'ha scritto una dichiarazione',
+    comment: 'ha scritto un commento',
+    teaser: 'Questo non hai ancora visto ...',
+    subject: 'Nuovo messaggio',
+  },
+  'lld-IT': {
+    // TODO!
+    message: 'ti ha inviato un messaggio',
+    user: 'ha modificato il tuo profilo',
+    statement: 'ha scritto una dichiarazione',
+    comment: 'ha scritto un commento',
+    teaser: 'Questo non hai ancora visto ...',
+    subject: 'Nuovo messaggio',
+  },
+};
 
 type Referrer = 'push' | 'email';
 type EActivity = {
@@ -32,8 +58,29 @@ type EActivity = {
   subjectId?: ID,
   groupId?: ID,
   objectId: ID,
-  content: { parentId?: ID, targetId?: ID, targetType?: tActivityType },
+  content: {
+    parentId?: ID,
+    targetId?: ID,
+    targetType?: tActivityType,
+    changedField?: string,
+    messageType?: MessageType,
+    objectId?: ID,
+  },
 };
+
+type DBTable =
+  | 'users'
+  | 'activities'
+  | 'communications'
+  | 'meetings'
+  | 'notes'
+  | 'proposals'
+  | 'statements'
+  | 'votes'
+  | 'messages'
+  | 'discussions'
+  | 'comments';
+
 type NotificationType = 'webpush' | 'email';
 type Subscriber = {
   id: ID,
@@ -52,8 +99,11 @@ type ResourceType =
   | StatementProps
   | UserProps;
 type ResourceMap = { [ID]: ResourceType };
+
+type ObjectMap = { [DBTable]: ResourceMap };
+
 type RelevantActivities = { subscriber: Subscriber, activities: EActivity[] };
-type GroupedActivityObjects = { [tActivityType]: { [ID]: ResourceType } };
+type GroupedActivityObjects = { [DBTable]: { [ID]: ResourceType } };
 type GroupedActivities = {
   bySubject: {
     [string]: {
@@ -84,7 +134,7 @@ type RawNotification = {
 type GroupedNotifications = {
   webpushData: NotificationSet,
   emailData: NotificationSet,
-  allObjects: { [tActivityType]: ResourceMap },
+  allObjects: ObjectMap,
   notifications: RawNotification[],
 };
 export type PushData = {
@@ -109,6 +159,7 @@ export type PushMessages = PushMessage[];
 
 export type Email = {
   htmlContent: EmailHTML,
+  text: string,
   receivers: string[],
 };
 export type Emails = Email[];
@@ -135,6 +186,25 @@ function interval(func, wait) {
   setTimeout(interv, wait);
 }
 
+const generatePlainTextMail = (
+  locale,
+  actorName,
+  notification,
+  title,
+  content,
+  link,
+) =>
+  `${
+    emailNotificationTranslations[locale].teaser
+  }\n\n${actorName} ${notification}\n\n${title}\n\n${content}\n\n${link}\n` +
+  `G O L D 2018 `;
+
+const mapLocale = {
+  'de-DE': 'de',
+  'it-IT': 'it',
+  'lld-IT': 'lld',
+};
+
 const filterReplies = (parents, activities) => {
   const result = [];
   parents.forEach(p => {
@@ -148,7 +218,7 @@ const filterReplies = (parents, activities) => {
   return result;
 };
 
-const mapTypeToTable: { [tActivityType]: tActivityType } = {
+const mapTypeToTable: { [tActivityType]: DBTable } = {
   [ActivityType.PROPOSAL]: 'proposals',
   [ActivityType.DISCUSSION]: 'discussions',
   [ActivityType.SURVEY]: 'proposals',
@@ -156,6 +226,20 @@ const mapTypeToTable: { [tActivityType]: tActivityType } = {
   [ActivityType.COMMENT]: 'comments',
   [ActivityType.MESSAGE]: 'messages',
   [ActivityType.USER]: 'users',
+  communication: 'communications',
+  meeting: 'meetings',
+  note: 'notes',
+};
+type ShortLocale = 'de' | 'it' | 'lld';
+const getTranslatedMessage = (
+  translations: { [ShortLocale]: string },
+  locale: Locale,
+): ?string => {
+  if (translations[mapLocale[locale]]) {
+    return translations[mapLocale[locale]];
+  }
+  // return subject[Object.keys(subject).find(l => subject[l]) || 'it'];
+  return Object.values(translations).find(s => s);
 };
 
 const fillWithData = (
@@ -189,7 +273,7 @@ const fillWithData = (
 
 const generateData = (
   activities: { [ID]: SubsForActivity },
-  objects: { [tActivityType]: ResourceMap },
+  objects: ObjectMap,
   subscriberById: SubscriberMap,
   makeFn: (
     activity: EActivity,
@@ -197,13 +281,14 @@ const generateData = (
     activityObject: ResourceType,
     locale: Locale,
     subscriberById: SubscriberMap,
-    objects: { [tActivityType]: ResourceMap },
+    objects: ObjectMap,
   ) => {},
 ): any => {
   const result = [];
   Object.keys(activities).forEach(activityId => {
     const { activity, subscriberByLocale } = activities[activityId];
-    const activityObject = objects[activity.type][activity.objectId];
+    const activityObject =
+      objects[mapTypeToTable[activity.type]][activity.objectId];
     Object.keys(subscriberByLocale).forEach(locale => {
       const subscriberIds = subscriberByLocale[locale];
       const data = makeFn(
@@ -230,6 +315,7 @@ const resourceByLocale: LocaleDictionary = {
       rejected: 'Beschluss abgelehnt',
       accepted: 'Beschluss angenommen',
       survey: 'Neue Umfrage',
+      waiting: 'Abstimmungsanfrage erfolgreich',
     },
     [ActivityType.DISCUSSION]: 'Neue Diskussion',
     [ActivityType.SURVEY]: 'Neue Umfrage',
@@ -245,12 +331,13 @@ const resourceByLocale: LocaleDictionary = {
       rejected: 'Proposta rigettata',
       accepted: 'Proposta accettata',
       survey: 'Nuovo  sondaggio',
+      waiting: 'Richiesta di votazione chiusa',
     },
     [ActivityType.DISCUSSION]: 'Nuova discussione',
     [ActivityType.SURVEY]: 'Nuovo sondaggio',
     [ActivityType.COMMENT]: 'Nuovo commento',
     [ActivityType.STATEMENT]: 'Nuovo statement',
-    [ActivityType.MESSAGE]: 'Nuovo messagio',
+    [ActivityType.MESSAGE]: 'Nuovo messaggio',
   },
   'lld-IT': {
     [ActivityType.PROPOSAL]: {
@@ -260,13 +347,26 @@ const resourceByLocale: LocaleDictionary = {
       rejected: 'Proposta rigettata',
       accepted: 'Proposta accettata',
       survey: 'Nuovo  sondaggio',
+      waiting: 'Richiesta di votazione chiusa',
     },
     [ActivityType.DISCUSSION]: 'Nuova discussione',
     [ActivityType.SURVEY]: 'Nuovo sondaggio',
     [ActivityType.COMMENT]: 'Nuovo commento',
     [ActivityType.STATEMENT]: 'Nuovo statement',
-    [ActivityType.MESSAGE]: 'Nuovo messagio',
+    [ActivityType.MESSAGE]: 'Nuovo messaggio',
   },
+};
+
+const notifyPredicate = (activity: EActivity, subscriber: Subscriber) => {
+  if (activity.actorId !== subscriber.id) {
+    if (
+      activity.type === ActivityType.USER ||
+      activity.verb === ActivityVerb.CREATE
+    ) {
+      return true;
+    }
+  }
+  return false;
 };
 
 const getCommentLink = (
@@ -309,7 +409,7 @@ const getDiscussionLink = (
   }?ref=${referrer}&refId=`;
 
 const getMessageLink = (messageId: ID, referrer) =>
-  `/message/${messageId}?ref${referrer}&refId=`;
+  `/message/${messageId}?ref=${referrer}&refId=`;
 
 const generatePushMessage = (
   activity: EActivity,
@@ -317,7 +417,7 @@ const generatePushMessage = (
   activityObject: any,
   locale: Locale,
   subscriberById: SubscriberMap,
-  objects: { [tActivityType]: ResourceMap },
+  objects: ObjectMap,
 ): PushMessage => {
   let title;
   let message;
@@ -329,26 +429,30 @@ const generatePushMessage = (
       title = resourceByLocale[locale][activity.type];
       message = activityObject.title;
       // problem if notifieing open votation
-      link = getProposalLink(activityObject, referrer) + activity.id;
+      link = getProposalLink(activityObject, referrer);
       break;
     case ActivityType.DISCUSSION:
       title = resourceByLocale[locale][activity.type];
       // problem if notifieing open votation
       message = activityObject.title;
-      link = getDiscussionLink(activityObject, referrer) + activity.id;
+      link = getDiscussionLink(activityObject, referrer);
       break;
     case ActivityType.PROPOSAL:
       // get resources
-      title = resourceByLocale[locale][activity.type][activityObject.state];
+      if (activity.type === 'proposed' && activityObject.closed_at) {
+        title = resourceByLocale[locale][activity.type][activityObject.waiting];
+      } else {
+        title = resourceByLocale[locale][activity.type][activityObject.state];
+      }
 
       message = activityObject.title;
 
-      link = getProposalLink(activityObject, referrer) + activity.id;
+      link = getProposalLink(activityObject, referrer);
       // recipients are data-activities
       break;
 
     case ActivityType.STATEMENT: {
-      const proposal: ProposalProps = (objects[ActivityType.PROPOSAL][
+      const proposal: ProposalProps = (objects.proposals[
         activity.targetId
       ]: any);
       message = proposal.title;
@@ -356,30 +460,28 @@ const generatePushMessage = (
 
       title = resourceByLocale[locale][activity.type];
       //
-      link =
-        getStatementLink(proposal.id, activityObject.poll_id, referrer) +
-        activity.id;
+      link = getStatementLink(proposal.id, activityObject.poll_id, referrer);
       break;
     }
 
     case ActivityType.COMMENT: {
-      const discussion: DiscussionProps = (objects[ActivityType.DISCUSSION][
+      const discussion: DiscussionProps = (objects.discussions[
         activity.targetId
       ]: any);
       message = discussion.title;
       // Diff between reply and new ?
 
       title = resourceByLocale[locale][activity.type];
-      link =
-        getCommentLink(activityObject, discussion.work_team_id, referrer) +
-        activity.id;
+      link = getCommentLink(activityObject, discussion.work_team_id, referrer);
       break;
     }
 
     case ActivityType.MESSAGE:
       title = resourceByLocale[locale][activity.type];
-      link = getMessageLink(activity.objectId, referrer) + activity.id;
-      message = activityObject.title;
+      link = getMessageLink(activity.objectId, referrer);
+      message =
+        getTranslatedMessage(activityObject.subject, locale) ||
+        emailNotificationTranslations[locale].subject;
       break;
     default:
       throw new Error(`Type not recognized ${activity.type}`);
@@ -396,12 +498,11 @@ const generatePushMessage = (
 
     return res;
   }); */
-
   return {
     message: {
       body: message.length > 40 ? `${message.slice(0, 36)}...` : message,
       title,
-      link,
+      link: link + activity.id,
       tag: activity.type,
     },
     receiverIds: subscriberIds,
@@ -448,6 +549,7 @@ class NotificationService {
   start: () => void;
   recover: () => void;
   getLastProcessedActivityId: () => ID;
+  purgeNotifications: ({ [string]: EActivity }) => any;
 
   constructor({
     eventManager = throwIfMissing('EventManager'),
@@ -466,11 +568,12 @@ class NotificationService {
     this.delimiter = '#';
     this.maxBatchSize = maxBatchSize || 500;
     this.batchingWindow = batchingWindow || 1000 * 10;
-    const env = process.env.NODE_ENV || 'development';
-    this.sendEmails = env === 'development';
+    // const env = process.env.NODE_ENV || 'development';
+    this.sendEmails = true; // env === 'development';
     this.filterActivity = this.filterActivity.bind(this);
     this.loadSubscriptions = this.loadSubscriptions.bind(this);
     this.generateEmail = this.generateEmail.bind(this);
+    this.purgeNotifications = this.purgeNotifications.bind(this);
 
     if (!__DEV__) {
       if (!process.env.HOST) {
@@ -511,6 +614,8 @@ class NotificationService {
           activity.targetType = TargetType.PROPOSAL;
           activity.targetId = activity.subjectId || subjectId;
           data = activity;
+        } else if (activity.verb === ActivityVerb.DELETE) {
+          data = activity;
         }
         break;
 
@@ -538,16 +643,32 @@ class NotificationService {
           activity.targetType = TargetType.DISCUSSION;
           activity.targetId = activity.subjectId || subjectId;
           data = activity;
+        } else if (activity.verb === ActivityVerb.DELETE) {
+          data = activity;
         }
         break;
 
       case ActivityType.MESSAGE:
-        if (activity.content.targetType && activity.content.targetId) {
+        if (activity.content.targetType) {
           activity.targetType = activity.content.targetType;
-          activity.targetId = activity.subjectId || activity.content.targetId;
+          activity.targetId = activity.subjectId;
           data = activity;
         }
         break;
+
+      /* case ActivityType.USER:
+        if (activity.verb === ActivityVerb.UPDATE) {
+          if (
+            activity.subjectId &&
+            activity.content.changedField &&
+            activity.content.changedField === 'groups'
+          ) {
+            activity.targetId = activity.subjectId;
+            activity.targetType = TargetType.USER;
+            data = activity;
+          }
+        }
+        break; */
       default:
         return;
     }
@@ -647,23 +768,6 @@ class NotificationService {
     return groupedActivities;
   }
 
-  async processQueue2() {
-    try {
-      // await this.batchProcessing();
-      if (timer) {
-        clearInterval(timer);
-        timer = null;
-        log.info('Resetting notification timer ');
-      } else {
-        timer = setInterval(this.batchProcessing, this.batchingWindow);
-      }
-    } catch (err) {
-      log.error({ err }, 'NotificationService failed ');
-      // means complete batch could be wasted -
-      await this.recover();
-      this.processQueue();
-    }
-  }
   async processQueue() {
     try {
       log.info('Starting batchprocessing');
@@ -712,7 +816,7 @@ class NotificationService {
             'users.locale as locale',
             'users.email as email',
           );
-      case TargetType.USER: // messages
+      case TargetType.USER: // messages, status notifications
         return this.dbConnector('notification_settings')
           .where({ user_id: selector[1] })
           .innerJoin('users', 'users.id', 'notification_settings.user_id')
@@ -722,6 +826,17 @@ class NotificationService {
             'users.locale as locale',
             'users.email as email',
           );
+      case TargetType.ALL: {
+        return this.dbConnector('notification_settings')
+          .innerJoin('users', 'users.id', 'notification_settings.user_id')
+          .whereNull('users.deleted_at') // no guests!
+          .select(
+            'notification_settings.user_id as id',
+            'notification_settings.settings as settings',
+            'users.locale as locale',
+            'users.email as email',
+          );
+      }
       case TargetType.PROPOSAL:
       case TargetType.DISCUSSION: {
         return this.dbConnector('subscriptions')
@@ -748,11 +863,11 @@ class NotificationService {
   }
 
   async loadObjects(data: {
-    [tActivityType]: Set<ID>,
+    [DBTable]: Set<ID>,
   }): Promise<GroupedActivityObjects> {
     const allObjects = {};
     const promises = Object.keys(data).map(async type => {
-      const objData = await this.dbConnector(mapTypeToTable[type])
+      const objData = await this.dbConnector(type)
         .whereIn('id', [...data[type].values()])
         .select();
       allObjects[type] = objData.reduce((acc, obj) => {
@@ -767,17 +882,26 @@ class NotificationService {
 
   async batchProcessing() {
     //  const startTime = process.hrtime();
-    //  console.log('BATCH -activities', this.activityQueue);
+    // console.log('BATCH -activities', this.activityQueue);
     try {
       const activities = this.activityQueue.splice(
         0,
         this.activityQueue.length,
       );
-      // makes dictionary
-      const activityMap: ActivityMap = activities.reduce((acc, activity) => {
-        acc[activity.id] = activity;
-        return acc;
-      }, {});
+      // filter
+
+      // makes dictionary & filter deleted activities out
+      const deletedResources = {};
+      const activityMap: ActivityMap = activities
+        .reverse()
+        .reduce((acc, activity) => {
+          if (activity.verb === ActivityVerb.DELETE) {
+            deletedResources[activity.type + activity.objectId] = activity;
+          } else if (!deletedResources[activity.type + activity.objectId]) {
+            acc[activity.id] = activity;
+          }
+          return acc;
+        }, {});
 
       if (Object.keys(activityMap).length) {
         const groupedActivities = this.groupBySubject(activityMap);
@@ -799,7 +923,11 @@ class NotificationService {
           allObjects,
         } = await this.getAndGroupNotifications(notificationData);
 
-        // console.log(' NEW GROUPED NOTIFICATIONS', { webpushData, emailData });
+        /*  console.log(' NEW GROUPED NOTIFICATIONS', {
+          webpushData,
+          emailData,
+          notifications,
+        }); */
 
         const notificationIds: ID[] = await this.dbConnector
           .batchInsert('notifications', notifications, this.maxBatchSize)
@@ -844,6 +972,8 @@ class NotificationService {
         });
       }
 
+      await this.purgeNotifications(deletedResources);
+
       // const endTime = process.hrtime(startTime);
       // console.log('PROCESSING TIME:', endTime);
 
@@ -854,6 +984,50 @@ class NotificationService {
       // TODO: recover?
       log.error({ err }, err.message);
     }
+  }
+
+  purgeNotifications(deleteActivities: { [string]: EActivity }) {
+    // delete notifications of deleted resources;
+    const deletePromises = Object.keys(deleteActivities).map(key => {
+      const activity = deleteActivities[key];
+      if (activity.type === ActivityType.STATEMENT) {
+        return this.deleteNotifications(
+          activity.objectId,
+          ActivityType.STATEMENT,
+        );
+      } else if (activity.type === ActivityType.COMMENT) {
+        const comment = activity.content;
+        if (!comment.parentId && comment.replyIds) {
+          // search and delete reply notifications
+          if (comment.replyIds.length) {
+            // find all related activities
+            return this.dbConnector('activities')
+              .whereIn('object_id', comment.replyIds)
+              .pluck('id')
+              .then(
+                replyActivityIds =>
+                  replyActivityIds.length
+                    ? this.dbConnector('notifications')
+                        .whereIn('activity_id', replyActivityIds)
+                        .del()
+                    : Promise.resolve(),
+              )
+              .then(() =>
+                this.deleteNotifications(comment.id, ActivityType.COMMENT),
+              )
+              .catch(err => {
+                log.error({ err }, 'Notification deletion failed');
+              });
+          }
+          return this.deleteNotifications(comment.id, ActivityType.COMMENT);
+        }
+
+        return this.deleteNotifications(comment.id, ActivityType.COMMENT);
+      }
+      return Promise.resolve();
+    });
+
+    return Promise.all(deletePromises);
   }
 
   async combineData(
@@ -888,9 +1062,7 @@ class NotificationService {
       if (!subscriber.subscriptionType) {
         return {
           subscriber,
-          activities: activities.filter(
-            a => a.actorId !== subscriber.id && a.verb === ActivityVerb.CREATE,
-          ),
+          activities: activities.filter(a => notifyPredicate(a, subscriber)),
         };
       }
       return {
@@ -969,13 +1141,38 @@ class NotificationService {
     }
   }
 
+  deleteNotifications(resourceId: ID, activityType: tActivityType) {
+    return this.dbConnector('activities')
+      .where({
+        object_id: resourceId,
+        type: activityType,
+        verb: ActivityVerb.CREATE,
+      })
+      .limit(1)
+      .pluck('id')
+      .then(([aId]) => {
+        if (aId) {
+          return this.dbConnector('notifications')
+            .where({ activity_id: aId })
+            .del();
+        }
+        return Promise.resolve();
+      })
+      .catch(err => {
+        log.error(
+          { err, resourceId, activityType },
+          'Notification deletion failed',
+        );
+      });
+  }
+
   generateEmail(
     activity: EActivity,
     subscriberIds: ID[],
     activityObject: any,
     locale: Locale,
     subscriberById: SubscriberMap,
-    objects: { [tActivityType]: ResourceMap },
+    objects: ObjectMap,
   ): Email {
     const receivers = subscriberIds.map(sId => subscriberById[sId].email);
     const referrer = 'email';
@@ -983,56 +1180,110 @@ class NotificationService {
       case ActivityType.DISCUSSION: {
         let link = getDiscussionLink(activityObject, referrer);
         link = this.linkPrefix + link + activity.id;
+        const text = `${resourceByLocale[locale][ActivityType.DISCUSSION]}: ${
+          activityObject.title
+        }`;
+
         const emailHTML = this.MailComposer.getDiscussionMail({
           discussion: activityObject,
+          sender: {
+            fullName: 'GOLD',
+            thumbnail: `${this.linkPrefix}/tile.png`,
+          },
+          notification: text,
+          subject: text,
           link,
           locale,
         });
-        return { htmlContent: emailHTML, receivers };
+        return {
+          htmlContent: emailHTML,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            'GOLD',
+            text,
+            activityObject.title,
+            '',
+            link,
+          ),
+        };
       }
       case ActivityType.SURVEY:
       case ActivityType.PROPOSAL: {
         let link = getProposalLink(activityObject, referrer);
         link = this.linkPrefix + link + activity.id;
+        const text = `${
+          resourceByLocale[locale][ActivityType.PROPOSAL][activityObject.state]
+        }: ${activityObject.title}`;
         const message = this.MailComposer.getProposalMail({
+          sender: {
+            fullName: 'GOLD',
+            thumbnail: `${this.linkPrefix}/tile.png`,
+          },
           proposal: activityObject,
           locale,
+          notification: text,
+          subject: text,
           link,
         });
 
-        return { htmlContent: message, receivers };
+        return {
+          htmlContent: message,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            'GOLD',
+            text,
+            activityObject.title,
+            '',
+            link,
+          ),
+        };
       }
 
       case ActivityType.STATEMENT: {
         // $FlowFixMe
-        const proposal: ProposalProps =
-          objects[ActivityType.PROPOSAL][activity.targetId];
+        const proposal: ProposalProps = objects.proposals[activity.targetId];
         // $FlowFixMe
-        const author: UserProps = objects[ActivityType.USER][activity.actorId];
+        const author: UserProps = objects.users[activity.actorId];
         let link = getStatementLink(
           proposal.id,
           activityObject.poll_id,
           referrer,
         );
         link = this.linkPrefix + link + activity.id;
+        const notification = emailNotificationTranslations[locale].statement;
+        const fullName = `${author.name} ${author.surname}`;
         const emailHTML = this.MailComposer.getStatementMail({
+          subject: proposal.title,
           statement: activityObject,
-          proposalTitle: proposal.title,
           author: {
-            fullName: `${author.name} ${author.surname}`,
+            fullName,
             thumbnail: author.thumbnail,
           },
+          notification,
           locale,
           link,
         });
-        return { htmlContent: emailHTML, receivers };
+        return {
+          htmlContent: emailHTML,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            fullName,
+            notification,
+            proposal.title,
+            activityObject.body,
+            link,
+          ),
+        };
       }
       case ActivityType.COMMENT: {
         // $FlowFixMe
         const discussion: DiscussionProps =
-          objects[ActivityType.DISCUSSION][activity.targetId];
+          objects.discussions[activity.targetId];
         // $FlowFixMe
-        const author: UserProps = objects[ActivityType.USER][activity.actorId];
+        const author: UserProps = objects.users[activity.actorId];
 
         let link = getCommentLink(
           activityObject,
@@ -1040,34 +1291,89 @@ class NotificationService {
           referrer,
         );
         link = this.linkPrefix + link + activity.id;
+        const notification = emailNotificationTranslations[locale].comment;
+        const fullName = `${author.name} ${author.surname}`;
         const emailHTML = this.MailComposer.getCommentMail({
           comment: activityObject,
+          subject: discussion.title,
+          notification,
           author: {
-            fullName: `${author.name} ${author.surname}`,
+            fullName,
             thumbnail: author.thumbnail,
           },
           discussionTitle: discussion.title,
           locale,
           link,
         });
-        return { htmlContent: emailHTML, receivers };
+        return {
+          htmlContent: emailHTML,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            fullName,
+            notification,
+            discussion.title,
+            activityObject.content,
+            link,
+          ),
+        };
       }
       case ActivityType.MESSAGE: {
         // $FlowFixMe
-        const author: UserProps = objects[ActivityType.USER][activity.actorId];
-
-        const emailHTML = this.MailComposer.getMessageMail({
-          message: activityObject.msg,
-          sender: {
-            fullName: `${author.name} ${author.surname}`,
-            thumbnail: author.thumbnail,
-          },
-          locale,
-          title: activityObject.subject,
-        });
-        return { htmlContent: emailHTML, receivers };
+        const author: UserProps = objects.users[activity.actorId];
+        let emailHTML = {
+          html: 'An error occured',
+          subject: 'System Notification Failure',
+        };
+        let fullName;
+        let notification;
+        let subject;
+        let link;
+        if (activity.content.messageType && activity.content.objectId) {
+          const messageObject =
+            objects[mapTypeToTable[activity.content.messageType]][
+              activity.content.objectId
+            ];
+          let message;
+          if (typeof messageObject.text_html === 'string') {
+            message = messageObject.text_html || messageObject.text_raw;
+          } else {
+            message = getTranslatedMessage(messageObject.text_html, locale);
+          }
+          fullName = `${author.name} ${author.surname}`;
+          notification = emailNotificationTranslations[locale].message;
+          link =
+            this.linkPrefix +
+            getMessageLink(activityObject.id, referrer) +
+            activity.id;
+          subject =
+            getTranslatedMessage(activityObject.subject, locale) ||
+            emailNotificationTranslations[locale].subject;
+          emailHTML = this.MailComposer.getMessageMail({
+            message: message || 'Error - no message',
+            sender: {
+              fullName,
+              thumbnail: author.thumbnail,
+            },
+            locale,
+            link,
+            notification,
+            subject,
+          });
+        }
+        return {
+          htmlContent: emailHTML,
+          receivers,
+          text: generatePlainTextMail(
+            locale,
+            fullName,
+            notification,
+            subject,
+            '',
+            link,
+          ),
+        };
       }
-
       default:
         throw new Error(`ActivityType not recognized : ${activity.type}`);
     }
@@ -1119,49 +1425,62 @@ class NotificationService {
       );
 
     const groupedByType: {
-      [tActivityType]: Set<ID>,
+      [DBTable]: Set<ID>,
     } = allActivities.reduce((acc, activityData) => {
       const { activity } = activityData;
-      acc[activity.type] = (acc[activity.type] || new Set()).add(
-        activity.objectId,
-      );
+      acc[mapTypeToTable[activity.type]] = (
+        acc[mapTypeToTable[activity.type]] || new Set()
+      ).add(activity.objectId);
       if (activity.type === ActivityType.STATEMENT) {
         // get subjectId from activity
         // add it to types to load
-        if (acc[ActivityType.PROPOSAL]) {
-          acc[ActivityType.PROPOSAL].add(activity.targetId);
+        if (acc.proposals) {
+          acc.proposals.add(activity.targetId);
         } else {
-          acc[ActivityType.PROPOSAL] = new Set([activity.targetId]);
+          acc.proposals = new Set([activity.targetId]);
         }
-        if (acc[ActivityType.USER]) {
-          acc[ActivityType.USER].add(activity.actorId);
+        if (acc.users) {
+          acc.users.add(activity.actorId);
         } else {
-          acc[ActivityType.USER] = new Set([activity.actorId]);
+          acc.users = new Set([activity.actorId]);
         }
       } else if (activity.type === ActivityType.COMMENT) {
         // add it to types to load
-        if (acc[ActivityType.DISCUSSION]) {
-          acc[ActivityType.DISCUSSION].add(activity.targetId);
+        if (acc.discussions) {
+          acc.discussions.add(activity.targetId);
         } else {
-          acc[ActivityType.DISCUSSION] = new Set([activity.targetId]);
+          acc.discussions = new Set([activity.targetId]);
         }
-        if (acc[ActivityType.USER]) {
-          acc[ActivityType.USER].add(activity.actorId);
+        if (acc.users) {
+          acc.users.add(activity.actorId);
         } else {
-          acc[ActivityType.USER] = new Set([activity.actorId]);
+          acc.users = new Set([activity.actorId]);
         }
       } else if (activity.type === ActivityType.MESSAGE) {
-        // add it to types to load
-        if (acc[ActivityType.USER]) {
-          acc[ActivityType.USER].add(activity.actorId);
+        // load actor
+        if (acc.users) {
+          acc.users.add(activity.actorId);
         } else {
-          acc[ActivityType.USER] = new Set([activity.actorId]);
+          acc.users = new Set([activity.actorId]);
+        }
+        // load messageObject
+        const objectType = mapTypeToTable[activity.content.messageType];
+        const { objectId } = activity.content;
+        if (acc[objectType]) {
+          acc[objectType].add(objectId);
+        } else {
+          acc[objectType] = new Set([objectId]);
+        }
+      } else if (activity.type === ActivityType.USER) {
+        if (acc.users) {
+          acc.users.add(activity.actorId);
+        } else {
+          acc.users = new Set([activity.actorId]);
         }
       }
 
       return acc;
     }, {});
-
     return this.loadObjects(groupedByType);
   }
 
@@ -1197,16 +1516,28 @@ class NotificationService {
             created_at: now,
           });
           const { settings } = user;
+
+          /* if (
+            activity.type === ActivityType.USER &&
+            activity.verb === ActivityVerb.UPDATE
+          ) {
+            // notify via mail - also without subscription
+            fillWithData(resultSet, 'emailData', activity, user);
+          } */
           if (settings[activity.type]) {
             // TODO normalize activities with Map aId: a, aId: [userIds]
 
             if (settings[activity.type].email) {
+              fillWithData(resultSet, 'emailData', activity, user);
+            } else if (activity.content.enforceEmail) {
               fillWithData(resultSet, 'emailData', activity, user);
             }
             // allow both notification methods combined
             if (settings[activity.type].webpush) {
               fillWithData(resultSet, 'webpushData', activity, user);
             }
+          } else if (activity.content.enforceEmail) {
+            fillWithData(resultSet, 'emailData', activity, user);
           }
         });
       }

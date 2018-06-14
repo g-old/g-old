@@ -259,6 +259,9 @@ if (__DEV__) {
             body: loremIpsum,
             position: 'pro',
           },
+          subject: 'The subject',
+          notification: 'has written a statement!',
+          link: '/',
           author: actor,
           proposalTitle: 'Title of the proposal',
           locale: req.language,
@@ -280,7 +283,9 @@ if (__DEV__) {
       case 'messageNotification': {
         message = root.MailComposer.getMessageMail({
           sender: actor,
-          message: loremIpsum,
+          message: `${loremIpsum}<br> <strong> Okay  </strong></br>`,
+          notification: 'hat ihnen eine Nachricht geschrieben',
+          link: '/',
           title: 'The subject',
           locale: req.language,
         });

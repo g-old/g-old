@@ -7,12 +7,25 @@ import { makeDir } from './lib/fs';
 
 const compileEmail = filename => {
   fs.readdirSync('src/emails').forEach(file => {
-    // read layout file
     if (file.endsWith('.hbs')) {
+      // read layout file
       const partial = fs
         .readFileSync(`src/emails/${file}`, 'utf8')
         .replace(/{{/g, '\\{{')
-        .replace(/\\{{(#block|\/block)/g, '{{$1');
+        .replace(/\\{{(#block|\/block)/g, '{{$1')
+        .replace(/-brand-/, 'M5S - 5SB')
+        .replace(
+          /-webpage-/,
+          'https://m5sbz.g-old.org',
+          /*  process.env.HOST
+            ? `https://${process.env.HOST}`
+            : 'http://localhost:3000', */
+        )
+        .replace(
+          /-address-/,
+          'Associazione Movimento 5 Stelle Alto Adige/Südtirol, Viale Venezia, n. 41, 39100 Bolzano',
+        );
+
       handlebars.registerPartial(file.substr(0, file.length - 4), partial);
     }
   });
