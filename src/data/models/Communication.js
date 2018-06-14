@@ -28,9 +28,6 @@ class Communication {
       created_at: new Date(),
     };
 
-    if (data.parentId) {
-      newData.parent_id = data.parentId;
-    }
     if (data.textRaw) {
       newData.text_raw = data.textRaw;
     }

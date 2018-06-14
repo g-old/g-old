@@ -113,12 +113,7 @@ class MessageInput extends React.Component {
 
   // TODO refactor
   onNotify(newValues, state, options) {
-    const {
-      recipients = [],
-      recipientType,
-      messageType,
-      parentId,
-    } = this.props;
+    const { recipients = [], recipientType, messageType } = this.props;
     const isDraft = options && options.draft;
     const { draftId, isPublished } = this.state;
     if (lazyValidationFailure(state.errors, isDraft)) {
@@ -140,7 +135,7 @@ class MessageInput extends React.Component {
     const subjectIt = values.subjectit.trim();
     const subject = {
       ...(subjectDe.length && { de: subjectDe }),
-      ...(subjectIt.length && { it: values.subjectIt }),
+      ...(subjectIt.length && { it: subjectIt }),
     };
 
     const object = {};
@@ -157,7 +152,6 @@ class MessageInput extends React.Component {
       };
     } else if (messageType === 'COMMUNICATION') {
       object.communication = {
-        parentId,
         textHtml: values.textde,
         replyable: true,
       };
@@ -337,7 +331,7 @@ class MessageInput extends React.Component {
       <div
         style={{
           margin: '0 auto',
-          width: messageType === 'NOTE' ? '45em' : '30em',
+          maxWidth: messageType === 'NOTE' ? '45em' : '30em',
         }}
       >
         <FormValidation

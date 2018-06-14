@@ -21,11 +21,75 @@ import { userFields } from './user';
 
 const createMessageMutation = `
 mutation($message:MessageInput){
-  createMessage(message:$message)
+  createMessage(message:$message){
+    id
+     sender{
+  ${userFields}
+  }
+  subject
+    parentId
+    createdAt,
+    messageType,
+     messageObject{
+  ... on Note{
+    id
+    content
+  }
+  ... on Communication{
+    id
+    content
+    replyable
+  }
+}
+  }
 }`;
 
 export const messageFields = `
 id
+parentId,
+createdAt
+parents{
+  id
+  parentId
+  sender{
+  ${userFields}
+  }
+  subject
+  messageType
+  messageObject{
+  ... on Note{
+    id
+    content
+  }
+  ... on Communication{
+    id
+    content
+    replyable
+  }
+}
+  createdAt
+}
+replies{
+  id
+  sender{
+  ${userFields}
+  }
+  parentId
+  subject
+  messageType
+  messageObject{
+  ... on Note{
+    id
+    content
+  }
+  ... on Communication{
+    id
+    content
+    replyable
+  }
+}
+  createdAt
+}
 sender{
   ${userFields}
 }
@@ -104,10 +168,12 @@ export function createMessage(message) {
       if (!data.createMessage) {
         throw Error('Message failed');
       }
+      const normalizedData = normalize(data.createMessage, messageSchema);
       dispatch({
         type: CREATE_MESSAGE_SUCCESS,
         id: message.recipients[0],
         properties,
+        payload: normalizedData,
       });
     } catch (error) {
       dispatch({

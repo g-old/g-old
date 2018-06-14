@@ -1,10 +1,11 @@
-import { GraphQLNonNull, GraphQLBoolean } from 'graphql';
+import { GraphQLNonNull } from 'graphql';
 import MessageInput from '../types/MessageInputType';
 import Message from '../models/Message';
+import MessageType from '../types/MessageType';
 import Note from '../models/Note';
 
 const createMessage = {
-  type: new GraphQLNonNull(GraphQLBoolean),
+  type: new GraphQLNonNull(MessageType),
   args: {
     message: {
       type: MessageInput,
@@ -38,7 +39,7 @@ const createMessage = {
 
     if (!newMessage) return null;
 
-    return true; // TODO return message
+    return newMessage; // TODO return message
   },
 };
 

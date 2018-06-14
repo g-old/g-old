@@ -2,6 +2,8 @@ import { schema } from 'normalizr';
 
 export const role = new schema.Entity('roles');
 export const user = new schema.Entity('users');
+export const message = new schema.Entity('messages');
+
 export const request = new schema.Entity('requests', {
   requester: user,
   processor: user,
@@ -64,9 +66,11 @@ export const recipient = new schema.Union(
   },
   '__typename',
 );
-export const message = new schema.Entity('messages', {
+message.define({
   sender: user,
   recipients: [recipient],
+  parents: [message],
+  replies: [message],
 });
 export const comment = new schema.Entity('comments');
 comment.define({
@@ -107,6 +111,8 @@ user.define({
   workTeams: [workTeam],
   requests: [request],
   notifications: [notification],
+  // messagesSent: [message],
+  // messagesReceived: [message],
 });
 
 export const log = new schema.Entity('logs', {

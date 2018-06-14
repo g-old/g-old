@@ -29,6 +29,8 @@ const CommunicationType = new ObjectType({
       type: GraphQLBoolean,
     },
 
+    // with recursive temp (id, text_html, parent_id) as (select id, text_html, parent_id from communications where id = 16 union all select communications.id, communications.text_html, communications.parent_id from messages join communications on messages.message_object_id = communications.id join temp on temp.parent_id = messages.id) select * from temp;
+
     createdAt: {
       type: GraphQLString,
     },

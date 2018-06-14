@@ -1508,21 +1508,21 @@
     "id": "label.newDiscussions",
     "description": "Label for notifications on new discussions",
     "defaultMessage": "New Discussions",
-    "message": "Nuove discussioni (anche senza iscrizione)",
+    "message": "Nuove discussioni",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.newProposals",
     "description": "Label new proposals",
     "defaultMessage": "New Proposals",
-    "message": "Nuove proposte (anche senza iscrizione)",
+    "message": "Nuove proposte",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.newSurveys",
     "description": "Label new surveys",
     "defaultMessage": "New Surveys",
-    "message": "Nuovi sondaggi (anche senza iscrizione)",
+    "message": "Nuovi sondaggi",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
@@ -1536,7 +1536,7 @@
     "id": "label.notificationSettings.messages",
     "description": "Label for notifications on new messages",
     "defaultMessage": "Messages",
-    "message": "Messaggi (anche senza iscrizione)",
+    "message": "Messaggi",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
@@ -1550,7 +1550,7 @@
     "id": "label.notificationSettings.statements",
     "description": "Label for notifications on new statements",
     "defaultMessage": "Statements",
-    "message": "Dichiarazioni di voto (Statements)",
+    "message": "Dichiarazioni di voto",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
@@ -1564,8 +1564,7 @@
     "id": "label.onWatchedProposals",
     "description": "Label for watched proposals/surveys",
     "defaultMessage": "on watched proposals/surveys",
-    "message":
-      "Riguardo a proposte/sondaggi seguiti  (vedi “iscriviti” nel filtro...)",
+    "message": "Riguardo a proposte/sondaggi seguiti",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
@@ -1579,7 +1578,7 @@
     "id": "label.stateUpdates",
     "description": "Label for state updates",
     "defaultMessage": "State updates",
-    "message": "",
+    "message": "Aggiornamenti",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   }
 ]

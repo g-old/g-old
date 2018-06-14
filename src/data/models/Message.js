@@ -2,6 +2,7 @@
 
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import WorkTeam from './WorkTeam';
 import EventManager from '../../core/EventManager';
 import Note from './Note';
 import Communication from './Communication';
@@ -34,12 +35,13 @@ class Message {
     this.subject = data.subject;
     this.senderId = data.sender_id;
     this.createdAt = data.created_at;
+    this.parentId = data.parent_id;
+    this.numReplies = data.num_replies;
   }
 
-  static async gen(viewer, id) {
-    const [data = null] = await knex('messages')
-      .where({ id })
-      .select();
+  static async gen(viewer, id, { messages }) {
+    const data = await messages.load(id);
+
     if (!data) return null;
     return canSee(viewer, data, Models.MESSAGE) ? new Message(data) : null;
   }
@@ -48,8 +50,18 @@ class Message {
     if (!data) {
       return null;
     }
-    if (data.communication && data.communication.parentId) {
+    if (data.parentId) {
       data.isReply = true; // eslint-disable-line no-param-reassign
+    }
+    if (data.recipientType === 'group' && data.recipients.length) {
+      // check if viewer is coordinator of that group
+      if (data.recipients.length !== 1) {
+        throw new Error('Implement write control for multiple groups');
+      }
+      const workteam = await WorkTeam.gen(viewer, data.recipients[0], loaders);
+      if (workteam.coordinatorId === viewer.id) {
+        data.isCoordinator = true; // eslint-disable-line no-param-reassign
+      }
     }
     if (!canMutate(viewer, data, Models.MESSAGE)) return null;
     let messageData;
@@ -67,6 +79,9 @@ class Message {
     }
     if (data.subject) {
       newData.subject = data.subject;
+    }
+    if (data.parentId) {
+      newData.parent_id = data.parentId;
     }
 
     if (data.enforceEmail) {
@@ -106,11 +121,19 @@ class Message {
         }
 
         newData.message_type = data.messageType;
-      });
+        [messageData = null] = await knex('messages')
+          .transacting(tra)
+          .insert(newData)
+          .returning('*');
 
-      [messageData = null] = await knex('messages')
-        .insert(newData)
-        .returning('*');
+        if (newData.parent_id) {
+          await knex('messages')
+            .transacting(tra)
+            .forUpdate()
+            .where({ id: newData.parent_id })
+            .increment('num_replies', 1);
+        }
+      });
     }
 
     const message = messageData ? new Message(messageData) : null;

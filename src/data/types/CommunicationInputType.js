@@ -11,17 +11,10 @@ const CommunicationInputType = new GraphQLInputObjectType({
     id: {
       type: GraphQLID,
     },
-    parentId: {
-      type: GraphQLID,
-    },
-
     textHtml: {
       type: String,
     },
 
-    textRaw: {
-      type: String,
-    },
     replyable: {
       type: GraphQLBoolean,
     },

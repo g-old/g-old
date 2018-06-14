@@ -1,6 +1,8 @@
 import { combineReducers } from 'redux';
 import { denormalize } from 'normalizr';
 import byId, * as fromById from './messageById';
+import byChannel, * as fromByChannel from './messagesByChannel';
+
 import {
   message as messageSchema,
   messageList as messageListSchema,
@@ -87,6 +89,7 @@ export default combineReducers({
   all,
   pageInfo,
   status,
+  byChannel,
 });
 
 const hydrateList = (state, data, entities) =>
@@ -102,6 +105,7 @@ const hydrateList = (state, data, entities) =>
       proposals: entities.proposals.byId,
       comments: entities.comments.byId,
       discussions: entities.discussions.byId,
+      workTeams: entities.workTeams.byId,
     },
   );
 
@@ -112,11 +116,18 @@ export const getStatus = state => ({
 const hydrateEntity = (data, entities) =>
   denormalize(data, messageSchema, {
     users: entities.users.byId,
+    messages: entities.messages.byId,
+    workTeams: entities.workTeams.byId,
   });
 
 export const getEntity = (state, id, entities) => {
   const message = fromById.getEntity(state.byId, id);
   return hydrateEntity(message, entities);
+};
+
+export const getByChannel = (state, channelId, entities) => {
+  const ids = fromByChannel.getIds(state.byChannel, channelId);
+  return hydrateList(state, ids, entities).messages;
 };
 
 export const getAll = (state, entities) => {
