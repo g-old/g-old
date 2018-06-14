@@ -278,7 +278,23 @@ function voteWriteControl(viewer, data) {
 
 function messageReadControl(viewer, data) {
   if (viewer.permissions & AccessMasks.LEVEL_0) {
-    return true;
+    // eslint-disable-next-line eqeqeq
+    if (data.sender_id == viewer.id) {
+      return true;
+    }
+    if (data.recipient_type === 'all') {
+      return true;
+    }
+    if (data.recipient_type === 'group') {
+      // check if same group
+      return data.recipients.some(id =>
+        viewer.wtMemberships.includes(Number(id)),
+      );
+    }
+    if (data.recipient_type === 'user') {
+      // eslint-disable-next-line eqeqeq
+      return data.recipients.some(id => id == viewer.id);
+    }
   }
   return false;
 }
