@@ -2,4 +2,4 @@
 component: ContentPage
 ---
 
-Contact address : Josefs email address
+Contact address : m5sbz@g-old.org
