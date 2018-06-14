@@ -83,7 +83,11 @@ class Message {
         let object = {};
         if (data.messageType === 'note') {
           if (data.note.id) {
+            // is draft
             object = await Note.gen(viewer, data.note.id, loaders);
+            if (object.isPublished) {
+              // should we use Note or update it or save it as new note??
+            }
           } else {
             object = await Note.create(viewer, data.note, loaders, tra);
           }
@@ -131,8 +135,7 @@ export default Message;
 const helpNotice = {
   de:
     'Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an m5sbz@g-old.org',
-  it:
-    'Se ritieni che ci sia un errore, scrivi una mail a m5sbz@g-old.org',
+  it: 'Se ritieni che ci sia un errore, scrivi una mail a m5sbz@g-old.org',
   lld:
     'Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an m5sbz@g-old.org',
 };

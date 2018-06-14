@@ -53,8 +53,8 @@ query($id:ID!) {
 `;
 
 const messageConnection = `
-query ($first:Int $after:String $userId:ID,$messageType:MessageTypeEnum, $isPublished:Boolean) {
-  messageConnection (first:$first after:$after userId:$userId messageType:$messageType, isPublished:$isPublished) {
+query ($first:Int $after:String $userId:ID,$messageType:MessageTypeEnum, $isPublished:Boolean $category: CategoryTypeEnum) {
+  messageConnection (first:$first after:$after userId:$userId messageType:$messageType, isPublished:$isPublished, category:$category) {
     pageInfo{
       endCursor
       hasNextPage

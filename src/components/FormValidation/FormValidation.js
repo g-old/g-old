@@ -192,7 +192,11 @@ class FormValidation extends React.Component {
       e.preventDefault();
       e.stopPropagation();
     }
-    const validationResult = this.validate(this.formFields);
+    let fields = this.formFields;
+    if (options && options.excludeFields && options.excludeFields.length) {
+      fields = fields.filter(field => !options.excludeFields.includes(field));
+    }
+    const validationResult = this.validate(fields);
     const newState = {
       errors: { ...this.state.errors, ...validationResult.errors },
     };
