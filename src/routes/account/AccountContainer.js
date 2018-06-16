@@ -11,6 +11,7 @@ import {
 } from '../../actions/user';
 import { verifyEmail } from '../../actions/verifyEmail';
 import { loadLogs } from '../../actions/log';
+import { Groups } from '../../organization';
 import { createRequest, deleteRequest } from '../../actions/request';
 import {
   createWebPushSub,
@@ -68,6 +69,16 @@ const messages = defineMessages({
       'Confirm your email address. A confirmation message was sent to ({email})',
     description: 'Notification to verify mail address',
   },
+  uploadCall: {
+    id: 'settings.uploadCall',
+    defaultMessage: 'Please upload a photo of yourself',
+    description: 'Notification to upload photo',
+  },
+  waitCall: {
+    id: 'settings.waitCall',
+    defaultMessage: 'You will be contacted as soon as possible',
+    description: 'Notification to upload photo',
+  },
   followees: {
     id: 'profile.followees',
     defaultMessage: 'Followees',
@@ -110,6 +121,27 @@ const renderFollowee = (data, fn, del) => (
     </Button>
   </li>
 );
+
+const getNotification = (ownAccount, user) => {
+  let messageId;
+  if (ownAccount && !user.emailVerified) {
+    messageId = 'verificationCall';
+  } else if (ownAccount && !user.thumbnail) {
+    messageId = 'uploadCall';
+    // eslint-disable-next-line no-bitwise
+  } else if (ownAccount && user.groups === Groups.GUEST) {
+    messageId = 'waitCall';
+  }
+
+  return (
+    messageId && (
+      <Notification
+        type="alert"
+        message={<FormattedMessage {...messages[messageId]} />}
+      />
+    )
+  );
+};
 
 class AccountContainer extends React.Component {
   static propTypes = {
@@ -258,20 +290,8 @@ class AccountContainer extends React.Component {
     } = this.props;
     if (!user) return null;
     const { followees = [] } = user;
-    let notification;
-    if (ownAccount && !user.emailVerified) {
-      notification = (
-        <Notification
-          type="alert"
-          message={
-            <FormattedMessage
-              {...messages.verificationCall}
-              values={{ email: user.email }}
-            />
-          }
-        />
-      );
-    }
+    const notification = getNotification(ownAccount, user);
+
     const profile = (
       <Profile
         ownAccount={ownAccount}

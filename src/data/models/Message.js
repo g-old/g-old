@@ -126,13 +126,13 @@ class Message {
             if (!object) {
               throw new Error('Object could not been loaded');
             }
-            if (object.isPublished) {
-              // should we use Note or update it or save it as new note??
-              throw new Error('TO IMPLEMENT published notes');
-            }
+
             if (data.note.textHtml) {
               // make diff
-              if (isDifferent(object.textHtml, data.note.textHtml)) {
+              if (
+                isDifferent(object.textHtml, data.note.textHtml) ||
+                object.isPublished
+              ) {
                 // save as new note
                 object = await Note.create(
                   viewer,
