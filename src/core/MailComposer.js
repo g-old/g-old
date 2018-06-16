@@ -18,7 +18,7 @@ function loadTemplate(filename, renderer) {
 }
 
 type Template = { subject: any => string, html: any => string };
-type Translations = { [string]: [string] };
+type Translations = { [string]: { [Locale]: string } };
 export type EmailHTML = { subject: string, html: string };
 type Actor = { fullName: string, thumbnail: ?string };
 type StatementMailProps = {
@@ -69,6 +69,11 @@ class MailComposer {
   templates: Map<string, Template>;
   translations: Translations;
   baseDir: string;
+  getWelcomeMailPlainText: (
+    user: { name: string },
+    link: string,
+    locale: Locale,
+  ) => string;
 
   constructor(
     renderEngine = throwIfMissing('Template render engine'),
@@ -102,6 +107,25 @@ class MailComposer {
       t: key => this.translations[key][locale],
     });
   }
+
+  getWelcomeMailPlainText(
+    user: { name: string },
+    link: string,
+    locale: Locale,
+  ) {
+    const text = `
+    ${this.translations.greeting[locale]} ${user.name}
+
+    ${this.translations.signup[locale]}
+    ${this.translations.clickLink[locale]}:
+    ${link}
+
+    ${this.translations.bestRegards[locale]}
+    Government by Online Democracy 2018
+`;
+    return text;
+  }
+
   getResetRequestMail(user, link, locale = 'de-DE') {
     return this.render('resetRequest', {
       name: user.name,

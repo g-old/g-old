@@ -136,16 +136,14 @@ class MailService {
     if (notOkay) {
       return { success: false, errors: notOkay };
     }
-    let content = 'text';
-    if (message.html) {
-      content = 'html';
-    }
+
     try {
       const messageData = {
         from: this.DEFAULT_SENDER,
         to: message.isMultiple ? [message.recipient] : message.recipient,
         subject: message.subject || '',
-        [content]: message[content],
+        ...(message.html && { html: message.html }),
+        ...(message.text && { text: message.text }),
         ...(message.isMultiple && { isMultiple: true }),
       };
 
