@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import PropTypes from 'prop-types';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import {
   recipientValidation,
@@ -9,6 +10,7 @@ import {
   lazyValidationFailure,
   EMPTY,
 } from './validationFns';
+import s from './MessageInput.css';
 import Box from '../Box';
 import CheckBox from '../CheckBox';
 import FormField from '../FormField';
@@ -45,6 +47,7 @@ class MessageInput extends React.Component {
     notifyUser: PropTypes.func.isRequired,
     updates: PropTypes.shape({
       pending: PropTypes.bool,
+      success: PropTypes.bool,
     }).isRequired,
     notifyGroup: PropTypes.bool,
     recipients: PropTypes.arrayOf(PropTypes.string),
@@ -109,16 +112,18 @@ class MessageInput extends React.Component {
 
   componentWillReceiveProps({ updates }) {
     if (updates && updates.success) {
-      if (!this.state.saving) {
-        this.reset();
-      } else {
-        const draftId = updates.success.startsWith('mo')
-          ? updates.success.slice(2)
-          : updates.success;
+      if (!(this.props.updates && this.props.updates.success)) {
+        if (!this.state.saving) {
+          this.reset();
+        } else {
+          const draftId = updates.success.startsWith('mo')
+            ? updates.success.slice(2)
+            : updates.success;
 
-        this.setState({
-          draftId,
-        }); // success was initialized with the mId
+          this.setState({
+            draftId,
+          }); // success was initialized with the mId
+        }
       }
     }
   }
@@ -127,7 +132,7 @@ class MessageInput extends React.Component {
   onNotify(newValues, state, options) {
     const { recipients = [], recipientType, messageType } = this.props;
     const isDraft = options && options.draft;
-    const { draftId, isPublished } = this.state;
+    const { draftId } = this.state;
     if (lazyValidationFailure(state.errors, isDraft)) {
       return;
     }
@@ -180,11 +185,21 @@ class MessageInput extends React.Component {
     };
     if (options && options.update) {
       this.props.updateMessage(message);
-    } else if (isDraft && isPublished && draftId) {
+    } else if (isDraft && !draftId) {
+      this.setState({ saving: isDraft }, () => this.props.notifyUser(message));
+    } else {
+      this.setState({
+        showNotice: true,
+        message,
+        layerOpen: true,
+      });
+    }
+
+    /* else if (isDraft && isPublished && draftId) {
       this.setState({ showNotice: true, message, layerOpen: true });
     } else {
       this.setState({ saving: isDraft }, () => this.props.notifyUser(message));
-    }
+    } */
   }
   onOpenLayer(e) {
     if (e) {
@@ -260,6 +275,8 @@ class MessageInput extends React.Component {
       },
       draftId: null,
       isPublished: null,
+      showNotice: false,
+      layerOpen: false,
     });
   }
 
@@ -277,7 +294,7 @@ class MessageInput extends React.Component {
     const editor = `text${activeLocale}`;
     return (
       <React.Fragment>
-        <fieldset>
+        <fieldset className={s.controlBox}>
           <FormField label="subject" error={errorMessages[`${subject}Error`]}>
             <input
               name={subject}
@@ -289,7 +306,9 @@ class MessageInput extends React.Component {
           {this.state.draftId && (
             <Notification
               type="alert"
-              message="Working on existing message!"
+              message={`Working on ${
+                this.state.isPublished ? 'PUBLISHED message' : 'draft'
+              }!`}
               action={
                 <Button primary onClick={this.unloadDraft} label="Unload" />
               }
@@ -329,6 +348,8 @@ class MessageInput extends React.Component {
           <NoticeLayer
             isDraft={this.state.draftId}
             isPublished={this.state.isPublished}
+            message={this.state.message}
+            updates={updates}
             isSending={this.state.message && this.state.message.isDraft}
             onClose={() =>
               this.setState({ showNotice: false, layerOpen: false })
@@ -466,16 +487,18 @@ class MessageInput extends React.Component {
                   />
                 </FormField>
               </fieldset>
-              <Box wrap>
+              <Box className={s.controlBox} justify wrap>
                 <Button
                   primary
+                  disabled={updates.pending}
                   onClick={onSubmit}
                   pending={this.props.updates && this.props.updates.pending}
                   label={<FormattedMessage {...messages.send} />}
                 />
                 {draftMode && (
-                  <Box>
+                  <React.Fragment>
                     <Button
+                      disabled={updates.pending}
                       primary
                       onClick={e =>
                         onSubmit(e, {
@@ -493,6 +516,7 @@ class MessageInput extends React.Component {
                     />
                     {draftId && (
                       <Button
+                        disabled={updates.pending}
                         primary
                         onClick={e =>
                           onSubmit(e, {
@@ -512,7 +536,7 @@ class MessageInput extends React.Component {
                         label="Save (overwrite)"
                       />
                     )}
-                  </Box>
+                  </React.Fragment>
                 )}
               </Box>
             </Box>
@@ -524,4 +548,4 @@ class MessageInput extends React.Component {
   }
 }
 
-export default MessageInput;
+export default withStyles(s)(MessageInput);
