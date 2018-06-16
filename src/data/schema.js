@@ -44,6 +44,7 @@ import flagConnection from './queries/flagConnection';
 import createPushSub from './mutations/createPushSub';
 import deletePushSub from './mutations/deletePushSub';
 import createMessage from './mutations/createMessage';
+import updateMessage from './mutations/updateMessage';
 import activities from './subscriptions/activities';
 import createWorkTeam from './mutations/createWorkTeam';
 import joinWorkTeam from './mutations/joinWorkTeam';
@@ -136,6 +137,7 @@ const schema = new Schema({
       createPushSub,
       deletePushSub,
       createMessage,
+      updateMessage,
       createWorkTeam,
       joinWorkTeam,
       leaveWorkTeam,

@@ -5,6 +5,9 @@ import {
   CREATE_MESSAGE_START,
   CREATE_MESSAGE_SUCCESS,
   CREATE_MESSAGE_ERROR,
+  UPDATE_MESSAGE_START,
+  UPDATE_MESSAGE_SUCCESS,
+  UPDATE_MESSAGE_ERROR,
   LOAD_MESSAGE_START,
   LOAD_MESSAGE_SUCCESS,
   LOAD_MESSAGE_ERROR,
@@ -22,6 +25,31 @@ import { userFields } from './user';
 const createMessageMutation = `
 mutation($message:MessageInput){
   createMessage(message:$message){
+    id
+     sender{
+  ${userFields}
+  }
+  subject
+    parentId
+    createdAt,
+    messageType,
+     messageObject{
+  ... on Note{
+    id
+    content
+  }
+  ... on Communication{
+    id
+    content
+    replyable
+  }
+}
+  }
+}`;
+
+const updateMessageMutation = `
+mutation($message:MessageInput){
+  updateMessage(message:$message){
     id
      sender{
   ${userFields}
@@ -109,9 +137,35 @@ subject
 `;
 
 const messageQuery = `
-query($id:ID!) {
+query($id:ID! ) {
   message(id:$id){
     ${messageFields}
+  }
+}
+`;
+
+const messageObjectQuery = `
+query($id:ID! $isMessageObject:Boolean) {
+  message(id:$id, isMessageObject:$isMessageObject){
+    id
+    sender{
+      ${userFields}
+    }
+    messageObject{
+      ... on Note {
+        id
+        isPublished
+        createdAt
+        updatedAt
+        textHtml{
+          de
+          it
+        }
+        content
+        keyword
+        category
+      }
+    }
   }
 }
 `;
@@ -192,14 +246,56 @@ export function createMessage(message) {
   };
 }
 
-export function loadMessage(id) {
+export function updateMessage(message) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    const properties = genStatusIndicators(['message']);
+    dispatch({
+      type: UPDATE_MESSAGE_START,
+      id: message.recipients[0],
+      properties,
+    });
+
+    try {
+      const { data } = await graphqlRequest(updateMessageMutation, { message });
+
+      if (!data.updateMessage) {
+        throw Error('Message failed');
+      }
+      const normalizedData = normalize(data.updateMessage, messageSchema);
+      dispatch({
+        type: UPDATE_MESSAGE_SUCCESS,
+        id: message.recipients[0],
+        properties,
+        payload: normalizedData,
+      });
+    } catch (error) {
+      dispatch({
+        type: UPDATE_MESSAGE_ERROR,
+        payload: {
+          error,
+        },
+        id: message.recipients[0],
+        properties,
+        message: error.message || 'Something went wrong',
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function loadMessage(id, isMessageObject) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: LOAD_MESSAGE_START,
     });
 
     try {
-      const { data } = await graphqlRequest(messageQuery, { id });
+      const { data } = await graphqlRequest(
+        isMessageObject ? messageObjectQuery : messageQuery,
+        { id, isMessageObject },
+      );
       const normalizedData = normalize(data.message, messageSchema);
       dispatch({
         type: LOAD_MESSAGE_SUCCESS,

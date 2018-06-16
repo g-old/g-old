@@ -1,5 +1,6 @@
 import DataLoader from 'dataloader';
 import knex from './knex';
+import log from '../logger';
 
 // TODO parallelize requests with Promise.all()
 const getUsersById = userIds =>
@@ -293,16 +294,21 @@ const getNotesById = noteIds =>
     knex('notes')
       .whereIn('id', noteIds)
       .select()
-      .then(data =>
-        resolve(
-          noteIds.map(
-            id =>
-              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
-              new Error(`Row not found: ${id}`),
+      .then(
+        data =>
+          resolve(
+            noteIds.map(
+              id =>
+                data.find(row => row.id == id) || // eslint-disable-line eqeqeq
+                new Error(`Row not found: ${id}`),
+            ),
           ),
-        ),
+        err => {
+          log.error({ err }, 'Notes loading failed');
+        },
       );
   });
+
 const getCommunicationsById = communicationIds =>
   new Promise(resolve => {
     knex('communications')

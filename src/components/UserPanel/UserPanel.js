@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { FormattedMessage, defineMessages } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './UserPanel.css';
-import { createMessage } from '../../actions/message';
+import { createMessage, updateMessage } from '../../actions/message';
 import { updateUser, loadUserList, findUser } from '../../actions/user';
 import FetchError from '../FetchError';
 import AccountDetails from '../AccountDetails';
@@ -57,6 +57,7 @@ class UserPanel extends React.Component {
       permissions: PropTypes.number,
     }).isRequired,
     createMessage: PropTypes.func.isRequired,
+    updateMessage: PropTypes.func.isRequired,
     messageUpdates: PropTypes.shape({}).isRequired,
   };
 
@@ -143,6 +144,7 @@ class UserPanel extends React.Component {
               heading={<FormattedMessage {...messages.messages} />}
             >
               <MessageInput
+                updateMessage={this.props.updateMessage}
                 draftMode
                 messageType="NOTE"
                 notifyUser={this.props.createMessage}
@@ -241,6 +243,7 @@ const mapDispatch = {
   loadUserList,
   findUser,
   createMessage,
+  updateMessage,
 };
 
 export default connect(mapStateToProps, mapDispatch)(withStyles(s)(UserPanel));

@@ -52,6 +52,7 @@ class MessageInput extends React.Component {
     messageType: PropTypes.oneOfType(['COMMUNICATION', 'NOTE']).isRequired,
     parentId: PropTypes.string,
     draftMode: PropTypes.boolean,
+    updateMessage: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -92,6 +93,9 @@ class MessageInput extends React.Component {
       '<p></p>';
 
     this.editor.setInitialState(initialValue);
+
+    const draftId = this.retrieveValue('draftId'); // loadMessage if draftid is present
+
     // eslint-disable-next-line react/no-did-mount-set-state
     this.setState({
       data: {
@@ -99,7 +103,7 @@ class MessageInput extends React.Component {
         textit: this.retrieveValue('it') || EMPTY,
       },
       isPublished: this.retrieveValue('isPublished'),
-      draftId: this.retrieveValue('draftId'),
+      draftId,
     });
   }
 
@@ -107,6 +111,14 @@ class MessageInput extends React.Component {
     if (updates && updates.success) {
       if (!this.state.saving) {
         this.reset();
+      } else {
+        const draftId = updates.success.startsWith('mo')
+          ? updates.success.slice(2)
+          : updates.success;
+
+        this.setState({
+          draftId,
+        }); // success was initialized with the mId
       }
     }
   }
@@ -166,7 +178,9 @@ class MessageInput extends React.Component {
       isDraft,
       enforceEmail: values.enforceEmail,
     };
-    if (isDraft && isPublished && draftId) {
+    if (options && options.update) {
+      this.props.updateMessage(message);
+    } else if (isDraft && isPublished && draftId) {
       this.setState({ showNotice: true, message, layerOpen: true });
     } else {
       this.setState({ saving: isDraft }, () => this.props.notifyUser(message));
@@ -187,6 +201,7 @@ class MessageInput extends React.Component {
     const initialValue =
       localStorage.getItem(this.storageKey + locale) || EMPTY;
     this.editor.setInitialState(initialValue);
+    // this.setState({ initialValue });
   }
   storeValues(keyValues) {
     Object.keys(keyValues).map(key =>
@@ -219,6 +234,9 @@ class MessageInput extends React.Component {
     this.editor.setInitialState(
       messageObject.textHtml[this.state.activeLocale] || EMPTY,
     );
+    /* this.setState({
+      initialValue: messageObject.textHtml[this.state.activeLocale] || EMPTY,
+    }); */
 
     this.onCloseLayer();
   }
@@ -271,7 +289,7 @@ class MessageInput extends React.Component {
           {this.state.draftId && (
             <Notification
               type="alert"
-              message="Working on a draft!"
+              message="Working on existing message!"
               action={
                 <Button primary onClick={this.unloadDraft} label="Unload" />
               }
@@ -303,7 +321,7 @@ class MessageInput extends React.Component {
 
   render() {
     const { updates = {}, messageType, recipientType, draftMode } = this.props;
-    const { activeLocale, layerOpen, showNotice } = this.state;
+    const { activeLocale, layerOpen, showNotice, draftId } = this.state;
     let layerComponent;
     if (layerOpen) {
       if (showNotice) {
@@ -448,7 +466,7 @@ class MessageInput extends React.Component {
                   />
                 </FormField>
               </fieldset>
-              <Box>
+              <Box wrap>
                 <Button
                   primary
                   onClick={onSubmit}
@@ -456,22 +474,45 @@ class MessageInput extends React.Component {
                   label={<FormattedMessage {...messages.send} />}
                 />
                 {draftMode && (
-                  <Button
-                    primary
-                    onClick={e =>
-                      onSubmit(e, {
-                        draft: true,
-                        excludeFields: [
-                          'subjectit',
-                          'subjectde',
-                          'recipients',
-                          'recipientType',
-                        ],
-                      })
-                    }
-                    pending={this.props.updates && this.props.updates.pending}
-                    label="Save as draft"
-                  />
+                  <Box>
+                    <Button
+                      primary
+                      onClick={e =>
+                        onSubmit(e, {
+                          draft: true,
+                          excludeFields: [
+                            'subjectit',
+                            'subjectde',
+                            'recipients',
+                            'recipientType',
+                          ],
+                        })
+                      }
+                      pending={this.props.updates && this.props.updates.pending}
+                      label="Save as new draft"
+                    />
+                    {draftId && (
+                      <Button
+                        primary
+                        onClick={e =>
+                          onSubmit(e, {
+                            draft: true,
+                            update: true,
+                            excludeFields: [
+                              'subjectit',
+                              'subjectde',
+                              'recipients',
+                              'recipientType',
+                            ],
+                          })
+                        }
+                        pending={
+                          this.props.updates && this.props.updates.pending
+                        }
+                        label="Save (overwrite)"
+                      />
+                    )}
+                  </Box>
                 )}
               </Box>
             </Box>

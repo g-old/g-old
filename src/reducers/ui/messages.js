@@ -39,10 +39,10 @@ const messages = (state = initState, action) => {
 
     case CREATE_MESSAGE_SUCCESS: {
       return {
-        ...state,
+        ...state, // to get id of created message
         mutation: {
           pending: false,
-          success: true,
+          success: action.payload.result || true,
           error: '',
         },
       };

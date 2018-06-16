@@ -1,5 +1,6 @@
 // @flow
 
+import DiffMatchPatch from 'diff-match-patch';
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import WorkTeam from './WorkTeam';
@@ -9,9 +10,30 @@ import Communication from './Communication';
 import log from '../../logger';
 import createLoaders from '../../data/dataLoader';
 
+const dmp = new DiffMatchPatch();
 export type MessageType = 'communication' | 'note' | 'meeting';
 
 type RecipientType = 'user' | 'group';
+
+const isDifferent = (oldTextHtml, newTextHtml) => {
+  let oldText;
+  let newText;
+  const result = ['de', 'it'].reduce((acc, curr) => {
+    oldText = oldTextHtml[curr];
+    newText = newTextHtml[curr];
+
+    if (oldText && newText) {
+      const diff = dmp.diff_main(oldText, newText);
+      if (diff.length) {
+        if (diff.some(d => d[0] !== 0))
+          // What to do...
+          acc[curr] = true;
+      }
+    }
+    return acc;
+  }, {});
+  return Object.keys(result).length > 0;
+};
 class Message {
   recipientType: RecipientType;
   id: ID;
@@ -100,11 +122,33 @@ class Message {
           if (data.note.id) {
             // is draft
             object = await Note.gen(viewer, data.note.id, loaders);
+
+            if (!object) {
+              throw new Error('Object could not been loaded');
+            }
             if (object.isPublished) {
               // should we use Note or update it or save it as new note??
+              throw new Error('TO IMPLEMENT published notes');
+            }
+            if (data.note.textHtml) {
+              // make diff
+              if (isDifferent(object.textHtml, data.note.textHtml)) {
+                // save as new note
+                object = await Note.create(
+                  viewer,
+                  { ...data.note, is_published: true },
+                  loaders,
+                  tra,
+                );
+              }
             }
           } else {
-            object = await Note.create(viewer, data.note, loaders, tra);
+            object = await Note.create(
+              viewer,
+              { ...data.note, is_published: true },
+              loaders,
+              tra,
+            );
           }
         } else if (data.messageType === 'communication') {
           object = await Communication.create(
