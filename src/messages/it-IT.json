@@ -242,7 +242,6 @@
       "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/FormValidation/FormValidation.js",
       "src/components/Login/Login.js",
-      "src/components/Message/Message.js",
       "src/components/MessageInput/MessageInput.js",
       "src/components/ProposalActions/ProposalActions.js",
       "src/components/ProposalInput/ProposalInput.js",
@@ -252,6 +251,7 @@
       "src/components/WorkTeamForm/WorkTeamForm.js",
       "src/components/WorkTeamInput/WorkTeamInput.js",
       "src/components/WorkTeamManager/WorkTeamManager.js",
+      "src/routes/message/MessageContainer.js",
       "src/routes/passwordRecovery/PasswordRecovery.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
@@ -426,9 +426,9 @@
     "message": "Invia",
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
-      "src/components/Message/Message.js",
       "src/components/MessageInput/MessageInput.js",
-      "src/components/ProposalInput/ProposalInput.js"
+      "src/components/ProposalInput/ProposalInput.js",
+      "src/routes/message/MessageContainer.js"
     ]
   },
   {
@@ -729,6 +729,7 @@
     "defaultMessage": "These passwords don't match. Try again?",
     "message": "Le password non corrispondono. Riprova.",
     "files": [
+      "src/components/FormValidation/FormValidation.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -740,6 +741,7 @@
       "Short passwords are easy to guess. Try one with at least 6 characters",
     "message": "Per la tua password utilizza almeno 6 caratteri",
     "files": [
+      "src/components/FormValidation/FormValidation.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -1208,7 +1210,10 @@
     "description": "Privacy label",
     "defaultMessage": "Privacy",
     "message": "Privacy",
-    "files": ["src/components/InfoPage/InfoPage.js"]
+    "files": [
+      "src/components/InfoPage/InfoPage.js",
+      "src/components/SignUp/SignUp.js"
+    ]
   },
   {
     "id": "coordinator",
@@ -1494,6 +1499,7 @@
     "files": [
       "src/components/NotificationSettings/NotificationSettings.js",
       "src/components/UserPanel/UserPanel.js",
+      "src/routes/account/AccountContainer.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
     ]
   },
@@ -1580,5 +1586,33 @@
     "defaultMessage": "State updates",
     "message": "Aggiornamenti",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "privacy.consent",
+    "description": "Signup consent notice",
+    "defaultMessage": "I accept the {policy}",
+    "message": "",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "privacy.readCall",
+    "description": "Call to read linked privac policy",
+    "defaultMessage": "Read our {link}",
+    "message": "",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "settings.uploadCall",
+    "description": "Notification to upload photo",
+    "defaultMessage": "Please upload a photo of yourself",
+    "message": "",
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "settings.waitCall",
+    "description": "Notification to upload photo",
+    "defaultMessage": "You will be contacted as soon as possible",
+    "message": "",
+    "files": ["src/routes/account/AccountContainer.js"]
   }
 ]

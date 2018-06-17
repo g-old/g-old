@@ -106,7 +106,7 @@ const messages = defineMessages({
   },
   consent: {
     id: 'privacy.consent',
-    defaultMessage: 'I accept the privacy policy',
+    defaultMessage: 'I accept the {policy}',
     description: 'Signup consent notice',
   },
   privacy: {
@@ -251,7 +251,11 @@ class SignUp extends React.Component {
       () => this.recaptchaInstance.execute(),
     );
   }
-  handlePasswordVisibility() {
+  handlePasswordVisibility(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     this.setState({ passwordsVisible: !this.state.passwordsVisible });
   }
   resetRecaptcha() {
@@ -287,27 +291,8 @@ class SignUp extends React.Component {
     }
     return (
       <Box tag="article" align column pad>
-        <FormValidation
-          ref={el => (this.form = el)} // eslint-disable-line
-          eager
-          onBlur={onBlurValidation}
-          options={{ invalidEmails: this.state.invalidEmails }}
-          validations={{
-            name: { args: { required: true, min: 2 } },
-            surname: { args: { required: true, min: 2 } },
-            password: {
-              fn: passwordValidation,
-              args: { required: true, min: 6 },
-            },
-            passwordAgain: {
-              fn: passwordAgainValidation,
-              args: { required: true, min: 6 },
-            },
-            email: { fn: emailValidation, args: { required: true } },
-            consent: { fn: consentValidation, args: { required: true } },
-          }}
-          submit={this.executeCaptcha}
-        >
+        <FormValidation // eslint-disable-next-line
+          ref={el => (this.form = el)} eager onBlur={onBlurValidation} options={{ invalidEmails: this.state.invalidEmails }} validations={{ name: { args: { required: true, min: 2 } }, surname: { args: { required: true, min: 2 } }, password: { fn: passwordValidation, args: { required: true, min: 6 } }, passwordAgain: { fn: passwordAgainValidation, args: { required: true, min: 6 } }, email: { fn: emailValidation, args: { required: true } }, consent: { fn: consentValidation, args: { required: true } } }} submit={this.executeCaptcha}>
           {({
             errorMessages,
             onBlur,
@@ -446,7 +431,14 @@ class SignUp extends React.Component {
                   }
                 >
                   <CheckBox
-                    label={<FormattedMessage {...messages.consent} />}
+                    label={
+                      <FormattedMessage
+                        {...messages.consent}
+                        values={{
+                          policy: <FormattedMessage {...messages.privacy} />,
+                        }}
+                      />
+                    }
                     checked={values.consent}
                     onChange={handleValueChanges}
                     onBlur={onBlur}
@@ -470,9 +462,7 @@ class SignUp extends React.Component {
             </Form>
           )}
         </FormValidation>
-        <Recaptcha
-          ref={
-            e => (this.recaptchaInstance = e) // eslint-disable-line
+        <Recaptcha ref={e => (this.recaptchaInstance = e) // eslint-disable-line
           }
           size="invisible"
           render="explicit"
