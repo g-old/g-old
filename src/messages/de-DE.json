@@ -1340,7 +1340,7 @@
     "id": "privacy",
     "description": "Privacy label",
     "defaultMessage": "Privacy",
-    "message": "Datenschutz",
+    "message": "Datenschutzerklärung",
     "files": ["src/components/InfoPage/InfoPage.js"]
   },
   {

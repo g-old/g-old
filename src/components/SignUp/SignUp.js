@@ -10,18 +10,18 @@ import Form from '../Form';
 import Label from '../Label';
 import Header from '../Header2';
 import Heading from '../Heading';
+import { ICONS } from '../../constants';
 
 import {
-  createValidator,
   passwordValidation,
   passwordAgainValidation,
   emailValidation,
-  nameValidation,
   capitalizeFirstLetter,
 } from '../../core/validation';
+import CheckBox from '../CheckBox';
+import FormValidation from '../FormValidation';
 
 const SCRIPT_ID = 'gold-recaptcha-script';
-const fieldNames = ['name', 'surname', 'email', 'password', 'passwordAgain'];
 const messages = defineMessages({
   title: {
     id: 'signup.title',
@@ -104,7 +104,40 @@ const messages = defineMessages({
     defaultMessage: 'Password',
     description: 'Heading of password section',
   },
+  consent: {
+    id: 'privacy.consent',
+    defaultMessage: 'I accept the privacy policy',
+    description: 'Signup consent notice',
+  },
+  privacy: {
+    id: 'privacy',
+    description: 'Privacy label',
+    defaultMessage: 'Privacy',
+  },
+
+  readPrivacy: {
+    id: 'privacy.readCall',
+    defaultMessage: 'Read our {link}',
+    description: 'Call to read linked privac policy',
+  },
 });
+
+const onBlurValidation = (fieldName, state, fields) => {
+  if (fieldName && state) {
+    if (fieldName === 'password' && state.passwordAgain.length > 0) {
+      fields.push('passwordAgain');
+    }
+  }
+};
+
+const consentValidation = consent => {
+  if (consent) {
+    return {
+      touched: false,
+    };
+  }
+  return { touched: true, errorName: 'empty' };
+};
 
 class SignUp extends React.Component {
   static propTypes = {
@@ -130,61 +163,15 @@ class SignUp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      password: '',
-      passwordAgain: '',
-      name: '',
-      surname: '',
-      email: '',
       invalidEmails: [],
-      captchaPending: true,
-      errors: {
-        password: {
-          touched: false,
-        },
-        passwordAgain: {
-          touched: false,
-        },
-        name: {
-          touched: false,
-        },
-        email: {
-          touched: false,
-        },
-        surname: {
-          touched: false,
-        },
-      },
     };
 
     this.onSubmit = this.onSubmit.bind(this);
-    this.handleValidation = this.handleValidation.bind(this);
-    this.visibleErrors = this.visibleErrors.bind(this);
-    this.handleBlur = this.handleBlur.bind(this);
-    this.handleValueChange = this.handleValueChange.bind(this);
     this.verifyCallback = this.verifyCallback.bind(this);
     this.executeCaptcha = this.executeCaptcha.bind(this);
     this.resetRecaptcha = this.resetRecaptcha.bind(this);
-    const testValues = {
-      password: { fn: 'password' },
-      passwordAgain: { fn: 'passwordAgain' },
-      name: { fn: 'name' },
-      surname: { fn: 'name' },
-      email: { fn: 'email' },
-    };
-    this.Validator = createValidator(
-      testValues,
-      {
-        password: passwordValidation,
-        passwordAgain: passwordAgainValidation,
-        email: emailValidation,
-        name: nameValidation,
-      },
-      this,
-      obj => obj.state,
-      {
-        minPasswordLength: 6,
-      },
-    );
+    this.handlePasswordVisibility = this.handlePasswordVisibility.bind(this);
+    this.handleInvalidEmail = this.handleInvalidEmail.bind(this);
   }
 
   componentDidMount() {
@@ -193,20 +180,18 @@ class SignUp extends React.Component {
 
   componentWillReceiveProps({ notUniqueEmail }) {
     if (notUniqueEmail) {
-      this.setState(
-        {
-          ...this.state,
-          invalidEmails: [
-            ...this.state.invalidEmails,
-            this.state.email.trim().toLowerCase(),
-          ],
-          errors: {
-            ...this.state.errors,
-            email: { touched: true, errorName: 'emailTaken' },
+      if (this.state.validatedInputs && this.state.validatedInputs.email) {
+        this.setState(
+          {
+            ...this.state,
+            invalidEmails: [
+              ...this.state.invalidEmails,
+              this.state.validatedInputs.email.trim().toLowerCase(),
+            ],
           },
-        },
-        this.resetRecaptcha,
-      );
+          this.handleInvalidEmail,
+        );
+      }
     }
   }
   componentWillUnmount() {
@@ -214,8 +199,8 @@ class SignUp extends React.Component {
   }
 
   onSubmit() {
-    if (this.handleValidation(fieldNames)) {
-      let { name, surname, email, password } = this.state;
+    if (this.state.validatedInputs) {
+      let { name, surname, email, password } = this.state.validatedInputs;
       name = name.trim();
       name = capitalizeFirstLetter(name);
       surname = surname.trim();
@@ -237,47 +222,17 @@ class SignUp extends React.Component {
     this.setState({ hasError: true });
   }
 
-  handleValueChange(e) {
-    const { name: field, value } = e.target;
-    if (this.state.errors[field].touched) {
-      this.setState({
-        errors: {
-          ...this.state.errors,
-          [field]: { ...this.state.errors[field], touched: false },
-        },
-      });
-    }
-    this.setState({ [field]: value });
-  }
-
   handleValidation(fields) {
     const validated = this.Validator(fields);
     this.setState({ errors: { ...this.state.errors, ...validated.errors } });
     return validated.failed === 0;
   }
 
-  handleBlur(e) {
-    const fields = [];
-    const currentField = e.target.name;
-    fields.push(e.target.name);
-    if (currentField) {
-      if (currentField === 'password' && this.state.passwordAgain.length > 0) {
-        fields.push('passwordAgain');
-      }
-      this.handleValidation(fields);
-    }
-  }
-
-  visibleErrors(errorNames) {
-    return errorNames.reduce((acc, curr) => {
-      const err = `${curr}Error`;
-      if (this.state.errors[curr].touched) {
-        acc[err] = (
-          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
-        );
-      }
-      return acc;
-    }, {});
+  handleInvalidEmail() {
+    this.resetRecaptcha();
+    this.form.enforceValidation(['email'], {
+      invalidEmails: this.state.invalidEmails,
+    });
   }
 
   verifyCallback(response) {
@@ -287,19 +242,17 @@ class SignUp extends React.Component {
     );
   }
 
-  executeCaptcha(e) {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    if (this.handleValidation(fieldNames)) {
-      this.setState(
-        {
-          captchaPending: true,
-        },
-        () => this.recaptchaInstance.execute(),
-      );
-    }
+  executeCaptcha(values) {
+    this.setState(
+      {
+        validatedInputs: values,
+        captchaPending: true,
+      },
+      () => this.recaptchaInstance.execute(),
+    );
+  }
+  handlePasswordVisibility() {
+    this.setState({ passwordsVisible: !this.state.passwordsVisible });
   }
   resetRecaptcha() {
     if (this.recaptchaInstance) {
@@ -322,14 +275,7 @@ class SignUp extends React.Component {
   }
 
   render() {
-    const {
-      nameError,
-      surnameError,
-      passwordError,
-      passwordAgainError,
-      emailError,
-      pending,
-    } = this.visibleErrors(fieldNames);
+    const { pending } = this.props;
 
     const loginError = this.props.error ? (
       <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
@@ -341,102 +287,189 @@ class SignUp extends React.Component {
     }
     return (
       <Box tag="article" align column pad>
-        <Form onSubmit={this.executeCaptcha}>
-          <Header align between>
-            <Heading tag="h2" strong>
-              <FormattedMessage {...messages.title} />
-            </Heading>
-          </Header>
-          <fieldset>
-            <FormField
-              label={<FormattedMessage {...messages.forename} />}
-              error={nameError}
-            >
-              <input
-                type="text"
-                name="name"
-                value={this.state.name}
-                onChange={this.handleValueChange}
-                onBlur={this.handleBlur}
-              />
-            </FormField>
-            <FormField
-              label={<FormattedMessage {...messages.surname} />}
-              error={surnameError}
-            >
-              <input
-                type="text"
-                name="surname"
-                autoComplete="family-name"
-                value={this.state.surname}
-                onChange={this.handleValueChange}
-                onBlur={this.handleBlur}
-              />
-            </FormField>
-          </fieldset>
+        <FormValidation
+          ref={el => (this.form = el)} // eslint-disable-line
+          eager
+          onBlur={onBlurValidation}
+          options={{ invalidEmails: this.state.invalidEmails }}
+          validations={{
+            name: { args: { required: true, min: 2 } },
+            surname: { args: { required: true, min: 2 } },
+            password: {
+              fn: passwordValidation,
+              args: { required: true, min: 6 },
+            },
+            passwordAgain: {
+              fn: passwordAgainValidation,
+              args: { required: true, min: 6 },
+            },
+            email: { fn: emailValidation, args: { required: true } },
+            consent: { fn: consentValidation, args: { required: true } },
+          }}
+          submit={this.executeCaptcha}
+        >
+          {({
+            errorMessages,
+            onBlur,
+            handleValueChanges,
+            values,
+            onSubmit,
+          }) => (
+            <Form onSubmit={onSubmit}>
+              <Header align between>
+                <Heading tag="h2" strong>
+                  <FormattedMessage {...messages.title} />
+                </Heading>
+              </Header>
+              <fieldset>
+                <FormField
+                  label={<FormattedMessage {...messages.forename} />}
+                  error={errorMessages.nameError}
+                >
+                  <input
+                    type="text"
+                    name="name"
+                    value={values.name}
+                    onChange={handleValueChanges}
+                    onBlur={onBlur}
+                  />
+                </FormField>
+                <FormField
+                  label={<FormattedMessage {...messages.surname} />}
+                  error={errorMessages.surnameError}
+                >
+                  <input
+                    type="text"
+                    name="surname"
+                    autoComplete="family-name"
+                    value={values.surname}
+                    onChange={handleValueChanges}
+                    onBlur={onBlur}
+                  />
+                </FormField>
+              </fieldset>
 
-          <Label>
-            <FormattedMessage {...messages.passwordHeading} />
-          </Label>
-          <fieldset>
-            <FormField
-              label={<FormattedMessage {...messages.password} />}
-              error={passwordError}
-            >
-              <input
-                id="password"
-                type="password"
-                name="password"
-                value={this.state.password}
-                onChange={this.handleValueChange}
-                onBlur={this.handleBlur}
-              />
-            </FormField>
-            <FormField
-              label={<FormattedMessage {...messages.passwordAgain} />}
-              error={passwordAgainError}
-            >
-              <input
-                id="passwordAgain"
-                type="password"
-                name="passwordAgain"
-                value={this.state.passwordAgain}
-                onChange={this.handleValueChange}
-                onBlur={this.handleBlur}
-              />
-            </FormField>
-          </fieldset>
-          <Label>
-            <FormattedMessage {...messages.emailHeading} />
-          </Label>
-          <fieldset>
-            <FormField
-              label={<FormattedMessage {...messages.email} />}
-              error={emailError}
-            >
-              <input
-                id="email"
-                type="text"
-                name="email"
-                autoComplete="email"
-                value={this.state.email}
-                onChange={this.handleValueChange}
-                onBlur={this.handleBlur}
-              />
-            </FormField>
-            {!this.props.notUniqueEmail && loginError}
-          </fieldset>
+              <Label>
+                <FormattedMessage {...messages.passwordHeading} />
+              </Label>
+              <fieldset>
+                <FormField
+                  label={<FormattedMessage {...messages.password} />}
+                  error={errorMessages.passwordError}
+                >
+                  <input
+                    id="password"
+                    type={this.state.passwordsVisible ? 'text' : 'password'}
+                    name="password"
+                    value={values.password}
+                    onChange={handleValueChanges}
+                    onBlur={onBlur}
+                  />
+                </FormField>
+                <FormField
+                  label={<FormattedMessage {...messages.passwordAgain} />}
+                  error={errorMessages.passwordAgainError}
+                  help={
+                    <Button
+                      plain
+                      onClick={this.handlePasswordVisibility}
+                      icon={
+                        <svg
+                          fill="#0000008a"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          width="24"
+                          xmlns="https://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0zm0 0h24v24H0z"
+                            fill="none"
+                          />
+                          <path
+                            d={
+                              ICONS[
+                                this.state.passwordsVisible
+                                  ? 'visibility'
+                                  : 'visibilityOff'
+                              ]
+                            }
+                          />
+                        </svg>
+                      }
+                    />
+                  }
+                >
+                  <input
+                    id="passwordAgain"
+                    type={this.state.passwordsVisible ? 'text' : 'password'}
+                    name="passwordAgain"
+                    value={values.passwordAgain}
+                    onChange={handleValueChanges}
+                    onBlur={onBlur}
+                  />
+                </FormField>
+              </fieldset>
+              <Label>
+                <FormattedMessage {...messages.emailHeading} />
+              </Label>
+              <fieldset>
+                <FormField
+                  label={<FormattedMessage {...messages.email} />}
+                  error={errorMessages.emailError}
+                >
+                  <input
+                    id="email"
+                    type="text"
+                    name="email"
+                    autoComplete="email"
+                    value={values.email}
+                    onChange={handleValueChanges}
+                    onBlur={onBlur}
+                  />
+                </FormField>
+                {!this.props.notUniqueEmail && loginError}
+              </fieldset>
+              <fieldset>
+                <FormField
+                  error={errorMessages.consentError}
+                  help={
+                    <FormattedMessage
+                      {...messages.readPrivacy}
+                      values={{
+                        link: (
+                          <a target="_blank" href="/about">
+                            <FormattedMessage {...messages.privacy} />
+                          </a>
+                        ),
+                      }}
+                    />
+                  }
+                >
+                  <CheckBox
+                    label={<FormattedMessage {...messages.consent} />}
+                    checked={values.consent}
+                    onChange={handleValueChanges}
+                    onBlur={onBlur}
+                    name="consent"
+                  />
+                </FormField>
+              </fieldset>
+              <p>
+                <a target="_blank" href="/about">
+                  <FormattedMessage {...messages.privacy} />
+                </a>
+              </p>
 
-          <Button primary fill disabled={this.state.captchaPending || pending}>
-            <FormattedMessage {...messages.nextStep} />
-          </Button>
-          <p>
-            By signing up you agree to our{' '}
-            <a target="_blank" href="/about">
-              Privacy Policy
-            </a>
-          </p>
-        </Form>
+              <Button
+                primary
+                fill
+                disabled={this.state.captchaPending || pending}
+              >
+                <FormattedMessage {...messages.nextStep} />
+              </Button>
+            </Form>
+          )}
+        </FormValidation>
         <Recaptcha
           ref={
             e => (this.recaptchaInstance = e) // eslint-disable-line
