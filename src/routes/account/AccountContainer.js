@@ -25,6 +25,8 @@ import {
 } from '../../actions/workTeam';
 import { loadFeed } from '../../actions/feed';
 import { uploadAvatar } from '../../actions/file';
+import { createMessage } from '../../actions/message';
+
 import Label from '../../components/Label';
 import {
   getUser,
@@ -36,6 +38,7 @@ import {
   getLogs,
   getLogIsFetching,
   getLogErrorMessage,
+  getMessageUpdates,
 } from '../../reducers';
 import Avatar from '../../components/Avatar';
 import UserSettings from '../../components/UserSettings';
@@ -188,11 +191,17 @@ class AccountContainer extends React.Component {
     ownAccount: PropTypes.bool.isRequired,
     fetched: PropTypes.bool.isRequired,
     fetchProfileData: PropTypes.func.isRequired,
-    sessionUser: PropTypes.shape({ id: PropTypes.string }).isRequired,
+    sessionUser: PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      surname: PropTypes.string,
+    }).isRequired,
     requestUpdates: PropTypes.shape({}).isRequired,
     deleteRequest: PropTypes.func.isRequired,
     createRequest: PropTypes.func.isRequired,
     loadMessages: PropTypes.func.isRequired,
+    createMessage: PropTypes.func.isRequired,
+    messageUpdates: PropTypes.shape({}).isRequired,
   };
   static defaultProps = {
     logs: null,
@@ -211,6 +220,7 @@ class AccountContainer extends React.Component {
     this.handleImageChange = this.handleImageChange.bind(this);
     this.getUserData = this.getUserData.bind(this);
     this.onResponsive = this.onResponsive.bind(this);
+    this.onNotify = this.onNotify.bind(this);
   }
 
   componentDidMount() {
@@ -248,6 +258,20 @@ class AccountContainer extends React.Component {
       });
     }
   }
+  onNotify(values) {
+    this.props.createMessage({
+      recipientType: 'USER',
+      messageType: 'COMMUNICATION',
+      recipients: [this.props.user.id],
+      subject: {
+        de: `${this.props.sessionUser.name} ${this.props.sessionUser.surname}`,
+      },
+      communication: {
+        textHtml: values.text,
+        replyable: true,
+      },
+    });
+  }
 
   getUserData(user) {
     const { id } = user;
@@ -277,6 +301,7 @@ class AccountContainer extends React.Component {
   handleImageChange() {
     this.setState({ showUpload: true });
   }
+
   render() {
     const {
       subscription,
@@ -299,6 +324,9 @@ class AccountContainer extends React.Component {
         user={this.props.user}
         fetchProfileData={this.props.fetchUser}
         updates={this.props.updates}
+        messageUpdates={this.props.messageUpdates}
+        onSend={this.onNotify}
+        sessionUser={this.props.sessionUser}
       />
     );
     if (!ownAccount) {
@@ -511,6 +539,7 @@ const mapDispatch = {
   createRequest,
   deleteRequest,
   loadMessages,
+  createMessage,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getUser(state, user.id) || user,
@@ -522,6 +551,7 @@ const mapStateToProps = (state, { user }) => ({
   logs: getLogs(state),
   logPending: getLogIsFetching(state),
   logError: getLogErrorMessage(state),
+  messageUpdates: getMessageUpdates(state),
 });
 
 export default connect(mapStateToProps, mapDispatch)(
