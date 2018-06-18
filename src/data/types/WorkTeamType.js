@@ -31,6 +31,9 @@ const WorkTeamType = new ObjectType({
         return User.gen(viewer, data.coordinatorId, loaders);
       },
     },
+    coordinatorId: {
+      type: ID,
+    },
     name: {
       type: GraphQLString,
     },

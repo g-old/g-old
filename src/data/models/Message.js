@@ -84,6 +84,17 @@ class Message {
       if (workteam.coordinatorId === viewer.id) {
         data.isCoordinator = true; // eslint-disable-line no-param-reassign
       }
+    } else if (
+      !data.reply &&
+      data.recipientType === 'user' &&
+      data.recipients.length === 1 &&
+      data.messageType === 'communication'
+    ) {
+      const recipientId = data.recipients[0];
+      const wtIds = await knex('work_teams')
+        .where({ coordinator_id: recipientId })
+        .pluck('id');
+      data.workTeamIds = wtIds; // eslint-disable-line no-param-reassign
     }
     if (!canMutate(viewer, data, Models.MESSAGE)) return null;
     let messageData;

@@ -306,6 +306,13 @@ function messageWriteControl(viewer, data) {
     return true;
   } else if (data.isReply || data.isCoordinator) {
     return true;
+  } else if (viewer.groups & Groups.VIEWER) {
+    // member can contact coordinator
+    if (data.workTeamIds) {
+      if (data.workTeamIds.some(wtId => viewer.wtMemberships.includes(wtId))) {
+        return true;
+      }
+    }
   }
   return false;
 }

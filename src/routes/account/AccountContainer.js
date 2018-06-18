@@ -264,7 +264,9 @@ class AccountContainer extends React.Component {
       messageType: 'COMMUNICATION',
       recipients: [this.props.user.id],
       subject: {
-        de: `${this.props.sessionUser.name} ${this.props.sessionUser.surname}`,
+        de: `Private message from ${this.props.sessionUser.name} ${
+          this.props.sessionUser.surname
+        }`,
       },
       communication: {
         textHtml: values.text,

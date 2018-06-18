@@ -63,6 +63,7 @@ const workTeam = `
     id
     displayName
     logo
+    coordinatorId,
     `;
 
 const messageFields = `

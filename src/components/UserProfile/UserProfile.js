@@ -16,7 +16,8 @@ const isContactable = (workteams, accountId, visitor) => {
   if (workteams && accountId != visitor.id) {
     if (workteams.some(wt => wt.coordinatorId == accountId)) {
       // is coordinator
-      if (workteams.some(wt => visitor.wtMemberships.includes(wt.id))) {
+
+      if (workteams.some(wt => visitor.wtMemberships.includes(Number(wt.id)))) {
         // visitor is member
         return true;
       }
@@ -64,6 +65,25 @@ class UserProfile extends React.Component {
     };
 
     this.toggleLayer = this.toggleLayer.bind(this);
+  }
+
+  componentWillReceiveProps({ user, messageUpdates }) {
+    if (user !== this.props.user) {
+      this.setState({
+        contactable: isContactable(
+          user.workTeams,
+          user.id,
+          this.props.sessionUser,
+        ),
+      });
+    }
+    if (
+      messageUpdates &&
+      messageUpdates.success &&
+      !this.props.messageUpdates.success
+    ) {
+      this.toggleLayer();
+    }
   }
 
   toggleLayer() {
@@ -196,10 +216,20 @@ class UserProfile extends React.Component {
         {this.state.layerOpen && (
           <Layer onClose={this.toggleLayer}>
             <Box padding="medium">
-              <MessageForm
-                onSend={this.props.onSend}
-                updates={this.props.messageUpdates || {}}
-              />
+              <div
+                style={{
+                  paddingTop: '2em',
+                  display: 'flex',
+                  width: '30em',
+                  margin: '0 auto',
+                  justifyContent: 'center',
+                }}
+              >
+                <MessageForm
+                  onSend={this.props.onSend}
+                  updates={this.props.messageUpdates || {}}
+                />
+              </div>
             </Box>
           </Layer>
         )}
