@@ -7,6 +7,9 @@ import {
   CREATE_DISCUSSION_START,
   CREATE_DISCUSSION_SUCCESS,
   CREATE_DISCUSSION_ERROR,
+  UPDATE_DISCUSSION_START,
+  UPDATE_DISCUSSION_SUCCESS,
+  UPDATE_DISCUSSION_ERROR,
 } from '../constants';
 import {
   discussion as discussionSchema,
@@ -77,6 +80,11 @@ const discussionQuery = `query($id:ID $parentId:ID){
 
 const createDiscussionMutation = `mutation($workTeamId:ID $content:String $title:String){
   createDiscussion(discussion:{workTeamId:$workTeamId content:$content title:$title}){
+    ${discussionFragment}
+  }
+}`;
+const updateDiscussionMutation = `mutation($discussion: DiscussionInput){
+  updateDiscussion(discussion:$discussion){
     ${discussionFragment}
   }
 }`;
@@ -184,6 +192,46 @@ export function createDiscussion(discussion) {
         },
         message: error.message || 'Something went wrong',
         id: virtualId,
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function updateDiscussion(discussion) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    if (process.env.BROWSER) {
+      const state = getState();
+      const updates = getDiscussionUpdates(state, discussion.id);
+
+      if (updates.pending) {
+        return false;
+      }
+    }
+    dispatch({
+      type: UPDATE_DISCUSSION_START,
+    });
+    try {
+      const { data } = await graphqlRequest(
+        updateDiscussionMutation,
+        discussion,
+      );
+      const normalizedData = normalize(data.updateDiscussion, discussionSchema);
+      // TODO change filter structure of reducer
+
+      dispatch({
+        type: UPDATE_DISCUSSION_SUCCESS,
+        payload: normalizedData,
+      });
+    } catch (error) {
+      dispatch({
+        type: UPDATE_DISCUSSION_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
       });
       return false;
     }

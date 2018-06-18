@@ -87,6 +87,25 @@ class Discussion {
     }
     return discussion;
   }
+
+  static async update(viewer, data) {
+    if (!data || !data.id) return null;
+    const isCoordinator = await checkIfCoordinator(viewer, data);
+
+    if (!canMutate(viewer, { ...data, isCoordinator }, Models.DISCUSSION))
+      return null;
+
+    const newData = { updated_at: new Date() };
+    if (data.closedAt) {
+      newData.closed_at = new Date();
+    }
+
+    const [discussion = null] = await knex('discussions')
+      .update(newData)
+      .returning('*');
+
+    return discussion ? new Discussion(discussion) : null;
+  }
 }
 
 export default Discussion;

@@ -19,6 +19,9 @@ const DiscussionInputType = new GraphQLInputObjectType({
     title: {
       type: String,
     },
+    closedAt: {
+      type: String,
+    },
   },
 });
 export default DiscussionInputType;
