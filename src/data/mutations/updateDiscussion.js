@@ -6,12 +6,16 @@ import Discussion from '../models/Discussion';
 const updateDiscussion = {
   type: new GraphQLNonNull(DiscussionType),
   args: {
-    comment: {
+    discussion: {
       type: DiscussionInputType,
     },
   },
-  resolve: async (data, { comment }, { viewer, loaders }) => {
-    const updatedDiscussion = await Discussion.update(viewer, comment, loaders);
+  resolve: async (data, { discussion }, { viewer, loaders }) => {
+    const updatedDiscussion = await Discussion.update(
+      viewer,
+      discussion,
+      loaders,
+    );
 
     return updatedDiscussion;
   },

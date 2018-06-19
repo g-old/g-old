@@ -60,6 +60,7 @@ import createComment from './mutations/createComment';
 import updateComment from './mutations/updateComment';
 import deleteComment from './mutations/deleteComment';
 import createDiscussion from './mutations/createDiscussion';
+import updateDiscussion from './mutations/updateDiscussion';
 import discussion from './queries/discussion';
 import comments from './queries/comments';
 import createRequest from './mutations/createRequest';
@@ -147,6 +148,7 @@ const schema = new Schema({
       updateComment,
       deleteComment,
       createDiscussion,
+      updateDiscussion,
       createRequest,
       updateRequest,
       deleteRequest,

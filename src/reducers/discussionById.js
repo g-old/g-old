@@ -26,6 +26,7 @@ export default function byId(state = {}, action) {
     case LOAD_FEED_SUCCESS: {
       return merge({}, state, action.payload.entities.discussions);
     }
+
     case CREATE_COMMENT_SUCCESS: {
       const comment = action.payload.entities.comments[action.payload.result];
       return comment.parentId

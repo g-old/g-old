@@ -88,13 +88,11 @@ class Subscription {
       subscriptionType = SubscriptionType.ALL;
     }
     newData.subscription_type = subscriptionType;
-
     const subscriptionInDB = await knex.transaction(async trx => {
       const [subscription = null] = await knex('subscriptions')
         .transacting(trx)
         .insert(newData)
         .returning('*');
-
       return subscription;
     });
 

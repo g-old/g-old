@@ -7,9 +7,9 @@ import s from './Discussion.css';
 class Discussion extends React.Component {
   static propTypes = {
     title: PropTypes.string.isRequired,
-    state: PropTypes.string.isRequired,
     content: PropTypes.string.isRequired,
     createdAt: PropTypes.string.isRequired,
+    closedAt: PropTypes.string,
     spokesman: PropTypes.shape({
       thumbnail: PropTypes.string,
       name: PropTypes.string,
@@ -18,12 +18,13 @@ class Discussion extends React.Component {
   };
   static defaultProps = {
     spokesman: null,
+    closedAt: null,
   };
   render() {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <div className={s.state}>{this.props.state}</div>
+          <div className={s.state}>{this.props.closedAt && 'CLOSED'}</div>
           <div className={s.headline}>{this.props.title}</div>
           <div className={s.date}>
             <FormattedRelative value={this.props.createdAt} />

@@ -91,16 +91,16 @@ class Discussion {
   static async update(viewer, data) {
     if (!data || !data.id) return null;
     const isCoordinator = await checkIfCoordinator(viewer, data);
-
     if (!canMutate(viewer, { ...data, isCoordinator }, Models.DISCUSSION))
       return null;
 
     const newData = { updated_at: new Date() };
-    if (data.closedAt) {
-      newData.closed_at = new Date();
+    if ('close' in data) {
+      newData.closed_at = data.close === true ? new Date() : null;
     }
 
     const [discussion = null] = await knex('discussions')
+      .where({ id: data.id })
       .update(newData)
       .returning('*');
 

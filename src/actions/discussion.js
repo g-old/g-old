@@ -56,6 +56,7 @@ ${discussionFields}
     id
     displayName
     logo
+    coordinatorId
   }
   comments{
     id
@@ -214,10 +215,9 @@ export function updateDiscussion(discussion) {
       type: UPDATE_DISCUSSION_START,
     });
     try {
-      const { data } = await graphqlRequest(
-        updateDiscussionMutation,
+      const { data } = await graphqlRequest(updateDiscussionMutation, {
         discussion,
-      );
+      });
       const normalizedData = normalize(data.updateDiscussion, discussionSchema);
       // TODO change filter structure of reducer
 

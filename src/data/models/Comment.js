@@ -68,7 +68,10 @@ class Comment {
         viewer,
         {
           ...data,
-          discussion: { workTeamId: discussion.work_team_id },
+          discussion: {
+            workTeamId: discussion.work_team_id,
+            closedAt: discussion.closed_at,
+          },
           creating: true,
         },
         Models.COMMENT,
@@ -133,7 +136,11 @@ class Comment {
     if (
       !canMutate(
         viewer,
-        { ...data, authorId: oldComment.author_id, discussion },
+        {
+          ...data,
+          authorId: oldComment.author_id,
+          discussion: { closedAt: discussion.closed_at },
+        },
         Models.COMMENT,
       )
     )
@@ -167,7 +174,11 @@ class Comment {
     if (
       !canMutate(
         viewer,
-        { ...data, authorId: oldComment.author_id, discussion },
+        {
+          ...data,
+          authorId: oldComment.author_id,
+          discussion: { closedAt: discussion.closed_at },
+        },
         Models.COMMENT,
       )
     ) {

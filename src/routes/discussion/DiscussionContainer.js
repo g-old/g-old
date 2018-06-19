@@ -7,7 +7,7 @@ import WorkteamHeader from '../../components/WorkteamHeader';
 import s from './DiscussionContainer.css';
 // import { defineMessages, FormattedMessage } from 'react-intl';
 // import history from '../../history';
-import { loadDiscussion } from '../../actions/discussion';
+import { loadDiscussion, updateDiscussion } from '../../actions/discussion';
 import {
   createComment,
   loadComments,
@@ -30,12 +30,14 @@ import {
 import FetchError from '../../components/FetchError';
 import Discussion from '../../components/Discussion';
 import Box from '../../components/Box';
-// import Button from '../../components/Button';
+import Button from '../../components/Button';
+import { ICONS } from '../../constants';
 // import Filter from '../../components/Filter';
 // import CheckBox from '../../components/CheckBox';
 import Comment from '../../components/Comment';
 import history from '../../history';
 import SubscriptionButton from '../../components/SubscriptionButton';
+import { Groups } from '../../organization';
 
 const handleProfileClick = ({ id }) => {
   if (id) history.push(`/accounts/${id}`);
@@ -46,6 +48,7 @@ class DiscussionContainer extends React.Component {
       comments: PropTypes.arrayOf(PropTypes.shape({})),
       id: PropTypes.oneOfType(PropTypes.string, PropTypes.number),
       subscription: PropTypes.shape({}),
+      closedAt: PropTypes.string,
     }).isRequired,
     user: PropTypes.shape({}).isRequired,
     proposalId: PropTypes.number.isRequired,
@@ -74,6 +77,8 @@ class DiscussionContainer extends React.Component {
     createSubscription: PropTypes.func.isRequired,
     updateSubscription: PropTypes.func.isRequired,
     deleteSubscription: PropTypes.func.isRequired,
+    updateDiscussion: PropTypes.func.isRequired,
+
     subscriptionStatus: PropTypes.shape({}).isRequired,
   };
   static defaultProps = {
@@ -89,6 +94,7 @@ class DiscussionContainer extends React.Component {
     this.handleCommentFetching = this.handleCommentFetching.bind(this);
     this.handleReply = this.handleReply.bind(this);
     this.handleSubscription = this.handleSubscription.bind(this);
+    this.handleDiscussionClosing = this.handleDiscussionClosing.bind(this);
   }
 
   componentDidMount() {
@@ -127,9 +133,18 @@ class DiscussionContainer extends React.Component {
   handleCommentFetching({ parentId }) {
     this.props.loadComments({ parentId });
   }
+  handleDiscussionClosing() {
+    const { discussion } = this.props;
+    this.props.updateDiscussion({
+      id: discussion.id,
+      close: !discussion.closedAt,
+    });
+  }
 
   handleReply({ id }) {
-    this.setState({ replying: id || '0000' }); // for main input
+    if (!this.props.discussion.closedAt) {
+      this.setState({ replying: id || '0000' }); // for main input
+    }
   }
   handleSubscription({ targetType, subscriptionType }) {
     const { id, subscription } = this.props.discussion;
@@ -173,6 +188,35 @@ class DiscussionContainer extends React.Component {
       );
     }
     if (this.isReady()) {
+      let closingElement;
+      if (
+        discussion.workTeam.coordinatorId == user.id || // eslint-disable-line
+        user.groups & Groups.ADMIN // eslint-disable-line
+      ) {
+        closingElement = (
+          <Button
+            plain
+            onClick={this.handleDiscussionClosing}
+            icon={
+              <svg
+                version="1.1"
+                viewBox="0 0 24 24"
+                width="24px"
+                height="24px"
+                role="img"
+                aria-label="lock"
+              >
+                <path
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth="2"
+                  d={ICONS[discussion.closedAt ? 'unlock' : 'lock']}
+                />
+              </svg>
+            }
+          />
+        );
+      }
       // return proposal, poll, statementslist
       if (!discussion.comments) return <span>NOTHING TO SEE</span>;
       return (
@@ -185,40 +229,47 @@ class DiscussionContainer extends React.Component {
                 flexDirection: 'column',
               }}
             >
-              <WorkteamHeader
-                displayName={discussion.workTeam.displayName}
-                id={discussion.workTeam.id}
-                logo={discussion.workTeam.logo}
+              <Box between>
+                <WorkteamHeader
+                  displayName={discussion.workTeam.displayName}
+                  id={discussion.workTeam.id}
+                  logo={discussion.workTeam.logo}
+                />
+
+                {closingElement}
+              </Box>
+              <Discussion
+                title={discussion.title}
+                content={discussion.content}
+                createdAt={discussion.createdAt}
+                closedAt={discussion.closedAt}
+                spokesman={discussion.spokesman}
               />
-              {/* <CheckBox
-              toggle
-              checked={discussion.subscribed}
-              label={discussion.subscribed ? 'ON' : 'OFF'}
-              onChange={this.handleSubscription}
-              disabled={isFetching}
-            /> */}
-              <Discussion {...discussion} />
-              <SubscriptionButton
-                onSubscribe={this.handleSubscription}
-                subscription={discussion.subscription}
-                targetType="DISCUSSION"
-                status={subscriptionStatus}
-              />
+              {!discussion.closedAt && (
+                <SubscriptionButton
+                  onSubscribe={this.handleSubscription}
+                  subscription={discussion.subscription}
+                  targetType="DISCUSSION"
+                  status={subscriptionStatus}
+                />
+              )}
             </div>
             <Box tag="section" column pad fill className={s.commentsSection}>
-              <Comment
-                asInput
-                user={user}
-                onCreate={this.handleCommentCreation}
-                updates={this.props.updates['0000'] || {}}
-              />
+              {!discussion.closedAt && (
+                <Comment
+                  asInput
+                  user={user}
+                  onCreate={this.handleCommentCreation}
+                  updates={this.props.updates['0000'] || {}}
+                />
+              )}
 
               {discussion.comments &&
                 discussion.comments.map(c => (
                   <Comment
                     {...c}
                     showReplies={c.id === commentId && childId}
-                    onReply={this.handleReply}
+                    onReply={!discussion.closedAt && this.handleReply}
                     loadReplies={this.handleCommentFetching}
                     onCreate={this.handleCommentCreation}
                     onUpdate={this.props.updateComment}
@@ -240,7 +291,7 @@ class DiscussionContainer extends React.Component {
                       c.replies.map(r => (
                         <Comment
                           {...r}
-                          onReply={this.handleReply}
+                          onReply={!discussion.closedAt && this.handleReply}
                           reply
                           onCreate={this.handleCommentCreation}
                           onUpdate={this.props.updateComment}
@@ -289,6 +340,7 @@ const mapDispatch = {
   createSubscription,
   updateSubscription,
   deleteSubscription,
+  updateDiscussion,
 };
 
 export default connect(mapStateToProps, mapDispatch)(
