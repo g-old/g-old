@@ -2,6 +2,8 @@ import { combineReducers } from 'redux';
 import {
   LOAD_DISCUSSION_SUCCESS,
   LOAD_DISCUSSIONS_SUCCESS,
+  LOAD_DISCUSSIONS_START,
+  LOAD_DISCUSSIONS_ERROR,
   LOAD_WORKTEAM_SUCCESS,
 } from '../constants';
 
@@ -42,9 +44,39 @@ const createReducer = filter => {
         return state;
     }
   };
+  const isFetching = (state = false, action) => {
+    if (action.filter !== filter) {
+      return state;
+    }
+    switch (action.type) {
+      case LOAD_DISCUSSIONS_START:
+        return true;
+      case LOAD_DISCUSSIONS_SUCCESS:
+      case LOAD_DISCUSSIONS_ERROR:
+        return false;
+      default:
+        return state;
+    }
+  };
+
+  const errorMessage = (state = null, action) => {
+    if (action.filter !== filter) {
+      return state;
+    }
+    switch (action.type) {
+      case LOAD_DISCUSSIONS_ERROR:
+        return action.message;
+      case LOAD_DISCUSSIONS_START:
+      case LOAD_DISCUSSIONS_SUCCESS:
+        return null;
+
+      default:
+        return state;
+    }
+  };
   const pageInfo = createPageInfo(LOAD_DISCUSSIONS_SUCCESS, filter);
 
-  return combineReducers({ ids, pageInfo });
+  return combineReducers({ ids, pageInfo, isFetching, errorMessage });
 };
 
 const byState = combineReducers({
@@ -53,7 +85,11 @@ const byState = combineReducers({
 });
 export default byState;
 
-export const getPageInfo = state => state.pageInfo || {};
+export const getPageInfo = state => ({
+  pagination: state.pageInfo,
+  pending: state.isFetching,
+  error: state.errorMessage,
+});
 
 export const getIds = (state, filter) =>
   state[filter] ? state[filter].ids : [];

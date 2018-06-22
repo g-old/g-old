@@ -133,32 +133,8 @@ const WorkTeamType = new ObjectType({
       type: GraphQLInt,
     },
     discussionConnection,
-    /* discussions: {
-      type: new GraphQLList(DiscussionType),
-      resolve(data, args, { viewer, loaders }) {
-        if (viewer && viewer.wtMemberships.includes(data.id)) {
-          return knex('discussions')
-            .where({ work_team_id: data.id })
-            .orderBy('created_at', 'DESC')
-            .pluck('id')
-            .then(ids => ids.map(id => Discussion.gen(viewer, id, loaders)));
-        }
-        return null;
-      },
-    }, */
-    proposalConnection /* {
-      type: new GraphQLList(ProposalType),
-      resolve(data, args, { viewer, loaders }) {
-        if (viewer && viewer.wtMemberships.includes(data.id)) {
-          return knex('proposals')
-            .where({ work_team_id: data.id })
-            .orderBy('created_at', 'DESC')
-            .pluck('id')
-            .then(ids => ids.map(id => Proposal.gen(viewer, id, loaders)));
-        }
-        return null;
-      },
-    }, */,
+
+    proposalConnection,
 
     // TODO see https://github.com/graphql/swapi-graphql/blob/master/src/schema/connections.js
     // make own query and link here

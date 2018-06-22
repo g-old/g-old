@@ -22,7 +22,9 @@ class ListView extends React.Component {
     children: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     onLoadMore: PropTypes.func.isRequired,
     onRetry: PropTypes.func.isRequired,
-    pageInfo: PropTypes.shape({ endCursor: PropTypes.string }).isRequired,
+    pageInfo: PropTypes.shape({
+      pagination: PropTypes.shape({ endCursor: PropTypes.string }),
+    }).isRequired,
     isFetching: PropTypes.bool.isRequired,
     errorMessage: PropTypes.string,
   };
@@ -35,7 +37,7 @@ class ListView extends React.Component {
 
   handleLoadMore() {
     this.props.onLoadMore({
-      after: this.props.pageInfo.endCursor,
+      after: this.props.pageInfo.pagination.endCursor,
     });
   }
   renderChildren() {
@@ -46,8 +48,11 @@ class ListView extends React.Component {
     ));
   }
   render() {
-    const { children, pageInfo, isFetching, errorMessage } = this.props;
-    if (isFetching && !children.length) {
+    const {
+      children,
+      pageInfo: { pending, errorMessage, pagination },
+    } = this.props;
+    if (pending && !children.length) {
       return (
         <div>
           <p> Loading ... </p>
@@ -59,7 +64,7 @@ class ListView extends React.Component {
       return (
         <div>
           <FetchError
-            isFetching={isFetching}
+            isFetching={pending}
             message={errorMessage}
             onRetry={this.props.onRetry}
           />
@@ -69,10 +74,10 @@ class ListView extends React.Component {
     return (
       <Box column>
         <List>{this.renderChildren()}</List>
-        {pageInfo.hasNextPage && (
+        {pagination.hasNextPage && (
           <Button
             primary
-            disabled={isFetching}
+            disabled={pending}
             onClick={this.handleLoadMore}
             label={<FormattedMessage {...messages.loadMore} />}
           />

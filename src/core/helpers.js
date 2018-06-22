@@ -280,6 +280,7 @@ export const join = (lookupTable, mainTable, lookupKey, mainKey, select) => {
 export const depaginate = (resource, data) => {
   let connections;
   const response = JSON.parse(JSON.stringify(data));
+
   if (Array.isArray(resource)) {
     connections = resource;
   } else {

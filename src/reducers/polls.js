@@ -14,7 +14,6 @@ import {
   LOAD_FEED_SUCCESS,
   CREATE_PROPOSAL_SUCCESS,
   UPDATE_PROPOSAL_SUCCESS,
-  JOIN_WORKTEAM_SUCCESS,
   LOAD_WORKTEAM_SUCCESS,
   SSE_UPDATE_SUCCESS,
 } from '../constants';
@@ -110,7 +109,6 @@ export default function polls(state = {}, action) {
     case LOAD_NOTIFICATIONS_SUCCESS:
     case UPDATE_PROPOSAL_SUCCESS:
     case CREATE_PROPOSAL_SUCCESS:
-    case JOIN_WORKTEAM_SUCCESS:
     case LOAD_WORKTEAM_SUCCESS:
     case LOAD_PROPOSAL_SUCCESS:
       return merge({}, state, action.payload.entities.polls);

@@ -3,12 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadProposalsList, loadProposal } from '../../actions/proposal';
 import history from '../../history';
-import {
-  getVisibleProposals,
-  getProposalsIsFetching,
-  getProposalsErrorMessage,
-  getProposalsPage,
-} from '../../reducers/index';
+import { getVisibleProposals, getProposalsPage } from '../../reducers/index';
 import FetchError from '../../components/FetchError';
 import ProposalsSubHeader from '../../components/ProposalsSubHeader';
 import ProposalListView from '../../components/ProposalListView';
@@ -49,15 +44,7 @@ class ProposalsOverviewContainer extends React.Component {
     filter: PropTypes.string.isRequired,
     isFetching: PropTypes.bool.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
-    errorMessage: PropTypes.string,
-    pageInfo: PropTypes.shape({
-      endCursor: PropTypes.string,
-      hasNextPage: PropTypes.bool,
-    }).isRequired,
-  };
-
-  static defaultProps = {
-    errorMessage: '',
+    pageInfo: PropTypes.shape({}).isRequired,
   };
 
   constructor(props) {
@@ -76,8 +63,14 @@ class ProposalsOverviewContainer extends React.Component {
   }
 
   render() {
-    const { filter, proposals, isFetching, errorMessage } = this.props;
-    if (isFetching && !proposals.length) {
+    const {
+      filter,
+      proposals,
+      isFetching,
+      pageInfo: { errorMessage, pending, pagination },
+    } = this.props;
+
+    if (pending && !proposals.length) {
       return (
         <div>
           <ProposalsSubHeader filter={filter} />
@@ -92,7 +85,7 @@ class ProposalsOverviewContainer extends React.Component {
           <ProposalsSubHeader filter={filter} />
 
           <FetchError
-            isFetching={isFetching}
+            isFetching={pending}
             message={errorMessage}
             onRetry={() => this.props.loadProposalsList({ state: filter })}
           />
@@ -110,7 +103,7 @@ class ProposalsOverviewContainer extends React.Component {
         <ProposalListView
           proposals={proposals}
           onProposalClick={this.onProposalClick}
-          pageInfo={this.props.pageInfo}
+          pageInfo={pagination}
           filter={filter}
           onLoadMore={this.props.loadProposalsList}
           isFetching={isFetching}
@@ -124,8 +117,6 @@ const mapStateToProps = (state, { filter = '' }) => ({
   proposals: getVisibleProposals(state, filter)
     .filter(p => !p.workTeamId)
     .sort(filter === 'active' ? sortActiveProposals : sortClosedProposals),
-  isFetching: getProposalsIsFetching(state, filter),
-  errorMessage: getProposalsErrorMessage(state, filter),
   pageInfo: getProposalsPage(state, filter),
 });
 

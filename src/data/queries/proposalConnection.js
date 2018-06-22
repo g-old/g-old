@@ -165,7 +165,12 @@ const proposal = {
       return acc;
     }, {});
     const data = await Promise.all(queries);
-    const edges = data.map(p => ({ node: p }));
+    const edges = data.reduce((result, curr) => {
+      if (curr) {
+        result.push({ node: curr });
+      }
+      return result;
+    }, []);
     const endCursor =
       edges.length > 0
         ? Buffer.from(
