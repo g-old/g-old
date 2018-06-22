@@ -3,11 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import history from '../../history';
-import {
-  loadProposal,
-  createProposalSub,
-  deleteProposalSub,
-} from '../../actions/proposal';
+import { loadProposal } from '../../actions/proposal';
 import {
   createSubscription,
   updateSubscription,
@@ -71,8 +67,6 @@ class ProposalContainer extends React.Component {
     voteUpdates: PropTypes.shape({}).isRequired,
     followeeVotes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    createProposalSub: PropTypes.func.isRequired,
-    deleteProposalSub: PropTypes.func.isRequired,
     createSubscription: PropTypes.func.isRequired,
     deleteSubscription: PropTypes.func.isRequired,
     updateSubscription: PropTypes.func.isRequired,
@@ -302,8 +296,6 @@ const mapDispatch = {
   updateVote,
   deleteVote,
   getVotes,
-  createProposalSub,
-  deleteProposalSub,
   createSubscription,
   updateSubscription,
   deleteSubscription,

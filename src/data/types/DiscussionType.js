@@ -44,6 +44,9 @@ const DiscussionType = new ObjectType({
       resolve: (data, args, { viewer, loaders }) =>
         WorkTeam.gen(viewer, data.workTeamId, loaders),
     },
+    workTeamId: {
+      type: ID,
+    },
     // TODO or more
     ownComment: {
       type: CommentType,

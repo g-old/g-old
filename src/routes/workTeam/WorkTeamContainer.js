@@ -7,6 +7,7 @@ import {
   joinWorkTeam,
   leaveWorkTeam,
 } from '../../actions/workTeam';
+import { loadDiscussions } from '../../actions/discussion';
 import { createRequest, deleteRequest } from '../../actions/request';
 import { getWorkTeam, getWorkTeamStatus } from '../../reducers';
 import WorkTeam from '../../components/WorkTeam';
@@ -14,6 +15,7 @@ import Box from '../../components/Box';
 import Nav from './NavSidebar';
 import DiscussionPreview from '../../components/DiscussionPreview';
 import ProposalPreview from '../../components/ProposalPreview';
+import { loadProposalsList } from '../../actions/proposal';
 
 import history from '../../history';
 
@@ -34,6 +36,8 @@ class WorkTeamContainer extends React.Component {
     deleteRequest: PropTypes.func.isRequired,
     joinWorkTeam: PropTypes.func.isRequired,
     leaveWorkTeam: PropTypes.func.isRequired,
+    loadDiscussions: PropTypes.func.isRequired,
+    loadProposalsList: PropTypes.func.isRequired,
     workTeamUpdates: PropTypes.shape({
       id: PropTypes.string,
       discussions: PropTypes.arrayOf(PropTypes.shape({})),
@@ -157,6 +161,8 @@ class WorkTeamContainer extends React.Component {
           onLeave={this.props.leaveWorkTeam}
           onDeleteRequest={this.props.deleteRequest}
           user={user}
+          onLoadDiscussions={this.props.loadDiscussions}
+          onLoadProposals={this.props.loadProposalsList}
         />
       );
     }
@@ -180,6 +186,8 @@ const mapDispatch = {
   joinWorkTeam,
   leaveWorkTeam,
   deleteRequest,
+  loadDiscussions,
+  loadProposalsList,
 };
 
 export default connect(mapStateToProps, mapDispatch)(WorkTeamContainer);

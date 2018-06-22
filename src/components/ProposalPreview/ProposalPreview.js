@@ -25,11 +25,8 @@ class ProposalPreview extends React.Component {
       tags: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
     onClick: PropTypes.func.isRequired,
-    className: PropTypes.string,
   };
-  static defaultProps = {
-    className: null,
-  };
+
   constructor(props) {
     super(props);
     this.state = {};
@@ -89,7 +86,7 @@ class ProposalPreview extends React.Component {
     }
 
     return (
-      <div className={cn(s.root, this.props.className)}>
+      <div className={cn(s.root)}>
         <div className={s.container}>
           <div // eslint-disable-line
             style={{ display: 'flex', cursor: 'pointer' }}

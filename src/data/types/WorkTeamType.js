@@ -8,18 +8,15 @@ import {
   GraphQLBoolean,
 } from 'graphql';
 import UserType from './UserType';
-import DiscussionType from './DiscussionType';
 import GroupStatusType from './GroupStatusType';
 import PageType from './PageType';
-
 import Request from '../models/Request';
 import ProposalStatusType from '../types/ProposalStatusType';
-
-import Discussion from '../models/Discussion';
 import User from '../models/User';
 import knex from '../knex';
 import proposalConnection from '../queries/proposalConnection';
 import requestConnection from '../queries/requestConnection';
+import discussionConnection from '../queries/discussionConnection';
 
 const WorkTeamType = new ObjectType({
   name: 'WorkTeam',
@@ -135,7 +132,8 @@ const WorkTeamType = new ObjectType({
     numProposals: {
       type: GraphQLInt,
     },
-    discussions: {
+    discussionConnection,
+    /* discussions: {
       type: new GraphQLList(DiscussionType),
       resolve(data, args, { viewer, loaders }) {
         if (viewer && viewer.wtMemberships.includes(data.id)) {
@@ -147,7 +145,7 @@ const WorkTeamType = new ObjectType({
         }
         return null;
       },
-    },
+    }, */
     proposalConnection /* {
       type: new GraphQLList(ProposalType),
       resolve(data, args, { viewer, loaders }) {

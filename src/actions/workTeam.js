@@ -1,6 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import { normalize } from 'normalizr';
 import { pollFieldsForList } from './proposal';
+import { depaginate } from '../core/helpers';
+
 import {
   LOAD_WORKTEAMS_START,
   LOAD_WORKTEAMS_ERROR,
@@ -20,10 +22,14 @@ import {
   UPDATE_WORKTEAM_START,
   UPDATE_WORKTEAM_SUCCESS,
   UPDATE_WORKTEAM_ERROR,
+  LOAD_PROPOSAL_LIST_SUCCESS,
+  LOAD_DISCUSSIONS_SUCCESS,
 } from '../constants';
 import {
   workTeamList as workTeamListSchema,
   workTeam as workTeamSchema,
+  proposalList,
+  discussionList,
 } from '../store/schema';
 
 const userFields = `
@@ -45,6 +51,15 @@ content
 deniedAt
 updatedAt
 createdAt
+`;
+
+const discussionFields = `
+  id
+  title
+  createdAt
+  closedAt
+  numComments
+  workTeamId
 `;
 
 const workTeamFields = `
@@ -133,7 +148,7 @@ const workTeamWithDetails = `query($id:ID!){
 
     }}`;
 
-const workTeamQuery = `query($id:ID! $state:String){
+const workTeamQuery = `query($id:ID! $state:String, $closed:Boolean){
   workTeam(id:$id){
     ${workTeamFields}
     ownStatus{
@@ -145,11 +160,17 @@ const workTeamQuery = `query($id:ID! $state:String){
         deniedAt
       }
     }
-    discussions{
-      id
-      title
-      createdAt
-      numComments
+  }
+      discussionConnection(closed:$closed, workteamId:$id){
+        pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          ${discussionFields}
+        }
+      }
     }
     proposalConnection(state:$state workTeamId:$id){
       pageInfo{
@@ -162,7 +183,6 @@ const workTeamQuery = `query($id:ID! $state:String){
         }
       }
     }
-  }
 }`;
 
 const proposalStatusQuery = `query($id:ID! $first:Int){
@@ -265,16 +285,6 @@ const leaveWorkTeamMutation = `mutation($id:ID, $memberId:ID){
   }
 }`;
 
-const dePaginate = (data, resourceName) => {
-  let resources = [];
-  const connectionName = `${resourceName}Connection`;
-  if (data[connectionName]) {
-    resources = data[connectionName].edges.map(p => p.node);
-    data[`${resourceName}s`] = resources; // eslint-disable-line no-param-reassign
-  }
-  return data;
-};
-
 export function loadWorkTeams(withMembers) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
@@ -343,7 +353,7 @@ export function joinWorkTeam(workTeamData, details) {
       }
       data.joinWorkTeam.proposals = proposals;
       const normalizedData = normalize(
-        dePaginate(data.joinWorkTeam, 'request'),
+        depaginate(['proposal', 'request', 'discussion'], data.workTeam),
         workTeamSchema,
       );
 
@@ -380,30 +390,44 @@ export function leaveWorkTeam(workTeamData) {
   };
 }
 
-export function loadWorkTeam({ id, state = 'active' }, details) {
+export function loadWorkTeam({ id, closed, state }, details) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: LOAD_WORKTEAM_START,
     });
     const query = details ? workTeamWithDetails : workTeamQuery;
     try {
-      const { data } = await graphqlRequest(query, { id, state });
+      const { data } = await graphqlRequest(query, { id, closed, state });
 
-      // TODO make paginable
-      let proposals = [];
-      if (data.workTeam.proposalConnection) {
-        proposals = data.workTeam.proposalConnection.edges.map(p => p.node);
-      }
-      data.workTeam.proposals = proposals;
-      // TODO make paginable
-      let requests = [];
-      if (data.workTeam.requestConnection) {
-        requests = data.workTeam.requestConnection.edges.map(p => p.node);
-      }
-      data.workTeam.requests = requests;
-      const normalizedData = normalize(data.workTeam, workTeamSchema);
+      // for requests
 
-      dispatch({ type: LOAD_WORKTEAM_SUCCESS, payload: normalizedData });
+      if (!details) {
+        // page query
+        const depaginated = depaginate(['proposal', 'discussion'], data);
+
+        dispatch({
+          type: LOAD_PROPOSAL_LIST_SUCCESS,
+          payload: normalize(depaginated.proposals, proposalList),
+          filter: state,
+          pagination: data.proposalConnection.pageInfo,
+          savePageInfo: false,
+        });
+        dispatch({
+          type: LOAD_DISCUSSIONS_SUCCESS,
+          payload: normalize(depaginated.discussions, discussionList),
+          filter: closed ? 'closed' : 'active',
+          pagination: data.discussionConnection.pageInfo,
+          savePageInfo: false,
+        });
+      }
+      dispatch({
+        type: LOAD_WORKTEAM_SUCCESS,
+        payload: normalize(
+          depaginate(['request'], data.workTeam),
+          workTeamSchema,
+        ),
+        filter: closed ? 'closed' : 'active',
+      });
     } catch (e) {
       dispatch({
         type: LOAD_WORKTEAM_ERROR,

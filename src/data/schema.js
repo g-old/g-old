@@ -51,8 +51,6 @@ import joinWorkTeam from './mutations/joinWorkTeam';
 import leaveWorkTeam from './mutations/leaveWorkTeam';
 import workTeams from './queries/workTeams';
 import workTeam from './queries/workTeam';
-import createProposalSub from './mutations/createProposalSub';
-import deleteProposalSub from './mutations/deleteProposalSub';
 import logs from './queries/logs';
 import statistics from './queries/statistics';
 import userConnection from './queries/userConnection';
@@ -82,6 +80,8 @@ import notificationConnection from './queries/notificationConnection';
 import clearNotifications from './mutations/clearNotifications';
 import message from './queries/message';
 import messageConnection from './queries/messageConnection';
+import discussionConnection from './queries/discussionConnection';
+
 /* GENERATOR */
 
 const schema = new Schema({
@@ -111,6 +111,7 @@ const schema = new Schema({
       requestConnection,
       subscriptionConnection,
       notificationConnection,
+      discussionConnection,
       message,
       messageConnection,
       /* GENERATOR_QUERIES */
@@ -142,8 +143,6 @@ const schema = new Schema({
       createWorkTeam,
       joinWorkTeam,
       leaveWorkTeam,
-      createProposalSub,
-      deleteProposalSub,
       createComment,
       updateComment,
       deleteComment,

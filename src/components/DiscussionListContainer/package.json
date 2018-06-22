@@ -1,0 +1,6 @@
+{
+  "name": "DiscussionListContainer",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./DiscussionListContainer.js"
+}

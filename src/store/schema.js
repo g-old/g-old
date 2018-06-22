@@ -49,12 +49,24 @@ export const proposal = new schema.Entity('proposals', {
 export const proposalStatus = new schema.Entity('proposalStatus', {
   proposal,
 });
+export const comment = new schema.Entity('comments');
+comment.define({
+  author: user,
+  replies: [comment],
+});
+export const discussion = new schema.Entity('discussions', {
+  author: user,
+  comments: [comment],
+  ownComment: comment,
+  subscription,
+});
 export const workTeam = new schema.Entity('workTeams', {
   coordinator: user,
   members: [user],
   ownStatus: {
     request,
   },
+  discussions: [discussion],
   requests: [request],
   proposals: [proposal],
   linkedProposals: [proposalStatus],
@@ -72,18 +84,7 @@ message.define({
   parents: [message],
   replies: [message],
 });
-export const comment = new schema.Entity('comments');
-comment.define({
-  author: user,
-  replies: [comment],
-});
 
-export const discussion = new schema.Entity('discussions', {
-  author: user,
-  comments: [comment],
-  ownComment: comment,
-  subscription,
-});
 export const unionSchema = new schema.Union(
   {
     ProposalDL: proposal,

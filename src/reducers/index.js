@@ -20,6 +20,12 @@ export default combineReducers({
 });
 
 /* GENERATOR */
+export const getDiscussionPageInfo = (state, filter) =>
+  fromEntity.getDiscussionPageInfo(state.entities, filter);
+export const getWTDiscussionsByState = (state, id, filter) =>
+  fromEntity.getWTDiscussionsByState(state.entities, id, filter);
+export const getWTProposalsByState = (state, id, filter) =>
+  fromEntity.getWTProposalsByState(state.entities, id, filter);
 export const getMessagesByChannel = (state, channelId) =>
   fromEntity.getMessagesByChannel(state.entities, channelId);
 export const getMessageUpdates = state => fromUi.getMessageUpdates(state.ui);

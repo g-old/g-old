@@ -4,6 +4,9 @@ import {
   LOAD_DISCUSSION_START,
   LOAD_DISCUSSION_SUCCESS,
   LOAD_DISCUSSION_ERROR,
+  LOAD_DISCUSSIONS_START,
+  LOAD_DISCUSSIONS_SUCCESS,
+  LOAD_DISCUSSIONS_ERROR,
   CREATE_DISCUSSION_START,
   CREATE_DISCUSSION_SUCCESS,
   CREATE_DISCUSSION_ERROR,
@@ -13,17 +16,18 @@ import {
 } from '../constants';
 import {
   discussion as discussionSchema,
-  //  discussionList as discussionListSchema,
+  discussionList as discussionListSchema,
   //  tagArray as tagArraySchema,
 } from '../store/schema';
 import { getIsDiscussionFetching, getDiscussionUpdates } from '../reducers';
 
 const discussionFields = `
-id
-createdAt
-title
-numComments
-closedAt
+  id
+  title
+  createdAt
+  closedAt
+  numComments
+  workTeamId
 `;
 
 const authorFields = `
@@ -32,8 +36,8 @@ name
 surname
 thumbnail
         `;
-/* const discussionConnection = `query($first:Int, $after:String, $workTeamId:ID){
-  discussionConnection(first:$first after:$after, workTeamId:$workTeamId){
+const discussionConnection = `query($first:Int, $after:String, $workteamId:ID $closed:Boolean){
+  discussionConnection(first:$first after:$after, workteamId:$workteamId closed:$closed){
     pageInfo{
       endCursor
       hasNextPage
@@ -44,7 +48,7 @@ thumbnail
       }
     }
   }
-}`; */
+}`;
 
 const discussionFragment = `
 ${discussionFields}
@@ -113,6 +117,41 @@ const mergeRepliesInotParent = (parentId, comments) => {
     return acc;
   }, []);
 };
+
+export function loadDiscussions({ first, after, closed, workteamId }) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    // TODO check if pending
+    dispatch({ type: LOAD_DISCUSSIONS_START });
+    try {
+      const { data } = await graphqlRequest(discussionConnection, {
+        closed,
+        workteamId,
+        first,
+        after,
+      });
+      const discussions = data.discussionConnection.edges.map(p => p.node);
+      const normalizedData = normalize(discussions, discussionListSchema);
+
+      dispatch({
+        type: LOAD_DISCUSSIONS_SUCCESS,
+        payload: normalizedData,
+        filter: closed ? 'closed' : 'active',
+        pagination: data.discussionConnection.pageInfo,
+        savePageInfo: after != null,
+      });
+      return true;
+    } catch (error) {
+      dispatch({
+        type: LOAD_DISCUSSIONS_ERROR,
+        payload: {
+          error,
+        },
+      });
+      return false;
+    }
+  };
+}
+
 export function loadDiscussion({ id, parentId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // Dont fetch if pending

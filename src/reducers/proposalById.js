@@ -5,8 +5,6 @@ import {
   LOAD_FEED_SUCCESS,
   CREATE_PROPOSAL_SUCCESS,
   UPDATE_PROPOSAL_SUCCESS,
-  CREATE_PROPOSALSUB_SUCCESS,
-  DELETE_PROPOSALSUB_SUCCESS,
   SSE_UPDATE_SUCCESS,
   LOAD_WORKTEAM_SUCCESS,
   JOIN_WORKTEAM_SUCCESS,
@@ -50,12 +48,6 @@ export default function byId(state = {}, action) {
       return merge({}, state, action.payload.entities.proposals);
     }
     case UPDATE_PROPOSAL_SUCCESS: {
-      return merge({}, state, action.payload.entities.proposals);
-    }
-    case CREATE_PROPOSALSUB_SUCCESS: {
-      return merge({}, state, action.payload.entities.proposals);
-    }
-    case DELETE_PROPOSALSUB_SUCCESS: {
       return merge({}, state, action.payload.entities.proposals);
     }
 

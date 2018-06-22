@@ -1,6 +1,6 @@
 import {
-  LOAD_DISCUSSION_SUCCESS,
-  LOAD_DISCUSSIONS_SUCCESS,
+  LOAD_PROPOSAL_SUCCESS,
+  LOAD_PROPOSAL_LIST_SUCCESS,
   LOAD_WORKTEAM_SUCCESS,
 } from '../constants';
 
@@ -8,12 +8,12 @@ import { sortByWorkTeam } from './reducerUtils';
 
 const byWorkTeam = (state = {}, action) => {
   switch (action.type) {
-    case LOAD_DISCUSSION_SUCCESS:
+    case LOAD_PROPOSAL_SUCCESS:
     case LOAD_WORKTEAM_SUCCESS:
-    case LOAD_DISCUSSIONS_SUCCESS: {
-      const { discussions } = action.payload.entities;
-      if (!discussions) return state;
-      return sortByWorkTeam(state, discussions, 'workTeamId');
+    case LOAD_PROPOSAL_LIST_SUCCESS: {
+      const { proposals } = action.payload.entities;
+      if (!proposals) return state;
+      return sortByWorkTeam(state, proposals, 'workTeamId');
     }
 
     default: {

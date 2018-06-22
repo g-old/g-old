@@ -1,11 +1,6 @@
 .list {
   margin: 1rem auto;
 
-  > div {
-    margin: 0 0.5rem;
-    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.11);
-  }
-
   > div:not(:last-child) {
     margin-bottom: 1.5rem;
   }

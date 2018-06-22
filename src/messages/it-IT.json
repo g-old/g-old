@@ -251,7 +251,6 @@
       "src/components/WorkTeamForm/WorkTeamForm.js",
       "src/components/WorkTeamInput/WorkTeamInput.js",
       "src/components/WorkTeamManager/WorkTeamManager.js",
-      "src/routes/message/MessageContainer.js",
       "src/routes/passwordRecovery/PasswordRecovery.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
@@ -426,9 +425,9 @@
     "message": "Invia",
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
+      "src/components/MessageForm/MessageForm.js",
       "src/components/MessageInput/MessageInput.js",
-      "src/components/ProposalInput/ProposalInput.js",
-      "src/routes/message/MessageContainer.js"
+      "src/components/ProposalInput/ProposalInput.js"
     ]
   },
   {

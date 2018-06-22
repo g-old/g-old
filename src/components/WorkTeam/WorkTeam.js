@@ -9,8 +9,7 @@ import Value from '../Value';
 import ConfirmLayer from '../ConfirmLayer';
 import Box from '../Box';
 import Button from '../Button';
-import DiscussionPreview from '../DiscussionPreview';
-import ProposalPreview from '../ProposalPreview';
+import Select from '../Select';
 import history from '../../history';
 import Tabs from '../Tabs';
 import Tab from '../Tab';
@@ -18,6 +17,8 @@ import { ICONS } from '../../constants';
 import { Groups } from '../../organization';
 import Link from '../Link';
 import UserThumbnail from '../UserThumbnail';
+import DiscussionListContainer from '../DiscussionListContainer';
+import ProposalListContainer from '../ProposalListContainer';
 
 const messages = defineMessages({
   join: {
@@ -78,6 +79,8 @@ class WorkTeam extends React.Component {
     onJoin: PropTypes.func.isRequired,
     onLeave: PropTypes.func.isRequired,
     onDeleteRequest: PropTypes.func.isRequired,
+    onLoadDiscussions: PropTypes.func.isRequired,
+    onLoadProposals: PropTypes.func.isRequired,
   };
   static defaultProps = {
     logo: null,
@@ -97,7 +100,23 @@ class WorkTeam extends React.Component {
     this.onOpenLayer = this.onOpenLayer.bind(this);
     this.onCloseLayer = this.onCloseLayer.bind(this);
     this.onLeave = this.onLeave.bind(this);
-    this.state = { showLayer: false, activeTabIndex: 0 };
+    this.handleDiscussionFilterChange = this.handleDiscussionFilterChange.bind(
+      this,
+    );
+    this.handleProposalFilterChange = this.handleProposalFilterChange.bind(
+      this,
+    );
+    this.handleLoadMoreDiscussions = this.handleLoadMoreDiscussions.bind(this);
+    this.handleLoadMoreProposals = this.handleLoadMoreProposals.bind(this);
+    this.fetchDiscussions = this.fetchDiscussions.bind(this);
+    this.fetchProposals = this.fetchProposals.bind(this);
+
+    this.state = {
+      showLayer: false,
+      activeTabIndex: 0,
+      discussionStatus: 'active',
+      proposalsStatus: 'active',
+    };
     this.activateTab = this.activateTab.bind(this);
   }
 
@@ -124,11 +143,54 @@ class WorkTeam extends React.Component {
   handleDiscussionClick({ discussionId }) {
     history.push(`${this.props.id}/discussions/${discussionId}`);
   }
+  handleLoadMoreDiscussions({ after }) {
+    const { discussionStatus } = this.state;
+    const { id } = this.props;
+    this.props.onLoadDiscussions({
+      closed: discussionStatus === 'closed',
+      workteamId: id,
+      after,
+    });
+  }
+  handleLoadMoreProposals({ after }) {
+    const { proposalsStatus } = this.state;
+    const { id } = this.props;
+    this.props.onLoadProposals({
+      state: proposalsStatus,
+      workTeamId: id,
+      after,
+    });
+  }
 
   handleJoining() {
     const { ownStatus = {}, id, onJoin } = this.props;
     if (ownStatus.status === 'NONE') {
       onJoin({ id });
+    }
+  }
+
+  handleDiscussionFilterChange(e) {
+    if (e.option !== this.state.discussionStatus) {
+      this.setState({ discussionStatus: e.option }, this.fetchDiscussions);
+    }
+  }
+
+  fetchDiscussions() {
+    this.props.onLoadDiscussions({
+      workteamId: this.props.id,
+      closed: this.state.discussionStatus !== 'active',
+    });
+  }
+  fetchProposals() {
+    this.props.onLoadProposals({
+      workTeamId: this.props.id,
+      state: this.state.proposalsStatus,
+    });
+  }
+
+  handleProposalFilterChange(e) {
+    if (e.option !== this.state.proposalsStatus) {
+      this.setState({ proposalsStatus: e.option }, this.fetchProposals);
     }
   }
 
@@ -189,14 +251,13 @@ class WorkTeam extends React.Component {
       numMembers,
       numDiscussions,
       numProposals,
-      proposals = [],
-      discussions = [],
       ownStatus = {},
       updates = {},
       user,
       coordinator,
       id,
     } = this.props;
+    const { discussionStatus, proposalsStatus } = this.state;
     let picture;
     if (logo) {
       picture = <img alt="Logo" className={s.logo} src={logo} />;
@@ -250,30 +311,40 @@ class WorkTeam extends React.Component {
             onActive={this.activateTab}
           >
             <Tab title={<FormattedMessage {...messages.proposals} />}>
-              <Box column className={s.itemContainer}>
-                {proposals.map(
-                  p =>
-                    p && (
-                      <ProposalPreview
-                        proposal={p}
-                        onClick={WorkTeam.onProposalClick}
-                      />
-                    ),
-                )}
-              </Box>
+              <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
+                <span style={{ maxWidth: '10em' }}>
+                  <Select
+                    value={proposalsStatus}
+                    onChange={this.handleProposalFilterChange}
+                    options={['active', 'accepted', 'repelled']}
+                  />
+                </span>
+              </div>
+              <ProposalListContainer
+                id={this.props.id}
+                status={proposalsStatus}
+                onLoadMore={this.handleLoadMoreProposals}
+                onItemClick={WorkTeam.onProposalClick}
+                onRetry={this.fetchProposals}
+              />
             </Tab>
             <Tab title={<FormattedMessage {...messages.discussions} />}>
-              <Box column className={s.itemContainer}>
-                {discussions.map(
-                  d =>
-                    d && (
-                      <DiscussionPreview
-                        discussion={d}
-                        onClick={this.handleDiscussionClick}
-                      />
-                    ),
-                )}
-              </Box>
+              <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
+                <span style={{ maxWidth: '10em' }}>
+                  <Select
+                    value={discussionStatus}
+                    onChange={this.handleDiscussionFilterChange}
+                    options={['active', 'closed']}
+                  />
+                </span>
+              </div>
+              <DiscussionListContainer
+                id={this.props.id}
+                status={discussionStatus}
+                onLoadMore={this.handleLoadMoreDiscussions}
+                onItemClick={this.handleDiscussionClick}
+                onRetry={this.fetchDiscussions}
+              />
             </Tab>
           </Tabs>
         </Box>

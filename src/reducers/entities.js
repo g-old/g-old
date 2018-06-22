@@ -49,8 +49,16 @@ export default combineReducers({
 });
 
 /* GENERATOR_EXPORTS */
+export const getDiscussionPageInfo = (state, filter) =>
+  fromDiscussions.getPageInfo(state.discussions, filter);
 export const getMessagesByChannel = (state, channelId) =>
   fromMessages.getByChannel(state.messages, channelId, state);
+
+export const getWTDiscussionsByState = (state, id, filter) =>
+  fromDiscussions.getWTDiscussionsByState(state.discussions, id, filter, state);
+
+export const getWTProposalsByState = (state, id, filter) =>
+  fromProposals.getWTProposalsByState(state.proposals, id, filter, state);
 
 export const getAllMessages = state =>
   fromMessages.getAll(state.messages, state);
