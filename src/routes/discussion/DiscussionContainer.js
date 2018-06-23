@@ -199,7 +199,7 @@ class DiscussionContainer extends React.Component {
                   fill="none"
                   stroke="#000"
                   strokeWidth="2"
-                  d={ICONS[discussion.closedAt ? 'unlock' : 'lock']}
+                  d={ICONS[discussion.closedAt ? 'lock' : 'unlock']}
                 />
               </svg>
             }
