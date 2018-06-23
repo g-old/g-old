@@ -18,7 +18,8 @@ import {
 } from '../../actions/proposal';
 import { findUser } from '../../actions/user';
 import ProposalsManager from '../../components/ProposalsManager';
-import ProposalListView from '../../components/ProposalListView';
+import ProposalPreview from '../../components/ProposalPreview';
+import ListView from '../../components/ListView';
 import ProposalStatusRow from './ProposalStatusRow';
 
 import { deleteRequest, updateRequest } from '../../actions/request';
@@ -29,8 +30,6 @@ import {
   getDiscussionUpdates,
   getRequestUpdates,
   getWorkTeamStatus,
-  getProposalsIsFetching,
-  getProposalsErrorMessage,
   getProposalsPage,
   getVisibleProposals,
   getMessageUpdates,
@@ -196,6 +195,8 @@ class WorkTeamManagement extends React.Component {
     this.onAllowRequest = this.onAllowRequest.bind(this);
     this.onDenyRequest = this.onDenyRequest.bind(this);
     this.onProposalClick = this.onProposalClick.bind(this);
+    this.handleOnRetry = this.handleOnRetry.bind(this);
+    this.handleLoadMore = this.handleLoadMore.bind(this);
   }
   onRequestClick(action, data) {
     this.setState({ showRequest: true, currentRequest: data });
@@ -237,6 +238,18 @@ class WorkTeamManagement extends React.Component {
     // should open proposalManager
     // then you can handle actions from there
   }
+  handleLoadMore({ after }) {
+    this.props.loadProposalsList({
+      after,
+      state: 'pending',
+    });
+  }
+
+  handleOnRetry() {
+    this.props.loadProposalsList({
+      state: 'pending',
+    });
+  }
   canAccess() {
     const { workTeam, user } = this.props;
     return (
@@ -254,9 +267,7 @@ class WorkTeamManagement extends React.Component {
       requestUpdates = {},
       discussionUpdates = {},
       workTeam = {},
-      isFetching,
-      errorMessage,
-      pageInfo = {},
+      pageInfo,
       proposals = [],
     } = this.props;
 
@@ -307,15 +318,21 @@ class WorkTeamManagement extends React.Component {
             })
           }
         >
-          <ProposalListView
-            proposals={proposals}
-            onProposalClick={this.onProposalClick}
+          <ListView
+            onRetry={this.handleOnRetry}
+            onLoadMore={this.handleLoadMore}
             pageInfo={pageInfo}
-            filter="pending"
-            onLoadMore={this.props.loadProposalsList}
-            isFetching={isFetching}
-            error={errorMessage}
-          />
+          >
+            {proposals.map(
+              s =>
+                s && (
+                  <ProposalPreview
+                    proposal={s}
+                    onClick={this.onProposalClick}
+                  />
+                ),
+            )}
+          </ListView>
         </AccordionPanel>,
         <AccordionPanel
           heading="State of Proposals"
@@ -414,8 +431,6 @@ const mapStateToProps = (state, { id }) => ({
   discussionUpdates: getDiscussionUpdates(state),
   requestUpdates: getRequestUpdates(state),
   workTeamUpdates: getWorkTeamStatus(state),
-  isFetching: getProposalsIsFetching(state, 'pending'),
-  errorMessage: getProposalsErrorMessage(state, 'pending'),
   pageInfo: getProposalsPage(state, 'pending'),
   proposals: getVisibleProposals(state, 'pending'),
   messageUpdates: getMessageUpdates(state),

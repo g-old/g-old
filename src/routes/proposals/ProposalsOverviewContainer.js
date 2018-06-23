@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import { loadProposalsList, loadProposal } from '../../actions/proposal';
 import history from '../../history';
 import { getVisibleProposals, getProposalsPage } from '../../reducers/index';
-import FetchError from '../../components/FetchError';
 import ProposalsSubHeader from '../../components/ProposalsSubHeader';
-import ProposalListView from '../../components/ProposalListView';
+import ListView from '../../components/ListView';
+import ProposalPreview from '../../components/ProposalPreview';
 
 const sortActiveProposals = (a, b) => {
   const timeA = new Date(
@@ -42,7 +42,6 @@ class ProposalsOverviewContainer extends React.Component {
       }),
     ).isRequired,
     filter: PropTypes.string.isRequired,
-    isFetching: PropTypes.bool.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
     pageInfo: PropTypes.shape({}).isRequired,
   };
@@ -50,6 +49,8 @@ class ProposalsOverviewContainer extends React.Component {
   constructor(props) {
     super(props);
     this.onProposalClick = this.onProposalClick.bind(this);
+    this.handleOnRetry = this.handleOnRetry.bind(this);
+    this.handleLoadMore = this.handleLoadMore.bind(this);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -57,57 +58,38 @@ class ProposalsOverviewContainer extends React.Component {
     history.push(`/proposal/${proposalId}/${pollId}`);
   }
 
-  isReady() {
-    // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
-    return this.props.proposals != null;
+  handleLoadMore({ after }) {
+    this.props.loadProposalsList({
+      after,
+      state: this.props.filter,
+    });
+  }
+
+  handleOnRetry() {
+    this.props.loadProposalsList({
+      state: this.props.filter,
+    });
   }
 
   render() {
-    const {
-      filter,
-      proposals,
-      isFetching,
-      pageInfo: { errorMessage, pending, pagination },
-    } = this.props;
+    const { filter, proposals, pageInfo } = this.props;
 
-    if (pending && !proposals.length) {
-      return (
-        <div>
-          <ProposalsSubHeader filter={filter} />
-          <p> Loading ... </p>
-        </div>
-      );
-    }
-
-    if (errorMessage && !proposals.length) {
-      return (
-        <div>
-          <ProposalsSubHeader filter={filter} />
-
-          <FetchError
-            isFetching={pending}
-            message={errorMessage}
-            onRetry={() => this.props.loadProposalsList({ state: filter })}
-          />
-        </div>
-      );
-    }
-
-    /* const platformProposals = proposals
-      .filter(p => !p.workTeamId)
-      .sort(filter === 'active' ? sortActiveProposals : sortClosedProposals); */
     return (
       <div>
         {/* <Navigation filter={filter} /> */}
         <ProposalsSubHeader filter={filter} />
-        <ProposalListView
-          proposals={proposals}
-          onProposalClick={this.onProposalClick}
-          pageInfo={pagination}
-          filter={filter}
-          onLoadMore={this.props.loadProposalsList}
-          isFetching={isFetching}
-        />
+        <ListView
+          onRetry={this.handleOnRetry}
+          onLoadMore={this.handleLoadMore}
+          pageInfo={pageInfo}
+        >
+          {proposals.map(
+            s =>
+              s && (
+                <ProposalPreview proposal={s} onClick={this.onProposalClick} />
+              ),
+          )}
+        </ListView>
       </div>
     );
   }

@@ -1,7 +1,0 @@
-.list {
-  margin: 1rem auto;
-
-  > div:not(:last-child) {
-    margin-bottom: 1.5rem;
-  }
-}

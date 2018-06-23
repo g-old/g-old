@@ -10,7 +10,8 @@ import {
   getProposalsErrorMessage,
   getPageInfo,
 } from '../../reducers/index';
-import ProposalListView from '../../components/ProposalListView';
+import ProposalPreview from '../../components/ProposalPreview';
+import ListView from '../../components/ListView';
 
 import FetchError from '../../components/FetchError';
 import Tag from '../../components/Tag';
@@ -36,13 +37,27 @@ class ProposalContainer extends React.Component {
       .isRequired, */
     tagId: PropTypes.string.isRequired,
   };
-  isReady() {
-    // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
-    return this.props.proposals != null;
+  constructor(props) {
+    super(props);
+    this.handleOnRetry = this.handleOnRetry.bind(this);
+    this.handleLoadMore = this.handleLoadMore.bind(this);
   }
+
   // eslint-disable-next-line class-methods-use-this
   handleProposalClick({ proposalId, pollId }) {
     history.push(`/proposal/${proposalId}/${pollId}`);
+  }
+  handleLoadMore({ after }) {
+    this.props.loadProposalsList({
+      after,
+      state: 'all',
+    });
+  }
+
+  handleOnRetry() {
+    this.props.loadProposalsList({
+      state: 'all',
+    });
   }
 
   render() {
@@ -51,6 +66,7 @@ class ProposalContainer extends React.Component {
       isFetching,
       errorMessage,
       tag,
+      pageInfo,
       // tags,
       tagId,
     } = this.props;
@@ -72,7 +88,8 @@ class ProposalContainer extends React.Component {
               this.props.loadProposalsList({
                 state: 'all',
                 tagId,
-              })}
+              })
+            }
           />
         </div>
       );
@@ -88,15 +105,21 @@ class ProposalContainer extends React.Component {
         <div style={{ display: 'flex', fontSize: '0.8em', paddingTop: '1em' }}>
           <Tag text={`${tag.displayName} (${tag.count})`} />
         </div>
-        <ProposalListView
-          proposals={proposals}
-          onProposalClick={this.handleSurveyClick}
-          pageInfo={this.props.pageInfo}
-          filter={'all'}
-          onLoadMore={this.props.loadProposalsList}
-          isFetching={isFetching}
-          tagId={this.props.tagId}
-        />
+        <ListView
+          onRetry={this.handleOnRetry}
+          onLoadMore={this.handleLoadMore}
+          pageInfo={pageInfo}
+        >
+          {proposals.map(
+            s =>
+              s && (
+                <ProposalPreview
+                  proposal={s}
+                  onClick={this.handleProposalClick}
+                />
+              ),
+          )}
+        </ListView>
       </div>
     );
   }
@@ -106,12 +129,11 @@ const mapStateToProps = (state, ownProps) => ({
   proposals: getProposalsByTag(state, ownProps.tagId),
   tag: getTag(state, ownProps.tagId),
   tags: getTags(state),
-  isFetching: getProposalsIsFetching(state, 'all'),
-  errorMessage: getProposalsErrorMessage(state, 'all'),
-  pageInfo: getPageInfo(
-    state,
-    `${'all$'}${ownProps.tagId}`,
-  ) /* getProposalsPage(state, 'active') */,
+  pageInfo: {
+    pagination: getPageInfo(state, `${'all$'}${ownProps.tagId}`),
+    pending: getProposalsIsFetching(state, 'all'),
+    errorMessage: getProposalsErrorMessage(state, 'all'),
+  },
 });
 
 const mapDispatch = {

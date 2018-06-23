@@ -116,9 +116,10 @@ class ProposalPreview extends React.Component {
                     tag =>
                       tag && (
                         <span // eslint-disable-line
-                          onClick={() =>
-                            history.push(`/proposals/tagged/${tag.id}`)
-                          }
+                          onClick={e => {
+                            e.stopPropagation();
+                            history.push(`/proposals/tagged/${tag.id}`);
+                          }}
                           key={tag.id}
                           className={s.tag}
                         >{`${tag.displayName}`}</span>
