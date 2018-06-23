@@ -1,87 +1,98 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import ProposalListView from '../../components/ProposalListView';
-
+import ProposalPreview from '../../components/ProposalPreview';
+import Select from '../../components/Select';
 import { loadProposalsList } from '../../actions/proposal';
-import {
-  getVisibleProposals,
-  getProposalsIsFetching,
-  getProposalsErrorMessage,
-  getProposalsPage,
-} from '../../reducers/index';
-import FetchError from '../../components/FetchError';
+import { getVisibleProposals, getProposalsPage } from '../../reducers/index';
 import history from '../../history';
+import ListView from '../../components/ListView';
 
 class SurveyListContainer extends React.Component {
   static propTypes = {
-    proposals: PropTypes.arrayOf(
+    surveys: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string,
       }),
     ).isRequired,
-    isFetching: PropTypes.bool.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
-    errorMessage: PropTypes.string,
     pageInfo: PropTypes.shape({
       endCursor: PropTypes.string,
       hasNextPage: PropTypes.bool,
     }).isRequired,
-  };
-
-  static defaultProps = {
-    errorMessage: '',
+    filter: PropTypes.string.isRequired,
   };
 
   constructor(props) {
     super(props);
     this.handleSurveyClick = this.handleSurveyClick.bind(this);
-  }
-  isReady() {
-    // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
-    return this.props.proposals != null;
+    this.handleOnRetry = this.handleOnRetry.bind(this);
+    this.handleLoadMore = this.handleLoadMore.bind(this);
   }
 
   // eslint-disable-next-line class-methods-use-this
   handleSurveyClick({ proposalId, pollId }) {
     history.push(`/proposal/${proposalId}/${pollId}`);
   }
+
+  handleLoadMore({ after }) {
+    this.props.loadProposalsList({
+      after,
+      state: 'survey',
+      closed: this.props.filter === 'closed',
+    });
+  }
+
+  handleOnRetry() {
+    this.props.loadProposalsList({
+      state: 'survey',
+      closed: this.props.filter === 'closed',
+    });
+  }
   render() {
-    const { proposals, isFetching, errorMessage } = this.props;
-    if (isFetching && !proposals.length) {
-      return <p> Loading ... </p>;
-    }
-
-    if (errorMessage && !proposals.length) {
-      return (
-        <FetchError
-          message={errorMessage}
-          onRetry={() => this.props.loadProposalsList({ state: 'survey' })}
-        />
-      );
-    }
-
+    const { surveys, pageInfo } = this.props;
     return (
       <div>
-        <ProposalListView
-          proposals={proposals}
-          onProposalClick={this.handleSurveyClick}
-          pageInfo={this.props.pageInfo}
-          filter="survey"
-          onLoadMore={this.props.loadProposalsList}
-          isFetching={isFetching}
-        />
+        <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
+          <span style={{ maxWidth: '10em' }}>
+            <Select
+              value={this.props.filter}
+              onChange={e => {
+                history.push(`/surveys/${e.option}`);
+              }}
+              options={['active', 'closed']}
+            />
+          </span>
+        </div>
+        <ListView
+          onRetry={this.handleOnRetry}
+          onLoadMore={this.handleLoadMore}
+          pageInfo={pageInfo}
+        >
+          {surveys.map(
+            s =>
+              s && (
+                <ProposalPreview
+                  proposal={s}
+                  onClick={this.handleSurveyClick}
+                />
+              ),
+          )}
+        </ListView>
       </div>
     );
   }
 }
 // TODO implement memoiziation with reselect
-const mapStateToProps = state => ({
-  proposals: getVisibleProposals(state, 'survey').sort(
-    (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt),
-  ),
-  isFetching: getProposalsIsFetching(state, 'survey'),
-  errorMessage: getProposalsErrorMessage(state, 'survey'),
+const mapStateToProps = (state, { filter }) => ({
+  surveys: getVisibleProposals(state, 'survey')
+    .filter(s => {
+      if (filter === 'active') {
+        return !s.closedAt;
+      }
+      return s.closedAt;
+    })
+    .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)),
   pageInfo: getProposalsPage(state, 'survey'),
 });
 

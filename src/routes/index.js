@@ -46,7 +46,7 @@ const routes = {
       load: () => import(/* webpackChunkName: 'about' */ './about'),
     },
     {
-      path: '/surveys',
+      path: '/surveys/:filter',
       load: () => import(/* webpackChunkName: 'surveys' */ './surveys'),
     },
     {

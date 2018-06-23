@@ -65,7 +65,7 @@ const messages = defineMessages({
 const contents = [
   { id: 1, path: '/feed', name: 'feed' },
   { id: 2, path: '/proposals/active', name: 'proposals' },
-  { id: 3, path: '/surveys', name: 'surveys' },
+  { id: 3, path: '/surveys/active', name: 'surveys' },
   { id: 4, path: '/workteams', name: 'workTeams' },
   { id: 5, path: '/accounts', name: 'users' },
 ];

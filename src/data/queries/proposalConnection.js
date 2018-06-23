@@ -1,4 +1,4 @@
-import { GraphQLInt, GraphQLString, GraphQLID } from 'graphql';
+import { GraphQLInt, GraphQLString, GraphQLID, GraphQLBoolean } from 'graphql';
 
 import PageType from '../types/PageType';
 import ProposalType from '../types/ProposalDLType';
@@ -23,10 +23,13 @@ const proposal = {
     workTeamId: {
       type: GraphQLID,
     },
+    closed: {
+      type: GraphQLBoolean,
+    },
   },
   resolve: async (
     parent,
-    { first = 10, after = '', state, tagId, workTeamId },
+    { first = 10, after = '', state, tagId, workTeamId, closed },
     { viewer, loaders },
   ) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
@@ -125,6 +128,13 @@ const proposal = {
             .innerJoin('polls', 'proposals.poll_one_id', 'polls.id')
             .where({ work_team_id: workTeamId || null })
             .where('proposals.state', '=', 'survey')
+            .modify(queryBuilder => {
+              if (closed) {
+                queryBuilder.whereNotNull('polls.closed_at');
+              } else {
+                queryBuilder.whereNull('polls.closed_at');
+              }
+            })
             .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
             .limit(first)
             .orderBy('polls.end_time', 'asc')

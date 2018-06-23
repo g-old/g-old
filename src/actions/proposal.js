@@ -244,7 +244,14 @@ export function loadProposal({ id, pollId }) {
   };
 }
 
-export function loadProposalsList({ state, first, after, tagId, workTeamId }) {
+export function loadProposalsList({
+  state,
+  first,
+  after,
+  tagId,
+  workTeamId,
+  closed,
+}) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
     // Dont fetch if pending
@@ -271,6 +278,7 @@ export function loadProposalsList({ state, first, after, tagId, workTeamId }) {
         after,
         tagId,
         workTeamId,
+        closed,
       });
       const proposals = data.proposalConnection.edges.map(p => p.node);
       const normalizedData = normalize(proposals, proposalListSchema);

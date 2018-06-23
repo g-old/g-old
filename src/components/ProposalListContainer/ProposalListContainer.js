@@ -4,12 +4,7 @@ import PropTypes from 'prop-types';
 import ListView from '../ListView';
 import ProposalPreview from '../ProposalPreview';
 
-import {
-  getWTProposalsByState,
-  getProposalsPage,
-  getProposalsIsFetching,
-  getProposalsErrorMessage,
-} from '../../reducers';
+import { getWTProposalsByState, getProposalsPage } from '../../reducers';
 
 export const ListContainerShape = {
   items: PropTypes.arrayOf(PropTypes.shape({})),
@@ -25,7 +20,7 @@ class ProposalListContainer extends React.Component {
     items: null,
   };
   render() {
-    const { items, pageInfo, onRetry, onLoadMore, onItemClick } = this.props;
+    const { items, onRetry, onLoadMore, onItemClick, pageInfo } = this.props;
     return (
       <ListView onRetry={onRetry} onLoadMore={onLoadMore} pageInfo={pageInfo}>
         {items.map(
@@ -40,8 +35,6 @@ const mapStateToProps = (state, { status, id }) => ({
   items: getWTProposalsByState(state, id, status),
   pageInfo: getProposalsPage(state, status),
   filter: status,
-  isFetching: getProposalsIsFetching(state, status),
-  errorMessage: getProposalsErrorMessage(state, status),
 });
 
 export default connect(mapStateToProps)(ProposalListContainer);
