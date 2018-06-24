@@ -200,6 +200,10 @@ function statementWriteControl(viewer, data) {
   if (viewer.permissions & Permissions.MODIFY_OWN_STATEMENTS) {
     return checkIfMember(viewer, data.proposal);
   }
+  // To allow viewes in workteams to write statements
+  if (data.proposal.workTeamId && viewer.groups & Groups.VIEWER) {
+    return checkIfMember(viewer, data.proposal);
+  }
   return false;
 }
 
@@ -270,7 +274,10 @@ function voteWriteControl(viewer, data) {
     if (viewer.permissions & Permissions.TAKE_SURVEYS) {
       return checkIfMember(viewer, data.proposal);
     }
-  } else if (viewer.permissions & Permissions.VOTE) {
+  } else if (
+    (data.proposal.workTeamId && viewer.groups & Groups.VIEWER) ||
+    viewer.permissions & Permissions.VOTE
+  ) {
     return checkIfMember(viewer, data.proposal);
   }
   return false;
