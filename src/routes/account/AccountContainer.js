@@ -146,6 +146,28 @@ const getNotification = (ownAccount, user) => {
   );
 };
 
+// TODO use ListView OR enhance List w errorhandlers etc
+const renderMessageList = data => {
+  if (data) {
+    return (
+      <List>
+        {data.map(m => (
+          <ListItem onClick={() => history.push(`/message/${m.id}`)}>
+            <MessagePreview
+              sender={m.sender}
+              subject={m.subject}
+              createdAt={m.createdAt}
+              numReplies={m.numReplies}
+            />
+          </ListItem>
+        ))}
+      </List>
+    );
+  }
+
+  return <List> {'No item found'} </List>;
+};
+
 class AccountContainer extends React.Component {
   static propTypes = {
     user: PropTypes.shape({
@@ -445,35 +467,11 @@ class AccountContainer extends React.Component {
                 heading={<FormattedMessage {...messages.messages} />}
               >
                 <Label> Messages received</Label>
-                <List>
-                  {user.messagesReceived &&
-                    user.messagesReceived.map(m => (
-                      <ListItem
-                        onClick={() => history.push(`/message/${m.id}`)}
-                      >
-                        <MessagePreview
-                          sender={m.sender}
-                          subject={m.subject}
-                          createdAt={m.createdAt}
-                          numReplies={m.numReplies}
-                        />
-                      </ListItem>
-                    ))}
-                </List>
+                {renderMessageList(user.messagesReceived)}
+
                 <Label> Messages sent</Label>
 
-                <List>
-                  {user.messagesSent &&
-                    user.messagesSent.map(m => (
-                      <ListItem>
-                        <MessagePreview
-                          sender={m.sender}
-                          subject={m.subject}
-                          createdAt={m.createdAt}
-                        />
-                      </ListItem>
-                    ))}
-                </List>
+                {renderMessageList(user.messagesSent)}
               </AccordionPanel>
               <AccordionPanel
                 heading={<FormattedMessage {...messages.settings} />}
