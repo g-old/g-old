@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from '../../components/Layout';
 import { loadProposalsList } from '../../actions/proposal';
-import SurveyListContainer from './SurveyListContainer';
+import SurveysOverviewContainer from './SurveysOverviewContainer';
 import { getSessionUser } from '../../reducers';
 import { canAccess } from '../../organization';
 
@@ -25,7 +25,7 @@ async function action({ store, path }, { filter }) {
     title,
     component: (
       <Layout>
-        <SurveyListContainer filter={filter} />
+        <SurveysOverviewContainer filter={filter} />
       </Layout>
     ),
   };

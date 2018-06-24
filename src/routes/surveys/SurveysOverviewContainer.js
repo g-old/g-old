@@ -8,7 +8,7 @@ import { getVisibleProposals, getProposalsPage } from '../../reducers/index';
 import history from '../../history';
 import ListView from '../../components/ListView';
 
-class SurveyListContainer extends React.Component {
+class SurveysOverviewContainer extends React.Component {
   static propTypes = {
     surveys: PropTypes.arrayOf(
       PropTypes.shape({
@@ -100,4 +100,4 @@ const mapDispatch = {
   loadProposalsList,
 };
 
-export default connect(mapStateToProps, mapDispatch)(SurveyListContainer);
+export default connect(mapStateToProps, mapDispatch)(SurveysOverviewContainer);

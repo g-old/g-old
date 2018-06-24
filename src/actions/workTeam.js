@@ -143,6 +143,18 @@ const proposalConnection = `proposalConnection(state:$state workTeamId:$id){
       }
     }`;
 
+const surveyConnection = `surveyConnection: proposalConnection(state:"survey" workTeamId:$id){
+      pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          ${proposalFields}
+        }
+      }
+    }`;
+
 const workTeamWithDetails = `query($id:ID! $state:String, $closed:Boolean){
     workTeam(id:$id) {
       ${workTeamFields}
@@ -161,6 +173,8 @@ const workTeamWithDetails = `query($id:ID! $state:String, $closed:Boolean){
   }
   ${proposalConnection}
   ${discussionConnection}
+  ${surveyConnection}
+
   }`;
 
 const workTeamQuery = `query($id:ID! $state:String, $closed:Boolean){
@@ -178,6 +192,7 @@ const workTeamQuery = `query($id:ID! $state:String, $closed:Boolean){
     }
   ${discussionConnection}
   ${proposalConnection}
+  ${surveyConnection}
 }`;
 
 const proposalStatusQuery = `query($id:ID! $first:Int){
@@ -221,6 +236,8 @@ const joinWorkTeamMutationWithDetails = `mutation($id:ID, $memberId:ID ){
     ${wtDetails}
     ${discussionConnection}
     ${proposalConnection}
+    ${surveyConnection}
+
       requestConnection(type:"joinWT" filterBy:[{filter:CONTENT_ID id:$id}]){
         pageInfo{
         endCursor
@@ -249,6 +266,8 @@ const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID $state:String $close
     }
    ${discussionConnection}
    ${proposalConnection}
+   ${surveyConnection}
+
   }
 }`;
 
@@ -282,7 +301,7 @@ const createResourceAction = (
 });
 
 const handleResources = (dispatch, data, state, closed) => {
-  const depaginated = depaginate(['proposal', 'discussion'], data);
+  const depaginated = depaginate(['proposal', 'discussion', 'survey'], data);
 
   dispatch(
     createResourceAction(
@@ -291,6 +310,15 @@ const handleResources = (dispatch, data, state, closed) => {
       proposalList,
       state,
       data.proposalConnection.pageInfo,
+    ),
+  );
+  dispatch(
+    createResourceAction(
+      LOAD_PROPOSAL_LIST_SUCCESS,
+      depaginated.surveys,
+      proposalList,
+      'survey',
+      data.surveyConnection.pageInfo,
     ),
   );
   dispatch(

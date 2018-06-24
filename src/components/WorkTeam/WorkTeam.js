@@ -19,6 +19,7 @@ import Link from '../Link';
 import UserThumbnail from '../UserThumbnail';
 import DiscussionListContainer from '../DiscussionListContainer';
 import ProposalListContainer from '../ProposalListContainer';
+import SurveyListContainer from '../SurveyListContainer';
 
 const messages = defineMessages({
   join: {
@@ -55,6 +56,11 @@ const messages = defineMessages({
     id: 'coordinator',
     defaultMessage: 'Coordinator',
     description: 'Label coordinator',
+  },
+  surveys: {
+    id: 'surveys',
+    description: 'Surveys label',
+    defaultMessage: 'Surveys',
   },
 });
 
@@ -106,8 +112,10 @@ class WorkTeam extends React.Component {
     this.handleProposalFilterChange = this.handleProposalFilterChange.bind(
       this,
     );
+    this.handleSurveyFilterChange = this.handleSurveyFilterChange.bind(this);
     this.handleLoadMoreDiscussions = this.handleLoadMoreDiscussions.bind(this);
     this.handleLoadMoreProposals = this.handleLoadMoreProposals.bind(this);
+    this.handleLoadMoreSurveys = this.handleLoadMoreSurveys.bind(this);
     this.fetchDiscussions = this.fetchDiscussions.bind(this);
     this.fetchProposals = this.fetchProposals.bind(this);
 
@@ -115,7 +123,8 @@ class WorkTeam extends React.Component {
       showLayer: false,
       activeTabIndex: 0,
       discussionStatus: 'active',
-      proposalsStatus: 'active',
+      proposalStatus: 'active',
+      surveyStatus: 'active',
     };
     this.activateTab = this.activateTab.bind(this);
   }
@@ -153,10 +162,20 @@ class WorkTeam extends React.Component {
     });
   }
   handleLoadMoreProposals({ after }) {
-    const { proposalsStatus } = this.state;
+    const { proposalStatus } = this.state;
     const { id } = this.props;
     this.props.onLoadProposals({
-      state: proposalsStatus,
+      state: proposalStatus,
+      workTeamId: id,
+      after,
+    });
+  }
+  handleLoadMoreSurveys({ after }) {
+    const { surveyStatus } = this.state;
+    const { id } = this.props;
+    this.props.onLoadProposals({
+      state: 'survey',
+      closed: surveyStatus === 'closed',
       workTeamId: id,
       after,
     });
@@ -174,6 +193,16 @@ class WorkTeam extends React.Component {
       this.setState({ discussionStatus: e.option }, this.fetchDiscussions);
     }
   }
+  handleProposalFilterChange(e) {
+    if (e.option !== this.state.proposalStatus) {
+      this.setState({ proposalStatus: e.option }, this.fetchProposals);
+    }
+  }
+  handleSurveyFilterChange(e) {
+    if (e.option !== this.state.surveyStatus) {
+      this.setState({ surveyStatus: e.option }, this.fetchSurveys);
+    }
+  }
 
   fetchDiscussions() {
     this.props.onLoadDiscussions({
@@ -184,14 +213,15 @@ class WorkTeam extends React.Component {
   fetchProposals() {
     this.props.onLoadProposals({
       workTeamId: this.props.id,
-      state: this.state.proposalsStatus,
+      state: this.state.proposalStatus,
     });
   }
-
-  handleProposalFilterChange(e) {
-    if (e.option !== this.state.proposalsStatus) {
-      this.setState({ proposalsStatus: e.option }, this.fetchProposals);
-    }
+  fetchSurveys() {
+    this.props.onLoadProposals({
+      workTeamId: this.props.id,
+      state: 'survey',
+      closed: this.state.surveyStatus === 'closed',
+    });
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -257,7 +287,7 @@ class WorkTeam extends React.Component {
       coordinator,
       id,
     } = this.props;
-    const { discussionStatus, proposalsStatus } = this.state;
+    const { discussionStatus, proposalStatus, surveyStatus } = this.state;
     let picture;
     if (logo) {
       picture = <img alt="Logo" className={s.logo} src={logo} />;
@@ -314,7 +344,7 @@ class WorkTeam extends React.Component {
               <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
                 <span style={{ maxWidth: '10em' }}>
                   <Select
-                    value={proposalsStatus}
+                    value={proposalStatus}
                     onChange={this.handleProposalFilterChange}
                     options={['active', 'accepted', 'repelled']}
                   />
@@ -322,7 +352,7 @@ class WorkTeam extends React.Component {
               </div>
               <ProposalListContainer
                 id={this.props.id}
-                status={proposalsStatus}
+                status={proposalStatus}
                 onLoadMore={this.handleLoadMoreProposals}
                 onItemClick={WorkTeam.onProposalClick}
                 onRetry={this.fetchProposals}
@@ -344,6 +374,24 @@ class WorkTeam extends React.Component {
                 onLoadMore={this.handleLoadMoreDiscussions}
                 onItemClick={this.handleDiscussionClick}
                 onRetry={this.fetchDiscussions}
+              />
+            </Tab>
+            <Tab title={<FormattedMessage {...messages.surveys} />}>
+              <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
+                <span style={{ maxWidth: '10em' }}>
+                  <Select
+                    value={surveyStatus}
+                    onChange={this.handleSurveyFilterChange}
+                    options={['active', 'closed']}
+                  />
+                </span>
+              </div>
+              <SurveyListContainer
+                id={this.props.id}
+                status={surveyStatus}
+                onLoadMore={this.handleLoadMoreSurveys}
+                onItemClick={WorkTeam.onProposalClick}
+                onRetry={this.fetchSurveys}
               />
             </Tab>
           </Tabs>
