@@ -829,7 +829,8 @@ class NotificationService {
       case TargetType.ALL: {
         return this.dbConnector('notification_settings')
           .innerJoin('users', 'users.id', 'notification_settings.user_id')
-          .whereNull('users.deleted_at') // no guests!
+          .whereRaw('users.groups & ? > 0', [Groups.VIEWER]) // no guests!
+          .whereNull('users.deleted_at')
           .select(
             'notification_settings.user_id as id',
             'notification_settings.settings as settings',
@@ -859,9 +860,10 @@ class NotificationService {
       }
       case TargetType.ROLE:
         // TODO handle case where more roles can be selected (targetId)
+        // Atm this works as alias for guest communication
         return this.dbConnector('notification_settings')
           .innerJoin('users', 'users.id', 'notification_settings.user_id')
-          .whereRaw('users.groups & ? > 0', [selector[1]])
+          .where('users.groups', '=', Groups.GUEST)
           .whereNull('users.deleted_at')
           .select(
             'notification_settings.user_id as id',

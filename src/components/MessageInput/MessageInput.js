@@ -178,7 +178,7 @@ class MessageInput extends React.Component {
     recipientType =
       (values.recipientType && values.recipientType.value) || recipientType;
     if (recipientType === 'ROLE' && (!recipients || !recipients.length)) {
-      recipients = [Groups.VIEWER];
+      recipients = [Groups.GUEST];
     }
 
     const message = {
@@ -410,7 +410,7 @@ class MessageInput extends React.Component {
                       inField
                       options={[
                         { value: 'ALL', label: 'ALL' },
-                        { value: 'ROLE', label: 'VIEWER_AND_UP' },
+                        { value: 'ROLE', label: 'GUESTS' },
                         { value: 'GROUP', label: 'GROUP' },
                         { value: 'USER', label: 'USER' },
                       ]}

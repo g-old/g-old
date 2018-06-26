@@ -290,7 +290,7 @@ function messageReadControl(viewer, data) {
       return true;
     }
     if (data.recipient_type === 'all') {
-      return true;
+      return (viewer.groups & Groups.VIEWER) > 0;
     }
     if (data.recipient_type === 'group') {
       // check if same group
@@ -302,9 +302,10 @@ function messageReadControl(viewer, data) {
       // eslint-disable-next-line eqeqeq
       return data.recipients.some(id => id == viewer.id);
     }
+    // Atm misused for guests
     if (data.recipient_type === 'role') {
       // eslint-disable-next-line eqeqeq
-      return data.recipients.some(role => viewer.groups & role);
+      return viewer.groups === Groups.GUEST;
     }
   }
   return false;
