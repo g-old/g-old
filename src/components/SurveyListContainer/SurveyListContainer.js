@@ -4,6 +4,7 @@ import { ListContainerShape } from '../ProposalListContainer';
 import ListView from '../ListView';
 import ProposalPreview from '../ProposalPreview';
 import { getWTProposalsByState, getProposalsPage } from '../../reducers';
+import { surveyStateFilter } from '../../routes/surveys/SurveysOverviewContainer';
 
 class SurveyListContainer extends React.Component {
   static propTypes = ListContainerShape;
@@ -22,12 +23,7 @@ class SurveyListContainer extends React.Component {
 
 const mapStateToProps = (state, { status, id }) => ({
   items: getWTProposalsByState(state, id, 'survey')
-    .filter(s => {
-      if (status === 'active') {
-        return !s.closedAt;
-      }
-      return s.closedAt;
-    })
+    .filter(s => surveyStateFilter(s, status))
     .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)),
 
   pageInfo: getProposalsPage(state, 'survey'),

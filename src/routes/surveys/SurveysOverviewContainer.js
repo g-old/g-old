@@ -8,6 +8,12 @@ import { getVisibleProposals, getProposalsPage } from '../../reducers/index';
 import history from '../../history';
 import ListView from '../../components/ListView';
 
+export const surveyStateFilter = (survey, filter) => {
+  if (filter === 'active') {
+    return !survey.pollOne.closedAt;
+  }
+  return survey.pollOne.closedAt;
+};
 class SurveysOverviewContainer extends React.Component {
   static propTypes = {
     surveys: PropTypes.arrayOf(
@@ -86,12 +92,7 @@ class SurveysOverviewContainer extends React.Component {
 // TODO implement memoiziation with reselect
 const mapStateToProps = (state, { filter }) => ({
   surveys: getVisibleProposals(state, 'survey')
-    .filter(s => {
-      if (filter === 'active') {
-        return !s.closedAt;
-      }
-      return s.closedAt;
-    })
+    .filter(s => surveyStateFilter(s, filter))
     .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)),
   pageInfo: getProposalsPage(state, 'survey'),
 });

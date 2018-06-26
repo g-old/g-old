@@ -150,8 +150,8 @@ query{
 `;
 
 const proposalConnection = `
-query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID) {
-  proposalConnection (state:$state first:$first after:$after tagId:$tagId workTeamId:$workTeamId) {
+query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID $closed:Boolean) {
+  proposalConnection (state:$state first:$first after:$after tagId:$tagId workTeamId:$workTeamId closed:$closed) {
     pageInfo{
       endCursor
       hasNextPage

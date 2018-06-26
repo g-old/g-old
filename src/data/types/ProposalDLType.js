@@ -30,7 +30,7 @@ const ProposalType = new ObjectType({
     author: {
       type: UserType,
       resolve: (parent, args, { viewer, loaders }) =>
-        User.gen(viewer, parent.author_id, loaders),
+        User.gen(viewer, parent.authorId, loaders),
     },
 
     body: {
@@ -55,12 +55,12 @@ const ProposalType = new ObjectType({
     pollOne: {
       type: PollType,
       resolve: (parent, args, { viewer, loaders }) =>
-        Poll.gen(viewer, parent.pollOne_id, loaders),
+        Poll.gen(viewer, parent.pollOneId, loaders),
     },
     pollTwo: {
       type: PollType,
       resolve: (parent, args, { viewer, loaders }) =>
-        Poll.gen(viewer, parent.pollTwo_id, loaders),
+        Poll.gen(viewer, parent.pollTwoId, loaders),
     },
 
     spokesman: {

@@ -78,7 +78,7 @@ describe('Proposal', () => {
         createLoaders(),
       );
       expect(proposal).toEqual(
-        expect.objectContaining({ state: 'voting', pollOne_id: null }),
+        expect.objectContaining({ state: 'voting', pollOneId: null }),
       );
     });
   });

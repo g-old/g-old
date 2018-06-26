@@ -13,6 +13,7 @@ import log from '../../logger';
 import sanitize from '../../core/htmlSanitizer';
 
 type ID = string | number;
+type ProposalState = 'accepted' | 'rejected' | 'revoked' | 'survey';
 export type ProposalProps = {
   id: ID,
   author_id: ID,
@@ -21,12 +22,13 @@ export type ProposalProps = {
   votes: number,
   poll_one_id: ID,
   poll_two_id: ID,
-  state: string,
+  state: ProposalState,
   created_at: string,
   spokesman_id: ID,
   notified_at: string,
   work_team_id: ID,
 };
+
 const validateTags = async tags => {
   let existingTags;
   let newTags;
@@ -133,8 +135,8 @@ const validateStateChange = async (
 ) => {
   const pollId =
     proposalInDB.state === 'proposed' || proposalInDB.state === 'survey'
-      ? proposalInDB.pollOne_id
-      : proposalInDB.pollTwo_id;
+      ? proposalInDB.pollOneId
+      : proposalInDB.pollTwoId;
   const pollInDB = await Poll.gen(viewer, pollId, loaders);
   if (pollInDB.closedAt) return false; // Dont allow alteration after closing;
   if (state === 'revoked') return true; // Proposals can be revoked at any time
@@ -171,14 +173,26 @@ const checkIfCoordinator = async (viewer, data) => {
 
 class Proposal {
   id: ID;
+  state: ProposalState;
+  authorId: ID;
+  body: string;
+  title: string;
+  votes: number;
+  pollOneId: ID;
+  pollTwoId: ID;
+  createdAt: string;
+  spokesmanId: ID;
+  notifiedAt: string;
+  workTeamId: ID;
+
   constructor(data: ProposalProps) {
     this.id = data.id;
-    this.author_id = data.author_id;
+    this.authorId = data.author_id;
     this.title = data.title;
     this.body = data.body;
     this.votes = data.votes;
-    this.pollOne_id = data.poll_one_id;
-    this.pollTwo_id = data.poll_two_id;
+    this.pollOneId = data.poll_one_id;
+    this.pollTwoId = data.poll_two_id;
     this.state = data.state;
     this.createdAt = data.created_at;
     this.spokesmanId = data.spokesman_id;
@@ -279,7 +293,7 @@ class Proposal {
         // TODO check first if not already closed?
         const pollOne = await Poll.update(
           viewer,
-          { id: proposalInDB.pollOne_id, closedAt: new Date(), isCoordinator },
+          { id: proposalInDB.pollOneId, closedAt: new Date(), isCoordinator },
           loaders,
         );
         if (!pollOne) throw Error('No pollOne provided');
@@ -288,8 +302,8 @@ class Proposal {
       if (newValues.state && newValues.state !== 'voting') {
         const pollId =
           proposalInDB.state === 'proposed' || proposalInDB.state === 'survey'
-            ? proposalInDB.pollOne_id
-            : proposalInDB.pollTwo_id;
+            ? proposalInDB.pollOneId
+            : proposalInDB.pollTwoId;
         await trx
           .where({ id: pollId })
           .update({ closed_at: new Date(), updated_at: new Date() })
@@ -447,21 +461,6 @@ class Proposal {
       });
     }
     return proposal;
-  }
-
-  async subscribe(viewer) {
-    if (['accepted, revoked, rejected'].indexOf(this.state) !== -1) return null;
-
-    const [sId = null] = await knex('proposal_user_subscriptions')
-      .insert({ proposal_id: this.id, user_id: viewer.id })
-      .returning('id');
-    return sId || null;
-  }
-
-  async unSubscribe(viewer) {
-    return knex('proposal_user_subscriptions')
-      .where({ proposal_id: this.id, user_id: viewer.id })
-      .del();
   }
 
   async isVotable(viewer) {
