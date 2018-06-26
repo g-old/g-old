@@ -857,6 +857,18 @@ class NotificationService {
             'users.email as email',
           );
       }
+      case TargetType.ROLE:
+        // TODO handle case where more roles can be selected (targetId)
+        return this.dbConnector('notification_settings')
+          .innerJoin('users', 'users.id', 'notification_settings.user_id')
+          .whereRaw('users.groups & ? > 0', [selector[1]])
+          .whereNull('users.deleted_at')
+          .select(
+            'notification_settings.user_id as id',
+            'notification_settings.settings as settings',
+            'users.locale as locale',
+            'users.email as email',
+          );
       default:
         throw new Error(`TargetType not recognized: ${selector[0]}`);
     }

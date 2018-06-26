@@ -13,7 +13,7 @@ import createLoaders from '../../data/dataLoader';
 const dmp = new DiffMatchPatch();
 export type MessageType = 'communication' | 'note' | 'meeting';
 
-type RecipientType = 'user' | 'group';
+type RecipientType = 'user' | 'group' | 'role' | 'all';
 
 const isDifferent = (oldTextHtml, newTextHtml) => {
   let oldText;
@@ -104,7 +104,7 @@ class Message {
       newData.recipient_type = data.recipientType;
     }
     if (data.recipients) {
-      if (data.recipients.length || data.recipientType === 'all') {
+      if (data.recipients.length || ['all'].includes(data.recipientType)) {
         newData.recipients = JSON.stringify(data.recipients || []);
       } else {
         throw new Error('Atleast one recipient required');

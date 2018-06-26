@@ -22,6 +22,7 @@ export const TargetType = {
   GROUP: 'group',
   USER: 'user',
   ALL: 'all',
+  ROLE: 'role',
 };
 
 class Subscription {

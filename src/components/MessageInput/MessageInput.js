@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
+import { Groups } from '../../organization';
 import {
   recipientValidation,
   textValidation,
@@ -130,7 +131,8 @@ class MessageInput extends React.Component {
 
   // TODO refactor
   onNotify(newValues, state, options) {
-    const { recipients = [], recipientType, messageType } = this.props;
+    const { messageType } = this.props;
+    let { recipientType, recipients = [] } = this.props;
     const isDraft = options && options.draft;
     const { draftId } = this.state;
     if (lazyValidationFailure(state.errors, isDraft)) {
@@ -173,9 +175,14 @@ class MessageInput extends React.Component {
         replyable: true,
       };
     }
+    recipientType =
+      (values.recipientType && values.recipientType.value) || recipientType;
+    if (recipientType === 'ROLE' && (!recipients || !recipients.length)) {
+      recipients = [Groups.VIEWER];
+    }
+
     const message = {
-      recipientType:
-        (values.recipientType && values.recipientType.value) || recipientType,
+      recipientType,
       messageType,
       ...object,
       recipients: recipients || [],
@@ -183,6 +190,7 @@ class MessageInput extends React.Component {
       isDraft,
       enforceEmail: values.enforceEmail,
     };
+
     if (options && options.update) {
       this.props.updateMessage(message);
     } else if (isDraft && !draftId) {
@@ -402,6 +410,7 @@ class MessageInput extends React.Component {
                       inField
                       options={[
                         { value: 'ALL', label: 'ALL' },
+                        { value: 'ROLE', label: 'VIEWER_AND_UP' },
                         { value: 'GROUP', label: 'GROUP' },
                         { value: 'USER', label: 'USER' },
                       ]}

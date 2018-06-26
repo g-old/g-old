@@ -302,6 +302,10 @@ function messageReadControl(viewer, data) {
       // eslint-disable-next-line eqeqeq
       return data.recipients.some(id => id == viewer.id);
     }
+    if (data.recipient_type === 'role') {
+      // eslint-disable-next-line eqeqeq
+      return data.recipients.some(role => viewer.groups & role);
+    }
   }
   return false;
 }

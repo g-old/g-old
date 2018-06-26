@@ -1,11 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { defineMessages, FormattedMessage } from 'react-intl';
+
 import Layer from '../Layer';
 import Box from '../Box';
 import Button from '../Button';
 import Message from '../Message';
 import Label from '../Label';
 
+const messages = defineMessages({
+  submit: {
+    id: 'command.submit',
+    description: 'Short command for sending data to the server',
+    defaultMessage: 'Submit',
+  },
+  cancel: {
+    id: 'commands.cancel',
+    description: 'Short command to cancel a operation',
+    defaultMessage: 'Cancel',
+  },
+});
 const getContent = textHtml => {
   const res = {};
   if (textHtml) {
@@ -18,7 +32,7 @@ const getContent = textHtml => {
 
 const NoticeLayer = ({ message, onSend, onClose, updates }) => {
   const content = (
-    <Box column>
+    <Box column align>
       <Label> DEUTSCH </Label>
       <Message
         subject={getContent(message.subject).de}
@@ -37,9 +51,12 @@ const NoticeLayer = ({ message, onSend, onClose, updates }) => {
         primary
         disabled={updates.pending}
         onClick={() => onSend()}
-        label="Sent"
+        label={<FormattedMessage {...messages.submit} />}
       />
-      <Button onClick={onClose} label="Cancel" />
+      <Button
+        onClick={onClose}
+        label={<FormattedMessage {...messages.cancel} />}
+      />
     </Box>
   );
 
