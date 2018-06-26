@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import ListView from '../ListView';
 import ProposalPreview from '../ProposalPreview';
-
+import { sortActiveProposals, sortClosedProposals } from '../../routes/utils';
 import { getWTProposalsByState, getProposalsPage } from '../../reducers';
 
 export const ListContainerShape = {
@@ -32,7 +32,10 @@ class ProposalListContainer extends React.Component {
 }
 
 const mapStateToProps = (state, { status, id }) => ({
-  items: getWTProposalsByState(state, id, status),
+  items: getWTProposalsByState(state, id, status).sort(
+    status === 'active' ? sortActiveProposals : sortClosedProposals,
+  ),
+
   pageInfo: getProposalsPage(state, status),
   filter: status,
 });

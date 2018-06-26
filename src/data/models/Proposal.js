@@ -491,8 +491,42 @@ class Proposal {
 
 export default Proposal;
 
-// Unsub all subscriptions when proposal ended
+const makeVisibleForMainteam = async proposal => {
+  try {
+    if (!proposal) {
+      throw new Error('Proposal not existing');
+    }
+    if (proposal.workTeamId) {
+      const [mainId = null] = await knex('work_teams')
+        .where({ main: true })
+        .pluck('id');
+
+      if (mainId) {
+        // eslint-disable-next-line eqeqeq
+        if (mainId == proposal.workTeamId) {
+          return Promise.resolve();
+        }
+        return knex('proposal_groups').insert({
+          group_id: mainId,
+          group_type: 'WT',
+          state: 'WAITING',
+          proposal_id: proposal.id,
+          created_at: new Date(),
+        });
+      }
+    }
+  } catch (err) {
+    log.error(
+      { err, proposalId: proposal.id, proposalState: proposal.state },
+      'Could not add proposal to mainTeam',
+    );
+  }
+
+  return Promise.resolve();
+};
+
 EventManager.subscribe('onProposalUpdated', async ({ proposal }) => {
+  // Unsub all subscriptions when proposal ended
   if (['accepted', 'rejected', 'revoked'].includes(proposal.state)) {
     try {
       await knex('subscriptions')
@@ -502,4 +536,6 @@ EventManager.subscribe('onProposalUpdated', async ({ proposal }) => {
       log.error({ err }, 'Subscription deletion failed');
     }
   }
+
+  await makeVisibleForMainteam(proposal);
 });

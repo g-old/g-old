@@ -1,5 +1,4 @@
 import knex from '../data/knex';
-import { insertIntoFeed } from './feed';
 import log from '../logger';
 import Proposal from '../data/models/Proposal';
 import createLoaders from '../data/dataLoader';
@@ -75,7 +74,7 @@ export const computeNextState = (state, poll, tRef) => {
   return newState;
 };
 
-async function proposalPolling(pubsub) {
+async function proposalPolling() {
   const proposals = await knex('proposals')
     .innerJoin('polls', function() {
       this.on(function() {
@@ -112,59 +111,9 @@ async function proposalPolling(pubsub) {
       SYSTEM,
       { id: proposal.id, state: newState },
       loaders,
-    )
-      .then(proposalData => {
-        if (proposalData) {
-          // TODO refactor later
-          let upliftPromise;
-          if (proposalData.workTeamId) {
-            upliftPromise = knex('work_teams')
-              .where({ main: true })
-              .pluck('id')
-              .then(([id]) => {
-                // eslint-disable-next-line eqeqeq
-                if (id && id != proposalData.workTeamId) {
-                  return knex('proposal_groups').insert({
-                    group_id: id,
-                    group_type: 'WT',
-                    state: 'WAITING',
-                    proposal_id: proposalData.id,
-                    created_at: new Date(),
-                  });
-                }
-                return null;
-              });
-          }
-          // should be solved  by events??
-          const insertionPromise = insertIntoFeed(
-            {
-              viewer: { id: 0, role: { type: 'system' } },
-              data: {
-                type: 'proposal',
-                content: proposalData,
-                objectId: proposalData.id,
-              },
-              verb: 'update',
-            },
-            true,
-          )
-            .then(activityId => {
-              if (activityId) {
-                return pubsub.publish('activities', { id: activityId });
-              }
-              return Promise.reject();
-            })
-            .catch(err => {
-              log.error({ err }, 'Feed insertion failed -worker- ');
-            });
-
-          return Promise.all([upliftPromise, insertionPromise]);
-        }
-        return Promise.reject(new Error('Proposal update failed'));
-      })
-      .catch(err => {
-        log.error({ err, proposal }, 'Proposal update failed');
-      });
+    ).catch(err => {
+      log.error({ err, proposal }, 'Proposal update failed');
+    });
   });
 
   return Promise.all(mutations);
@@ -172,14 +121,14 @@ async function proposalPolling(pubsub) {
   // workerFn();
 }
 
-const worker = async pubsub => {
+const worker = async () => {
   try {
-    proposalPolling(pubsub);
+    proposalPolling();
   } catch (err) {
     log.error({ err }, 'Worker failed ');
   }
   setTimeout(() => {
-    worker(pubsub);
+    worker();
   }, 10000);
 };
 

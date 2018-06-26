@@ -67,7 +67,7 @@ process.on('unhandledRejection', (reason, p) => {
 const pubsub = root.PubSub;
 root.NotificationService.start();
 
-worker(pubsub);
+worker();
 BWorker.start(path.resolve(__dirname, 'backgroundWorker.js'));
 
 const sendMailJob = (viewer, { content }, mailType) => {
