@@ -1,7 +1,7 @@
 import knex from '../knex';
 import PollingMode from './PollingMode';
 import { canSee, canMutate, Models } from '../../core/accessControl';
-import { Permissions } from '../../organization';
+import { Groups } from '../../organization';
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
@@ -21,6 +21,7 @@ class Poll {
     this.endTime = data.end_time;
     this.closedAt = data.closed_at;
   }
+
   static async gen(viewer, id, { polls }) {
     if (!id) return null;
     const data = await polls.load(id);
@@ -41,17 +42,20 @@ class Poll {
     const mode = await PollingMode.gen(viewer, this.pollingModeId, loaders);
     return mode.unipolar === true;
   }
+
   async isCommentable(viewer, loaders) {
     if (this.closedAt) return false;
     const mode = await PollingMode.gen(viewer, this.pollingModeId, loaders);
     return mode.withStatements === true;
   }
   /* eslint-disable class-methods-use-this */
+
   // eslint-disable-next-line no-unused-vars
   async validate(viewer) {
     // TODO
     return true;
   }
+
   /* eslint-enable class-methods-use-this */
   static async create(viewer, data, loaders) {
     // authorize
@@ -79,11 +83,11 @@ class Poll {
             .transacting(trx)
             .where({ work_team_id: data.workTeamId })
             .join('users', 'users.id', 'user_work_teams.user_id') // bc also viewers can be members
-            .whereRaw('users.groups & ? > 0', [Permissions.VOTE]) // TODO whitelist
+            .whereRaw('users.groups & ? > 0', [Groups.VIEWER]) // TODO whitelist
             .count('users.id');
         } else {
           numVoter = await trx
-            .whereRaw('groups & ? > 0', [Permissions.VOTE]) // TODO whitelist
+            .whereRaw('groups & ? > 0', [Groups.VOTER]) // TODO whitelist
             .count('id')
             .into('users');
         }
