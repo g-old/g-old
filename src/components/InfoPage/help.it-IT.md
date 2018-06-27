@@ -45,7 +45,7 @@ Ogni utente ha la possibilità di scegliere fino a cinque altri utenti da seguir
 
 ### GOLD (Government by OnLine Democracy)
 
-Seguendo questo [link](https://drive.google.com/file/d/1hcFer8ulwVD_BIptIQ340EXIsJ9UnEef/view?usp=sharing) troverai una spiegazione molto sintetica del modello GOLD, un modello per implementare la democrazia diretta attraverso una rete sociale su internet dotata di strumenti sviluppati appositamente per la discussione e la votazione di proposte riguardante qualsiasi aspetto della società civile.
+Seguendo questo [link](https://drive.google.com/file/d/1hcFer8ulwVD_BIptIQ340EXIsJ9UnEef/view?usp=sharing) troverai una spiegazione molto sintetica del modello GOLD, un modello per implementare la democrazia diretta attraverso una rete sociale su internet dotata di strumenti sviluppati appositamente per la discussione e la votazione di proposte riguardanti qualsiasi aspetto della società civile.
 
 ### Gruppi di lavoro (gdl)
 
