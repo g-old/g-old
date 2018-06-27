@@ -3,9 +3,8 @@ import knex from '../knex';
 import Poll from './Poll';
 import User from './User';
 import PollingMode from './PollingMode';
-import { TargetType } from './Subscription';
+import { TargetType } from './utils';
 import { dedup } from '../../core/helpers';
-import { computeNextState } from '../../core/worker';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import { Groups } from '../../organization';
 import EventManager from '../../core/EventManager';
@@ -27,6 +26,65 @@ export type ProposalProps = {
   spokesman_id: ID,
   notified_at: string,
   work_team_id: ID,
+};
+
+export const computeNextState = (state, poll, tRef) => {
+  let newState;
+  let ref;
+
+  switch (tRef) {
+    case 'voters':
+      ref = poll.upvotes + poll.downvotes;
+      break;
+    case 'all':
+      ref = poll.numVoter;
+      break;
+
+    default:
+      throw Error(`Threshold reference not implemented: ${tRef}`);
+  }
+
+  ref *= poll.threshold / 100;
+
+  if (poll.upvotes >= ref) {
+    switch (state) {
+      case 'proposed': {
+        newState = 'proposed';
+        break;
+      }
+      case 'voting': {
+        newState = 'accepted';
+        break;
+      }
+      case 'survey': {
+        newState = 'survey';
+        break;
+      }
+
+      default:
+        throw Error(`State not recognized: ${state}`);
+    }
+  } else {
+    switch (state) {
+      case 'proposed': {
+        newState = 'accepted';
+        break;
+      }
+      case 'voting': {
+        newState = 'rejected';
+        break;
+      }
+      case 'survey': {
+        newState = 'survey';
+        break;
+      }
+
+      default:
+        throw Error(`State not recognized: ${state}`);
+    }
+  }
+
+  return newState;
 };
 
 const validateTags = async tags => {
@@ -93,19 +151,19 @@ const validatePoll = async (viewer, poll, loaders) => {
 
     if (!pollingMode) throw Error('PollingMode not found');
     // check if modifications
-    const { id, ...props } = poll.mode;
-    const keys = Object.keys(props);
+    const { id, ...properties } = poll.mode;
+    const keys = Object.keys(properties);
     if (keys.length > 0) {
       // check if values are different
       const diff = keys.reduce((acc, curr) => {
-        if (props[curr] !== pollingMode[curr]) {
+        if (properties[curr] !== pollingMode[curr]) {
           // eslint-disable-next-line no-param-reassign
           acc += 1;
         }
         return acc;
       }, 0);
       createPollingMode = diff > 0;
-      pollingModeData = { ...pollingMode, ...props };
+      pollingModeData = { ...pollingMode, ...properties };
       if (pollingMode.name === 'survey') {
         isSurvey = true;
         pollingModeData.thresholdRef = 'voters';
@@ -173,16 +231,27 @@ const checkIfCoordinator = async (viewer, data) => {
 
 class Proposal {
   id: ID;
+
   state: ProposalState;
+
   authorId: ID;
+
   body: string;
+
   title: string;
+
   votes: number;
+
   pollOneId: ID;
+
   pollTwoId: ID;
+
   createdAt: string;
+
   spokesmanId: ID;
+
   notifiedAt: string;
+
   workTeamId: ID;
 
   constructor(data: ProposalProps) {
@@ -199,6 +268,7 @@ class Proposal {
     this.notifiedAt = data.notified_at;
     this.workTeamId = data.work_team_id;
   }
+
   static async gen(viewer, id, { proposals }) {
     const data = await proposals.load(id);
     if (data == null) return null;
@@ -229,6 +299,7 @@ class Proposal {
     .then(ids => {return ids; }));
       */
   }
+
   // TODO make member method
   static async update(viewer, data, loaders) {
     // throw Error('TESTERROR');
@@ -536,6 +607,7 @@ EventManager.subscribe('onProposalUpdated', async ({ proposal }) => {
       log.error({ err }, 'Subscription deletion failed');
     }
   }
-
-  await makeVisibleForMainteam(proposal);
+  if (['accepted'].includes(proposal.state)) {
+    await makeVisibleForMainteam(proposal);
+  }
 });
