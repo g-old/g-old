@@ -61,6 +61,16 @@ const messages = defineMessages({
     defaultMessage: 'Revoked',
     description: 'Proposal was revoked',
   },
+  closed: {
+    id: 'survey.closed',
+    description: 'Survey closed',
+    defaultMessage: 'Closed!',
+  },
+  voteRequest: {
+    id: 'proposal.votingRequested',
+    description: 'Poll reached its limit',
+    defaultMessage: 'Voting requested!',
+  },
 });
 
 const langSchema = {
@@ -69,11 +79,43 @@ const langSchema = {
   'lld-IT': 'lldName',
 };
 
+function renderGroupHeader(info, title, locale) {
+  return (
+    <Box align between className={s.groupHeader}>
+      <Button
+        plain
+        onClick={() => history.push(`/workteams/${info.workTeamId}`)}
+      >
+        {info.logo ? (
+          'IMPLEMENT LOGO'
+        ) : (
+          <svg
+            version="1.1"
+            viewBox="0 0 24 24"
+            role="img"
+            width="48px"
+            height="48px"
+            aria-label="cloud"
+          >
+            <path
+              fill="none"
+              stroke="#000"
+              strokeWidth="2"
+              d={ICONS.workteam}
+            />
+          </svg>
+        )}
+        <span>{info[langSchema[locale]] || info.name || ':('}</span>
+      </Button>
+      <Label>{title}</Label>
+    </Box>
+  );
+}
+
 function getProposalHeader(verb, proposal) {
   let state = verb;
   let identifier;
-
-  if (proposal.state === 'update') {
+  if (verb === 'update') {
     state = proposal.state; // eslint-disable-line
   }
   switch (state) {
@@ -82,9 +124,21 @@ function getProposalHeader(verb, proposal) {
       identifier = isSurvey ? 'newSurvey' : 'newProposal';
       break;
     }
-    case 'accepted':
+    case 'proposed': {
+      identifier = 'voteRequest';
+      break;
+    }
+    case 'survey': {
+      identifier = 'closed';
+      break;
+    }
+
     case 'accept': {
       identifier = 'proposalFailed';
+      break;
+    }
+    case 'accepted': {
+      identifier = 'proposalValid';
       break;
     }
     case 'rejected':
@@ -128,6 +182,7 @@ class Activity extends React.Component {
     date: PropTypes.string.isRequired,
     locale: PropTypes.string.isRequired,
   };
+
   static defaultProps = {
     content: {},
   };
@@ -143,42 +198,11 @@ class Activity extends React.Component {
   onProposalClick({ proposalId, pollId }) {
     history.push(`/proposal/${proposalId}/${pollId}`);
   }
-  renderGroupHeader(info, title) {
-    return (
-      <Box align between className={s.groupHeader}>
-        <Button
-          plain
-          onClick={() => history.push(`/workteams/${info.workTeamId}`)}
-        >
-          {info.logo ? (
-            'IMPLEMENT LOGO'
-          ) : (
-            <svg
-              version="1.1"
-              viewBox="0 0 24 24"
-              role="img"
-              width="48px"
-              height="48px"
-              aria-label="cloud"
-            >
-              <path
-                fill="none"
-                stroke="#000"
-                strokeWidth="2"
-                d={ICONS.workteam}
-              />
-            </svg>
-          )}
-          <span>
-            {info[langSchema[this.props.locale]] || info.name || ':('}
-          </span>
-        </Button>
-        <Label>{title}</Label>
-      </Box>
-    );
-  }
+
   renderVote(info) {
-    const { position } = this.props.content;
+    const {
+      content: { position, pollId, voter },
+    } = this.props;
     const thumb = (
       <svg
         viewBox="0 0 24 24"
@@ -189,7 +213,7 @@ class Activity extends React.Component {
       >
         <path
           fill="none"
-          stroke={this.props.content.position === 'pro' ? '#8cc800' : '#ff324d'}
+          stroke={position === 'pro' ? '#8cc800' : '#ff324d'}
           strokeWidth="2"
           d={ICONS.thumbUpAlt}
           transform={position === 'pro' ? '' : 'scale(1,-1) translate(0,-24)'}
@@ -198,18 +222,12 @@ class Activity extends React.Component {
     );
     return (
       <Link // eslint-disable-line
-        to={`/proposal/${info.proposalId || 'xxx'}/${
-          this.props.content.pollId
-        }`}
+        to={`/proposal/${info.proposalId || 'xxx'}/${pollId}`}
       >
         <div className={s.follower}>
           <span>
-            <Avatar user={this.props.content.voter} isFollowee />
-            <span>
-              {`${this.props.content.voter.name} ${
-                this.props.content.voter.surname
-              }`}
-            </span>
+            <Avatar user={voter} isFollowee />
+            <span>{`${voter.name} ${voter.surname}`}</span>
           </span>
 
           {thumb}
@@ -226,31 +244,32 @@ class Activity extends React.Component {
     return (
       <Link // eslint-disable-line
         to={`/workteams/${workTeamId}/discussions/${
-          this.props.content.discussionId
+          content.discussionId
         }?comment=${parent || content.id}${child ? `&child=${child}` : ''}`}
       >
-        <Comment preview {...this.props.content} />
+        <Comment preview {...content} />
       </Link>
     );
   }
 
   renderContent() {
-    const { content, verb } = this.props;
+    const { content, verb, locale, info } = this.props;
     if (!content) return { header: 'No content' };
     const result = {};
-    switch (content.__typename) { // eslint-disable-line
+    const infoData = JSON.parse(info || '{}');
+    switch (
+      content.__typename // eslint-disable-line
+    ) {
       case 'StatementDL': {
-        const info = JSON.parse(this.props.info || '{}');
-
         result.content = (
           <Link // eslint-disable-line
-            to={`/proposal/${info.proposalId || 'xxx'}/${content.pollId}`}
+            to={`/proposal/${infoData.proposalId || 'xxx'}/${content.pollId}`}
           >
             <Statement {...content} />
           </Link>
         );
 
-        result.header = info.proposalTitle || ':(';
+        result.header = infoData.proposalTitle || ':(';
         break;
       }
       case 'ProposalDL': {
@@ -259,45 +278,40 @@ class Activity extends React.Component {
         );
         let header = getProposalHeader(verb, content);
         if (content.workTeamId) {
-          const info = JSON.parse(this.props.info || '{}');
-          header = this.renderGroupHeader(info, header);
+          header = renderGroupHeader(infoData, header, locale);
         }
         result.header = header;
         break;
       }
       case 'VoteDL': {
-        const info = JSON.parse(this.props.info || '{}');
-
-        result.content = this.renderVote(info);
-        result.header = info.proposalTitle || ':(';
+        result.content = this.renderVote(infoData);
+        result.header = infoData.proposalTitle || ':(';
         break;
       }
 
       case 'Discussion': {
-        const info = JSON.parse(this.props.info || '{}');
         result.content = (
           <DiscussionPreview
             discussion={content}
             onClick={() =>
               history.push(
-                `/workteams/${info.workTeamId}/discussions/${content.id}`,
+                `/workteams/${infoData.workTeamId}/discussions/${content.id}`,
               )
             }
           />
         );
 
-        result.header = this.renderGroupHeader(
+        result.header = renderGroupHeader(
           info,
           <FormattedMessage {...messages.newDiscussion} />,
+          locale,
         );
         break;
       }
 
       case 'Comment': {
-        const info = JSON.parse(this.props.info || '{}');
-
-        result.content = this.renderComment(info.workTeamId);
-        result.header = info.title;
+        result.content = this.renderComment(infoData.workTeamId);
+        result.header = infoData.title;
         break;
       }
 
@@ -310,11 +324,11 @@ class Activity extends React.Component {
 
   render() {
     const { header, content } = this.renderContent();
-
+    const { date } = this.props;
     return (
       <div className={s.container}>
         <div className={s.date}>
-          <FormattedRelative value={this.props.date} />
+          <FormattedRelative value={date} />
         </div>
         <div>{header}</div>
 
