@@ -49,7 +49,7 @@ Seguendo questo [link](https://drive.google.com/file/d/1hcFer8ulwVD_BIptIQ340EXI
 
 ### Gruppi di lavoro (gdl)
 
-Sulla piattaforma possono essere attivati gruppi di lavoro dedicati a temi diversi. Attualmente sono previsti i seguenti gruppi di lavoro: **sociale e sanità, formazione e cultura, mobilità e trasporti, urbanistica, ambiente, economia, eventi e accoglienza. Ogni utente è obbligato ad iscriversi ad almeno un gruppo di lavoro**. Nei gdl sono possibili le seguenti attività: discussioni su vari argomenti e votazioni delle proposte elaborate. La partecipazione ai lavori dei gdl permetterà agli utenti di primo livello (viewer) di acquisire il diritto di voto cioè di diventare utenti di secondo livello. I coordinatori dei gruppi di lavoro hanno la facoltà di dare e togliere il diritto di voto agli utenti.
+Sulla piattaforma possono essere attivati gruppi di lavoro dedicati a temi diversi. Attualmente sono previsti i seguenti gruppi di lavoro: **sociale e sanità, formazione e cultura, mobilità e trasporti, urbanistica, ambiente, economia, eventi e accoglienza. Ogni utente è obbligato ad iscriversi ad almeno un gruppo di lavoro**. Nei gdl sono possibili le seguenti attività: discussioni su vari argomenti e votazioni delle proposte elaborate. La partecipazione ai lavori dei gdl permetterà agli utenti visitatori (viewer) di acquisire il diritto di voto, cioè di diventare votanti. I coordinatori dei gruppi di lavoro hanno la facoltà di proporre al coordinatore della piattaforma di dare o di togliere il diritto di voto agli utenti.
 
 ### P
 
