@@ -7,14 +7,19 @@ import {
   GraphQLInt,
   GraphQLBoolean,
 } from 'graphql';
-import TagType from './TagType';
+
+/* eslint-disable import/no-cycle */
 import PollType from './PollDLType';
-import User from '../models/User';
 import UserType from './UserType';
+import SubscriptionType from './SubscriptionType';
+/* eslint-enable import/no-cycle */
+
+import TagType from './TagType';
+import User from '../models/User';
 import Poll from '../models/Poll';
 import Tag from '../models/Tag';
-import Subscription, { TargetType } from '../models/Subscription';
-import SubscriptionType from './SubscriptionType';
+import Subscription from '../models/Subscription';
+import { TargetType } from '../models/utils';
 import knex from '../knex';
 
 const ProposalType = new ObjectType({
