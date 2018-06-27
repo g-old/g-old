@@ -81,7 +81,7 @@ module.exports = {
   // timers: // [string]
 
   transform: {
-    '\\.jsx?$': 'babel-jest',
+    '\\.(js|jsx|mjs)$': '<rootDir>/node_modules/babel-jest',
     '\\.(gql|graphql)$': 'jest-transform-graphql',
     '\\.(jpe?g|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
       '<rootDir>/jest/fileTransformer.js',
