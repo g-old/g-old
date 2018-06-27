@@ -11,7 +11,7 @@ import chokidar from 'chokidar';
 import Promise from 'bluebird';
 import { transformFileSync } from 'babel-core';
 import { readFile, writeFile, glob } from './lib/fs';
-import babelrc from '../.babelrc';
+import babelrc from '../babel.config';
 import { locales } from '../src/config';
 
 const GLOB_PATTERN = 'src/**/*.{js,jsx}';

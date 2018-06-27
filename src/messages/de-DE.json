@@ -450,6 +450,7 @@
     "files": [
       "src/components/ConfirmLayer/ConfirmLayer.js",
       "src/components/ImageUpload/ImageUpload.js",
+      "src/components/MessageInput/NoticeLayer.js",
       "src/components/Poll/Poll.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
@@ -640,6 +641,7 @@
       "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/MessageForm/MessageForm.js",
       "src/components/MessageInput/MessageInput.js",
+      "src/components/MessageInput/NoticeLayer.js",
       "src/components/ProposalInput/ProposalInput.js"
     ]
   },
@@ -679,7 +681,7 @@
     "defaultMessage": "Load more",
     "message": "Mehr",
     "files": [
-      "src/components/ProposalListView/ProposalListView.js",
+      "src/components/ListView/ListView.js",
       "src/components/UserPanel/UserPanel.js",
       "src/routes/accountList/AccountListContainer.js",
       "src/routes/memberList/MemberListContainer.js",
@@ -1328,7 +1330,10 @@
     "description": "Surveys label",
     "defaultMessage": "Surveys",
     "message": "Umfragen",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/WorkTeam/WorkTeam.js"
+    ]
   },
   {
     "id": "faq",
@@ -1752,5 +1757,19 @@
     "defaultMessage": "You will be contacted as soon as possible",
     "message": "Sie werden nun so schnell wie möglich freigeschalten!",
     "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "proposal.votingRequested",
+    "description": "Poll reached its limit",
+    "defaultMessage": "Voting requested!",
+    "message": "",
+    "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "survey.closed",
+    "description": "Survey closed",
+    "defaultMessage": "Closed!",
+    "message": "Beendet!",
+    "files": ["src/components/Activity/Activity.js"]
   }
 ]
