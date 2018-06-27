@@ -4,7 +4,8 @@ import { throwIfMissing } from './utils';
 import log from '../logger';
 import { sendJob } from './childProcess';
 // import config from '../config';
-import { SubscriptionType, TargetType } from '../data/models/Subscription';
+import { SubscriptionType } from '../data/models/Subscription';
+import { TargetType } from '../data/models/utils';
 import Activity, { ActivityType, ActivityVerb } from '../data/models/Activity';
 import type { tActivityType, tActivityVerb } from '../data/models/Activity';
 import MailComposer from './MailComposer';
@@ -519,23 +520,37 @@ type NotificationProps = {
 
 class NotificationService {
   EventManager: {};
+
   activityQueue: EActivity[];
+
   delimiter: string;
+
   maxBatchSize: number;
+
   batchingWindow: number;
+
   dbConnector: any;
+
   PubSub: PubSub;
+
   linkPrefix: string;
+
   lastActivityId: ID;
+
   sendEmails: boolean;
+
   MailComposer: MailComposer;
+
   filterActivity: (payload: PayloadType) => void;
+
   loadSubscriptions: Selector => Promise<Subscriber[]>;
+
   mergeNotifyableActivitiesWithSubscribers: (
     Subscriber,
     ID[],
     ActivityMap,
   ) => Promise<RelevantActivities>;
+
   generateEmail: (
     activity: EActivity,
     subscriberIds: ID[],
@@ -544,11 +559,17 @@ class NotificationService {
     subscriberById: SubscriberMap,
     objects: { [tActivityType]: ResourceMap },
   ) => Email;
+
   batchProcessing: () => void;
+
   processQueue: () => void;
+
   start: () => void;
+
   recover: () => void;
+
   getLastProcessedActivityId: () => ID;
+
   purgeNotifications: ({ [string]: EActivity }) => any;
 
   constructor({
@@ -1009,7 +1030,8 @@ class NotificationService {
           activity.objectId,
           ActivityType.STATEMENT,
         );
-      } else if (activity.type === ActivityType.COMMENT) {
+      }
+      if (activity.type === ActivityType.COMMENT) {
         const comment = activity.content;
         if (!comment.parentId && comment.replyIds) {
           // search and delete reply notifications

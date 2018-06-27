@@ -1,5 +1,5 @@
 import { GraphQLEnumType } from 'graphql';
-import { TargetType } from '../models/Subscription';
+import { TargetType } from '../models/utils';
 
 const TargetTypeEnum = new GraphQLEnumType({
   name: 'TargetTypeEnum',

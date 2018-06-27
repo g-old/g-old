@@ -3,7 +3,9 @@ throw new Error('Not implemented');
 import { throwIfMissing } from './utils';
 import log from '../logger';
 
-import { SubscriptionType, TargetType } from '../data/models/Subscription';
+import { SubscriptionType } from '../data/models/Subscription';
+import { TargetType } from '../data/models/utils';
+
 import { ActivityType } from '../data/models/Activity';
 
 const groupByActivityType = notifications =>

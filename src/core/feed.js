@@ -5,7 +5,7 @@ import Message from '../data/models/Message';
 import knex from '../data/knex';
 import log from '../logger';
 // import User from '../data/models/User';
-import { TargetType } from '../data/models/Subscription';
+import { TargetType } from '../data/models/utils';
 
 const maxFeedLength = 30;
 

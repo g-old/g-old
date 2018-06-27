@@ -1,6 +1,6 @@
 import knex from '../data/knex';
 import log from '../logger';
-import Proposal from '../data/models/Proposal';
+import Proposal, { computeNextState } from '../data/models/Proposal';
 import createLoaders from '../data/dataLoader';
 import { Permissions, Groups } from '../organization';
 
@@ -14,65 +14,6 @@ const SYSTEM = {
   groups: Groups.SYSTEM,
 };
 /* eslint-enable no-bitwise */
-
-export const computeNextState = (state, poll, tRef) => {
-  let newState;
-  let ref;
-
-  switch (tRef) {
-    case 'voters':
-      ref = poll.upvotes + poll.downvotes;
-      break;
-    case 'all':
-      ref = poll.numVoter;
-      break;
-
-    default:
-      throw Error(`Threshold reference not implemented: ${tRef}`);
-  }
-
-  ref *= poll.threshold / 100;
-
-  if (poll.upvotes >= ref) {
-    switch (state) {
-      case 'proposed': {
-        newState = 'proposed';
-        break;
-      }
-      case 'voting': {
-        newState = 'accepted';
-        break;
-      }
-      case 'survey': {
-        newState = 'survey';
-        break;
-      }
-
-      default:
-        throw Error(`State not recognized: ${state}`);
-    }
-  } else {
-    switch (state) {
-      case 'proposed': {
-        newState = 'accepted';
-        break;
-      }
-      case 'voting': {
-        newState = 'rejected';
-        break;
-      }
-      case 'survey': {
-        newState = 'survey';
-        break;
-      }
-
-      default:
-        throw Error(`State not recognized: ${state}`);
-    }
-  }
-
-  return newState;
-};
 
 async function proposalPolling() {
   const proposals = await knex('proposals')

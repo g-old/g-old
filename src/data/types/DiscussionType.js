@@ -7,15 +7,18 @@ import {
   GraphQLNonNull,
 } from 'graphql';
 import knex from '../knex';
-
+/* eslint-disable import/no-cycle */
 import WorkTeamType from './WorkTeamType';
-import WorkTeam from '../models/WorkTeam';
-import CommentType from './CommentType';
-import Comment from '../models/Comment';
-import UserType from './UserType';
-import User from '../models/User';
 import SubscriptionType from './SubscriptionType';
-import Subscription, { TargetType } from '../models/Subscription';
+import CommentType from './CommentType';
+import UserType from './UserType';
+/* eslint-enable import/no-cycle */
+import WorkTeam from '../models/WorkTeam';
+import Comment from '../models/Comment';
+import User from '../models/User';
+
+import Subscription from '../models/Subscription';
+import { TargetType } from '../models/utils';
 
 const DiscussionType = new ObjectType({
   name: 'Discussion',

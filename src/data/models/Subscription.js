@@ -2,6 +2,7 @@ import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import Proposal from './Proposal';
 import Discussion from './Discussion';
+import { TargetType } from './utils';
 
 export const EventType = {
   NEW_PROPOSAL: 'new_proposal',
@@ -15,14 +16,6 @@ export const SubscriptionType = {
   FOLLOWEES: 'followees',
   REPLIES: 'replies',
   UPDATES: 'updates',
-};
-export const TargetType = {
-  PROPOSAL: 'proposal',
-  DISCUSSION: 'discussion',
-  GROUP: 'group',
-  USER: 'user',
-  ALL: 'all',
-  ROLE: 'role',
 };
 
 class Subscription {
