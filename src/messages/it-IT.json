@@ -294,7 +294,7 @@
     "id": "proposal.rejected",
     "description": "Proposal got rejected",
     "defaultMessage": "Rejected",
-    "message": "Rigettata",
+    "message": "Respinta",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
@@ -402,7 +402,7 @@
     "id": "statements.flag",
     "description": "Menu entry on statements to flag statement",
     "defaultMessage": "flag",
-    "message": "Segnala abuso",
+    "message": "Segnala",
     "files": [
       "src/components/Comment/Comment.js",
       "src/components/Statement/Statement.js"
@@ -412,7 +412,7 @@
     "id": "statements.follow",
     "description": "Menu entry on statements to follow author",
     "defaultMessage": "follow",
-    "message": "",
+    "message": "segui",
     "files": [
       "src/components/Comment/Comment.js",
       "src/components/Statement/Statement.js"
@@ -486,7 +486,7 @@
     "id": "header.brand",
     "description": "Brand name displayed in header",
     "defaultMessage": "M5",
-    "message": "",
+    "message": "M5S 5SB",
     "files": ["src/components/Header/Header.js"]
   },
   {
@@ -512,7 +512,7 @@
     "id": "commands.cancel",
     "description": "Short command to cancel a operation",
     "defaultMessage": "Cancel",
-    "message": "Cancella",
+    "message": "Annulla",
     "files": [
       "src/components/ConfirmLayer/ConfirmLayer.js",
       "src/components/ImageUpload/ImageUpload.js",
@@ -911,7 +911,7 @@
     "id": "join.withdraw",
     "description": "Cancel join request",
     "defaultMessage": "Dismiss request",
-    "message": "",
+    "message": "Ritirare la richiesta",
     "files": ["src/components/WorkTeam/WorkTeam.js"]
   },
   {
@@ -988,7 +988,7 @@
     "id": "roles.unlock",
     "description": "Button label for those who can only unlock viewers",
     "defaultMessage": "Unlock viewer",
-    "message": "Sblocca il viewer",
+    "message": "Sblocca viewer",
     "files": ["src/components/GroupManager/GroupManager.js"]
   },
   {
@@ -1021,7 +1021,7 @@
     "id": "label.email",
     "description": "Heading of email section",
     "defaultMessage": "Email",
-    "message": "Indirizzo email",
+    "message": "email",
     "files": [
       "src/components/Login/Login.js",
       "src/components/SignUp/SignUp.js",
@@ -1074,7 +1074,7 @@
     "id": "settings.email.requestCreated",
     "description": "Notification that a request has been created",
     "defaultMessage": "Check your email ({email}) to confirm.",
-    "message": "Controlla la tua casella di posta ({email}) per confirmare ",
+    "message": "Controlla la tua casella di posta ({email}) per confermare ",
     "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
@@ -1090,7 +1090,7 @@
     "defaultMessage":
       "Confirm your email address. A confirmation message was sent to ({email})",
     "message":
-      "Conferma il tuo indirizzo email. Un messaggio di conferma è stato inviato a ({email})",
+      "Conferma il tuo indirizzo email. Messaggio di conferma inviato a ({email})",
     "files": ["src/routes/account/AccountContainer.js"]
   },
   {
@@ -1175,7 +1175,7 @@
     "id": "spokesman",
     "description": "Spokesman label",
     "defaultMessage": "Spokesman",
-    "message": "Relatore",
+    "message": "Referente",
     "files": ["src/components/Proposal/Proposal.js"]
   },
   {
@@ -1223,7 +1223,7 @@
     "id": "coordinator",
     "description": "Label coordinator",
     "defaultMessage": "Coordinator",
-    "message": "Coordinatore",
+    "message": "Coordinato da",
     "files": ["src/components/WorkTeam/WorkTeam.js"]
   },
   {
@@ -1251,7 +1251,7 @@
     "id": "label.or",
     "description": "Label or",
     "defaultMessage": "OR",
-    "message": "O",
+    "message": "OPPURE",
     "files": ["src/routes/home/Home.js"]
   },
   {
@@ -1272,7 +1272,7 @@
     "id": "notificationType.email",
     "description": "Label email",
     "defaultMessage": "Email",
-    "message": "",
+    "message": "email",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
@@ -1307,7 +1307,7 @@
     "id": "subscriptionType.all",
     "description": "Subscribe for all available events",
     "defaultMessage": "All",
-    "message": "Tutto",
+    "message": "TUTTO",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
@@ -1321,7 +1321,7 @@
     "id": "subscriptionType.followees",
     "description": "Subscribe for  events of followees",
     "defaultMessage": "Followees",
-    "message": "",
+    "message": "Persone seguite",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
@@ -1335,7 +1335,7 @@
     "id": "subscriptionType.updates",
     "description": "Subscribe for state updates",
     "defaultMessage": "State updates",
-    "message": "",
+    "message": "Aggiornamenti",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
@@ -1362,7 +1362,7 @@
     "id": "notifications.proposal.accepted",
     "description": "Status message for notifications",
     "defaultMessage": "got accepted!",
-    "message": "è stato accettato",
+    "message": "è stato approvato",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1376,42 +1376,42 @@
     "id": "notifications.proposal.proposed",
     "description": "Status message for notifications",
     "defaultMessage": "was proposed!",
-    "message": "è stato proposto",
+    "message": "è stata proposta",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.rejected",
     "description": "Status message for notifications",
     "defaultMessage": "was rejected!",
-    "message": "è stato rigettato",
+    "message": "è stata respinta",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.revoked",
     "description": "Status message for notifications",
     "defaultMessage": "was revoked!",
-    "message": "è stato revocato",
+    "message": "è stata retirata",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.voting",
     "description": "Status message for notifications",
     "defaultMessage": "opened voting phase!",
-    "message": "ha aperto la votazione",
+    "message": "è aperta la votazione",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.statement.new",
     "description": "Status message for notifications",
     "defaultMessage": "wrote a statement on",
-    "message": "ha scritto una dichiarazione su",
+    "message": "dichiarazione di voto su",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.survey.closed",
     "description": "Status message for notifications",
     "defaultMessage": "was closed",
-    "message": "è terminato",
+    "message": "sondaggio chiuso",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1457,7 +1457,7 @@
     "id": "contact",
     "description": "Contact label",
     "defaultMessage": "Contact",
-    "message": "",
+    "message": "Contatta",
     "files": ["src/components/InfoPage/InfoPage.js"]
   },
   {
@@ -1471,7 +1471,7 @@
     "id": "label.notificationSettings",
     "description": "Label for notification settings",
     "defaultMessage": "Notification settings",
-    "message": "Impostazioni di notifica",
+    "message": "Impostazioni notifiche",
     "files": ["src/routes/account/AccountContainer.js"]
   },
   {
@@ -1485,14 +1485,14 @@
     "id": "notifications.user.update.roleAdded",
     "description": "Status message for notifications",
     "defaultMessage": "You got a new role:",
-    "message": "",
+    "message": "Hai ottenuto un nuovo diritto",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.user.update.roleLost",
     "description": "Status message for notifications",
     "defaultMessage": "You lost your role:",
-    "message": "",
+    "message": "Hai perso un diritto",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1595,28 +1595,28 @@
     "id": "privacy.consent",
     "description": "Signup consent notice",
     "defaultMessage": "I accept the {policy}",
-    "message": "",
+    "message": "Accetto {policy}",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
     "id": "privacy.readCall",
     "description": "Call to read linked privac policy",
     "defaultMessage": "Read our {link}",
-    "message": "",
+    "message": "Leggi l'informativa {link}",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
     "id": "settings.uploadCall",
     "description": "Notification to upload photo",
     "defaultMessage": "Please upload a photo of yourself",
-    "message": "",
+    "message": "Per favore carica una foto riconoscibile",
     "files": ["src/routes/account/AccountContainer.js"]
   },
   {
     "id": "settings.waitCall",
     "description": "Notification to upload photo",
     "defaultMessage": "You will be contacted as soon as possible",
-    "message": "",
+    "message": "Verrai contattato il più presto possibile",
     "files": ["src/routes/account/AccountContainer.js"]
   },
   {
