@@ -1223,7 +1223,8 @@
     "description": "Notification to verify mail address",
     "defaultMessage":
       "Confirm your email address. A confirmation message was sent to ({email})",
-    "message": "Bitte bestätigen Sie ihre E-Mail-Adresse",
+    "message":
+      "Bitte bestätigen Sie ihre E-Mail-Adresse. Eine Bestätigungsmail wurde an ({email}) verschickt.",
     "files": ["src/routes/account/AccountContainer.js"]
   },
   {
