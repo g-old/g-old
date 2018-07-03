@@ -141,7 +141,10 @@ function getProposalHeader(verb, proposal) {
       identifier = 'proposalValid';
       break;
     }
-    case 'rejected':
+    case 'rejected': {
+      identifier = 'proposalFailed';
+      break;
+    }
     case 'reject': {
       identifier = 'proposalValid';
       break;

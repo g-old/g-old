@@ -8,7 +8,7 @@ import Select from '../Select';
 
 const messages = defineMessages({
   active: {
-    id: 'proposals.active',
+    id: 'resource.active',
     defaultMessage: 'active',
     description: 'Filter for active proposals/surveys/discussions',
   },

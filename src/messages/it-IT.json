@@ -280,7 +280,7 @@
     "id": "proposal.failed",
     "description": "Votation against proposal",
     "defaultMessage": "Failed!",
-    "message": "Errore!",
+    "message": "Respinta!",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
@@ -294,7 +294,7 @@
     "id": "proposal.rejected",
     "description": "Proposal got rejected",
     "defaultMessage": "Rejected",
-    "message": "Rigettata",
+    "message": "Rigettata!",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
