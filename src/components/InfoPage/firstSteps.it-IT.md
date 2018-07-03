@@ -2,8 +2,7 @@
 component: ContentPage
 ---
 
-Per favore prenditi il tempo di leggere queste semplici indicazioni. In ogni caso puoi ritornare su questa sezione attraverso la barra di navigazione - sezione “informazioni”.
-
+Per favore prenditi il tempo di leggere queste semplici indicazioni.
 Congratulazioni, sei all’inizio del tuo percorso. Seguendo i passi indicati di seguito avrai accesso al prossimo livello.
 
 ### 1) Conferma il tuo indirizzo email
@@ -19,4 +18,4 @@ Congratulazioni, sei all’inizio del tuo percorso. Seguendo i passi indicati di
 
 ### 3) Scegli un gruppo di lavoro al quale vuoi partecipare
 
-* Vai alla sezione “gruppi di lavoro” nella barra di navigazione e scegli uno o più gruppi di lavoro. Ricordati che è obbligatorio partecipare ad almeno un gruppo di lavoro.
+* Vai alla sezione “gruppi di lavoro” nella barra di navigazione e scegli uno o più gruppi di lavoro. Nei gruppi di lavoro si svolgerà la principale attività di elaborazione di nuove proposte.
