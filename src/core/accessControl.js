@@ -166,7 +166,8 @@ function proposalWriteControl(viewer, data) {
       return true;
     }
     return viewer.permissions & PermissionsSchema[Groups.ADMIN];
-  } else if (viewer.permissions & PermissionsSchema[Groups.RELATOR]) {
+  }
+  if (viewer.permissions & PermissionsSchema[Groups.RELATOR]) {
     if (data.id && data.state) {
       // updates
       if (viewer.permissions & Permissions.MODIFY_PROPOSALS) {
@@ -175,7 +176,8 @@ function proposalWriteControl(viewer, data) {
       return false;
     }
     return true;
-  } else if (data.state === 'survey') {
+  }
+  if (data.state === 'survey') {
     if (viewer.permissions & Permissions.PUBLISH_SURVEYS) {
       return true;
     }
@@ -257,7 +259,8 @@ function pollWriteControl(viewer, data) {
       return false;
     }
     return true;
-  } else if (data.isCoordinator) {
+  }
+  if (data.isCoordinator) {
     return true;
   }
   return viewer.permissions & PermissionsSchema[Groups.ADMIN];
@@ -316,9 +319,11 @@ function messageWriteControl(viewer, data) {
     (Permissions.NOTIFY_GROUPS | Permissions.NOTIFY_ALL)
   ) {
     return true;
-  } else if (data.isReply || data.isCoordinator) {
+  }
+  if (data.isReply || data.isCoordinator) {
     return true;
-  } else if (viewer.groups & Groups.VIEWER) {
+  }
+  if (viewer.groups & Groups.VIEWER) {
     // member can contact coordinator
     if (data.workTeamIds) {
       if (data.workTeamIds.some(wtId => viewer.wtMemberships.includes(wtId))) {
@@ -376,7 +381,8 @@ function discussionWriteControl(viewer, data) {
       return true;
     }
     return viewer.permissions & PermissionsSchema[Groups.ADMIN];
-  } else if (viewer.permissions & Permissions.PUBLISH_DISCUSSIONS) {
+  }
+  if (viewer.permissions & Permissions.PUBLISH_DISCUSSIONS) {
     return true;
   }
   return false;

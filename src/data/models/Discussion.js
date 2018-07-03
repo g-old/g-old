@@ -91,8 +91,10 @@ class Discussion {
   static async update(viewer, data) {
     if (!data || !data.id) return null;
     const isCoordinator = await checkIfCoordinator(viewer, data);
-    if (!canMutate(viewer, { ...data, isCoordinator }, Models.DISCUSSION))
+
+    if (!canMutate(viewer, { ...data, isCoordinator }, Models.DISCUSSION)) {
       return null;
+    }
 
     const newData = { updated_at: new Date() };
     if ('close' in data) {

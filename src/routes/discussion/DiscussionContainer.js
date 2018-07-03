@@ -70,10 +70,12 @@ class DiscussionContainer extends React.Component {
 
     subscriptionStatus: PropTypes.shape({}).isRequired,
   };
+
   static defaultProps = {
     errorMessage: null,
     childId: null,
   };
+
   constructor(props) {
     super(props);
     this.state = {};
@@ -84,6 +86,7 @@ class DiscussionContainer extends React.Component {
     this.handleReply = this.handleReply.bind(this);
     this.handleSubscription = this.handleSubscription.bind(this);
     this.handleDiscussionClosing = this.handleDiscussionClosing.bind(this);
+    this.fetchDiscussion = this.fetchDiscussion.bind(this);
   }
 
   componentDidMount() {
@@ -104,55 +107,68 @@ class DiscussionContainer extends React.Component {
 
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
-    return this.props.discussion;
+    const { discussion } = this.props;
+    return discussion;
   }
 
   handleCommentCreation(data) {
+    const { discussion, createComment: makeComment, id } = this.props;
     let targetId;
-    if (!this.props.discussion.subscription) {
-      targetId = this.props.discussion.id;
+    if (!discussion.subscription) {
+      targetId = discussion.id;
     }
-    this.props.createComment({
-      ...data,
-      discussionId: this.props.id,
-      targetId,
-    });
+    makeComment({ ...data, discussionId: id, targetId });
   }
 
   handleCommentFetching({ parentId }) {
-    this.props.loadComments({ parentId });
+    const { loadComments: fetchComments } = this.props;
+    fetchComments({ parentId });
   }
+
   handleDiscussionClosing() {
-    const { discussion } = this.props;
-    this.props.updateDiscussion({
+    const { discussion, updateDiscussion: mutateDiscussion } = this.props;
+    mutateDiscussion({
       id: discussion.id,
       close: !discussion.closedAt,
+      workTeamId: discussion.workTeam.id,
     });
   }
 
   handleReply({ id }) {
-    if (!this.props.discussion.closedAt) {
+    const { discussion } = this.props;
+    if (!discussion.closedAt) {
       this.setState({ replying: id || '0000' }); // for main input
     }
   }
+
   handleSubscription({ targetType, subscriptionType }) {
-    const { id, subscription } = this.props.discussion;
+    const {
+      discussion: { id, subscription },
+      updateSubscription: mutateSubscription,
+      createSubscription: subscribe,
+      deleteSubscription: unsubscribe,
+    } = this.props;
     if (subscription && subscriptionType === 'DELETE') {
-      this.props.deleteSubscription({ id: subscription.id });
+      unsubscribe({ id: subscription.id });
     } else if (subscription) {
-      this.props.updateSubscription({
+      mutateSubscription({
         id: subscription.id,
         targetType,
         subscriptionType,
         targetId: id,
       });
     } else {
-      this.props.createSubscription({
+      subscribe({
         targetType,
         subscriptionType,
         targetId: id,
       });
     }
+  }
+
+  fetchDiscussion() {
+    const { loadDiscussion: fetchDiscussion, id } = this.props;
+    fetchDiscussion({ id });
   }
 
   render() {
@@ -164,16 +180,17 @@ class DiscussionContainer extends React.Component {
       commentId,
       childId,
       subscriptionStatus,
+      updates,
+      updateComment: mutateComment,
+      deleteComment: eraseComment,
     } = this.props;
+    const { replying } = this.state;
     if (isFetching && !discussion) {
       return <p>{'Loading...'} </p>;
     }
     if (errorMessage && !discussion) {
       return (
-        <FetchError
-          message={errorMessage}
-          onRetry={() => this.props.loadDiscussion({ id: this.props.id })}
-        />
+        <FetchError message={errorMessage} onRetry={this.fetchDiscussion} />
       );
     }
     if (this.isReady()) {
@@ -249,7 +266,7 @@ class DiscussionContainer extends React.Component {
                   asInput
                   user={user}
                   onCreate={this.handleCommentCreation}
-                  updates={this.props.updates['0000'] || {}}
+                  updates={updates['0000'] || {}}
                 />
               )}
 
@@ -261,14 +278,14 @@ class DiscussionContainer extends React.Component {
                     onReply={!discussion.closedAt && this.handleReply}
                     loadReplies={this.handleCommentFetching}
                     onCreate={this.handleCommentCreation}
-                    onUpdate={this.props.updateComment}
-                    onDelete={this.props.deleteComment}
+                    onUpdate={mutateComment}
+                    onDelete={eraseComment}
                     onProfileClick={handleProfileClick}
-                    openInput={c.id === this.state.replying}
+                    openInput={c.id === replying}
                     // eslint-disable-next-line eqeqeq
                     own={c.author.id == user.id}
                     user={user}
-                    updates={this.props.updates[c.id]}
+                    updates={updates[c.id]}
                     ref={
                       c.id === this.scrollToId
                         ? node => (this.commentTo = node) // eslint-disable-line
@@ -283,13 +300,13 @@ class DiscussionContainer extends React.Component {
                           onReply={!discussion.closedAt && this.handleReply}
                           reply
                           onCreate={this.handleCommentCreation}
-                          onUpdate={this.props.updateComment}
-                          onDelete={this.props.deleteComment}
-                          openInput={r.id === this.state.replying}
+                          onUpdate={mutateComment}
+                          onDelete={eraseComment}
+                          openInput={r.id === replying}
                           onProfileClick={handleProfileClick}
                           // eslint-disable-next-line eqeqeq
                           own={r.author.id == user.id}
-                          updates={this.props.updates[c.id]}
+                          updates={updates[c.id]}
                           user={user}
                           ref={
                             r.id === this.scrollToId
@@ -332,6 +349,7 @@ const mapDispatch = {
   updateDiscussion,
 };
 
-export default connect(mapStateToProps, mapDispatch)(
-  withStyles(s)(DiscussionContainer),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(withStyles(s)(DiscussionContainer));
