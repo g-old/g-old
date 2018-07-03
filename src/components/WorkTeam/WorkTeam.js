@@ -353,9 +353,14 @@ class WorkTeam extends React.Component {
               width="24px"
               height="24px"
               role="img"
-              aria-label="lock"
+              aria-label="settings"
             >
-              <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.lock} />
+              <path
+                fill="none"
+                stroke="#000"
+                strokeWidth="2"
+                d={ICONS.settings}
+              />
             </svg>
           </Link>,
         );
