@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import { ListContainerShape } from '../ProposalListContainer';
 import ListView from '../ListView';
 import ProposalPreview from '../ProposalPreview';
-import { getWTProposalsByState, getProposalsPage } from '../../reducers';
+import { getWTProposalsByState, getResourcePageInfo } from '../../reducers';
+import { genProposalPageKey } from '../../reducers/pageInfo';
 import {
   surveyStateFilter,
   sortActiveProposals,
@@ -12,7 +13,9 @@ import {
 
 class SurveyListContainer extends React.Component {
   static propTypes = ListContainerShape;
+
   static defaultProps = { items: null };
+
   render() {
     const { items, onRetry, onLoadMore, onItemClick, pageInfo } = this.props;
     return (
@@ -30,7 +33,11 @@ const mapStateToProps = (state, { status, id }) => ({
     .filter(s => surveyStateFilter(s, status))
     .sort(status === 'active' ? sortActiveProposals : sortClosedProposals),
 
-  pageInfo: getProposalsPage(state, 'survey'),
+  pageInfo: getResourcePageInfo(
+    state,
+    'proposals',
+    genProposalPageKey({ state: 'survey', closed: status, workteamId: id }),
+  ),
 });
 
 export default connect(mapStateToProps)(SurveyListContainer);

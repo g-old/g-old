@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 import ProposalPreview from '../../components/ProposalPreview';
 import Select from '../../components/Select';
 import { loadProposalsList } from '../../actions/proposal';
-import { getVisibleProposals, getProposalsPage } from '../../reducers/index';
+import { getVisibleProposals, getResourcePageInfo } from '../../reducers/index';
+import { genProposalPageKey } from '../../reducers/pageInfo';
 import history from '../../history';
 import ListView from '../../components/ListView';
 import {
@@ -41,27 +42,24 @@ class SurveysOverviewContainer extends React.Component {
   }
 
   handleLoadMore({ after }) {
-    this.props.loadProposalsList({
-      after,
-      state: 'survey',
-      closed: this.props.filter === 'closed',
-    });
+    const { loadProposalsList: loadProposals, filter } = this.props;
+
+    loadProposals({ after, state: 'survey', closed: filter === 'closed' });
   }
 
   handleOnRetry() {
-    this.props.loadProposalsList({
-      state: 'survey',
-      closed: this.props.filter === 'closed',
-    });
+    const { loadProposalsList: loadProposals, filter } = this.props;
+    loadProposals({ state: 'survey', closed: filter === 'closed' });
   }
+
   render() {
-    const { surveys, pageInfo } = this.props;
+    const { surveys, pageInfo, filter } = this.props;
     return (
       <div>
         <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
           <span style={{ maxWidth: '10em' }}>
             <Select
-              value={this.props.filter}
+              value={filter}
               onChange={e => {
                 history.push(`/surveys/${e.option}`);
               }}
@@ -93,11 +91,18 @@ const mapStateToProps = (state, { filter }) => ({
   surveys: getVisibleProposals(state, 'survey')
     .filter(s => surveyStateFilter(s, filter))
     .sort(filter === 'active' ? sortActiveProposals : sortClosedProposals),
-  pageInfo: getProposalsPage(state, 'survey'),
+  pageInfo: getResourcePageInfo(
+    state,
+    'proposals',
+    genProposalPageKey({ state: 'survey', closed: filter }),
+  ),
 });
 
 const mapDispatch = {
   loadProposalsList,
 };
 
-export default connect(mapStateToProps, mapDispatch)(SurveysOverviewContainer);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(SurveysOverviewContainer);

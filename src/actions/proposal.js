@@ -17,6 +17,7 @@ import {
   LOAD_TAGS_ERROR,
   LOAD_TAGS_SUCCESS,
 } from '../constants';
+import { genProposalPageKey } from '../reducers/pageInfo';
 import {
   proposal as proposalSchema,
   proposalList as proposalListSchema,
@@ -265,10 +266,17 @@ export function loadProposalsList({
         return false;
       }
     }
+    const pageKey = genProposalPageKey({
+      state,
+      workteamId: workTeamId,
+      closed,
+      tagId,
+    });
     dispatch({
       type: LOAD_PROPOSAL_LIST_START,
       payload: {},
       filter: state,
+      pageKey,
     });
 
     try {
@@ -290,6 +298,7 @@ export function loadProposalsList({
         pagination: data.proposalConnection.pageInfo,
         savePageInfo: after != null,
         pageIndex: `${state}$${tagId || ''}`,
+        pageKey,
       });
     } catch (error) {
       dispatch({
@@ -297,6 +306,7 @@ export function loadProposalsList({
         payload: {
           error,
         },
+        pageKey,
 
         filter: state,
         message: error.message || 'Something went wrong',

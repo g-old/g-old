@@ -12,7 +12,8 @@ import {
   updateProposal,
 } from '../../actions/proposal';
 import TagManager from '../TagManager';
-import { getVisibleProposals, getProposalsPage } from '../../reducers';
+import { getVisibleProposals, getResourcePageInfo } from '../../reducers';
+import { genProposalPageKey } from '../../reducers/pageInfo';
 
 const messages = defineMessages({
   proposalInput: {
@@ -159,7 +160,11 @@ class ProposalPanel extends React.Component {
 
 const mapStateToProps = state => ({
   proposals: getVisibleProposals(state, 'active').filter(p => !p.workTeamId),
-  pageInfo: getProposalsPage(state, 'active'),
+  pageInfo: getResourcePageInfo(
+    state,
+    'proposals',
+    genProposalPageKey({ state: 'active' }),
+  ), // getProposalsPage(state, 'active'),
 });
 const mapDispatch = {
   loadTags,

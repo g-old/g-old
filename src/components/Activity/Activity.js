@@ -302,7 +302,7 @@ class Activity extends React.Component {
         );
 
         result.header = renderGroupHeader(
-          info,
+          infoData,
           <FormattedMessage {...messages.newDiscussion} />,
           locale,
         );

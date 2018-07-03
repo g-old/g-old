@@ -28,6 +28,7 @@ class ListView extends React.Component {
     isFetching: PropTypes.bool.isRequired,
     errorMessage: PropTypes.string,
   };
+
   static defaultProps = { errorMessage: null };
 
   constructor(props) {
@@ -36,21 +37,26 @@ class ListView extends React.Component {
   }
 
   handleLoadMore() {
-    this.props.onLoadMore({
-      after: this.props.pageInfo.pagination.endCursor,
+    const { onLoadMore, pageInfo } = this.props;
+    onLoadMore({
+      after: pageInfo.pagination.endCursor,
     });
   }
+
   renderChildren() {
-    return React.Children.map(this.props.children, child => (
+    const { children } = this.props;
+    return React.Children.map(children, child => (
       <div>
         <Card>{child} </Card>
       </div>
     ));
   }
+
   render() {
     const {
       children,
       pageInfo: { pending, errorMessage, pagination },
+      onRetry,
     } = this.props;
     if (pending && !children.length) {
       return (
@@ -66,7 +72,7 @@ class ListView extends React.Component {
           <FetchError
             isFetching={pending}
             message={errorMessage}
-            onRetry={this.props.onRetry}
+            onRetry={onRetry}
           />
         </div>
       );

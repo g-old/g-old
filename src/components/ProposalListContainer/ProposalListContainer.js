@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import ListView from '../ListView';
 import ProposalPreview from '../ProposalPreview';
 import { sortActiveProposals, sortClosedProposals } from '../../routes/utils';
-import { getWTProposalsByState, getProposalsPage } from '../../reducers';
+import { getWTProposalsByState, getResourcePageInfo } from '../../reducers';
+import { genProposalPageKey } from '../../reducers/pageInfo';
 
 export const ListContainerShape = {
   items: PropTypes.arrayOf(PropTypes.shape({})),
@@ -16,9 +17,11 @@ export const ListContainerShape = {
 
 class ProposalListContainer extends React.Component {
   static propTypes = ListContainerShape;
+
   static defaultProps = {
     items: null,
   };
+
   render() {
     const { items, onRetry, onLoadMore, onItemClick, pageInfo } = this.props;
     return (
@@ -36,7 +39,11 @@ const mapStateToProps = (state, { status, id }) => ({
     status === 'active' ? sortActiveProposals : sortClosedProposals,
   ),
 
-  pageInfo: getProposalsPage(state, status),
+  pageInfo: getResourcePageInfo(
+    state,
+    'proposals',
+    genProposalPageKey({ state: status, workteamId: id }),
+  ),
   filter: status,
 });
 

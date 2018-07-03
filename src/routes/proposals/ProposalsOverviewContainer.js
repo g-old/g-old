@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadProposalsList, loadProposal } from '../../actions/proposal';
 import history from '../../history';
-import { getVisibleProposals, getProposalsPage } from '../../reducers/index';
+import { getVisibleProposals, getResourcePageInfo } from '../../reducers/index';
+import { genProposalPageKey } from '../../reducers/pageInfo';
 import ProposalsSubHeader from '../../components/ProposalsSubHeader';
 import ListView from '../../components/ListView';
 import ProposalPreview from '../../components/ProposalPreview';
@@ -34,15 +35,18 @@ class ProposalsOverviewContainer extends React.Component {
   }
 
   handleLoadMore({ after }) {
-    this.props.loadProposalsList({
+    const { loadProposalsList: loadProposals, filter } = this.props;
+    loadProposals({
       after,
-      state: this.props.filter,
+      state: filter,
     });
   }
 
   handleOnRetry() {
-    this.props.loadProposalsList({
-      state: this.props.filter,
+    const { loadProposalsList: loadProposals, filter } = this.props;
+
+    loadProposals({
+      state: filter,
     });
   }
 
@@ -74,7 +78,11 @@ const mapStateToProps = (state, { filter = '' }) => ({
   proposals: getVisibleProposals(state, filter)
     .filter(p => !p.workTeamId)
     .sort(filter === 'active' ? sortActiveProposals : sortClosedProposals),
-  pageInfo: getProposalsPage(state, filter),
+  pageInfo: getResourcePageInfo(
+    state,
+    'proposals',
+    genProposalPageKey({ state: filter }),
+  ),
 });
 
 const mapDispatch = {
@@ -82,6 +90,7 @@ const mapDispatch = {
   loadProposal,
 };
 
-export default connect(mapStateToProps, mapDispatch)(
-  ProposalsOverviewContainer,
-);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(ProposalsOverviewContainer);

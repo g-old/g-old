@@ -7,6 +7,7 @@ import ui, * as fromUi from './ui';
 import consent from './consent';
 import statistics from './statistics';
 import system from './system';
+import pageInfo, * as fromPageInfo from './pageInfo';
 
 export default combineReducers({
   user,
@@ -17,9 +18,14 @@ export default combineReducers({
   consent,
   statistics,
   system,
+  pageInfo,
 });
 
 /* GENERATOR */
+
+export const getResourcePageInfo = (state, resource, filter) =>
+  fromPageInfo.getPageInfo(state.pageInfo, resource, filter);
+
 export const getDiscussionPageInfo = (state, filter) =>
   fromEntity.getDiscussionPageInfo(state.entities, filter);
 export const getWTDiscussionsByState = (state, id, filter) =>

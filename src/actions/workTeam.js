@@ -31,6 +31,7 @@ import {
   proposalList,
   discussionList,
 } from '../store/schema';
+import { genProposalPageKey } from '../reducers/pageInfo';
 
 const userFields = `
 id
@@ -292,17 +293,19 @@ const createResourceAction = (
   schema,
   filter,
   pagination,
+  pageKey,
 ) => ({
   type: actionType,
   payload: normalize(resource, schema),
   filter,
   pagination,
   savePageInfo: false,
+  pageKey,
 });
 
-const handleResources = (dispatch, data, state, closed) => {
+const handleResources = (dispatch, data, state, workteamId, closed) => {
   const depaginated = depaginate(['proposal', 'discussion', 'survey'], data);
-
+  const pageKey = genProposalPageKey({ state, workteamId, closed });
   dispatch(
     createResourceAction(
       LOAD_PROPOSAL_LIST_SUCCESS,
@@ -310,6 +313,7 @@ const handleResources = (dispatch, data, state, closed) => {
       proposalList,
       state,
       data.proposalConnection.pageInfo,
+      pageKey,
     ),
   );
   dispatch(
@@ -319,6 +323,7 @@ const handleResources = (dispatch, data, state, closed) => {
       proposalList,
       'survey',
       data.surveyConnection.pageInfo,
+      pageKey,
     ),
   );
   dispatch(
@@ -413,7 +418,13 @@ export function joinWorkTeam(workTeamData, details) {
 
       // dispatch multiple
 
-      handleResources(dispatch, data.joinWorkTeam, state, closed);
+      handleResources(
+        dispatch,
+        data.joinWorkTeam,
+        state,
+        workTeamData.id,
+        closed,
+      );
     } catch (e) {
       dispatch({
         type: JOIN_WORKTEAM_ERROR,
@@ -459,7 +470,7 @@ export function loadWorkTeam(
       const { data } = await graphqlRequest(query, { id, closed, state });
 
       // page query
-      handleResources(dispatch, data, state, closed);
+      handleResources(dispatch, data, state, id, closed);
 
       dispatch({
         type: LOAD_WORKTEAM_SUCCESS,
