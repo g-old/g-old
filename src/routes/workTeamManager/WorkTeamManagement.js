@@ -6,11 +6,7 @@ import Accordion from '../../components/Accordion';
 import Box from '../../components/Box';
 import WorkteamHeader from '../../components/WorkteamHeader';
 import AccordionPanel from '../../components/AccordionPanel';
-import {
-  loadWorkTeam,
-  joinWorkTeam,
-  loadProposalStatus,
-} from '../../actions/workTeam';
+import { joinWorkTeam, loadProposalStatus } from '../../actions/workTeam';
 import {
   loadTags,
   loadProposalsList,
@@ -30,11 +26,13 @@ import {
   getDiscussionUpdates,
   getRequestUpdates,
   getWorkTeamStatus,
-  getProposalsPage,
   getVisibleProposals,
   getMessageUpdates,
   getWTProposalsByState,
+  getResourcePageInfo,
 } from '../../reducers';
+import { genProposalPageKey } from '../../reducers/pageInfo';
+
 import DiscussionInput from '../../components/DiscussionInput';
 import ProposalInput from '../../components/ProposalInput';
 import Tabs from '../../components/Tabs';
@@ -246,13 +244,13 @@ class WorkTeamManagement extends React.Component {
   }
 
   handleLoadMore({ after }) {
-    const { loadProposalsList: loadProposals } = this.props;
-    loadProposals({ after, state: 'pending' });
+    const { loadProposalsList: loadProposals, id } = this.props;
+    loadProposals({ after, state: 'pending', workTeamId: id });
   }
 
   handleLoadProposals() {
-    const { loadProposalsList: loadProposals } = this.props;
-    loadProposals({ state: 'pending' });
+    const { loadProposalsList: loadProposals, id } = this.props;
+    loadProposals({ state: 'pending', workTeamId: id });
   }
 
   canAccess() {
@@ -453,14 +451,17 @@ const mapStateToProps = (state, { id }) => ({
   discussionUpdates: getDiscussionUpdates(state),
   requestUpdates: getRequestUpdates(state),
   workTeamUpdates: getWorkTeamStatus(state),
-  pageInfo: getProposalsPage(state, 'pending'),
+  pageInfo: getResourcePageInfo(
+    state,
+    'proposals',
+    genProposalPageKey({ state: 'pending', workteamId: id }),
+  ), // getProposalsPage(state, 'pending'),
   proposals: getVisibleProposals(state, 'pending'),
   messageUpdates: getMessageUpdates(state),
   wtProposals: getWTProposalsByState(state, id, 'active'),
 });
 
 const mapDispatch = {
-  loadWorkTeam,
   deleteRequest,
   joinWorkTeam,
   updateRequest,

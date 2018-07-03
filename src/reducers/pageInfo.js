@@ -82,6 +82,6 @@ export const getPageInfo = (state, resource, pageKey) => {
   return {
     errorMessage: data.errorMessage,
     pending: data.isFetching,
-    pagination: data.pagination,
+    pagination: data.pagination || {},
   };
 };
