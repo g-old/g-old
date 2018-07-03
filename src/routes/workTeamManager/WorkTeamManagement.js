@@ -372,7 +372,11 @@ class WorkTeamManagement extends React.Component {
             searchTerm=""
             noRequestsFound="No requests found"
             checkedIndices={[]}
-            assets={workTeam.linkedProposals || []}
+            assets={
+              workTeam.linkedProposals.filter(
+                lP => lP.proposal.state === 'accepted',
+              ) || []
+            }
             row={ProposalStatusRow}
             tableHeaders={['title', 'lastPoll', 'state', 'closed at']}
           />
