@@ -1362,7 +1362,7 @@
     "id": "notifications.proposal.accepted",
     "description": "Status message for notifications",
     "defaultMessage": "got accepted!",
-    "message": "è stato approvato",
+    "message": "è stata approvata",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1390,7 +1390,7 @@
     "id": "notifications.proposal.revoked",
     "description": "Status message for notifications",
     "defaultMessage": "was revoked!",
-    "message": "è stata retirata",
+    "message": "è stata ritirata",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1425,7 +1425,7 @@
     "id": "label.locale",
     "description": "Label locale",
     "defaultMessage": "Language",
-    "message": "Impostazioni lingua",
+    "message": "Lingua",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
