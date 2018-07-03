@@ -4,21 +4,21 @@ component: ContentPage
 
 ### Privacy
 
-#### INFORMATIVA PER IL TRATTAMENTO DEI DATI PERSONALI
-## AI SENSI DELL’ART. 13 DEL REGOLAMENTO EUROPEO SULLA PRIVACY N. 679/2016
-## Associazione Movimento 5 Stelle Alto Adige/Südtirol
-## Premessa
+## INFORMATIVA PER IL TRATTAMENTO DEI DATI PERSONALI
+### AI SENSI DELL’ART. 13 DEL REGOLAMENTO EUROPEO SULLA PRIVACY N. 679/2016
+### Associazione Movimento 5 Stelle Alto Adige/Südtirol
+### Premessa
 
 **Il Regolamento Europeo sulla privacy n. 679/2016**, garantisce che il trattamento dei dati personali si svolga nel rispetto dei diritti, delle libertà fondamentali e della dignità dell’Interessato, con particolare riferimento alla riservatezza e alla protezione dei dati personali.
 Ai sensi e per gli effetti **degli artt. 12 e 13, del Regolamento Europeo sulla privacy n. 679/2016**, La informiamo che l’Associazione MoVimento 5 Stelle Alto Adige/Südtirol tratterà dati personali e informazioni che riguardano la Sua persona, per il raggiungimento dei propri scopi statutari, in particolare lo scopo della raccolta e del trattamento è di disporre degli indirizzi di posta elettronica per autenticare l’utente e al fine di aggiornare automaticamente gli utenti attraverso l’invio di e-mail per consentire la partecipazione degli iscritti ad ogni attività della piattaforma m5sbz.g-old.org.
 
-# Natura e base giuridica del conferimento (art. 13 lett. c, Regolamento Europeo n. 679/2016).
+### Natura e base giuridica del conferimento (art. 13 lett. c, Regolamento Europeo n. 679/2016).
 
 Il conferimento dei dati essendo funzionale all’iscrizione all’Associazione è su base volontaria. Ciascun iscritto potrà revocare il proprio consenso in qualsiasi momento comunicandolo attraverso i canali stabiliti e di seguito indicati e dal momento della ricezione/elaborazione della revoca del consenso non sarà più considerato iscritto alla piattaforma m5sbz.g-old.org e i suoi dati saranno cancellati.
 
 I dati personali degli scritti verranno condivisi soltanto con i Responsabili del trattamento (interni ed esterni al MoVimento 5 Stelle Alto Adige/Südtirol) per il raggiungimento delle finalità del trattamento. Non verranno comunicati né diffusi a terzi e verranno conservati sia su supporto magnetico sia su supporto cartaceo per tutto il periodo di validità dell’iscrizione e per due anni dalla data di cessazione dell’iscrizione al movimento. Tale conservazione suppletiva è legittimata dall’esigenza di dover eventualmente provare o rispondere puntualmente ad eventuali e successive contestazioni dell’ex iscritto.
 
-# Finalità e modalità del trattamento (art. 13 lett. c, Regolamento Europeo n. 679/2016)
+### Finalità e modalità del trattamento (art. 13 lett. c, Regolamento Europeo n. 679/2016)
 
 Nel rispetto di tale normativa, il trattamento dei dati sarà improntato ai principi di correttezza, liceità e trasparenza e di tutela della riservatezza e Ti forniamo le seguenti informazioni:
 - a. i dati personali da Te forniti verranno trattati per le seguenti finalità: consentire la partecipazione degli iscritti alla piattaforma m5sbz.g-old.org, informarli delle novità e delle attività promosse, autenticare gli utenti a fini di sicurezza, conservare i dati relativi alle comunicazioni suddette e alle eventuali donazioni degli iscritti e/o ai documenti inviati, ecc.;
