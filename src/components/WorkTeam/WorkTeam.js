@@ -9,7 +9,6 @@ import Value from '../Value';
 import ConfirmLayer from '../ConfirmLayer';
 import Box from '../Box';
 import Button from '../Button';
-import Select from '../Select';
 import history from '../../history';
 import Tabs from '../Tabs';
 import Tab from '../Tab';
@@ -20,6 +19,7 @@ import UserThumbnail from '../UserThumbnail';
 import DiscussionListContainer from '../DiscussionListContainer';
 import ProposalListContainer from '../ProposalListContainer';
 import SurveyListContainer from '../SurveyListContainer';
+import StateFilter from '../StateFilter';
 
 const messages = defineMessages({
   join: {
@@ -88,14 +88,12 @@ class WorkTeam extends React.Component {
     onLoadDiscussions: PropTypes.func.isRequired,
     onLoadProposals: PropTypes.func.isRequired,
   };
+
   static defaultProps = {
     logo: null,
     discussions: null,
     proposals: null,
   };
-  static onProposalClick({ proposalId, pollId }) {
-    history.push(`/proposal/${proposalId}/${pollId}`);
-  }
 
   constructor(props) {
     super(props);
@@ -129,6 +127,10 @@ class WorkTeam extends React.Component {
     this.activateTab = this.activateTab.bind(this);
   }
 
+  static onProposalClick({ proposalId, pollId }) {
+    history.push(`/proposal/${proposalId}/${pollId}`);
+  }
+
   onOpenLayer() {
     this.setState({ showLayer: true });
   }
@@ -142,38 +144,41 @@ class WorkTeam extends React.Component {
       e.preventDefault();
       e.stopPropagation();
     }
-    const { ownStatus = {}, id } = this.props;
+    const { ownStatus = {}, id, onLeave } = this.props;
     if (ownStatus !== 'NONE') {
-      this.props.onLeave({ id }).then(() => this.onCloseLayer());
+      onLeave({ id }).then(() => this.onCloseLayer());
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
   handleDiscussionClick({ discussionId }) {
-    history.push(`${this.props.id}/discussions/${discussionId}`);
+    const { id } = this.props;
+    history.push(`${id}/discussions/${discussionId}`);
   }
+
   handleLoadMoreDiscussions({ after }) {
     const { discussionStatus } = this.state;
-    const { id } = this.props;
-    this.props.onLoadDiscussions({
+    const { id, onLoadDiscussions } = this.props;
+    onLoadDiscussions({
       closed: discussionStatus === 'closed',
       workteamId: id,
       after,
     });
   }
+
   handleLoadMoreProposals({ after }) {
     const { proposalStatus } = this.state;
-    const { id } = this.props;
-    this.props.onLoadProposals({
+    const { id, onLoadProposals } = this.props;
+    onLoadProposals({
       state: proposalStatus,
       workTeamId: id,
       after,
     });
   }
+
   handleLoadMoreSurveys({ after }) {
     const { surveyStatus } = this.state;
-    const { id } = this.props;
-    this.props.onLoadProposals({
+    const { id, onLoadProposals } = this.props;
+    onLoadProposals({
       state: 'survey',
       closed: surveyStatus === 'closed',
       workTeamId: id,
@@ -189,38 +194,58 @@ class WorkTeam extends React.Component {
   }
 
   handleDiscussionFilterChange(e) {
-    if (e.option !== this.state.discussionStatus) {
-      this.setState({ discussionStatus: e.option }, this.fetchDiscussions);
+    const { discussionStatus } = this.state;
+    if (e.option.value !== discussionStatus) {
+      this.setState(
+        { discussionStatus: e.option.value },
+        this.fetchDiscussions,
+      );
     }
   }
+
   handleProposalFilterChange(e) {
-    if (e.option !== this.state.proposalStatus) {
-      this.setState({ proposalStatus: e.option }, this.fetchProposals);
+    const { proposalStatus } = this.state;
+
+    if (e.option.value !== proposalStatus) {
+      this.setState({ proposalStatus: e.option.value }, this.fetchProposals);
     }
   }
+
   handleSurveyFilterChange(e) {
-    if (e.option !== this.state.surveyStatus) {
-      this.setState({ surveyStatus: e.option }, this.fetchSurveys);
+    const { surveyStatus } = this.state;
+
+    if (e.option.value !== surveyStatus) {
+      this.setState({ surveyStatus: e.option.value }, this.fetchSurveys);
     }
   }
 
   fetchDiscussions() {
-    this.props.onLoadDiscussions({
-      workteamId: this.props.id,
-      closed: this.state.discussionStatus !== 'active',
+    const { onLoadDiscussions, id } = this.props;
+    const { discussionStatus } = this.state;
+
+    onLoadDiscussions({
+      workteamId: id,
+      closed: discussionStatus !== 'active',
     });
   }
+
   fetchProposals() {
-    this.props.onLoadProposals({
-      workTeamId: this.props.id,
-      state: this.state.proposalStatus,
+    const { onLoadProposals, id } = this.props;
+    const { proposalStatus } = this.state;
+
+    onLoadProposals({
+      workTeamId: id,
+      state: proposalStatus,
     });
   }
+
   fetchSurveys() {
-    this.props.onLoadProposals({
-      workTeamId: this.props.id,
+    const { onLoadProposals, id } = this.props;
+    const { surveyStatus } = this.state;
+    onLoadProposals({
+      workTeamId: id,
       state: 'survey',
-      closed: this.state.surveyStatus === 'closed',
+      closed: surveyStatus === 'closed',
     });
   }
 
@@ -287,7 +312,13 @@ class WorkTeam extends React.Component {
       coordinator,
       id,
     } = this.props;
-    const { discussionStatus, proposalStatus, surveyStatus } = this.state;
+    const {
+      discussionStatus,
+      proposalStatus,
+      surveyStatus,
+      activeTabIndex,
+      showLayer,
+    } = this.state;
     let picture;
     if (logo) {
       picture = <img alt="Logo" className={s.logo} src={logo} />;
@@ -336,22 +367,15 @@ class WorkTeam extends React.Component {
     if (ownStatus.status === 'MEMBER') {
       contentSection = (
         <Box tag="section" column fill>
-          <Tabs
-            activeIndex={this.state.activeTabIndex}
-            onActive={this.activateTab}
-          >
+          <Tabs activeIndex={activeTabIndex} onActive={this.activateTab}>
             <Tab title={<FormattedMessage {...messages.proposals} />}>
-              <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
-                <span style={{ maxWidth: '10em' }}>
-                  <Select
-                    value={proposalStatus}
-                    onChange={this.handleProposalFilterChange}
-                    options={['active', 'accepted', 'repelled']}
-                  />
-                </span>
-              </div>
+              <StateFilter
+                states={['active', 'accepted', 'repelled']}
+                filter={proposalStatus}
+                onChange={this.handleProposalFilterChange}
+              />
               <ProposalListContainer
-                id={this.props.id}
+                id={id}
                 status={proposalStatus}
                 onLoadMore={this.handleLoadMoreProposals}
                 onItemClick={WorkTeam.onProposalClick}
@@ -359,17 +383,13 @@ class WorkTeam extends React.Component {
               />
             </Tab>
             <Tab title={<FormattedMessage {...messages.discussions} />}>
-              <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
-                <span style={{ maxWidth: '10em' }}>
-                  <Select
-                    value={discussionStatus}
-                    onChange={this.handleDiscussionFilterChange}
-                    options={['active', 'closed']}
-                  />
-                </span>
-              </div>
+              <StateFilter
+                states={['active', 'closed']}
+                filter={discussionStatus}
+                onChange={this.handleDiscussionFilterChange}
+              />
               <DiscussionListContainer
-                id={this.props.id}
+                id={id}
                 status={discussionStatus}
                 onLoadMore={this.handleLoadMoreDiscussions}
                 onItemClick={this.handleDiscussionClick}
@@ -377,17 +397,13 @@ class WorkTeam extends React.Component {
               />
             </Tab>
             <Tab title={<FormattedMessage {...messages.surveys} />}>
-              <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
-                <span style={{ maxWidth: '10em' }}>
-                  <Select
-                    value={surveyStatus}
-                    onChange={this.handleSurveyFilterChange}
-                    options={['active', 'closed']}
-                  />
-                </span>
-              </div>
+              <StateFilter
+                states={['active', 'closed']}
+                filter={surveyStatus}
+                onChange={this.handleSurveyFilterChange}
+              />
               <SurveyListContainer
-                id={this.props.id}
+                id={id}
                 status={surveyStatus}
                 onLoadMore={this.handleLoadMoreSurveys}
                 onItemClick={WorkTeam.onProposalClick}
@@ -399,7 +415,7 @@ class WorkTeam extends React.Component {
       );
     }
     let layer;
-    if (this.state.showLayer) {
+    if (showLayer) {
       layer = (
         <ConfirmLayer
           onClose={this.onCloseLayer}

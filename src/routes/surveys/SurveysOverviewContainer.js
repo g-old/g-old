@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import ProposalPreview from '../../components/ProposalPreview';
-import Select from '../../components/Select';
+import StateFilter from '../../components/StateFilter';
 import { loadProposalsList } from '../../actions/proposal';
 import { getVisibleProposals, getResourcePageInfo } from '../../reducers/index';
 import { genProposalPageKey } from '../../reducers/pageInfo';
@@ -14,6 +14,11 @@ import {
   sortClosedProposals,
 } from '../utils';
 
+const onFilterChange = e => {
+  if (e) {
+    history.push(`/surveys/${e.option.value}`);
+  }
+};
 class SurveysOverviewContainer extends React.Component {
   static propTypes = {
     surveys: PropTypes.arrayOf(
@@ -56,17 +61,12 @@ class SurveysOverviewContainer extends React.Component {
     const { surveys, pageInfo, filter } = this.props;
     return (
       <div>
-        <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
-          <span style={{ maxWidth: '10em' }}>
-            <Select
-              value={filter}
-              onChange={e => {
-                history.push(`/surveys/${e.option}`);
-              }}
-              options={['active', 'closed']}
-            />
-          </span>
-        </div>
+        <StateFilter
+          states={['active', 'closed']}
+          filter={filter}
+          onChange={onFilterChange}
+        />
+
         <ListView
           onRetry={this.handleOnRetry}
           onLoadMore={this.handleLoadMore}

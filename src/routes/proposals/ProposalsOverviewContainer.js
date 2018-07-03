@@ -5,11 +5,16 @@ import { loadProposalsList, loadProposal } from '../../actions/proposal';
 import history from '../../history';
 import { getVisibleProposals, getResourcePageInfo } from '../../reducers/index';
 import { genProposalPageKey } from '../../reducers/pageInfo';
-import ProposalsSubHeader from '../../components/ProposalsSubHeader';
+import StateFilter from '../../components/StateFilter';
 import ListView from '../../components/ListView';
 import ProposalPreview from '../../components/ProposalPreview';
 import { sortActiveProposals, sortClosedProposals } from '../utils';
 
+const onFilterChange = e => {
+  if (e) {
+    history.push(`/proposals/${e.option.value}`);
+  }
+};
 class ProposalsOverviewContainer extends React.Component {
   static propTypes = {
     proposals: PropTypes.arrayOf(
@@ -56,7 +61,11 @@ class ProposalsOverviewContainer extends React.Component {
     return (
       <div>
         {/* <Navigation filter={filter} /> */}
-        <ProposalsSubHeader filter={filter} />
+        <StateFilter
+          states={['active', 'accepted', 'repelled']}
+          filter={filter}
+          onChange={onFilterChange}
+        />
         <ListView
           onRetry={this.handleOnRetry}
           onLoadMore={this.handleLoadMore}

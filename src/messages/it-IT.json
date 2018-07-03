@@ -1632,5 +1632,33 @@
     "defaultMessage": "Closed!",
     "message": "Chiuso!",
     "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "proposals.accepted",
+    "description": "Filter for accepted proposals",
+    "defaultMessage": "accepted",
+    "message": "approvate",
+    "files": ["src/components/StateFilter/StateFilter.js"]
+  },
+  {
+    "id": "proposals.repelled",
+    "description": "Filter for repelled proposals",
+    "defaultMessage": "repelled",
+    "message": "respinte",
+    "files": ["src/components/StateFilter/StateFilter.js"]
+  },
+  {
+    "id": "resource.active",
+    "description": "Filter for active proposals/surveys/discussions",
+    "defaultMessage": "active",
+    "message": "in corso",
+    "files": ["src/components/StateFilter/StateFilter.js"]
+  },
+  {
+    "id": "resource.closed",
+    "description": "Filter for closed proposals/surveys/discussions",
+    "defaultMessage": "closed",
+    "message": "chiuse",
+    "files": ["src/components/StateFilter/StateFilter.js"]
   }
 ]
