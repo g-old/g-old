@@ -314,12 +314,10 @@ function messageReadControl(viewer, data) {
   return false;
 }
 function messageWriteControl(viewer, data) {
-  if (
-    viewer.permissions &
-    (Permissions.NOTIFY_GROUPS | Permissions.NOTIFY_ALL)
-  ) {
+  if (viewer.permissions & Permissions.NOTIFY_ALL) {
     return true;
   }
+
   if (data.isReply || data.isCoordinator) {
     return true;
   }
