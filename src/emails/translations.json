@@ -7,7 +7,7 @@
   "signup": {
     "de-DE":
       " Wir freuen uns sehr, Sie hier auf unserer Plattform GOLD begrüßen zu dürfen!",
-    "it-IT": "Siamo lieti di accoglierti sulla piattaforma  GOLD!",
+    "it-IT": "Siamo lieti di accoglierti nella piattaforma  GOLD!",
     "lld-IT": "Con plajei Ves saludun sun la plataforma GOLD"
   },
   "explainConfirmation": {
@@ -38,11 +38,11 @@
   },
   "resetRequest": {
     "de-DE":
-      "Wir schicken Ihnen diese Email, da Sie (oder jemand anderes) das Passwort für ihr Konto zurücksetzen möchten.",
+      "Wir schicken Ihnen diese Email, da Sie das Passwort für ihr Konto zurücksetzen möchten.",
     "it-IT":
-      "Ti mandiamo questa mail perchè  hai (o qualcun altro al tuo posto ha) chiesto di modificare la password del tuo account",
+      "Ti mandiamo questa mail perchè  hai chiesto di modificare la password del tuo account",
     "lld-IT":
-      "Ves manun chesta mail, ajache valgungn à damandé de mudé la password de vost account"
+      "Ves manun chesta mail, ajache aveis damandé de mudé la password de vost account"
   },
   "clickReset": {
     "de-DE": "Mein Passwort zurücksetzen",
@@ -114,13 +114,13 @@
   },
   "clickMessageLink": {
     "de-DE": "Nachricht ansehen",
-    "it-IT": "",
-    "lld-IT": ""
+    "it-IT": "Guardare il messaggio",
+    "lld-IT": "Cialé l messaje"
   },
 
   "heading": {
     "de-DE": "Das haben Sie verpasst...",
-    "it-IT": "Questo non hai visto ancora...",
-    "lld-IT": "Questo non hai visto ancora..."
+    "it-IT": "Questo non l'hai visto ancora...",
+    "lld-IT": "Chest ne aste nia ciamò vedù..."
   }
 }
