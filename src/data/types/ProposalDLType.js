@@ -12,8 +12,8 @@ import {
 import PollType from './PollDLType';
 import UserType from './UserType';
 import SubscriptionType from './SubscriptionType';
+import WorkTeamType from './WorkTeamType';
 /* eslint-enable import/no-cycle */
-
 import TagType from './TagType';
 import User from '../models/User';
 import Poll from '../models/Poll';
@@ -21,6 +21,7 @@ import Tag from '../models/Tag';
 import Subscription from '../models/Subscription';
 import { TargetType } from '../models/utils';
 import knex from '../knex';
+import WorkTeam from '../models/WorkTeam';
 
 const ProposalType = new ObjectType({
   name: 'ProposalDL',
@@ -56,6 +57,13 @@ const ProposalType = new ObjectType({
     },
     workTeamId: {
       type: GraphQLString,
+    },
+    workteam: {
+      type: WorkTeamType,
+      resolve: (parent, args, { viewer, loaders }) =>
+        parent.workTeamId
+          ? WorkTeam.gen(viewer, parent.workTeamId, loaders)
+          : null,
     },
     pollOne: {
       type: PollType,

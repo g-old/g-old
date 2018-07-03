@@ -111,6 +111,11 @@ const query = `
   query ($id:ID $pollId: ID) {
     proposalDL (id:$id pollId:$pollId) {
       ${proposal}
+      workteam{
+        id
+        logo
+        displayName
+      }
       subscription{
         ${subscriptionFields}
       }

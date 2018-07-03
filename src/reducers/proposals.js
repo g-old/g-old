@@ -5,7 +5,7 @@ import byId, * as fromById from './proposalById';
 import createList, * as fromList from './createProposalsList';
 import byTag, * as fromByTag from './proposalsByTag';
 import byWT, * as fromByWT from './proposalsByWorkTeam';
-import { proposalList as proposalListSchema } from './../store/schema';
+import { proposalList as proposalListSchema } from '../store/schema';
 
 const listByFilter = combineReducers({
   all: createList('all'),
@@ -33,6 +33,7 @@ const hydrateProposals = (state, data, entities) =>
       users: entities.users.byId,
       statements: entities.statements.byId,
       subscriptions: entities.subscriptions.byId,
+      workTeams: entities.workTeams.byId,
     },
   );
 

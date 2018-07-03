@@ -32,6 +32,7 @@ import Button from '../../components/Button';
 import Poll from '../../components/Poll';
 import Filter from '../../components/Filter';
 import SubscriptionButton from '../../components/SubscriptionButton';
+import WorkteamHeader from '../../components/WorkteamHeader/WorkteamHeader';
 
 const messages = defineMessages({
   voting: {
@@ -72,10 +73,12 @@ class ProposalContainer extends React.Component {
     updateSubscription: PropTypes.func.isRequired,
     subscriptionStatus: PropTypes.shape({}),
   };
+
   static defaultProps = {
     errorMessage: null,
     subscriptionStatus: null,
   };
+
   constructor(props) {
     super(props);
     this.state = { filter: 'all' };
@@ -87,10 +90,11 @@ class ProposalContainer extends React.Component {
 
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
+    const { proposal } = this.props;
     return (
-      this.props.proposal &&
-      ((this.props.proposal.pollOne && this.props.proposal.pollOne.mode) ||
-        (this.props.proposal.pollTwo && this.props.proposal.pollTwo.mode))
+      proposal &&
+      ((proposal.pollOne && proposal.pollOne.mode) ||
+        (proposal.pollTwo && proposal.pollTwo.mode))
     );
   }
 
@@ -111,48 +115,66 @@ class ProposalContainer extends React.Component {
   }
 
   handleVoting(data, method, info) {
-    const { proposal } = this.props;
+    const {
+      proposal,
+      createVote: vote,
+      updateVote: mutateVote,
+      deleteVote: eraseVote,
+    } = this.props;
     switch (method) {
       case 'create': {
         let targetId;
         if (!proposal.subscription) {
           if (proposal.state !== 'survey') {
-            targetId = this.props.proposal.id;
+            targetId = proposal.id;
           }
         }
-        this.props.createVote({ ...data, targetId });
+        vote({ ...data, targetId });
         break;
       }
       case 'update': {
-        this.props.updateVote(data, info);
+        mutateVote(data, info);
         break;
       }
       case 'del': {
-        this.props.deleteVote(data, info);
+        eraseVote(data, info);
         break;
       }
       default:
         throw Error('Unknown method');
     }
   }
+
+  // TODO make subscribe HOC
+
   handleSubscription({ targetType, subscriptionType }) {
-    const { id, subscription } = this.props.proposal;
+    const {
+      proposal: { id, subscription },
+      deleteSubscription: unsubscribe,
+      updateSubscription: mutateSubscription,
+      createSubscription: subscribe,
+    } = this.props;
     if (subscription && subscriptionType === 'DELETE') {
-      this.props.deleteSubscription({ id: subscription.id });
+      unsubscribe({ id: subscription.id });
     } else if (subscription) {
-      this.props.updateSubscription({
+      mutateSubscription({
         id: subscription.id,
         targetType,
         subscriptionType,
         targetId: id,
       });
     } else {
-      this.props.createSubscription({
+      subscribe({
         targetType,
         subscriptionType,
         targetId: id,
       });
     }
+  }
+
+  fetchProposal() {
+    const { loadProposal: fetchProposal, proposalId } = this.props;
+    fetchProposal({ id: proposalId });
   }
 
   render() {
@@ -163,6 +185,10 @@ class ProposalContainer extends React.Component {
       user,
       followees,
       subscriptionStatus,
+      pollId,
+      getVotes: fetchVotes,
+      voteUpdates,
+      followeeVotes,
     } = this.props;
     const showSubscription = ['proposed', 'voting'].includes(proposal.state);
     const { filter } = this.state;
@@ -170,20 +196,13 @@ class ProposalContainer extends React.Component {
       return <p>{'Loading...'} </p>;
     }
     if (errorMessage && !proposal) {
-      return (
-        <FetchError
-          message={errorMessage}
-          onRetry={() => this.props.loadProposal({ id: this.props.proposalId })}
-        />
-      );
+      return <FetchError message={errorMessage} onRetry={this.fetchProposal} />;
     }
     if (this.isReady()) {
       let poll;
       if (proposal.pollOne) {
         poll =
-          proposal.pollOne.id === this.props.pollId
-            ? proposal.pollOne
-            : proposal.pollTwo;
+          proposal.pollOne.id === pollId ? proposal.pollOne : proposal.pollTwo;
       } else {
         poll = proposal.pollTwo;
       }
@@ -241,7 +260,16 @@ class ProposalContainer extends React.Component {
       return (
         <div>
           <Box column pad>
-            <Proposal {...proposal} />
+            <div>
+              {proposal.workteam && (
+                <WorkteamHeader
+                  displayName={proposal.workteam.displayName}
+                  id={proposal.workteam.id}
+                  logo={proposal.workteam.logo}
+                />
+              )}
+              <Proposal {...proposal} />
+            </div>
             {showSubscription && (
               <SubscriptionButton
                 status={subscriptionStatus}
@@ -254,12 +282,12 @@ class ProposalContainer extends React.Component {
               {...poll}
               canVote={proposal.canVote}
               onVote={this.handleVoting}
-              onFetchVoters={this.props.getVotes}
+              onFetchVoters={fetchVotes}
               user={user}
-              filter={this.state.filter}
+              filter={filter}
               filterFn={this.filterStatements}
-              updates={this.props.voteUpdates}
-              followeeVotes={this.props.followeeVotes}
+              updates={voteUpdates}
+              followeeVotes={followeeVotes}
             />
             {filterNode}
             <StatementsContainer
@@ -267,7 +295,7 @@ class ProposalContainer extends React.Component {
               followees={followees}
               poll={poll}
               user={user}
-              filter={this.state.filter}
+              filter={filter}
             />
             {switchPollBtn}
           </Box>
@@ -301,4 +329,7 @@ const mapDispatch = {
   deleteSubscription,
 };
 
-export default connect(mapStateToProps, mapDispatch)(ProposalContainer);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(ProposalContainer);

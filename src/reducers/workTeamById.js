@@ -6,6 +6,7 @@ import {
   CREATE_WORKTEAM_SUCCESS,
   FETCH_USER_SUCCESS,
   LEAVE_WORKTEAM_SUCCESS,
+  LOAD_PROPOSAL_SUCCESS,
   //  CREATE_REQUEST_SUCCESS,
   //  DELETE_REQUEST_SUCCESS,
 } from '../constants';
@@ -16,6 +17,7 @@ export default function workTeams(state = {}, action) {
     case FETCH_USER_SUCCESS:
     case LOAD_WORKTEAM_SUCCESS:
     case LEAVE_WORKTEAM_SUCCESS:
+    case LOAD_PROPOSAL_SUCCESS:
     case CREATE_WORKTEAM_SUCCESS: {
       return merge({}, state, action.payload.entities.workTeams);
     }

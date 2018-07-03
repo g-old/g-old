@@ -3,6 +3,7 @@ import { schema } from 'normalizr';
 export const role = new schema.Entity('roles');
 export const user = new schema.Entity('users');
 export const message = new schema.Entity('messages');
+export const workTeam = new schema.Entity('workTeams');
 
 export const request = new schema.Entity('requests', {
   requester: user,
@@ -45,6 +46,7 @@ export const proposal = new schema.Entity('proposals', {
   pollTwo: poll,
   tags: [tag],
   subscription,
+  workteam: workTeam,
 });
 export const proposalStatus = new schema.Entity('proposalStatus', {
   proposal,
@@ -60,7 +62,8 @@ export const discussion = new schema.Entity('discussions', {
   ownComment: comment,
   subscription,
 });
-export const workTeam = new schema.Entity('workTeams', {
+
+workTeam.define({
   coordinator: user,
   members: [user],
   ownStatus: {
@@ -71,6 +74,7 @@ export const workTeam = new schema.Entity('workTeams', {
   proposals: [proposal],
   linkedProposals: [proposalStatus],
 });
+
 export const recipient = new schema.Union(
   {
     User: user,
