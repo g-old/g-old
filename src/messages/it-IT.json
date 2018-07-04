@@ -308,7 +308,7 @@
     "id": "proposal.valid",
     "description": "Proposal turned valid",
     "defaultMessage": "Proposal accepted!",
-    "message": "Proposta accettata",
+    "message": "Proposta approvata",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
