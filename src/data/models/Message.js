@@ -8,7 +8,7 @@ import EventManager from '../../core/EventManager';
 import Note from './Note';
 import Communication from './Communication';
 import log from '../../logger';
-import createLoaders from '../../data/dataLoader';
+import createLoaders from '../dataLoader';
 
 const dmp = new DiffMatchPatch();
 export type MessageType = 'communication' | 'note' | 'meeting';
@@ -36,17 +36,29 @@ const isDifferent = (oldTextHtml, newTextHtml) => {
 };
 class Message {
   recipientType: RecipientType;
+
   id: ID;
+
   messageHtml: string;
+
   subject: string;
+
   senderId: ID;
+
   messageType: MessageType;
+
   objectId: ID;
+
   recipients: [ID];
+
   msg: string;
+
   createdAt: string;
+
   message: string;
+
   enforceEmail: boolean;
+
   constructor(data) {
     this.id = data.id;
     this.recipientType = data.recipient_type;
@@ -300,6 +312,48 @@ const userStatusTranslations = {
       helpNotice.it
     }`,
     lld: `translate: Sie sind ab jetzt kein "Member Manager" mehr. ${
+      helpNotice.lld
+    }`,
+  },
+  relator_added: {
+    de:
+      'Sie sind als "Relator" freigeschalten worden. Ab sofort können Sie Beschlusse und Umfragen plattformweit einstellen, sowie Nachrichten an alle unsere Mitglieder schicken.',
+    it:
+      'translate:Sie sind als "Relator" freigeschalten worden. Ab sofort können Sie Beschlusse und Umfragen plattformweit einstellen, sowie Nachrichten an alle unsere Mitglieder schicken.',
+    lld:
+      'translate:Sie sind als "Relator" freigeschalten worden. Ab sofort können Sie Beschlusse und Umfragen plattformweit einstellen, sowie Nachrichten an alle unsere Mitglieder schicken.',
+  },
+  relator_lost: {
+    de: `Sie sind ab jetzt kein "Relator" mehr. ${helpNotice.de}`,
+    it: `translate: Sie sind ab jetzt kein "Relator" mehr. ${helpNotice.it}`,
+    lld: `translate: Sie sind ab jetzt kein "Relator" mehr. ${helpNotice.lld}`,
+  },
+  team_leader_added: {
+    de:
+      'Sie sind als "Teamleader" freigeschalten worden. Damit haben Sie Zugang zum Adminbereich der Plattform.',
+    it:
+      'tranlate: Sie sind als "Teamleader" freigeschalten worden. Damit haben Sie Zugang zum Adminbereich der Plattform.',
+    lld:
+      'translate: Sie sind als "Teamleader" freigeschalten worden. Damit haben Sie Zugang zum Adminbereich der Plattform.',
+  },
+  team_leader_lost: {
+    de: `Sie sind ab jetzt kein "Teamleader" mehr. ${helpNotice.de}`,
+    it: `Sie sind ab jetzt kein "Teamleader" mehr. ${helpNotice.it}`,
+    lld: `Sie sind ab jetzt kein "Teamleader" mehr. ${helpNotice.lld}`,
+  },
+
+  district_keeper_added: {
+    de: 'Sie sind als "District keeper" freigeschalten worden.',
+    it: 'Sie sind als "District keeper" freigeschalten worden.',
+    lld: 'Sie sind als "District keeper" freigeschalten worden.',
+  },
+
+  district_keeper_lost: {
+    de: `Sie sind ab jetzt kein "District keeper" mehr. ${helpNotice.de}`,
+    it: `translate: Sie sind ab jetzt kein "District keeper" mehr. ${
+      helpNotice.it
+    }`,
+    lld: `translate: Sie sind ab jetzt kein "District keeper" mehr. ${
       helpNotice.lld
     }`,
   },
