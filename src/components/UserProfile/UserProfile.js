@@ -8,10 +8,15 @@ import history from '../../history';
 import Button from '../Button';
 import Layer from '../Layer';
 import MessageForm from '../MessageForm';
+import { Groups } from '../../organization';
 
 import { ICONS } from '../../constants';
 
-const isContactable = (workteams, accountId, visitor) => {
+const isContactable = (workteams, accountId, accountRoles, visitor) => {
+  // eslint-disable-next-line no-bitwise
+  if (accountRoles & Groups.CONTACTEE) {
+    return true;
+  }
   /* eslint-disable eqeqeq */
   if (workteams && accountId != visitor.id) {
     if (workteams.some(wt => wt.coordinatorId == accountId)) {
@@ -38,6 +43,7 @@ class UserProfile extends React.Component {
       numStatements: PropTypes.number,
       numFollowers: PropTypes.number,
       numLikes: PropTypes.number,
+      groups: PropTypes.number,
       workTeams: PropTypes.arrayOf(PropTypes.shape({})),
       followees: PropTypes.arrayOf(
         PropTypes.shape({
@@ -60,6 +66,7 @@ class UserProfile extends React.Component {
       contactable: isContactable(
         props.user.workTeams,
         props.user.id,
+        props.user.groups,
         props.sessionUser,
       ),
     };
@@ -68,30 +75,47 @@ class UserProfile extends React.Component {
   }
 
   componentWillReceiveProps({ user, messageUpdates }) {
-    if (user !== this.props.user) {
+    const {
+      user: oldUser,
+      sessionUser,
+      messageUpdates: oldMessageUpdates,
+    } = this.props;
+    if (user !== oldUser) {
       this.setState({
         contactable: isContactable(
           user.workTeams,
           user.id,
-          this.props.sessionUser,
+          user.groups,
+          sessionUser,
         ),
       });
     }
     if (
       messageUpdates &&
       messageUpdates.success &&
-      !this.props.messageUpdates.success
+      !oldMessageUpdates.success
     ) {
       this.toggleLayer();
     }
   }
 
   toggleLayer() {
-    this.setState({ layerOpen: !this.state.layerOpen });
+    const { layerOpen } = this.state;
+    this.setState({ layerOpen: !layerOpen });
   }
 
   render() {
-    if (!this.props.user) return null;
+    const {
+      user,
+      ownAccount,
+      onImageChange,
+      updates,
+      onSend,
+      messageUpdates,
+    } = this.props;
+
+    if (!user) return null;
+    const { contactable, layerOpen } = this.state;
     const {
       avatar,
       name,
@@ -100,17 +124,17 @@ class UserProfile extends React.Component {
       numFollowers,
       numLikes,
       workTeams,
-    } = this.props.user;
-    const canChangeImg = this.props.ownAccount;
+    } = user;
+    const canChangeImg = ownAccount;
 
     return (
       <Box column align>
         <ProfilePicture
-          user={this.props.user}
+          user={user}
           img={avatar}
           canChange={canChangeImg}
-          onChange={this.props.onImageChange}
-          updates={this.props.updates.dataUrl}
+          onChange={onImageChange}
+          updates={updates.dataUrl}
         />
 
         <Label big>
@@ -172,7 +196,7 @@ class UserProfile extends React.Component {
             value={numStatements || 0}
           />
         </Box>
-        {this.state.contactable && (
+        {contactable && (
           <Button
             onClick={this.toggleLayer}
             icon={
@@ -213,7 +237,7 @@ class UserProfile extends React.Component {
               </Box>
             ))}
         </Box>
-        {this.state.layerOpen && (
+        {layerOpen && (
           <Layer onClose={this.toggleLayer}>
             <Box padding="medium">
               <div
@@ -225,10 +249,7 @@ class UserProfile extends React.Component {
                   justifyContent: 'center',
                 }}
               >
-                <MessageForm
-                  onSend={this.props.onSend}
-                  updates={this.props.messageUpdates || {}}
-                />
+                <MessageForm onSend={onSend} updates={messageUpdates || {}} />
               </div>
             </Box>
           </Layer>

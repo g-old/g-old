@@ -357,6 +357,21 @@ const userStatusTranslations = {
       helpNotice.lld
     }`,
   },
+  contactee_added: {
+    de:
+      'Sie sind als "Contactee" freigeschalten worden. Ab sofort können Sie von Mitgliedern der Plattform direkt angeschrieben werden',
+    it:
+      'translate: Sie sind als "Contactee" freigeschalten worden. Ab sofort können Sie von Mitgliedern der Plattform direkt angeschrieben werden',
+    lld:
+      'translate: Sie sind als "Contactee" freigeschalten worden. Ab sofort können Sie von Mitgliedern der Plattform direkt angeschrieben werden',
+  },
+  contactee_lost: {
+    de: `Sie sind ab jetzt kein "Contactee" mehr. ${helpNotice.de}`,
+    it: `translate: Sie sind ab jetzt kein "Contactee" mehr. ${helpNotice.it}`,
+    lld: `translate: Sie sind ab jetzt kein "Contactee" mehr. ${
+      helpNotice.lld
+    }`,
+  },
 };
 
 EventManager.subscribe('onUserUpdated', async ({ user, viewer }) => {

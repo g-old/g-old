@@ -52,6 +52,7 @@ export const Groups = {
   GUEST: 256,
   SYSTEM: 512,
   TEAM_LEADER: 1024,
+  CONTACTEE: 2048,
 };
 
 /* eslint-disable no-bitwise */
@@ -124,6 +125,7 @@ export const Privileges = {
   GRANT_RELATOR: 128,
   GRANT_ADMIN: 256,
   GRANT_LEADER: 512,
+  GRANT_CONTACTEE: 1024,
 };
 /* Privilege masks - Change here if you want to adjust privileges for groups */
 
@@ -136,7 +138,8 @@ const adminPrivileges =
   Privileges.GRANT_RELATOR |
   Privileges.GRANT_DISTRICT_KEEPER |
   Privileges.GRANT_MEMBER_MANAGER |
-  Privileges.GRANT_LEADER;
+  Privileges.GRANT_LEADER |
+  Privileges.GRANT_CONTACTEE;
 
 const superUserPrivileges = adminPrivileges | Privileges.GRANT_ADMIN;
 
@@ -201,6 +204,7 @@ export const GroupConditions = {
   [Groups.VIEWER]: Privileges.GRANT_VIEWER,
   [Groups.GUEST]: Privileges.GRANT_GUEST,
   [Groups.TEAM_LEADER]: Privileges.GRANT_LEADER,
+  [Groups.CONTACTEE]: Privileges.GRANT_CONTACTEE,
 };
 
 export const calcRights = userGroups =>
