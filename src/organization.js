@@ -191,7 +191,7 @@ export const AccessMasks = {
     Privileges.GRANT_DISTRICT_KEEPER |
     Privileges.GRANT_ADMIN,
   NOTIFICATION: Permissions.NOTIFY_ALL | Permissions.NOTIFY_GROUPS,
-  WORKTEAM_MANAGER: Groups.ADMIN | Groups.TEAM_LEADER,
+  WORKTEAM_MANAGER: Groups.ADMIN | Groups.TEAM_LEADER | Groups.CONTACTEE,
 };
 
 export const GroupConditions = {

@@ -2,6 +2,7 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
+import WorkTeam from './WorkTeam';
 
 type ID = number | string;
 export type DiscussionProps = {
@@ -16,11 +17,14 @@ export type DiscussionProps = {
   closed_at: string,
 };
 
-const checkIfCoordinator = async (viewer, data) => {
+const checkIfCoordinator = async (viewer, data, workTeam) => {
   if (data.workTeamId) {
-    const [coordinatorId] = await knex('work_teams')
-      .where({ id: data.workTeamId })
-      .pluck('coordinator_id');
+    let { coordinatorId } = workTeam;
+    if (!coordinatorId) {
+      ([coordinatorId = null] = await knex('work_teams'))
+        .where({ id: data.workTeamId })
+        .pluck('coordinator_id');
+    }
     // eslint-disable-next-line
     return coordinatorId && coordinatorId == viewer.id;
   }
@@ -50,11 +54,21 @@ class Discussion {
     return new Discussion(data);
   }
 
-  static async create(viewer, data) {
+  static async create(viewer, data, loaders) {
     if (!data) return null;
-    const isCoordinator = await checkIfCoordinator(viewer, data);
+    let workTeam = {};
+    if (data.workTeamId) {
+      workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
+    }
+    const isCoordinator = await checkIfCoordinator(viewer, data, workTeam);
 
-    if (!canMutate(viewer, { ...data, isCoordinator }, Models.DISCUSSION))
+    if (
+      !canMutate(
+        viewer,
+        { ...data, isCoordinator, mainTeam: workTeam.mainTeam },
+        Models.DISCUSSION,
+      )
+    )
       return null;
 
     const discussionInDB = await knex.transaction(async trx => {

@@ -1,5 +1,3 @@
-import merge from 'lodash.merge';
-
 import {
   LOAD_WORKTEAMS_SUCCESS,
   LOAD_WORKTEAM_SUCCESS,
@@ -7,8 +5,6 @@ import {
   FETCH_USER_SUCCESS,
   LEAVE_WORKTEAM_SUCCESS,
   LOAD_PROPOSAL_SUCCESS,
-  //  CREATE_REQUEST_SUCCESS,
-  //  DELETE_REQUEST_SUCCESS,
 } from '../constants';
 
 export default function workTeams(state = {}, action) {
@@ -19,7 +15,8 @@ export default function workTeams(state = {}, action) {
     case LEAVE_WORKTEAM_SUCCESS:
     case LOAD_PROPOSAL_SUCCESS:
     case CREATE_WORKTEAM_SUCCESS: {
-      return merge({}, state, action.payload.entities.workTeams);
+      return { ...state, ...action.payload.entities.workTeams };
+      // return merge({}, state, action.payload.entities.workTeams);
     }
 
     default: {

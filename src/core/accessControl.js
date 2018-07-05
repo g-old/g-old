@@ -165,9 +165,9 @@ function proposalWriteControl(viewer, data) {
     if (data.isCoordinator) {
       return true;
     }
-    return viewer.permissions & PermissionsSchema[Groups.ADMIN];
+    return (viewer.groups & Groups.ADMIN) > 0;
   }
-  if (viewer.permissions & PermissionsSchema[Groups.RELATOR]) {
+  if (viewer.groups & Groups.RELATOR) {
     if (data.id && data.state) {
       // updates
       if (viewer.permissions & Permissions.MODIFY_PROPOSALS) {
@@ -375,6 +375,12 @@ function discussionReadControl(viewer, data) {
 }
 function discussionWriteControl(viewer, data) {
   if (data.workTeamId) {
+    if (
+      data.mainTeam &&
+      viewer.wtMemberships.includes(Number(data.workTeamId))
+    ) {
+      return true;
+    }
     if (data.isCoordinator) {
       return true;
     }

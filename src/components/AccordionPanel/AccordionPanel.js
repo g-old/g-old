@@ -17,23 +17,28 @@ class AccordionPanel extends React.Component {
     heading: PropTypes.node.isRequired,
     children: PropTypes.node,
   };
+
   static defaultProps = {
     onChange: null,
     onActive: null,
     children: [],
   };
+
   constructor(props) {
     super(props);
     this.onClickTab = this.onClickTab.bind(this);
   }
+
   onClickTab(e) {
-    const { onChange } = this.props;
+    const { onChange, active, onActive } = this.props;
     if (e) {
       e.preventDefault();
     }
-    onChange();
-    if (!this.props.active && this.props.onActive) {
-      this.props.onActive();
+    if (onChange) {
+      onChange();
+    }
+    if (!active && onActive) {
+      onActive();
     }
   }
 

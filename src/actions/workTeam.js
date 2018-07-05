@@ -231,7 +231,7 @@ const updateWorkTeamMutation = `mutation($workTeam:WorkTeamInput){
   }
 }`;
 
-const joinWorkTeamMutationWithDetails = `mutation($id:ID, $memberId:ID ){
+const joinWorkTeamMutationWithDetails = `mutation($id:ID, $memberId:ID  $state:String $closed:Boolean ){
   joinWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     ${workTeamFields}
     ${wtDetails}

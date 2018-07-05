@@ -43,14 +43,13 @@ class WorkTeamContainer extends React.Component {
       discussions: PropTypes.arrayOf(PropTypes.shape({})),
     }),
   };
+
   static defaultProps = {
     workTeamData: null,
     requestUpdates: null,
     workTeamUpdates: null,
   };
-  static onProposalClick({ proposalId, pollId }) {
-    history.push(`/proposal/${proposalId}/${pollId}`);
-  }
+
   constructor(props) {
     super(props);
     this.state = {};
@@ -63,6 +62,11 @@ class WorkTeamContainer extends React.Component {
   componentDidMount() {
     this.responsive = Responsive.start(this.onResponsive);
   }
+
+  static onProposalClick({ proposalId, pollId }) {
+    history.push(`/proposal/${proposalId}/${pollId}`);
+  }
+
   onResponsive(small) {
     // deactivate if we change resolutions
     if (small) {
@@ -78,10 +82,14 @@ class WorkTeamContainer extends React.Component {
 
   // eslint-disable-next-line class-methods-use-this
   handleDiscussionClick({ discussionId }) {
-    history.push(`${this.props.workTeamData.id}/discussions/${discussionId}`);
+    const { workTeamData } = this.props;
+    history.push(`${workTeamData.id}/discussions/${discussionId}`);
   }
+
   renderDiscussions() {
-    const { discussions } = this.props.workTeamData;
+    const {
+      workTeamData: { discussions },
+    } = this.props;
     return (
       <Box column padding="medium" pad>
         {discussions &&
@@ -99,7 +107,9 @@ class WorkTeamContainer extends React.Component {
   }
 
   renderProposals() {
-    const { proposals } = this.props.workTeamData;
+    const {
+      workTeamData: { proposals },
+    } = this.props;
 
     return (
       <Box column pad>
@@ -118,58 +128,54 @@ class WorkTeamContainer extends React.Component {
   }
 
   render() {
-    const { workTeamData = {}, user } = this.props;
-    const { smallSize } = this.state;
+    const {
+      workTeamData = {},
+      user,
+      createRequest: makeRequest,
+      workTeamUpdates,
+      joinWorkTeam: join,
+      leaveWorkTeam: leave,
+      deleteRequest: eraseRequest,
+      loadDiscussions: fetchDiscussions,
+      loadProposalsList: loadProposals,
+    } = this.props;
+    const { smallSize, content } = this.state;
     let sidebar;
-    let content;
+    let element;
     const isResponsive = false; // to deactivate
     if (!smallSize && isResponsive) {
       sidebar = (
         <Nav
-          {...this.props.workTeamData}
+          {...workTeamData}
           handleNavClicks={(e, resource) => {
             this.setState({ content: resource });
           }}
         />
       );
-      if (this.state.content === 'discussions') {
-        content = this.renderDiscussions();
-      } else if (this.state.content === 'proposals') {
-        content = this.renderProposals();
-      } else {
-        content = (
-          <div>
-            {'JOINING AND LEAVING WORKTEAM CURRENTLY ONLY IN MOBILE VERSION'}{' '}
-            <button
-              onClick={() => {
-                this.responsive.stop();
-                this.setState({ smallSize: true });
-              }}
-            >
-              Click to switch
-            </button>
-          </div>
-        );
+      if (content === 'discussions') {
+        element = this.renderDiscussions();
+      } else if (content === 'proposals') {
+        element = this.renderProposals();
       }
     } else {
-      content = (
+      element = (
         <WorkTeam
           {...workTeamData}
-          onJoinRequest={this.props.createRequest}
-          updates={this.props.workTeamUpdates}
-          onJoin={this.props.joinWorkTeam}
-          onLeave={this.props.leaveWorkTeam}
-          onDeleteRequest={this.props.deleteRequest}
+          onJoinRequest={makeRequest}
+          updates={workTeamUpdates}
+          onJoin={join}
+          onLeave={leave}
+          onDeleteRequest={eraseRequest}
           user={user}
-          onLoadDiscussions={this.props.loadDiscussions}
-          onLoadProposals={this.props.loadProposalsList}
+          onLoadDiscussions={fetchDiscussions}
+          onLoadProposals={loadProposals}
         />
       );
     }
     return (
       <Box justify={smallSize || !isResponsive}>
         {sidebar}
-        {content}
+        {element}
       </Box>
     );
   }
@@ -190,4 +196,7 @@ const mapDispatch = {
   loadProposalsList,
 };
 
-export default connect(mapStateToProps, mapDispatch)(WorkTeamContainer);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(WorkTeamContainer);

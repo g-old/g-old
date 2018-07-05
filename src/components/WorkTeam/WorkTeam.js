@@ -64,6 +64,11 @@ const messages = defineMessages({
   },
 });
 
+const isPrivileged = (user, coordinator, mainTeam, id) =>
+  user.id == coordinator.id || // eslint-disable-line eqeqeq
+  user.groups & Groups.ADMIN || // eslint-disable-line no-bitwise
+  (mainTeam && user.wtMemberships.includes(Number(id)));
+
 class WorkTeam extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
@@ -76,6 +81,7 @@ class WorkTeam extends React.Component {
     numProposals: PropTypes.number.isRequired,
     discussions: PropTypes.arrayOf(PropTypes.shape({})),
     proposals: PropTypes.arrayOf(PropTypes.shape({})),
+    mainTeam: PropTypes.bool,
     ownStatus: PropTypes.shape({
       status: PropTypes.oneOf(['NONE', 'MEMBER', 'PENDING']),
     }).isRequired,
@@ -93,6 +99,7 @@ class WorkTeam extends React.Component {
     logo: null,
     discussions: null,
     proposals: null,
+    mainTeam: null,
   };
 
   constructor(props) {
@@ -311,6 +318,7 @@ class WorkTeam extends React.Component {
       user,
       coordinator,
       id,
+      mainTeam,
     } = this.props;
     const {
       discussionStatus,
@@ -342,8 +350,8 @@ class WorkTeam extends React.Component {
     if (ownStatus.status) {
       const controls = [];
       controls.push(this.renderActionButton(ownStatus.status, updates));
-      // eslint-disable-next-line
-      if (user.id == coordinator.id || user.groups & Groups.ADMIN) {
+
+      if (isPrivileged(user, coordinator, mainTeam, id)) {
         controls.push(
           // eslint-disable-next-line jsx-a11y/anchor-is-valid
           <Link to={`/workteams/${id}/admin`}>
