@@ -247,7 +247,7 @@ const userStatusTranslations = {
     de:
       'Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen, Beiträge und Beschlüsse lesen sowie an Diskussionen teilnehmen.',
     it:
-      'Sei stato abilitato come Visitatore e da adesso puoi iscriverti ai gruppi di lavoro, partecipare ai sondaggi, leggere interventi, decisioni e partecipare alle discussioni.',
+      'Sei stato abilitato come Visitatore e da adesso puoi partecipare ai sondaggi, iscriverti ai gruppi di lavoro e lì partecipare a tutte le attività previste: discussioni, sondaggi e votazioni.',
     lld:
       'translate: Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen, Beiträge und Beschlüsse lesen sowie an Diskussionen teilnehmen.',
   },
@@ -319,38 +319,38 @@ const userStatusTranslations = {
     de:
       'Sie sind als "Relator" freigeschalten worden. Ab sofort können Sie Beschlusse und Umfragen plattformweit einstellen, sowie Nachrichten an alle unsere Mitglieder schicken.',
     it:
-      'translate:Sie sind als "Relator" freigeschalten worden. Ab sofort können Sie Beschlusse und Umfragen plattformweit einstellen, sowie Nachrichten an alle unsere Mitglieder schicken.',
+      'Sei stato abilitato come "Relatore". Da questo momento potrai inserire proposte e sondaggi a livello di piattaforma e mandare messaggi a tutti gli utenti.',
     lld:
       'translate:Sie sind als "Relator" freigeschalten worden. Ab sofort können Sie Beschlusse und Umfragen plattformweit einstellen, sowie Nachrichten an alle unsere Mitglieder schicken.',
   },
   relator_lost: {
     de: `Sie sind ab jetzt kein "Relator" mehr. ${helpNotice.de}`,
-    it: `translate: Sie sind ab jetzt kein "Relator" mehr. ${helpNotice.it}`,
+    it: `Da questo momento non sei più "Relatore". ${helpNotice.it}`,
     lld: `translate: Sie sind ab jetzt kein "Relator" mehr. ${helpNotice.lld}`,
   },
   team_leader_added: {
     de:
       'Sie sind als "Teamleader" freigeschalten worden. Damit haben Sie Zugang zum Adminbereich der Plattform.',
     it:
-      'tranlate: Sie sind als "Teamleader" freigeschalten worden. Damit haben Sie Zugang zum Adminbereich der Plattform.',
+      'Sei appena stato abilitato come coordinatore di un gruppo di lavoro e di conseguenza avrai accesso a strumenti riservati agli amministratori.',
     lld:
       'translate: Sie sind als "Teamleader" freigeschalten worden. Damit haben Sie Zugang zum Adminbereich der Plattform.',
   },
   team_leader_lost: {
     de: `Sie sind ab jetzt kein "Teamleader" mehr. ${helpNotice.de}`,
-    it: `Sie sind ab jetzt kein "Teamleader" mehr. ${helpNotice.it}`,
+    it: `Da questo momento non sei più coordinatore di un gruppo di lavoro. ${helpNotice.it}`,
     lld: `Sie sind ab jetzt kein "Teamleader" mehr. ${helpNotice.lld}`,
   },
 
   district_keeper_added: {
     de: 'Sie sind als "District keeper" freigeschalten worden.',
-    it: 'Sie sind als "District keeper" freigeschalten worden.',
+    it: 'Sei appena stato abilitato come responsabile di zona.',
     lld: 'Sie sind als "District keeper" freigeschalten worden.',
   },
 
   district_keeper_lost: {
     de: `Sie sind ab jetzt kein "District keeper" mehr. ${helpNotice.de}`,
-    it: `translate: Sie sind ab jetzt kein "District keeper" mehr. ${
+    it: `Da questo momento non sei più responsabile di zona. ${
       helpNotice.it
     }`,
     lld: `translate: Sie sind ab jetzt kein "District keeper" mehr. ${
@@ -361,13 +361,13 @@ const userStatusTranslations = {
     de:
       'Sie sind als "Contactee" freigeschalten worden. Ab sofort können Sie von Mitgliedern der Plattform direkt angeschrieben werden',
     it:
-      'translate: Sie sind als "Contactee" freigeschalten worden. Ab sofort können Sie von Mitgliedern der Plattform direkt angeschrieben werden',
+      'Sei appena stato abilitato come "persona di riferimento". Da subito tutti gli utenti potranno contattarti direttamente',
     lld:
       'translate: Sie sind als "Contactee" freigeschalten worden. Ab sofort können Sie von Mitgliedern der Plattform direkt angeschrieben werden',
   },
   contactee_lost: {
     de: `Sie sind ab jetzt kein "Contactee" mehr. ${helpNotice.de}`,
-    it: `translate: Sie sind ab jetzt kein "Contactee" mehr. ${helpNotice.it}`,
+    it: `Da questo momento non sei più "persona di riferimento". ${helpNotice.it}`,
     lld: `translate: Sie sind ab jetzt kein "Contactee" mehr. ${
       helpNotice.lld
     }`,
