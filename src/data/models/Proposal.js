@@ -10,6 +10,7 @@ import { Groups } from '../../organization';
 import EventManager from '../../core/EventManager';
 import log from '../../logger';
 import sanitize from '../../core/htmlSanitizer';
+import Statement from './Statement'; // eslint-disable-line import/no-cycle
 
 type ID = string | number;
 type ProposalState = 'accepted' | 'rejected' | 'revoked' | 'survey';
@@ -532,6 +533,55 @@ class Proposal {
       });
     }
     return proposal;
+  }
+
+  static async delete(viewer, data, loaders) {
+    if (!data || !data.id) return null;
+    const isCoordinator = await checkIfCoordinator(viewer, data);
+
+    if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL)) {
+      return null;
+    }
+    const deletedProposal = await knex.transaction(async () => {
+      // allow only if softdeletion already happened
+      const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
+      if (proposalInDB) {
+        if (!proposalInDB.deletedAt) {
+          throw new Error('Soft-deletion missing');
+        }
+        // for both polls
+
+        const statementIds = await knex('statements')
+          .where({ poll_Id: proposalInDB.pollOneId })
+          .orWhere({ poll_id: proposalInDB.pollTwoId })
+          .pluck('id');
+
+        const statementDeletePromises = statementIds.map(sId =>
+          Statement.delete(viewer, { id: sId }, loaders),
+        );
+        await Promise.all(statementDeletePromises);
+
+        // no FK present
+        await knex('flagged_statements')
+          .whereIn('statement_id', statementIds)
+          .del();
+
+        // proposal_groups is deleted via on delete trigger
+
+        await knex('proposals')
+          .where({ id: data.id })
+          .del();
+
+        // decrement counters
+        if (proposalInDB.workTeamId) {
+          await knex('work_teams')
+            .where({ id: proposalInDB.workTeamId })
+            .decrement('num_proposals', 1);
+        }
+      }
+      return proposalInDB;
+    });
+    return deletedProposal;
   }
 
   async isVotable(viewer) {

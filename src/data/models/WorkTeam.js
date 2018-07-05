@@ -2,6 +2,7 @@ import knex from '../knex';
 import User from './User';
 import Request from './Request';
 import Proposal from './Proposal';
+import Discussion from './Discussion'; // eslint-disable-line import/no-cycle
 
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import { Groups } from '../../organization';
@@ -35,10 +36,12 @@ class WorkTeam {
     this.lldName = data.lld_name;
     this.mainTeam = data.main;
   }
+
   canNotify(viewer) {
     // eslint-disable-next-line eqeqeq
     return viewer.id == this.coordinatorId || viewer.role.type === 'admin';
   }
+
   canModifyMemberShips(viewer, requester) {
     // eslint-disable-next-line eqeqeq
     if (this.restricted) {
@@ -54,6 +57,7 @@ class WorkTeam {
 
     return false;
   }
+
   async addMembershipToSessions(userId) {
     return this.modifySessions(userId, true);
   }
@@ -93,6 +97,7 @@ class WorkTeam {
       [serializedUser, this.id],
     ); */
   }
+
   async join(viewer, memberId, loaders) {
     let requester;
     // eslint-disable-next-line eqeqeq
@@ -378,6 +383,59 @@ class WorkTeam {
     }
 
     return workTeam ? new WorkTeam(workTeam) : null;
+  }
+
+  static async delete(viewer, data, loaders) {
+    if (!data || !data.id) return null;
+    // eslint-disable-next-line no-bitwise
+    if (!viewer && (viewer.groups & Groups.ADMIN) === 0) {
+      return null;
+    }
+
+    const deletedWorkTeam = await knex.transaction(async () => {
+      // delete discussions, surveys, proposals, requests
+      const workTeaminDB = await WorkTeam.gen(viewer, data.id, loaders);
+      const discussionIds = await knex('discussions')
+        .where({ work_team_id: data.id })
+        .pluck('id');
+
+      const discussionDeletePromises = discussionIds.map(dId =>
+        Discussion.delete(viewer, { id: dId }, loaders),
+      );
+
+      await Promise.all(discussionDeletePromises);
+
+      const proposalIds = await knex('proposals')
+        .where({ work_team_id: data.id })
+        .pluck('id');
+
+      // safety measure
+      await knex('proposals')
+        .whereIn('id', proposalIds)
+        .update({ deleted_at: new Date() });
+
+      const proposalDeletePromises = proposalIds.map(pId =>
+        Proposal.delete(viewer, { id: pId }, loaders),
+      );
+
+      await Promise.all(proposalDeletePromises);
+
+      const requestIds = await knex('requests')
+        .where({ work_team_id: data.id })
+        .pluck('ids');
+
+      const requestDeletePromises = requestIds.map(rId =>
+        Request.delete(viewer, { id: rId }, loaders),
+      );
+      await Promise.all(requestDeletePromises);
+
+      // members
+      await knex('user_work_teams')
+        .where({ work_team_id: data.id })
+        .del();
+      return workTeaminDB;
+    });
+    return deletedWorkTeam;
   }
 
   async getLinkedProposals(viewer, loaders) {

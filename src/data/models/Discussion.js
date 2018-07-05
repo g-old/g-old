@@ -2,7 +2,8 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
-import WorkTeam from './WorkTeam';
+import WorkTeam from './WorkTeam'; // eslint-disable-line import/no-cycle
+import Comment from './Comment';
 
 type ID = number | string;
 export type DiscussionProps = {
@@ -32,6 +33,10 @@ const checkIfCoordinator = async (viewer, data, workTeam) => {
 };
 
 class Discussion {
+  id: ID;
+
+  workTeamId: ID;
+
   constructor(data: DiscussionProps) {
     this.id = data.id;
     this.title = data.title;
@@ -121,6 +126,38 @@ class Discussion {
       .returning('*');
 
     return discussion ? new Discussion(discussion) : null;
+  }
+
+  static async delete(viewer, data, loaders) {
+    if (!data || !data.id) return null;
+    const isCoordinator = await checkIfCoordinator(viewer, data);
+
+    if (!canMutate(viewer, { ...data, isCoordinator }, Models.DISCUSSION)) {
+      return null;
+    }
+    const deletedDiscussion = await knex.transaction(async () => {
+      const discussion = await Discussion.gen(viewer, data.id, loaders);
+      if (discussion) {
+        const commentIds = await knex('comments')
+          .where({ discussion_id: data.id })
+          .pluck('id');
+        // pass trx around?
+        const commentDeletePromises = commentIds.map(cId =>
+          Comment.delete(viewer, { id: cId }, loaders),
+        );
+        await Promise.all(commentDeletePromises);
+        await knex('discussions')
+          .where({ id: data.id })
+          .del();
+
+        await knex('work_teams')
+          .where({ id: discussion.workTeamId })
+          .decrement('num_discussions', 1);
+      }
+      return discussion;
+    });
+
+    return deletedDiscussion || null;
   }
 }
 
