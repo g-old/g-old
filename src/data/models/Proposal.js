@@ -27,6 +27,7 @@ export type ProposalProps = {
   spokesman_id: ID,
   notified_at: string,
   work_team_id: ID,
+  deleted_at: ?string,
 };
 
 export const computeNextState = (state, poll, tRef) => {
@@ -230,6 +231,13 @@ const checkIfCoordinator = async (viewer, data) => {
   return false;
 };
 
+const transactify = async (fn, dbConnector, trx) => {
+  if (trx) {
+    return fn(trx);
+  }
+  return dbConnector.transaction(async tContext => fn(tContext));
+};
+
 class Proposal {
   id: ID;
 
@@ -255,6 +263,8 @@ class Proposal {
 
   workTeamId: ID;
 
+  deletedAt: ?string;
+
   constructor(data: ProposalProps) {
     this.id = data.id;
     this.authorId = data.author_id;
@@ -268,6 +278,7 @@ class Proposal {
     this.spokesmanId = data.spokesman_id;
     this.notifiedAt = data.notified_at;
     this.workTeamId = data.work_team_id;
+    this.deletedAt = data.deleted_at;
   }
 
   static async gen(viewer, id, { proposals }) {
@@ -535,6 +546,45 @@ class Proposal {
     return proposal;
   }
 
+  static async toggleStatus(viewer, data, loaders, trx) {
+    if (!data || !data.id) return null;
+
+    // eslint-disable-next-line no-bitwise
+    if ((viewer.groups & Groups.ADMIN) === 0) {
+      throw new Error('Permission denied');
+    }
+
+    const toggle = async transaction => {
+      const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
+      if (proposalInDB) {
+        const now = new Date();
+        const pollIds = [];
+        if (proposalInDB.pollOneId) {
+          pollIds.push(proposalInDB.pollOneId);
+        }
+        if (proposalInDB.pollTwoId) {
+          pollIds.push(proposalInDB.pollTwoId);
+        }
+        if (pollIds.length) {
+          await knex('polls')
+            .transacting(transaction)
+            .whereIn('id', pollIds)
+            .update({ closed_at: data.value, updated_at: now });
+        }
+        return knex('proposals')
+          .transacting(transaction)
+          .where({ id: data.id })
+          .update({ deleted_at: data.value, updated_at: now })
+          .returning('*');
+      }
+      return proposalInDB;
+    };
+
+    const updatedProposal = await transactify(toggle, knex, trx);
+
+    return updatedProposal ? new Proposal(updatedProposal) : null;
+  }
+
   static async delete(viewer, data, loaders) {
     if (!data || !data.id) return null;
     const isCoordinator = await checkIfCoordinator(viewer, data);
@@ -542,7 +592,7 @@ class Proposal {
     if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL)) {
       return null;
     }
-    const deletedProposal = await knex.transaction(async () => {
+    const deletedProposal = await knex.transaction(async trx => {
       // allow only if softdeletion already happened
       const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
       if (proposalInDB) {
@@ -563,18 +613,31 @@ class Proposal {
 
         // no FK present
         await knex('flagged_statements')
+          .transacting(trx)
           .whereIn('statement_id', statementIds)
           .del();
 
         // proposal_groups is deleted via on delete trigger
 
+        // delete subscriptions
+        await knex('subscriptions')
+          .transacting(trx)
+          .where({ target_type: TargetType.PROPOSAL, target_id: data.id })
+          .del();
+
+        // delete group messages
+
+        await knex('subscriptions');
+
         await knex('proposals')
+          .transacting(trx)
           .where({ id: data.id })
           .del();
 
         // decrement counters
         if (proposalInDB.workTeamId) {
           await knex('work_teams')
+            .transacting(trx)
             .where({ id: proposalInDB.workTeamId })
             .decrement('num_proposals', 1);
         }

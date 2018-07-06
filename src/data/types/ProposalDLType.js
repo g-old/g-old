@@ -93,6 +93,9 @@ const ProposalType = new ObjectType({
       type: GraphQLString,
       resolve: data => data.createdAt,
     },
+    deletedAt: {
+      type: GraphQLString,
+    },
 
     subscribed: {
       type: GraphQLBoolean,

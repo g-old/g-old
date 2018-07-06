@@ -1,9 +1,12 @@
 // @flow
 import Poll from './Poll';
+/* eslint-disable import/no-cycle */
+import Proposal from './Proposal';
 import Vote from './Vote';
+/* eslint-enable import/no-cycle */
+
 import knex from '../knex';
 import User from './User';
-import Proposal from './Proposal';
 import { Groups } from '../../organization';
 
 import { canSee, canMutate, Models } from '../../core/accessControl';
@@ -59,7 +62,9 @@ class Statement {
     } */
     if (!data || !data.id || !data.pollId) return null;
     const proposal = await Proposal.genByPoll(viewer, data.pollId, loaders);
-
+    if (!proposal) {
+      throw new Error('Proposal not found');
+    }
     if (!canMutate(viewer, { data, proposal }, Models.STATEMENT)) return null;
     // validate
     // eslint-disable-next-line prefer-arrow-callback

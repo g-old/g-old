@@ -1,7 +1,10 @@
 import { GraphQLInt, GraphQLString, GraphQLID, GraphQLBoolean } from 'graphql';
 
-import PageType from '../types/PageType';
+/* eslint-disable import/no-cycle */
 import ProposalType from '../types/ProposalDLType';
+/* eslint-enable import/no-cycle */
+
+import PageType from '../types/PageType';
 import Proposal from '../models/Proposal';
 import knex from '../knex';
 
@@ -71,7 +74,7 @@ const proposal = {
               });
             })
             //  .where({ 'polls.closed_at': null }) TODO find some other way to p1 to p2 transitioning
-            .where({ work_team_id: workTeamId || null })
+            .where({ work_team_id: workTeamId || null, deleted_at: null })
             .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
             .limit(first)
             .orderBy('polls.end_time', 'asc')

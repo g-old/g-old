@@ -6,7 +6,11 @@ import Accordion from '../../components/Accordion';
 import Box from '../../components/Box';
 import WorkteamHeader from '../../components/WorkteamHeader';
 import AccordionPanel from '../../components/AccordionPanel';
-import { joinWorkTeam, loadProposalStatus } from '../../actions/workTeam';
+import {
+  joinWorkTeam,
+  loadProposalStatus,
+  updateWorkTeam,
+} from '../../actions/workTeam';
 import {
   loadTags,
   loadProposalsList,
@@ -34,6 +38,7 @@ import DiscussionInput from '../../components/DiscussionInput';
 import ProposalInput from '../../components/ProposalInput';
 import Tabs from '../../components/Tabs';
 import Tab from '../../components/Tab';
+import Button from '../../components/Button';
 import { Groups } from '../../organization';
 import history from '../../history';
 import MessageInput from '../../components/MessageInput';
@@ -168,6 +173,7 @@ class WorkTeamManagement extends React.Component {
     messageUpdates: PropTypes.shape({}).isRequired,
     updateProposal: PropTypes.func.isRequired,
     wtProposals: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    updateWorkTeam: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -193,6 +199,8 @@ class WorkTeamManagement extends React.Component {
     this.fetchTags = this.fetchTags.bind(this);
     this.fetchProposalStatus = this.fetchProposalStatus.bind(this);
     this.fetchWTProposals = this.fetchWTProposals.bind(this);
+    this.onDeactivateWT = this.onDeactivateWT.bind(this);
+    this.onActivateWT = this.onActivateWT.bind(this);
   }
 
   onRequestClick(action, data) {
@@ -227,6 +235,16 @@ class WorkTeamManagement extends React.Component {
 
   onCancel() {
     this.setState({ showRequest: false });
+  }
+
+  onDeactivateWT() {
+    const { updateWorkTeam: update, workTeam } = this.props;
+    update({ id: workTeam.id, closing: true });
+  }
+
+  onActivateWT() {
+    const { updateWorkTeam: update, workTeam } = this.props;
+    update({ id: workTeam.id, closing: false });
   }
 
   // eslint-disable-next-line
@@ -375,6 +393,16 @@ class WorkTeamManagement extends React.Component {
             onRequestClick={this.onRequestClick}
           />
         </Tab>,
+        <Tab title="Settings">
+          <Box>
+            <Button
+              primary
+              label="Deactivate WT"
+              onClick={this.onDeactivateWT}
+            />
+            <Button primary label="Delete WT" onClick={this.handleDeletion} />
+          </Box>
+        </Tab>,
       );
     }
 
@@ -441,6 +469,7 @@ const mapDispatch = {
   loadProposalStatus,
   createMessage,
   updateProposal,
+  updateWorkTeam,
 };
 
 export default connect(

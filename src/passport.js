@@ -16,7 +16,7 @@
 import passport from 'passport';
 import bcrypt from 'bcrypt';
 import { Strategy as LocalStrategy } from 'passport-local';
-import knex from '../src/data/knex';
+import knex from './data/knex';
 import log from './logger';
 import { calcRights } from './organization';
 
@@ -84,7 +84,7 @@ passport.serializeUser((user, done) => {
       avatar = avatar.slice(0, stIndex) + avatar.substring(endIndex);
     }
     return knex('user_work_teams')
-      .where({ user_id: user.id })
+      .where({ user_id: user.id, inactive: false })
       .select('work_team_id')
       .then(ids => ids)
       .then(ids => {

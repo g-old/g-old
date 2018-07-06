@@ -7,16 +7,19 @@ import {
   GraphQLInt,
   GraphQLBoolean,
 } from 'graphql';
+/* eslint-disable import/no-cycle */
 import UserType from './UserType';
 import GroupStatusType from './GroupStatusType';
-import PageType from './PageType';
-import Request from '../models/Request';
-import ProposalStatusType from '../types/ProposalStatusType';
-import User from '../models/User';
-import knex from '../knex';
-import proposalConnection from '../queries/proposalConnection';
+import ProposalStatusType from './ProposalStatusType';
 import requestConnection from '../queries/requestConnection';
 import discussionConnection from '../queries/discussionConnection';
+import proposalConnection from '../queries/proposalConnection';
+/* eslint-enable import/no-cycle */
+
+import PageType from './PageType';
+import Request from '../models/Request';
+import User from '../models/User';
+import knex from '../knex';
 
 const WorkTeamType = new ObjectType({
   name: 'WorkTeam',
@@ -131,6 +134,9 @@ const WorkTeamType = new ObjectType({
     },
     numProposals: {
       type: GraphQLInt,
+    },
+    deletedAt: {
+      type: GraphQLString,
     },
     discussionConnection,
 

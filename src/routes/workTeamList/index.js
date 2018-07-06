@@ -11,14 +11,15 @@ async function action({ store, path }) {
   const user = getSessionUser(store.getState());
   if (!user) {
     return { redirect: `/?redirect=${path}` };
-  } else if (!canAccess(user, title)) {
+  }
+  if (!canAccess(user, title)) {
     return { redirect: '/' };
   }
   if (!process.env.BROWSER) {
     // FAKE STATE active, TODO change
-    await store.dispatch(loadWorkTeams());
+    await store.dispatch(loadWorkTeams(false, true));
   } else {
-    store.dispatch(loadWorkTeams());
+    store.dispatch(loadWorkTeams(false, true));
   }
   return {
     chunks: ['workteam'],

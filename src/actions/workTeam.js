@@ -79,13 +79,13 @@ const workTeamFields = `
     thumbnail
     id
   }`;
-const workTeams = `query{
-  workTeams {
+const workTeams = `query($active:Boolean){
+  workTeams(active$active) {
     ${workTeamFields}
   }}`;
 
-const workTeamsWithMembers = `query{
-    workTeams {
+const workTeamsWithMembers = `query($active:Boolean){
+    workTeams(active:$active) {
       ${workTeamFields}
       members{
         name
@@ -337,7 +337,7 @@ const handleResources = (dispatch, data, state, workteamId, closed) => {
   );
 };
 
-export function loadWorkTeams(withMembers) {
+export function loadWorkTeams(withMembers, active) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: LOAD_WORKTEAMS_START,
@@ -346,6 +346,7 @@ export function loadWorkTeams(withMembers) {
     try {
       const { data } = await graphqlRequest(
         withMembers ? workTeamsWithMembers : workTeams,
+        { active },
       );
       const normalizedData = normalize(data.workTeams, workTeamListSchema);
 
