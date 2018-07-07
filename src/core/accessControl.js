@@ -167,6 +167,7 @@ function proposalWriteControl(viewer, data) {
     }
     return (viewer.groups & Groups.ADMIN) > 0;
   }
+
   if (viewer.groups & Groups.RELATOR) {
     if (data.id && data.state) {
       // updates
@@ -399,6 +400,10 @@ function commentReadControl(viewer, data) {
   return false;
 }
 function commentWriteControl(viewer, data) {
+  if (data.delete && viewer.groups & Groups.ADMIN) {
+    return true;
+  }
+
   if (data.discussion.closedAt) {
     return false;
   }

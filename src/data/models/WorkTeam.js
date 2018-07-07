@@ -466,7 +466,7 @@ class WorkTeam {
       return null;
     }
 
-    const deletedWorkTeam = await knex.transaction(async () => {
+    const deletedWorkTeam = await knex.transaction(async trx => {
       // delete discussions, surveys, proposals, requests
       const workTeaminDB = await WorkTeam.gen(viewer, data.id, loaders);
       const discussionIds = await knex('discussions')
@@ -486,6 +486,8 @@ class WorkTeam {
       // safety measure
       await knex('proposals')
         .whereIn('id', proposalIds)
+        .forUpdate()
+
         .update({ deleted_at: new Date() });
 
       const proposalDeletePromises = proposalIds.map(pId =>
@@ -494,37 +496,79 @@ class WorkTeam {
 
       await Promise.all(proposalDeletePromises);
 
-      const requestIds = await knex('requests')
-        .where({ work_team_id: data.id })
-        .pluck('ids');
+      await knex('requests')
+        .transacting(trx)
+        .forUpdate()
 
-      const requestDeletePromises = requestIds.map(rId =>
+        .where({ type: 'joinWT' })
+        .whereRaw("content->> 'id' = ?", [data.id])
+        .del();
+
+      /* const requestDeletePromises = requestIds.map(rId =>
         Request.delete(viewer, { id: rId }, loaders),
       );
       await Promise.all(requestDeletePromises);
-
+*/
       // messages
-      const [messageIds] = await knex('messages')
+      const messageIds = await knex('messages')
         .where({
-          messageType: 'note',
-          recipientType: 'group',
-          targetId: data.id,
+          message_type: 'note',
+          recipient_type: 'group',
         })
-        .del()
-        .returning('id');
-      //  console.log('MESSAGEIDS', { messageIds });
+        .whereRaw('recipients \\?| ?', [[data.id]])
+        .pluck('id');
       // delete notifications
+      if (messageIds.length) {
+        const activityIds = await knex('activities')
+          .where({ type: 'message' })
+          .whereIn('object_id', messageIds)
+          .pluck('id');
+
+        if (activityIds.length) {
+          await knex('notifications')
+            .transacting(trx)
+            .forUpdate()
+
+            .whereIn('activity_id', activityIds)
+            .del();
+        }
+        // delete messages
+
+        await knex('messages')
+          .transacting(trx)
+          .forUpdate()
+          .whereIn('id', messageIds)
+          .del();
+      }
+
       // const messageDeletePromises = await knex('activities').where({type: 'message'}).whereIn('object_id', messageIds)
-      await knex('notifications')
-        .join('activities', 'activities.id', '=', 'notifications.id')
-        .where({ 'activities.type': 'message' })
-        .whereIn('activities.object_id', messageIds.map(m => m.id))
-        .del();
-      // delete messages
+      /* await knex('notifications')
+        .transacting(trx)
+        .join('activities', function() {
+          this.on('activities.id', '=', 'notifications.id')
+            .andOn(('activities.type', '=', 'message'))
+            .andOn(knex.raw('activities.object_id IN ?', [messageIds]));
+        })
+        // .join('activities', 'activities.id', '=', 'notifications.id')
+        // .where({ 'activities.type': 'message' })
+        // .whereIn('activities.object_id', messageIds)
+        .del(); */
 
       // members
       await knex('user_work_teams')
+        .transacting(trx)
         .where({ work_team_id: data.id })
+        .del();
+
+      // delete feeds
+      await knex('system_feeds')
+        .transacting(trx)
+        .where({ type: 'WT', group_id: data.id })
+        .del();
+
+      await knex('work_teams')
+        .transacting(trx)
+        .where({ id: data.id })
         .del();
       return workTeaminDB;
     });

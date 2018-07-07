@@ -24,6 +24,9 @@ import {
   UPDATE_WORKTEAM_ERROR,
   LOAD_PROPOSAL_LIST_SUCCESS,
   LOAD_DISCUSSIONS_SUCCESS,
+  DELETE_WORKTEAM_START,
+  DELETE_WORKTEAM_SUCCESS,
+  DELETE_WORKTEAM_ERROR,
 } from '../constants';
 import {
   workTeamList as workTeamListSchema,
@@ -231,6 +234,12 @@ const updateWorkTeamMutation = `mutation($workTeam:WorkTeamInput){
     ${wtDetails}
   }
 }`;
+const deleteWorkteamMutation = `mutation($workteam:WorkTeamInput){
+  deleteWorkteam (workteam:$workteam){
+    ${workTeamFields}
+    ${wtDetails}
+  }
+}`;
 
 const joinWorkTeamMutationWithDetails = `mutation($id:ID, $memberId:ID  $state:String $closed:Boolean ){
   joinWorkTeam (workTeam:{id:$id, memberId:$memberId}){
@@ -355,34 +364,6 @@ export function loadWorkTeams(withMembers, active) {
     } catch (e) {
       dispatch({
         type: LOAD_WORKTEAMS_ERROR,
-        message: e.message || 'Something went wrong',
-      });
-    }
-  };
-}
-
-export function createWorkTeam(workTeam) {
-  return async (dispatch, getState, { graphqlRequest }) => {
-    dispatch({
-      type: CREATE_WORKTEAM_START,
-      id: 'create',
-    });
-
-    try {
-      const { data } = await graphqlRequest(createWorkTeamMutation, {
-        workTeam,
-      });
-      const normalizedData = normalize(data.createWorkTeam, workTeamSchema);
-
-      dispatch({
-        type: CREATE_WORKTEAM_SUCCESS,
-        id: 'create',
-        payload: normalizedData,
-      });
-    } catch (e) {
-      dispatch({
-        type: CREATE_WORKTEAM_ERROR,
-        id: 'create',
         message: e.message || 'Something went wrong',
       });
     }
@@ -535,24 +516,49 @@ export function loadProposalStatus({ id, first }) {
   };
 }
 
-export function updateWorkTeam(workTeam) {
-  return async (dispatch, getState, { graphqlRequest }) => {
+const createMutation = (types, resource, query, schema, selectorFn) => {
+  const [requestType, successType, errorType] = types;
+  return args => async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
-      type: UPDATE_WORKTEAM_START,
+      type: requestType,
     });
 
     try {
-      const { data } = await graphqlRequest(updateWorkTeamMutation, {
-        workTeam,
+      const { data } = await graphqlRequest(query, {
+        [resource]: args,
       });
-      const normalizedData = normalize(data.updateWorkTeam, workTeamSchema);
+      const normalizedData = normalize(selectorFn(data), schema);
 
-      dispatch({ type: UPDATE_WORKTEAM_SUCCESS, payload: normalizedData });
+      dispatch({ type: successType, payload: normalizedData });
     } catch (e) {
       dispatch({
-        type: UPDATE_WORKTEAM_ERROR,
+        type: errorType,
         message: e.message || 'Something went wrong',
       });
     }
   };
-}
+};
+
+export const createWorkTeam = createMutation(
+  [CREATE_WORKTEAM_START, CREATE_WORKTEAM_SUCCESS, CREATE_WORKTEAM_ERROR],
+  'workTeam',
+  createWorkTeamMutation,
+  workTeamSchema,
+  data => data.createWorkTeam,
+);
+
+export const updateWorkTeam = createMutation(
+  [UPDATE_WORKTEAM_START, UPDATE_WORKTEAM_SUCCESS, UPDATE_WORKTEAM_ERROR],
+  'workTeam',
+  updateWorkTeamMutation,
+  workTeamSchema,
+  data => data.updateWorkTeam,
+);
+
+export const deleteWorkteam = createMutation(
+  [DELETE_WORKTEAM_START, DELETE_WORKTEAM_SUCCESS, DELETE_WORKTEAM_ERROR],
+  'workteam',
+  deleteWorkteamMutation,
+  workTeamSchema,
+  data => data.deleteWorkteam,
+);

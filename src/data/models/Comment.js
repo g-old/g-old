@@ -19,14 +19,23 @@ export type CommentProps = {
 const MAX_CONTENT_LENGTH = 10000;
 class Comment {
   id: ID;
+
   authorId: ID;
+
   discussionId: ID;
+
   content: string;
+
   parentId: ID;
+
   numReplies: number;
+
   createdAt: string;
+
   updatedAt: string;
+
   editedAt: string;
+
   constructor(data: CommentProps) {
     this.id = data.id;
     this.authorId = data.author_id;
@@ -176,6 +185,7 @@ class Comment {
         viewer,
         {
           ...data,
+          delete: true,
           authorId: oldComment.author_id,
           discussion: { closedAt: discussion.closed_at },
         },

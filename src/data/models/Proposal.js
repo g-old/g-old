@@ -320,7 +320,6 @@ class Proposal {
     // authorize
     if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL))
       return null;
-
     // validate
     if (!data.id) return null;
     const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
@@ -428,7 +427,6 @@ class Proposal {
 
     if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL))
       return null;
-
     // validate
     if (!data.text) return null;
     if (!data.title) return null;
@@ -602,7 +600,7 @@ class Proposal {
         // for both polls
 
         const statementIds = await knex('statements')
-          .where({ poll_Id: proposalInDB.pollOneId })
+          .where({ poll_id: proposalInDB.pollOneId })
           .orWhere({ poll_id: proposalInDB.pollTwoId })
           .pluck('id');
 

@@ -4,6 +4,7 @@ import {
   LOAD_WORKTEAMS_SUCCESS,
   LOAD_WORKTEAMS_ERROR,
   CREATE_WORKTEAM_SUCCESS,
+  DELETE_WORKTEAM_SUCCESS,
 } from '../constants';
 
 const ids = (state = [], action) => {
@@ -14,6 +15,8 @@ const ids = (state = [], action) => {
     case CREATE_WORKTEAM_SUCCESS: {
       return [...state, action.payload.result];
     }
+    case DELETE_WORKTEAM_SUCCESS:
+      return state.filter(id => id != action.payload.result); // eslint-disable-line eqeqeq
     default:
       return state;
   }

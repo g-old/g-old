@@ -11,7 +11,7 @@ const SYSTEM = {
     Permissions.MODIFY_PROPOSALS |
     Permissions.CLOSE_POLLS |
     Permissions.VIEW_PROPOSALS,
-  groups: Groups.SYSTEM,
+  groups: Groups.SYSTEM | Groups.RELATOR,
 };
 /* eslint-enable no-bitwise */
 

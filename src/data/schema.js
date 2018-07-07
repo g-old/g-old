@@ -47,6 +47,7 @@ import createMessage from './mutations/createMessage';
 import updateMessage from './mutations/updateMessage';
 import activities from './subscriptions/activities';
 import createWorkTeam from './mutations/createWorkTeam';
+import deleteWorkteam from './mutations/deleteWorkteam';
 import joinWorkTeam from './mutations/joinWorkTeam';
 import leaveWorkTeam from './mutations/leaveWorkTeam';
 import workTeams from './queries/workTeams';
@@ -152,6 +153,7 @@ const schema = new Schema({
       updateRequest,
       deleteRequest,
       updateWorkTeam,
+      deleteWorkteam,
       createTag,
       updateTag,
       deleteTag,
