@@ -199,8 +199,7 @@ class WorkTeamManagement extends React.Component {
     this.fetchTags = this.fetchTags.bind(this);
     this.fetchProposalStatus = this.fetchProposalStatus.bind(this);
     this.fetchWTProposals = this.fetchWTProposals.bind(this);
-    this.onDeactivateWT = this.onDeactivateWT.bind(this);
-    this.onActivateWT = this.onActivateWT.bind(this);
+    this.onToggleWT = this.onToggleWT.bind(this);
   }
 
   onRequestClick(action, data) {
@@ -237,14 +236,9 @@ class WorkTeamManagement extends React.Component {
     this.setState({ showRequest: false });
   }
 
-  onDeactivateWT() {
+  onToggleWT() {
     const { updateWorkTeam: update, workTeam } = this.props;
-    update({ id: workTeam.id, closing: true });
-  }
-
-  onActivateWT() {
-    const { updateWorkTeam: update, workTeam } = this.props;
-    update({ id: workTeam.id, closing: false });
+    update({ id: workTeam.id, closing: !workTeam.deletedAt });
   }
 
   // eslint-disable-next-line
@@ -397,8 +391,8 @@ class WorkTeamManagement extends React.Component {
           <Box>
             <Button
               primary
-              label="Deactivate WT"
-              onClick={this.onDeactivateWT}
+              label={workTeam.deletedAt ? 'ActivateWT' : 'Deactivate WT'}
+              onClick={this.onToggleWT}
             />
             <Button primary label="Delete WT" onClick={this.handleDeletion} />
           </Box>

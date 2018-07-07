@@ -177,21 +177,117 @@ class ProposalContainer extends React.Component {
     fetchProposal({ id: proposalId });
   }
 
-  render() {
+  renderInteractions() {
     const {
       proposal,
-      isFetching,
-      errorMessage,
-      user,
       followees,
-      subscriptionStatus,
+      user,
       pollId,
+      subscriptionStatus,
       getVotes: fetchVotes,
       voteUpdates,
       followeeVotes,
     } = this.props;
+    if (proposal.deletedAt) {
+      return null;
+    }
     const showSubscription = ['proposed', 'voting'].includes(proposal.state);
     const { filter } = this.state;
+    let poll;
+    if (proposal.pollOne) {
+      poll =
+        proposal.pollOne.id === pollId ? proposal.pollOne : proposal.pollTwo;
+    } else {
+      poll = proposal.pollTwo;
+    }
+    const canSwitchPolls = !!(proposal.pollOne && proposal.pollTwo);
+    if (!poll) {
+      return <div>SOMETHING GOT REALLY WRONG</div>;
+    }
+    let switchPollBtn = null;
+
+    if (canSwitchPolls) {
+      const isPollOne = poll.id === proposal.pollOne.id;
+      switchPollBtn = (
+        <Button
+          reverse={isPollOne}
+          label={
+            <FormattedMessage
+              {...messages[isPollOne ? 'voting' : 'proposal']}
+            />
+          }
+          icon={
+            <svg
+              version="1.1"
+              viewBox="0 0 24 24"
+              width="24px"
+              height="24px"
+              role="img"
+            >
+              <path
+                fill="none"
+                stroke="#000"
+                strokeWidth="2"
+                d="M2,12 L22,12 M13,3 L22,12 L13,21"
+                transform={isPollOne ? null : 'matrix(-1 0 0 1 24 0)'}
+              />
+            </svg>
+          }
+          onClick={this.handlePollSwitching}
+        />
+      );
+    }
+    let hideOwnStatement = true;
+    if (
+      filter === 'all' ||
+      (poll.ownVote && filter === poll.ownVote.position)
+    ) {
+      hideOwnStatement = false;
+    }
+    let filterNode = null;
+    if (poll.mode && poll.mode.withStatements && !poll.mode.unipolar) {
+      filterNode = <Filter filter={filter} filterFn={this.filterStatements} />;
+    }
+    return (
+      <React.Fragment>
+        {showSubscription && (
+          <SubscriptionButton
+            status={subscriptionStatus}
+            targetType="PROPOSAL"
+            onSubscribe={this.handleSubscription}
+            subscription={proposal.subscription}
+          />
+        )}
+
+        <Poll
+          {...poll}
+          canVote={proposal.canVote}
+          onVote={this.handleVoting}
+          onFetchVoters={fetchVotes}
+          user={user}
+          filter={filter}
+          filterFn={this.filterStatements}
+          updates={voteUpdates}
+          followeeVotes={followeeVotes}
+        />
+
+        {filterNode}
+
+        <StatementsContainer
+          hideOwnStatement={hideOwnStatement}
+          followees={followees}
+          poll={poll}
+          user={user}
+          filter={filter}
+        />
+
+        {switchPollBtn}
+      </React.Fragment>
+    );
+  }
+
+  render() {
+    const { proposal, isFetching, errorMessage } = this.props;
     if (isFetching && !proposal) {
       return <p>{'Loading...'} </p>;
     }
@@ -199,63 +295,6 @@ class ProposalContainer extends React.Component {
       return <FetchError message={errorMessage} onRetry={this.fetchProposal} />;
     }
     if (this.isReady()) {
-      let poll;
-      if (proposal.pollOne) {
-        poll =
-          proposal.pollOne.id === pollId ? proposal.pollOne : proposal.pollTwo;
-      } else {
-        poll = proposal.pollTwo;
-      }
-      const canSwitchPolls = !!(proposal.pollOne && proposal.pollTwo);
-      if (!poll) {
-        return <div>SOMETHING GOT REALLY WRONG</div>;
-      }
-      let switchPollBtn = null;
-
-      if (canSwitchPolls) {
-        const isPollOne = poll.id === proposal.pollOne.id;
-        switchPollBtn = (
-          <Button
-            reverse={isPollOne}
-            label={
-              <FormattedMessage
-                {...messages[isPollOne ? 'voting' : 'proposal']}
-              />
-            }
-            icon={
-              <svg
-                version="1.1"
-                viewBox="0 0 24 24"
-                width="24px"
-                height="24px"
-                role="img"
-              >
-                <path
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  d="M2,12 L22,12 M13,3 L22,12 L13,21"
-                  transform={isPollOne ? null : 'matrix(-1 0 0 1 24 0)'}
-                />
-              </svg>
-            }
-            onClick={this.handlePollSwitching}
-          />
-        );
-      }
-      let hideOwnStatement = true;
-      if (
-        filter === 'all' ||
-        (poll.ownVote && filter === poll.ownVote.position)
-      ) {
-        hideOwnStatement = false;
-      }
-      let filterNode = null;
-      if (poll.mode && poll.mode.withStatements && !poll.mode.unipolar) {
-        filterNode = (
-          <Filter filter={filter} filterFn={this.filterStatements} />
-        );
-      }
       // return proposal, poll, statementslist
       return (
         <div>
@@ -270,34 +309,7 @@ class ProposalContainer extends React.Component {
               )}
               <Proposal {...proposal} />
             </div>
-            {showSubscription && (
-              <SubscriptionButton
-                status={subscriptionStatus}
-                targetType="PROPOSAL"
-                onSubscribe={this.handleSubscription}
-                subscription={proposal.subscription}
-              />
-            )}
-            <Poll
-              {...poll}
-              canVote={proposal.canVote}
-              onVote={this.handleVoting}
-              onFetchVoters={fetchVotes}
-              user={user}
-              filter={filter}
-              filterFn={this.filterStatements}
-              updates={voteUpdates}
-              followeeVotes={followeeVotes}
-            />
-            {filterNode}
-            <StatementsContainer
-              hideOwnStatement={hideOwnStatement}
-              followees={followees}
-              poll={poll}
-              user={user}
-              filter={filter}
-            />
-            {switchPollBtn}
+            {this.renderInteractions()}
           </Box>
         </div>
       ); // <TestProposal user={this.props.user} proposal={this.props.proposal} />;

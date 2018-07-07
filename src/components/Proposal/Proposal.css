@@ -47,6 +47,11 @@
   padding: 1em;
 }
 
+.deleted {
+  opacity: 0.1;
+  pointer-events: none;
+}
+
 .body {
   padding-top: 1em;
 

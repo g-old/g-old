@@ -5,6 +5,7 @@ import {
 } from 'react-intl';
 import React from 'react';
 import PropTypes from 'prop-types';
+import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import ProposalState from '../ProposalState';
 import s from './Proposal.css';
@@ -24,6 +25,7 @@ class Proposal extends React.Component {
     state: PropTypes.string.isRequired,
     body: PropTypes.string.isRequired,
     publishedAt: PropTypes.string.isRequired,
+    deletedAt: PropTypes.string,
     spokesman: PropTypes.shape({
       thumbnail: PropTypes.string,
       name: PropTypes.string,
@@ -31,30 +33,38 @@ class Proposal extends React.Component {
       id: PropTypes.string,
     }),
   };
+
   static defaultProps = {
     spokesman: null,
+    deletedAt: null,
   };
+
   render() {
+    const {
+      deletedAt,
+      state,
+      title,
+      publishedAt,
+      body,
+      spokesman,
+    } = this.props;
     return (
-      <div className={s.root}>
+      <div className={cn(s.root, deletedAt && s.deleted)}>
         <div className={s.container}>
           <div className={s.state}>
-            <ProposalState state={this.props.state} />
+            <ProposalState state={state} />
           </div>
-          <div className={s.headline}>{this.props.title}</div>
+          <div className={s.headline}>{title}</div>
           <div className={s.date}>
-            <FormattedRelative value={this.props.publishedAt} />
+            <FormattedRelative value={publishedAt} />
           </div>
-          <div
-            className={s.body}
-            dangerouslySetInnerHTML={{ __html: this.props.body }}
-          />
-          {this.props.spokesman && (
+          <div className={s.body} dangerouslySetInnerHTML={{ __html: body }} />
+          {spokesman && (
             <div>
               <UserThumbnail
                 marked
                 label={<FormattedMessage {...messages.spokesman} />}
-                user={this.props.spokesman}
+                user={spokesman}
               />
             </div>
           )}

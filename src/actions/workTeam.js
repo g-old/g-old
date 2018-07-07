@@ -70,6 +70,7 @@ const workTeamFields = `
   numDiscussions
   numProposals
   restricted
+  deletedAt
   mainTeam
   logo
   background
@@ -80,7 +81,7 @@ const workTeamFields = `
     id
   }`;
 const workTeams = `query($active:Boolean){
-  workTeams(active$active) {
+  workTeams(active:$active) {
     ${workTeamFields}
   }}`;
 

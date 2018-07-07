@@ -100,6 +100,7 @@ publishedAt
 state
 body
 votes
+deletedAt
 spokesman{
   ${userFields}
 }

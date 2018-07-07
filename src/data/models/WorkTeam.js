@@ -28,7 +28,7 @@ async function changeWTStatus(viewer, loaders, deactivate, workteamId) {
   if (deactivate) {
     value = now;
   }
-  const updatedWorkTeam = await knex.transaction(async trx => {
+  const [updatedWorkTeam = null] = await knex.transaction(async trx => {
     // close all Discussions
     const discussionIds = await knex('discussions')
       .where({ work_team_id: workteamId })
@@ -38,7 +38,7 @@ async function changeWTStatus(viewer, loaders, deactivate, workteamId) {
       .whereIn('id', discussionIds)
       .update({ closed_at: value, updated_at: now });
     // softdelete proposals
-    const proposalIds = await knex('discussions')
+    const proposalIds = await knex('proposals')
       .where({ work_team_id: workteamId })
       .pluck('id');
 
@@ -502,6 +502,25 @@ class WorkTeam {
         Request.delete(viewer, { id: rId }, loaders),
       );
       await Promise.all(requestDeletePromises);
+
+      // messages
+      const [messageIds] = await knex('messages')
+        .where({
+          messageType: 'note',
+          recipientType: 'group',
+          targetId: data.id,
+        })
+        .del()
+        .returning('id');
+      //  console.log('MESSAGEIDS', { messageIds });
+      // delete notifications
+      // const messageDeletePromises = await knex('activities').where({type: 'message'}).whereIn('object_id', messageIds)
+      await knex('notifications')
+        .join('activities', 'activities.id', '=', 'notifications.id')
+        .where({ 'activities.type': 'message' })
+        .whereIn('activities.object_id', messageIds.map(m => m.id))
+        .del();
+      // delete messages
 
       // members
       await knex('user_work_teams')

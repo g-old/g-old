@@ -84,7 +84,7 @@ passport.serializeUser((user, done) => {
       avatar = avatar.slice(0, stIndex) + avatar.substring(endIndex);
     }
     return knex('user_work_teams')
-      .where({ user_id: user.id, inactive: false })
+      .where({ user_id: user.id })
       .select('work_team_id')
       .then(ids => ids)
       .then(ids => {

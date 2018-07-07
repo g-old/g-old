@@ -82,6 +82,7 @@ class WorkTeam extends React.Component {
     discussions: PropTypes.arrayOf(PropTypes.shape({})),
     proposals: PropTypes.arrayOf(PropTypes.shape({})),
     mainTeam: PropTypes.bool,
+    deletedAt: PropTypes.string,
     ownStatus: PropTypes.shape({
       status: PropTypes.oneOf(['NONE', 'MEMBER', 'PENDING']),
     }).isRequired,
@@ -100,6 +101,7 @@ class WorkTeam extends React.Component {
     discussions: null,
     proposals: null,
     mainTeam: null,
+    deletedAt: null,
   };
 
   constructor(props) {
@@ -319,6 +321,7 @@ class WorkTeam extends React.Component {
       coordinator,
       id,
       mainTeam,
+      deletedAt,
     } = this.props;
     const {
       discussionStatus,
@@ -347,7 +350,7 @@ class WorkTeam extends React.Component {
     }
 
     let actionBtns;
-    if (ownStatus.status) {
+    if (ownStatus.status && !deletedAt) {
       const controls = [];
       controls.push(this.renderActionButton(ownStatus.status, updates));
 
@@ -377,7 +380,7 @@ class WorkTeam extends React.Component {
     }
 
     let contentSection;
-    if (ownStatus.status === 'MEMBER') {
+    if (ownStatus.status === 'MEMBER' && !deletedAt) {
       contentSection = (
         <Box tag="section" column fill>
           <Tabs activeIndex={activeTabIndex} onActive={this.activateTab}>
@@ -438,7 +441,14 @@ class WorkTeam extends React.Component {
       );
     }
     return (
-      <Box align column padding="medium" pad fill>
+      <Box
+        className={deletedAt && s.inactive}
+        align
+        column
+        padding="medium"
+        pad
+        fill
+      >
         {picture}
         <Heading tag="h2">{displayName}</Heading>
         <Box>
@@ -504,6 +514,7 @@ class WorkTeam extends React.Component {
             value={numDiscussions || 0}
           />
         </Box>
+
         {actionBtns}
         {contentSection}
         {layer}
