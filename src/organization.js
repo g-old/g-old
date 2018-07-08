@@ -285,6 +285,14 @@ export const canChangeGroups = (actor, targetUser, updatedGroups) => {
 
 export const isAdmin = viewer => viewer && (viewer.groups & Groups.ADMIN) > 0;
 
+export const isCoordinator = async (viewer, workteam) => {
+  if (viewer && workteam && workteam.coordinatorId) {
+    // eslint-disable-next-line
+    return workteam.coordinatorId == viewer.id;
+  }
+  return false;
+};
+
 export const getUpdatedGroup = (oldGroups: number, updatedGroups: number) => {
   let groupDiff = oldGroups ^ updatedGroups;
   let added = true;

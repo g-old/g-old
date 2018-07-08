@@ -2,10 +2,14 @@
 import knex from '../knex';
 import Poll from './Poll';
 import User from './User';
+/* eslint-disable import/no-cycle */
+import WorkTeam from './WorkTeam';
+/* eslint-enable import/no-cycle */
+
 import PollingMode from './PollingMode';
 import { dedup } from '../../core/helpers';
 import { canSee, canMutate, Models } from '../../core/accessControl';
-import { Groups } from '../../organization';
+import { isAdmin, Groups } from '../../organization';
 import EventManager from '../../core/EventManager';
 import log from '../../logger';
 import sanitize from '../../core/htmlSanitizer';
@@ -220,17 +224,6 @@ const validateStateChange = async (
   return true;
 };
 
-const checkIfCoordinator = async (viewer, data) => {
-  if (data.workTeamId) {
-    const [coordinatorId] = await knex('work_teams')
-      .where({ id: data.workTeamId })
-      .pluck('coordinator_id');
-    // eslint-disable-next-line
-    return coordinatorId && coordinatorId == viewer.id;
-  }
-  return false;
-};
-
 class Proposal {
   id: ID;
 
@@ -308,15 +301,17 @@ class Proposal {
   // TODO make member method
   static async update(viewer, data, loaders) {
     // throw Error('TESTERROR');
-    const isCoordinator = await checkIfCoordinator(viewer, data);
-
-    // authorize
-    if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL))
-      return null;
-    // validate
-    if (!data.id) return null;
+    if (!data || !data.id) return null;
     const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
     if (!proposalInDB) return null;
+    let workTeam;
+    if (proposalInDB.workTeamId) {
+      workTeam = await WorkTeam.gen(viewer, proposalInDB.workTeamId, loaders);
+    }
+
+    // authorize
+    if (!canMutate(viewer, { ...data, workTeam }, Models.PROPOSAL)) return null;
+    // validate
     // if (data.state && ['revoked', 'accepted'].indexOf(data.state) === -1) return null;
     const { pollData, pollingModeData, createPollingMode } = await validatePoll(
       viewer,
@@ -360,7 +355,7 @@ class Proposal {
         };
         const pollTwo = await Poll.create(
           viewer,
-          { ...pollTwoData, isCoordinator },
+          { ...pollTwoData, workTeam },
           loaders,
         );
         if (!pollTwo) throw Error('No pollTwo provided');
@@ -368,7 +363,7 @@ class Proposal {
         // TODO check first if not already closed?
         const pollOne = await Poll.update(
           viewer,
-          { id: proposalInDB.pollOneId, closedAt: new Date(), isCoordinator },
+          { id: proposalInDB.pollOneId, closedAt: new Date(), workTeam },
           loaders,
         );
         if (!pollOne) throw Error('No pollOne provided');
@@ -414,15 +409,15 @@ class Proposal {
   }
 
   static async create(viewer, data, loaders) {
+    if (!data || !data.text || !data.title) return null;
     // throw Error('TestError');
     // authorize
-    const isCoordinator = await checkIfCoordinator(viewer, data);
-
-    if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL))
-      return null;
+    let workTeam;
+    if (data.workTeamId) {
+      workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
+    }
+    if (!canMutate(viewer, { ...data, workTeam }, Models.PROPOSAL)) return null;
     // validate
-    if (!data.text) return null;
-    if (!data.title) return null;
     const { pollData, pollingModeData, createPollingMode } = await validatePoll(
       viewer,
       { ...data.poll, ...(data.workTeamId && { workTeamId: data.workTeamId }) },
@@ -458,7 +453,7 @@ class Proposal {
       };
       const pollOne = await Poll.create(
         viewer,
-        { ...pollOneData, isCoordinator },
+        { ...pollOneData, workTeam },
         loaders,
       );
       if (!pollOne) throw Error('No pollOne provided');
@@ -540,8 +535,7 @@ class Proposal {
   static async toggleStatus(viewer, data, loaders, trx) {
     if (!data || !data.id) return null;
 
-    // eslint-disable-next-line no-bitwise
-    if ((viewer.groups & Groups.ADMIN) === 0) {
+    if (!isAdmin(viewer)) {
       throw new Error('Permission denied');
     }
 
@@ -578,10 +572,9 @@ class Proposal {
 
   static async delete(viewer, data, loaders, trx) {
     if (!data || !data.id) return null;
-    const isCoordinator = await checkIfCoordinator(viewer, data);
 
-    if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL)) {
-      return null;
+    if (!isAdmin(viewer)) {
+      throw new Error('Permission denied');
     }
 
     const deleteProposal = async transaction => {

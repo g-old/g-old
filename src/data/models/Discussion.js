@@ -21,20 +21,6 @@ export type DiscussionProps = {
   deleted_at: ?string,
 };
 
-const checkIfCoordinator = async (viewer, data, workTeam) => {
-  if (data.workTeamId) {
-    let { coordinatorId } = workTeam;
-    if (!coordinatorId) {
-      ([coordinatorId = null] = await knex('work_teams'))
-        .where({ id: data.workTeamId })
-        .pluck('coordinator_id');
-    }
-    // eslint-disable-next-line
-    return coordinatorId && coordinatorId == viewer.id;
-  }
-  return false;
-};
-
 class Discussion {
   id: ID;
 
@@ -81,16 +67,19 @@ class Discussion {
 
   static async create(viewer, data, loaders) {
     if (!data) return null;
-    let workTeam = {};
+    let workTeam;
     if (data.workTeamId) {
       workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
     }
-    const isCoordinator = await checkIfCoordinator(viewer, data, workTeam);
 
     if (
       !canMutate(
         viewer,
-        { ...data, isCoordinator, mainTeam: workTeam.mainTeam },
+        {
+          ...data,
+          workTeam,
+          mainTeam: workTeam ? workTeam.mainTeam : false,
+        },
         Models.DISCUSSION,
       )
     )
@@ -129,13 +118,21 @@ class Discussion {
 
   static async update(viewer, data, loaders) {
     if (!data || !data.id) return null;
-    let workTeam = {};
+    let workTeam;
     if (data.workTeamId) {
       workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
     }
-    const isCoordinator = await checkIfCoordinator(viewer, data, workTeam);
 
-    if (!canMutate(viewer, { ...data, isCoordinator }, Models.DISCUSSION)) {
+    if (
+      !canMutate(
+        viewer,
+        {
+          ...data,
+          workTeam,
+        },
+        Models.DISCUSSION,
+      )
+    ) {
       return null;
     }
 
@@ -154,13 +151,21 @@ class Discussion {
 
   static async delete(viewer, data, loaders, trx) {
     if (!data || !data.id) return null;
-    let workTeam = {};
+    let workTeam;
     if (data.workTeamId) {
       workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
     }
-    const isCoordinator = await checkIfCoordinator(viewer, data, workTeam);
 
-    if (!canMutate(viewer, { ...data, isCoordinator }, Models.DISCUSSION)) {
+    if (
+      !canMutate(
+        viewer,
+        {
+          ...data,
+          workTeam,
+        },
+        Models.DISCUSSION,
+      )
+    ) {
       return null;
     }
     const deleteDiscussion = async transaction => {

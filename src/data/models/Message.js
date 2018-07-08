@@ -87,15 +87,13 @@ class Message {
     if (data.parentId) {
       data.isReply = true; // eslint-disable-line no-param-reassign
     }
+    let workTeam;
     if (data.recipientType === 'group' && data.recipients.length) {
       // check if viewer is coordinator of that group
       if (data.recipients.length !== 1) {
         throw new Error('Implement write control for multiple groups');
       }
-      const workteam = await WorkTeam.gen(viewer, data.recipients[0], loaders);
-      if (workteam.coordinatorId === viewer.id) {
-        data.isCoordinator = true; // eslint-disable-line no-param-reassign
-      }
+      workTeam = await WorkTeam.gen(viewer, data.recipients[0], loaders);
     } else if (
       !data.reply &&
       data.recipientType === 'user' &&
@@ -108,7 +106,7 @@ class Message {
         .pluck('id');
       data.workTeamIds = wtIds; // eslint-disable-line no-param-reassign
     }
-    if (!canMutate(viewer, data, Models.MESSAGE)) return null;
+    if (!canMutate(viewer, { ...data, workTeam }, Models.MESSAGE)) return null;
     let messageData;
     const newData = { created_at: new Date(), sender_id: viewer.id };
 

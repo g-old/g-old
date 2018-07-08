@@ -97,8 +97,8 @@ class Poll {
       if (data.workTeamId) {
         delete data.workTeamId; // eslint-disable-line
       }
-      if ('isCoordinator' in data) {
-        delete data.isCoordinator; // eslint-disable-line
+      if ('workTeam' in data) {
+        delete data.workTeam; // eslint-disable-line
       }
       const id = await trx
         .insert(

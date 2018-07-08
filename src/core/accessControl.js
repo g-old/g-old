@@ -4,6 +4,7 @@ import {
   AccessMasks,
   PrivilegesSchema,
   PermissionsSchema,
+  isCoordinator,
 } from '../organization';
 /* eslint-disable no-bitwise */
 // TODO make object
@@ -161,8 +162,11 @@ function proposalReadControl(viewer, data) {
 }
 
 function proposalWriteControl(viewer, data) {
+  if (data.workTeam && data.workTeam.deletedAt) {
+    return false;
+  }
   if (data.workTeamId) {
-    if (data.isCoordinator) {
+    if (isCoordinator(viewer, data.workTeam)) {
       return true;
     }
     return (viewer.groups & Groups.ADMIN) > 0;
@@ -194,6 +198,9 @@ function statementReadControl(viewer, data) {
 }
 
 function statementWriteControl(viewer, data) {
+  if (data.proposal.deletedAt) {
+    return false;
+  }
   if (
     data.proposal.state === 'survey' &&
     viewer.permissions & Permissions.TAKE_SURVEYS
@@ -261,7 +268,7 @@ function pollWriteControl(viewer, data) {
     }
     return true;
   }
-  if (data.isCoordinator) {
+  if (isCoordinator(viewer, data.workTeam)) {
     return true;
   }
   return viewer.permissions & PermissionsSchema[Groups.ADMIN];
@@ -315,11 +322,14 @@ function messageReadControl(viewer, data) {
   return false;
 }
 function messageWriteControl(viewer, data) {
+  if (data.workTeam && data.workTeam.deletedAt) {
+    return false;
+  }
   if (viewer.permissions & Permissions.NOTIFY_ALL) {
     return true;
   }
 
-  if (data.isReply || data.isCoordinator) {
+  if (data.isReply || isCoordinator(viewer, data.workTeam)) {
     return true;
   }
   if (viewer.groups & Groups.VIEWER) {
@@ -375,6 +385,9 @@ function discussionReadControl(viewer, data) {
   return false;
 }
 function discussionWriteControl(viewer, data) {
+  if (data.workTeam && data.workTeam.deletedAt) {
+    return false;
+  }
   if (data.workTeamId) {
     if (
       data.mainTeam &&
@@ -382,7 +395,7 @@ function discussionWriteControl(viewer, data) {
     ) {
       return true;
     }
-    if (data.isCoordinator) {
+    if (isCoordinator(viewer, data.workTeam)) {
       return true;
     }
     return viewer.permissions & PermissionsSchema[Groups.ADMIN];
@@ -404,7 +417,7 @@ function commentWriteControl(viewer, data) {
     return true;
   }
 
-  if (data.discussion.closedAt) {
+  if (data.discussion.closedAt || data.discussion.deletedAt) {
     return false;
   }
   if (data.creating) {
