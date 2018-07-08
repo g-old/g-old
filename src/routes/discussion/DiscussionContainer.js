@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { findDOMNode } from 'react-dom';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import WorkteamHeader from '../../components/WorkteamHeader';
+import Notification from '../../components/Notification';
 import s from './DiscussionContainer.css';
 // import { defineMessages, FormattedMessage } from 'react-intl';
 // import history from '../../history';
@@ -225,6 +226,10 @@ class DiscussionContainer extends React.Component {
       }
       // return proposal, poll, statementslist
       if (!discussion.comments) return <span>NOTHING TO SEE</span>;
+      if (discussion.deletedAt)
+        return (
+          <Notification type="alert" message="Discussion not accessible!" />
+        );
       return (
         <div>
           <Box tag="article" column pad align>

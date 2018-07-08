@@ -53,31 +53,33 @@ function WorkteamTableRow({
         />
       </td>
       <td>
-        <Button
-          plain
-          icon={
-            <svg
-              version="1.1"
-              viewBox="0 0 24 24"
-              width="24px"
-              height="24px"
-              role="img"
-              aria-label="edit"
-            >
-              <path
-                fill="none"
-                stroke="#000"
-                strokeWidth="2"
-                d={ICONS.delete}
-              />
-            </svg>
-          }
-          onClick={e => {
-            onClickMenu('DELETE');
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        />
+        {deletedAt && (
+          <Button
+            plain
+            icon={
+              <svg
+                version="1.1"
+                viewBox="0 0 24 24"
+                width="24px"
+                height="24px"
+                role="img"
+                aria-label="edit"
+              >
+                <path
+                  fill="none"
+                  stroke="#0000008a"
+                  strokeWidth="2"
+                  d={ICONS.trash}
+                />
+              </svg>
+            }
+            onClick={e => {
+              onClickMenu('DELETE');
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          />
+        )}
       </td>
       <td>
         <Button
@@ -91,7 +93,12 @@ function WorkteamTableRow({
               role="img"
               aria-label="edit"
             >
-              <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.edit} />
+              <path
+                fill="none"
+                stroke="#0000008a"
+                strokeWidth="2"
+                d={ICONS.edit}
+              />
             </svg>
           }
           onClick={e => {

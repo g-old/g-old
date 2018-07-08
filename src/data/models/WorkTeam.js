@@ -5,7 +5,7 @@ import Proposal from './Proposal';
 import Discussion from './Discussion'; // eslint-disable-line import/no-cycle
 
 import { canSee, canMutate, Models } from '../../core/accessControl';
-import { Groups } from '../../organization';
+import { Groups, isAdmin } from '../../organization';
 
 async function validateCoordinator(viewer, id, loaders) {
   const coordinator = await User.gen(viewer, id, loaders);
@@ -21,6 +21,7 @@ async function updateCoordinatorsGroups(viewer, id, loaders) {
     loaders.users.clear(id);
   }
 }
+
 async function changeWTStatus(viewer, loaders, deactivate, workteamId) {
   const now = new Date();
   let value = null;
@@ -29,14 +30,12 @@ async function changeWTStatus(viewer, loaders, deactivate, workteamId) {
     value = now;
   }
   const [updatedWorkTeam = null] = await knex.transaction(async trx => {
-    // close all Discussions
-    const discussionIds = await knex('discussions')
-      .where({ work_team_id: workteamId })
-      .pluck('id');
+    // soft delete all Discussions
     await knex('discussions')
       .transacting(trx)
-      .whereIn('id', discussionIds)
-      .update({ closed_at: value, updated_at: now });
+      .forUpdate()
+      .where({ work_team_id: workteamId })
+      .update({ deleted_at: value, updated_at: now });
     // softdelete proposals
     const proposalIds = await knex('proposals')
       .where({ work_team_id: workteamId })
@@ -430,45 +429,37 @@ class WorkTeam {
     return workTeam ? new WorkTeam(workTeam) : null;
   }
 
-  static async activate(viewer, data, loaders) {
-    if (!data || !data.id) return null;
-    // eslint-disable-next-line no-bitwise
-    if (!viewer || (viewer.groups & Groups.ADMIN) === 0) {
+  static async toggle(viewer, data, loaders) {
+    if (!isAdmin(viewer)) {
       return null;
     }
-    const workTeamInDB = await WorkTeam.gen(viewer, data.id, loaders);
     let result;
-    if (workTeamInDB && workTeamInDB.deletedAt) {
-      result = await changeWTStatus(viewer, loaders, false, data.id);
-    }
-    return result;
-  }
-
-  static async deactivate(viewer, data, loaders) {
-    if (!data || !data.id) return null;
-    // eslint-disable-next-line no-bitwise
-    if (!viewer || (viewer.groups & Groups.ADMIN) === 0) {
-      return null;
-    }
     const workTeamInDB = await WorkTeam.gen(viewer, data.id, loaders);
-    let result;
-
-    if (workTeamInDB && !workTeamInDB.deletedAt) {
-      result = await changeWTStatus(viewer, loaders, true, data.id);
+    if (workTeamInDB) {
+      if (
+        (!workTeamInDB.deletedAt && data.closing) ||
+        (workTeamInDB.deletedAt && data.closing === false)
+      ) {
+        result = await changeWTStatus(viewer, loaders, data.closing, data.id);
+      }
     }
+
     return result;
   }
 
   static async delete(viewer, data, loaders) {
     if (!data || !data.id) return null;
     // eslint-disable-next-line no-bitwise
-    if (!viewer && (viewer.groups & Groups.ADMIN) === 0) {
+    if (!isAdmin(viewer)) {
       return null;
     }
 
     const deletedWorkTeam = await knex.transaction(async trx => {
       // delete discussions, surveys, proposals, requests
-      const workTeaminDB = await WorkTeam.gen(viewer, data.id, loaders);
+      const workTeamInDB = await WorkTeam.gen(viewer, data.id, loaders);
+      if (!workTeamInDB.deletedAt) {
+        throw new Error('Must be soft-deleted!');
+      }
       const discussionIds = await knex('discussions')
         .where({ work_team_id: data.id })
         .pluck('id');
@@ -503,12 +494,6 @@ class WorkTeam {
         .pluck('id');
 
       if (proposalIds.length) {
-        // safety measure
-        await knex('proposals')
-          .whereIn('id', proposalIds)
-          .forUpdate()
-          .update({ deleted_at: new Date(), updated_at: new Date() });
-
         const proposalDeletePromises = proposalIds.map(pId =>
           Proposal.delete(viewer, { id: pId, isCascading: true }, loaders, trx),
         );
@@ -604,7 +589,7 @@ class WorkTeam {
         .transacting(trx)
         .where({ id: data.id })
         .del();
-      return workTeaminDB;
+      return workTeamInDB;
     });
     return deletedWorkTeam;
   }

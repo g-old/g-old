@@ -526,7 +526,7 @@ app.post('/reset/:token', (req, res) =>
 app.get('/verify/:token', (req, res) => {
   // ! No check if user is logged in !
   const systemViewer = {
-    id: 1,
+    id: -1,
     groups: Groups.SYSTEM,
     permissions: Permissions.VIEW_USER_INFO,
   };

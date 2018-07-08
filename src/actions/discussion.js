@@ -26,6 +26,7 @@ const discussionFields = `
   title
   createdAt
   closedAt
+  deletedAt
   numComments
   workTeamId
 `;

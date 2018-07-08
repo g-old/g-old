@@ -67,8 +67,12 @@ const DiscussionType = new ObjectType({
     comments: {
       type: new GraphQLList(CommentType),
       resolve: (data, args, { viewer, loaders }) => {
-        // experimental
-        if (viewer && viewer.wtMemberships.includes(data.workTeamId)) {
+        // experimental!
+        if (
+          viewer &&
+          viewer.wtMemberships.includes(data.workTeamId) &&
+          !data.deletedAt
+        ) {
           return knex('comments')
             .where({ discussion_id: data.id })
             .where({ parent_id: null })
@@ -109,6 +113,9 @@ const DiscussionType = new ObjectType({
       type: GraphQLString,
     },
     closedAt: {
+      type: GraphQLString,
+    },
+    deletedAt: {
       type: GraphQLString,
     },
   }),

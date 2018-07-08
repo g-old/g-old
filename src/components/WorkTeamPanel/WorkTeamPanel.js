@@ -90,7 +90,9 @@ class WorkTeamPanel extends React.Component {
           closing: !activeWT.deletedAt,
         });
       } else if (action === 'DELETE') {
-        deleteWT({ id: activeWT.id });
+        if (activeWT.deletedAt) {
+          deleteWT({ id: activeWT.id });
+        }
       }
     }
   }
@@ -109,7 +111,11 @@ class WorkTeamPanel extends React.Component {
           <ConfirmLayer
             note={
               action === 'VISIBILITY'
-                ? `${activeWT.deletedAt ? 'Activate' : 'Deactivate'} Workteam?`
+                ? `${
+                    activeWT.deletedAt
+                      ? 'Activate Workteam? Polls will terminate immediatly if endTime was reached while deactivated'
+                      : 'Deactivate Workteam? Polls get closed!'
+                  }`
                 : 'EXPERIMENTAL! Deletion cannot be undone'
             }
             onClose={this.onToggleLayer}
@@ -130,7 +136,7 @@ class WorkTeamPanel extends React.Component {
           checkedIndices={[]}
           assets={workTeams || []}
           row={WorkteamRow}
-          tableHeaders={['name', 'coordinator', 'status', '', '']}
+          tableHeaders={['Name', 'Coordinator', 'Status', '', '']}
         />
       </Box>
     );

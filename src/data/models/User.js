@@ -57,14 +57,23 @@ const sanitizeName = name =>
     : name;
 class User {
   id: ID;
+
   name: string;
+
   surname: string;
+
   email: string;
+
   groups: number;
+
   thumbnail: string;
+
   emailVerified: boolean;
+
   lastLogin: string;
+
   createdAt: string;
+
   canVoteSince: ?string;
 
   constructor(data: UserProps) {
@@ -80,6 +89,7 @@ class User {
     this.canVoteSince = data.can_vote_since;
     this.locale = data.locale;
   }
+
   static async gen(viewer, id, { users }) {
     if (!id) return null;
     const data = await users.load(id);
