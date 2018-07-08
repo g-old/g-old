@@ -50,6 +50,7 @@ query($userId:ID){
       id
       title
       publishedAt
+      deletedAt
       state
       body
       votes

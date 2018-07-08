@@ -5,8 +5,3 @@
   border-radius: 6px;
   background-color: #fff;
 }
-
-.inactive {
-  opacity: 0.1;
-  pointer-events: none;
-}

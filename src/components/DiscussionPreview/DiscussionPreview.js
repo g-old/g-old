@@ -29,22 +29,25 @@ class DiscussionPreview extends React.Component {
     }).isRequired,
     onClick: PropTypes.func.isRequired,
   };
+
   constructor(props) {
     super(props);
     this.handleClick = this.handleClick.bind(this);
   }
 
   handleClick() {
-    if (this.props.onClick) {
-      this.props.onClick({
-        discussionId: this.props.discussion.id,
-        workTeamId: this.props.discussion.workTeamId,
+    const { onClick, discussion } = this.props;
+    if (onClick) {
+      onClick({
+        discussionId: discussion.id,
+        workTeamId: discussion.workTeamId,
       });
     }
   }
 
   render() {
     const { discussion } = this.props;
+
     return (
       <Box column onClick={this.handleClick}>
         <div>

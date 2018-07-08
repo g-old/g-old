@@ -13,6 +13,7 @@ import Comment from '../Comment';
 import Label from '../Label';
 import ProposalPreview from '../ProposalPreview';
 import DiscussionPreview from '../DiscussionPreview';
+import Notification from '../Notification';
 import Box from '../Box';
 
 import Link from '../Link';
@@ -276,7 +277,9 @@ class Activity extends React.Component {
         break;
       }
       case 'ProposalDL': {
-        result.content = (
+        result.content = content.deletedAt ? (
+          <Notification type="alert" message="Proposal not accessible" />
+        ) : (
           <ProposalPreview proposal={content} onClick={this.onProposalClick} />
         );
         let header = getProposalHeader(verb, content);
@@ -293,7 +296,9 @@ class Activity extends React.Component {
       }
 
       case 'Discussion': {
-        result.content = (
+        result.content = content.deletedAt ? (
+          <Notification type="alert" message="Discussion not accessible" />
+        ) : (
           <DiscussionPreview
             discussion={content}
             onClick={() =>

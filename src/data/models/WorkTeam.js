@@ -30,13 +30,14 @@ async function changeWTStatus(viewer, loaders, deactivate, workteamId) {
     value = now;
   }
   const [updatedWorkTeam = null] = await knex.transaction(async trx => {
-    // soft delete all Discussions
+    // soft-delete discussions
     await knex('discussions')
       .transacting(trx)
       .forUpdate()
       .where({ work_team_id: workteamId })
       .update({ deleted_at: value, updated_at: now });
-    // softdelete proposals
+
+    // soft-delete proposals
     const proposalIds = await knex('proposals')
       .where({ work_team_id: workteamId })
       .pluck('id');
@@ -51,11 +52,13 @@ async function changeWTStatus(viewer, loaders, deactivate, workteamId) {
 
     await knex('user_work_teams')
       .transacting(trx)
+      .forUpdate()
       .where({ work_team_id: workteamId })
       .update({ inactive: !!value, updated_at: now });
 
     return knex('work_teams')
       .transacting(trx)
+      .forUpdate()
       .where({ id: workteamId })
       .update({ deleted_at: value, updated_at: now })
       .returning('*');

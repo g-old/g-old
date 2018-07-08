@@ -124,7 +124,8 @@ const ProposalType = new ObjectType({
     },
     canVote: {
       type: GraphQLBoolean,
-      resolve: async (parent, args, { viewer }) => parent.isVotable(viewer),
+      resolve: async (parent, args, { viewer }) =>
+        parent.deletedAt ? false : parent.isVotable(viewer),
     },
   }),
 });

@@ -17,6 +17,14 @@ const workTeam = {
   resolve: async (root, args, { viewer, loaders }) => {
     const workTeamResult = await WorkTeam.gen(viewer, args.id, loaders);
     if (workTeamResult) {
+      if (workTeamResult.deletedAt) {
+        return {
+          id: workTeamResult.id,
+          name: workTeamResult.name,
+          coordinatorId: workTeamResult.coordinatorId,
+          deletedAt: workTeamResult.deletedAt,
+        };
+      }
       workTeamResult.args = args; // TODO change query
     }
     return workTeamResult;

@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import history from '../../history';
 import { loadProposal } from '../../actions/proposal';
+import Notification from '../../components/Notification';
 import {
   createSubscription,
   updateSubscription,
@@ -293,6 +294,9 @@ class ProposalContainer extends React.Component {
     }
     if (errorMessage && !proposal) {
       return <FetchError message={errorMessage} onRetry={this.fetchProposal} />;
+    }
+    if (proposal.deletedAt) {
+      return <Notification type="alert" message="Proposal not accessible!" />;
     }
     if (this.isReady()) {
       // return proposal, poll, statementslist

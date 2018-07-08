@@ -4,7 +4,7 @@ import { combineReducers } from 'redux';
 import {
   voteList as voteListSchema,
   userList as userListSchema,
-} from './../store/schema';
+} from '../store/schema';
 import {
   LOAD_PROPOSAL_SUCCESS,
   FETCH_USER_SUCCESS,
@@ -15,17 +15,19 @@ const allIds = (state = [], action) => {
   switch (action.type) {
     case LOAD_PROPOSAL_SUCCESS: {
       const { polls } = action.payload.entities;
-
-      const ids = Object.keys(polls).reduce((acc, curr) => {
-        const voteIds = polls[curr].followees || [];
-        return acc.concat(
-          voteIds.map(vId => {
-            const vote = action.payload.entities.votes[vId];
-            return vote.voter;
-          }),
-        );
-      }, []);
-      return [...new Set([...state, ...ids])];
+      if (polls) {
+        const ids = Object.keys(polls).reduce((acc, curr) => {
+          const voteIds = polls[curr].followees || [];
+          return acc.concat(
+            voteIds.map(vId => {
+              const vote = action.payload.entities.votes[vId];
+              return vote.voter;
+            }),
+          );
+        }, []);
+        return [...new Set([...state, ...ids])];
+      }
+      return state;
     }
 
     case UPDATE_USER_SUCCESS: {
@@ -68,12 +70,15 @@ const votesByPoll = (state = {}, action) => {
     }
     case LOAD_PROPOSAL_SUCCESS: {
       const { polls } = action.payload.entities;
-      const pollVotes = Object.keys(polls).reduce((acc, curr) => {
-        const voteIds = polls[curr].followees || [];
+      if (polls) {
+        const pollVotes = Object.keys(polls).reduce((acc, curr) => {
+          const voteIds = polls[curr].followees || [];
 
-        return { ...acc, [curr]: [...voteIds] };
-      }, {});
-      return merge({}, state, pollVotes);
+          return { ...acc, [curr]: [...voteIds] };
+        }, {});
+        return merge({}, state, pollVotes);
+      }
+      return state;
     }
 
     default:
@@ -92,6 +97,7 @@ const votesByFollowee = (state = {}, action) => {
     }
     case LOAD_PROPOSAL_SUCCESS: {
       const { polls, votes } = action.payload.entities;
+      if (!polls) return state;
       const followeeVotes = Object.keys(polls).reduce((acc, curr) => {
         const voteIds = polls[curr].followees || [];
 

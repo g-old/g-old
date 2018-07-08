@@ -20,6 +20,7 @@ import DiscussionListContainer from '../DiscussionListContainer';
 import ProposalListContainer from '../ProposalListContainer';
 import SurveyListContainer from '../SurveyListContainer';
 import StateFilter from '../StateFilter';
+import Notification from '../Notification';
 
 const messages = defineMessages({
   join: {
@@ -440,15 +441,24 @@ class WorkTeam extends React.Component {
         />
       );
     }
+    if (deletedAt) {
+      return (
+        <Box align column padding="medium" pad fill>
+          {picture}
+          <Heading tag="h2">{displayName}</Heading>
+          <Box>
+            <UserThumbnail
+              marked
+              label={<FormattedMessage {...messages.coordinator} />}
+              user={coordinator}
+            />
+          </Box>
+          <Notification type="alert" message="Workteam inactive" />
+        </Box>
+      );
+    }
     return (
-      <Box
-        className={deletedAt && s.inactive}
-        align
-        column
-        padding="medium"
-        pad
-        fill
-      >
+      <Box align column padding="medium" pad fill>
         {picture}
         <Heading tag="h2">{displayName}</Heading>
         <Box>
