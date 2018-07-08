@@ -9,7 +9,7 @@ exports.up = function(knex, Promise) {
 exports.down = function(knex, Promise) {
   return Promise.all([
     knex.schema.table('notes', table => {
-      table.boolean('is_published');
+      table.dropColumn('is_published');
     }),
   ]);
 };

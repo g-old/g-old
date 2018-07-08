@@ -68,20 +68,28 @@ class Statement {
     if (!canMutate(viewer, { data, proposal }, Models.STATEMENT)) return null;
     // validate
     // eslint-disable-next-line prefer-arrow-callback
-    const deletedStatement = await knex.transaction(async function(trx) {
+    const deletedStatement = await knex.transaction(async trx => {
       const statementInDB = await Statement.gen(viewer, data.id, loaders);
       if (!statementInDB) throw Error('Statement does not exist!');
-      const poll = await Poll.gen(viewer, statementInDB.pollId, loaders);
-      if (poll && poll.closedAt) {
-        // eslint-disable-next-line no-bitwise
-        if (!(viewer.groups & (Groups.MODERATOR > 0))) {
-          throw new Error('Poll is closed');
+
+      // allow deleting if proposal was soft-deleted
+      // eslint-disable-next-line no-bitwise
+      if (!(viewer.groups & Groups.ADMIN)) {
+        const poll = await Poll.gen(viewer, statementInDB.pollId, loaders);
+        if (poll && poll.closedAt) {
+          // eslint-disable-next-line no-bitwise
+          if (!(viewer.groups & (Groups.MODERATOR > 0))) {
+            throw new Error('Poll is closed');
+          }
         }
+
+        // eslint-disable-next-line eqeqeq
+        if (statementInDB.author_id != viewer.id)
+          throw Error('Permission denied');
+        if (statementInDB.deletedAt)
+          throw Error('Statement cannot be modified!');
       }
-      // eslint-disable-next-line eqeqeq
-      if (statementInDB.author_id != viewer.id)
-        throw Error('Permission denied');
-      if (statementInDB.deletedAt) throw Error('Statement cannot be modified!');
+
       await trx
         .where({ id: data.id })
         .into('statements')

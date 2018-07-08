@@ -7,6 +7,9 @@ exports.up = function(knex, Promise) {
     knex.schema.table('work_teams', table => {
       table.timestamp('deleted_at');
     }),
+    knex.schema.table('discussions', table => {
+      table.timestamp('deleted_at');
+    }),
   ]);
 };
 
@@ -17,6 +20,9 @@ exports.down = function(knex, Promise) {
       table.dropColumn('inactive');
     }),
     knex.schema.table('work_teams', table => {
+      table.dropColumn('deleted_at');
+    }),
+    knex.schema.table('discussions', table => {
       table.dropColumn('deleted_at');
     }),
   ]);

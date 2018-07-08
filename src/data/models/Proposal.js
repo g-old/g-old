@@ -3,7 +3,6 @@ import knex from '../knex';
 import Poll from './Poll';
 import User from './User';
 import PollingMode from './PollingMode';
-import { TargetType } from './utils';
 import { dedup } from '../../core/helpers';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import { Groups } from '../../organization';
@@ -11,6 +10,7 @@ import EventManager from '../../core/EventManager';
 import log from '../../logger';
 import sanitize from '../../core/htmlSanitizer';
 import Statement from './Statement'; // eslint-disable-line import/no-cycle
+import { transactify, TargetType } from './utils';
 
 type ID = string | number;
 type ProposalState = 'accepted' | 'rejected' | 'revoked' | 'survey';
@@ -229,13 +229,6 @@ const checkIfCoordinator = async (viewer, data) => {
     return coordinatorId && coordinatorId == viewer.id;
   }
   return false;
-};
-
-const transactify = async (fn, dbConnector, trx) => {
-  if (trx) {
-    return fn(trx);
-  }
-  return dbConnector.transaction(async tContext => fn(tContext));
 };
 
 class Proposal {
@@ -583,15 +576,15 @@ class Proposal {
     return updatedProposal ? new Proposal(updatedProposal) : null;
   }
 
-  static async delete(viewer, data, loaders) {
+  static async delete(viewer, data, loaders, trx) {
     if (!data || !data.id) return null;
     const isCoordinator = await checkIfCoordinator(viewer, data);
 
     if (!canMutate(viewer, { ...data, isCoordinator }, Models.PROPOSAL)) {
       return null;
     }
-    const deletedProposal = await knex.transaction(async trx => {
-      // allow only if softdeletion already happened
+
+    const deleteProposal = async transaction => {
       const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
       if (proposalInDB) {
         if (!proposalInDB.deletedAt) {
@@ -599,50 +592,68 @@ class Proposal {
         }
         // for both polls
 
-        const statementIds = await knex('statements')
+        const statementsData = await knex('statements')
           .where({ poll_id: proposalInDB.pollOneId })
           .orWhere({ poll_id: proposalInDB.pollTwoId })
-          .pluck('id');
+          .select(['id', 'poll_id', 'likes', 'author_id']); // return user_id if we want to correct stmt counters on user
 
-        const statementDeletePromises = statementIds.map(sId =>
-          Statement.delete(viewer, { id: sId }, loaders),
-        );
-        await Promise.all(statementDeletePromises);
+        if (statementsData.length) {
+          if (data.isCascading) {
+            // means deletion was initiated from wt -> we don't care about activities
+            await knex('statements')
+              .transacting(transaction)
+              .forUpdate()
+              .whereIn('id', statementsData.map(d => d.id))
+              .del();
+            // likes and statementcounters are counted live atm - no need to correct them
+            // const summed = groupAndSumBy(statementsData,'author_id', 'likes');
+          } else {
+            // activities are created for not messing up the feed
+            const statementDeletePromises = statementsData.map(sData =>
+              Statement.delete(
+                viewer,
+                { id: sData.id, pollId: sData.poll_id },
+                loaders,
+              ),
+            );
+            await Promise.all(statementDeletePromises);
+          }
 
-        // no FK present
-        await knex('flagged_statements')
-          .transacting(trx)
-          .whereIn('statement_id', statementIds)
-          .del();
-
+          // no FK present
+          await knex('flagged_statements')
+            .transacting(transaction)
+            .forUpdate()
+            .whereIn('statement_id', statementsData.map(s => s.id))
+            .del();
+        }
         // proposal_groups is deleted via on delete trigger
 
         // delete subscriptions
         await knex('subscriptions')
-          .transacting(trx)
+          .transacting(transaction)
+          .forUpdate()
           .where({ target_type: TargetType.PROPOSAL, target_id: data.id })
           .del();
 
-        // delete group messages
-
-        await knex('subscriptions');
-
         await knex('proposals')
-          .transacting(trx)
+          .transacting(transaction)
+          .forUpdate()
           .where({ id: data.id })
           .del();
 
         // decrement counters
         if (proposalInDB.workTeamId) {
           await knex('work_teams')
-            .transacting(trx)
+            .transacting(transaction)
+            .forUpdate()
             .where({ id: proposalInDB.workTeamId })
             .decrement('num_proposals', 1);
         }
       }
       return proposalInDB;
-    });
-    return deletedProposal;
+    };
+
+    return transactify(deleteProposal, knex, trx);
   }
 
   async isVotable(viewer) {

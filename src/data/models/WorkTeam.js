@@ -473,28 +473,60 @@ class WorkTeam {
         .where({ work_team_id: data.id })
         .pluck('id');
 
-      const discussionDeletePromises = discussionIds.map(dId =>
-        Discussion.delete(viewer, { id: dId }, loaders),
-      );
+      if (discussionIds.length) {
+        const discussionDeletePromises = discussionIds.map(dId =>
+          Discussion.delete(
+            viewer,
+            { id: dId, isCascading: true },
+            loaders,
+            trx,
+          ),
+        );
 
-      await Promise.all(discussionDeletePromises);
+        await Promise.all(discussionDeletePromises);
+
+        const discussionActivityIds = await knex('activities')
+          .where({ type: 'discussion' })
+          .whereIn('object_id', discussionIds)
+          .pluck('id');
+
+        if (discussionActivityIds.length) {
+          await knex('notifications')
+            .transacting(trx)
+            .whereIn('activity_id', discussionActivityIds)
+            .del();
+        }
+      }
 
       const proposalIds = await knex('proposals')
         .where({ work_team_id: data.id })
         .pluck('id');
 
-      // safety measure
-      await knex('proposals')
-        .whereIn('id', proposalIds)
-        .forUpdate()
+      if (proposalIds.length) {
+        // safety measure
+        await knex('proposals')
+          .whereIn('id', proposalIds)
+          .forUpdate()
+          .update({ deleted_at: new Date(), updated_at: new Date() });
 
-        .update({ deleted_at: new Date() });
+        const proposalDeletePromises = proposalIds.map(pId =>
+          Proposal.delete(viewer, { id: pId, isCascading: true }, loaders, trx),
+        );
 
-      const proposalDeletePromises = proposalIds.map(pId =>
-        Proposal.delete(viewer, { id: pId }, loaders),
-      );
+        await Promise.all(proposalDeletePromises);
 
-      await Promise.all(proposalDeletePromises);
+        // delete proposal notifications
+        const proposalActivityIds = await knex('activities')
+          .where({ type: 'proposal' })
+          .whereIn('object_id', proposalIds)
+          .pluck('id');
+        if (proposalActivityIds.length) {
+          await knex('notifications')
+            .transacting(trx)
+            .whereIn('activity_id', proposalActivityIds)
+            .del();
+        }
+      }
 
       await knex('requests')
         .transacting(trx)
@@ -540,6 +572,8 @@ class WorkTeam {
           .whereIn('id', messageIds)
           .del();
       }
+
+      // delete discussion notifications
 
       // const messageDeletePromises = await knex('activities').where({type: 'message'}).whereIn('object_id', messageIds)
       /* await knex('notifications')
