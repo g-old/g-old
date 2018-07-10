@@ -11,6 +11,7 @@ import {
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import log from '../../logger';
 import EventManager from '../../core/EventManager';
+import { transactify } from './utils';
 
 const NOTIFICATION_FIELDS = [
   'proposal',
@@ -496,7 +497,7 @@ class User {
       .then(ids => ids.map(id => User.gen(viewer, id, loaders)));
   }
 
-  static async delete(viewer, data) {
+  static async delete(viewer, data, loaders) {
     const result = { user: null, errors: [] };
     if (!data || !data.id) {
       result.errors.push('Missing args');
@@ -507,36 +508,146 @@ class User {
       result.errors.push('Permission denied');
       return result;
     }
-    let deletedUserData;
+    let deletedUser;
     try {
-      deletedUserData = await knex.transaction(async trx => {
-        const [userData = null] = await knex('users')
-          .transacting(trx)
-          .forUpdate()
-          .where({ id: data.id })
-          .returning('*');
+      deletedUser = await knex.transaction(async trx => {
+        const userInDB = await User.gen(viewer, data.id, loaders);
 
-        if (!userData || userData.groups !== Groups.GUEST) {
-          throw new Error(userData ? 'Permission denied' : 'User not found');
+        if (!userInDB || userInDB.groups !== Groups.GUEST) {
+          throw new Error(userInDB ? 'Permission denied' : 'User not found');
         }
-        const rowCount = await knex('users')
-          .transacting(trx)
-          .forUpdate()
-          .where({ id: data.id })
-          .del();
+        let rowCount;
+        try {
+          rowCount = await knex('users')
+            .transacting(trx)
+            .forUpdate()
+            .where({ id: data.id })
+            .del();
+        } catch (e) {
+          // FK violation
+          if (e.code === '23503') {
+            // delete all infos from user
+            const now = new Date();
+            const newData = {
+              id: data.id,
+              deleted_at: now,
+              updated_at: now,
+            };
+            if (!data.block) {
+              newData.name = ' ';
+              newData.surname = ' ';
+              newData.email = `unknown@unknown${data.id}.com`;
+              newData.groups = 0;
+              newData.password_hash = null;
+              newData.last_login_at = null;
+              newData.can_vote_since = null;
+              newData.thumbnail = null;
+              newData.email_verified = false;
+            }
+
+            // thumbnail
+            const deleteUser = async transaction => {
+              await knex('users')
+                .transacting(transaction)
+                .forUpdate()
+                .where({ id: data.id })
+                .update(newData);
+              // userfeeds
+              await knex('feeds')
+                .transacting(transaction)
+                .forUpdate()
+                .where({ user_id: data.id })
+                .del();
+              // useractivities
+              // ???
+
+              // usernotifications
+              await knex('notifications')
+                .transacting(transaction)
+                .forUpdate()
+                .where({ user_id: data.id })
+                .del();
+              // notificationsettings
+              await knex('notification_settings')
+                .transacting(transaction)
+                .forUpdate()
+                .where({ user_id: data.id })
+                .del();
+              // subscriptions
+              await knex('subscriptions')
+                .transacting(transaction)
+                .forUpdate()
+                .where({ user_id: data.id })
+                .del();
+              // webpush subscriptions
+              await knex('subscriptions')
+                .transacting(transaction)
+                .forUpdate()
+                .where({ user_id: data.id })
+                .del();
+
+              // followees
+              await knex('user_follows')
+                .transacting(transaction)
+                .forUpdate()
+                .where({ follower_id: data.id })
+                .orWhere({ followee_id: data.id })
+                .del();
+
+              // requests
+              await knex('requests')
+                .transacting(transaction)
+                .forUpdate()
+                .where({ requester_id: data.id })
+                .del();
+              // wt memberships
+              await knex('user_work_teams')
+                .transacting(transaction)
+                .forUpdate()
+                .where({ user_id: data.id })
+                .del();
+              // messages
+              // ???
+
+              // statements likes
+              await knex('statement_likes')
+                .transacting(transaction)
+                .forUpdate()
+                .where({ user_id: data.id })
+                .del();
+
+              if (!data.block) {
+                // statements, comments, delete content
+                await knex('statements')
+                  .transacting(transaction)
+                  .forUpdate()
+                  .where({ author_id: data.id })
+                  .update({ deleted_at: now, updated_at: now, body: ' ' });
+                await knex('comments')
+                  .transacting(transaction)
+                  .forUpdate()
+                  .where({ author_id: data.id })
+                  .update({ edited_at: now, updated_at: now, content: ' ' });
+              }
+            };
+            await transactify(deleteUser, knex);
+            return userInDB;
+          }
+          throw e;
+        }
         if (rowCount < 1) {
           throw new Error('DB failure');
         }
 
-        return userData;
+        return userInDB;
       });
     } catch (err) {
       result.errors.push(err.message ? err.message : err);
       log.error({ err, viewer, data }, 'Deletion failed');
     }
 
-    if (deletedUserData) {
-      result.user = new User(deletedUserData);
+    if (deletedUser) {
+      result.user = deletedUser;
     }
 
     return result;

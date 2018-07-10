@@ -89,7 +89,9 @@ class UserNotification extends React.Component {
     id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
     read: PropTypes.bool.isRequired,
   };
+
   static defaultProps = {};
+
   computeData() {
     const { activity, id } = this.props;
     let message = <span>Not found</span>;
@@ -121,7 +123,8 @@ class UserNotification extends React.Component {
         break;
       }
       case 'proposal': {
-        const activePoll = activity.object.pollTwo || activity.object.pollOne;
+        const activePoll = activity.object.pollTwo ||
+          activity.object.pollOne || { id: undefined };
         if (activity.verb === 'create') {
           message = (
             <React.Fragment>
@@ -239,14 +242,14 @@ class UserNotification extends React.Component {
   }
 
   render() {
-    const { activity } = this.props;
+    const { activity, read } = this.props;
 
     const data = this.computeData(activity);
     return (
       // eslint-disable-next-line
       <Link
         to={data.path}
-        className={cn(s.root, this.props.read ? null : s.unread)}
+        className={cn(s.root,read ? null : s.unread)}
       >
         <div className={s.container}>
           <div>

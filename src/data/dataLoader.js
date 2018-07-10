@@ -25,6 +25,8 @@ const getUsersById = userIds =>
   Groups each value from the pair by the key and returns an array with the same
   length and order of the request-array.
 */
+/* eslint-disable eqeqeq */
+
 function groupFollowers(data, requestedIds) {
   const store = {};
   for (let i = 0, l = data.length; i < l; i += 1) {
@@ -58,7 +60,7 @@ const getRolesById = roleIds =>
         resolve(
           roleIds.map(
             id =>
-              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
+              data.find(row => row.id == id) ||
               new Error(`Row not found: ${id}`),
           ),
         ),
@@ -66,85 +68,107 @@ const getRolesById = roleIds =>
   });
 
 const getProposalsById = proposalIds =>
-  new Promise(resolve => {
+  new Promise((resolve, reject) => {
     knex('proposals')
       .whereIn('id', proposalIds)
       .select()
-      .then(data =>
-        resolve(
-          proposalIds.map(
-            id =>
-              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
-              new Error(`Row not found: ${id}`),
+      .then(
+        data =>
+          resolve(
+            proposalIds.map(
+              id =>
+                data.find(row => row.id == id) ||
+                new Error(`Row not found: ${id}`),
+            ),
           ),
-        ),
+        e => {
+          reject(e);
+        },
       );
   });
 
 const getProposalsByPollId = pollIds =>
-  new Promise(resolve => {
+  new Promise((resolve, reject) => {
     knex('proposals')
       .whereIn('poll_one_id', pollIds)
       .orWhereIn('poll_two_id', pollIds)
       .select()
-      .then(data =>
-        resolve(
-          pollIds.map(
-            id =>
-              data.find(
-                row => row.poll_one_id == id || row.poll_two_id == id, // eslint-disable-line eqeqeq
-              ) || new Error(`Row not found: ${id}`),
+      .then(
+        data =>
+          resolve(
+            pollIds.map(
+              id =>
+                data.find(
+                  row => row.poll_one_id == id || row.poll_two_id == id,
+                ) || new Error(`Row not found: ${id}`),
+            ),
           ),
-        ),
+        e => {
+          reject(e);
+        },
       );
   });
 
 const getPollsById = pollIds =>
-  new Promise(resolve => {
+  new Promise((resolve, reject) => {
     knex('polls')
       .whereIn('id', pollIds)
       .select()
-      .then(data =>
-        resolve(
-          pollIds.map(
-            id =>
-              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
-              new Error(`Row not found: ${id}`),
+      .then(
+        data =>
+          resolve(
+            pollIds.map(
+              id =>
+                data.find(row => row.id == id) ||
+                new Error(`Row not found: ${id}`),
+            ),
           ),
-        ),
+        e => {
+          reject(e);
+        },
       );
   });
 const getVotesById = voteIds =>
-  new Promise(resolve => {
+  new Promise((resolve, reject) => {
     knex('votes')
       .whereIn('id', voteIds)
       .select()
-      .then(data =>
-        resolve(
-          voteIds.map(
-            id =>
-              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
-              new Error(`Row not found: ${id}`),
+      .then(
+        data =>
+          resolve(
+            voteIds.map(
+              id =>
+                data.find(row => row.id == id) ||
+                new Error(`Row not found: ${id}`),
+            ),
           ),
-        ),
+        e => {
+          reject(e);
+        },
       );
   });
 
 const getStatementsById = statementIds =>
-  new Promise(resolve => {
+  new Promise((resolve, reject) => {
     knex('statements')
       .whereIn('id', statementIds)
       .select()
-      .then(data =>
-        resolve(
-          statementIds.map(
-            id =>
-              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
-              new Error(`Row not found: ${id}`),
+      .then(
+        data =>
+          resolve(
+            statementIds.map(
+              id =>
+                data.find(row => row.id == id) ||
+                new Error(`Row not found: ${id}`),
+            ),
           ),
-        ),
+        e => {
+          reject(e);
+        },
       );
   });
+
+/* eslint-enable eqeqeq */
 
 const getPollingModesById = pollingModeIds =>
   new Promise(resolve => {

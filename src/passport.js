@@ -37,6 +37,7 @@ passport.use(
       const email = emailField.trim().toLowerCase();
       return knex('users')
         .where({ email })
+        .whereNull('deleted_at')
         .returning([
           'id',
           'name',

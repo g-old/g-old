@@ -278,11 +278,6 @@ class Proposal {
 
   static async genByPoll(viewer, pollId, { proposalsByPoll }) {
     const data = await proposalsByPoll.load(pollId);
-    /*  const data = await knex('proposals')
-      .where({ poll_one_id: pollId })
-      .orWhere({ poll_two_id: pollId })
-      .select(); */
-
     if (!data) return null;
     const result = new Proposal(data); // for isMember check in accessControl;
     if (!canSee(viewer, result, Models.PROPOSAL)) return null;
