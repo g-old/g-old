@@ -160,6 +160,7 @@ const proposal = {
             })
             .whereNot({ work_team_id: workTeamId })
             .whereNotNull('work_team_id')
+            .whereNull('proposals.deleted_at')
             .where('proposals.state', '=', 'accepted')
             .whereRaw('(polls.end_time, polls.id) < (?,?)', [cursor, id])
             .limit(first)

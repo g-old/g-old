@@ -11,8 +11,13 @@ const user = {
       type: new GraphQLNonNull(GraphQLID),
     },
   },
-  resolve: (parent, { id }, { viewer, loaders }) =>
-    User.gen(viewer, id, loaders),
+  resolve: async (parent, { id }, { viewer, loaders }) => {
+    const result = await User.gen(viewer, id, loaders);
+    if (result.deletedAt) {
+      return { id: result.id, deletedAt: result.deletedAt };
+    }
+    return result;
+  },
 };
 
 export default user;

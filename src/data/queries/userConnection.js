@@ -30,27 +30,24 @@ const userConnection = {
     // cursor = cursor ? new Date(cursor) : new Date();
     let [cursor = null, id = 0] = pagination ? pagination.split('$') : [];
     id = Number(id);
-    let users = [];
 
     cursor = cursor ? new Date(cursor) : new Date();
-    if (union) {
-      users = await knex('users')
-        .whereRaw('groups & ? > 0', [group])
-        .whereRaw('(users.created_at, users.id) < (?,?)', [cursor, id])
-        .limit(first)
-        .orderBy('users.created_at', 'desc')
-        .orderBy('users.id', 'desc')
-        .select('users.id as id', 'users.created_at as time');
-    } else {
-      users = await knex('users')
-        // .whereRaw('groups & ? > 0', [group]) TODO Later
-        .where({ groups: group })
-        .whereRaw('(users.created_at, users.id) < (?,?)', [cursor, id])
-        .limit(first)
-        .orderBy('users.created_at', 'desc')
-        .orderBy('users.id', 'desc')
-        .select('users.id as id', 'users.created_at as time');
-    }
+
+    const users = await knex('users')
+      .modify(queryBuilder => {
+        if (union) {
+          queryBuilder.whereRaw('groups & ? > 0', [group]);
+        } else {
+          queryBuilder.where({ groups: group });
+        }
+      })
+      .whereNull('users.deleted_at')
+      .whereRaw('(users.created_at, users.id) < (?,?)', [cursor, id])
+      .limit(first)
+      .orderBy('users.created_at', 'desc')
+      .orderBy('users.id', 'desc')
+      .select('users.id as id', 'users.created_at as time');
+
     const queries = users.map(u => User.gen(viewer, u.id, loaders));
     const usersSet = users.reduce((acc, curr) => {
       acc[curr.id] = curr;

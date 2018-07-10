@@ -164,7 +164,6 @@ const WorkTeamType = new ObjectType({
         id = Number(id);
         let proposalStates = [];
         cursor = cursor ? new Date(cursor) : new Date(null);
-
         proposalStates = await knex('proposal_groups')
           .where({
             group_id: parent.id,

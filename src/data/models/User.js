@@ -622,7 +622,9 @@ class User {
                   .transacting(transaction)
                   .forUpdate()
                   .where({ author_id: data.id })
-                  .update({ deleted_at: now, updated_at: now, body: ' ' });
+                  .del();
+
+                // deleting comments is a bit messy bc we would have to decrement the wt-comment counters correctly
                 await knex('comments')
                   .transacting(transaction)
                   .forUpdate()
