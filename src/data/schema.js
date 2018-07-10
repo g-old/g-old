@@ -14,7 +14,6 @@ import {
 
 import intl from './queries/intl';
 import votes from './queries/votes';
-import users from './queries/users';
 import createStatement from './mutations/createStatement';
 import deleteStatement from './mutations/deleteStatement';
 import updateStatement from './mutations/updateStatement';
@@ -92,7 +91,6 @@ const schema = new Schema({
       intl,
       proposalDL,
       proposalsDL,
-      users,
       userConnection,
       votes,
       searchUser,
