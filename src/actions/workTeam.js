@@ -396,8 +396,7 @@ export function joinWorkTeam(workTeamData, details) {
         workTeamSchema,
       );
 
-      dispatch({ type: JOIN_WORKTEAM_SUCCESS });
-      dispatch({ type: LOAD_WORKTEAM_SUCCESS, payload: normalizedData });
+      dispatch({ type: JOIN_WORKTEAM_SUCCESS, payload: normalizedData });
 
       // dispatch multiple
 
