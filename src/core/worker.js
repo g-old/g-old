@@ -28,6 +28,7 @@ async function proposalPolling() {
     })
     .innerJoin('polling_modes', 'polls.polling_mode_id', 'polling_modes.id')
     .where({ 'polls.closed_at': null })
+    .where({ 'polls.deleted_at': null })
     .where('polls.end_time', '<=', new Date())
     .select(
       'proposals.id as id',

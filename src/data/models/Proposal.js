@@ -549,7 +549,7 @@ class Proposal {
           await knex('polls')
             .transacting(transaction)
             .whereIn('id', pollIds)
-            .update({ closed_at: data.value, updated_at: now });
+            .update({ deleted_at: data.value, updated_at: now });
         }
         return knex('proposals')
           .transacting(transaction)
