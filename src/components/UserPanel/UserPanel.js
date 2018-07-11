@@ -8,9 +8,9 @@ import { createMessage, updateMessage } from '../../actions/message';
 import { updateUser, loadUserList, findUser } from '../../actions/user';
 import FetchError from '../FetchError';
 import AccountDetails from '../AccountDetails';
-import Accordion from '../../components/Accordion';
-import AccordionPanel from '../../components/AccordionPanel';
-import SearchField from '../../components/SearchField';
+import Accordion from '../Accordion';
+import AccordionPanel from '../AccordionPanel';
+import SearchField from '../SearchField';
 import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
@@ -65,12 +65,14 @@ class UserPanel extends React.Component {
     guestArray: null,
     viewerArray: null,
   };
+
   constructor(props) {
     super(props);
     this.state = { showAccount: false };
     this.handleProfileClick = this.handleProfileClick.bind(this);
     this.handleLayerClosing = this.handleLayerClosing.bind(this);
   }
+
   componentDidMount() {
     // this.props.loadUserList('viewer');
   }
@@ -79,6 +81,7 @@ class UserPanel extends React.Component {
     this.setState({ showAccount: true, accountId: id });
     // history.push(`/admin/accounts/${id}`);
   }
+
   handleLayerClosing() {
     this.setState({ showAccount: false });
   }
@@ -114,27 +117,37 @@ class UserPanel extends React.Component {
       viewerArrayStatus,
       viewerArray,
       guestArray,
+      userArray,
+      user,
+      findUser: fetchUser,
+      updateUser: mutateUser,
+      updateMessage: mutateMessage,
+      createMessage: makeMessage,
+      messageUpdates,
+      loadUserList: loadUsers,
     } = this.props;
-    if (!this.props.user) return null;
+    const { showAccount, accountId } = this.state;
+    if (!user) return null;
     return (
       <Box wrap>
         <div style={{ marginLeft: '12px' }}>
           <FormField overflow label="Username">
             <SearchField
-              data={this.props.userArray}
-              fetch={this.props.findUser}
+              data={userArray}
+              fetch={fetchUser}
               displaySelected={data => {
                 this.setState({ accountId: data.id, showAccount: true });
               }}
             />
           </FormField>
         </div>
-        {this.state.showAccount && (
+        {showAccount && (
           <Layer onClose={this.handleLayerClosing}>
             <AccountDetails
-              user={this.props.user}
-              accountId={this.state.accountId}
-              update={this.props.updateUser}
+              user={user}
+              accountId={accountId}
+              update={mutateUser}
+              onClose={this.handleLayerClosing}
             />
           </Layer>
         )}
@@ -144,17 +157,17 @@ class UserPanel extends React.Component {
               heading={<FormattedMessage {...messages.messages} />}
             >
               <MessageInput
-                updateMessage={this.props.updateMessage}
+                updateMessage={mutateMessage}
                 draftMode
                 messageType="NOTE"
-                notifyUser={this.props.createMessage}
-                updates={this.props.messageUpdates}
+                notifyUser={makeMessage}
+                updates={messageUpdates}
               />
             </AccordionPanel>
             <AccordionPanel
               heading="Guest accounts"
               onActive={() => {
-                this.props.loadUserList({ group: Groups.GUEST });
+                loadUsers({ group: Groups.GUEST });
               }}
             >
               {guestArrayStatus.pending &&
@@ -165,18 +178,16 @@ class UserPanel extends React.Component {
               {guestArrayStatus.error && (
                 <FetchError
                   message={guestArrayStatus.error}
-                  onRetry={() =>
-                    this.props.loadUserList({ group: Groups.GUEST })
-                  }
+                  onRetry={() => loadUsers({ group: Groups.GUEST })}
                 />
               )}
-              {this.renderUserList(this.props.guestArray)}
+              {this.renderUserList(guestArray)}
               {guestArrayStatus.pageInfo.hasNextPage && (
                 <Button
                   primary
                   disabled={guestArrayStatus.pending}
                   onClick={() => {
-                    this.props.loadUserList({
+                    loadUsers({
                       group: Groups.GUEST,
                       after: guestArrayStatus.pageInfo.endCursor,
                     });
@@ -188,7 +199,7 @@ class UserPanel extends React.Component {
             <AccordionPanel
               heading="Viewer accounts"
               onActive={() => {
-                this.props.loadUserList({ group: VIEWERS });
+                loadUsers({ group: VIEWERS });
               }}
             >
               {viewerArrayStatus.pending &&
@@ -200,19 +211,19 @@ class UserPanel extends React.Component {
                 <FetchError
                   message={viewerArrayStatus.error}
                   onRetry={() =>
-                    this.props.loadUserList({
+                    loadUsers({
                       group: VIEWERS,
                     })
                   }
                 />
               )}
-              {this.renderUserList(this.props.viewerArray)}
+              {this.renderUserList(viewerArray)}
               {viewerArrayStatus.pageInfo.hasNextPage && (
                 <Button
                   primary
                   disabled={viewerArrayStatus.pending}
                   onClick={() => {
-                    this.props.loadUserList({
+                    loadUsers({
                       group: VIEWERS,
                       after: viewerArrayStatus.pageInfo.endCursor,
                     });
@@ -246,4 +257,7 @@ const mapDispatch = {
   updateMessage,
 };
 
-export default connect(mapStateToProps, mapDispatch)(withStyles(s)(UserPanel));
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(withStyles(s)(UserPanel));

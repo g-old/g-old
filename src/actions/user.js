@@ -496,6 +496,14 @@ export function deleteUser({ id }) {
 
     dispatch({
       type: DELETE_USER_START,
+      id,
+      properties: {
+        deleted: {
+          pending: true,
+          success: false,
+          error: null,
+        },
+      },
     });
 
     try {
@@ -514,6 +522,7 @@ export function deleteUser({ id }) {
           payload: {
             errors,
           },
+
           message: { fields: standardError },
         });
         return false;
@@ -523,12 +532,28 @@ export function deleteUser({ id }) {
         type: DELETE_USER_SUCCESS,
         payload: normalizedData,
         filter: 'all',
+        id,
+        properties: {
+          deleted: {
+            pending: false,
+            success: true,
+            error: null,
+          },
+        },
       });
     } catch (error) {
       dispatch({
         type: DELETE_USER_ERROR,
         payload: {
           error,
+        },
+        id,
+        properties: {
+          deleted: {
+            pending: false,
+            success: false,
+            error: error.message || 'Something went wrong',
+          },
         },
         message: error.message || 'Something went wrong',
       });

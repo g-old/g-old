@@ -114,6 +114,7 @@ class AccountDetails extends React.Component {
     createMessage: PropTypes.func.isRequired,
     deleteUser: PropTypes.func.isRequired,
     messageUpdates: PropTypes.shape({}).isRequired,
+    onClose: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -135,12 +136,19 @@ class AccountDetails extends React.Component {
   }
 
   componentWillReceiveProps({ accountId, updates }) {
-    const { accountId: oldAccountId, fetchUser: loadUser } = this.props;
+    const {
+      accountId: oldAccountId,
+      fetchUser: loadUser,
+      onClose,
+    } = this.props;
     if (accountId && accountId !== oldAccountId) {
       loadUser({ id: accountId });
     }
     if (updates.dataUrl && updates.dataUrl.success) {
       this.setState({ showUpload: false });
+    }
+    if (updates.deleted && updates.deleted.success) {
+      onClose();
     }
   }
 
