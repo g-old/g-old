@@ -170,6 +170,7 @@ class Discussion {
     }
     const deleteDiscussion = async transaction => {
       const discussion = await Discussion.gen(viewer, data.id, loaders);
+
       if (discussion) {
         const commentIds = await knex('comments')
           .where({ discussion_id: data.id })

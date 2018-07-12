@@ -382,7 +382,7 @@ function discussionReadControl(viewer, data) {
   if (viewer.wtMemberships.includes(data.work_team_id)) {
     return true;
   }
-  return false;
+  return viewer.groups & Groups.ADMIN || false;
 }
 function discussionWriteControl(viewer, data) {
   if (data.workTeam && data.workTeam.deletedAt) {

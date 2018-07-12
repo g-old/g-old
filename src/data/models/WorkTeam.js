@@ -1,7 +1,10 @@
 import knex from '../knex';
+/* eslint-disable import/no-cycle */
+import Proposal from './Proposal';
+/* eslint-enable import/no-cycle */
+
 import User from './User';
 import Request from './Request';
-import Proposal from './Proposal';
 import Discussion from './Discussion'; // eslint-disable-line import/no-cycle
 
 import { canSee, canMutate, Models } from '../../core/accessControl';
@@ -478,7 +481,6 @@ class WorkTeam {
         );
 
         await Promise.all(discussionDeletePromises);
-
         const discussionActivityIds = await knex('activities')
           .where({ type: 'discussion' })
           .whereIn('object_id', discussionIds)
@@ -579,17 +581,20 @@ class WorkTeam {
       // members
       await knex('user_work_teams')
         .transacting(trx)
+        .forUpdate()
         .where({ work_team_id: data.id })
         .del();
 
       // delete feeds
       await knex('system_feeds')
         .transacting(trx)
+        .forUpdate()
         .where({ type: 'WT', group_id: data.id })
         .del();
 
       await knex('work_teams')
         .transacting(trx)
+        .forUpdate()
         .where({ id: data.id })
         .del();
       return workTeamInDB;

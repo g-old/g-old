@@ -74,7 +74,10 @@ const proposal = {
               });
             })
             //  .where({ 'polls.closed_at': null }) TODO find some other way to p1 to p2 transitioning
-            .where({ work_team_id: workTeamId || null, deleted_at: null })
+            .where({
+              work_team_id: workTeamId || null,
+              'proposals.deleted_at': null,
+            })
             .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
             .limit(first)
             .orderBy('polls.end_time', 'asc')
