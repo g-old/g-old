@@ -32,7 +32,7 @@ const userConnection = {
     id = Number(id);
 
     cursor = cursor ? new Date(cursor) : new Date();
-
+    // const countQuery = knex.raw('COUNT(users.id) OVER()');
     const users = await knex('users')
       .modify(queryBuilder => {
         if (union) {
@@ -47,7 +47,21 @@ const userConnection = {
       .orderBy('users.created_at', 'desc')
       .orderBy('users.id', 'desc')
       .select('users.id as id', 'users.created_at as time');
-
+    // integrate in first query
+    const [count = null] = await knex('users')
+      .modify(queryBuilder => {
+        if (union) {
+          queryBuilder.whereRaw('groups & ? > 0', [group]);
+        } else {
+          queryBuilder.where({ groups: group });
+        }
+      })
+      .whereNull('users.deleted_at')
+      .count('id');
+    let totalCount;
+    if (count) {
+      totalCount = count.count;
+    }
     const queries = users.map(u => User.gen(viewer, u.id, loaders));
     const usersSet = users.reduce((acc, curr) => {
       acc[curr.id] = curr;
@@ -72,6 +86,7 @@ const userConnection = {
         endCursor,
         hasNextPage,
       },
+      totalCount,
     };
   },
 };

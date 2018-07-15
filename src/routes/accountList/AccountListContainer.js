@@ -4,32 +4,25 @@ import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { loadUserList } from '../../actions/user';
 import { Groups } from '../../organization';
-import { getVisibleUsers, getUsersStatus } from '../../reducers';
-import List from '../../components/List';
-import ListItem from '../../components/ListItem';
-import Avatar from '../../components/Avatar';
-import Button from '../../components/Button';
-import FetchError from '../../components/FetchError';
+import { getVisibleUsers, getResourcePageInfo } from '../../reducers';
+
 import Box from '../../components/Box';
 import Heading from '../../components/Heading';
-
+import ListView from '../../components/ListView';
+import { genUsersPageKey } from '../../reducers/pageInfo';
+import UserListItem from './UserListItem';
 import history from '../../history';
 
 // eslint-disable-next-line no-bitwise
 const ACTIVE_USER = Groups.VIEWER | Groups.VOTER;
 const messages = defineMessages({
-  loadMore: {
-    id: 'command.loadMore',
-    defaultMessage: 'Load more',
-    description: 'To get more data',
-  },
   users: {
     id: 'users',
     defaultMessage: 'Users',
     description: 'Users label',
   },
 });
-const handleItemClick = id => {
+const onUserClick = id => {
   history.push(`/accounts/${id}`);
 };
 // TODO don't user List component - onClick is not cheap
@@ -38,52 +31,48 @@ class AccountList extends React.Component {
     loadUserList: PropTypes.func.isRequired,
     userList: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     userListStatus: PropTypes.shape({}).isRequired,
+    pageInfo: PropTypes.shape({}).isRequired,
   };
+
+  constructor(props) {
+    super(props);
+    this.handleLoadMore = this.handleLoadMore.bind(this);
+    this.handleOnRetry = this.handleOnRetry.bind(this);
+  }
+
+  handleLoadMore({ after }) {
+    const { loadUserList: loadUsers } = this.props;
+    loadUsers({
+      group: ACTIVE_USER,
+      union: true,
+      after,
+    });
+  }
+
+  handleOnRetry() {
+    const { loadUserList: loadUsers } = this.props;
+
+    loadUsers({ group: ACTIVE_USER, union: true });
+  }
+
   render() {
-    const { userListStatus, userList } = this.props;
+    const { userList, pageInfo } = this.props;
     return (
       <Box pad column>
         <Heading tag="h3">
-          <FormattedMessage {...messages.users} />
+          <div style={{ paddingLeft: '0.5em' }}>
+            <FormattedMessage {...messages.users} /> ({pageInfo.totalCount})
+          </div>
         </Heading>
-        {userListStatus.pending && !userList.length && <p>Loading...</p>}
-        {!userListStatus.pending &&
-          !userList.length &&
-          !userListStatus.error && <p> No data</p>}
-        {userListStatus.error && (
-          <FetchError
-            message={userListStatus.error}
-            onRetry={() =>
-              this.props.loadUserList({ group: ACTIVE_USER, union: true })
-            }
-          />
-        )}
-        <List>
-          {userList.map(u => (
-            <ListItem onClick={() => handleItemClick(u.id)}>
-              <Box pad>
-                <Avatar user={u} />
-                <span>
-                  {u.name} {} {u.surname}
-                </span>
-              </Box>
-            </ListItem>
-          ))}
-        </List>
-        {userListStatus.pageInfo.hasNextPage && (
-          <Button
-            primary
-            disabled={userListStatus.pending}
-            onClick={() => {
-              this.props.loadUserList({
-                group: ACTIVE_USER,
-                after: userListStatus.pageInfo.endCursor,
-                union: true,
-              });
-            }}
-            label={<FormattedMessage {...messages.loadMore} />}
-          />
-        )}
+        <ListView
+          onRetry={this.handleOnRetry}
+          onLoadMore={this.handleLoadMore}
+          pageInfo={pageInfo}
+        >
+          {userList.map(
+            u => u && <UserListItem user={u} onClick={onUserClick} />,
+          )}
+        </ListView>
       </Box>
     );
   }
@@ -91,11 +80,18 @@ class AccountList extends React.Component {
 
 const mapStateToProps = state => ({
   userList: getVisibleUsers(state, 'all'),
-  userListStatus: getUsersStatus(state, ACTIVE_USER),
+  pageInfo: getResourcePageInfo(
+    state,
+    'users',
+    genUsersPageKey({ union: true, group: ACTIVE_USER }),
+  ),
 });
 
 const mapDispatch = {
   loadUserList,
 };
 
-export default connect(mapStateToProps, mapDispatch)(AccountList);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(AccountList);

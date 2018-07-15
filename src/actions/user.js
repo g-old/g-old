@@ -2,6 +2,8 @@
 import { normalize } from 'normalizr';
 import { genStatusIndicators, depaginate } from '../core/helpers';
 import { user as userSchema, userList as userArray } from '../store/schema';
+import { genUsersPageKey } from '../reducers/pageInfo';
+
 import {
   LOAD_USERS_START,
   LOAD_USERS_SUCCESS,
@@ -33,6 +35,7 @@ export const userFields = `
 const userConnection = `
 query ($group:Int $after:String $union:Boolean) {
   userConnection (group:$group after:$after union:$union) {
+    totalCount
     pageInfo{
       endCursor
       hasNextPage
@@ -196,13 +199,14 @@ export function loadUserList({ group, first, after, union = false }) {
     if (getUsersStatus(getState(), group).pending) {
       return false;
     }
-
+    const pageKey = genUsersPageKey({ union, group });
     dispatch({
       type: LOAD_USERS_START,
       payload: {
         group,
       },
       filter: group,
+      pageKey,
     });
 
     try {
@@ -219,6 +223,8 @@ export function loadUserList({ group, first, after, union = false }) {
         payload: normalizedData,
         filter: group,
         pagination: data.userConnection.pageInfo,
+        totalCount: data.userConnection.totalCount,
+        pageKey,
         savePageInfo: after != null,
       });
     } catch (error) {
@@ -227,6 +233,7 @@ export function loadUserList({ group, first, after, union = false }) {
         payload: {
           error,
         },
+        pageKey,
         message: error.message || 'Something went wrong',
         filter: group,
       });

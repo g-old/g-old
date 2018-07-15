@@ -3,6 +3,9 @@ import {
   LOAD_PROPOSAL_LIST_SUCCESS,
   LOAD_PROPOSAL_LIST_START,
   LOAD_PROPOSAL_LIST_ERROR,
+  LOAD_USERS_START,
+  LOAD_USERS_SUCCESS,
+  LOAD_USERS_ERROR,
 } from '../constants';
 
 const handlePageInfo = (state, action) => {
@@ -31,6 +34,7 @@ const createPageInfo = types => {
           isFetching: false,
           success: true,
           errorMessage: null,
+          totalCount: action.totalCount,
         };
       }
       case failureType: {
@@ -65,6 +69,12 @@ export default combineReducers({
     LOAD_PROPOSAL_LIST_SUCCESS,
     LOAD_PROPOSAL_LIST_ERROR,
   ]),
+
+  users: createPageInfo([
+    LOAD_USERS_START,
+    LOAD_USERS_SUCCESS,
+    LOAD_USERS_ERROR,
+  ]),
 });
 
 export const genProposalPageKey = ({
@@ -73,6 +83,10 @@ export const genProposalPageKey = ({
   closed = false,
   tagId = 'tagId',
 }) => `${state}$${workteamId}$${closed}$${tagId}`;
+
+export const genUsersPageKey = ({ union = false, group = 'group' }) =>
+  `${group}$${union}`;
+
 export const getPageInfo = (state, resource, pageKey) => {
   const data = state[resource][pageKey] || {
     errorMessage: null,
@@ -83,5 +97,6 @@ export const getPageInfo = (state, resource, pageKey) => {
     errorMessage: data.errorMessage,
     pending: data.isFetching,
     pagination: data.pagination || {},
+    totalCount: data.totalCount,
   };
 };

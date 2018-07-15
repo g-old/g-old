@@ -1510,7 +1510,7 @@
     "id": "notifications.proposal.proposed",
     "description": "Status message for notifications",
     "defaultMessage": "was proposed!",
-    "message": "wurde vorgeschlagen!",
+    "message": "Abstimmung gefordert!",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1763,7 +1763,7 @@
     "id": "proposal.votingRequested",
     "description": "Poll reached its limit",
     "defaultMessage": "Voting requested!",
-    "message": "",
+    "message": "Abstimmung gefordert!",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
