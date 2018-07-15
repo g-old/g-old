@@ -94,8 +94,8 @@ const config = {
               {
                 targets: {
                   browsers: pkg.browserslist,
-                  forceAllTransforms: !isDebug, // for UglifyJS
                 },
+                forceAllTransforms: !isDebug, // for UglifyJS
                 modules: false,
                 useBuiltIns: false,
                 debug: false,
@@ -103,7 +103,7 @@ const config = {
             ],
             // Experimental ECMAScript proposals
             // https://babeljs.io/docs/plugins/#presets-stage-x-experimental-presets-
-            '@babel/preset-stage-2',
+            ['@babel/preset-stage-2', { decoratorsLegacy: true }],
             // Flow
             // https://github.com/babel/babel/tree/master/packages/babel-preset-flow
             '@babel/preset-flow',
@@ -346,7 +346,7 @@ const clientConfig = {
       output: `${BUILD_DIR}/asset-manifest.json`,
       publicPath: true,
       writeToDisk: true,
-      customize: (key, value) => {
+      customize: ({ key, value }) => {
         // You can prevent adding items to the manifest by returning false.
         if (key.toLowerCase().endsWith('.map')) return false;
         return { key, value };

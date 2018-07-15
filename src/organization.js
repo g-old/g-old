@@ -12,28 +12,22 @@ export const Permissions = {
   NONE: 0,
   CHANGE_OWN_PROFILE: 2,
   DELETE_OWN_ACCOUNT: 4,
-
   VIEW_PROPOSALS: 8,
   VIEW_STATEMENTS: 16,
   VIEW_VOTES: 32,
-
   VOTE: 64,
   MODIFY_OWN_STATEMENTS: 128,
   LIKE: 256,
   FLAG_STATEMENTS: 512,
-
   PUBLISH_PROPOSALS: 1024,
   REVOKE_PROPOSALS: 2048,
   MODIFY_PROPOSALS: 4096,
   CLOSE_POLLS: 8192,
-
   ADD_TO_DISTRICT: 16384,
   REMOVE_FROM_DISTRICT: 32768,
-
   DELETE_STATEMENTS: 65536,
   MUTATE_PROFILES: 131072,
   VIEW_USER_INFO: 262144,
-
   DELETE_ACCOUNTS: 524288,
   NOTIFY_GROUPS: 1048576,
   NOTIFY_ALL: 2097152,
@@ -58,6 +52,7 @@ export const Groups = {
   GUEST: 256,
   SYSTEM: 512,
   TEAM_LEADER: 1024,
+  CONTACTEE: 2048,
 };
 
 /* eslint-disable no-bitwise */
@@ -92,7 +87,8 @@ const relatorMask =
   Permissions.CLOSE_POLLS |
   Permissions.MODIFY_PROPOSALS |
   Permissions.REVOKE_PROPOSALS |
-  Permissions.PUBLISH_DISCUSSIONS;
+  Permissions.PUBLISH_DISCUSSIONS |
+  Permissions.NOTIFY_ALL;
 
 /* District keepers */
 const districtKeeperMask =
@@ -129,6 +125,7 @@ export const Privileges = {
   GRANT_RELATOR: 128,
   GRANT_ADMIN: 256,
   GRANT_LEADER: 512,
+  GRANT_CONTACTEE: 1024,
 };
 /* Privilege masks - Change here if you want to adjust privileges for groups */
 
@@ -141,7 +138,8 @@ const adminPrivileges =
   Privileges.GRANT_RELATOR |
   Privileges.GRANT_DISTRICT_KEEPER |
   Privileges.GRANT_MEMBER_MANAGER |
-  Privileges.GRANT_LEADER;
+  Privileges.GRANT_LEADER |
+  Privileges.GRANT_CONTACTEE;
 
 const superUserPrivileges = adminPrivileges | Privileges.GRANT_ADMIN;
 
@@ -193,7 +191,7 @@ export const AccessMasks = {
     Privileges.GRANT_DISTRICT_KEEPER |
     Privileges.GRANT_ADMIN,
   NOTIFICATION: Permissions.NOTIFY_ALL | Permissions.NOTIFY_GROUPS,
-  WORKTEAM_MANAGER: Groups.ADMIN | Groups.TEAM_LEADER,
+  WORKTEAM_MANAGER: Groups.ADMIN | Groups.TEAM_LEADER | Groups.CONTACTEE,
 };
 
 export const GroupConditions = {
@@ -206,6 +204,7 @@ export const GroupConditions = {
   [Groups.VIEWER]: Privileges.GRANT_VIEWER,
   [Groups.GUEST]: Privileges.GRANT_GUEST,
   [Groups.TEAM_LEADER]: Privileges.GRANT_LEADER,
+  [Groups.CONTACTEE]: Privileges.GRANT_CONTACTEE,
 };
 
 export const calcRights = userGroups =>
@@ -282,6 +281,16 @@ export const canChangeGroups = (actor, targetUser, updatedGroups) => {
     }
     return true;
   });
+};
+
+export const isAdmin = viewer => viewer && (viewer.groups & Groups.ADMIN) > 0;
+
+export const isCoordinator = async (viewer, workteam) => {
+  if (viewer && workteam && workteam.coordinatorId) {
+    // eslint-disable-next-line
+    return workteam.coordinatorId == viewer.id;
+  }
+  return false;
 };
 
 export const getUpdatedGroup = (oldGroups: number, updatedGroups: number) => {

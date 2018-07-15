@@ -43,6 +43,17 @@ const messages = defineMessages({
     defaultMessage: 'Email address already in use',
     description: 'Help for not unique email',
   },
+  shortPassword: {
+    id: 'form.error-shortPassword',
+    defaultMessage:
+      'Short passwords are easy to guess. Try one with at least 6 characters ',
+    description: 'Help for short passwords',
+  },
+  passwordMismatch: {
+    id: 'form.error-passwordMismatch',
+    defaultMessage: "These passwords don't match. Try again?",
+    description: 'Help for mismatching passwords',
+  },
 });
 
 const genInitialState = (fields, values) =>
@@ -115,8 +126,18 @@ class FormValidation extends React.Component {
     children: PropTypes.func.isRequired,
     names: PropTypes.shape({}),
     lazy: PropTypes.boolean,
+    eager: PropTypes.boolean,
+    onBlur: PropTypes.func,
+    options: PropTypes.shape({}),
   };
-  static defaultProps = { data: null, names: null, lazy: null };
+  static defaultProps = {
+    data: null,
+    names: null,
+    lazy: null,
+    eager: null,
+    onBlur: null,
+    options: null,
+  };
 
   constructor(props) {
     super(props);
@@ -172,17 +193,25 @@ class FormValidation extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.validate = this.validate.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
+    this.enforceValidation = this.enforceValidation.bind(this);
   }
 
-  componentWillReceiveProps({ data }) {
-    if (data !== this.props.data) {
-      const newState = {
+  componentWillReceiveProps({ data, options }) {
+    let newState = {};
+    if (
+      (data && data !== this.props.data) ||
+      (options && options !== this.props.options)
+    ) {
+      newState = {
         ...genInitialState(this.formFields, {
           ...this.state,
           ...(data && data),
-          ...(data.names && { ...data.names }),
+          ...(data && data.names && { ...data.names }),
         }),
       };
+      if (options && options !== this.props.options) {
+        newState = { ...newState, ...options };
+      }
       this.setState(newState);
     }
   }
@@ -192,7 +221,11 @@ class FormValidation extends React.Component {
       e.preventDefault();
       e.stopPropagation();
     }
-    const validationResult = this.validate(this.formFields);
+    let fields = this.formFields;
+    if (options && options.excludeFields && options.excludeFields.length) {
+      fields = fields.filter(field => !options.excludeFields.includes(field));
+    }
+    const validationResult = this.validate(fields);
     const newState = {
       errors: { ...this.state.errors, ...validationResult.errors },
     };
@@ -214,8 +247,14 @@ class FormValidation extends React.Component {
 
   handleBlur(e) {
     const field = e.target.name;
+    const fields = [];
+
     if (this.state[field]) {
-      const validationResult = this.validate([field]);
+      fields.push(field);
+      if (this.props.onBlur) {
+        this.props.onBlur(field, this.state, fields);
+      }
+      const validationResult = this.validate(fields);
       this.setState({
         errors: { ...this.state.errors, ...validationResult.errors },
       });
@@ -224,6 +263,21 @@ class FormValidation extends React.Component {
 
   validate(fields) {
     return this.Validator(fields);
+  }
+
+  enforceValidation(fields, options) {
+    const validate = () => {
+      const validationResult = this.validate(fields);
+      const newState = {
+        errors: { ...this.state.errors, ...validationResult.errors },
+      };
+      this.setState(newState);
+    };
+    if (options) {
+      this.setState({ ...options }, validate);
+    } else {
+      validate();
+    }
   }
 
   visibleErrors(errorNames) {
@@ -249,7 +303,18 @@ class FormValidation extends React.Component {
     } else {
       value = e.target.value; //eslint-disable-line
     }
-    this.setState({ [e.target.name]: value });
+    const field = e.target.name;
+    if (this.props.eager) {
+      if (this.state.errors[field].touched) {
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            [field]: { ...this.state.errors[field], touched: false },
+          },
+        });
+      }
+    }
+    this.setState({ [field]: value });
   }
 
   renderChildren() {
@@ -260,7 +325,6 @@ class FormValidation extends React.Component {
     );
 
     const inputChanged = Object.keys(fields).length > 0;
-
     return this.props.children({
       validate: this.handleValidate,
       errorMessages: this.visibleErrors(this.formFields),

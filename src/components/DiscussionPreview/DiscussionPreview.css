@@ -1,10 +1,5 @@
 @import '../variables.css';
 
-.root {
-  margin: 0.5em 1em;
-  padding: 1em 0.5em;
-}
-
 .header {
   font-weight: 300;
   font-size: 1.25rem;
@@ -13,18 +8,6 @@
   color: black;
 }
 
-.header:hover {
-  color: #7f4d4e;
-}
-
-/*
-.title {
-  font-weight: bold;
-  padding-top: 0;
-  color: black;
-  position: relative;
-}
-*/
 .date {
   text-align: right;
   font-size: 0.8em;

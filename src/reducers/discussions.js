@@ -3,12 +3,15 @@ import { denormalize } from 'normalizr';
 import all, * as fromList from './discussionList';
 import byId, * as fromById from './discussionById';
 import byWT, * as fromByWorkTeam from './discussionsByWorkTeam';
+import byState, * as fromByState from './discussionsByState';
+
 import { discussionList as discussionListSchema } from './../store/schema';
 
 export default combineReducers({
   byId,
   byWT,
   all,
+  byState,
 });
 
 const hydrateDiscussions = (state, data, entities) =>
@@ -33,6 +36,16 @@ export const getDiscussion = (state, id, entities) => {
   return hydrated.discussions ? hydrated.discussions[0] : {};
 };
 
+export const getWTDiscussionsByState = (state, wtId, filter, entities) => {
+  const discussionIds = fromByWorkTeam.getIds(state.byWT, wtId);
+  const filtered = fromByState.getIds(state.byState, filter);
+
+  const results = discussionIds.filter(id => filtered.find(sId => sId === id));
+  const hydrated = hydrateDiscussions(state, results, entities);
+
+  return hydrated.discussions || [];
+};
+
 export const getDiscussionsByWT = (state, tagId, entities) => {
   const hydrated = hydrateDiscussions(
     state,
@@ -42,3 +55,7 @@ export const getDiscussionsByWT = (state, tagId, entities) => {
 
   return hydrated.discussions || [];
 };
+
+export const getPageInfo = (state, filter) => ({
+  ...fromByState.getPageInfo(state.byState[filter]),
+});

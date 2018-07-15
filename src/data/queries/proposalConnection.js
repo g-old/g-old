@@ -1,7 +1,10 @@
-import { GraphQLInt, GraphQLString, GraphQLID } from 'graphql';
+import { GraphQLInt, GraphQLString, GraphQLID, GraphQLBoolean } from 'graphql';
+
+/* eslint-disable import/no-cycle */
+import ProposalType from '../types/ProposalDLType';
+/* eslint-enable import/no-cycle */
 
 import PageType from '../types/PageType';
-import ProposalType from '../types/ProposalDLType';
 import Proposal from '../models/Proposal';
 import knex from '../knex';
 
@@ -23,10 +26,13 @@ const proposal = {
     workTeamId: {
       type: GraphQLID,
     },
+    closed: {
+      type: GraphQLBoolean,
+    },
   },
   resolve: async (
     parent,
-    { first = 10, after = '', state, tagId, workTeamId },
+    { first = 10, after = '', state, tagId, workTeamId, closed },
     { viewer, loaders },
   ) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
@@ -68,7 +74,10 @@ const proposal = {
               });
             })
             //  .where({ 'polls.closed_at': null }) TODO find some other way to p1 to p2 transitioning
-            .where({ work_team_id: workTeamId || null })
+            .where({
+              work_team_id: workTeamId || null,
+              'proposals.deleted_at': null,
+            })
             .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
             .limit(first)
             .orderBy('polls.end_time', 'asc')
@@ -125,6 +134,13 @@ const proposal = {
             .innerJoin('polls', 'proposals.poll_one_id', 'polls.id')
             .where({ work_team_id: workTeamId || null })
             .where('proposals.state', '=', 'survey')
+            .modify(queryBuilder => {
+              if (closed) {
+                queryBuilder.whereNotNull('polls.closed_at');
+              } else {
+                queryBuilder.whereNull('polls.closed_at');
+              }
+            })
             .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
             .limit(first)
             .orderBy('polls.end_time', 'asc')
@@ -147,6 +163,7 @@ const proposal = {
             })
             .whereNot({ work_team_id: workTeamId })
             .whereNotNull('work_team_id')
+            .whereNull('proposals.deleted_at')
             .where('proposals.state', '=', 'accepted')
             .whereRaw('(polls.end_time, polls.id) < (?,?)', [cursor, id])
             .limit(first)
@@ -165,7 +182,12 @@ const proposal = {
       return acc;
     }, {});
     const data = await Promise.all(queries);
-    const edges = data.map(p => ({ node: p }));
+    const edges = data.reduce((result, curr) => {
+      if (curr) {
+        result.push({ node: curr });
+      }
+      return result;
+    }, []);
     const endCursor =
       edges.length > 0
         ? Buffer.from(

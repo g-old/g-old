@@ -1,32 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import Message from '../../components/Message';
 import Box from '../../components/Box';
 import { getMessage, getMessageUpdates } from '../../reducers';
 import { createMessage } from '../../actions/message';
 import List from '../../components/List';
 import ListItem from '../../components/ListItem';
-import FormValidation from '../../components/FormValidation';
-import Button from '../../components/Button';
-import FormField from '../../components/FormField';
 import MessageChannel from './MessageChannel';
-
-const messages = defineMessages({
-  send: {
-    id: 'command.submit',
-    description: 'Short command for sending data to the server',
-    defaultMessage: 'Submit',
-  },
-
-  empty: {
-    id: 'form.error-empty',
-    defaultMessage: "You can't leave this empty",
-    description: 'Help for empty fields',
-  },
-});
+import MessageForm from '../../components/MessageForm';
 
 class MessageContainer extends React.Component {
   static propTypes = {
@@ -104,7 +86,9 @@ class MessageContainer extends React.Component {
 
         {messageObject &&
           messageObject.replyable && (
-            <div
+            <MessageForm updates={messageUpdates} onSend={this.sendReply} />
+          )
+        /* <div
               style={{
                 width: '100%',
                 maxWidth: '35em',
@@ -139,7 +123,8 @@ class MessageContainer extends React.Component {
                 )}
               </FormValidation>
             </div>
-          )}
+          ) */
+        }
       </Box>
     );
   }

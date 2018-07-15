@@ -5,8 +5,11 @@ import {
   GraphQLNonNull,
 } from 'graphql';
 import User from '../models/User';
+/* eslint-disable import/no-cycle */
 import UserType from './UserType';
 import ObjectType from './ObjectType';
+/* eslint-enable import/no-cycle */
+
 import Message from '../models/Message';
 import Proposal from '../models/Proposal';
 import Statement from '../models/Statement';
@@ -124,12 +127,22 @@ const ActivityType = new GraphQLObjectType({
     object: {
       type: ObjectType,
       resolve: async (parent, args, { viewer, loaders }) => {
+        let result;
         if (parent.type === AType.PROPOSAL) {
           if (parent.verb === 'update') {
             loaders.proposals.clear(parent.objectId);
             loaders.polls.clearAll(); // or specify
           }
-          return Proposal.gen(viewer, parent.objectId, loaders);
+          result = await Proposal.gen(viewer, parent.objectId, loaders);
+          if (result.deletedAt) {
+            return new Proposal({
+              id: result.id,
+              deleted_at: result.deletedAt,
+              work_team_id: result.workTeamId,
+            });
+          }
+
+          return result;
         }
         if (parent.type === AType.STATEMENT) {
           return getStatement(viewer, parent, loaders);
@@ -141,7 +154,16 @@ const ActivityType = new GraphQLObjectType({
           return Message.gen(viewer, parent.objectId, loaders);
         }
         if (parent.type === AType.DISCUSSION) {
-          return Discussion.gen(viewer, parent.objectId, loaders);
+          result = await Discussion.gen(viewer, parent.objectId, loaders);
+          if (result.deletedAt) {
+            return new Discussion({
+              id: result.id,
+              deleted_at: result.deletedAt,
+              work_team_id: result.workTeamId,
+            });
+          }
+
+          return result;
         }
         if (parent.type === AType.COMMENT) {
           return Comment.gen(viewer, parent.objectId, loaders);

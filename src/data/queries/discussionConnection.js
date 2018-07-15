@@ -1,4 +1,4 @@
-import { GraphQLInt, GraphQLString, GraphQLID } from 'graphql';
+import { GraphQLInt, GraphQLString, GraphQLID, GraphQLBoolean } from 'graphql';
 
 import PageType from '../types/PageType';
 import DiscussionType from '../types/DiscussionType';
@@ -17,10 +17,13 @@ const discussionConnection = {
     workteamId: {
       type: GraphQLID,
     },
+    closed: {
+      type: GraphQLBoolean,
+    },
   },
   resolve: async (
     parent,
-    { first = 10, after = '', workTeamId },
+    { first = 10, after = '', workteamId, closed },
     { viewer, loaders },
   ) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
@@ -32,20 +35,35 @@ const discussionConnection = {
 
     const discussions = await knex('discussions')
       // .whereRaw('groups & ? > 0', [group]) TODO Later
-      .where({ work_team_id: workTeamId })
-      .whereRaw('(discussions.created_at, users.id) < (?,?)', [cursor, id])
+      .where({ work_team_id: workteamId })
+      .modify(queryBuilder => {
+        if (!closed) {
+          queryBuilder.whereNull('closed_at');
+        } else {
+          queryBuilder.whereNotNull('closed_at');
+        }
+      })
+      .whereRaw('(discussions.created_at, discussions.id) < (?,?)', [
+        cursor,
+        id,
+      ])
       .limit(first)
       .orderBy('discussions.created_at', 'desc')
       .orderBy('discussions.id', 'desc')
-      .select('users.id as id', 'discussions.created_at as time');
-
+      .select('discussions.id as id', 'discussions.created_at as time');
     const queries = discussions.map(u => Discussion.gen(viewer, u.id, loaders));
     const discussionsSet = discussions.reduce((acc, curr) => {
       acc[curr.id] = curr;
       return acc;
     }, {});
     const data = await Promise.all(queries);
-    const edges = data.map(p => ({ node: p }));
+    // filter void nodes out
+    const edges = data.reduce((result, curr) => {
+      if (curr) {
+        result.push({ node: curr });
+      }
+      return result;
+    }, []); // data.map(p => ({ node: p }));
     const endCursor =
       edges.length > 0
         ? Buffer.from(

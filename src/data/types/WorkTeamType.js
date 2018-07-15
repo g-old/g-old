@@ -7,19 +7,19 @@ import {
   GraphQLInt,
   GraphQLBoolean,
 } from 'graphql';
+/* eslint-disable import/no-cycle */
 import UserType from './UserType';
-import DiscussionType from './DiscussionType';
 import GroupStatusType from './GroupStatusType';
+import ProposalStatusType from './ProposalStatusType';
+import requestConnection from '../queries/requestConnection';
+import discussionConnection from '../queries/discussionConnection';
+import proposalConnection from '../queries/proposalConnection';
+/* eslint-enable import/no-cycle */
+
 import PageType from './PageType';
-
 import Request from '../models/Request';
-import ProposalStatusType from '../types/ProposalStatusType';
-
-import Discussion from '../models/Discussion';
 import User from '../models/User';
 import knex from '../knex';
-import proposalConnection from '../queries/proposalConnection';
-import requestConnection from '../queries/requestConnection';
 
 const WorkTeamType = new ObjectType({
   name: 'WorkTeam',
@@ -30,6 +30,9 @@ const WorkTeamType = new ObjectType({
       resolve(data, args, { viewer, loaders }) {
         return User.gen(viewer, data.coordinatorId, loaders);
       },
+    },
+    coordinatorId: {
+      type: ID,
     },
     name: {
       type: GraphQLString,
@@ -132,32 +135,12 @@ const WorkTeamType = new ObjectType({
     numProposals: {
       type: GraphQLInt,
     },
-    discussions: {
-      type: new GraphQLList(DiscussionType),
-      resolve(data, args, { viewer, loaders }) {
-        if (viewer && viewer.wtMemberships.includes(data.id)) {
-          return knex('discussions')
-            .where({ work_team_id: data.id })
-            .orderBy('created_at', 'DESC')
-            .pluck('id')
-            .then(ids => ids.map(id => Discussion.gen(viewer, id, loaders)));
-        }
-        return null;
-      },
+    deletedAt: {
+      type: GraphQLString,
     },
-    proposalConnection /* {
-      type: new GraphQLList(ProposalType),
-      resolve(data, args, { viewer, loaders }) {
-        if (viewer && viewer.wtMemberships.includes(data.id)) {
-          return knex('proposals')
-            .where({ work_team_id: data.id })
-            .orderBy('created_at', 'DESC')
-            .pluck('id')
-            .then(ids => ids.map(id => Proposal.gen(viewer, id, loaders)));
-        }
-        return null;
-      },
-    }, */,
+    discussionConnection,
+
+    proposalConnection,
 
     // TODO see https://github.com/graphql/swapi-graphql/blob/master/src/schema/connections.js
     // make own query and link here
@@ -181,7 +164,6 @@ const WorkTeamType = new ObjectType({
         id = Number(id);
         let proposalStates = [];
         cursor = cursor ? new Date(cursor) : new Date(null);
-
         proposalStates = await knex('proposal_groups')
           .where({
             group_id: parent.id,

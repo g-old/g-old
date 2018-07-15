@@ -76,13 +76,6 @@ const messages = defineMessages({
     description: 'Comment edited',
   },
 });
-const EditMenu = props => <div>{props.children}</div>;
-EditMenu.propTypes = {
-  children: PropTypes.element,
-};
-EditMenu.defaultProps = {
-  children: null,
-};
 
 class Comment extends React.Component {
   static propTypes = {
@@ -391,7 +384,7 @@ class Comment extends React.Component {
       if (user) {
         // canLike = !asInput && !own && (user.permissions & Permissions.LIKE) > 0;
         canDelete =
-          own ||
+          (own && this.props.onReply) ||
           (!deletedAt && (user.permissions & Permissions.DELETE_COMMENTS) > 0);
         canFlag =
           !own &&
@@ -419,7 +412,7 @@ class Comment extends React.Component {
         );
       }
 
-      if (own) {
+      if (own && this.props.onReply) {
         menuFields.push(
           <Button
             onClick={this.handleEditing}
@@ -428,23 +421,25 @@ class Comment extends React.Component {
           />,
         );
       }
-      menu = (
-        <Menu
-          dropAlign={{ top: 'top', right: 'right' }}
-          icon={
-            <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-              <path
-                fill="none"
-                stroke="#666"
-                strokeWidth="2"
-                d="M3,13 L3,11 L5,11 L5,13 L3,13 Z M11,12.9995001 L11,11 L12.9995001,11 L12.9995001,12.9995001 L11,12.9995001 Z M19,12.9995001 L19,11 L20.9995001,11 L20.9995001,12.9995001 L19,12.9995001 Z"
-              />
-            </svg>
-          }
-        >
-          {menuFields}
-        </Menu>
-      );
+      if (menuFields.length) {
+        menu = (
+          <Menu
+            dropAlign={{ top: 'top', right: 'right' }}
+            icon={
+              <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+                <path
+                  fill="none"
+                  stroke="#666"
+                  strokeWidth="2"
+                  d="M3,13 L3,11 L5,11 L5,13 L3,13 Z M11,12.9995001 L11,11 L12.9995001,11 L12.9995001,12.9995001 L11,12.9995001 Z M19,12.9995001 L19,11 L20.9995001,11 L20.9995001,12.9995001 L19,12.9995001 Z"
+                />
+              </svg>
+            }
+          >
+            {menuFields}
+          </Menu>
+        );
+      }
     }
     return menu;
   }
@@ -490,11 +485,13 @@ class Comment extends React.Component {
 
   renderFooter(user) {
     const footer = [];
-    footer.push(
-      <button onClick={this.handleReply} className={s.command}>
-        <FormattedMessage {...messages.reply} />
-      </button>,
-    );
+    if (this.props.onReply) {
+      footer.push(
+        <button onClick={this.handleReply} className={s.command}>
+          <FormattedMessage {...messages.reply} />
+        </button>,
+      );
+    }
     if (this.state.open && !this.state.editing) {
       footer.push(
         <div style={{ marginLeft: '3rem' }}>

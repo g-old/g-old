@@ -4,6 +4,7 @@ import {
   AccessMasks,
   PrivilegesSchema,
   PermissionsSchema,
+  isCoordinator,
 } from '../organization';
 /* eslint-disable no-bitwise */
 // TODO make object
@@ -161,12 +162,17 @@ function proposalReadControl(viewer, data) {
 }
 
 function proposalWriteControl(viewer, data) {
+  if (data.workTeam && data.workTeam.deletedAt) {
+    return false;
+  }
   if (data.workTeamId) {
-    if (data.isCoordinator) {
+    if (isCoordinator(viewer, data.workTeam)) {
       return true;
     }
-    return viewer.permissions & PermissionsSchema[Groups.ADMIN];
-  } else if (viewer.permissions & PermissionsSchema[Groups.RELATOR]) {
+    return (viewer.groups & Groups.ADMIN) > 0;
+  }
+
+  if (viewer.groups & Groups.RELATOR) {
     if (data.id && data.state) {
       // updates
       if (viewer.permissions & Permissions.MODIFY_PROPOSALS) {
@@ -175,7 +181,8 @@ function proposalWriteControl(viewer, data) {
       return false;
     }
     return true;
-  } else if (data.state === 'survey') {
+  }
+  if (data.state === 'survey') {
     if (viewer.permissions & Permissions.PUBLISH_SURVEYS) {
       return true;
     }
@@ -191,6 +198,9 @@ function statementReadControl(viewer, data) {
 }
 
 function statementWriteControl(viewer, data) {
+  if (data.proposal.deletedAt) {
+    return false;
+  }
   if (
     data.proposal.state === 'survey' &&
     viewer.permissions & Permissions.TAKE_SURVEYS
@@ -198,6 +208,10 @@ function statementWriteControl(viewer, data) {
     return checkIfMember(viewer, data.proposal);
   }
   if (viewer.permissions & Permissions.MODIFY_OWN_STATEMENTS) {
+    return checkIfMember(viewer, data.proposal);
+  }
+  // To allow viewes in workteams to write statements
+  if (data.proposal.workTeamId && viewer.groups & Groups.VIEWER) {
     return checkIfMember(viewer, data.proposal);
   }
   return false;
@@ -253,7 +267,8 @@ function pollWriteControl(viewer, data) {
       return false;
     }
     return true;
-  } else if (data.isCoordinator) {
+  }
+  if (isCoordinator(viewer, data.workTeam)) {
     return true;
   }
   return viewer.permissions & PermissionsSchema[Groups.ADMIN];
@@ -270,7 +285,10 @@ function voteWriteControl(viewer, data) {
     if (viewer.permissions & Permissions.TAKE_SURVEYS) {
       return checkIfMember(viewer, data.proposal);
     }
-  } else if (viewer.permissions & Permissions.VOTE) {
+  } else if (
+    (data.proposal.workTeamId && viewer.groups & Groups.VIEWER) ||
+    viewer.permissions & Permissions.VOTE
+  ) {
     return checkIfMember(viewer, data.proposal);
   }
   return false;
@@ -283,7 +301,7 @@ function messageReadControl(viewer, data) {
       return true;
     }
     if (data.recipient_type === 'all') {
-      return true;
+      return (viewer.groups & Groups.VIEWER) > 0;
     }
     if (data.recipient_type === 'group') {
       // check if same group
@@ -295,17 +313,32 @@ function messageReadControl(viewer, data) {
       // eslint-disable-next-line eqeqeq
       return data.recipients.some(id => id == viewer.id);
     }
+    // Atm misused for guests
+    if (data.recipient_type === 'role') {
+      // eslint-disable-next-line eqeqeq
+      return viewer.groups === Groups.GUEST;
+    }
   }
   return false;
 }
 function messageWriteControl(viewer, data) {
-  if (
-    viewer.permissions &
-    (Permissions.NOTIFY_GROUPS | Permissions.NOTIFY_ALL)
-  ) {
+  if (data.workTeam && data.workTeam.deletedAt) {
+    return false;
+  }
+  if (viewer.permissions & Permissions.NOTIFY_ALL) {
     return true;
-  } else if (data.isReply || data.isCoordinator) {
+  }
+
+  if (data.isReply || isCoordinator(viewer, data.workTeam)) {
     return true;
+  }
+  if (viewer.groups & Groups.VIEWER) {
+    // member can contact coordinator
+    if (data.workTeamIds) {
+      if (data.workTeamIds.some(wtId => viewer.wtMemberships.includes(wtId))) {
+        return true;
+      }
+    }
   }
   return false;
 }
@@ -349,15 +382,25 @@ function discussionReadControl(viewer, data) {
   if (viewer.wtMemberships.includes(data.work_team_id)) {
     return true;
   }
-  return false;
+  return viewer.groups & Groups.ADMIN || false;
 }
 function discussionWriteControl(viewer, data) {
+  if (data.workTeam && data.workTeam.deletedAt) {
+    return false;
+  }
   if (data.workTeamId) {
-    if (data.isCoordinator) {
+    if (
+      data.mainTeam &&
+      viewer.wtMemberships.includes(Number(data.workTeamId))
+    ) {
+      return true;
+    }
+    if (isCoordinator(viewer, data.workTeam)) {
       return true;
     }
     return viewer.permissions & PermissionsSchema[Groups.ADMIN];
-  } else if (viewer.permissions & Permissions.PUBLISH_DISCUSSIONS) {
+  }
+  if (viewer.permissions & Permissions.PUBLISH_DISCUSSIONS) {
     return true;
   }
   return false;
@@ -370,7 +413,11 @@ function commentReadControl(viewer, data) {
   return false;
 }
 function commentWriteControl(viewer, data) {
-  if (data.discussion.closedAt) {
+  if (data.delete && viewer.groups & Groups.ADMIN) {
+    return true;
+  }
+
+  if (data.discussion.closedAt || data.discussion.deletedAt) {
     return false;
   }
   if (data.creating) {

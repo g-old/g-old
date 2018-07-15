@@ -23,7 +23,7 @@ const compileEmail = filename => {
         )
         .replace(
           /-address-/,
-          'Associazione Movimento 5 Stelle Alto Adige/Südtirol, Viale Venezia, n. 41, 39100 Bolzano',
+          'Associazione Movimento 5 Stelle Alto Adige/Südtirol, m5sbz@g-old.org',
         );
 
       handlebars.registerPartial(file.substr(0, file.length - 4), partial);

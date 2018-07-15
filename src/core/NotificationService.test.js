@@ -2,7 +2,9 @@
 /* eslint-env jest */
 
 import NotificationService from './NotificationService';
-import { SubscriptionType, TargetType } from '../data/models/Subscription';
+import { SubscriptionType } from '../data/models/Subscription';
+import { TargetType } from '../data/models/utils';
+
 import { getUniqueId } from '../../test/utils';
 import { ActivityType } from '../data/models/Activity';
 

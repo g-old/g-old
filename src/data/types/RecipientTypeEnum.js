@@ -12,6 +12,9 @@ const RecipientType = new GraphQLEnumType({
     ALL: {
       value: 'all',
     },
+    ROLE: {
+      value: 'role',
+    },
   },
 });
 

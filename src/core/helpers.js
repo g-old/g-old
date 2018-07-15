@@ -277,8 +277,29 @@ export const join = (lookupTable, mainTable, lookupKey, mainKey, select) => {
   return output;
 };
 
-export const depaginate = (resource, response) => {
-  const conn = response[`${resource}Connection`];
+export const depaginate = (resource, data) => {
+  let connections;
+  const response = JSON.parse(JSON.stringify(data));
+
+  if (Array.isArray(resource)) {
+    connections = resource;
+  } else {
+    connections = [resource];
+  }
+  return connections.reduce((result, rType) => {
+    const conn = result[`${rType}Connection`];
+
+    if (conn) {
+      const key = `${rType}Connection`;
+      /* eslint-disable no-param-reassign */
+      delete result[key];
+      result[`${rType}s`] = conn.edges.map(p => p.node);
+      /* eslint-enable no-param-reassign */
+    }
+    return result;
+  }, response);
+
+  /* const conn = response[`${resource}Connection`];
   if (conn) {
     const key = `${resource}Connection`;
     delete response[key];
@@ -288,5 +309,5 @@ export const depaginate = (resource, response) => {
       [`${resource}s`]: conn.edges.map(p => p.node),
     };
   }
-  return response;
+  return response; */
 };

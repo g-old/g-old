@@ -7,15 +7,21 @@ import {
   GraphQLInt,
   GraphQLBoolean,
 } from 'graphql';
-import TagType from './TagType';
+
+/* eslint-disable import/no-cycle */
 import PollType from './PollDLType';
-import User from '../models/User';
 import UserType from './UserType';
+import SubscriptionType from './SubscriptionType';
+import WorkTeamType from './WorkTeamType';
+/* eslint-enable import/no-cycle */
+import TagType from './TagType';
+import User from '../models/User';
 import Poll from '../models/Poll';
 import Tag from '../models/Tag';
-import Subscription, { TargetType } from '../models/Subscription';
-import SubscriptionType from './SubscriptionType';
+import Subscription from '../models/Subscription';
+import { TargetType } from '../models/utils';
 import knex from '../knex';
+import WorkTeam from '../models/WorkTeam';
 
 const ProposalType = new ObjectType({
   name: 'ProposalDL',
@@ -30,7 +36,7 @@ const ProposalType = new ObjectType({
     author: {
       type: UserType,
       resolve: (parent, args, { viewer, loaders }) =>
-        User.gen(viewer, parent.author_id, loaders),
+        User.gen(viewer, parent.authorId, loaders),
     },
 
     body: {
@@ -52,15 +58,22 @@ const ProposalType = new ObjectType({
     workTeamId: {
       type: GraphQLString,
     },
+    workteam: {
+      type: WorkTeamType,
+      resolve: (parent, args, { viewer, loaders }) =>
+        parent.workTeamId
+          ? WorkTeam.gen(viewer, parent.workTeamId, loaders)
+          : null,
+    },
     pollOne: {
       type: PollType,
       resolve: (parent, args, { viewer, loaders }) =>
-        Poll.gen(viewer, parent.pollOne_id, loaders),
+        Poll.gen(viewer, parent.pollOneId, loaders),
     },
     pollTwo: {
       type: PollType,
       resolve: (parent, args, { viewer, loaders }) =>
-        Poll.gen(viewer, parent.pollTwo_id, loaders),
+        Poll.gen(viewer, parent.pollTwoId, loaders),
     },
 
     spokesman: {
@@ -79,6 +92,9 @@ const ProposalType = new ObjectType({
     publishedAt: {
       type: GraphQLString,
       resolve: data => data.createdAt,
+    },
+    deletedAt: {
+      type: GraphQLString,
     },
 
     subscribed: {
@@ -108,7 +124,8 @@ const ProposalType = new ObjectType({
     },
     canVote: {
       type: GraphQLBoolean,
-      resolve: async (parent, args, { viewer }) => parent.isVotable(viewer),
+      resolve: async (parent, args, { viewer }) =>
+        parent.deletedAt ? false : parent.isVotable(viewer),
     },
   }),
 });

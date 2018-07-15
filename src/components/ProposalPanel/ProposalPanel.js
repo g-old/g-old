@@ -6,9 +6,14 @@ import ProposalInput from '../ProposalInput';
 import ProposalsManager from '../ProposalsManager';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
-import { loadTags, loadProposalsList } from '../../actions/proposal';
+import {
+  loadTags,
+  loadProposalsList,
+  updateProposal,
+} from '../../actions/proposal';
 import TagManager from '../TagManager';
-import { getVisibleProposals } from '../../reducers';
+import { getVisibleProposals, getResourcePageInfo } from '../../reducers';
+import { genProposalPageKey } from '../../reducers/pageInfo';
 
 const messages = defineMessages({
   proposalInput: {
@@ -88,22 +93,39 @@ class ProposalPanel extends React.Component {
   static propTypes = {
     loadProposalsList: PropTypes.func.isRequired,
     loadTags: PropTypes.func.isRequired,
+    updateProposal: PropTypes.func.isRequired,
     proposals: PropTypes.arrayOf(PropTypes.shape({})),
+    pageInfo: PropTypes.shape({}).isRequired,
   };
 
   static defaultProps = {
     proposals: null,
   };
 
+  constructor(props) {
+    super(props);
+    this.fetchProposals = this.fetchProposals.bind(this);
+    this.fetchTags = this.fetchTags.bind(this);
+  }
+
+  fetchTags() {
+    const { loadTags: fetchTags } = this.props;
+    fetchTags();
+  }
+
+  fetchProposals({ after } = {}) {
+    const { loadProposalsList: loadProposals } = this.props;
+    loadProposals({ state: 'active', first: 50, after });
+  }
+
   render() {
+    const { proposals, pageInfo, updateProposal: mutateProposal } = this.props;
     return (
       <div>
         <Accordion>
           <AccordionPanel
             heading={<FormattedMessage {...messages.proposalInput} />}
-            onActive={() => {
-              this.props.loadTags();
-            }}
+            onActive={this.fetchTags}
           >
             <ProposalInput
               maxTags={8}
@@ -113,21 +135,20 @@ class ProposalPanel extends React.Component {
           </AccordionPanel>
           <AccordionPanel
             heading={<FormattedMessage {...messages.proposalManager} />}
-            onActive={() => {
-              this.props.loadProposalsList({ state: 'active', first: 50 });
-            }}
+            onActive={this.fetchProposals}
           >
             <ProposalsManager
               pollOptions={pollOptions}
               defaultPollValues={defaultPollValues}
-              proposals={this.props.proposals || []}
+              proposals={proposals || []}
+              pageInfo={pageInfo}
+              updateProposal={mutateProposal}
+              loadProposals={this.fetchProposals}
             />
           </AccordionPanel>
           <AccordionPanel
             heading={<FormattedMessage {...messages.tags} />}
-            onActive={() => {
-              this.props.loadTags();
-            }}
+            onActive={this.fetchTags}
           >
             <TagManager />
           </AccordionPanel>
@@ -138,11 +159,20 @@ class ProposalPanel extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  proposals: getVisibleProposals(state, 'active'),
+  proposals: getVisibleProposals(state, 'active').filter(p => !p.workTeamId),
+  pageInfo: getResourcePageInfo(
+    state,
+    'proposals',
+    genProposalPageKey({ state: 'active' }),
+  ), // getProposalsPage(state, 'active'),
 });
 const mapDispatch = {
   loadTags,
   loadProposalsList,
+  updateProposal,
 };
 
-export default connect(mapStateToProps, mapDispatch)(ProposalPanel);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(ProposalPanel);

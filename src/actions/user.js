@@ -2,6 +2,8 @@
 import { normalize } from 'normalizr';
 import { genStatusIndicators, depaginate } from '../core/helpers';
 import { user as userSchema, userList as userArray } from '../store/schema';
+import { genUsersPageKey } from '../reducers/pageInfo';
+
 import {
   LOAD_USERS_START,
   LOAD_USERS_SUCCESS,
@@ -33,6 +35,7 @@ export const userFields = `
 const userConnection = `
 query ($group:Int $after:String $union:Boolean) {
   userConnection (group:$group after:$after union:$union) {
+    totalCount
     pageInfo{
       endCursor
       hasNextPage
@@ -63,6 +66,7 @@ const workTeam = `
     id
     displayName
     logo
+    coordinatorId,
     `;
 
 const messageFields = `
@@ -195,13 +199,14 @@ export function loadUserList({ group, first, after, union = false }) {
     if (getUsersStatus(getState(), group).pending) {
       return false;
     }
-
+    const pageKey = genUsersPageKey({ union, group });
     dispatch({
       type: LOAD_USERS_START,
       payload: {
         group,
       },
       filter: group,
+      pageKey,
     });
 
     try {
@@ -218,6 +223,8 @@ export function loadUserList({ group, first, after, union = false }) {
         payload: normalizedData,
         filter: group,
         pagination: data.userConnection.pageInfo,
+        totalCount: data.userConnection.totalCount,
+        pageKey,
         savePageInfo: after != null,
       });
     } catch (error) {
@@ -226,6 +233,7 @@ export function loadUserList({ group, first, after, union = false }) {
         payload: {
           error,
         },
+        pageKey,
         message: error.message || 'Something went wrong',
         filter: group,
       });
@@ -495,6 +503,14 @@ export function deleteUser({ id }) {
 
     dispatch({
       type: DELETE_USER_START,
+      id,
+      properties: {
+        deleted: {
+          pending: true,
+          success: false,
+          error: null,
+        },
+      },
     });
 
     try {
@@ -513,6 +529,7 @@ export function deleteUser({ id }) {
           payload: {
             errors,
           },
+
           message: { fields: standardError },
         });
         return false;
@@ -522,12 +539,28 @@ export function deleteUser({ id }) {
         type: DELETE_USER_SUCCESS,
         payload: normalizedData,
         filter: 'all',
+        id,
+        properties: {
+          deleted: {
+            pending: false,
+            success: true,
+            error: null,
+          },
+        },
       });
     } catch (error) {
       dispatch({
         type: DELETE_USER_ERROR,
         payload: {
           error,
+        },
+        id,
+        properties: {
+          deleted: {
+            pending: false,
+            success: false,
+            error: error.message || 'Something went wrong',
+          },
         },
         message: error.message || 'Something went wrong',
       });

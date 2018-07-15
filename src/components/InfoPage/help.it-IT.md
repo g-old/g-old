@@ -45,7 +45,7 @@ Ogni utente ha la possibilità di scegliere fino a cinque altri utenti da seguir
 
 ### GOLD (Government by OnLine Democracy)
 
-Seguendo questo [link](https://drive.google.com/file/d/1hcFer8ulwVD_BIptIQ340EXIsJ9UnEef/view?usp=sharing) troverai una spiegazione molto sintetica del modello GOLD, un modello per implementare la democrazia diretta attraverso una rete sociale su internet dotata di strumenti sviluppati appositamente per la discussione e la votazione di proposte riguardante qualsiasi aspetto della società civile.
+Seguendo questo [link](https://drive.google.com/file/d/1hcFer8ulwVD_BIptIQ340EXIsJ9UnEef/view?usp=sharing) troverai una spiegazione molto sintetica del modello GOLD, un modello per implementare la democrazia diretta attraverso una rete sociale su internet dotata di strumenti sviluppati appositamente per la discussione e la votazione di proposte riguardanti qualsiasi aspetto della società civile.
 
 ### Gruppi di lavoro (gdl)
 
@@ -58,7 +58,7 @@ Sulla piattaforma possono essere attivati gruppi di lavoro dedicati a temi diver
 Per gli utenti della piattaforma sono previsti i seguenti profili
 
 * **_Ospite (guest)_**: vede la pagina di iscrizione e la sezione informazioni
-* **_Visitatore (viewer)_**: può leggere tutto e partecipare ai sondaggi
+* **_Visitatore (viewer)_**: può leggere tutto, partecipare ai sondaggi e alle discussioni nei gruppi di lavoro.
 * **_Votante (voter)_**: può leggere, commentare e votare.
 * **_Moderatore (moderator)_**: è un voter con il diritto aggiuntivo di poter eliminare commenti segnalati come offensivi o non rispettosi delle regole della piattaforma,
 * **_Relatore (relator)_**: può pubblicare proposte e sondaggi, indire delle votazioni e avviare delle discussioni.

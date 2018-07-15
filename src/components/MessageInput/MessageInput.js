@@ -1,7 +1,9 @@
 // @flow
 import React from 'react';
 import PropTypes from 'prop-types';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
+import { Groups } from '../../organization';
 import {
   recipientValidation,
   textValidation,
@@ -9,6 +11,7 @@ import {
   lazyValidationFailure,
   EMPTY,
 } from './validationFns';
+import s from './MessageInput.css';
 import Box from '../Box';
 import CheckBox from '../CheckBox';
 import FormField from '../FormField';
@@ -19,9 +22,11 @@ import LocaleSelector from './LocaleSelector';
 import Select from '../Select';
 import MessagesLayer from './MessagesLayer';
 import Editor from '../MainEditor';
-import Message from '../Message';
+// import Message from '../Message';
+import NoticeLayer from './NoticeLayer';
+import Notification from '../Notification';
 
-import { ICONS } from '../../constants';
+import { ICONS, FLAG_STATEMENT_START } from '../../constants';
 
 const messages = defineMessages({
   send: {
@@ -37,31 +42,103 @@ const messages = defineMessages({
   },
 });
 
-class MessageInput extends React.Component {
+type MessageType = 'COMMUNICATION' | 'NOTE';
+type RecipientType = 'USER' | 'GROUP';
+type CategoryType = 'CIRCULAR';
+type Note = { id?: ID, textHtml: { [string]: string }, category: CategoryType };
+type Communication = { textHtml: string, replyable: boolean };
+type Message = {
+  recipientType: RecipientType,
+  messageType: MessageType,
+  note?: Note,
+  communication?: Communication,
+  recipients: [?ID],
+  subject: string,
+  isDraft: boolean,
+  enforceEmail: boolean,
+};
+type State = {
+  draftId?: ?ID,
+  data: {
+    textde: string,
+    textit: string,
+    subjectde: string,
+    subjectit: string,
+    recipients: [ID],
+    messageType: MessageType,
+    recipientType: RecipientType,
+  },
+  activeLocale: 'de' | 'it',
+  isPublished?: boolean,
+  saving?: boolean,
+  showNotice?: boolean,
+  layerOpen?: boolean,
+  message?: Message,
+  initialValue?: {},
+};
+
+type Props = {
+  receiverId: ID,
+  notifyUser: Message => void,
+  draftMode?: boolean,
+  updates: { pending: boolean, success: string },
+  recipients?: [?ID],
+  recipientType: RecipientType,
+  messageType: MessageType,
+  parentId?: ID,
+  updateMessage: Message => void,
+};
+
+class MessageInput extends React.Component<Props, State> {
+  /* eslint-disable react/sort-comp */
+  onNotify: () => void;
+
+  onCloseLayer: () => void;
+
+  handleSelection: () => void;
+
+  handleLanguageSelection: () => void;
+
+  storageKey: string;
+
+  onOpenLayer: () => void;
+
+  unloadDraft: () => void;
+
+  retrieveValue: string => any;
+
+  storeValues: ({}) => void;
+
+  editor: ?{};
+
+  sendMessage: (?Message) => void;
+
+  /* eslint-enable react/sort-comp */
+
   static propTypes = {
     receiverId: PropTypes.string.isRequired,
     notifyUser: PropTypes.func.isRequired,
     updates: PropTypes.shape({
       pending: PropTypes.bool,
+      success: PropTypes.bool,
     }).isRequired,
-    notifyGroup: PropTypes.bool,
     recipients: PropTypes.arrayOf(PropTypes.string),
     recipientType: PropTypes.oneOfType(['USER', 'GROUP']).isRequired,
     messageType: PropTypes.oneOfType(['COMMUNICATION', 'NOTE']).isRequired,
     parentId: PropTypes.string,
-    draftMode: PropTypes.boolean,
+    draftMode: PropTypes.bool,
+    updateMessage: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
-    notifyGroup: null,
     recipients: null,
     parentId: null,
     draftMode: null,
   };
+
   constructor(props) {
     super(props);
     const activeLocale = 'de';
-    this.onNotify = this.onNotify.bind(this);
     this.state = {
       data: {
         textde: EMPTY,
@@ -74,45 +151,76 @@ class MessageInput extends React.Component {
       },
       activeLocale,
     };
+
+    this.onNotify = this.onNotify.bind(this);
     this.handleLanguageSelection = this.handleLanguageSelection.bind(this);
     this.handleSelection = this.handleSelection.bind(this);
     this.onCloseLayer = this.onCloseLayer.bind(this);
     this.onOpenLayer = this.onOpenLayer.bind(this);
-
+    this.unloadDraft = this.unloadDraft.bind(this);
+    this.retrieveValue = this.retrieveValue.bind(this);
+    this.storeValues = this.storeValues.bind(this);
+    this.sendMessage = this.sendMessage.bind(this);
     this.storageKey = `Message${props.messageType}`; // TODO find better one
   }
 
   componentDidMount() {
+    const { activeLocale } = this.state;
     const initialValue =
-      localStorage.getItem(this.storageKey + this.state.activeLocale) ||
-      '<p></p>';
+      localStorage.getItem(this.storageKey + activeLocale) || '<p></p>';
 
     this.editor.setInitialState(initialValue);
+
+    const draftId = this.retrieveValue('draftId'); // loadMessage if draftid is present
+
     // eslint-disable-next-line react/no-did-mount-set-state
-    this.setState({
+    this.setState(prevState => ({
       data: {
-        textde: localStorage.getItem(`${this.storageKey}de`) || EMPTY,
-        textit: localStorage.getItem(`${this.storageKey}it`) || EMPTY,
+        ...prevState.data,
+        textde: this.retrieveValue('de') || EMPTY,
+        textit: this.retrieveValue('it') || EMPTY,
       },
-    });
+      isPublished: this.retrieveValue('isPublished'),
+      draftId,
+    }));
   }
 
   componentWillReceiveProps({ updates }) {
     if (updates && updates.success) {
-      this.reset();
+      const { updates: oldUpdates } = this.props;
+      if (!(oldUpdates && oldUpdates.success)) {
+        const { saving } = this.state;
+        if (!saving) {
+          this.reset();
+        } else {
+          const draftId = updates.success.startsWith('mo')
+            ? updates.success.slice(2)
+            : updates.success;
+
+          this.setState({ draftId }); // success was initialized with the mId
+        }
+      }
+    }
+  }
+
+  sendMessage(message) {
+    const { notifyUser: notify } = this.props;
+    if (message) {
+      notify(message);
     }
   }
 
   // TODO refactor
   onNotify(newValues, state, options) {
     const {
-      recipients = [],
-      recipientType,
       messageType,
-      parentId,
+      updateMessage: mutateMessage,
+      notifyUser: notify,
     } = this.props;
-
-    if (lazyValidationFailure(state.errors, options && options.draft)) {
+    let { recipientType, recipients = [] } = this.props;
+    const isDraft = options && options.draft;
+    const { draftId } = this.state;
+    if (lazyValidationFailure(state.errors, isDraft)) {
       return;
     }
 
@@ -134,12 +242,11 @@ class MessageInput extends React.Component {
       ...(subjectIt.length && { it: subjectIt }),
     };
 
-    const draftId = localStorage.getItem(`${this.storageKey}draftId`);
     const object = {};
     if (messageType === 'NOTE') {
       object.note = {
-        ...((this.state.draftId || draftId) && {
-          id: this.state.draftId || draftId,
+        ...(draftId && {
+          id: draftId,
         }),
         textHtml: {
           ...(values.textde && { de: values.textde }),
@@ -153,24 +260,50 @@ class MessageInput extends React.Component {
         replyable: true,
       };
     }
-    this.props.notifyUser({
-      parentId,
-      recipientType:
-        (values.recipientType && values.recipientType.value) || recipientType,
+    recipientType =
+      (values.recipientType && values.recipientType.value) || recipientType;
+    if (recipientType === 'ROLE' && (!recipients || !recipients.length)) {
+      recipients = [Groups.GUEST];
+    }
+
+    const message = {
+      recipientType,
       messageType,
       ...object,
       recipients: recipients || [],
       subject,
-      isDraft: options && options.draft,
+      isDraft,
       enforceEmail: values.enforceEmail,
-    });
+    };
+
+    if (options && options.update) {
+      mutateMessage(message);
+    } else if (isDraft && !draftId) {
+      this.setState({ saving: isDraft }, () => this.sendMessage(message));
+    } else if (messageType === 'COMMUNICATION') {
+      notify(message);
+    } else {
+      this.setState({
+        showNotice: true,
+        message,
+        layerOpen: true,
+      });
+    }
+
+    /* else if (isDraft && isPublished && draftId) {
+      this.setState({ showNotice: true, message, layerOpen: true });
+    } else {
+      this.setState({ saving: isDraft }, () => this.props.notifyUser(message));
+    } */
   }
+
   onOpenLayer(e) {
     if (e) {
       e.stopPropagation();
     }
     this.setState({ layerOpen: true });
   }
+
   onCloseLayer() {
     this.setState({ layerOpen: false });
   }
@@ -180,30 +313,56 @@ class MessageInput extends React.Component {
     const initialValue =
       localStorage.getItem(this.storageKey + locale) || EMPTY;
     this.editor.setInitialState(initialValue);
+    // this.setState({ initialValue });
   }
+
+  storeValues(keyValues) {
+    Object.keys(keyValues).map(key =>
+      localStorage.setItem(this.storageKey + key, keyValues[key]),
+    );
+  }
+
+  retrieveValue(key) {
+    return localStorage.getItem(this.storageKey + key);
+  }
+
   handleSelection(messageObject) {
-    this.setState({
+    const { activeLocale } = this.state;
+    this.setState(prevState => ({
       data: {
+        ...prevState.data,
         textde: messageObject.textHtml.de,
         textit: messageObject.textHtml.it,
       },
+      isPublished: messageObject.isPublished,
+      draftId: messageObject.id,
+    }));
+
+    this.storeValues({
+      de: messageObject.textHtml.de,
+      it: messageObject.textHtml.it,
+      draftId: messageObject.id,
+      isPublished: messageObject.isPublished,
     });
-    localStorage.setItem(`${this.storageKey}de`, messageObject.textHtml.de);
+    /*  localStorage.setItem(`${this.storageKey}de`, messageObject.textHtml.de);
     localStorage.setItem(`${this.storageKey}it`, messageObject.textHtml.it);
     localStorage.setItem(`${this.storageKey}draftId`, messageObject.id);
-
-    this.editor.setInitialState(
-      messageObject.textHtml[this.state.activeLocale] || EMPTY,
-    );
+*/
+    this.editor.setInitialState(messageObject.textHtml[activeLocale] || EMPTY);
+    /* this.setState({
+      initialValue: messageObject.textHtml[this.state.activeLocale] || EMPTY,
+    }); */
 
     this.onCloseLayer();
-    this.setState({ draftId: messageObject.id });
   }
+
   reset() {
+    const { recipients, messageType, recipientType } = this.props;
     this.editor.reset();
     localStorage.setItem(`${this.storageKey}de`, EMPTY);
     localStorage.setItem(`${this.storageKey}it`, EMPTY);
     localStorage.removeItem(`${this.storageKey}draftId`);
+    localStorage.removeItem(`${this.storageKey}isPublished`);
 
     this.setState({
       data: {
@@ -211,21 +370,35 @@ class MessageInput extends React.Component {
         textit: EMPTY,
         subjectde: ' ',
         subjectit: ' ',
-        recipients: this.props.recipients || [],
+        recipients: recipients || [],
         enforceEmail: false,
-        messageType: this.props.messageType,
-        recipientType: this.props.recipientType,
+        messageType,
+        recipientType,
       },
       draftId: null,
+      isPublished: false,
+      showNotice: false,
+      layerOpen: false,
     });
+  }
+
+  unloadDraft() {
+    const { draftId } = this.state;
+    if (draftId) {
+      localStorage.removeItem(`${this.storageKey}draftId`);
+      localStorage.removeItem(`${this.storageKey}isPublished`);
+
+      this.setState({ draftId: null, isPublished: FLAG_STATEMENT_START });
+    }
   }
 
   renderTextInputs(handleValueChanges, activeLocale, values, errorMessages) {
     const subject = `subject${activeLocale}`;
     const editor = `text${activeLocale}`;
+    const { draftId, isPublished, initialValue } = this.state;
     return (
       <React.Fragment>
-        <fieldset>
+        <fieldset className={s.controlBox}>
           <FormField label="subject" error={errorMessages[`${subject}Error`]}>
             <input
               name={subject}
@@ -234,13 +407,24 @@ class MessageInput extends React.Component {
               onChange={handleValueChanges}
             />
           </FormField>
+          {draftId && (
+            <Notification
+              type="alert"
+              message={`Working on ${
+                isPublished ? 'PUBLISHED message' : 'draft'
+              }!`}
+              action={
+                <Button primary onClick={this.unloadDraft} label="Unload" />
+              }
+            />
+          )}
           <FormField error={errorMessages[`${editor}Error`]}>
             <div style={{ padding: '0 1.5em' }}>
               <Editor
                 ref={
                   elm => (this.editor = elm) // eslint-disable-line
                 }
-                initialValue={this.state.initialValue}
+                initialValue={initialValue}
                 onChange={value => {
                   handleValueChanges({ target: { name: editor, value } });
                   localStorage.setItem(this.storageKey + activeLocale, value);
@@ -249,18 +433,51 @@ class MessageInput extends React.Component {
             </div>
           </FormField>
         </fieldset>
-        <FormField label="Preview">
+        {/* <FormField label="Preview">
           <div>
             <Message subject={values[subject]} content={values[editor]} />
           </div>
-        </FormField>
+              </FormField> */}
       </React.Fragment>
     );
   }
 
   render() {
     const { updates = {}, messageType, recipientType, draftMode } = this.props;
-    const { activeLocale } = this.state;
+    const {
+      activeLocale,
+      layerOpen,
+      showNotice,
+      draftId,
+      isPublished,
+      message,
+      data,
+    } = this.state;
+    let layerComponent;
+    if (layerOpen) {
+      if (showNotice) {
+        layerComponent = (
+          <NoticeLayer
+            isDraft={draftId}
+            isPublished={isPublished}
+            message={message}
+            updates={updates}
+            isSending={message && message.isDraft}
+            onClose={() =>
+              this.setState({ showNotice: false, layerOpen: false })
+            }
+            onSend={() => this.sendMessage(message)}
+          />
+        );
+      } else {
+        layerComponent = (
+          <MessagesLayer
+            onClose={this.onCloseLayer}
+            onSelection={this.handleSelection}
+          />
+        );
+      }
+    }
     return (
       <div
         style={{
@@ -269,21 +486,21 @@ class MessageInput extends React.Component {
         }}
       >
         <FormValidation
-          lazy={draftMode} // call onSubmit even when errors are present
-          updatePending={updates && updates.pending}
+          lazy={draftMode}
+          updatePending={
+            updates && updates.pending // call onSubmit even when errors are present
+          }
           validations={{
             textit: { fn: textValidation },
             textde: { fn: textValidation },
             subjectde: { fn: subjectValidation },
             subjectit: { fn: subjectValidation },
             recipients: { fn: recipientValidation },
-            recipientType: {
-              args: { required: true },
-            },
+            recipientType: { args: { required: true } },
             enforceEmail: {},
           }}
           submit={this.onNotify}
-          data={this.state.data}
+          data={data}
         >
           {({ values, handleValueChanges, onSubmit, errorMessages }) => (
             <Box column>
@@ -297,6 +514,7 @@ class MessageInput extends React.Component {
                       inField
                       options={[
                         { value: 'ALL', label: 'ALL' },
+                        { value: 'ROLE', label: 'GUESTS' },
                         { value: 'GROUP', label: 'GROUP' },
                         { value: 'USER', label: 'USER' },
                       ]}
@@ -375,41 +593,70 @@ class MessageInput extends React.Component {
                   <CheckBox
                     toggle
                     checked={values.enforceEmail}
-                    disabled={this.props.updates && this.props.updates.pending}
+                    disabled={updates && updates.pending}
                     label="Enforce Email"
                     name="enforceEmail"
                     onChange={handleValueChanges}
                   />
                 </FormField>
               </fieldset>
-              <Box>
+              <Box className={s.controlBox} justify wrap>
                 <Button
                   primary
+                  disabled={updates.pending}
                   onClick={onSubmit}
-                  pending={this.props.updates && this.props.updates.pending}
+                  pending={updates && updates.pending}
                   label={<FormattedMessage {...messages.send} />}
-                />{' '}
+                />
                 {draftMode && (
-                  <Button
-                    primary
-                    onClick={e => onSubmit(e, { draft: true })}
-                    pending={this.props.updates && this.props.updates.pending}
-                    label="Save as draft"
-                  />
+                  <React.Fragment>
+                    <Button
+                      disabled={updates.pending}
+                      primary
+                      onClick={e =>
+                        onSubmit(e, {
+                          draft: true,
+                          excludeFields: [
+                            'subjectit',
+                            'subjectde',
+                            'recipients',
+                            'recipientType',
+                          ],
+                        })
+                      }
+                      pending={updates && updates.pending}
+                      label="Save as new draft"
+                    />
+                    {draftId && (
+                      <Button
+                        disabled={updates.pending}
+                        primary
+                        onClick={e =>
+                          onSubmit(e, {
+                            draft: true,
+                            update: true,
+                            excludeFields: [
+                              'subjectit',
+                              'subjectde',
+                              'recipients',
+                              'recipientType',
+                            ],
+                          })
+                        }
+                        pending={updates && updates.pending}
+                        label="Save (overwrite)"
+                      />
+                    )}
+                  </React.Fragment>
                 )}
               </Box>
             </Box>
           )}
         </FormValidation>
-        {this.state.layerOpen && (
-          <MessagesLayer
-            onClose={this.onCloseLayer}
-            onSelection={this.handleSelection}
-          />
-        )}
+        {layerOpen && layerComponent}
       </div>
     );
   }
 }
 
-export default MessageInput;
+export default withStyles(s)(MessageInput);

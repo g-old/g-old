@@ -43,6 +43,9 @@ const WorkTeamInputType = new GraphQLInputObjectType({
     backgroundAssetId: {
       type: ID,
     },
+    closing: {
+      type: GraphQLBoolean,
+    },
   },
 });
 export default WorkTeamInputType;

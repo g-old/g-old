@@ -4,8 +4,8 @@ import { denormalize } from 'normalizr';
 import byId, * as fromById from './proposalById';
 import createList, * as fromList from './createProposalsList';
 import byTag, * as fromByTag from './proposalsByTag';
-
-import { proposalList as proposalListSchema } from './../store/schema';
+import byWT, * as fromByWT from './proposalsByWorkTeam';
+import { proposalList as proposalListSchema } from '../store/schema';
 
 const listByFilter = combineReducers({
   all: createList('all'),
@@ -20,6 +20,7 @@ export default combineReducers({
   byId,
   listByFilter,
   byTag,
+  byWT,
 });
 
 const hydrateProposals = (state, data, entities) =>
@@ -32,6 +33,7 @@ const hydrateProposals = (state, data, entities) =>
       users: entities.users.byId,
       statements: entities.statements.byId,
       subscriptions: entities.subscriptions.byId,
+      workTeams: entities.workTeams.byId,
     },
   );
 
@@ -50,6 +52,14 @@ export const getProposal = (state, id, entities) => {
   const proposal = fromById.getProposal(state.byId, id);
   const hydrated = hydrateProposals(state, [proposal], entities);
   return hydrated.proposals[0] || {};
+};
+
+export const getWTProposalsByState = (state, wtId, filter, entities) => {
+  const proposalIds = fromByWT.getIds(state.byWT, wtId);
+  const filtered = fromList.getIds(state.listByFilter[filter]);
+  const results = proposalIds.filter(id => filtered.find(sId => sId === id));
+  const hydrated = hydrateProposals(state, results, entities);
+  return hydrated.proposals || [];
 };
 
 export const getProposalsByTag = (state, tagId, entities) => {

@@ -4,8 +4,11 @@ import {
   GraphQLID,
   GraphQLNonNull,
 } from 'graphql';
-import Proposal from '../models/Proposal';
+/* eslint-disable import/no-cycle */
 import ProposalType from './ProposalDLType';
+/* eslint-enable import/no-cycle */
+
+import Proposal from '../models/Proposal';
 
 const ProposalStatusType = new ObjectType({
   name: 'ProposalStatus',
@@ -17,8 +20,13 @@ const ProposalStatusType = new ObjectType({
 
     proposal: {
       type: ProposalType,
-      resolve: (data, args, { viewer, loaders }) =>
-        Proposal.gen(viewer, data.proposal_id, loaders),
+      resolve: async (data, args, { viewer, loaders }) => {
+        const proposal = await Proposal.gen(viewer, data.proposal_id, loaders);
+        if (proposal.deletedAt) {
+          return { id: proposal.id, deletedAt: proposal.deletedAt };
+        }
+        return proposal;
+      },
     },
     state: {
       type: GraphQLString,

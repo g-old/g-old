@@ -2,6 +2,7 @@ import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import Proposal from './Proposal';
 import Discussion from './Discussion';
+import { TargetType } from './utils';
 
 export const EventType = {
   NEW_PROPOSAL: 'new_proposal',
@@ -15,13 +16,6 @@ export const SubscriptionType = {
   FOLLOWEES: 'followees',
   REPLIES: 'replies',
   UPDATES: 'updates',
-};
-export const TargetType = {
-  PROPOSAL: 'proposal',
-  DISCUSSION: 'discussion',
-  GROUP: 'group',
-  USER: 'user',
-  ALL: 'all',
 };
 
 class Subscription {
@@ -88,13 +82,11 @@ class Subscription {
       subscriptionType = SubscriptionType.ALL;
     }
     newData.subscription_type = subscriptionType;
-
     const subscriptionInDB = await knex.transaction(async trx => {
       const [subscription = null] = await knex('subscriptions')
         .transacting(trx)
         .insert(newData)
         .returning('*');
-
       return subscription;
     });
 

@@ -15,11 +15,20 @@ const proposal = {
       type: GraphQLID,
     },
   },
-  resolve: (parent, { id, pollId }, { viewer, loaders }) => {
+  resolve: async (parent, { id, pollId }, { viewer, loaders }) => {
+    let result;
     if (id) {
-      return Proposal.gen(viewer, id, loaders);
+      result = await Proposal.gen(viewer, id, loaders);
     }
-    return Proposal.genByPoll(viewer, pollId, loaders);
+    result = await Proposal.genByPoll(viewer, pollId, loaders);
+    if (result.deletedAt) {
+      return {
+        id: result.id,
+        workTeamId: result.workTeamId,
+        deletedAt: result.deletedAt,
+      };
+    }
+    return result;
   },
 };
 

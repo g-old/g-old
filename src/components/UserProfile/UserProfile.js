@@ -5,8 +5,32 @@ import Value from '../Value';
 import Label from '../Label';
 import ProfilePicture from '../ProfilePicture';
 import history from '../../history';
+import Button from '../Button';
+import Layer from '../Layer';
+import MessageForm from '../MessageForm';
+import { Groups } from '../../organization';
 
 import { ICONS } from '../../constants';
+
+const isContactable = (workteams, accountId, accountRoles, visitor) => {
+  // eslint-disable-next-line no-bitwise
+  if (accountRoles & Groups.CONTACTEE) {
+    return true;
+  }
+  /* eslint-disable eqeqeq */
+  if (workteams && accountId != visitor.id) {
+    if (workteams.some(wt => wt.coordinatorId == accountId)) {
+      // is coordinator
+
+      if (workteams.some(wt => visitor.wtMemberships.includes(Number(wt.id)))) {
+        // visitor is member
+        return true;
+      }
+    }
+  }
+  return false;
+  /* eslint-enable eqeqeq */
+};
 
 class UserProfile extends React.Component {
   static propTypes = {
@@ -19,6 +43,7 @@ class UserProfile extends React.Component {
       numStatements: PropTypes.number,
       numFollowers: PropTypes.number,
       numLikes: PropTypes.number,
+      groups: PropTypes.number,
       workTeams: PropTypes.arrayOf(PropTypes.shape({})),
       followees: PropTypes.arrayOf(
         PropTypes.shape({
@@ -29,10 +54,68 @@ class UserProfile extends React.Component {
     ownAccount: PropTypes.bool.isRequired,
     onImageChange: PropTypes.func.isRequired,
     updates: PropTypes.shape({ dataUrl: PropTypes.string }).isRequired,
+    sessionUser: PropTypes.shape({}).isRequired,
+    onSend: PropTypes.func.isRequired,
+    messageUpdates: PropTypes.func.isRequired,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      contactable: isContactable(
+        props.user.workTeams,
+        props.user.id,
+        props.user.groups,
+        props.sessionUser,
+      ),
+    };
+
+    this.toggleLayer = this.toggleLayer.bind(this);
+  }
+
+  componentWillReceiveProps({ user, messageUpdates }) {
+    const {
+      user: oldUser,
+      sessionUser,
+      messageUpdates: oldMessageUpdates,
+    } = this.props;
+    if (user !== oldUser) {
+      this.setState({
+        contactable: isContactable(
+          user.workTeams,
+          user.id,
+          user.groups,
+          sessionUser,
+        ),
+      });
+    }
+    if (
+      messageUpdates &&
+      messageUpdates.success &&
+      !oldMessageUpdates.success
+    ) {
+      this.toggleLayer();
+    }
+  }
+
+  toggleLayer() {
+    const { layerOpen } = this.state;
+    this.setState({ layerOpen: !layerOpen });
+  }
+
   render() {
-    if (!this.props.user) return null;
+    const {
+      user,
+      ownAccount,
+      onImageChange,
+      updates,
+      onSend,
+      messageUpdates,
+    } = this.props;
+
+    if (!user) return null;
+    const { contactable, layerOpen } = this.state;
     const {
       avatar,
       name,
@@ -40,16 +123,18 @@ class UserProfile extends React.Component {
       numStatements,
       numFollowers,
       numLikes,
-    } = this.props.user;
-    const canChangeImg = this.props.ownAccount;
+      workTeams,
+    } = user;
+    const canChangeImg = ownAccount;
+
     return (
       <Box column align>
         <ProfilePicture
-          user={this.props.user}
+          user={user}
           img={avatar}
           canChange={canChangeImg}
-          onChange={this.props.onImageChange}
-          updates={this.props.updates.dataUrl}
+          onChange={onImageChange}
+          updates={updates.dataUrl}
         />
 
         <Label big>
@@ -111,9 +196,26 @@ class UserProfile extends React.Component {
             value={numStatements || 0}
           />
         </Box>
+        {contactable && (
+          <Button
+            onClick={this.toggleLayer}
+            icon={
+              <svg
+                viewBox="0 0 24 24"
+                width="24px"
+                height="24px"
+                role="img"
+                aria-label="contact"
+              >
+                <path fillRule="evenodd" d={ICONS.mail} />
+              </svg>
+            }
+            label="Contact"
+          />
+        )}
         <Box column>
-          {this.props.user.workTeams &&
-            this.props.user.workTeams.map(t => (
+          {workTeams &&
+            workTeams.map(t => (
               <Box between onClick={() => history.push(`/workteams/${t.id}`)}>
                 <svg
                   version="1.1"
@@ -135,6 +237,23 @@ class UserProfile extends React.Component {
               </Box>
             ))}
         </Box>
+        {layerOpen && (
+          <Layer onClose={this.toggleLayer}>
+            <Box padding="medium">
+              <div
+                style={{
+                  paddingTop: '2em',
+                  display: 'flex',
+                  width: '30em',
+                  margin: '0 auto',
+                  justifyContent: 'center',
+                }}
+              >
+                <MessageForm onSend={onSend} updates={messageUpdates || {}} />
+              </div>
+            </Box>
+          </Layer>
+        )}
       </Box>
     );
   }

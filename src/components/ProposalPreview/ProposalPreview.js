@@ -25,11 +25,8 @@ class ProposalPreview extends React.Component {
       tags: PropTypes.arrayOf(PropTypes.object),
     }).isRequired,
     onClick: PropTypes.func.isRequired,
-    className: PropTypes.string,
   };
-  static defaultProps = {
-    className: null,
-  };
+
   constructor(props) {
     super(props);
     this.state = {};
@@ -37,22 +34,25 @@ class ProposalPreview extends React.Component {
   }
 
   handleClick() {
-    if (this.props.onClick) {
-      const { id, state } = this.props.proposal;
-      const poll = getLastActivePoll(state, this.props.proposal);
-      this.props.onClick({ proposalId: id, pollId: poll.id });
+    const { onClick, proposal } = this.props;
+    if (onClick) {
+      const { id, state } = proposal;
+      const poll = getLastActivePoll(state, proposal);
+      onClick({ proposalId: id, pollId: poll.id });
     }
   }
 
   render() {
-    if (!this.props.proposal) {
+    const { proposal } = this.props;
+    if (!proposal) {
       return <div />;
     }
     // TODO move to state
-    const poll = getLastActivePoll(
-      this.props.proposal.state,
-      this.props.proposal,
-    );
+    const poll = getLastActivePoll(proposal.state, proposal);
+
+    if (!poll) {
+      return <div />;
+    }
 
     const pollPreview = [
       <svg key="0" viewBox="0 0 24 24" width="16px" height="16px" role="img">
@@ -89,7 +89,7 @@ class ProposalPreview extends React.Component {
     }
 
     return (
-      <div className={cn(s.root, this.props.className)}>
+      <div className={cn(s.root)}>
         <div className={s.container}>
           <div // eslint-disable-line
             style={{ display: 'flex', cursor: 'pointer' }}
@@ -99,8 +99,7 @@ class ProposalPreview extends React.Component {
             {/* <PollPreview poll={poll} /> */}
             {
               <div className={s.pollPreview}>
-                {pollPreview}{' '}
-                <ProposalState state={this.props.proposal.state} />
+                {pollPreview} <ProposalState state={proposal.state} />
               </div>
             }
 
@@ -108,20 +107,21 @@ class ProposalPreview extends React.Component {
               <div className={s.date}>
                 <FormattedRelative value={poll.endTime} />
               </div>
-              <div className={s.header}>{this.props.proposal.title}</div>
+              <div className={s.header}>{proposal.title}</div>
               {/* <div className={s.body}>
                 {body}
               </div> */}
               {/* eslint-disable jsx-a11y/no-static-element-interactions */}
               <div className={s.tags}>
-                {this.props.proposal.tags &&
-                  this.props.proposal.tags.map(
+                {proposal.tags &&
+                  proposal.tags.map(
                     tag =>
                       tag && (
                         <span // eslint-disable-line
-                          onClick={() =>
-                            history.push(`/proposals/tagged/${tag.id}`)
-                          }
+                          onClick={e => {
+                            e.stopPropagation();
+                            history.push(`/proposals/tagged/${tag.id}`);
+                          }}
                           key={tag.id}
                           className={s.tag}
                         >{`${tag.displayName}`}</span>

@@ -19,14 +19,23 @@ export type CommentProps = {
 const MAX_CONTENT_LENGTH = 10000;
 class Comment {
   id: ID;
+
   authorId: ID;
+
   discussionId: ID;
+
   content: string;
+
   parentId: ID;
+
   numReplies: number;
+
   createdAt: string;
+
   updatedAt: string;
+
   editedAt: string;
+
   constructor(data: CommentProps) {
     this.id = data.id;
     this.authorId = data.author_id;
@@ -68,7 +77,10 @@ class Comment {
         viewer,
         {
           ...data,
-          discussion: { workTeamId: discussion.work_team_id },
+          discussion: {
+            workTeamId: discussion.work_team_id,
+            closedAt: discussion.closed_at,
+          },
           creating: true,
         },
         Models.COMMENT,
@@ -133,7 +145,11 @@ class Comment {
     if (
       !canMutate(
         viewer,
-        { ...data, authorId: oldComment.author_id, discussion },
+        {
+          ...data,
+          authorId: oldComment.author_id,
+          discussion: { closedAt: discussion.closed_at },
+        },
         Models.COMMENT,
       )
     )
@@ -167,7 +183,12 @@ class Comment {
     if (
       !canMutate(
         viewer,
-        { ...data, authorId: oldComment.author_id, discussion },
+        {
+          ...data,
+          delete: true,
+          authorId: oldComment.author_id,
+          discussion: { closedAt: discussion.closed_at },
+        },
         Models.COMMENT,
       )
     ) {

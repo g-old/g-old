@@ -16,7 +16,7 @@
 import passport from 'passport';
 import bcrypt from 'bcrypt';
 import { Strategy as LocalStrategy } from 'passport-local';
-import knex from '../src/data/knex';
+import knex from './data/knex';
 import log from './logger';
 import { calcRights } from './organization';
 
@@ -37,6 +37,7 @@ passport.use(
       const email = emailField.trim().toLowerCase();
       return knex('users')
         .where({ email })
+        .whereNull('deleted_at')
         .returning([
           'id',
           'name',

@@ -16,13 +16,8 @@ import {
   LOAD_TAGS_START,
   LOAD_TAGS_ERROR,
   LOAD_TAGS_SUCCESS,
-  CREATE_PROPOSALSUB_START,
-  CREATE_PROPOSALSUB_SUCCESS,
-  CREATE_PROPOSALSUB_ERROR,
-  DELETE_PROPOSALSUB_START,
-  DELETE_PROPOSALSUB_SUCCESS,
-  DELETE_PROPOSALSUB_ERROR,
 } from '../constants';
+import { genProposalPageKey } from '../reducers/pageInfo';
 import {
   proposal as proposalSchema,
   proposalList as proposalListSchema,
@@ -105,6 +100,7 @@ publishedAt
 state
 body
 votes
+deletedAt
 spokesman{
   ${userFields}
 }
@@ -116,6 +112,11 @@ const query = `
   query ($id:ID $pollId: ID) {
     proposalDL (id:$id pollId:$pollId) {
       ${proposal}
+      workteam{
+        id
+        logo
+        displayName
+      }
       subscription{
         ${subscriptionFields}
       }
@@ -156,8 +157,8 @@ query{
 `;
 
 const proposalConnection = `
-query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID) {
-  proposalConnection (state:$state first:$first after:$after tagId:$tagId workTeamId:$workTeamId) {
+query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID $closed:Boolean) {
+  proposalConnection (state:$state first:$first after:$after tagId:$tagId workTeamId:$workTeamId closed:$closed) {
     pageInfo{
       endCursor
       hasNextPage
@@ -169,6 +170,7 @@ query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID) {
         publishedAt
         state
         body
+        workTeamId,
         tags{
           displayName
           id
@@ -208,20 +210,6 @@ mutation($id:ID  $poll:PollInput $state:ProposalState $workTeamId:ID ){
   }
 }
 `;
-
-const createProposalSubMutation = `mutation($proposalId:ID!){
-createProposalSub (subscription:{proposalId:$proposalId}){
-  id
-  subscribed
-}
-}`;
-
-const deleteProposalSubMutation = `mutation($proposalId:ID!){
-deleteProposalSub (subscription:{proposalId:$proposalId}){
-  id
-  subscribed
-}
-}`;
 
 export function loadProposal({ id, pollId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
@@ -263,7 +251,14 @@ export function loadProposal({ id, pollId }) {
   };
 }
 
-export function loadProposalsList({ state, first, after, tagId, workTeamId }) {
+export function loadProposalsList({
+  state,
+  first,
+  after,
+  tagId,
+  workTeamId,
+  closed,
+}) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
     // Dont fetch if pending
@@ -277,10 +272,17 @@ export function loadProposalsList({ state, first, after, tagId, workTeamId }) {
         return false;
       }
     }
+    const pageKey = genProposalPageKey({
+      state,
+      workteamId: workTeamId,
+      closed,
+      tagId,
+    });
     dispatch({
       type: LOAD_PROPOSAL_LIST_START,
       payload: {},
       filter: state,
+      pageKey,
     });
 
     try {
@@ -290,6 +292,7 @@ export function loadProposalsList({ state, first, after, tagId, workTeamId }) {
         after,
         tagId,
         workTeamId,
+        closed,
       });
       const proposals = data.proposalConnection.edges.map(p => p.node);
       const normalizedData = normalize(proposals, proposalListSchema);
@@ -301,6 +304,7 @@ export function loadProposalsList({ state, first, after, tagId, workTeamId }) {
         pagination: data.proposalConnection.pageInfo,
         savePageInfo: after != null,
         pageIndex: `${state}$${tagId || ''}`,
+        pageKey,
       });
     } catch (error) {
       dispatch({
@@ -308,6 +312,7 @@ export function loadProposalsList({ state, first, after, tagId, workTeamId }) {
         payload: {
           error,
         },
+        pageKey,
 
         filter: state,
         message: error.message || 'Something went wrong',
@@ -423,70 +428,6 @@ export function loadTags() {
         payload: {
           error,
         },
-      });
-      return false;
-    }
-
-    return true;
-  };
-}
-
-export function createProposalSub(proposalId) {
-  return async (dispatch, getState, { graphqlRequest }) => {
-    dispatch({
-      type: CREATE_PROPOSALSUB_START,
-      id: proposalId,
-    });
-    try {
-      const { data } = await graphqlRequest(createProposalSubMutation, {
-        proposalId,
-      });
-      const normalizedData = normalize(data.createProposalSub, proposalSchema);
-      dispatch({
-        type: CREATE_PROPOSALSUB_SUCCESS,
-        payload: normalizedData,
-        id: proposalId,
-      });
-    } catch (error) {
-      dispatch({
-        type: CREATE_PROPOSALSUB_ERROR,
-        payload: {
-          error,
-        },
-        message: error.message || 'Something went wrong',
-        id: proposalId,
-      });
-      return false;
-    }
-
-    return true;
-  };
-}
-
-export function deleteProposalSub(proposalId) {
-  return async (dispatch, getState, { graphqlRequest }) => {
-    dispatch({
-      type: DELETE_PROPOSALSUB_START,
-      id: proposalId,
-    });
-    try {
-      const { data } = await graphqlRequest(deleteProposalSubMutation, {
-        proposalId,
-      });
-      const normalizedData = normalize(data.deleteProposalSub, proposalSchema);
-      dispatch({
-        type: DELETE_PROPOSALSUB_SUCCESS,
-        payload: normalizedData,
-        id: proposalId,
-      });
-    } catch (error) {
-      dispatch({
-        type: DELETE_PROPOSALSUB_ERROR,
-        payload: {
-          error,
-        },
-        message: error.message || 'Something went wrong',
-        id: proposalId,
       });
       return false;
     }

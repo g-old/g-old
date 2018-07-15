@@ -20,6 +20,9 @@ import {
   CREATE_MESSAGE_START,
   CREATE_MESSAGE_SUCCESS,
   CREATE_MESSAGE_ERROR,
+  DELETE_USER_SUCCESS,
+  DELETE_USER_ERROR,
+  DELETE_USER_START,
 } from '../../constants';
 
 import { getErrors, getSuccessState } from '../../core/helpers';
@@ -32,6 +35,7 @@ const users = (state = {}, action) => {
     case RESET_PASSWORD_START:
     case UPDATE_USER_START:
     case CREATE_MESSAGE_START:
+    case DELETE_USER_START:
     case CREATE_VEMAIL_START: {
       return {
         ...state,
@@ -48,6 +52,7 @@ const users = (state = {}, action) => {
     case UPLOAD_AVATAR_ERROR:
     case UPDATE_USER_ERROR:
     case CREATE_MESSAGE_ERROR:
+    case DELETE_USER_ERROR:
     case CREATE_VEMAIL_ERROR: {
       const current = state[action.id];
       const newState = getErrors(current, action);
@@ -65,6 +70,7 @@ const users = (state = {}, action) => {
     case SESSION_LOGIN_SUCCESS:
     case UPLOAD_AVATAR_SUCCESS:
     case CREATE_MESSAGE_SUCCESS:
+    case DELETE_USER_SUCCESS:
     case CREATE_VEMAIL_SUCCESS: {
       const { id } = action; // Is initial id!
       const current = state[id];

@@ -1,10 +1,14 @@
 import knex from '../knex';
+/* eslint-disable import/no-cycle */
+import Proposal from './Proposal';
+/* eslint-enable import/no-cycle */
+
 import User from './User';
 import Request from './Request';
-import Proposal from './Proposal';
+import Discussion from './Discussion'; // eslint-disable-line import/no-cycle
 
 import { canSee, canMutate, Models } from '../../core/accessControl';
-import { Groups } from '../../organization';
+import { Groups, isAdmin } from '../../organization';
 
 async function validateCoordinator(viewer, id, loaders) {
   const coordinator = await User.gen(viewer, id, loaders);
@@ -21,6 +25,51 @@ async function updateCoordinatorsGroups(viewer, id, loaders) {
   }
 }
 
+async function changeWTStatus(viewer, loaders, deactivate, workteamId) {
+  const now = new Date();
+  let value = null;
+
+  if (deactivate) {
+    value = now;
+  }
+  const [updatedWorkTeam = null] = await knex.transaction(async trx => {
+    // soft-delete discussions
+    await knex('discussions')
+      .transacting(trx)
+      .forUpdate()
+      .where({ work_team_id: workteamId })
+      .update({ deleted_at: value, updated_at: now });
+
+    // soft-delete proposals
+    const proposalIds = await knex('proposals')
+      .where({ work_team_id: workteamId })
+      .pluck('id');
+
+    const proposalPromises = proposalIds.map(pId =>
+      Proposal.toggleStatus(viewer, { id: pId, value }, loaders, trx),
+    );
+
+    await Promise.all(proposalPromises);
+
+    // set user_work_teams to disabled/deleted
+
+    await knex('user_work_teams')
+      .transacting(trx)
+      .forUpdate()
+      .where({ work_team_id: workteamId })
+      .update({ inactive: !!value, updated_at: now });
+
+    return knex('work_teams')
+      .transacting(trx)
+      .forUpdate()
+      .where({ id: workteamId })
+      .update({ deleted_at: value, updated_at: now })
+      .returning('*');
+  });
+  // eslint-disable-next-line
+  return updatedWorkTeam ? new WorkTeam(updatedWorkTeam) : null;
+}
+
 class WorkTeam {
   constructor(data) {
     this.id = data.id;
@@ -34,11 +83,14 @@ class WorkTeam {
     this.itName = data.it_name;
     this.lldName = data.lld_name;
     this.mainTeam = data.main;
+    this.deletedAt = data.deleted_at;
   }
+
   canNotify(viewer) {
     // eslint-disable-next-line eqeqeq
     return viewer.id == this.coordinatorId || viewer.role.type === 'admin';
   }
+
   canModifyMemberShips(viewer, requester) {
     // eslint-disable-next-line eqeqeq
     if (this.restricted) {
@@ -54,6 +106,7 @@ class WorkTeam {
 
     return false;
   }
+
   async addMembershipToSessions(userId) {
     return this.modifySessions(userId, true);
   }
@@ -93,6 +146,7 @@ class WorkTeam {
       [serializedUser, this.id],
     ); */
   }
+
   async join(viewer, memberId, loaders) {
     let requester;
     // eslint-disable-next-line eqeqeq
@@ -360,6 +414,7 @@ class WorkTeam {
     if (Object.keys(newData).length) {
       newData.updated_at = new Date();
     }
+
     const [workTeam = null] = await knex.transaction(async trx => {
       await WorkTeam.checkForMainTeam(newData.main, trx);
       // eslint-disable-next-line newline-per-chained-call
@@ -378,6 +433,173 @@ class WorkTeam {
     }
 
     return workTeam ? new WorkTeam(workTeam) : null;
+  }
+
+  static async toggle(viewer, data, loaders) {
+    if (!isAdmin(viewer)) {
+      return null;
+    }
+    let result;
+    const workTeamInDB = await WorkTeam.gen(viewer, data.id, loaders);
+    if (workTeamInDB) {
+      if (
+        (!workTeamInDB.deletedAt && data.closing) ||
+        (workTeamInDB.deletedAt && data.closing === false)
+      ) {
+        result = await changeWTStatus(viewer, loaders, data.closing, data.id);
+      }
+    }
+
+    return result;
+  }
+
+  static async delete(viewer, data, loaders) {
+    if (!data || !data.id) return null;
+    // eslint-disable-next-line no-bitwise
+    if (!isAdmin(viewer)) {
+      return null;
+    }
+
+    const deletedWorkTeam = await knex.transaction(async trx => {
+      // delete discussions, surveys, proposals, requests
+      const workTeamInDB = await WorkTeam.gen(viewer, data.id, loaders);
+      if (!workTeamInDB.deletedAt) {
+        throw new Error('Must be soft-deleted!');
+      }
+      const discussionIds = await knex('discussions')
+        .where({ work_team_id: data.id })
+        .pluck('id');
+
+      if (discussionIds.length) {
+        const discussionDeletePromises = discussionIds.map(dId =>
+          Discussion.delete(
+            viewer,
+            { id: dId, isCascading: true },
+            loaders,
+            trx,
+          ),
+        );
+
+        await Promise.all(discussionDeletePromises);
+        const discussionActivityIds = await knex('activities')
+          .where({ type: 'discussion' })
+          .whereIn('object_id', discussionIds)
+          .pluck('id');
+
+        if (discussionActivityIds.length) {
+          await knex('notifications')
+            .transacting(trx)
+            .whereIn('activity_id', discussionActivityIds)
+            .del();
+        }
+      }
+
+      const proposalIds = await knex('proposals')
+        .where({ work_team_id: data.id })
+        .pluck('id');
+
+      if (proposalIds.length) {
+        const proposalDeletePromises = proposalIds.map(pId =>
+          Proposal.delete(viewer, { id: pId, isCascading: true }, loaders, trx),
+        );
+
+        await Promise.all(proposalDeletePromises);
+
+        // delete proposal notifications
+        const proposalActivityIds = await knex('activities')
+          .where({ type: 'proposal' })
+          .whereIn('object_id', proposalIds)
+          .pluck('id');
+        if (proposalActivityIds.length) {
+          await knex('notifications')
+            .transacting(trx)
+            .whereIn('activity_id', proposalActivityIds)
+            .del();
+        }
+      }
+
+      await knex('requests')
+        .transacting(trx)
+        .forUpdate()
+
+        .where({ type: 'joinWT' })
+        .whereRaw("content->> 'id' = ?", [data.id])
+        .del();
+
+      /* const requestDeletePromises = requestIds.map(rId =>
+        Request.delete(viewer, { id: rId }, loaders),
+      );
+      await Promise.all(requestDeletePromises);
+*/
+      // messages
+      const messageIds = await knex('messages')
+        .where({
+          message_type: 'note',
+          recipient_type: 'group',
+        })
+        .whereRaw('recipients \\?| ?', [[data.id]])
+        .pluck('id');
+      // delete notifications
+      if (messageIds.length) {
+        const activityIds = await knex('activities')
+          .where({ type: 'message' })
+          .whereIn('object_id', messageIds)
+          .pluck('id');
+
+        if (activityIds.length) {
+          await knex('notifications')
+            .transacting(trx)
+            .forUpdate()
+
+            .whereIn('activity_id', activityIds)
+            .del();
+        }
+        // delete messages
+
+        await knex('messages')
+          .transacting(trx)
+          .forUpdate()
+          .whereIn('id', messageIds)
+          .del();
+      }
+
+      // delete discussion notifications
+
+      // const messageDeletePromises = await knex('activities').where({type: 'message'}).whereIn('object_id', messageIds)
+      /* await knex('notifications')
+        .transacting(trx)
+        .join('activities', function() {
+          this.on('activities.id', '=', 'notifications.id')
+            .andOn(('activities.type', '=', 'message'))
+            .andOn(knex.raw('activities.object_id IN ?', [messageIds]));
+        })
+        // .join('activities', 'activities.id', '=', 'notifications.id')
+        // .where({ 'activities.type': 'message' })
+        // .whereIn('activities.object_id', messageIds)
+        .del(); */
+
+      // members
+      await knex('user_work_teams')
+        .transacting(trx)
+        .forUpdate()
+        .where({ work_team_id: data.id })
+        .del();
+
+      // delete feeds
+      await knex('system_feeds')
+        .transacting(trx)
+        .forUpdate()
+        .where({ type: 'WT', group_id: data.id })
+        .del();
+
+      await knex('work_teams')
+        .transacting(trx)
+        .forUpdate()
+        .where({ id: data.id })
+        .del();
+      return workTeamInDB;
+    });
+    return deletedWorkTeam;
   }
 
   async getLinkedProposals(viewer, loaders) {

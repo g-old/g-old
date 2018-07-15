@@ -4,23 +4,31 @@ import {
   LOAD_DISCUSSION_START,
   LOAD_DISCUSSION_SUCCESS,
   LOAD_DISCUSSION_ERROR,
+  LOAD_DISCUSSIONS_START,
+  LOAD_DISCUSSIONS_SUCCESS,
+  LOAD_DISCUSSIONS_ERROR,
   CREATE_DISCUSSION_START,
   CREATE_DISCUSSION_SUCCESS,
   CREATE_DISCUSSION_ERROR,
+  UPDATE_DISCUSSION_START,
+  UPDATE_DISCUSSION_SUCCESS,
+  UPDATE_DISCUSSION_ERROR,
 } from '../constants';
 import {
   discussion as discussionSchema,
-  //  discussionList as discussionListSchema,
+  discussionList as discussionListSchema,
   //  tagArray as tagArraySchema,
 } from '../store/schema';
 import { getIsDiscussionFetching, getDiscussionUpdates } from '../reducers';
 
 const discussionFields = `
-id
-createdAt
-title
-numComments
-closedAt
+  id
+  title
+  createdAt
+  closedAt
+  deletedAt
+  numComments
+  workTeamId
 `;
 
 const authorFields = `
@@ -29,8 +37,8 @@ name
 surname
 thumbnail
         `;
-/* const discussionConnection = `query($first:Int, $after:String, $workTeamId:ID){
-  discussionConnection(first:$first after:$after, workTeamId:$workTeamId){
+const discussionConnection = `query($first:Int, $after:String, $workteamId:ID $closed:Boolean){
+  discussionConnection(first:$first after:$after, workteamId:$workteamId closed:$closed){
     pageInfo{
       endCursor
       hasNextPage
@@ -41,7 +49,7 @@ thumbnail
       }
     }
   }
-}`; */
+}`;
 
 const discussionFragment = `
 ${discussionFields}
@@ -53,6 +61,7 @@ ${discussionFields}
     id
     displayName
     logo
+    coordinatorId
   }
   comments{
     id
@@ -80,6 +89,11 @@ const createDiscussionMutation = `mutation($workTeamId:ID $content:String $title
     ${discussionFragment}
   }
 }`;
+const updateDiscussionMutation = `mutation($discussion: DiscussionInput){
+  updateDiscussion(discussion:$discussion){
+    ${discussionFragment}
+  }
+}`;
 
 const mergeRepliesInotParent = (parentId, comments) => {
   const replies = comments
@@ -104,6 +118,41 @@ const mergeRepliesInotParent = (parentId, comments) => {
     return acc;
   }, []);
 };
+
+export function loadDiscussions({ first, after, closed, workteamId }) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    // TODO check if pending
+    dispatch({ type: LOAD_DISCUSSIONS_START });
+    try {
+      const { data } = await graphqlRequest(discussionConnection, {
+        closed,
+        workteamId,
+        first,
+        after,
+      });
+      const discussions = data.discussionConnection.edges.map(p => p.node);
+      const normalizedData = normalize(discussions, discussionListSchema);
+
+      dispatch({
+        type: LOAD_DISCUSSIONS_SUCCESS,
+        payload: normalizedData,
+        filter: closed ? 'closed' : 'active',
+        pagination: data.discussionConnection.pageInfo,
+        savePageInfo: after != null,
+      });
+      return true;
+    } catch (error) {
+      dispatch({
+        type: LOAD_DISCUSSIONS_ERROR,
+        payload: {
+          error,
+        },
+      });
+      return false;
+    }
+  };
+}
+
 export function loadDiscussion({ id, parentId }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // Dont fetch if pending
@@ -184,6 +233,45 @@ export function createDiscussion(discussion) {
         },
         message: error.message || 'Something went wrong',
         id: virtualId,
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function updateDiscussion(discussion) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    if (process.env.BROWSER) {
+      const state = getState();
+      const updates = getDiscussionUpdates(state, discussion.id);
+
+      if (updates.pending) {
+        return false;
+      }
+    }
+    dispatch({
+      type: UPDATE_DISCUSSION_START,
+    });
+    try {
+      const { data } = await graphqlRequest(updateDiscussionMutation, {
+        discussion,
+      });
+      const normalizedData = normalize(data.updateDiscussion, discussionSchema);
+      // TODO change filter structure of reducer
+
+      dispatch({
+        type: UPDATE_DISCUSSION_SUCCESS,
+        payload: normalizedData,
+      });
+    } catch (error) {
+      dispatch({
+        type: UPDATE_DISCUSSION_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
       });
       return false;
     }

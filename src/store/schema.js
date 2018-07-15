@@ -3,6 +3,7 @@ import { schema } from 'normalizr';
 export const role = new schema.Entity('roles');
 export const user = new schema.Entity('users');
 export const message = new schema.Entity('messages');
+export const workTeam = new schema.Entity('workTeams');
 
 export const request = new schema.Entity('requests', {
   requester: user,
@@ -45,20 +46,35 @@ export const proposal = new schema.Entity('proposals', {
   pollTwo: poll,
   tags: [tag],
   subscription,
+  workteam: workTeam,
 });
 export const proposalStatus = new schema.Entity('proposalStatus', {
   proposal,
 });
-export const workTeam = new schema.Entity('workTeams', {
+export const comment = new schema.Entity('comments');
+comment.define({
+  author: user,
+  replies: [comment],
+});
+export const discussion = new schema.Entity('discussions', {
+  author: user,
+  comments: [comment],
+  ownComment: comment,
+  subscription,
+});
+
+workTeam.define({
   coordinator: user,
   members: [user],
   ownStatus: {
     request,
   },
+  discussions: [discussion],
   requests: [request],
   proposals: [proposal],
   linkedProposals: [proposalStatus],
 });
+
 export const recipient = new schema.Union(
   {
     User: user,
@@ -72,18 +88,7 @@ message.define({
   parents: [message],
   replies: [message],
 });
-export const comment = new schema.Entity('comments');
-comment.define({
-  author: user,
-  replies: [comment],
-});
 
-export const discussion = new schema.Entity('discussions', {
-  author: user,
-  comments: [comment],
-  ownComment: comment,
-  subscription,
-});
 export const unionSchema = new schema.Union(
   {
     ProposalDL: proposal,

@@ -5,6 +5,7 @@ import MessageType from '../types/MessageType';
 import Message from '../models/Message';
 import MessageTypeEnum from '../types/MessageTypeEnum';
 import knex from '../knex';
+import CategoryTypeEnum from '../types/CategoryTypeEnum';
 
 const messageObjects = {
   type: PageType(MessageType),
@@ -18,6 +19,9 @@ const messageObjects = {
     messageType: {
       type: MessageTypeEnum,
     },
+    category: {
+      type: CategoryTypeEnum,
+    },
 
     after: {
       type: GraphQLString,
@@ -28,7 +32,14 @@ const messageObjects = {
   },
   resolve: async (
     parent,
-    { first = 10, after = '', userId, isPublished = true, messageType },
+    {
+      first = 10,
+      after = '',
+      userId,
+      isPublished = true,
+      messageType,
+      category,
+    },
     { viewer, loaders },
   ) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
@@ -36,11 +47,13 @@ const messageObjects = {
     id = Number(id);
 
     const table = messageType ? `${messageType}s` : 'messages';
-
     const objectIds = await knex(table)
       .modify(queryBuilder => {
         if (messageType === 'note') {
-          queryBuilder.where({ is_published: isPublished });
+          queryBuilder.where({
+            is_published: isPublished,
+            ...(category && { category }),
+          });
         } else {
           queryBuilder.where({
             sender_id: userId || viewer.id,

@@ -9,8 +9,6 @@ import Value from '../Value';
 import ConfirmLayer from '../ConfirmLayer';
 import Box from '../Box';
 import Button from '../Button';
-import DiscussionPreview from '../DiscussionPreview';
-import ProposalPreview from '../ProposalPreview';
 import history from '../../history';
 import Tabs from '../Tabs';
 import Tab from '../Tab';
@@ -18,6 +16,11 @@ import { ICONS } from '../../constants';
 import { Groups } from '../../organization';
 import Link from '../Link';
 import UserThumbnail from '../UserThumbnail';
+import DiscussionListContainer from '../DiscussionListContainer';
+import ProposalListContainer from '../ProposalListContainer';
+import SurveyListContainer from '../SurveyListContainer';
+import StateFilter from '../StateFilter';
+import Notification from '../Notification';
 
 const messages = defineMessages({
   join: {
@@ -55,7 +58,17 @@ const messages = defineMessages({
     defaultMessage: 'Coordinator',
     description: 'Label coordinator',
   },
+  surveys: {
+    id: 'surveys',
+    description: 'Surveys label',
+    defaultMessage: 'Surveys',
+  },
 });
+
+const isPrivileged = (user, coordinator, mainTeam, id) =>
+  user.id == coordinator.id || // eslint-disable-line eqeqeq
+  user.groups & Groups.ADMIN || // eslint-disable-line no-bitwise
+  (mainTeam && user.wtMemberships.includes(Number(id)));
 
 class WorkTeam extends React.Component {
   static propTypes = {
@@ -69,6 +82,8 @@ class WorkTeam extends React.Component {
     numProposals: PropTypes.number.isRequired,
     discussions: PropTypes.arrayOf(PropTypes.shape({})),
     proposals: PropTypes.arrayOf(PropTypes.shape({})),
+    mainTeam: PropTypes.bool,
+    deletedAt: PropTypes.string,
     ownStatus: PropTypes.shape({
       status: PropTypes.oneOf(['NONE', 'MEMBER', 'PENDING']),
     }).isRequired,
@@ -78,15 +93,17 @@ class WorkTeam extends React.Component {
     onJoin: PropTypes.func.isRequired,
     onLeave: PropTypes.func.isRequired,
     onDeleteRequest: PropTypes.func.isRequired,
+    onLoadDiscussions: PropTypes.func.isRequired,
+    onLoadProposals: PropTypes.func.isRequired,
   };
+
   static defaultProps = {
     logo: null,
     discussions: null,
     proposals: null,
+    mainTeam: null,
+    deletedAt: null,
   };
-  static onProposalClick({ proposalId, pollId }) {
-    history.push(`/proposal/${proposalId}/${pollId}`);
-  }
 
   constructor(props) {
     super(props);
@@ -97,8 +114,31 @@ class WorkTeam extends React.Component {
     this.onOpenLayer = this.onOpenLayer.bind(this);
     this.onCloseLayer = this.onCloseLayer.bind(this);
     this.onLeave = this.onLeave.bind(this);
-    this.state = { showLayer: false, activeTabIndex: 0 };
+    this.handleDiscussionFilterChange = this.handleDiscussionFilterChange.bind(
+      this,
+    );
+    this.handleProposalFilterChange = this.handleProposalFilterChange.bind(
+      this,
+    );
+    this.handleSurveyFilterChange = this.handleSurveyFilterChange.bind(this);
+    this.handleLoadMoreDiscussions = this.handleLoadMoreDiscussions.bind(this);
+    this.handleLoadMoreProposals = this.handleLoadMoreProposals.bind(this);
+    this.handleLoadMoreSurveys = this.handleLoadMoreSurveys.bind(this);
+    this.fetchDiscussions = this.fetchDiscussions.bind(this);
+    this.fetchProposals = this.fetchProposals.bind(this);
+
+    this.state = {
+      showLayer: false,
+      activeTabIndex: 0,
+      discussionStatus: 'active',
+      proposalStatus: 'active',
+      surveyStatus: 'active',
+    };
     this.activateTab = this.activateTab.bind(this);
+  }
+
+  static onProposalClick({ proposalId, pollId }) {
+    history.push(`/proposal/${proposalId}/${pollId}`);
   }
 
   onOpenLayer() {
@@ -114,15 +154,46 @@ class WorkTeam extends React.Component {
       e.preventDefault();
       e.stopPropagation();
     }
-    const { ownStatus = {}, id } = this.props;
+    const { ownStatus = {}, id, onLeave } = this.props;
     if (ownStatus !== 'NONE') {
-      this.props.onLeave({ id }).then(() => this.onCloseLayer());
+      onLeave({ id }).then(() => this.onCloseLayer());
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
   handleDiscussionClick({ discussionId }) {
-    history.push(`${this.props.id}/discussions/${discussionId}`);
+    const { id } = this.props;
+    history.push(`${id}/discussions/${discussionId}`);
+  }
+
+  handleLoadMoreDiscussions({ after }) {
+    const { discussionStatus } = this.state;
+    const { id, onLoadDiscussions } = this.props;
+    onLoadDiscussions({
+      closed: discussionStatus === 'closed',
+      workteamId: id,
+      after,
+    });
+  }
+
+  handleLoadMoreProposals({ after }) {
+    const { proposalStatus } = this.state;
+    const { id, onLoadProposals } = this.props;
+    onLoadProposals({
+      state: proposalStatus,
+      workTeamId: id,
+      after,
+    });
+  }
+
+  handleLoadMoreSurveys({ after }) {
+    const { surveyStatus } = this.state;
+    const { id, onLoadProposals } = this.props;
+    onLoadProposals({
+      state: 'survey',
+      closed: surveyStatus === 'closed',
+      workTeamId: id,
+      after,
+    });
   }
 
   handleJoining() {
@@ -130,6 +201,62 @@ class WorkTeam extends React.Component {
     if (ownStatus.status === 'NONE') {
       onJoin({ id });
     }
+  }
+
+  handleDiscussionFilterChange(e) {
+    const { discussionStatus } = this.state;
+    if (e.option.value !== discussionStatus) {
+      this.setState(
+        { discussionStatus: e.option.value },
+        this.fetchDiscussions,
+      );
+    }
+  }
+
+  handleProposalFilterChange(e) {
+    const { proposalStatus } = this.state;
+
+    if (e.option.value !== proposalStatus) {
+      this.setState({ proposalStatus: e.option.value }, this.fetchProposals);
+    }
+  }
+
+  handleSurveyFilterChange(e) {
+    const { surveyStatus } = this.state;
+
+    if (e.option.value !== surveyStatus) {
+      this.setState({ surveyStatus: e.option.value }, this.fetchSurveys);
+    }
+  }
+
+  fetchDiscussions() {
+    const { onLoadDiscussions, id } = this.props;
+    const { discussionStatus } = this.state;
+
+    onLoadDiscussions({
+      workteamId: id,
+      closed: discussionStatus !== 'active',
+    });
+  }
+
+  fetchProposals() {
+    const { onLoadProposals, id } = this.props;
+    const { proposalStatus } = this.state;
+
+    onLoadProposals({
+      workTeamId: id,
+      state: proposalStatus,
+    });
+  }
+
+  fetchSurveys() {
+    const { onLoadProposals, id } = this.props;
+    const { surveyStatus } = this.state;
+    onLoadProposals({
+      workTeamId: id,
+      state: 'survey',
+      closed: surveyStatus === 'closed',
+    });
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -189,14 +316,21 @@ class WorkTeam extends React.Component {
       numMembers,
       numDiscussions,
       numProposals,
-      proposals = [],
-      discussions = [],
       ownStatus = {},
       updates = {},
       user,
       coordinator,
       id,
+      mainTeam,
+      deletedAt,
     } = this.props;
+    const {
+      discussionStatus,
+      proposalStatus,
+      surveyStatus,
+      activeTabIndex,
+      showLayer,
+    } = this.state;
     let picture;
     if (logo) {
       picture = <img alt="Logo" className={s.logo} src={logo} />;
@@ -217,11 +351,11 @@ class WorkTeam extends React.Component {
     }
 
     let actionBtns;
-    if (ownStatus.status) {
+    if (ownStatus.status && !deletedAt) {
       const controls = [];
       controls.push(this.renderActionButton(ownStatus.status, updates));
-      // eslint-disable-next-line
-      if (user.id == coordinator.id || user.groups & Groups.ADMIN) {
+
+      if (isPrivileged(user, coordinator, mainTeam, id)) {
         controls.push(
           // eslint-disable-next-line jsx-a11y/anchor-is-valid
           <Link to={`/workteams/${id}/admin`}>
@@ -231,9 +365,14 @@ class WorkTeam extends React.Component {
               width="24px"
               height="24px"
               role="img"
-              aria-label="lock"
+              aria-label="settings"
             >
-              <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.lock} />
+              <path
+                fill="none"
+                stroke="#000"
+                strokeWidth="2"
+                d={ICONS.settings}
+              />
             </svg>
           </Link>,
         );
@@ -242,51 +381,80 @@ class WorkTeam extends React.Component {
     }
 
     let contentSection;
-    if (ownStatus.status === 'MEMBER') {
+    if (ownStatus.status === 'MEMBER' && !deletedAt) {
       contentSection = (
         <Box tag="section" column fill>
-          <Tabs
-            activeIndex={this.state.activeTabIndex}
-            onActive={this.activateTab}
-          >
+          <Tabs activeIndex={activeTabIndex} onActive={this.activateTab}>
             <Tab title={<FormattedMessage {...messages.proposals} />}>
-              <Box column className={s.itemContainer}>
-                {proposals.map(
-                  p =>
-                    p && (
-                      <ProposalPreview
-                        proposal={p}
-                        onClick={WorkTeam.onProposalClick}
-                      />
-                    ),
-                )}
-              </Box>
+              <StateFilter
+                states={['active', 'accepted', 'repelled']}
+                filter={proposalStatus}
+                onChange={this.handleProposalFilterChange}
+              />
+              <ProposalListContainer
+                id={id}
+                status={proposalStatus}
+                onLoadMore={this.handleLoadMoreProposals}
+                onItemClick={WorkTeam.onProposalClick}
+                onRetry={this.fetchProposals}
+              />
             </Tab>
             <Tab title={<FormattedMessage {...messages.discussions} />}>
-              <Box column className={s.itemContainer}>
-                {discussions.map(
-                  d =>
-                    d && (
-                      <DiscussionPreview
-                        discussion={d}
-                        onClick={this.handleDiscussionClick}
-                      />
-                    ),
-                )}
-              </Box>
+              <StateFilter
+                states={['active', 'closed']}
+                filter={discussionStatus}
+                onChange={this.handleDiscussionFilterChange}
+              />
+              <DiscussionListContainer
+                id={id}
+                status={discussionStatus}
+                onLoadMore={this.handleLoadMoreDiscussions}
+                onItemClick={this.handleDiscussionClick}
+                onRetry={this.fetchDiscussions}
+              />
+            </Tab>
+            <Tab title={<FormattedMessage {...messages.surveys} />}>
+              <StateFilter
+                states={['active', 'closed']}
+                filter={surveyStatus}
+                onChange={this.handleSurveyFilterChange}
+              />
+              <SurveyListContainer
+                id={id}
+                status={surveyStatus}
+                onLoadMore={this.handleLoadMoreSurveys}
+                onItemClick={WorkTeam.onProposalClick}
+                onRetry={this.fetchSurveys}
+              />
             </Tab>
           </Tabs>
         </Box>
       );
     }
     let layer;
-    if (this.state.showLayer) {
+    if (showLayer) {
       layer = (
         <ConfirmLayer
           onClose={this.onCloseLayer}
           onSubmit={this.onLeave}
           action="leave"
         />
+      );
+    }
+    if (deletedAt) {
+      return (
+        <Box align column padding="medium" pad fill>
+          {picture}
+          <Heading tag="h2">{displayName}</Heading>
+          <Box>
+            <UserThumbnail
+              marked
+              label={<FormattedMessage {...messages.coordinator} />}
+              user={coordinator}
+            />
+          </Box>
+          <Notification type="alert" message="Workteam inactive" />
+        </Box>
       );
     }
     return (
@@ -356,6 +524,7 @@ class WorkTeam extends React.Component {
             value={numDiscussions || 0}
           />
         </Box>
+
         {actionBtns}
         {contentSection}
         {layer}

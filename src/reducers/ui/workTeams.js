@@ -9,11 +9,11 @@ import {
   DELETE_WORKTEAM_ERROR,
   DELETE_WORKTEAM_SUCCESS,
   JOIN_WORKTEAM_START,
-  JOIN_WORKTEAM_SUCCESS,
   JOIN_WORKTEAM_ERROR,
   LEAVE_WORKTEAM_START,
   LEAVE_WORKTEAM_SUCCESS,
   LEAVE_WORKTEAM_ERROR,
+  JOIN_WORKTEAM_SUCCESS,
 } from '../../constants';
 
 // import { getErrors, getSuccessState } from '../../core/helpers';

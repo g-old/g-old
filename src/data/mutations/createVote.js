@@ -2,10 +2,9 @@ import { GraphQLNonNull, GraphQLID } from 'graphql';
 import VoteInputType from '../types/VoteInputType';
 import Vote from '../models/Vote';
 import VoteType from '../types/VoteDLType';
-import Subscription, {
-  TargetType,
-  SubscriptionType,
-} from '../models/Subscription';
+import Subscription, { SubscriptionType } from '../models/Subscription';
+import { TargetType } from '../models/utils';
+
 import WithSubscriptionResultType from '../types/WithSubscriptionResultType';
 
 const createVote = {

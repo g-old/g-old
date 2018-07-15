@@ -51,6 +51,7 @@ id
       numComments
       closedAt
       content
+      deletedAt
       author{
         ${userFields}
       }
@@ -68,6 +69,7 @@ id
       body
       votes
       workTeamId
+      deletedAt
       pollOne {
         ${pollFieldsForList}
       }

@@ -2,6 +2,7 @@ import {
   GraphQLString as String,
   GraphQLInputObjectType,
   GraphQLID as ID,
+  GraphQLBoolean,
 } from 'graphql';
 
 const DiscussionInputType = new GraphQLInputObjectType({
@@ -18,6 +19,9 @@ const DiscussionInputType = new GraphQLInputObjectType({
     },
     title: {
       type: String,
+    },
+    close: {
+      type: GraphQLBoolean,
     },
   },
 });

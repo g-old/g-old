@@ -11,6 +11,7 @@ import {
 } from '../../actions/user';
 import { verifyEmail } from '../../actions/verifyEmail';
 import { loadLogs } from '../../actions/log';
+import { Groups } from '../../organization';
 import { createRequest, deleteRequest } from '../../actions/request';
 import {
   createWebPushSub,
@@ -24,6 +25,8 @@ import {
 } from '../../actions/workTeam';
 import { loadFeed } from '../../actions/feed';
 import { uploadAvatar } from '../../actions/file';
+import { createMessage } from '../../actions/message';
+
 import Label from '../../components/Label';
 import {
   getUser,
@@ -35,6 +38,7 @@ import {
   getLogs,
   getLogIsFetching,
   getLogErrorMessage,
+  getMessageUpdates,
 } from '../../reducers';
 import Avatar from '../../components/Avatar';
 import UserSettings from '../../components/UserSettings';
@@ -67,6 +71,16 @@ const messages = defineMessages({
     defaultMessage:
       'Confirm your email address. A confirmation message was sent to ({email})',
     description: 'Notification to verify mail address',
+  },
+  uploadCall: {
+    id: 'settings.uploadCall',
+    defaultMessage: 'Please upload a photo of yourself',
+    description: 'Notification to upload photo',
+  },
+  waitCall: {
+    id: 'settings.waitCall',
+    defaultMessage: 'You will be contacted as soon as possible',
+    description: 'Notification to upload photo',
   },
   followees: {
     id: 'profile.followees',
@@ -110,6 +124,54 @@ const renderFollowee = (data, fn, del) => (
     </Button>
   </li>
 );
+
+const getNotification = (ownAccount, user) => {
+  let messageId;
+  if (ownAccount && !user.emailVerified) {
+    messageId = 'verificationCall';
+  } else if (ownAccount && !user.thumbnail) {
+    messageId = 'uploadCall';
+    // eslint-disable-next-line no-bitwise
+  } else if (ownAccount && user.groups === Groups.GUEST) {
+    messageId = 'waitCall';
+  }
+
+  return (
+    messageId && (
+      <Notification
+        type="alert"
+        message={
+          <FormattedMessage
+            {...messages[messageId]}
+            values={{ email: user.email }}
+          />
+        }
+      />
+    )
+  );
+};
+
+// TODO use ListView OR enhance List w errorhandlers etc
+const renderMessageList = data => {
+  if (data) {
+    return (
+      <List>
+        {data.map(m => (
+          <ListItem onClick={() => history.push(`/message/${m.id}`)}>
+            <MessagePreview
+              sender={m.sender}
+              subject={m.subject}
+              createdAt={m.createdAt}
+              numReplies={m.numReplies}
+            />
+          </ListItem>
+        ))}
+      </List>
+    );
+  }
+
+  return <List> {'No item found'} </List>;
+};
 
 class AccountContainer extends React.Component {
   static propTypes = {
@@ -156,17 +218,25 @@ class AccountContainer extends React.Component {
     ownAccount: PropTypes.bool.isRequired,
     fetched: PropTypes.bool.isRequired,
     fetchProfileData: PropTypes.func.isRequired,
-    sessionUser: PropTypes.shape({ id: PropTypes.string }).isRequired,
+    sessionUser: PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      surname: PropTypes.string,
+    }).isRequired,
     requestUpdates: PropTypes.shape({}).isRequired,
     deleteRequest: PropTypes.func.isRequired,
     createRequest: PropTypes.func.isRequired,
     loadMessages: PropTypes.func.isRequired,
+    createMessage: PropTypes.func.isRequired,
+    messageUpdates: PropTypes.shape({}).isRequired,
   };
+
   static defaultProps = {
     logs: null,
     logError: null,
     workTeams: null,
   };
+
   constructor(props) {
     super(props);
 
@@ -179,14 +249,19 @@ class AccountContainer extends React.Component {
     this.handleImageChange = this.handleImageChange.bind(this);
     this.getUserData = this.getUserData.bind(this);
     this.onResponsive = this.onResponsive.bind(this);
+    this.onNotify = this.onNotify.bind(this);
+    this.fetchLogs = this.fetchLogs.bind(this);
+    this.fetchMessages = this.fetchMessages.bind(this);
   }
 
   componentDidMount() {
-    this.getUserData(this.props.user);
+    const { user } = this.props;
+    this.getUserData(user);
     this.responsive = Responsive.start(this.onResponsive);
   }
 
   componentWillReceiveProps({ updates, subscription, user }) {
+    const { user: oldUser } = this.props;
     if (updates.dataUrl && updates.dataUrl.success) {
       this.setState({ showUpload: false });
     }
@@ -194,10 +269,11 @@ class AccountContainer extends React.Component {
       this.setState({ disableSubscription: subscription.disabled });
     }
     // eslint-disable-next-line eqeqeq
-    if (user.id != this.props.user.id) {
+    if (user.id != oldUser.id) {
       this.getUserData(user);
     }
   }
+
   componentWillUnmount() {
     if (this.responsive) {
       this.responsive.stop();
@@ -217,34 +293,71 @@ class AccountContainer extends React.Component {
     }
   }
 
+  onNotify(values) {
+    const { createMessage: notify, user, sessionUser } = this.props;
+    notify({
+      recipientType: 'USER',
+      messageType: 'COMMUNICATION',
+      recipients: [user.id],
+      subject: {
+        de: `Private message from ${sessionUser.name} ${sessionUser.surname}`,
+      },
+      communication: {
+        textHtml: values.text,
+        replyable: true,
+      },
+    });
+  }
+
   getUserData(user) {
     const { id } = user;
-    const { sessionUser } = this.props;
+    const {
+      sessionUser,
+      fetchUser: loadUser,
+      checkSubscription: checkSub,
+      fetched,
+      fetchProfileData: loadProfileData,
+    } = this.props;
     if (!sessionUser) return;
     // eslint-disable-next-line eqeqeq
     if (user.id == sessionUser.id) {
-      this.props.fetchUser({ id });
+      loadUser({ id });
       const pushAvailable = isPushAvailable();
       if (pushAvailable) {
-        this.props.checkSubscription();
+        checkSub();
       }
-    } else if (!this.props.fetched) {
-      this.props.fetchProfileData({ id });
+    } else if (!fetched) {
+      loadProfileData({ id });
     }
   }
 
   handleWPSubscription() {
-    const { subscription } = this.props;
+    const {
+      subscription,
+      deleteWebPushSub: deleteSub,
+      createWebPushSub: createSub,
+    } = this.props;
     if (subscription.isPushEnabled) {
-      this.props.deleteWebPushSub();
+      deleteSub();
     } else {
-      this.props.createWebPushSub();
+      createSub();
     }
   }
 
   handleImageChange() {
     this.setState({ showUpload: true });
   }
+
+  fetchLogs() {
+    const { loadLogs: fetchLogs } = this.props;
+    fetchLogs(true);
+  }
+
+  fetchMessages() {
+    const { loadMessages: fetchMessages, user } = this.props;
+    fetchMessages(user.id);
+  }
+
   render() {
     const {
       subscription,
@@ -255,30 +368,39 @@ class AccountContainer extends React.Component {
       logPending,
       user,
       requestUpdates,
+      messageUpdates,
+      fetchUser: loadUser,
+      sessionUser,
+      updateUser: mutateUser,
+      uploadAvatar: saveAvatar,
+      verifyEmail: emailVerification,
+      deleteRequest: cancelRequest,
+      createRequest: makeRequest,
+      joinWorkTeam: join,
+      leaveWorkTeam: leave,
+      workTeams,
     } = this.props;
+
+    const {
+      editFollowees,
+      smallSize,
+      showUpload,
+      disableSubscription,
+    } = this.state;
     if (!user) return null;
     const { followees = [] } = user;
-    let notification;
-    if (ownAccount && !user.emailVerified) {
-      notification = (
-        <Notification
-          type="alert"
-          message={
-            <FormattedMessage
-              {...messages.verificationCall}
-              values={{ email: user.email }}
-            />
-          }
-        />
-      );
-    }
+    const notification = getNotification(ownAccount, user);
+
     const profile = (
       <Profile
         ownAccount={ownAccount}
         onImageChange={this.handleImageChange}
-        user={this.props.user}
-        fetchProfileData={this.props.fetchUser}
-        updates={this.props.updates}
+        user={user}
+        fetchProfileData={loadUser}
+        updates={updates}
+        messageUpdates={messageUpdates}
+        onSend={this.onNotify}
+        sessionUser={sessionUser}
       />
     );
     if (!ownAccount) {
@@ -310,16 +432,16 @@ class AccountContainer extends React.Component {
               </svg>
             }
             onClick={() => {
-              this.setState({ editFollowees: !this.state.editFollowees });
+              this.setState({ editFollowees: !editFollowees });
             }}
           />
 
           <Box wrap tag="ul" className={s.followeeContainer}>
             {followees.map(f =>
               renderFollowee(
-                { userId: this.props.user.id, followee: f },
-                this.props.updateUser,
-                this.state.editFollowees,
+                { userId: user.id, followee: f },
+                mutateUser,
+                editFollowees,
               ),
             )}
           </Box>
@@ -347,15 +469,7 @@ class AccountContainer extends React.Component {
         <Notification
           type="error"
           message={logError}
-          action={
-            <Button
-              primary
-              label="Retry"
-              onClick={() => {
-                this.props.loadLogs(true);
-              }}
-            />
-          }
+          action={<Button primary label="Retry" onClick={this.fetchLogs} />}
         />
       );
     } else {
@@ -364,13 +478,13 @@ class AccountContainer extends React.Component {
     return (
       <Box tag="article" column padding="medium">
         {notification}
-        <Box between column={this.state.smallSize}>
-          {this.state.showUpload && (
+        <Box between column={smallSize}>
+          {showUpload && (
             <ImageUpload
               uploadAvatar={data => {
-                this.props.uploadAvatar({
+                saveAvatar({
                   ...data,
-                  id: this.props.user.id,
+                  id: user.id,
                 });
               }}
               uploadPending={updates.dataUrl && updates.dataUrl.pending}
@@ -389,68 +503,36 @@ class AccountContainer extends React.Component {
             <Accordion openMulti>
               <AccordionPanel
                 column
-                onActive={() => {
-                  this.props.loadMessages(user.id);
-                }}
+                onActive={this.fetchMessages}
                 heading={<FormattedMessage {...messages.messages} />}
               >
                 <Label> Messages received</Label>
-                <List>
-                  {user.messagesReceived &&
-                    user.messagesReceived.map(m => (
-                      <ListItem
-                        onClick={() => history.push(`/message/${m.id}`)}
-                      >
-                        <MessagePreview
-                          sender={m.sender}
-                          subject={m.subject}
-                          createdAt={m.createdAt}
-                          numReplies={m.numReplies}
-                        />
-                      </ListItem>
-                    ))}
-                </List>
+                {renderMessageList(user.messagesReceived)}
+
                 <Label> Messages sent</Label>
 
-                <List>
-                  {user.messagesSent &&
-                    user.messagesSent.map(m => (
-                      <ListItem>
-                        <MessagePreview
-                          sender={m.sender}
-                          subject={m.subject}
-                          createdAt={m.createdAt}
-                        />
-                      </ListItem>
-                    ))}
-                </List>
+                {renderMessageList(user.messagesSent)}
               </AccordionPanel>
               <AccordionPanel
                 heading={<FormattedMessage {...messages.settings} />}
               >
                 <div style={{ marginTop: '1em' }}>
                   <UserSettings
-                    smallSize={this.state.smallSize}
-                    resendEmail={this.props.verifyEmail}
-                    deleteRequest={this.props.deleteRequest}
+                    smallSize={smallSize}
+                    resendEmail={emailVerification}
+                    deleteRequest={cancelRequest}
                     updates={updates}
                     requestUpdates={requestUpdates}
-                    user={this.props.user}
-                    updateUser={this.props.updateUser}
-                    createRequest={this.props.createRequest}
-                    onJoinWorkTeam={this.props.joinWorkTeam}
-                    onLeaveWorkTeam={this.props.leaveWorkTeam}
-                    workTeams={this.props.workTeams}
+                    user={user}
+                    updateUser={mutateUser}
+                    createRequest={makeRequest}
+                    onJoinWorkTeam={join}
+                    onLeaveWorkTeam={leave}
+                    workTeams={workTeams}
                   />
                 </div>
               </AccordionPanel>
-              <AccordionPanel
-                heading="Log"
-                column
-                onActive={() => {
-                  this.props.loadLogs(true);
-                }}
-              >
+              <AccordionPanel heading="Log" column onActive={this.fetchLogs}>
                 {displayLog}
               </AccordionPanel>
               <AccordionPanel
@@ -459,12 +541,12 @@ class AccountContainer extends React.Component {
                 }
               >
                 <NotificationSettings
-                  user={this.props.user}
-                  update={this.props.updateUser}
+                  user={user}
+                  update={mutateUser}
                   updates={updates && updates.notificationSettings}
                   pushSubscription={subscription}
                   onPushSubChange={this.handleWPSubscription}
-                  disableSubscription={this.state.disableSubscription}
+                  disableSubscription={disableSubscription}
                 />
               </AccordionPanel>
             </Accordion>
@@ -491,6 +573,7 @@ const mapDispatch = {
   createRequest,
   deleteRequest,
   loadMessages,
+  createMessage,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getUser(state, user.id) || user,
@@ -502,8 +585,10 @@ const mapStateToProps = (state, { user }) => ({
   logs: getLogs(state),
   logPending: getLogIsFetching(state),
   logError: getLogErrorMessage(state),
+  messageUpdates: getMessageUpdates(state),
 });
 
-export default connect(mapStateToProps, mapDispatch)(
-  withStyles(s)(AccountContainer),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(withStyles(s)(AccountContainer));

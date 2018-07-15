@@ -488,7 +488,7 @@ class MainEditor extends React.Component {
   renderEditor() {
     return (
       <Editor
-        placeholder="Enter somes text..."
+        placeholder="Enter some text..."
         value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}

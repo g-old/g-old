@@ -2,4 +2,4 @@
 component: ContentPage
 ---
 
-Contact address : joe.pedevilla@gmail.com
+Indirizzo email: m5sbz@g-old.org.

@@ -15,7 +15,7 @@ class EmailVerification extends React.Component {
   };
 
   render() {
-    const { updates } = this.props;
+    const { updates, verifyEmail: verify } = this.props;
     // const verifyError = updates && updates.verifyEmail && updates.verifyEmail.error;
     const verifyPending =
       updates && updates.verifyEmail && updates.verifyEmail.pending;
@@ -29,15 +29,13 @@ class EmailVerification extends React.Component {
       content = (
         <Notification
           type="error"
-          message={
-            'Could not verify your email. The link is expired or invalid.'
-          }
+          message="Could not verify your email. The link is expired or invalid."
           action={
             <Button
               primary
-              label={'Send new link'}
+              label="Send new link"
               disabled={verifyPending}
-              onClick={this.props.verifyEmail}
+              onClick={verify}
             />
           }
         />
@@ -59,4 +57,7 @@ const mapDispatch = {
   verifyEmail,
 };
 
-export default connect(mapStateToProps, mapDispatch)(EmailVerification);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(EmailVerification);

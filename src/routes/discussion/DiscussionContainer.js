@@ -4,10 +4,11 @@ import { connect } from 'react-redux';
 import { findDOMNode } from 'react-dom';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import WorkteamHeader from '../../components/WorkteamHeader';
+import Notification from '../../components/Notification';
 import s from './DiscussionContainer.css';
 // import { defineMessages, FormattedMessage } from 'react-intl';
 // import history from '../../history';
-import { loadDiscussion } from '../../actions/discussion';
+import { loadDiscussion, updateDiscussion } from '../../actions/discussion';
 import {
   createComment,
   loadComments,
@@ -30,12 +31,14 @@ import {
 import FetchError from '../../components/FetchError';
 import Discussion from '../../components/Discussion';
 import Box from '../../components/Box';
-// import Button from '../../components/Button';
+import Button from '../../components/Button';
+import { ICONS } from '../../constants';
 // import Filter from '../../components/Filter';
 // import CheckBox from '../../components/CheckBox';
 import Comment from '../../components/Comment';
 import history from '../../history';
 import SubscriptionButton from '../../components/SubscriptionButton';
+import { Groups } from '../../organization';
 
 const handleProfileClick = ({ id }) => {
   if (id) history.push(`/accounts/${id}`);
@@ -46,22 +49,12 @@ class DiscussionContainer extends React.Component {
       comments: PropTypes.arrayOf(PropTypes.shape({})),
       id: PropTypes.oneOfType(PropTypes.string, PropTypes.number),
       subscription: PropTypes.shape({}),
+      closedAt: PropTypes.string,
     }).isRequired,
     user: PropTypes.shape({}).isRequired,
-    proposalId: PropTypes.number.isRequired,
     isFetching: PropTypes.bool.isRequired,
     errorMessage: PropTypes.string,
-    pollId: PropTypes.string.isRequired,
-    createVote: PropTypes.func.isRequired,
-    updateVote: PropTypes.func.isRequired,
-    deleteVote: PropTypes.func.isRequired,
-    loadProposal: PropTypes.func.isRequired,
-    getVotes: PropTypes.func.isRequired,
-    voteUpdates: PropTypes.shape({}).isRequired,
-    followeeVotes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    createProposalSub: PropTypes.func.isRequired,
-    deleteProposalSub: PropTypes.func.isRequired,
     loadDiscussion: PropTypes.func.isRequired,
     createComment: PropTypes.func.isRequired,
     loadComments: PropTypes.func.isRequired,
@@ -74,12 +67,16 @@ class DiscussionContainer extends React.Component {
     createSubscription: PropTypes.func.isRequired,
     updateSubscription: PropTypes.func.isRequired,
     deleteSubscription: PropTypes.func.isRequired,
+    updateDiscussion: PropTypes.func.isRequired,
+
     subscriptionStatus: PropTypes.shape({}).isRequired,
   };
+
   static defaultProps = {
     errorMessage: null,
     childId: null,
   };
+
   constructor(props) {
     super(props);
     this.state = {};
@@ -89,6 +86,8 @@ class DiscussionContainer extends React.Component {
     this.handleCommentFetching = this.handleCommentFetching.bind(this);
     this.handleReply = this.handleReply.bind(this);
     this.handleSubscription = this.handleSubscription.bind(this);
+    this.handleDiscussionClosing = this.handleDiscussionClosing.bind(this);
+    this.fetchDiscussion = this.fetchDiscussion.bind(this);
   }
 
   componentDidMount() {
@@ -109,46 +108,68 @@ class DiscussionContainer extends React.Component {
 
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
-    return this.props.discussion;
+    const { discussion } = this.props;
+    return discussion;
   }
 
   handleCommentCreation(data) {
+    const { discussion, createComment: makeComment, id } = this.props;
     let targetId;
-    if (!this.props.discussion.subscription) {
-      targetId = this.props.discussion.id;
+    if (!discussion.subscription) {
+      targetId = discussion.id;
     }
-    this.props.createComment({
-      ...data,
-      discussionId: this.props.id,
-      targetId,
-    });
+    makeComment({ ...data, discussionId: id, targetId });
   }
 
   handleCommentFetching({ parentId }) {
-    this.props.loadComments({ parentId });
+    const { loadComments: fetchComments } = this.props;
+    fetchComments({ parentId });
+  }
+
+  handleDiscussionClosing() {
+    const { discussion, updateDiscussion: mutateDiscussion } = this.props;
+    mutateDiscussion({
+      id: discussion.id,
+      close: !discussion.closedAt,
+      workTeamId: discussion.workTeam.id,
+    });
   }
 
   handleReply({ id }) {
-    this.setState({ replying: id || '0000' }); // for main input
+    const { discussion } = this.props;
+    if (!discussion.closedAt) {
+      this.setState({ replying: id || '0000' }); // for main input
+    }
   }
+
   handleSubscription({ targetType, subscriptionType }) {
-    const { id, subscription } = this.props.discussion;
+    const {
+      discussion: { id, subscription },
+      updateSubscription: mutateSubscription,
+      createSubscription: subscribe,
+      deleteSubscription: unsubscribe,
+    } = this.props;
     if (subscription && subscriptionType === 'DELETE') {
-      this.props.deleteSubscription({ id: subscription.id });
+      unsubscribe({ id: subscription.id });
     } else if (subscription) {
-      this.props.updateSubscription({
+      mutateSubscription({
         id: subscription.id,
         targetType,
         subscriptionType,
         targetId: id,
       });
     } else {
-      this.props.createSubscription({
+      subscribe({
         targetType,
         subscriptionType,
         targetId: id,
       });
     }
+  }
+
+  fetchDiscussion() {
+    const { loadDiscussion: fetchDiscussion, id } = this.props;
+    fetchDiscussion({ id });
   }
 
   render() {
@@ -160,21 +181,55 @@ class DiscussionContainer extends React.Component {
       commentId,
       childId,
       subscriptionStatus,
+      updates,
+      updateComment: mutateComment,
+      deleteComment: eraseComment,
     } = this.props;
+    const { replying } = this.state;
     if (isFetching && !discussion) {
       return <p>{'Loading...'} </p>;
     }
     if (errorMessage && !discussion) {
       return (
-        <FetchError
-          message={errorMessage}
-          onRetry={() => this.props.loadDiscussion({ id: this.props.id })}
-        />
+        <FetchError message={errorMessage} onRetry={this.fetchDiscussion} />
       );
     }
     if (this.isReady()) {
+      let closingElement;
+      if (
+        discussion.workTeam.coordinatorId == user.id || // eslint-disable-line
+        user.groups & Groups.ADMIN // eslint-disable-line
+      ) {
+        closingElement = (
+          <Button
+            plain
+            onClick={this.handleDiscussionClosing}
+            icon={
+              <svg
+                version="1.1"
+                viewBox="0 0 24 24"
+                width="24px"
+                height="24px"
+                role="img"
+                aria-label="lock"
+              >
+                <path
+                  fill="none"
+                  stroke="#000"
+                  strokeWidth="2"
+                  d={ICONS[discussion.closedAt ? 'lock' : 'unlock']}
+                />
+              </svg>
+            }
+          />
+        );
+      }
       // return proposal, poll, statementslist
       if (!discussion.comments) return <span>NOTHING TO SEE</span>;
+      if (discussion.deletedAt)
+        return (
+          <Notification type="alert" message="Discussion not accessible!" />
+        );
       return (
         <div>
           <Box tag="article" column pad align>
@@ -185,50 +240,57 @@ class DiscussionContainer extends React.Component {
                 flexDirection: 'column',
               }}
             >
-              <WorkteamHeader
-                displayName={discussion.workTeam.displayName}
-                id={discussion.workTeam.id}
-                logo={discussion.workTeam.logo}
+              <Box between>
+                <WorkteamHeader
+                  displayName={discussion.workTeam.displayName}
+                  id={discussion.workTeam.id}
+                  logo={discussion.workTeam.logo}
+                />
+
+                {closingElement}
+              </Box>
+              <Discussion
+                title={discussion.title}
+                content={discussion.content}
+                createdAt={discussion.createdAt}
+                closedAt={discussion.closedAt}
+                spokesman={discussion.spokesman}
               />
-              {/* <CheckBox
-              toggle
-              checked={discussion.subscribed}
-              label={discussion.subscribed ? 'ON' : 'OFF'}
-              onChange={this.handleSubscription}
-              disabled={isFetching}
-            /> */}
-              <Discussion {...discussion} />
-              <SubscriptionButton
-                onSubscribe={this.handleSubscription}
-                subscription={discussion.subscription}
-                targetType="DISCUSSION"
-                status={subscriptionStatus}
-              />
+              {!discussion.closedAt && (
+                <SubscriptionButton
+                  onSubscribe={this.handleSubscription}
+                  subscription={discussion.subscription}
+                  targetType="DISCUSSION"
+                  status={subscriptionStatus}
+                />
+              )}
             </div>
             <Box tag="section" column pad fill className={s.commentsSection}>
-              <Comment
-                asInput
-                user={user}
-                onCreate={this.handleCommentCreation}
-                updates={this.props.updates['0000'] || {}}
-              />
+              {!discussion.closedAt && (
+                <Comment
+                  asInput
+                  user={user}
+                  onCreate={this.handleCommentCreation}
+                  updates={updates['0000'] || {}}
+                />
+              )}
 
               {discussion.comments &&
                 discussion.comments.map(c => (
                   <Comment
                     {...c}
                     showReplies={c.id === commentId && childId}
-                    onReply={this.handleReply}
+                    onReply={!discussion.closedAt && this.handleReply}
                     loadReplies={this.handleCommentFetching}
                     onCreate={this.handleCommentCreation}
-                    onUpdate={this.props.updateComment}
-                    onDelete={this.props.deleteComment}
+                    onUpdate={mutateComment}
+                    onDelete={eraseComment}
                     onProfileClick={handleProfileClick}
-                    openInput={c.id === this.state.replying}
+                    openInput={c.id === replying}
                     // eslint-disable-next-line eqeqeq
                     own={c.author.id == user.id}
                     user={user}
-                    updates={this.props.updates[c.id]}
+                    updates={updates[c.id]}
                     ref={
                       c.id === this.scrollToId
                         ? node => (this.commentTo = node) // eslint-disable-line
@@ -240,16 +302,16 @@ class DiscussionContainer extends React.Component {
                       c.replies.map(r => (
                         <Comment
                           {...r}
-                          onReply={this.handleReply}
+                          onReply={!discussion.closedAt && this.handleReply}
                           reply
                           onCreate={this.handleCommentCreation}
-                          onUpdate={this.props.updateComment}
-                          onDelete={this.props.deleteComment}
-                          openInput={r.id === this.state.replying}
+                          onUpdate={mutateComment}
+                          onDelete={eraseComment}
+                          openInput={r.id === replying}
                           onProfileClick={handleProfileClick}
                           // eslint-disable-next-line eqeqeq
                           own={r.author.id == user.id}
-                          updates={this.props.updates[c.id]}
+                          updates={updates[c.id]}
                           user={user}
                           ref={
                             r.id === this.scrollToId
@@ -289,8 +351,10 @@ const mapDispatch = {
   createSubscription,
   updateSubscription,
   deleteSubscription,
+  updateDiscussion,
 };
 
-export default connect(mapStateToProps, mapDispatch)(
-  withStyles(s)(DiscussionContainer),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(withStyles(s)(DiscussionContainer));

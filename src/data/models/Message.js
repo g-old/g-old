@@ -1,5 +1,6 @@
 // @flow
 
+import DiffMatchPatch from 'diff-match-patch';
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import WorkTeam from './WorkTeam';
@@ -7,24 +8,57 @@ import EventManager from '../../core/EventManager';
 import Note from './Note';
 import Communication from './Communication';
 import log from '../../logger';
-import createLoaders from '../../data/dataLoader';
+import createLoaders from '../dataLoader';
 
+const dmp = new DiffMatchPatch();
 export type MessageType = 'communication' | 'note' | 'meeting';
 
-type RecipientType = 'user' | 'group';
+type RecipientType = 'user' | 'group' | 'role' | 'all';
+
+const isDifferent = (oldTextHtml, newTextHtml) => {
+  let oldText;
+  let newText;
+  const result = ['de', 'it'].reduce((acc, curr) => {
+    oldText = oldTextHtml[curr];
+    newText = newTextHtml[curr];
+
+    if (oldText && newText) {
+      const diff = dmp.diff_main(oldText, newText);
+      if (diff.length) {
+        if (diff.some(d => d[0] !== 0))
+          // What to do...
+          acc[curr] = true;
+      }
+    }
+    return acc;
+  }, {});
+  return Object.keys(result).length > 0;
+};
 class Message {
   recipientType: RecipientType;
+
   id: ID;
+
   messageHtml: string;
+
   subject: string;
+
   senderId: ID;
+
   messageType: MessageType;
+
   objectId: ID;
+
   recipients: [ID];
+
   msg: string;
+
   createdAt: string;
+
   message: string;
+
   enforceEmail: boolean;
+
   constructor(data) {
     this.id = data.id;
     this.recipientType = data.recipient_type;
@@ -53,17 +87,26 @@ class Message {
     if (data.parentId) {
       data.isReply = true; // eslint-disable-line no-param-reassign
     }
+    let workTeam;
     if (data.recipientType === 'group' && data.recipients.length) {
       // check if viewer is coordinator of that group
       if (data.recipients.length !== 1) {
         throw new Error('Implement write control for multiple groups');
       }
-      const workteam = await WorkTeam.gen(viewer, data.recipients[0], loaders);
-      if (workteam.coordinatorId === viewer.id) {
-        data.isCoordinator = true; // eslint-disable-line no-param-reassign
-      }
+      workTeam = await WorkTeam.gen(viewer, data.recipients[0], loaders);
+    } else if (
+      !data.reply &&
+      data.recipientType === 'user' &&
+      data.recipients.length === 1 &&
+      data.messageType === 'communication'
+    ) {
+      const recipientId = data.recipients[0];
+      const wtIds = await knex('work_teams')
+        .where({ coordinator_id: recipientId })
+        .pluck('id');
+      data.workTeamIds = wtIds; // eslint-disable-line no-param-reassign
     }
-    if (!canMutate(viewer, data, Models.MESSAGE)) return null;
+    if (!canMutate(viewer, { ...data, workTeam }, Models.MESSAGE)) return null;
     let messageData;
     const newData = { created_at: new Date(), sender_id: viewer.id };
 
@@ -71,7 +114,7 @@ class Message {
       newData.recipient_type = data.recipientType;
     }
     if (data.recipients) {
-      if (data.recipients.length || data.recipientType === 'all') {
+      if (data.recipients.length || ['all'].includes(data.recipientType)) {
         newData.recipients = JSON.stringify(data.recipients || []);
       } else {
         throw new Error('Atleast one recipient required');
@@ -98,9 +141,35 @@ class Message {
         let object = {};
         if (data.messageType === 'note') {
           if (data.note.id) {
+            // is draft
             object = await Note.gen(viewer, data.note.id, loaders);
+
+            if (!object) {
+              throw new Error('Object could not been loaded');
+            }
+
+            if (data.note.textHtml) {
+              // make diff
+              if (
+                isDifferent(object.textHtml, data.note.textHtml) ||
+                object.isPublished
+              ) {
+                // save as new note
+                object = await Note.create(
+                  viewer,
+                  { ...data.note, is_published: true },
+                  loaders,
+                  tra,
+                );
+              }
+            }
           } else {
-            object = await Note.create(viewer, data.note, loaders, tra);
+            object = await Note.create(
+              viewer,
+              { ...data.note, is_published: true },
+              loaders,
+              tra,
+            );
           }
         } else if (data.messageType === 'communication') {
           object = await Communication.create(
@@ -176,7 +245,7 @@ const userStatusTranslations = {
     de:
       'Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen, Beiträge und Beschlüsse lesen sowie an Diskussionen teilnehmen.',
     it:
-      'Sei stato abilitato come Visitatore e da adesso puoi iscriverti ai gruppi di lavoro, partecipare ai sondaggi, leggere interventi, decisioni e partecipare alle discussioni.',
+      'Sei stato abilitato come Visitatore e da adesso puoi partecipare ai sondaggi, iscriverti ai gruppi di lavoro e lì partecipare a tutte le attività previste: discussioni, sondaggi e votazioni.',
     lld:
       'translate: Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen, Beiträge und Beschlüsse lesen sowie an Diskussionen teilnehmen.',
   },
@@ -241,6 +310,63 @@ const userStatusTranslations = {
       helpNotice.it
     }`,
     lld: `translate: Sie sind ab jetzt kein "Member Manager" mehr. ${
+      helpNotice.lld
+    }`,
+  },
+  relator_added: {
+    de:
+      'Sie sind als "Relator" freigeschalten worden. Ab sofort können Sie Beschlusse und Umfragen plattformweit einstellen, sowie Nachrichten an alle unsere Mitglieder schicken.',
+    it:
+      'Sei stato abilitato come "Relatore". Da questo momento potrai inserire proposte e sondaggi a livello di piattaforma e mandare messaggi a tutti gli utenti.',
+    lld:
+      'translate:Sie sind als "Relator" freigeschalten worden. Ab sofort können Sie Beschlusse und Umfragen plattformweit einstellen, sowie Nachrichten an alle unsere Mitglieder schicken.',
+  },
+  relator_lost: {
+    de: `Sie sind ab jetzt kein "Relator" mehr. ${helpNotice.de}`,
+    it: `Da questo momento non sei più "Relatore". ${helpNotice.it}`,
+    lld: `translate: Sie sind ab jetzt kein "Relator" mehr. ${helpNotice.lld}`,
+  },
+  team_leader_added: {
+    de:
+      'Sie sind als "Teamleader" freigeschalten worden. Damit haben Sie Zugang zum Adminbereich der Plattform.',
+    it:
+      'Sei appena stato abilitato come coordinatore di un gruppo di lavoro e di conseguenza avrai accesso a strumenti riservati agli amministratori.',
+    lld:
+      'translate: Sie sind als "Teamleader" freigeschalten worden. Damit haben Sie Zugang zum Adminbereich der Plattform.',
+  },
+  team_leader_lost: {
+    de: `Sie sind ab jetzt kein "Teamleader" mehr. ${helpNotice.de}`,
+    it: `Da questo momento non sei più coordinatore di un gruppo di lavoro. ${helpNotice.it}`,
+    lld: `Sie sind ab jetzt kein "Teamleader" mehr. ${helpNotice.lld}`,
+  },
+
+  district_keeper_added: {
+    de: 'Sie sind als "District keeper" freigeschalten worden.',
+    it: 'Sei appena stato abilitato come responsabile di zona.',
+    lld: 'Sie sind als "District keeper" freigeschalten worden.',
+  },
+
+  district_keeper_lost: {
+    de: `Sie sind ab jetzt kein "District keeper" mehr. ${helpNotice.de}`,
+    it: `Da questo momento non sei più responsabile di zona. ${
+      helpNotice.it
+    }`,
+    lld: `translate: Sie sind ab jetzt kein "District keeper" mehr. ${
+      helpNotice.lld
+    }`,
+  },
+  contactee_added: {
+    de:
+      'Sie sind als "Contactee" freigeschalten worden. Ab sofort können Sie von Mitgliedern der Plattform direkt angeschrieben werden',
+    it:
+      'Sei appena stato abilitato come "persona di riferimento". Da subito tutti gli utenti potranno contattarti direttamente',
+    lld:
+      'translate: Sie sind als "Contactee" freigeschalten worden. Ab sofort können Sie von Mitgliedern der Plattform direkt angeschrieben werden',
+  },
+  contactee_lost: {
+    de: `Sie sind ab jetzt kein "Contactee" mehr. ${helpNotice.de}`,
+    it: `Da questo momento non sei più "persona di riferimento". ${helpNotice.it}`,
+    lld: `translate: Sie sind ab jetzt kein "Contactee" mehr. ${
       helpNotice.lld
     }`,
   },

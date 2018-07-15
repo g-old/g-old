@@ -3,11 +3,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import history from '../../history';
-import {
-  loadProposal,
-  createProposalSub,
-  deleteProposalSub,
-} from '../../actions/proposal';
+import { loadProposal } from '../../actions/proposal';
+import Notification from '../../components/Notification';
 import {
   createSubscription,
   updateSubscription,
@@ -36,6 +33,7 @@ import Button from '../../components/Button';
 import Poll from '../../components/Poll';
 import Filter from '../../components/Filter';
 import SubscriptionButton from '../../components/SubscriptionButton';
+import WorkteamHeader from '../../components/WorkteamHeader/WorkteamHeader';
 
 const messages = defineMessages({
   voting: {
@@ -71,17 +69,17 @@ class ProposalContainer extends React.Component {
     voteUpdates: PropTypes.shape({}).isRequired,
     followeeVotes: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    createProposalSub: PropTypes.func.isRequired,
-    deleteProposalSub: PropTypes.func.isRequired,
     createSubscription: PropTypes.func.isRequired,
     deleteSubscription: PropTypes.func.isRequired,
     updateSubscription: PropTypes.func.isRequired,
     subscriptionStatus: PropTypes.shape({}),
   };
+
   static defaultProps = {
     errorMessage: null,
     subscriptionStatus: null,
   };
+
   constructor(props) {
     super(props);
     this.state = { filter: 'all' };
@@ -93,10 +91,11 @@ class ProposalContainer extends React.Component {
 
   isReady() {
     // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
+    const { proposal } = this.props;
     return (
-      this.props.proposal &&
-      ((this.props.proposal.pollOne && this.props.proposal.pollOne.mode) ||
-        (this.props.proposal.pollTwo && this.props.proposal.pollTwo.mode))
+      proposal &&
+      ((proposal.pollOne && proposal.pollOne.mode) ||
+        (proposal.pollTwo && proposal.pollTwo.mode))
     );
   }
 
@@ -117,43 +116,56 @@ class ProposalContainer extends React.Component {
   }
 
   handleVoting(data, method, info) {
-    const { proposal } = this.props;
+    const {
+      proposal,
+      createVote: vote,
+      updateVote: mutateVote,
+      deleteVote: eraseVote,
+    } = this.props;
     switch (method) {
       case 'create': {
         let targetId;
         if (!proposal.subscription) {
           if (proposal.state !== 'survey') {
-            targetId = this.props.proposal.id;
+            targetId = proposal.id;
           }
         }
-        this.props.createVote({ ...data, targetId });
+        vote({ ...data, targetId });
         break;
       }
       case 'update': {
-        this.props.updateVote(data, info);
+        mutateVote(data, info);
         break;
       }
       case 'del': {
-        this.props.deleteVote(data, info);
+        eraseVote(data, info);
         break;
       }
       default:
         throw Error('Unknown method');
     }
   }
+
+  // TODO make subscribe HOC
+
   handleSubscription({ targetType, subscriptionType }) {
-    const { id, subscription } = this.props.proposal;
+    const {
+      proposal: { id, subscription },
+      deleteSubscription: unsubscribe,
+      updateSubscription: mutateSubscription,
+      createSubscription: subscribe,
+    } = this.props;
     if (subscription && subscriptionType === 'DELETE') {
-      this.props.deleteSubscription({ id: subscription.id });
+      unsubscribe({ id: subscription.id });
     } else if (subscription) {
-      this.props.updateSubscription({
+      mutateSubscription({
         id: subscription.id,
         targetType,
         subscriptionType,
         targetId: id,
       });
     } else {
-      this.props.createSubscription({
+      subscribe({
         targetType,
         subscriptionType,
         targetId: id,
@@ -161,121 +173,147 @@ class ProposalContainer extends React.Component {
     }
   }
 
-  render() {
+  fetchProposal() {
+    const { loadProposal: fetchProposal, proposalId } = this.props;
+    fetchProposal({ id: proposalId });
+  }
+
+  renderInteractions() {
     const {
       proposal,
-      isFetching,
-      errorMessage,
-      user,
       followees,
+      user,
+      pollId,
       subscriptionStatus,
+      getVotes: fetchVotes,
+      voteUpdates,
+      followeeVotes,
     } = this.props;
+    if (proposal.deletedAt) {
+      return null;
+    }
     const showSubscription = ['proposed', 'voting'].includes(proposal.state);
     const { filter } = this.state;
+    let poll;
+    if (proposal.pollOne) {
+      poll =
+        proposal.pollOne.id === pollId ? proposal.pollOne : proposal.pollTwo;
+    } else {
+      poll = proposal.pollTwo;
+    }
+    const canSwitchPolls = !!(proposal.pollOne && proposal.pollTwo);
+    if (!poll) {
+      return <div>SOMETHING GOT REALLY WRONG</div>;
+    }
+    let switchPollBtn = null;
+
+    if (canSwitchPolls) {
+      const isPollOne = poll.id === proposal.pollOne.id;
+      switchPollBtn = (
+        <Button
+          reverse={isPollOne}
+          label={
+            <FormattedMessage
+              {...messages[isPollOne ? 'voting' : 'proposal']}
+            />
+          }
+          icon={
+            <svg
+              version="1.1"
+              viewBox="0 0 24 24"
+              width="24px"
+              height="24px"
+              role="img"
+            >
+              <path
+                fill="none"
+                stroke="#000"
+                strokeWidth="2"
+                d="M2,12 L22,12 M13,3 L22,12 L13,21"
+                transform={isPollOne ? null : 'matrix(-1 0 0 1 24 0)'}
+              />
+            </svg>
+          }
+          onClick={this.handlePollSwitching}
+        />
+      );
+    }
+    let hideOwnStatement = true;
+    if (
+      filter === 'all' ||
+      (poll.ownVote && filter === poll.ownVote.position)
+    ) {
+      hideOwnStatement = false;
+    }
+    let filterNode = null;
+    if (poll.mode && poll.mode.withStatements && !poll.mode.unipolar) {
+      filterNode = <Filter filter={filter} filterFn={this.filterStatements} />;
+    }
+    return (
+      <React.Fragment>
+        {showSubscription && (
+          <SubscriptionButton
+            status={subscriptionStatus}
+            targetType="PROPOSAL"
+            onSubscribe={this.handleSubscription}
+            subscription={proposal.subscription}
+          />
+        )}
+
+        <Poll
+          {...poll}
+          canVote={proposal.canVote}
+          onVote={this.handleVoting}
+          onFetchVoters={fetchVotes}
+          user={user}
+          filter={filter}
+          filterFn={this.filterStatements}
+          updates={voteUpdates}
+          followeeVotes={followeeVotes}
+        />
+
+        {filterNode}
+
+        <StatementsContainer
+          hideOwnStatement={hideOwnStatement}
+          followees={followees}
+          poll={poll}
+          user={user}
+          filter={filter}
+        />
+
+        {switchPollBtn}
+      </React.Fragment>
+    );
+  }
+
+  render() {
+    const { proposal, isFetching, errorMessage } = this.props;
     if (isFetching && !proposal) {
       return <p>{'Loading...'} </p>;
     }
     if (errorMessage && !proposal) {
-      return (
-        <FetchError
-          message={errorMessage}
-          onRetry={() => this.props.loadProposal({ id: this.props.proposalId })}
-        />
-      );
+      return <FetchError message={errorMessage} onRetry={this.fetchProposal} />;
+    }
+    if (proposal.deletedAt) {
+      return <Notification type="alert" message="Proposal not accessible!" />;
     }
     if (this.isReady()) {
-      let poll;
-      if (proposal.pollOne) {
-        poll =
-          proposal.pollOne.id === this.props.pollId
-            ? proposal.pollOne
-            : proposal.pollTwo;
-      } else {
-        poll = proposal.pollTwo;
-      }
-      const canSwitchPolls = !!(proposal.pollOne && proposal.pollTwo);
-      if (!poll) {
-        return <div>SOMETHING GOT REALLY WRONG</div>;
-      }
-      let switchPollBtn = null;
-
-      if (canSwitchPolls) {
-        const isPollOne = poll.id === proposal.pollOne.id;
-        switchPollBtn = (
-          <Button
-            reverse={isPollOne}
-            label={
-              <FormattedMessage
-                {...messages[isPollOne ? 'voting' : 'proposal']}
-              />
-            }
-            icon={
-              <svg
-                version="1.1"
-                viewBox="0 0 24 24"
-                width="24px"
-                height="24px"
-                role="img"
-              >
-                <path
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  d="M2,12 L22,12 M13,3 L22,12 L13,21"
-                  transform={isPollOne ? null : 'matrix(-1 0 0 1 24 0)'}
-                />
-              </svg>
-            }
-            onClick={this.handlePollSwitching}
-          />
-        );
-      }
-      let hideOwnStatement = true;
-      if (
-        filter === 'all' ||
-        (poll.ownVote && filter === poll.ownVote.position)
-      ) {
-        hideOwnStatement = false;
-      }
-      let filterNode = null;
-      if (poll.mode && poll.mode.withStatements && !poll.mode.unipolar) {
-        filterNode = (
-          <Filter filter={filter} filterFn={this.filterStatements} />
-        );
-      }
       // return proposal, poll, statementslist
       return (
         <div>
           <Box column pad>
-            <Proposal {...proposal} />
-            {showSubscription && (
-              <SubscriptionButton
-                status={subscriptionStatus}
-                targetType="PROPOSAL"
-                onSubscribe={this.handleSubscription}
-                subscription={proposal.subscription}
-              />
-            )}
-            <Poll
-              {...poll}
-              canVote={proposal.canVote}
-              onVote={this.handleVoting}
-              onFetchVoters={this.props.getVotes}
-              user={user}
-              filter={this.state.filter}
-              filterFn={this.filterStatements}
-              updates={this.props.voteUpdates}
-              followeeVotes={this.props.followeeVotes}
-            />
-            {filterNode}
-            <StatementsContainer
-              hideOwnStatement={hideOwnStatement}
-              followees={followees}
-              poll={poll}
-              user={user}
-              filter={this.state.filter}
-            />
-            {switchPollBtn}
+            <div>
+              {proposal.workteam && (
+                <WorkteamHeader
+                  displayName={proposal.workteam.displayName}
+                  id={proposal.workteam.id}
+                  logo={proposal.workteam.logo}
+                />
+              )}
+              <Proposal {...proposal} />
+            </div>
+            {this.renderInteractions()}
           </Box>
         </div>
       ); // <TestProposal user={this.props.user} proposal={this.props.proposal} />;
@@ -302,11 +340,12 @@ const mapDispatch = {
   updateVote,
   deleteVote,
   getVotes,
-  createProposalSub,
-  deleteProposalSub,
   createSubscription,
   updateSubscription,
   deleteSubscription,
 };
 
-export default connect(mapStateToProps, mapDispatch)(ProposalContainer);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(ProposalContainer);

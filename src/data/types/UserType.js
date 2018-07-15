@@ -9,15 +9,16 @@ import {
 } from 'graphql';
 
 import knex from '../knex';
-
+/* eslint-disable import/no-cycle */
 import WorkTeamType from './WorkTeamType';
-import WorkTeam from '../models/WorkTeam';
 import NotificationType from './NotificationType';
-import Notification from '../models/Notification';
 import MessageType from './MessageType';
+import requestConnection from '../queries/requestConnection';
+/* eslint-enable import/no-cycle */
+import WorkTeam from '../models/WorkTeam';
+import Notification from '../models/Notification';
 import Message from '../models/Message';
 import User from '../models/User';
-import requestConnection from '../queries/requestConnection';
 import { Permissions } from '../../organization';
 
 /* eslint-disable */
@@ -120,7 +121,7 @@ const UserType = new ObjectType({
       resolve: (data, args, { viewer, loaders }) => {
         if (viewer) {
           return knex('user_work_teams')
-            .where({ user_id: data.id })
+            .where({ user_id: data.id, inactive: false })
             .innerJoin(
               'work_teams',
               'work_teams.id',

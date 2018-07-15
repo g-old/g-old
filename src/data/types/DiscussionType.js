@@ -7,15 +7,18 @@ import {
   GraphQLNonNull,
 } from 'graphql';
 import knex from '../knex';
-
+/* eslint-disable import/no-cycle */
 import WorkTeamType from './WorkTeamType';
-import WorkTeam from '../models/WorkTeam';
-import CommentType from './CommentType';
-import Comment from '../models/Comment';
-import UserType from './UserType';
-import User from '../models/User';
 import SubscriptionType from './SubscriptionType';
-import Subscription, { TargetType } from '../models/Subscription';
+import CommentType from './CommentType';
+import UserType from './UserType';
+/* eslint-enable import/no-cycle */
+import WorkTeam from '../models/WorkTeam';
+import Comment from '../models/Comment';
+import User from '../models/User';
+
+import Subscription from '../models/Subscription';
+import { TargetType } from '../models/utils';
 
 const DiscussionType = new ObjectType({
   name: 'Discussion',
@@ -44,6 +47,9 @@ const DiscussionType = new ObjectType({
       resolve: (data, args, { viewer, loaders }) =>
         WorkTeam.gen(viewer, data.workTeamId, loaders),
     },
+    workTeamId: {
+      type: ID,
+    },
     // TODO or more
     ownComment: {
       type: CommentType,
@@ -61,8 +67,12 @@ const DiscussionType = new ObjectType({
     comments: {
       type: new GraphQLList(CommentType),
       resolve: (data, args, { viewer, loaders }) => {
-        // experimental
-        if (viewer && viewer.wtMemberships.includes(data.workTeamId)) {
+        // experimental!
+        if (
+          viewer &&
+          viewer.wtMemberships.includes(data.workTeamId) &&
+          !data.deletedAt
+        ) {
           return knex('comments')
             .where({ discussion_id: data.id })
             .where({ parent_id: null })
@@ -103,6 +113,9 @@ const DiscussionType = new ObjectType({
       type: GraphQLString,
     },
     closedAt: {
+      type: GraphQLString,
+    },
+    deletedAt: {
       type: GraphQLString,
     },
   }),

@@ -4,7 +4,8 @@ import { throwIfMissing } from './utils';
 import log from '../logger';
 import { sendJob } from './childProcess';
 // import config from '../config';
-import { SubscriptionType, TargetType } from '../data/models/Subscription';
+import { SubscriptionType } from '../data/models/Subscription';
+import { TargetType } from '../data/models/utils';
 import Activity, { ActivityType, ActivityVerb } from '../data/models/Activity';
 import type { tActivityType, tActivityVerb } from '../data/models/Activity';
 import MailComposer from './MailComposer';
@@ -519,23 +520,37 @@ type NotificationProps = {
 
 class NotificationService {
   EventManager: {};
+
   activityQueue: EActivity[];
+
   delimiter: string;
+
   maxBatchSize: number;
+
   batchingWindow: number;
+
   dbConnector: any;
+
   PubSub: PubSub;
+
   linkPrefix: string;
+
   lastActivityId: ID;
+
   sendEmails: boolean;
+
   MailComposer: MailComposer;
+
   filterActivity: (payload: PayloadType) => void;
+
   loadSubscriptions: Selector => Promise<Subscriber[]>;
+
   mergeNotifyableActivitiesWithSubscribers: (
     Subscriber,
     ID[],
     ActivityMap,
   ) => Promise<RelevantActivities>;
+
   generateEmail: (
     activity: EActivity,
     subscriberIds: ID[],
@@ -544,11 +559,17 @@ class NotificationService {
     subscriberById: SubscriberMap,
     objects: { [tActivityType]: ResourceMap },
   ) => Email;
+
   batchProcessing: () => void;
+
   processQueue: () => void;
+
   start: () => void;
+
   recover: () => void;
+
   getLastProcessedActivityId: () => ID;
+
   purgeNotifications: ({ [string]: EActivity }) => any;
 
   constructor({
@@ -829,7 +850,8 @@ class NotificationService {
       case TargetType.ALL: {
         return this.dbConnector('notification_settings')
           .innerJoin('users', 'users.id', 'notification_settings.user_id')
-          .whereNull('users.deleted_at') // no guests!
+          .whereRaw('users.groups & ? > 0', [Groups.VIEWER]) // no guests!
+          .whereNull('users.deleted_at')
           .select(
             'notification_settings.user_id as id',
             'notification_settings.settings as settings',
@@ -857,6 +879,19 @@ class NotificationService {
             'users.email as email',
           );
       }
+      case TargetType.ROLE:
+        // TODO handle case where more roles can be selected (targetId)
+        // Atm this works as alias for guest communication
+        return this.dbConnector('notification_settings')
+          .innerJoin('users', 'users.id', 'notification_settings.user_id')
+          .where('users.groups', '=', Groups.GUEST)
+          .whereNull('users.deleted_at')
+          .select(
+            'notification_settings.user_id as id',
+            'notification_settings.settings as settings',
+            'users.locale as locale',
+            'users.email as email',
+          );
       default:
         throw new Error(`TargetType not recognized: ${selector[0]}`);
     }
@@ -995,7 +1030,8 @@ class NotificationService {
           activity.objectId,
           ActivityType.STATEMENT,
         );
-      } else if (activity.type === ActivityType.COMMENT) {
+      }
+      if (activity.type === ActivityType.COMMENT) {
         const comment = activity.content;
         if (!comment.parentId && comment.replyIds) {
           // search and delete reply notifications

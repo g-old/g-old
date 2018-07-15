@@ -6,20 +6,14 @@ import Accordion from '../../components/Accordion';
 import Box from '../../components/Box';
 import WorkteamHeader from '../../components/WorkteamHeader';
 import AccordionPanel from '../../components/AccordionPanel';
+import { joinWorkTeam, loadProposalStatus } from '../../actions/workTeam';
 import {
-  loadWorkTeam,
-  joinWorkTeam,
-  loadProposalStatus,
-} from '../../actions/workTeam';
-import {
-  createProposal,
   loadTags,
   loadProposalsList,
+  updateProposal,
 } from '../../actions/proposal';
 import { findUser } from '../../actions/user';
 import ProposalsManager from '../../components/ProposalsManager';
-import ProposalListView from '../../components/ProposalListView';
-import ProposalStatusRow from './ProposalStatusRow';
 
 import { deleteRequest, updateRequest } from '../../actions/request';
 
@@ -29,23 +23,23 @@ import {
   getDiscussionUpdates,
   getRequestUpdates,
   getWorkTeamStatus,
-  getProposalsIsFetching,
-  getProposalsErrorMessage,
-  getProposalsPage,
   getVisibleProposals,
   getMessageUpdates,
+  getWTProposalsByState,
+  getResourcePageInfo,
 } from '../../reducers';
+import { genProposalPageKey } from '../../reducers/pageInfo';
+
 import DiscussionInput from '../../components/DiscussionInput';
 import ProposalInput from '../../components/ProposalInput';
 import Tabs from '../../components/Tabs';
 import Tab from '../../components/Tab';
-import RequestsList from '../../components/RequestsList';
-import Request from '../../components/Request';
-import AssetsTable from '../../components/AssetsTable';
 import { Groups } from '../../organization';
 import history from '../../history';
 import MessageInput from '../../components/MessageInput';
 import { createMessage } from '../../actions/message';
+import UpstreamProposalsView from './UpstreamProposalsView';
+import RequestsView from './RequestsView';
 
 // import FetchError from '../../components/FetchError';
 const messages = defineMessages({
@@ -166,14 +160,14 @@ class WorkTeamManagement extends React.Component {
     joinWorkTeam: PropTypes.func.isRequired,
     updateRequest: PropTypes.func.isRequired,
     loadTags: PropTypes.func.isRequired,
-    isFetching: PropTypes.bool,
     loadProposalsList: PropTypes.func.isRequired,
     loadProposalStatus: PropTypes.func.isRequired,
-    errorMessage: PropTypes.string,
     pageInfo: PropTypes.shape({}),
     proposalUpdates: PropTypes.shape({}),
     createMessage: PropTypes.func.isRequired,
-    messageUpdates: PropTypes.shape({}),
+    messageUpdates: PropTypes.shape({}).isRequired,
+    updateProposal: PropTypes.func.isRequired,
+    wtProposals: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   };
 
   static defaultProps = {
@@ -182,12 +176,10 @@ class WorkTeamManagement extends React.Component {
     requestUpdates: null,
     discussionUpdates: null,
     proposalUpdates: null,
-    isFetching: null,
-    errorMessage: null,
     proposals: null,
     pageInfo: null,
-    messageUpdates: null,
   };
+
   constructor(props) {
     super(props);
     this.state = { showRequest: false };
@@ -196,16 +188,26 @@ class WorkTeamManagement extends React.Component {
     this.onAllowRequest = this.onAllowRequest.bind(this);
     this.onDenyRequest = this.onDenyRequest.bind(this);
     this.onProposalClick = this.onProposalClick.bind(this);
+    this.handleLoadProposals = this.handleLoadProposals.bind(this);
+    this.handleLoadMore = this.handleLoadMore.bind(this);
+    this.fetchTags = this.fetchTags.bind(this);
+    this.fetchProposalStatus = this.fetchProposalStatus.bind(this);
+    this.fetchWTProposals = this.fetchWTProposals.bind(this);
   }
+
   onRequestClick(action, data) {
     this.setState({ showRequest: true, currentRequest: data });
   }
+
   onAllowRequest() {
-    const { type, requester } = this.state.currentRequest;
+    const {
+      currentRequest: { type, requester },
+    } = this.state;
+    const { joinWorkTeam: join, workTeam } = this.props;
     if (type === 'joinWT') {
-      this.props.joinWorkTeam(
+      join(
         {
-          id: this.props.workTeam.id,
+          id: workTeam.id,
           memberId: requester.id,
         },
         true,
@@ -215,10 +217,11 @@ class WorkTeamManagement extends React.Component {
   }
 
   onDenyRequest() {
-    const { id } = this.state.currentRequest;
-
-    alert('TO IMPLEMENT');
-    this.props.updateRequest({ id, deny: true });
+    const {
+      currentRequest: { id },
+    } = this.state;
+    const { updateRequest: update } = this.props;
+    update({ id, deny: true });
     this.setState({ joining: false });
   }
 
@@ -237,110 +240,167 @@ class WorkTeamManagement extends React.Component {
     // should open proposalManager
     // then you can handle actions from there
   }
+
+  handleLoadMore({ after }) {
+    const { loadProposalsList: loadProposals, id } = this.props;
+    loadProposals({ after, state: 'pending', workTeamId: id });
+  }
+
+  handleLoadProposals() {
+    const { loadProposalsList: loadProposals, id } = this.props;
+    loadProposals({ state: 'pending', workTeamId: id });
+  }
+
   canAccess() {
     const { workTeam, user } = this.props;
     return (
       /* eslint-disable */
       user.groups & Groups.ADMIN ||
-      (workTeam.coordinator && workTeam.coordinator.id == user.id)
+      (workTeam.coordinator && workTeam.coordinator.id == user.id) ||
+      (workTeam.mainTeam && user.wtMemberships.includes(Number(workTeam.id)))
     ); /* eslint-enable */
   }
+
+  fetchTags() {
+    const { loadTags: fetchTags } = this.props;
+    fetchTags();
+  }
+
+  fetchProposalStatus() {
+    const { loadProposalStatus: loadProposals, id } = this.props;
+    loadProposals({
+      state: 'pending',
+      id,
+      first: 30,
+    });
+  }
+
+  fetchWTProposals({ after } = {}) {
+    const { loadProposalsList: loadProposals, id } = this.props;
+    loadProposals({
+      state: 'active',
+      workTeamId: id,
+      after,
+    });
+  }
+
+  renderTabs() {
+    const tabs = [];
+    const {
+      user,
+      workTeam = {},
+      workTeamUpdates = {},
+      requestUpdates = {},
+      id,
+      discussionUpdates,
+      wtProposals,
+      pageInfo,
+      proposals,
+      createMessage: notify,
+      messageUpdates: messageStatus,
+      updateProposal: mutateProposal,
+    } = this.props;
+    const { showRequest, joining, currentRequest } = this.state;
+    // eslint-disable-next-line no-bitwise
+    const isAdmin = (user.groups & Groups.ADMIN) > 0;
+    const isCoordinator =
+      workTeam && workTeam.coordinator && workTeam.coordinator.id == user.id; // eslint-disable-line eqeqeq
+    tabs.push(
+      <Tab title={<FormattedMessage {...messages.discussions} />}>
+        <Accordion>
+          <AccordionPanel
+            heading={<FormattedMessage {...messages.createDiscussion} />}
+          >
+            <DiscussionInput workTeamId={id} updates={discussionUpdates} />
+          </AccordionPanel>
+        </Accordion>
+      </Tab>,
+    );
+    if (isAdmin) {
+      if (workTeam.mainTeam) {
+        tabs.push(
+          <Tab title="Proposals from WTs">
+            <UpstreamProposalsView
+              loadProposalsState={this.fetchProposalStatus}
+              pageInfo={pageInfo}
+              onProposalClick={this.onProposalClick}
+              loadProposals={this.handleLoadProposals}
+              loadMoreProposals={this.handleLoadMore}
+              proposals={proposals}
+              linkedProposals={workTeam.linkedProposals}
+            />
+          </Tab>,
+        );
+      }
+      tabs.push(
+        <Tab title={<FormattedMessage {...messages.proposals} />}>
+          <Accordion>
+            <AccordionPanel
+              heading={<FormattedMessage {...messages.proposalInput} />}
+              onActive={this.fetchTags}
+            >
+              <ProposalInput
+                workTeamId={id}
+                maxTags={8}
+                pollOptions={pollOptions}
+                defaultPollValues={defaultPollValues}
+              />
+            </AccordionPanel>
+            <AccordionPanel
+              heading={<FormattedMessage {...messages.proposalManager} />}
+              onActive={this.fetchWTProposals}
+            >
+              <ProposalsManager
+                proposals={wtProposals || []}
+                workTeamId={id}
+                pollOptions={pollOptions}
+                defaultPollValues={defaultPollValues}
+                updateProposal={mutateProposal}
+                pageInfo={pageInfo}
+                loadProposals={this.fetchWTProposals}
+              />
+            </AccordionPanel>
+          </Accordion>
+        </Tab>,
+
+        <Tab title={<FormattedMessage {...messages.requests} />}>
+          <RequestsView
+            showRequest={showRequest}
+            updates={joining ? workTeamUpdates : requestUpdates}
+            request={currentRequest}
+            requests={workTeam.requests}
+            onAllowRequest={this.onAllowRequest}
+            onDenyRequest={this.onDenyRequest}
+            onCancel={this.onCancel}
+            onRequestClick={this.onRequestClick}
+          />
+        </Tab>,
+      );
+    }
+
+    if (isAdmin || isCoordinator) {
+      tabs.push(
+        <Tab title={<FormattedMessage {...messages.messages} />}>
+          <MessageInput
+            messageType="NOTE"
+            recipients={[id]}
+            recipientType="GROUP"
+            notifyUser={notify}
+            updates={messageStatus}
+          />
+        </Tab>,
+      );
+    }
+
+    return tabs;
+  }
+
   render() {
     if (!this.canAccess()) {
       return <div>ACCESS DENIED</div>;
     }
-    const {
-      workTeamUpdates = {},
-      requestUpdates = {},
-      discussionUpdates = {},
-      workTeam = {},
-      isFetching,
-      errorMessage,
-      pageInfo = {},
-      proposals = [],
-    } = this.props;
+    const { workTeam = {} } = this.props;
 
-    let content;
-    if (this.state.showRequest) {
-      const updates = this.state.joining ? workTeamUpdates : requestUpdates;
-      content = (
-        <Request
-          onAllow={this.onAllowRequest}
-          onDeny={this.onDenyRequest}
-          onCancel={this.onCancel}
-          {...this.state.currentRequest}
-          updates={updates}
-        />
-      );
-    } else {
-      content = (
-        <RequestsList
-          onClickCheckbox={this.onClickCheckbox}
-          onClickMenu={this.onRequestClick}
-          allowMultiSelect
-          searchTerm=""
-          noRequestsFound="No requests found"
-          checkedIndices={[]}
-          requests={this.props.workTeam.requests || []}
-          tableHeaders={[
-            'name',
-            'request',
-            'processor',
-            'created_at',
-            'denied_at',
-            '',
-            '',
-          ]}
-        />
-      );
-    }
-    let mainTeamView = <div />;
-    if (workTeam.mainTeam) {
-      mainTeamView = [
-        <AccordionPanel
-          heading="Accepted proposals from WTs"
-          onActive={() =>
-            this.props.loadProposalsList({
-              state: 'pending',
-              workTeamId: workTeam.id,
-              first: 30,
-            })
-          }
-        >
-          <ProposalListView
-            proposals={proposals}
-            onProposalClick={this.onProposalClick}
-            pageInfo={pageInfo}
-            filter="pending"
-            onLoadMore={this.props.loadProposalsList}
-            isFetching={isFetching}
-            error={errorMessage}
-          />
-        </AccordionPanel>,
-        <AccordionPanel
-          heading="State of Proposals"
-          onActive={() =>
-            this.props.loadProposalStatus({
-              state: 'pending',
-              id: workTeam.id,
-              first: 30,
-            })
-          }
-        >
-          <AssetsTable
-            onClickCheckbox={this.onClickCheckbox}
-            onClickMenu={this.onProposalClick}
-            allowMultiSelect
-            searchTerm=""
-            noRequestsFound="No requests found"
-            checkedIndices={[]}
-            assets={this.props.workTeam.linkedProposals || []}
-            row={ProposalStatusRow}
-            tableHeaders={['title', 'lastPoll', 'state', 'closed at']}
-          />
-        </AccordionPanel>,
-      ];
-    }
     return (
       <Box column>
         {/* eslint-disable-next-line */}
@@ -349,60 +409,7 @@ class WorkTeamManagement extends React.Component {
           displayName={workTeam.displayName}
           logo={workTeam.logo}
         />
-        <Tabs>
-          <Tab title={<FormattedMessage {...messages.discussions} />}>
-            <Accordion>
-              <AccordionPanel
-                heading={<FormattedMessage {...messages.createDiscussion} />}
-              >
-                <DiscussionInput
-                  workTeamId={this.props.id}
-                  updates={discussionUpdates}
-                />
-              </AccordionPanel>
-            </Accordion>
-          </Tab>
-          <Tab title={<FormattedMessage {...messages.proposals} />}>
-            <Accordion>
-              <AccordionPanel
-                heading={<FormattedMessage {...messages.proposalInput} />}
-                onActive={() => {
-                  this.props.loadTags();
-                }}
-              >
-                <ProposalInput
-                  workTeamId={this.props.id}
-                  maxTags={8}
-                  pollOptions={pollOptions}
-                  defaultPollValues={defaultPollValues}
-                />
-              </AccordionPanel>
-              <AccordionPanel
-                heading={<FormattedMessage {...messages.proposalManager} />}
-              >
-                <ProposalsManager
-                  proposals={this.props.workTeam.proposals || []}
-                  workTeamId={this.props.id}
-                  pollOptions={pollOptions}
-                  defaultPollValues={defaultPollValues}
-                />
-              </AccordionPanel>
-              {mainTeamView}
-            </Accordion>
-          </Tab>
-          <Tab title={<FormattedMessage {...messages.requests} />}>
-            {content}
-          </Tab>
-          <Tab title={<FormattedMessage {...messages.messages} />}>
-            <MessageInput
-              messageType="NOTE"
-              recipients={[this.props.id]}
-              recipientType="GROUP"
-              notifyUser={this.props.createMessage}
-              updates={this.props.messageUpdates}
-            />
-          </Tab>
-        </Tabs>
+        <Tabs>{this.renderTabs()}</Tabs>
       </Box>
     );
   }
@@ -414,24 +421,29 @@ const mapStateToProps = (state, { id }) => ({
   discussionUpdates: getDiscussionUpdates(state),
   requestUpdates: getRequestUpdates(state),
   workTeamUpdates: getWorkTeamStatus(state),
-  isFetching: getProposalsIsFetching(state, 'pending'),
-  errorMessage: getProposalsErrorMessage(state, 'pending'),
-  pageInfo: getProposalsPage(state, 'pending'),
+  pageInfo: getResourcePageInfo(
+    state,
+    'proposals',
+    genProposalPageKey({ state: 'pending', workteamId: id }),
+  ), // getProposalsPage(state, 'pending'),
   proposals: getVisibleProposals(state, 'pending'),
   messageUpdates: getMessageUpdates(state),
+  wtProposals: getWTProposalsByState(state, id, 'active'),
 });
 
 const mapDispatch = {
-  loadWorkTeam,
   deleteRequest,
   joinWorkTeam,
   updateRequest,
-  createProposal,
   findUser,
   loadTags,
   loadProposalsList,
   loadProposalStatus,
   createMessage,
+  updateProposal,
 };
 
-export default connect(mapStateToProps, mapDispatch)(WorkTeamManagement);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(WorkTeamManagement);

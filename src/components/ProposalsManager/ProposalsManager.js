@@ -1,59 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import s from './ProposalManager.css';
-import {
-  // getVisibleProposals,
-  getProposalsIsFetching,
-  getProposalsErrorMessage,
-  getProposalsPage,
-} from '../../reducers';
-import { updateProposal } from '../../actions/proposal';
+
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
-import PollState from '../PollState';
 import Button from '../Button';
 import FetchError from '../FetchError';
 import Box from '../Box';
 import ProposalActions from '../ProposalActions';
-import Label from '../Label';
-import ProposalListEntry from './ProposalListEntry';
+import AssetsTable from '../AssetsTable';
+import ProposalRow from './ProposalRow';
 import Layer from '../Layer';
-
-const ProposalInfo = props => (
-  <Box column onClick={props.onClick}>
-    <Label>{props.title}</Label>
-    <div style={{ marginTop: '1em' }}>
-      <PollState
-        compact
-        allVoters={props.poll.allVoters}
-        upvotes={props.poll.upvotes}
-        downvotes={props.poll.downvotes}
-        thresholdRef={props.poll.mode.thresholdRef}
-        threshold={props.poll.threshold}
-        unipolar={props.poll.mode.unipolar}
-      />
-    </div>
-
-    {props.children}
-  </Box>
-);
-
-ProposalInfo.propTypes = {
-  title: PropTypes.string.isRequired,
-  poll: PropTypes.shape({
-    upvotes: PropTypes.number.isRequired,
-    downvotes: PropTypes.number.isRequired,
-    allVoters: PropTypes.number.isRequired,
-    mode: PropTypes.shape({
-      thresholdRef: PropTypes.string,
-      unipolar: PropTypes.bool,
-    }),
-    threshold: PropTypes.number.isRequired,
-  }).isRequired,
-  children: PropTypes.element.isRequired,
-  onClick: PropTypes.func.isRequired,
-};
 
 class ProposalsManager extends React.Component {
   static propTypes = {
@@ -62,17 +17,15 @@ class ProposalsManager extends React.Component {
         id: PropTypes.string,
       }),
     ).isRequired,
+    loadProposals: PropTypes.func.isRequired,
     updateProposal: PropTypes.func.isRequired,
     defaultPollValues: PropTypes.shape({}).isRequired,
-    isFetching: PropTypes.bool.isRequired,
-    loadProposalsList: PropTypes.func.isRequired,
-    errorMessage: PropTypes.string,
     pollOptions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     pageInfo: PropTypes.shape({}).isRequired,
   };
-  static defaultProps = {
-    errorMessage: null,
-  };
+
+  static defaultProps = {};
+
   constructor(props) {
     super(props);
     this.state = { settings: { pollOption: { value: '2' } } };
@@ -81,9 +34,9 @@ class ProposalsManager extends React.Component {
     this.handleStateChange = this.handleStateChange.bind(this);
     this.toggleSettings = this.toggleSettings.bind(this);
     this.handleProposalClick = this.handleProposalClick.bind(this);
-    this.renderProposalList = this.renderProposalList.bind(this);
     this.handleLayerClosing = this.handleLayerClosing.bind(this);
   }
+
   handleProposalClick({ id }) {
     this.setState({ showDetails: true, activeProposal: id });
   }
@@ -112,18 +65,19 @@ class ProposalsManager extends React.Component {
       default:
         throw Error(`Element not recognized: ${e.target.name}`);
     }
-    this.setState({
-      settings: { ...this.state.settings, [e.target.name]: value },
-    });
+    this.setState(prevState => ({
+      settings: { ...prevState.settings, [e.target.name]: value },
+    }));
   }
 
   handleStateChange() {
-    const newState = this.state.action;
-    this.props.updateProposal({
-      id: this.state.currentProposal,
-      state: newState,
-      ...(this.state.currentProposal.workTeamId && {
-        workTeamId: this.state.currentProposal.workTeamId,
+    const { updateProposal } = this.props;
+    const { action, currentProposal } = this.state;
+    updateProposal({
+      id: currentProposal,
+      state: action,
+      ...(currentProposal.workTeamId && {
+        workTeamId: currentProposal.workTeamId,
       }),
     });
     this.setState({ currentProposal: null });
@@ -135,10 +89,13 @@ class ProposalsManager extends React.Component {
 
   handleOnSubmit() {
     // TODO sanitize input
-    // TODO refactor - is the same as in ProposalsInput
+    // TODO refactor -
+    const { updateProposal, defaultPollValues } = this.props;
+    const { settings, currentProposal } = this.state;
+    let { dateFrom, timeFrom, dateTo, timeTo } = settings;
     let startTime = null;
+
     let endTime = null;
-    let { dateFrom, timeFrom, dateTo, timeTo } = this.state.settings;
     if (dateFrom || timeFrom) {
       dateFrom = dateFrom || new Date();
       timeFrom = timeFrom || utcCorrectedDate().slice(11, 16);
@@ -156,16 +113,17 @@ class ProposalsManager extends React.Component {
       threshold,
       thresholdRef,
       unipolar,
-    } = this.state.settings;
-    const pollingModeId = this.state.settings.pollOption.value;
-    this.props.updateProposal({
-      id: this.state.currentProposal,
+      pollOption,
+    } = settings;
+    const pollingModeId = pollOption.value;
+
+    updateProposal({
+      id: currentProposal,
       poll: {
         startTime,
         endTime,
         secret,
-        threshold:
-          threshold || this.props.defaultPollValues[pollingModeId].threshold,
+        threshold: threshold || defaultPollValues[pollingModeId].threshold,
         mode: {
           withStatements,
           id: pollingModeId,
@@ -173,49 +131,34 @@ class ProposalsManager extends React.Component {
           thresholdRef,
         },
       },
-      ...(this.state.currentProposal.workTeamId && {
-        workTeamId: this.state.currentProposal.workTeamId,
+      ...(currentProposal.workTeamId && {
+        workTeamId: currentProposal.workTeamId,
       }),
     });
   }
+
   toggleSettings() {
-    this.setState({ displaySettings: !this.state.displaySettings });
+    this.setState(prevState => ({
+      displaySettings: !prevState.displaySettings,
+    }));
   }
-  renderProposalList(proposals) {
-    return (
-      <table className={s.proposalList}>
-        <thead>
-          <tr>
-            <th className={s.title}>Title</th>
-            <th>Poll</th>
-            <th className={s.date}>Endtime</th>
-          </tr>
-        </thead>
-        <tbody>
-          {proposals &&
-            proposals.map(p => (
-              <ProposalListEntry
-                key={p.id}
-                proposal={p}
-                onProposalClick={this.handleProposalClick}
-              />
-            ))}
-        </tbody>
-      </table>
-    );
-  }
+
   render() {
-    const { pageInfo, proposals = [], isFetching, errorMessage } = this.props;
-    if (isFetching && !proposals.length) {
+    const {
+      pageInfo: { errorMessage, pagination, pending },
+      proposals = [],
+      loadProposals,
+      pollOptions,
+      defaultPollValues,
+      updateProposal,
+    } = this.props;
+    const { showDetails, activeProposal } = this.state;
+    const { intl } = this.context;
+    if (pending && !proposals.length) {
       return <p>{'Loading...'} </p>;
     }
     if (errorMessage && !proposals.length) {
-      return (
-        <FetchError
-          message={errorMessage}
-          onRetry={() => this.props.loadProposalsList({ state: 'active' })}
-        />
-      );
+      return <FetchError message={errorMessage} onRetry={loadProposals} />;
     }
     const toRender = proposals.filter(p => p.state === 'proposed');
     toRender.sort(
@@ -224,29 +167,37 @@ class ProposalsManager extends React.Component {
 
     return (
       <Box column pad>
-        {this.state.showDetails && (
+        {showDetails && (
           <Layer onClose={this.handleLayerClosing}>
             <ProposalActions
-              pollOptions={this.props.pollOptions}
-              defaultPollValues={this.props.defaultPollValues}
-              intl={this.context.intl}
-              updateProposal={this.props.updateProposal}
-              id={this.state.activeProposal}
+              pollOptions={pollOptions}
+              defaultPollValues={defaultPollValues}
+              intl={intl}
+              updateProposal={updateProposal}
+              id={activeProposal}
               onFinish={this.handleLayerClosing}
             />
           </Layer>
         )}
 
-        {this.renderProposalList(toRender)}
+        <AssetsTable
+          onClickCheckbox={this.onClickCheckbox}
+          onClickMenu={this.handleProposalClick}
+          searchTerm=""
+          noRequestsFound="No messages found"
+          checkedIndices={[]}
+          assets={toRender}
+          row={ProposalRow}
+          tableHeaders={['Title', 'Poll', 'Endtime', '']}
+        />
 
-        {pageInfo.hasNextPage && (
+        {pagination.hasNextPage && (
           <Button
-            disabled={this.props.isFetching}
+            disabled={pending}
             label="LOAD MORE"
             onClick={() => {
-              this.props.loadProposalsList({
-                state: 'active',
-                after: pageInfo.endCursor,
+              loadProposals({
+                after: pagination.endCursor,
               });
             }}
           />
@@ -256,19 +207,7 @@ class ProposalsManager extends React.Component {
   }
 }
 
-const mapPropsToState = state => ({
-  // proposals: getVisibleProposals(state, 'active'),
-  isFetching: getProposalsIsFetching(state, 'active'),
-  errorMessage: getProposalsErrorMessage(state, 'active'),
-  pageInfo: getProposalsPage(state, 'active'),
-});
-const mapDispatch = {
-  updateProposal,
-  // loadProposalsList,
-};
 ProposalsManager.contextTypes = {
-  intl: PropTypes.object,
+  intl: PropTypes.shape({}), // TODO inject intl in PollInput
 };
-export default connect(mapPropsToState, mapDispatch)(
-  withStyles(s)(ProposalsManager),
-);
+export default ProposalsManager;

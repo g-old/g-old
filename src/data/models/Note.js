@@ -60,7 +60,11 @@ class Note {
     }
 
     const [note = null] = await knex('notes')
-      .transacting(trx)
+      .modify(queryBuilder => {
+        if (trx) {
+          queryBuilder.transacting(trx);
+        }
+      })
       .insert(newData)
       .returning('*');
 

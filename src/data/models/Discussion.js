@@ -2,6 +2,10 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
+import { transactify } from './utils';
+
+import WorkTeam from './WorkTeam'; // eslint-disable-line import/no-cycle
+import Comment from './Comment';
 
 type ID = number | string;
 export type DiscussionProps = {
@@ -12,22 +16,32 @@ export type DiscussionProps = {
   content: string,
   num_comments: number,
   created_at: string,
-  updated_at: string,
-  closed_at: string,
-};
-
-const checkIfCoordinator = async (viewer, data) => {
-  if (data.workTeamId) {
-    const [coordinatorId] = await knex('work_teams')
-      .where({ id: data.workTeamId })
-      .pluck('coordinator_id');
-    // eslint-disable-next-line
-    return coordinatorId && coordinatorId == viewer.id;
-  }
-  return false;
+  updated_at: ?string,
+  closed_at: ?string,
+  deleted_at: ?string,
 };
 
 class Discussion {
+  id: ID;
+
+  title: string;
+
+  authorId: ID;
+
+  workTeamId: ID;
+
+  content: string;
+
+  numComments: number;
+
+  createdAt: string;
+
+  updatedAt: ?string;
+
+  closedAt: ?string;
+
+  deletedAt: ?string;
+
   constructor(data: DiscussionProps) {
     this.id = data.id;
     this.title = data.title;
@@ -38,6 +52,7 @@ class Discussion {
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
     this.closedAt = data.closed_at;
+    this.deletedAt = data.deleted_at;
   }
 
   static async gen(viewer, id, { discussions }) {
@@ -50,11 +65,24 @@ class Discussion {
     return new Discussion(data);
   }
 
-  static async create(viewer, data) {
+  static async create(viewer, data, loaders) {
     if (!data) return null;
-    const isCoordinator = await checkIfCoordinator(viewer, data);
+    let workTeam;
+    if (data.workTeamId) {
+      workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
+    }
 
-    if (!canMutate(viewer, { ...data, isCoordinator }, Models.DISCUSSION))
+    if (
+      !canMutate(
+        viewer,
+        {
+          ...data,
+          workTeam,
+          mainTeam: workTeam ? workTeam.mainTeam : false,
+        },
+        Models.DISCUSSION,
+      )
+    )
       return null;
 
     const discussionInDB = await knex.transaction(async trx => {
@@ -86,6 +114,98 @@ class Discussion {
       });
     }
     return discussion;
+  }
+
+  static async update(viewer, data, loaders) {
+    if (!data || !data.id) return null;
+    let workTeam;
+    if (data.workTeamId) {
+      workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
+    }
+
+    if (
+      !canMutate(
+        viewer,
+        {
+          ...data,
+          workTeam,
+        },
+        Models.DISCUSSION,
+      )
+    ) {
+      return null;
+    }
+
+    const newData = { updated_at: new Date() };
+    if ('close' in data) {
+      newData.closed_at = data.close === true ? new Date() : null;
+    }
+
+    const [discussion = null] = await knex('discussions')
+      .where({ id: data.id })
+      .update(newData)
+      .returning('*');
+
+    return discussion ? new Discussion(discussion) : null;
+  }
+
+  static async delete(viewer, data, loaders, trx) {
+    if (!data || !data.id) return null;
+    let workTeam;
+    if (data.workTeamId) {
+      workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
+    }
+
+    if (
+      !canMutate(
+        viewer,
+        {
+          ...data,
+          workTeam,
+        },
+        Models.DISCUSSION,
+      )
+    ) {
+      return null;
+    }
+    const deleteDiscussion = async transaction => {
+      const discussion = await Discussion.gen(viewer, data.id, loaders);
+
+      if (discussion) {
+        const commentIds = await knex('comments')
+          .where({ discussion_id: data.id })
+          .pluck('id');
+
+        if (commentIds.length) {
+          if (data.isCascading) {
+            // initiated by wt
+            await knex('comments')
+              .transacting(transaction)
+              .forUpdate()
+              .whereIn('id', commentIds)
+              .del();
+          } else {
+            const commentDeletePromises = commentIds.map(cId =>
+              Comment.delete(viewer, { id: cId }, loaders),
+            );
+            await Promise.all(commentDeletePromises);
+          }
+        }
+        await knex('discussions')
+          .transacting(transaction)
+          .forUpdate()
+          .where({ id: data.id })
+          .del();
+
+        await knex('work_teams')
+          .transacting(transaction)
+          .forUpdate()
+          .where({ id: discussion.workTeamId })
+          .decrement('num_discussions', 1);
+      }
+      return discussion;
+    };
+    return transactify(deleteDiscussion, knex, trx);
   }
 }
 

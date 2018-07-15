@@ -3,7 +3,6 @@ import Layout from '../../components/Layout';
 import { loadWorkTeam } from '../../actions/workTeam';
 import WorkTeamManagement from './WorkTeamManagement';
 import { getSessionUser } from '../../reducers';
-import { canAccess } from '../../organization';
 
 const title = 'WorkteamManager';
 
@@ -11,9 +10,11 @@ async function action({ store, path }, { id }) {
   const user = getSessionUser(store.getState());
   if (!user) {
     return { redirect: `/?redirect=${path}` };
-  } else if (!canAccess(user, title)) {
-    return { redirect: `/workteams/${id}` };
   }
+  // check is in component
+  /* else if (!canAccess(user, title)) {
+    return { redirect: `/workteams/${id}` };
+  } */
   if (!process.env.BROWSER) {
     await store.dispatch(loadWorkTeam({ id }, true));
   } else {

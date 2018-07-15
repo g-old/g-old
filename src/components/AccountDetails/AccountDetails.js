@@ -114,11 +114,12 @@ class AccountDetails extends React.Component {
     createMessage: PropTypes.func.isRequired,
     deleteUser: PropTypes.func.isRequired,
     messageUpdates: PropTypes.shape({}).isRequired,
+    onClose: PropTypes.func.isRequired,
   };
 
   constructor(props) {
     super(props);
-    this.props.fetchUser({ id: props.accountId });
+    // this.props.fetchUser({ id: props.accountId });
     this.onPromoteToViewer = this.onPromoteToViewer.bind(this);
     this.displayUploadLayer = this.displayUploadLayer.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
@@ -128,22 +129,36 @@ class AccountDetails extends React.Component {
   }
 
   componentDidMount(props) {
+    const { fetchUser: loadUser, accountId } = this.props;
     if (props && props.accountId) {
-      this.props.fetchUser({ id: this.props.accountId });
+      loadUser({ id: accountId });
     }
   }
+
   componentWillReceiveProps({ accountId, updates }) {
-    if (accountId && accountId !== this.props.accountId) {
-      this.props.fetchUser({ id: accountId });
+    const {
+      accountId: oldAccountId,
+      fetchUser: loadUser,
+      onClose,
+    } = this.props;
+    if (accountId && accountId !== oldAccountId) {
+      loadUser({ id: accountId });
     }
     if (updates.dataUrl && updates.dataUrl.success) {
       this.setState({ showUpload: false });
     }
+    if (updates.deleted && updates.deleted.success) {
+      onClose();
+    }
   }
+
   onPromoteToViewer() {
-    const { accountData: { groups, id } } = this.props;
+    const {
+      update,
+      accountData: { groups, id },
+    } = this.props;
     if (groups === Groups.GUEST) {
-      this.props.update({
+      update({
         id,
         groups: groups | Groups.VIEWER, // eslint-disable-line no-bitwise
       });
@@ -151,7 +166,8 @@ class AccountDetails extends React.Component {
   }
 
   handleDelete() {
-    this.props.deleteUser({ id: this.props.accountData.id });
+    const { deleteUser: eraseUser, accountData } = this.props;
+    eraseUser({ id: accountData.id });
   }
 
   displayUploadLayer() {
@@ -159,7 +175,16 @@ class AccountDetails extends React.Component {
   }
 
   render() {
-    const { updates, accountData, user } = this.props;
+    const {
+      updates,
+      accountData,
+      user,
+      update,
+      createMessage: makeMessage,
+      messageUpdates,
+      uploadAvatar: uploadPicture,
+    } = this.props;
+    const { showUpload } = this.state;
     if (!accountData) {
       return null;
     }
@@ -183,7 +208,7 @@ class AccountDetails extends React.Component {
         >
           <RightsManager
             updates={updates.privilege}
-            updateFn={this.props.update}
+            updateFn={update}
             account={accountData}
             id={id}
           />
@@ -201,7 +226,7 @@ class AccountDetails extends React.Component {
           <GroupManager
             updates={updates.role}
             account={accountData}
-            updateFn={this.props.update}
+            updateFn={update}
             user={user}
           />
         </AccordionPanel>
@@ -217,22 +242,21 @@ class AccountDetails extends React.Component {
             recipients={[id]}
             recipientType="USER"
             messageType="COMMUNICATION"
-            notifyUser={this.props.createMessage}
-            updates={this.props.messageUpdates}
+            notifyUser={makeMessage}
+            updates={messageUpdates}
           />
         </AccordionPanel>
       );
     }
 
     const avatarSet = checkAvatar(avatar || thumbnail);
-
     return (
       <Box className={s.root} flex wrap>
         <Box className={s.profile} flex pad align column>
-          {this.state.showUpload && (
+          {showUpload && (
             <ImageUpload
               uploadAvatar={data => {
-                this.props.uploadAvatar({ ...data, id });
+                uploadPicture({ ...data, id });
               }}
               uploadPending={updates.dataUrl && updates.dataUrl.pending}
               uploadError={updates.dataUrl && updates.dataUrl.error}
@@ -287,13 +311,15 @@ class AccountDetails extends React.Component {
               {RightsPanel}
               {MessagePanel}
             </Accordion>
-            <Box justify>
-              <Button
-                onClick={this.handleDelete}
-                primary
-                label={<FormattedMessage {...messages.delete} />}
-              />
-            </Box>
+            {groups === Groups.GUEST && (
+              <Box justify>
+                <Button
+                  onClick={this.handleDelete}
+                  primary
+                  label={<FormattedMessage {...messages.delete} />}
+                />
+              </Box>
+            )}
           </Box>
         )}
       </Box>
@@ -311,6 +337,7 @@ const mapDispatch = {
   createMessage,
   deleteUser,
 };
-export default connect(mapStateToProps, mapDispatch)(
-  withStyles(s)(AccountDetails),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(withStyles(s)(AccountDetails));

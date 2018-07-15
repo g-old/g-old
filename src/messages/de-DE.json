@@ -352,7 +352,6 @@
       "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/FormValidation/FormValidation.js",
       "src/components/Login/Login.js",
-      "src/components/Message/Message.js",
       "src/components/MessageInput/MessageInput.js",
       "src/components/ProposalActions/ProposalActions.js",
       "src/components/ProposalInput/ProposalInput.js",
@@ -404,6 +403,7 @@
     "defaultMessage": "These passwords don't match. Try again?",
     "message": "Die Passwörter stimmen nicht überein. Nochmal versuchen?",
     "files": [
+      "src/components/FormValidation/FormValidation.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -416,6 +416,7 @@
     "message":
       "Kurze Passwörter sind leicht zu erraten. Bitte mindestens 6 Zeichen verwenden",
     "files": [
+      "src/components/FormValidation/FormValidation.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -449,6 +450,7 @@
     "files": [
       "src/components/ConfirmLayer/ConfirmLayer.js",
       "src/components/ImageUpload/ImageUpload.js",
+      "src/components/MessageInput/NoticeLayer.js",
       "src/components/Poll/Poll.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
@@ -637,8 +639,9 @@
     "message": "Abschicken",
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
-      "src/components/Message/Message.js",
+      "src/components/MessageForm/MessageForm.js",
       "src/components/MessageInput/MessageInput.js",
+      "src/components/MessageInput/NoticeLayer.js",
       "src/components/ProposalInput/ProposalInput.js"
     ]
   },
@@ -678,7 +681,7 @@
     "defaultMessage": "Load more",
     "message": "Mehr",
     "files": [
-      "src/components/ProposalListView/ProposalListView.js",
+      "src/components/ListView/ListView.js",
       "src/components/UserPanel/UserPanel.js",
       "src/routes/accountList/AccountListContainer.js",
       "src/routes/memberList/MemberListContainer.js",
@@ -1220,7 +1223,8 @@
     "description": "Notification to verify mail address",
     "defaultMessage":
       "Confirm your email address. A confirmation message was sent to ({email})",
-    "message": "Bitte bestätigen Sie ihre E-Mail-Adresse",
+    "message":
+      "Bitte bestätigen Sie ihre E-Mail-Adresse. Eine Bestätigungsmail wurde an ({email}) verschickt.",
     "files": ["src/routes/account/AccountContainer.js"]
   },
   {
@@ -1327,7 +1331,10 @@
     "description": "Surveys label",
     "defaultMessage": "Surveys",
     "message": "Umfragen",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/WorkTeam/WorkTeam.js"
+    ]
   },
   {
     "id": "faq",
@@ -1340,8 +1347,11 @@
     "id": "privacy",
     "description": "Privacy label",
     "defaultMessage": "Privacy",
-    "message": "Datenschutz",
-    "files": ["src/components/InfoPage/InfoPage.js"]
+    "message": "Datenschutzerklärung",
+    "files": [
+      "src/components/InfoPage/InfoPage.js",
+      "src/components/SignUp/SignUp.js"
+    ]
   },
   {
     "id": "coordinator",
@@ -1500,7 +1510,7 @@
     "id": "notifications.proposal.proposed",
     "description": "Status message for notifications",
     "defaultMessage": "was proposed!",
-    "message": "wurde vorgeschlagen!",
+    "message": "Abstimmung gefordert!",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1633,6 +1643,7 @@
     "files": [
       "src/components/NotificationSettings/NotificationSettings.js",
       "src/components/UserPanel/UserPanel.js",
+      "src/routes/account/AccountContainer.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
     ]
   },
@@ -1719,5 +1730,75 @@
     "defaultMessage": "State updates",
     "message": "Aktualisierungen",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "privacy.consent",
+    "description": "Signup consent notice",
+    "defaultMessage": "I accept the {policy}",
+    "message": "Ich akzeptiere die {policy} ",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "privacy.readCall",
+    "description": "Call to read linked privac policy",
+    "defaultMessage": "Read our {link}",
+    "message": "Lesen Sie unsere {link}",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "settings.uploadCall",
+    "description": "Notification to upload photo",
+    "defaultMessage": "Please upload a photo of yourself",
+    "message": "Bitte laden Sie ein aktuelles Porträtfoto von sich hoch",
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "settings.waitCall",
+    "description": "Notification to upload photo",
+    "defaultMessage": "You will be contacted as soon as possible",
+    "message": "Sie werden nun so schnell wie möglich freigeschalten!",
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "proposal.votingRequested",
+    "description": "Poll reached its limit",
+    "defaultMessage": "Voting requested!",
+    "message": "Abstimmung gefordert!",
+    "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "survey.closed",
+    "description": "Survey closed",
+    "defaultMessage": "Closed!",
+    "message": "Beendet!",
+    "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "proposals.accepted",
+    "description": "Filter for accepted proposals",
+    "defaultMessage": "accepted",
+    "message": "angenommen",
+    "files": ["src/components/StateFilter/StateFilter.js"]
+  },
+  {
+    "id": "proposals.repelled",
+    "description": "Filter for repelled proposals",
+    "defaultMessage": "repelled",
+    "message": "abgelehnt",
+    "files": ["src/components/StateFilter/StateFilter.js"]
+  },
+  {
+    "id": "resource.active",
+    "description": "Filter for active proposals/surveys/discussions",
+    "defaultMessage": "active",
+    "message": "aktiv",
+    "files": ["src/components/StateFilter/StateFilter.js"]
+  },
+  {
+    "id": "resource.closed",
+    "description": "Filter for closed proposals/surveys/discussions",
+    "defaultMessage": "closed",
+    "message": "geschlossen",
+    "files": ["src/components/StateFilter/StateFilter.js"]
   }
 ]

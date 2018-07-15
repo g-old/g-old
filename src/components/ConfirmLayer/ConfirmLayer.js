@@ -24,6 +24,11 @@ const messages = defineMessages({
     defaultMessage: 'Leave',
     description: 'Label',
   },
+  change: {
+    id: 'commands.change',
+    description: 'Short command to change a setting',
+    defaultMessage: 'Change',
+  },
   cancel: {
     id: 'commands.cancel',
     defaultMessage: 'Cancel',
@@ -36,37 +41,39 @@ const messages = defineMessages({
   },
 });
 
-function ConfirmLayer(props) {
-  const action = props.action || 'delete';
-  let note;
-  if (props.note) {
-    note = (
+function ConfirmLayer({ action, note, onClose, title, intl, onSubmit }) {
+  const actionId = action || 'delete';
+  let message;
+  if (note) {
+    message = (
       <Box pad="medium">
         <Box align="center" justify="center">
-          {props.note}
+          {note}
         </Box>
       </Box>
     );
   }
   return (
-    <Layer onClose={props.onClose}>
+    <Layer onClose={onClose}>
       <Form>
         <Header pad="medium" direction="column">
           <Heading tag="h2" margin="none">
-            {props.title || <FormattedMessage {...messages.confirm} />}
+            {title || <FormattedMessage {...messages.confirm} />}
           </Heading>
         </Header>
-        {note}
+        {message}
         <Box tag="footer" justify padding="medium">
           <div>
             <Button
-              label={props.intl.formatMessage({ ...messages[action] })}
-              onClick={props.onSubmit}
+              label={intl.formatMessage({
+                ...messages[actionId],
+              })}
+              onClick={onSubmit}
             />{' '}
             <Button
-              label={props.intl.formatMessage({ ...messages.cancel })}
+              label={intl.formatMessage({ ...messages.cancel })}
               primary
-              onClick={props.onClose}
+              onClick={onClose}
             />
           </div>
         </Box>

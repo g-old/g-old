@@ -1,6 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import { normalize } from 'normalizr';
 import { pollFieldsForList } from './proposal';
+import { depaginate } from '../core/helpers';
+
 import {
   LOAD_WORKTEAMS_START,
   LOAD_WORKTEAMS_ERROR,
@@ -20,11 +22,19 @@ import {
   UPDATE_WORKTEAM_START,
   UPDATE_WORKTEAM_SUCCESS,
   UPDATE_WORKTEAM_ERROR,
+  LOAD_PROPOSAL_LIST_SUCCESS,
+  LOAD_DISCUSSIONS_SUCCESS,
+  DELETE_WORKTEAM_START,
+  DELETE_WORKTEAM_SUCCESS,
+  DELETE_WORKTEAM_ERROR,
 } from '../constants';
 import {
   workTeamList as workTeamListSchema,
   workTeam as workTeamSchema,
+  proposalList,
+  discussionList,
 } from '../store/schema';
+import { genProposalPageKey } from '../reducers/pageInfo';
 
 const userFields = `
 id
@@ -47,6 +57,15 @@ updatedAt
 createdAt
 `;
 
+const discussionFields = `
+  id
+  title
+  createdAt
+  closedAt
+  numComments
+  workTeamId
+`;
+
 const workTeamFields = `
   id
   displayName
@@ -54,6 +73,7 @@ const workTeamFields = `
   numDiscussions
   numProposals
   restricted
+  deletedAt
   mainTeam
   logo
   background
@@ -63,13 +83,13 @@ const workTeamFields = `
     thumbnail
     id
   }`;
-const workTeams = `query{
-  workTeams {
+const workTeams = `query($active:Boolean){
+  workTeams(active:$active) {
     ${workTeamFields}
   }}`;
 
-const workTeamsWithMembers = `query{
-    workTeams {
+const workTeamsWithMembers = `query($active:Boolean){
+    workTeams(active:$active) {
       ${workTeamFields}
       members{
         name
@@ -104,11 +124,19 @@ const proposalFields = `
     pollOne {${pollFieldsForList}}
     pollTwo {${pollFieldsForList}}`;
 
-const workTeamWithDetails = `query($id:ID!){
-    workTeam(id:$id) {
-      ${workTeamFields}
-      ${wtDetails}
-          proposalConnection(state:"active" workTeamId:$id){
+const discussionConnection = `discussionConnection(closed:$closed, workteamId:$id){
+        pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          ${discussionFields}
+        }
+      }
+    }`;
+
+const proposalConnection = `proposalConnection(state:$state workTeamId:$id){
       pageInfo{
         endCursor
         hasNextPage
@@ -118,7 +146,24 @@ const workTeamWithDetails = `query($id:ID!){
           ${proposalFields}
         }
       }
-    }
+    }`;
+
+const surveyConnection = `surveyConnection: proposalConnection(state:"survey" workTeamId:$id){
+      pageInfo{
+        endCursor
+        hasNextPage
+      }
+      edges{
+        node{
+          ${proposalFields}
+        }
+      }
+    }`;
+
+const workTeamWithDetails = `query($id:ID! $state:String, $closed:Boolean){
+    workTeam(id:$id) {
+      ${workTeamFields}
+      ${wtDetails}
       requestConnection(type:"joinWT" filterBy:[{filter:CONTENT_ID id:$id}]){
         pageInfo{
         endCursor
@@ -130,10 +175,14 @@ const workTeamWithDetails = `query($id:ID!){
         }
       }
     }
+  }
+  ${proposalConnection}
+  ${discussionConnection}
+  ${surveyConnection}
 
-    }}`;
+  }`;
 
-const workTeamQuery = `query($id:ID! $state:String){
+const workTeamQuery = `query($id:ID! $state:String, $closed:Boolean){
   workTeam(id:$id){
     ${workTeamFields}
     ownStatus{
@@ -143,26 +192,12 @@ const workTeamQuery = `query($id:ID! $state:String){
         type
         content
         deniedAt
-      }
-    }
-    discussions{
-      id
-      title
-      createdAt
-      numComments
-    }
-    proposalConnection(state:$state workTeamId:$id){
-      pageInfo{
-        endCursor
-        hasNextPage
-      }
-      edges{
-        node{
-          ${proposalFields}
         }
       }
     }
-  }
+  ${discussionConnection}
+  ${proposalConnection}
+  ${surveyConnection}
 }`;
 
 const proposalStatusQuery = `query($id:ID! $first:Int){
@@ -199,11 +234,21 @@ const updateWorkTeamMutation = `mutation($workTeam:WorkTeamInput){
     ${wtDetails}
   }
 }`;
+const deleteWorkteamMutation = `mutation($workteam:WorkTeamInput){
+  deleteWorkteam (workteam:$workteam){
+    ${workTeamFields}
+    ${wtDetails}
+  }
+}`;
 
-const joinWorkTeamMutationWithDetails = `mutation($id:ID, $memberId:ID){
+const joinWorkTeamMutationWithDetails = `mutation($id:ID, $memberId:ID  $state:String $closed:Boolean ){
   joinWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     ${workTeamFields}
     ${wtDetails}
+    ${discussionConnection}
+    ${proposalConnection}
+    ${surveyConnection}
+
       requestConnection(type:"joinWT" filterBy:[{filter:CONTENT_ID id:$id}]){
         pageInfo{
         endCursor
@@ -218,7 +263,7 @@ const joinWorkTeamMutationWithDetails = `mutation($id:ID, $memberId:ID){
   }
 }`;
 
-const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID $state:String){
+const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID $state:String $closed:Boolean){
   joinWorkTeam (workTeam:{id:$id, memberId:$memberId}){
     ${workTeamFields}
     ownStatus{
@@ -230,23 +275,10 @@ const joinWorkTeamMutation = `mutation($id:ID, $memberId:ID $state:String){
         deniedAt
       }
     }
-    discussions{
-      id
-      title
-      createdAt
-      numComments
-    }
-    proposalConnection(state:$state workTeamId:$id){
-      pageInfo{
-        endCursor
-        hasNextPage
-      }
-      edges{
-        node{
-          ${proposalFields}
-        }
-      }
-    }
+   ${discussionConnection}
+   ${proposalConnection}
+   ${surveyConnection}
+
   }
 }`;
 
@@ -265,17 +297,57 @@ const leaveWorkTeamMutation = `mutation($id:ID, $memberId:ID){
   }
 }`;
 
-const dePaginate = (data, resourceName) => {
-  let resources = [];
-  const connectionName = `${resourceName}Connection`;
-  if (data[connectionName]) {
-    resources = data[connectionName].edges.map(p => p.node);
-    data[`${resourceName}s`] = resources; // eslint-disable-line no-param-reassign
-  }
-  return data;
+const createResourceAction = (
+  actionType,
+  resource,
+  schema,
+  filter,
+  pagination,
+  pageKey,
+) => ({
+  type: actionType,
+  payload: normalize(resource, schema),
+  filter,
+  pagination,
+  savePageInfo: false,
+  pageKey,
+});
+
+const handleResources = (dispatch, data, state, workteamId, closed) => {
+  const depaginated = depaginate(['proposal', 'discussion', 'survey'], data);
+  const pageKey = genProposalPageKey({ state, workteamId, closed });
+  dispatch(
+    createResourceAction(
+      LOAD_PROPOSAL_LIST_SUCCESS,
+      depaginated.proposals,
+      proposalList,
+      state,
+      data.proposalConnection.pageInfo,
+      pageKey,
+    ),
+  );
+  dispatch(
+    createResourceAction(
+      LOAD_PROPOSAL_LIST_SUCCESS,
+      depaginated.surveys,
+      proposalList,
+      'survey',
+      data.surveyConnection.pageInfo,
+      pageKey,
+    ),
+  );
+  dispatch(
+    createResourceAction(
+      LOAD_DISCUSSIONS_SUCCESS,
+      depaginated.discussions,
+      discussionList,
+      closed ? 'closed' : 'active',
+      data.discussionConnection.pageInfo,
+    ),
+  );
 };
 
-export function loadWorkTeams(withMembers) {
+export function loadWorkTeams(withMembers, active) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: LOAD_WORKTEAMS_START,
@@ -284,6 +356,7 @@ export function loadWorkTeams(withMembers) {
     try {
       const { data } = await graphqlRequest(
         withMembers ? workTeamsWithMembers : workTeams,
+        { active },
       );
       const normalizedData = normalize(data.workTeams, workTeamListSchema);
 
@@ -297,57 +370,43 @@ export function loadWorkTeams(withMembers) {
   };
 }
 
-export function createWorkTeam(workTeam) {
-  return async (dispatch, getState, { graphqlRequest }) => {
-    dispatch({
-      type: CREATE_WORKTEAM_START,
-      id: 'create',
-    });
-
-    try {
-      const { data } = await graphqlRequest(createWorkTeamMutation, {
-        workTeam,
-      });
-      const normalizedData = normalize(data.createWorkTeam, workTeamSchema);
-
-      dispatch({
-        type: CREATE_WORKTEAM_SUCCESS,
-        id: 'create',
-        payload: normalizedData,
-      });
-    } catch (e) {
-      dispatch({
-        type: CREATE_WORKTEAM_ERROR,
-        id: 'create',
-        message: e.message || 'Something went wrong',
-      });
-    }
-  };
-}
-
 export function joinWorkTeam(workTeamData, details) {
   return async (dispatch, getState, { graphqlRequest }) => {
+    const state = 'active';
+    const closed = false;
     dispatch({
       type: JOIN_WORKTEAM_START,
     });
 
     try {
-      const { data } = await graphqlRequest(
-        details ? joinWorkTeamMutationWithDetails : joinWorkTeamMutation,
-        { ...workTeamData, state: 'active' },
-      );
-      // TODO make paginable
-      let proposals = [];
-      if (data.joinWorkTeam.proposalConnection) {
-        proposals = data.joinWorkTeam.proposalConnection.edges.map(p => p.node);
-      }
-      data.joinWorkTeam.proposals = proposals;
+      const query = details
+        ? joinWorkTeamMutationWithDetails
+        : joinWorkTeamMutation;
+
+      const { data } = await graphqlRequest(query, {
+        ...workTeamData,
+        state,
+        closed,
+      });
+
+      // connections are "inline"
+
       const normalizedData = normalize(
-        dePaginate(data.joinWorkTeam, 'request'),
+        depaginate(['request'], data.joinWorkTeam),
         workTeamSchema,
       );
 
       dispatch({ type: JOIN_WORKTEAM_SUCCESS, payload: normalizedData });
+
+      // dispatch multiple
+
+      handleResources(
+        dispatch,
+        data.joinWorkTeam,
+        state,
+        workTeamData.id,
+        closed,
+      );
     } catch (e) {
       dispatch({
         type: JOIN_WORKTEAM_ERROR,
@@ -380,30 +439,29 @@ export function leaveWorkTeam(workTeamData) {
   };
 }
 
-export function loadWorkTeam({ id, state = 'active' }, details) {
+export function loadWorkTeam(
+  { id, closed = false, state = 'active' },
+  details,
+) {
   return async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
       type: LOAD_WORKTEAM_START,
     });
     const query = details ? workTeamWithDetails : workTeamQuery;
     try {
-      const { data } = await graphqlRequest(query, { id, state });
+      const { data } = await graphqlRequest(query, { id, closed, state });
 
-      // TODO make paginable
-      let proposals = [];
-      if (data.workTeam.proposalConnection) {
-        proposals = data.workTeam.proposalConnection.edges.map(p => p.node);
-      }
-      data.workTeam.proposals = proposals;
-      // TODO make paginable
-      let requests = [];
-      if (data.workTeam.requestConnection) {
-        requests = data.workTeam.requestConnection.edges.map(p => p.node);
-      }
-      data.workTeam.requests = requests;
-      const normalizedData = normalize(data.workTeam, workTeamSchema);
+      // page query
+      handleResources(dispatch, data, state, id, closed);
 
-      dispatch({ type: LOAD_WORKTEAM_SUCCESS, payload: normalizedData });
+      dispatch({
+        type: LOAD_WORKTEAM_SUCCESS,
+        payload: normalize(
+          depaginate(['request'], data.workTeam),
+          workTeamSchema,
+        ),
+        filter: closed ? 'closed' : 'active',
+      });
     } catch (e) {
       dispatch({
         type: LOAD_WORKTEAM_ERROR,
@@ -457,24 +515,49 @@ export function loadProposalStatus({ id, first }) {
   };
 }
 
-export function updateWorkTeam(workTeam) {
-  return async (dispatch, getState, { graphqlRequest }) => {
+const createMutation = (types, resource, query, schema, selectorFn) => {
+  const [requestType, successType, errorType] = types;
+  return args => async (dispatch, getState, { graphqlRequest }) => {
     dispatch({
-      type: UPDATE_WORKTEAM_START,
+      type: requestType,
     });
 
     try {
-      const { data } = await graphqlRequest(updateWorkTeamMutation, {
-        workTeam,
+      const { data } = await graphqlRequest(query, {
+        [resource]: args,
       });
-      const normalizedData = normalize(data.updateWorkTeam, workTeamSchema);
+      const normalizedData = normalize(selectorFn(data), schema);
 
-      dispatch({ type: UPDATE_WORKTEAM_SUCCESS, payload: normalizedData });
+      dispatch({ type: successType, payload: normalizedData });
     } catch (e) {
       dispatch({
-        type: UPDATE_WORKTEAM_ERROR,
+        type: errorType,
         message: e.message || 'Something went wrong',
       });
     }
   };
-}
+};
+
+export const createWorkTeam = createMutation(
+  [CREATE_WORKTEAM_START, CREATE_WORKTEAM_SUCCESS, CREATE_WORKTEAM_ERROR],
+  'workTeam',
+  createWorkTeamMutation,
+  workTeamSchema,
+  data => data.createWorkTeam,
+);
+
+export const updateWorkTeam = createMutation(
+  [UPDATE_WORKTEAM_START, UPDATE_WORKTEAM_SUCCESS, UPDATE_WORKTEAM_ERROR],
+  'workTeam',
+  updateWorkTeamMutation,
+  workTeamSchema,
+  data => data.updateWorkTeam,
+);
+
+export const deleteWorkteam = createMutation(
+  [DELETE_WORKTEAM_START, DELETE_WORKTEAM_SUCCESS, DELETE_WORKTEAM_ERROR],
+  'workteam',
+  deleteWorkteamMutation,
+  workTeamSchema,
+  data => data.deleteWorkteam,
+);

@@ -30,26 +30,37 @@ const userConnection = {
     // cursor = cursor ? new Date(cursor) : new Date();
     let [cursor = null, id = 0] = pagination ? pagination.split('$') : [];
     id = Number(id);
-    let users = [];
 
     cursor = cursor ? new Date(cursor) : new Date();
-    if (union) {
-      users = await knex('users')
-        .whereRaw('groups & ? > 0', [group])
-        .whereRaw('(users.created_at, users.id) < (?,?)', [cursor, id])
-        .limit(first)
-        .orderBy('users.created_at', 'desc')
-        .orderBy('users.id', 'desc')
-        .select('users.id as id', 'users.created_at as time');
-    } else {
-      users = await knex('users')
-        // .whereRaw('groups & ? > 0', [group]) TODO Later
-        .where({ groups: group })
-        .whereRaw('(users.created_at, users.id) < (?,?)', [cursor, id])
-        .limit(first)
-        .orderBy('users.created_at', 'desc')
-        .orderBy('users.id', 'desc')
-        .select('users.id as id', 'users.created_at as time');
+    // const countQuery = knex.raw('COUNT(users.id) OVER()');
+    const users = await knex('users')
+      .modify(queryBuilder => {
+        if (union) {
+          queryBuilder.whereRaw('groups & ? > 0', [group]);
+        } else {
+          queryBuilder.where({ groups: group });
+        }
+      })
+      .whereNull('users.deleted_at')
+      .whereRaw('(users.created_at, users.id) < (?,?)', [cursor, id])
+      .limit(first)
+      .orderBy('users.created_at', 'desc')
+      .orderBy('users.id', 'desc')
+      .select('users.id as id', 'users.created_at as time');
+    // integrate in first query
+    const [count = null] = await knex('users')
+      .modify(queryBuilder => {
+        if (union) {
+          queryBuilder.whereRaw('groups & ? > 0', [group]);
+        } else {
+          queryBuilder.where({ groups: group });
+        }
+      })
+      .whereNull('users.deleted_at')
+      .count('id');
+    let totalCount;
+    if (count) {
+      totalCount = count.count;
     }
     const queries = users.map(u => User.gen(viewer, u.id, loaders));
     const usersSet = users.reduce((acc, curr) => {
@@ -75,6 +86,7 @@ const userConnection = {
         endCursor,
         hasNextPage,
       },
+      totalCount,
     };
   },
 };

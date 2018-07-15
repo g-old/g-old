@@ -12,8 +12,11 @@ const updateWorkTeam = {
     },
   },
   resolve: async (data, { workTeam }, { viewer, loaders }) => {
-    const newWorkTeam = await WorkTeam.update(viewer, workTeam, loaders);
-    return newWorkTeam;
+    if (workTeam && 'closing' in workTeam) {
+      return WorkTeam.toggle(viewer, workTeam, loaders);
+    }
+    const updatedWorkTeam = await WorkTeam.update(viewer, workTeam, loaders);
+    return updatedWorkTeam;
   },
 };
 

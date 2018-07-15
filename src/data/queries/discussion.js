@@ -15,6 +15,13 @@ const discussion = {
   },
   resolve: async (parent, { id, parentId }, { viewer, loaders }) => {
     const result = await Discussion.gen(viewer, id, loaders);
+    if (result.deletedAt) {
+      return {
+        id: result.id,
+        deletedAt: result.deletedAt,
+        workTeamId: result.workTeamId,
+      };
+    }
     result.parentId = parentId; // to pass args to subresolver
     return result;
   },

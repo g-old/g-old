@@ -112,4 +112,8 @@ export default createList;
 export const getIds = state => state.ids;
 export const getIsFetching = state => state.isFetching;
 export const getErrorMessage = state => state.errorMessage;
-export const getPageInfo = state => state.pageInfo;
+export const getPageInfo = state => ({
+  pagination: state.pageInfo,
+  errorMessage: state.errorMessage,
+  pending: state.isFetching,
+});

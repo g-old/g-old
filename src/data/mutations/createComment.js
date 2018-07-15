@@ -2,10 +2,9 @@ import { GraphQLNonNull, GraphQLID } from 'graphql';
 import CommentInput from '../types/CommentInputType';
 import CommentType from '../types/CommentType';
 import Comment from '../models/Comment';
-import Subscription, {
-  TargetType,
-  SubscriptionType,
-} from '../models/Subscription';
+import Subscription, { SubscriptionType } from '../models/Subscription';
+import { TargetType } from '../models/utils';
+
 import WithSubscriptionResultType from '../types/WithSubscriptionResultType';
 
 const createComment = {

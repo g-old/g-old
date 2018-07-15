@@ -1,0 +1,10 @@
+@import '../variables';
+
+.root {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.filter {
+  max-width: 12em;
+}

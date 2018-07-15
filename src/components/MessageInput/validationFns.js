@@ -42,7 +42,10 @@ export const lazyValidationFailure = (errors, isDraft) => {
 
 export const recipientValidation = (recipients, state) => {
   let result = { touched: false };
-  if (!recipients.length && state.recipientType.value !== 'ALL') {
+  if (
+    !recipients.length &&
+    !['ALL', 'ROLE'].includes(state.recipientType.value)
+  ) {
     result = {
       touched: true,
       errorName: 'empty',

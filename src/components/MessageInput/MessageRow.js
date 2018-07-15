@@ -17,7 +17,7 @@ function MessageRow({ messageType, messageObject, onClickMenu }) {
       <td> {messageType}</td>
       <td>{messageObject.keyword}</td>
       <td>{messageObject.category}</td>
-      <td>{messageObject.isPublised ? 'yes' : 'no'}</td>
+      <td>{messageObject.isPublished ? 'yes' : 'no'}</td>
     </TableRow>
   );
 }

@@ -1,7 +1,7 @@
 import { GraphQLEnumType } from 'graphql';
 
 const CategoryTypeEnum = new GraphQLEnumType({
-  name: 'EventTypeEnum',
+  name: 'CategoryTypeEnum',
   values: {
     CIRCULAR: {
       value: 'circular',

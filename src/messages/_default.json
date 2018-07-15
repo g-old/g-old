@@ -51,7 +51,6 @@
       "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/FormValidation/FormValidation.js",
       "src/components/Login/Login.js",
-      "src/components/Message/Message.js",
       "src/components/MessageInput/MessageInput.js",
       "src/components/ProposalActions/ProposalActions.js",
       "src/components/ProposalInput/ProposalInput.js",
@@ -255,8 +254,9 @@
     "message": "",
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
-      "src/components/Message/Message.js",
+      "src/components/MessageForm/MessageForm.js",
       "src/components/MessageInput/MessageInput.js",
+      "src/components/MessageInput/NoticeLayer.js",
       "src/components/ProposalInput/ProposalInput.js"
     ]
   },
@@ -345,6 +345,7 @@
     "files": [
       "src/components/ConfirmLayer/ConfirmLayer.js",
       "src/components/ImageUpload/ImageUpload.js",
+      "src/components/MessageInput/NoticeLayer.js",
       "src/components/Poll/Poll.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
@@ -524,7 +525,7 @@
     "defaultMessage": "Load more",
     "message": "",
     "files": [
-      "src/components/ProposalListView/ProposalListView.js",
+      "src/components/ListView/ListView.js",
       "src/components/UserPanel/UserPanel.js",
       "src/routes/accountList/AccountListContainer.js",
       "src/routes/memberList/MemberListContainer.js",
@@ -609,6 +610,7 @@
     "defaultMessage": "These passwords don't match. Try again?",
     "message": "",
     "files": [
+      "src/components/FormValidation/FormValidation.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -620,6 +622,7 @@
       "Short passwords are easy to guess. Try one with at least 6 characters",
     "message": "",
     "files": [
+      "src/components/FormValidation/FormValidation.js",
       "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -1124,7 +1127,10 @@
     "description": "Surveys label",
     "defaultMessage": "Surveys",
     "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/WorkTeam/WorkTeam.js"
+    ]
   },
   {
     "id": "faq",
@@ -1138,7 +1144,10 @@
     "description": "Privacy label",
     "defaultMessage": "Privacy",
     "message": "",
-    "files": ["src/components/InfoPage/InfoPage.js"]
+    "files": [
+      "src/components/InfoPage/InfoPage.js",
+      "src/components/SignUp/SignUp.js"
+    ]
   },
   {
     "id": "coordinator",
@@ -1418,6 +1427,7 @@
     "files": [
       "src/components/NotificationSettings/NotificationSettings.js",
       "src/components/UserPanel/UserPanel.js",
+      "src/routes/account/AccountContainer.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
     ]
   },
@@ -1504,5 +1514,75 @@
     "defaultMessage": "State updates",
     "message": "",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
+  },
+  {
+    "id": "privacy.consent",
+    "description": "Signup consent notice",
+    "defaultMessage": "I accept the {policy}",
+    "message": "",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "privacy.readCall",
+    "description": "Call to read linked privac policy",
+    "defaultMessage": "Read our {link}",
+    "message": "",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "settings.uploadCall",
+    "description": "Notification to upload photo",
+    "defaultMessage": "Please upload a photo of yourself",
+    "message": "",
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "settings.waitCall",
+    "description": "Notification to upload photo",
+    "defaultMessage": "You will be contacted as soon as possible",
+    "message": "",
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "proposal.votingRequested",
+    "description": "Poll reached its limit",
+    "defaultMessage": "Voting requested!",
+    "message": "",
+    "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "survey.closed",
+    "description": "Survey closed",
+    "defaultMessage": "Closed!",
+    "message": "",
+    "files": ["src/components/Activity/Activity.js"]
+  },
+  {
+    "id": "proposals.accepted",
+    "description": "Filter for accepted proposals",
+    "defaultMessage": "accepted",
+    "message": "",
+    "files": ["src/components/StateFilter/StateFilter.js"]
+  },
+  {
+    "id": "proposals.repelled",
+    "description": "Filter for repelled proposals",
+    "defaultMessage": "repelled",
+    "message": "",
+    "files": ["src/components/StateFilter/StateFilter.js"]
+  },
+  {
+    "id": "resource.active",
+    "description": "Filter for active proposals/surveys/discussions",
+    "defaultMessage": "active",
+    "message": "",
+    "files": ["src/components/StateFilter/StateFilter.js"]
+  },
+  {
+    "id": "resource.closed",
+    "description": "Filter for closed proposals/surveys/discussions",
+    "defaultMessage": "closed",
+    "message": "",
+    "files": ["src/components/StateFilter/StateFilter.js"]
   }
 ]

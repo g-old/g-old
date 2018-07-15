@@ -10,6 +10,8 @@
   border-color: yellow;
 }
 
+/* stylelint-disable no-descending-specificity */
+
 .table {
   width: 100%;
   max-width: 100%;
@@ -26,11 +28,11 @@
     text-align: center;
 
     &:first-child {
-      padding-left: 12px;
+      padding-left: 24px;
     }
 
     &:last-child {
-      padding-right: 12px;
+      padding-right: 24px;
     }
   }
 
@@ -138,3 +140,5 @@
     padding-left: 1.5rem;
   }
 }
+
+/* stylelint-enable no-descending-specificity */
