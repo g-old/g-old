@@ -1,0 +1,63 @@
+@import '../../components/variables.css';
+
+.container {
+  margin: 12px 24px;
+}
+
+.availableTag {
+  border: 1px solid #ddd;
+  background: #eee;
+  font-size: 12px;
+  display: inline-block;
+  padding: 5px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.tags {
+  font-size: 0.8em;
+}
+
+.tag {
+  margin: 0 2px 2px;
+  padding: 0 2px;
+  border: solid 1px gray;
+  border-radius: 3px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tagInput {
+  width: 8em;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.inputField {
+  height: 100%;
+  font-size: 12px;
+  width: auto;
+  border: 1px solid #eee;
+  background-color: var(--color-accent-3-shade);
+  outline: none;
+}
+
+/*
+.suggestions {
+  position: absolute;
+}
+
+.suggestions li {
+  border-bottom: 1px solid #ddd;
+  padding: 5px 10px;
+  margin: 0;
+}
+
+.suggestions ul {
+  list-style-type: none;
+  box-shadow: 0.05em 0.01em 0.5em rgba(0, 0, 0, 0.2);
+  background: white;
+  width: 8em;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+} */

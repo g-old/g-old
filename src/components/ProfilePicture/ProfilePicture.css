@@ -1,0 +1,72 @@
+@import "../../components/variables.css";
+
+.avatar {
+  width: 256px;
+  height: 256px;
+  border-radius: 10%;
+  display: inline-block;
+  max-width: 100%;
+  max-height: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.placeholder {
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+}
+
+.placeholder img {
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  transition: opacity 1s linear;
+}
+
+.loaded {
+  opacity: 1;
+}
+
+.placeholder img.loaded {
+  opacity: 1;
+}
+
+.imgSmall {
+  filter: blur(15px);
+
+  /* this is needed so Safari keeps sharp edges */
+  transform: scale(1);
+}
+
+.container {
+  position: relative;
+  width: 256px;
+  height: 256px;
+  stroke: var(--color-accent-5);
+}
+
+.overlay {
+  display: flex;
+  bottom: 15%;
+  right: 10%;
+  width: 100%;
+  position: absolute;
+  z-index: 10;
+  justify-content: flex-end;
+}
+
+.uploadIcon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  background-color: var(--color-gold);
+  border-radius: 32px;
+
+  svg {
+    margin: auto;
+  }
+}

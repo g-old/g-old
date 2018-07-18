@@ -1,0 +1,111 @@
+@import '../variables.css';
+
+.button {
+  background-color: transparent;
+  border: 2px solid #e0b000;
+  border-radius: 5px;
+  color: #333;
+  font-size: 1.1875rem;
+  line-height: 24px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  outline: none;
+  min-width: 120px;
+  max-width: 384px;
+  padding: 6px 22px;
+  transition: 0.1s ease-in-out;
+}
+
+.button:not(.fill) {
+  flex: 0 0 auto;
+}
+
+.button:not(.disabled):not(.accent):not(.plain):hover {
+  box-shadow: 0 0 0 2px #e0b000;
+}
+
+.primary {
+  color: #fff;
+  background-color: #e0b000;
+}
+
+.primary :not(.disabled):hover {
+  box-shadow: 0 0 0 2px #e0b000;
+}
+
+.icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+}
+
+.button:not(.plain) {
+  .icon + .label {
+    margin-left: 12px;
+  }
+}
+
+.label {
+  text-decoration: none;
+}
+
+.plain {
+  border: 2px solid transparent;
+  padding: 0;
+  width: auto;
+  height: auto;
+  min-width: 0;
+  max-width: none;
+  text-align: inherit;
+  font-weight: inherit;
+  border-radius: 0;
+  line-height: inherit;
+
+  .label {
+    margin: 0 12px;
+  }
+
+  .icon {
+    /*  padding: 12px; */
+
+    + .label {
+      margin-left: 0;
+    }
+  }
+}
+
+.fill {
+  max-width: none;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.accent {
+  border: 2px solid var(--color-accent-1);
+}
+
+.accent:not(.disabled):not(.plain):hover {
+  box-shadow: 0 0 0 2px var(--color-accent-1);
+}
+
+.button:not(.plain) {
+  .icon {
+    + .label {
+      margin-left: 12px;
+    }
+  }
+}
+
+.button:not(.plain) {
+  .label {
+    + .icon {
+      margin-left: 12px;
+    }
+  }
+}
+
+.disabled {
+  opacity: 0.3;
+  cursor: default;
+}

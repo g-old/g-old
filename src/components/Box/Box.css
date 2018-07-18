@@ -1,0 +1,75 @@
+.root {
+  display: flex;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  flex-direction: row;
+}
+
+.root:not(.column) > *:not(:last-child) {
+  margin-right: 24px;
+
+  @media only screen and (max-width: 30em) {
+    margin-right: 12px;
+  }
+}
+
+.root.column > *:not(:last-child) {
+  margin-bottom: 24px;
+}
+
+.column {
+  flex-direction: column;
+}
+
+.between {
+  justify-content: space-between;
+}
+
+.clickable {
+  cursor: pointer;
+  outline: none;
+}
+
+.align {
+  align-items: center;
+}
+
+.justify {
+  justify-content: center;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.flex {
+  flex: 1 0;
+}
+
+.root legend {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.medium {
+  padding: 3em;
+
+  @media only screen and (max-width: 30em) {
+    padding: 1em;
+  }
+}
+
+.small {
+  padding: 1rem;
+}
+
+.fill {
+  width: 100%;
+}
+
+.pad {
+  padding-left: 24px;
+  padding-right: 24px;
+}

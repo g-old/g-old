@@ -1,0 +1,30 @@
+@import '../../components/variables.css';
+
+.success {
+  stroke: #000;
+  fill: #000;
+  color: #000;
+  background-color: var(--color-green);
+}
+
+.error {
+  background-color: var(--color-red);
+  stroke: #fff;
+  fill: #fff;
+  color: #fff;
+}
+
+.alert {
+  background-color: #ffd602;
+  stroke: #000;
+  fill: #000;
+  color: #000;
+}
+
+.notification {
+  font-size: 1.1875rem;
+  line-height: 24px;
+  padding: 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+}

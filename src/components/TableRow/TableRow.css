@@ -1,0 +1,12 @@
+.selectable {
+  text-decoration: inherit;
+  cursor: pointer;
+}
+
+.row {
+  border-bottom: 1px solid #eee;
+
+  &:hover {
+    background-color: #eee;
+  }
+}

@@ -1,0 +1,17 @@
+import { GraphQLID } from 'graphql';
+
+import {{properCase name}}Type from '../types/{{properCase name}}Type';
+import {{properCase name}} from '../models/{{properCase name}}';
+
+const {{camelCase name}} = {
+  type: {{properCase name}}Type,
+  args: {
+    id: {
+      type: GraphQLID,
+    },
+  },
+  resolve: (parent, { id }, { viewer, loaders }) =>
+    {{properCase name}}.gen(viewer, id, loaders),
+};
+
+export default {{camelCase name}};

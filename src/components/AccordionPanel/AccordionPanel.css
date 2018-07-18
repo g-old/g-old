@@ -1,0 +1,43 @@
+@import '../../components/variables.css';
+
+.closed {
+  display: none;
+}
+
+.open {
+  display: block;
+}
+
+.active {
+  .control {
+    transform: rotate(90deg);
+  }
+}
+
+.control {
+  display: inherit;
+}
+
+.box {
+  flex-direction: column;
+  flex: 0 0 auto;
+  display: flex;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.panel {
+  margin: 12px;
+}
+
+.header {
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.listItem {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+}

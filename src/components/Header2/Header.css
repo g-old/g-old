@@ -1,0 +1,9 @@
+.header {
+  min-height: 72px;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.container {
+  flex-shrink: 0;
+}

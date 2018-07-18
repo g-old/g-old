@@ -1,0 +1,63 @@
+import {
+  CREATE_{{constantCase name}}_START,
+  CREATE_{{constantCase name}}_SUCCESS,
+  CREATE_{{constantCase name}}_ERROR,
+  UPDATE_{{constantCase name}}_START,
+  UPDATE_{{constantCase name}}_ERROR,
+  UPDATE_{{constantCase name}}_SUCCESS,
+  DELETE_{{constantCase name}}_START,
+  DELETE_{{constantCase name}}_ERROR,
+  DELETE_{{constantCase name}}_SUCCESS,
+} from '../../constants';
+
+import { getErrors, getSuccessState } from '../../core/helpers';
+
+const {{camelCase name}}s = (state = {}, action) => {
+  switch (action.type) {
+    case CREATE_{{constantCase name}}_START:
+    case UPDATE_{{constantCase name}}_START:
+    case DELETE_{{constantCase name}}_START: {
+      return {
+        ...state,
+        [action.id]: {
+          ...state[action.id],
+          ...action.properties,
+        },
+      };
+    }
+
+    case CREATE_{{constantCase name}}_ERROR:
+    case UPDATE_{{constantCase name}}_ERROR:
+    case DELETE_{{constantCase name}}_ERROR: {
+      const current = state[action.id];
+      const newState = getErrors(current, action);
+      return {
+        ...state,
+        [action.id]: {
+          ...state[action.id],
+          ...newState,
+        },
+      };
+    }
+    case CREATE_{{constantCase name}}_SUCCESS:
+    case UPDATE_{{constantCase name}}_SUCCESS:
+    case DELETE_{{constantCase name}}_SUCCESS:{
+      const id = action.id; // Is initial id!
+      const current = state[id];
+      const newState = getSuccessState(current, action);
+      return {
+        ...state,
+        [id]: {
+          ...state[id],
+          ...newState,
+        },
+      };
+    }
+
+    default:
+      return state;
+  }
+};
+export default {{camelCase name}}s;
+
+export const getStatus = (state, id) => state[id] || {};

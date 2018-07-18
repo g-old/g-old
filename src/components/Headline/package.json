@@ -1,0 +1,6 @@
+{
+  "name": "Headline",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./Headline.js"
+}

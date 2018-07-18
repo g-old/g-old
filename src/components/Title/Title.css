@@ -1,0 +1,66 @@
+.title {
+  max-height: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+  white-space: nowrap;
+  font-size: 2.5em;
+  line-height: initial;
+  margin-right: 1em;
+  flex: 0 1 auto;
+
+  @media only screen and (min-width: 45em) {
+    font-weight: 500;
+  }
+
+  > *:not(:last-child) {
+    margin-right: 0.5em;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  svg,
+  img {
+    max-width: 30rem;
+    flex: 0 0 auto;
+
+    &:not(:last-child) {
+      margin-right: 0.5em;
+    }
+  }
+}
+
+.interactive {
+  cursor: pointer;
+
+  @media only screen and (min-width: 45em) {
+    transition: color 1s ease-in-out;
+  }
+
+  &:hover {
+    color: $brand-color;
+    cursor: pointer;
+  }
+}
+
+.small {
+  font-size: 1.5em;
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

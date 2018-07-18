@@ -1,0 +1,17 @@
+.root {
+  width: 24px;
+  height: 24px;
+  stroke-dasharray: 60px 60px;
+  stroke-dashoffset: 0;
+  animation: rotate 0.8s infinite linear;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

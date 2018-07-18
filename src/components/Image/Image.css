@@ -1,0 +1,27 @@
+.image {
+  max-width: 100%;
+}
+
+.small {
+  width: 9rem;
+}
+
+.medium {
+  width: 24rem;
+}
+
+.fit {
+  object-fit: contain;
+}
+
+.thumb {
+  width: 3rem;
+  height: 3rem;
+  flex: 0 0 auto;
+  object-fit: cover;
+}
+
+.full {
+  width: 100%;
+  height: auto;
+}

@@ -1,0 +1,19 @@
+.menu_control {
+  text-align: inherit;
+  margin-bottom: 0.2em;
+}
+
+.drop {
+  position: absolute;
+  background-color: rgba(248, 248, 248, 0.95);
+  border: none;
+  box-shadow: none;
+  z-index: 20;
+  border-radius: 4px;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+.primary {
+  width: 100%;
+}

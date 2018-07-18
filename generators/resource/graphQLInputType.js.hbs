@@ -1,0 +1,15 @@
+import {
+  GraphQLString as String,
+  GraphQLInputObjectType,
+  GraphQLID as ID,
+} from 'graphql';
+
+const {{properCase name}}InputType = new GraphQLInputObjectType({
+  name: '{{properCase name}}Input',
+  fields: {
+    id: {
+      type: ID,
+    },
+  },
+});
+export default {{properCase name}}InputType;

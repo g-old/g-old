@@ -1,0 +1,12 @@
+$1
+export const getVisible{{properCase name}}s = (state, filter) =>
+  fromEntity.getVisible{{properCase name}}s(state.entities, filter);
+
+export const get{{properCase name}} = (state, filter) =>
+  fromEntity.get{{properCase name}}(state.entities, filter);
+
+export const get{{properCase name}}sStatus = (state, filter) =>
+  fromEntity.get{{properCase name}}sStatus(state.entities, filter);
+
+export const get{{properCase name}}Updates = (state, filter) =>
+  fromUi.get{{properCase name}}Updates(state.ui, filter);

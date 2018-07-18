@@ -1,0 +1,184 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Layout renders children correctly 1`] = `
+<div
+  className="layout"
+>
+  <div
+    className={null}
+  />
+  <span
+    style={
+      Object {
+        "display": "none",
+      }
+    }
+  />
+  <div
+    className="banner"
+  >
+    <img
+      alt="banner"
+      src="/banner01.jpg"
+    />
+  </div>
+  <div
+    className="root"
+  >
+    <div
+      className="container"
+    >
+      <button
+        className="button plain"
+        disabled={false}
+        onClick={[Function]}
+      >
+        <img
+          alt="avatar"
+          height="42px"
+          src="/tile.png"
+          width="42px"
+        />
+      </button>
+      <span
+        className="brand"
+      >
+        <span>
+          G O L D
+        </span>
+      </span>
+      <div
+        role="navigation"
+      >
+        <div
+          className="navBar"
+        >
+          <a
+            className="link"
+            href="/feed"
+            onClick={[Function]}
+          >
+            <span>
+              Feed
+            </span>
+          </a>
+          <a
+            className="link"
+            href="/proposals/active"
+            onClick={[Function]}
+          >
+            <span>
+              Proposals
+            </span>
+          </a>
+          <a
+            className="link"
+            href="/surveys"
+            onClick={[Function]}
+          >
+            <span>
+              Surveys
+            </span>
+          </a>
+          <a
+            className="link"
+            href="/admin"
+            onClick={[Function]}
+          >
+            <span>
+              Admin
+            </span>
+          </a>
+          <a
+            className="link"
+            href="/about"
+            onClick={[Function]}
+          >
+            <span>
+              About
+            </span>
+          </a>
+        </div>
+        <div
+          className="menu"
+        >
+          <div
+            className="root primary column"
+            onClick={null}
+          >
+            <button
+              className="button plain"
+              disabled={false}
+              onClick={[Function]}
+            >
+              <span
+                className="icon"
+              >
+                <svg
+                  aria-label="menu"
+                  height="24px"
+                  role="img"
+                  version="1.1"
+                  viewBox="0 0 24 24"
+                  width="24px"
+                >
+                  <path
+                    d="M2,19 L22,19 M2,5 L22,5 M2,12 L22,12"
+                    fill="none"
+                    stroke="#000"
+                    strokeWidth="2"
+                  />
+                </svg>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="content"
+  >
+    <div
+      className="child"
+    />
+  </div>
+  <div
+    className="footer"
+  >
+    <div
+      className="root"
+    >
+      <div
+        className="container"
+      >
+        <span
+          className="text"
+        >
+          © G O L D
+        </span>
+        <span
+          className="spacer"
+        >
+          ·
+        </span>
+        <a
+          className="link"
+          href="/"
+          onClick={[Function]}
+        >
+          Home
+        </a>
+        <div>
+          <span>
+            <span>
+              Deutsch
+            </span>
+             
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

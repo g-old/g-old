@@ -1,0 +1,16 @@
+import {
+  GraphQLString as String,
+  GraphQLObjectType as ObjectType,
+  GraphQLID as ID,
+} from 'graphql';
+
+const {{properCase name}}Type = new ObjectType({
+  name: '{{properCase name}}',
+  fields:{
+    id: {
+      type: ID,
+    },
+  },
+});
+
+export default {{properCase name}}Type;

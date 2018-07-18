@@ -1,0 +1,44 @@
+{{#if wantFlowTypes}}
+/* @flow */
+{{/if}}
+import React from 'react';
+import PropTypes from 'prop-types';
+{{#if wantCss}}
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import cn from 'classnames';
+import s from './{{properCase name}}.css';
+{{/if}}
+import Box from '../Box';
+{{#if imports}}
+{{{ createImports imports }}}
+{{/if}}
+
+{{#if wantFlowTypes}}
+type {{ properCase name }}Props = {
+
+}
+{{/if}}
+
+class {{ properCase name }} extends React.Component {
+
+  static propTypes = {
+
+  };
+  static defaultProps = {
+
+  }
+
+  render() {
+    return (
+      <Box>
+
+      </Box>
+    );
+  }
+}
+
+{{#if wantCss}}
+export default withStyles(s)({{properCase name}})
+{{else}}
+export default {{properCase name}}
+{{/if}}

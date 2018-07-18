@@ -1,0 +1,32 @@
+import { combineReducers } from 'redux';
+import { denormalize } from 'normalizr';
+import createList, * as fromList from './create{{properCase name}}List';
+import byId, * as fromById from './{{camelCase name}}ById';
+import { {{camelCase name}}List as {{camelCase name}}ListSchema, {{camelCase name}} as {{camelCase name}}Schema } from './../store/schema';
+
+const listByFilter = combineReducers({
+  all: createList('all'),
+});
+export default combineReducers({
+  byId,
+  listByFilter,
+});
+
+const hydrateList = (state, data, entities) =>
+  denormalize(data, {{camelCase name}}ListSchema, {
+    ...entities,
+  });
+
+export const getStatus = (state,filter) => fromList.getStatus(state.listByFilter[filter])
+const hydrateEntity = (data, entities) => denormalize(data, {{camelCase name}}Schema, entities);
+
+export const getEntity = (state, id, entities) => {
+  const {{camelCase name}} = fromById.getEntity(state.byId, id);
+  return hydrateEntity({{camelCase name}}, entities)
+};
+
+export const getVisible = (state, filter, entities) => {
+  const ids = fromList.getIds(state.listByFilter[filter]);
+  const data = ids.map(id => fromById.getEntity(state.byId, id));
+  return hydrateList(state, data, entities);
+}

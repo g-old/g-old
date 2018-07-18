@@ -1,0 +1,10 @@
+.headline {
+  font-weight: 300;
+  margin-bottom: 24px;
+  max-width: 100%;
+}
+
+.medium {
+  font-size: 4rem;
+  line-height: 1;
+}

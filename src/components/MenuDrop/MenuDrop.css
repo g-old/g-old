@@ -1,0 +1,20 @@
+.menu_contents {
+  text-align: left;
+}
+
+.menu_contents > *:hover {
+  background-color: rgba(150, 8, 150, 0.3);
+}
+
+.menu_drop_left {
+  font-size: 1.1875rem;
+  line-height: 1.26316;
+  max-height: 100vh;
+}
+
+.menu_drop_right {
+  font-size: 1.1875rem;
+  line-height: 1.26316;
+  max-height: 100vh;
+  text-align: right;
+}

@@ -1,0 +1,48 @@
+.form {
+  position: relative;
+  max-width: 100%;
+  width: 30em;
+
+  fieldset {
+    min-width: 0;
+    border: none;
+    margin: 0;
+    margin-bottom: 2rem;
+    margin-top: 1rem;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    > legend {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    /*  > *:not(.form-field) + .form-field {
+      margin-top: 1rem;
+    }
+
+    > .#.form-field + *:not(.form-field):not(.form-fields) {
+      margin-top: 2rem;
+    }
+
+    > .form-fields {
+      display: flex;
+      flex-direction: row;
+
+      .form-field {
+        margin-bottom: -1px;
+      }
+
+      > .button {
+        flex: 0 0 auto;
+      }
+    } */
+  }
+}

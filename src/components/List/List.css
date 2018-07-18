@@ -1,0 +1,20 @@
+@import '../variables';
+
+.list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+}
+
+.more {
+  display: inherit;
+}
+
+.list > * {
+  margin-bottom: 1em;
+
+  :hover {
+    background-color: var(--color-accent-3-shade);
+  }
+}

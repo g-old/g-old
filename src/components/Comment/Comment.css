@@ -1,0 +1,173 @@
+@import '../../components/variables.css';
+
+.root {
+  transition: margin 0.5s;
+  color: #000;
+  max-width: 35em;
+  margin: auto;
+}
+
+.details {
+  display: inline-block;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  font-size: 1em;
+}
+
+.author {
+  font-weight: 600;
+}
+
+.avatar {
+  display: inline-block;
+  margin-right: 0.5em;
+  min-width: 2.5em;
+  width: 2.5em;
+  height: 2.5em;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.replies {
+  margin-left: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.replies > div {
+  margin-top: 1em;
+  line-height: 1em;
+}
+
+.replies .avatar {
+  margin-right: 0.5em;
+  width: 2em;
+  height: auto;
+}
+
+.date {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.more {
+  margin-top: 0.5rem;
+  color: #167ac6;
+  font-weight: 500;
+}
+
+.bar {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: baseline;
+  width: 100%;
+}
+
+.text {
+  -ms-word-break: break-all;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-line;
+  line-height: 1.3rem;
+  width: 100%;
+  display: inline-block;
+}
+
+.collapsed {
+  max-height: 3.9rem;
+  overflow: hidden;
+}
+
+.expanded {
+  max-height: none;
+}
+
+.contentToggle {
+  margin: -8px 0 10px;
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  height: auto;
+  background: transparent;
+  color: #666;
+  font-weight: normal;
+  font-size: inherit;
+  text-decoration: none;
+  box-shadow: none;
+  outline: 0;
+  display: inline-block;
+}
+
+.command {
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  height: auto;
+  background: transparent;
+  color: var(--color-accent-1);
+  font-size: inherit;
+  text-decoration: none;
+  box-shadow: none;
+  outline: 0;
+  display: block;
+  min-height: 1.5rem;
+  font-weight: 600;
+}
+
+.contentToggle:hover {
+  text-decoration: underline;
+}
+
+.spinning {
+  width: 24px;
+  height: 24px;
+  stroke-dasharray: 60px 60px;
+  stroke-dashoffset: 0;
+  animation: rotate 0.8s infinite linear;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes highlight {
+  0% {
+    background: var(--color-accent-3);
+  }
+
+  100% {
+    background: inherit;
+  }
+}
+
+.active {
+  animation: highlight 3s;
+}
+
+.textEdit {
+  font-family: var(--font-family-base);
+  width: 99%;
+  line-height: 1.3rem;
+  box-sizing: border-box;
+}
+
+/* .inactive {
+  .avatar {
+    opacity: 0.5;
+  }
+
+  .textEdit {
+    height: 1.2rem;
+  }
+} */

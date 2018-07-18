@@ -1,0 +1,36 @@
+
+@import '../../components/variables.css';
+
+.header {
+  min-height: 96px;
+  width: 100%;
+  margin-bottom: 0;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1.5rem;
+}
+
+.menu {
+  width: 100%;
+  flex: 1 1 auto;
+  overflow: auto;
+  position: relative;
+  white-space: nowrap;
+  flex-direction: column;
+}
+
+.footer {
+  min-height: 36px;
+  width: 100%;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}

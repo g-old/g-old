@@ -1,0 +1,9 @@
+@import '../variables';
+
+.textArea {
+  height: 10em;
+  outline-color: transparent;
+  border-style: none;
+  border-color: Transparent;
+  overflow: auto;
+}

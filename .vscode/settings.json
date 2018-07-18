@@ -1,0 +1,15 @@
+{
+  "editor.formatOnPaste": true,
+  "editor.minimap.enabled": true,
+  "editor.snippetSuggestions": "top",
+  "editor.formatOnSave": true,
+  "flow.useNPMPackagedFlow": true,
+  "javascript.format.enable": false,
+  "javascript.validate.enable": false,
+  "vsicons.presets.angular": false,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/build": true
+  }
+}

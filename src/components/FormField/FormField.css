@@ -1,0 +1,93 @@
+@import '../variables.css';
+
+.field {
+  position: relative;
+  padding: 6px 24px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  margin-bottom: -1px;
+  background-color: #fff;
+  color: #333;
+  opacity: 1;
+  overflow: visible;
+  transition: all 0.4s, padding-top 0.3s 0.1s, padding-bottom 0.3s 0.1s;
+}
+
+.contents {
+  display: block;
+  margin-left: -24px;
+  margin-right: -24px;
+}
+
+.contents > input {
+  height: 36px;
+  padding: 0 24px;
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  font-size: 16px;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding-left: 22px;
+  box-sizing: border-box;
+  outline: none;
+  background-color: transparent;
+  color: inherit;
+  margin: 0;
+}
+
+.contents > label {
+  display: block;
+  font-size: 16px;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 6px 24px;
+}
+
+.contents > textarea {
+  vertical-align: top;
+  resize: vertical;
+  padding: 0 24px;
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 0;
+  font-size: 16px;
+  font-size: 1rem;
+  line-height: 1.5;
+  padding-left: 22px;
+  box-sizing: border-box;
+  outline: none;
+  background-color: transparent;
+  color: inherit;
+  margin: 0;
+}
+
+.contents input {
+  border: 0;
+}
+
+.field_error {
+  display: block;
+  float: right;
+  color: var(--color-red);
+  line-height: 24px;
+}
+
+.error {
+  z-index: 1;
+  border-color: var(--color-red);
+}
+
+.help {
+  display: block;
+}
+
+.focus {
+  z-index: 1;
+  border-color: var(--color-accent-1);
+}
+
+.overflow {
+  overflow: visible;
+}

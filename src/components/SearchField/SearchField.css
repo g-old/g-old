@@ -1,0 +1,90 @@
+/*  ported from http://codepen.io/moroshko/pen/PZWbzK */
+@import '../../components/variables.css';
+
+.container {
+  position: relative;
+}
+
+.input {
+  width: 240px;
+  height: 30px;
+  padding: 10px 20px;
+  font-family: var(--font-family-base);
+  font-weight: 300;
+  font-size: 16px;
+  padding-left: 24px;
+}
+
+.inputFocused {
+  outline: none;
+}
+
+.suggestionsContainer {
+  display: none;
+}
+
+.containerOpen .input {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.containerOpen .suggestionsContainer {
+  display: block;
+  position: absolute;
+  top: 56px;
+  left: -1px;
+  width: 100%;
+  border: 1px solid #aaa;
+  background-color: #fff;
+  font-family: var(--font-family-base);
+  font-weight: 300;
+  font-size: 16px;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  z-index: 2;
+}
+
+.suggestion {
+  cursor: pointer;
+  padding: 10px 20px;
+}
+
+.suggestion:not(:first-child) {
+  border-top: 1px solid #ddd;
+}
+
+.suggestionsList {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.inputFocused {
+  color: #120000;
+  outline: none;
+}
+
+.suggestionHighlighted {
+  background-color: rgba(150, 8, 150, 0.3);
+  color: #fff;
+}
+
+.highlight {
+  color: #e00;
+  font-weight: bold;
+}
+
+.name {
+  margin-left: 68px;
+  line-height: 45px;
+}
+
+.suggestionHighlighted .highlight {
+  color: #120000;
+}
+
+.suggestionContent {
+  display: flex;
+  align-items: center;
+  background-repeat: no-repeat;
+}

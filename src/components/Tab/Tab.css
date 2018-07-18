@@ -1,0 +1,17 @@
+.tab {
+  padding: 0 12px;
+}
+
+.tab_label {
+  border-color: #000;
+  border-bottom: 4px solid transparent;
+  padding-bottom: 10px;
+  cursor: pointer;
+  display: inline-block;
+  color: #666;
+}
+
+.active {
+  border-bottom: 4px solid;
+  color: black;
+}

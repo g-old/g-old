@@ -1,0 +1,20 @@
+import { GraphQLNonNull } from 'graphql';
+import {{properCase name}}Input from '../types/{{properCase name}}InputType';
+import {{properCase name}}Type from '../types/{{properCase name}}Type';
+import {{properCase name}} from '../models/{{properCase name}}';
+
+const update{{properCase name}} = {
+  type: new GraphQLNonNull({{properCase name}}Type),
+  args: {
+    {{camelCase name}}: {
+      type: {{properCase name}}Input,
+      description: 'Update {{camelCase name}}',
+    },
+  },
+  resolve: async (data, { {{camelCase name}} }, { viewer, loaders }) => {
+    const new{{properCase name}} = await {{properCase name}}.update(viewer, {{camelCase name}}, loaders);
+    return new{{properCase name}};
+  },
+};
+
+export default update{{properCase name}};

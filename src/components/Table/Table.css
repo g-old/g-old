@@ -1,0 +1,144 @@
+.selected {
+  box-sizing: inherit;
+}
+
+.active {
+  box-sizing: inherit;
+}
+
+.focus {
+  border-color: yellow;
+}
+
+/* stylelint-disable no-descending-specificity */
+
+.table {
+  width: 100%;
+  max-width: 100%;
+
+  table {
+    max-width: 100%;
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  td,
+  th {
+    padding: 11px 12px;
+    text-align: center;
+
+    &:first-child {
+      padding-left: 24px;
+    }
+
+    &:last-child {
+      padding-right: 24px;
+    }
+  }
+
+  th {
+    font-weight: 100;
+    font-size: 1rem;
+    border-bottom: 1px solid #000;
+    border-color: #000;
+  }
+}
+
+.mirror {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  > thead {
+    position: fixed;
+    background-color: red;
+  }
+}
+
+.more {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.scrollable {
+  position: relative;
+
+  .tableContainer {
+    thead {
+      visibility: hidden;
+    }
+
+    th {
+      border-bottom: none;
+    }
+  }
+}
+
+.selectable {
+  .tableContainer {
+    outline: none;
+  }
+
+  .focus {
+    border-color: green;
+    box-shadow: 0 0 1px 1px green;
+  }
+
+  tbody {
+    tr {
+      cursor: pointer;
+      outline: none;
+
+      td {
+        transition: background-color 0.2s;
+      }
+
+      &.selected {
+        td {
+          background-color: red;
+          color: white;
+        }
+      }
+
+      &.active,
+      &:hover {
+        td {
+          background-color: blue;
+          color: white;
+        }
+      }
+    }
+  }
+}
+
+.small {
+  thead {
+    display: none;
+  }
+
+  td {
+    display: block;
+
+    &::before {
+      font-weight: 100;
+      font-size: 1.1875rem;
+      line-height: 24px;
+      content: attr(data-th);
+      display: block;
+      padding-right: 12px;
+    }
+  }
+
+  tr {
+    border-bottom: 1px solid #eee;
+  }
+
+  td,
+  th {
+    text-align: left;
+    padding-left: 1.5rem;
+  }
+}
+
+/* stylelint-enable no-descending-specificity */

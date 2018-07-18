@@ -1,0 +1,11 @@
+.avatar {
+  width: 2.2em;
+  height: 2.2em;
+}
+
+.followee {
+  width: 2.2em;
+  height: 2.2em;
+  border-radius: 12px;
+  border: 6px solid #25149b;
+}
