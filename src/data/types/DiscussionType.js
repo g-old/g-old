@@ -73,18 +73,20 @@ const DiscussionType = new ObjectType({
           viewer.wtMemberships.includes(data.workTeamId) &&
           !data.deletedAt
         ) {
-          return knex('comments')
-            .where({ discussion_id: data.id })
-            .where({ parent_id: null })
-            .modify(queryBuilder => {
-              if (data.parentId) {
-                queryBuilder.orWhere({ parent_id: data.parentId });
-              }
-            })
-            .orderBy('num_replies', 'desc')
-            .orderBy('created_at', 'desc')
-            .pluck('id')
-            .then(ids => ids.map(id => Comment.gen(viewer, id, loaders)));
+          return (
+            knex('comments')
+              .where({ discussion_id: data.id })
+              .where({ parent_id: null })
+              .modify(queryBuilder => {
+                if (data.parentId) {
+                  queryBuilder.orWhere({ parent_id: data.parentId });
+                }
+              })
+              //   .orderBy('num_replies', 'desc')
+              .orderBy('created_at', 'desc')
+              .pluck('id')
+              .then(ids => ids.map(id => Comment.gen(viewer, id, loaders)))
+          );
         }
         return [];
       },

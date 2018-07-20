@@ -129,7 +129,7 @@ class WorkTeam extends React.Component {
 
     this.state = {
       showLayer: false,
-      activeTabIndex: 0,
+      activeTabIndex: 1,
       discussionStatus: 'active',
       proposalStatus: 'active',
       surveyStatus: 'active',
