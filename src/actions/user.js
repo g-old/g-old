@@ -139,6 +139,7 @@ query ($id:ID!) {
       ${workTeam}
     }
     ${userFields}
+    groups
   }
 }
 `;
