@@ -9,7 +9,7 @@ import Button from '../Button';
 import Layer from '../Layer';
 import MessageForm from '../MessageForm';
 import { Groups } from '../../organization';
-
+import RoleBadge from './RoleBadge';
 import { ICONS } from '../../constants';
 
 const isContactable = (workteams, accountId, accountRoles, visitor) => {
@@ -140,6 +140,7 @@ class UserProfile extends React.Component {
         <Label big>
           {name} {surname}
         </Label>
+        <RoleBadge groups={user.groups} />
         <Box>
           <Value
             icon={

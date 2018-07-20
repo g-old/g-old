@@ -284,6 +284,8 @@ export const canChangeGroups = (actor, targetUser, updatedGroups) => {
 };
 
 export const isAdmin = viewer => viewer && (viewer.groups & Groups.ADMIN) > 0;
+export const isViewer = viewer => viewer && (viewer.groups & Groups.VIEWER) > 0;
+export const isVoter = viewer => viewer && (viewer.groups & Groups.VOTER) > 0;
 
 export const isCoordinator = async (viewer, workteam) => {
   if (viewer && workteam && workteam.coordinatorId) {
