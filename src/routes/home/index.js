@@ -16,7 +16,8 @@ import { canAccess } from '../../organization';
 const title = 'Home';
 
 async function action({ store }) {
-  const state = await store.getState();
+  const state = store.getState();
+
   const user = getSessionUser(state);
 
   if (user) {

@@ -9,6 +9,6 @@ export default combineReducers({
   users,
 });
 
-export const getUser = (state, id) => fromUsers.getUser(state, id);
+export const getUser = (state, id) => fromUsers.getUser(state.users, id, state);
 
 /* GENERATOR_EXPORTS */

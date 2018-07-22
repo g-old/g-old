@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
+import {ButtonTest} from 'componentslib_test';
 import normalizeCss from 'normalize.css';
 import { allowCookies } from '../../actions/session';
 import { getConsent } from '../../reducers';
@@ -63,18 +64,18 @@ class Layout extends React.Component {
         <img alt="banner" src="/banner01.jpg" />
       </div>
     );
-    return (
-      <div className={s.layout}>
+    return <div className={s.layout}>
         <div className={this.props.loading ? s.loader : null} />
         {toast}
         {banner}
         <Header />
-        <div className={s.content}>{this.props.children}</div>
+        <div className={s.content}>
+          <ButtonTest label={'TESTLABEL'} /> {this.props.children}
+        </div>
         <div className={s.footer}>
           <Footer />
         </div>
-      </div>
-    );
+      </div>;
   }
 }
 

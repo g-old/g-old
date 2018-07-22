@@ -4,7 +4,6 @@ import { genStatusIndicators, depaginate } from '../core/helpers';
 import { user as userSchema, userList as userArray } from '../store/schema';
 
 import {
-
   UPDATE_USER_START,
   UPDATE_USER_SUCCESS,
   UPDATE_USER_ERROR,
@@ -27,8 +26,6 @@ export const userFields = `
   surname,
   thumbnail,
     `;
-
-
 
 const messageFields = `
       id
@@ -121,8 +118,6 @@ const objectifySettings = userData => {
   return userData;
 };
 
-
-
 const initialId = '0000';
 
 export function createUser(newUser, responseCode = null) {
@@ -182,8 +177,6 @@ export function createUser(newUser, responseCode = null) {
     return true;
   };
 }
-
-
 
 export function updateUser(user) {
   return async (dispatch, getState, { graphqlRequest }) => {

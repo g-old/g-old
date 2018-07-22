@@ -1,159 +1,19 @@
 [
   {
-    "id": "account.avatarMissing",
-    "description": "Avatar missing",
-    "defaultMessage": "No photo set",
-    "message": "",
-    "files": ["src/components/AccountDetails/AccountDetails.js"]
-  },
-  {
-    "id": "account.delete",
-    "description": "Deleting the account",
-    "defaultMessage": "Delete account",
-    "message": "",
-    "files": ["src/components/AccountDetails/AccountDetails.js"]
-  },
-  {
-    "id": "account.emailValidationMissing",
-    "description": "Email not validated",
-    "defaultMessage": "Email not validated",
-    "message": "",
-    "files": ["src/components/AccountDetails/AccountDetails.js"]
-  },
-  {
-    "id": "account.lastLogin",
-    "description": "Last login date",
-    "defaultMessage": "Last login at",
-    "message": "",
-    "files": ["src/components/AccountDetails/AccountDetails.js"]
-  },
-  {
-    "id": "account.notify",
-    "description": "Contact user",
-    "defaultMessage": "Notify user",
-    "message": "",
-    "files": ["src/components/AccountDetails/AccountDetails.js"]
-  },
-  {
-    "id": "account.workTeamMissing",
-    "description": "No team choosen",
-    "defaultMessage": "No team choosen",
-    "message": "",
-    "files": ["src/components/AccountDetails/AccountDetails.js"]
-  },
-  {
     "id": "form.error-empty",
     "description": "Help for empty fields",
     "defaultMessage": "You can't leave this empty",
     "message": "",
     "files": [
-      "src/components/AccountDetails/AccountDetails.js",
-      "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/FormValidation/FormValidation.js",
       "src/components/Login/Login.js",
       "src/components/MessageInput/MessageInput.js",
-      "src/components/ProposalActions/ProposalActions.js",
-      "src/components/ProposalInput/ProposalInput.js",
       "src/components/SignUp/SignUp.js",
       "src/components/TagForm/TagForm.js",
       "src/components/UserSettings/UserSettings.js",
-      "src/components/WorkTeamForm/WorkTeamForm.js",
-      "src/components/WorkTeamInput/WorkTeamInput.js",
-      "src/components/WorkTeamManager/WorkTeamManager.js",
       "src/routes/passwordRecovery/PasswordRecovery.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
-  },
-  {
-    "id": "rights.header",
-    "description": "Header of privilegemanager",
-    "defaultMessage": "Rights",
-    "message": "",
-    "files": ["src/components/AccountDetails/AccountDetails.js"]
-  },
-  {
-    "id": "roles.header",
-    "description": "Header of groupsemanager",
-    "defaultMessage": "Set & Change Groups",
-    "message": "",
-    "files": ["src/components/AccountDetails/AccountDetails.js"]
-  },
-  {
-    "id": "discussion.new",
-    "description": "Title for activity",
-    "defaultMessage": "New discussion",
-    "message": "",
-    "files": ["src/components/Activity/Activity.js"]
-  },
-  {
-    "id": "proposal.failed",
-    "description": "Votation against proposal",
-    "defaultMessage": "Failed!",
-    "message": "",
-    "files": ["src/components/Activity/Activity.js"]
-  },
-  {
-    "id": "proposal.new",
-    "description": "Title for activity",
-    "defaultMessage": "New proposal",
-    "message": "",
-    "files": ["src/components/Activity/Activity.js"]
-  },
-  {
-    "id": "proposal.rejected",
-    "description": "Proposal got rejected",
-    "defaultMessage": "Rejected",
-    "message": "",
-    "files": ["src/components/Activity/Activity.js"]
-  },
-  {
-    "id": "proposal.revoked",
-    "description": "Proposal was revoked",
-    "defaultMessage": "Revoked",
-    "message": "",
-    "files": ["src/components/Activity/Activity.js"]
-  },
-  {
-    "id": "proposal.valid",
-    "description": "Proposal turned valid",
-    "defaultMessage": "Proposal accepted!",
-    "message": "",
-    "files": ["src/components/Activity/Activity.js"]
-  },
-  {
-    "id": "proposal.voting",
-    "description": "Proposal can be voted from now on",
-    "defaultMessage": "Voting open",
-    "message": "",
-    "files": ["src/components/Activity/Activity.js"]
-  },
-  {
-    "id": "survey.new",
-    "description": "Title for activity",
-    "defaultMessage": "New survey",
-    "message": "",
-    "files": ["src/components/Activity/Activity.js"]
-  },
-  {
-    "id": "calendar.blank",
-    "description": "Blank calendar",
-    "defaultMessage": "No date set",
-    "message": "",
-    "files": ["src/components/Calendar/Calendar.js"]
-  },
-  {
-    "id": "calendar.today.long",
-    "description": "Today",
-    "defaultMessage": "Today",
-    "message": "",
-    "files": ["src/components/Calendar/Calendar.js"]
-  },
-  {
-    "id": "calendar.today.short",
-    "description": "Today",
-    "defaultMessage": "Today",
-    "message": "",
-    "files": ["src/components/Calendar/Calendar.js"]
   },
   {
     "id": "commands.collapseReplies",
@@ -202,50 +62,35 @@
     "description": "Btn to collapse statements",
     "defaultMessage": "Show less",
     "message": "",
-    "files": [
-      "src/components/Comment/Comment.js",
-      "src/components/Statement/Statement.js"
-    ]
+    "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "statements.delete",
     "description": "Menu entry on statements to delete statement",
     "defaultMessage": "delete",
     "message": "",
-    "files": [
-      "src/components/Comment/Comment.js",
-      "src/components/Statement/Statement.js"
-    ]
+    "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "statements.expand",
     "description": "Btn to expand statements",
     "defaultMessage": "Read more",
     "message": "",
-    "files": [
-      "src/components/Comment/Comment.js",
-      "src/components/Statement/Statement.js"
-    ]
+    "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "statements.flag",
     "description": "Menu entry on statements to flag statement",
     "defaultMessage": "flag",
     "message": "",
-    "files": [
-      "src/components/Comment/Comment.js",
-      "src/components/Statement/Statement.js"
-    ]
+    "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "statements.follow",
     "description": "Menu entry on statements to follow author",
     "defaultMessage": "follow",
     "message": "",
-    "files": [
-      "src/components/Comment/Comment.js",
-      "src/components/Statement/Statement.js"
-    ]
+    "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "command.submit",
@@ -253,22 +98,9 @@
     "defaultMessage": "Submit",
     "message": "",
     "files": [
-      "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/MessageForm/MessageForm.js",
       "src/components/MessageInput/MessageInput.js",
-      "src/components/MessageInput/NoticeLayer.js",
-      "src/components/ProposalInput/ProposalInput.js"
-    ]
-  },
-  {
-    "id": "form.error-past",
-    "description": "Help for wrong time settings",
-    "defaultMessage": "Time already passed",
-    "message": "",
-    "files": [
-      "src/components/DiscussionInput/DiscussionInput.js",
-      "src/components/ProposalActions/ProposalActions.js",
-      "src/components/ProposalInput/ProposalInput.js"
+      "src/components/MessageInput/NoticeLayer.js"
     ]
   },
   {
@@ -278,31 +110,9 @@
     "defaultMessage": "You selection is not correct. Click on a suggestion",
     "message": "",
     "files": [
-      "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/FormValidation/FormValidation.js",
-      "src/components/ProposalInput/ProposalInput.js",
-      "src/components/TagForm/TagForm.js",
-      "src/components/WorkTeamForm/WorkTeamForm.js",
-      "src/components/WorkTeamInput/WorkTeamInput.js",
-      "src/components/WorkTeamManager/WorkTeamManager.js"
+      "src/components/TagForm/TagForm.js"
     ]
-  },
-  {
-    "id": "notification.success",
-    "description": "Should notify a successful action",
-    "defaultMessage": "Success!",
-    "message": "",
-    "files": [
-      "src/components/DiscussionInput/DiscussionInput.js",
-      "src/components/ProposalInput/ProposalInput.js"
-    ]
-  },
-  {
-    "id": "numComments",
-    "description": "Number of comments",
-    "defaultMessage": "{cnt} comments",
-    "message": "",
-    "files": ["src/components/DiscussionPreview/DiscussionPreview.js"]
   },
   {
     "id": "header.banner.title",
@@ -317,13 +127,6 @@
     "defaultMessage": "M5",
     "message": "",
     "files": ["src/components/Header/Header.js"]
-  },
-  {
-    "id": "help.firstSteps",
-    "description": "Title of help section",
-    "defaultMessage": "What to do next",
-    "message": "",
-    "files": ["src/components/InfoPage/InfoPage.js"]
   },
   {
     "id": "action.error",
@@ -346,7 +149,6 @@
       "src/components/ConfirmLayer/ConfirmLayer.js",
       "src/components/ImageUpload/ImageUpload.js",
       "src/components/MessageInput/NoticeLayer.js",
-      "src/components/Poll/Poll.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -415,182 +217,11 @@
     "files": ["src/components/Navigation/Navigation.js"]
   },
   {
-    "id": "poll.closed",
-    "description": "Poll closing time",
-    "defaultMessage": "Ended",
-    "message": "",
-    "files": ["src/components/Poll/Poll.js"]
-  },
-  {
-    "id": "poll.closing",
-    "description": "Poll ending time",
-    "defaultMessage": "Closing",
-    "message": "",
-    "files": ["src/components/Poll/Poll.js"]
-  },
-  {
-    "id": "poll.notify",
-    "description": "Notice that vote change will lead to statement deletion",
-    "defaultMessage": "Your statement will be deleted!",
-    "message": "",
-    "files": ["src/components/Poll/Poll.js"]
-  },
-  {
-    "id": "poll.retractVote",
-    "description": "Drawing back the vote",
-    "defaultMessage": "Retract your vote",
-    "message": "",
-    "files": ["src/components/Poll/Poll.js"]
-  },
-  {
-    "id": "poll.voteError",
-    "description": "Notice that voting was not successful",
-    "defaultMessage": "Voting failed!",
-    "message": "",
-    "files": ["src/components/Poll/Poll.js"]
-  },
-  {
-    "id": "date.to",
-    "description": "Date until",
-    "defaultMessage": "End date",
-    "message": "",
-    "files": ["src/components/PollInput/PollInput.js"]
-  },
-  {
-    "id": "poll.reference",
-    "description": "Threshold reference of poll",
-    "defaultMessage": "Threshold reference",
-    "message": "",
-    "files": ["src/components/PollInput/PollInput.js"]
-  },
-  {
-    "id": "poll.threshold",
-    "description": "Poll threshold",
-    "defaultMessage": "Threshold",
-    "message": "",
-    "files": ["src/components/PollInput/PollInput.js"]
-  },
-  {
-    "id": "poll.type",
-    "description": "Poll type",
-    "defaultMessage": "Poll type",
-    "message": "",
-    "files": ["src/components/PollInput/PollInput.js"]
-  },
-  {
-    "id": "time.to",
-    "description": "Time until",
-    "defaultMessage": "End time",
-    "message": "",
-    "files": ["src/components/PollInput/PollInput.js"]
-  },
-  {
-    "id": "confirmation",
-    "description": "Ask for confirmation",
-    "defaultMessage": "Are you sure?",
-    "message": "",
-    "files": ["src/components/ProposalActions/ProposalActions.js"]
-  },
-  {
-    "id": "manager.close",
-    "description": "Close the proposal",
-    "defaultMessage": "Close proposal",
-    "message": "",
-    "files": ["src/components/ProposalActions/ProposalActions.js"]
-  },
-  {
-    "id": "manager.open",
-    "description": "Starts the voting process",
-    "defaultMessage": "Open voting",
-    "message": "",
-    "files": ["src/components/ProposalActions/ProposalActions.js"]
-  },
-  {
-    "id": "manager.revoke",
-    "description": "Revoke proposal",
-    "defaultMessage": "Revoke proposal",
-    "message": "",
-    "files": ["src/components/ProposalActions/ProposalActions.js"]
-  },
-  {
-    "id": "manager.revokeShort",
-    "description": "Revoke proposal, short",
-    "defaultMessage": "Revoke",
-    "message": "",
-    "files": ["src/components/ProposalActions/ProposalActions.js"]
-  },
-  {
     "id": "command.loadMore",
     "description": "To get more data",
     "defaultMessage": "Load more",
     "message": "",
-    "files": [
-      "src/components/ListView/ListView.js",
-      "src/components/UserPanel/UserPanel.js",
-      "src/routes/accountList/AccountListContainer.js",
-      "src/routes/memberList/MemberListContainer.js",
-      "src/routes/notifications/NotificationListContainer.js"
-    ]
-  },
-  {
-    "id": "proposalInput",
-    "description": "Creating new proposal",
-    "defaultMessage": "Create a new proposal",
-    "message": "",
-    "files": [
-      "src/components/ProposalPanel/ProposalPanel.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
-  },
-  {
-    "id": "proposalManager",
-    "description": "Manage proposals",
-    "defaultMessage": "Manage proposals",
-    "message": "",
-    "files": [
-      "src/components/ProposalPanel/ProposalPanel.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
-  },
-  {
-    "id": "proposalManager.phaseOnePoll",
-    "description": "PhaseOnePoll presets",
-    "defaultMessage": "TR: 25 - PHASE ONE - NO STATEMENTS",
-    "message": "",
-    "files": [
-      "src/components/ProposalPanel/ProposalPanel.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
-  },
-  {
-    "id": "proposalManager.phaseTwoPoll",
-    "description": "PhaseTwoPoll presets",
-    "defaultMessage": "TR: 50 - PHASE TWO - WITH STATEMENTS",
-    "message": "",
-    "files": [
-      "src/components/ProposalPanel/ProposalPanel.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
-  },
-  {
-    "id": "proposalManager.survey",
-    "description": "Survey presets",
-    "defaultMessage": "Survey",
-    "message": "",
-    "files": [
-      "src/components/ProposalPanel/ProposalPanel.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
-  },
-  {
-    "id": "tags",
-    "description": "Tags",
-    "defaultMessage": "Tags",
-    "message": "",
-    "files": [
-      "src/components/ProposalPanel/ProposalPanel.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
+    "files": ["src/components/ListView/ListView.js"]
   },
   {
     "id": "form.error-emailTaken",
@@ -703,24 +334,7 @@
     "description": "Short command to invoke deletion",
     "defaultMessage": "Delete",
     "message": "",
-    "files": [
-      "src/components/ConfirmLayer/ConfirmLayer.js",
-      "src/components/SupervisionPanel/SupervisionPanel.js"
-    ]
-  },
-  {
-    "id": "commands.more",
-    "description": "Load more resources",
-    "defaultMessage": "Show more",
-    "message": "",
-    "files": ["src/components/SupervisionPanel/SupervisionPanel.js"]
-  },
-  {
-    "id": "commands.reject",
-    "description": "Short command to invoke rejection",
-    "defaultMessage": "Reject",
-    "message": "",
-    "files": ["src/components/SupervisionPanel/SupervisionPanel.js"]
+    "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
   },
   {
     "id": "action.success",
@@ -738,7 +352,7 @@
     "defaultMessage": "Change",
     "message": "",
     "files": [
-      "src/components/GroupManager/GroupManager.js",
+      "src/components/ConfirmLayer/ConfirmLayer.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -824,34 +438,6 @@
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
-    "id": "join",
-    "description": "Button label",
-    "defaultMessage": "Join",
-    "message": "",
-    "files": ["src/components/WorkTeam/WorkTeam.js"]
-  },
-  {
-    "id": "join.withdraw",
-    "description": "Cancel join request",
-    "defaultMessage": "Dismiss request",
-    "message": "",
-    "files": ["src/components/WorkTeam/WorkTeam.js"]
-  },
-  {
-    "id": "leave",
-    "description": "Leave team",
-    "defaultMessage": "Leave",
-    "message": "",
-    "files": ["src/components/WorkTeam/WorkTeam.js"]
-  },
-  {
-    "id": "profile.followees",
-    "description": "Followees",
-    "defaultMessage": "Followees",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
     "id": "login.email",
     "description": "Email-address",
     "defaultMessage": "Email",
@@ -900,41 +486,6 @@
     "files": ["src/routes/passwordReset/PasswordReset.js"]
   },
   {
-    "id": "proposal",
-    "description": "Switch to proposal poll",
-    "defaultMessage": "Proposal",
-    "message": "",
-    "files": ["src/routes/proposal/ProposalContainer.js"]
-  },
-  {
-    "id": "voting",
-    "description": "Switch to voting poll",
-    "defaultMessage": "Voting",
-    "message": "",
-    "files": ["src/routes/proposal/ProposalContainer.js"]
-  },
-  {
-    "id": "account.role",
-    "description": "Role of the user",
-    "defaultMessage": "Role",
-    "message": "",
-    "files": ["src/components/GroupManager/GroupManager.js"]
-  },
-  {
-    "id": "notifications.error.undefined",
-    "description": "Server or network error",
-    "defaultMessage": "Something went wrong",
-    "message": "",
-    "files": ["src/components/GroupManager/GroupManager.js"]
-  },
-  {
-    "id": "roles.unlock",
-    "description": "Button label for those who can only unlock viewers",
-    "defaultMessage": "Unlock viewer",
-    "message": "",
-    "files": ["src/components/GroupManager/GroupManager.js"]
-  },
-  {
     "id": "action.leave",
     "description": "Label",
     "defaultMessage": "Leave",
@@ -978,28 +529,11 @@
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
-    "id": "request.email.title",
-    "description": "Label for logs",
-    "defaultMessage": "Request to change my email address",
-    "message": "",
-    "files": ["src/components/ActivityLog/ActivityLog.js"]
-  },
-  {
-    "id": "request.join.title",
-    "description": "Label for logs",
-    "defaultMessage": "Request to join a workteam",
-    "message": "",
-    "files": ["src/components/ActivityLog/ActivityLog.js"]
-  },
-  {
     "id": "action.save",
     "description": "Label",
     "defaultMessage": "Save",
     "message": "",
-    "files": [
-      "src/components/NotificationSettings/NotificationSettings.js",
-      "src/components/UserSettings/EmailField.js"
-    ]
+    "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
     "id": "settings.email.requestCreated",
@@ -1016,43 +550,25 @@
     "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
-    "id": "settings.verificationCall",
-    "description": "Notification to verify mail address",
-    "defaultMessage":
-      "Confirm your email address. A confirmation message was sent to ({email})",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
     "id": "proposals",
     "description": "Proposals label",
     "defaultMessage": "Proposals",
     "message": "",
-    "files": [
-      "src/components/Navigation/Navigation.js",
-      "src/components/WorkTeam/WorkTeam.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
+    "files": ["src/components/Navigation/Navigation.js"]
   },
   {
     "id": "users",
     "description": "Users label",
     "defaultMessage": "Users",
     "message": "",
-    "files": [
-      "src/components/Navigation/Navigation.js",
-      "src/routes/accountList/AccountListContainer.js"
-    ]
+    "files": ["src/components/Navigation/Navigation.js"]
   },
   {
     "id": "workTeams",
     "description": "Workteam label",
     "defaultMessage": "Workteams",
     "message": "",
-    "files": [
-      "src/components/Navigation/Navigation.js",
-      "src/routes/workTeamList/WorkTeamListContainer.js"
-    ]
+    "files": ["src/components/Navigation/Navigation.js"]
   },
   {
     "id": "logout",
@@ -1072,50 +588,6 @@
     ]
   },
   {
-    "id": "discussions",
-    "description": "Discussions label",
-    "defaultMessage": "Discussions",
-    "message": "",
-    "files": [
-      "src/components/WorkTeam/WorkTeam.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
-  },
-  {
-    "id": "members",
-    "description": "Members label",
-    "defaultMessage": "Members",
-    "message": "",
-    "files": [
-      "src/components/WorkTeam/WorkTeam.js",
-      "src/routes/memberList/MemberListContainer.js"
-    ]
-  },
-  {
-    "id": "settings",
-    "description": "Label for settings",
-    "defaultMessage": "Settings",
-    "message": "",
-    "files": [
-      "src/routes/account/AccountContainer.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
-  },
-  {
-    "id": "spokesman",
-    "description": "Spokesman label",
-    "defaultMessage": "Spokesman",
-    "message": "",
-    "files": ["src/components/Proposal/Proposal.js"]
-  },
-  {
-    "id": "command.visit",
-    "description": "Short command to visit something",
-    "defaultMessage": "Visit",
-    "message": "",
-    "files": ["src/components/DiscussionInput/DiscussionInput.js"]
-  },
-  {
     "id": "about",
     "description": "About label",
     "defaultMessage": "About",
@@ -1127,34 +599,14 @@
     "description": "Surveys label",
     "defaultMessage": "Surveys",
     "message": "",
-    "files": [
-      "src/components/Navigation/Navigation.js",
-      "src/components/WorkTeam/WorkTeam.js"
-    ]
-  },
-  {
-    "id": "faq",
-    "description": "FAQ label",
-    "defaultMessage": "Frequently asked questions",
-    "message": "",
-    "files": ["src/components/InfoPage/InfoPage.js"]
+    "files": ["src/components/Navigation/Navigation.js"]
   },
   {
     "id": "privacy",
     "description": "Privacy label",
     "defaultMessage": "Privacy",
     "message": "",
-    "files": [
-      "src/components/InfoPage/InfoPage.js",
-      "src/components/SignUp/SignUp.js"
-    ]
-  },
-  {
-    "id": "coordinator",
-    "description": "Label coordinator",
-    "defaultMessage": "Coordinator",
-    "message": "",
-    "files": ["src/components/WorkTeam/WorkTeam.js"]
+    "files": ["src/components/SignUp/SignUp.js"]
   },
   {
     "id": "form.error-min",
@@ -1183,34 +635,6 @@
     "defaultMessage": "OR",
     "message": "",
     "files": ["src/routes/home/Home.js"]
-  },
-  {
-    "id": "label.markRead",
-    "description": "Label mark as read",
-    "defaultMessage": "Mark all as read",
-    "message": "",
-    "files": ["src/components/NotificationDrop/NotificationDrop.js"]
-  },
-  {
-    "id": "label.notificationsLink",
-    "description": "Label notifications link",
-    "defaultMessage": "See all notifications",
-    "message": "",
-    "files": ["src/components/NotificationDrop/NotificationDrop.js"]
-  },
-  {
-    "id": "notificationType.email",
-    "description": "Label email",
-    "defaultMessage": "Email",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "webpush",
-    "description": "Push label",
-    "defaultMessage": "Push",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "confirm",
@@ -1269,251 +693,11 @@
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
-    "id": "notifications.comment.new",
-    "description": "Status message for notifications",
-    "defaultMessage": "wrote a comment on",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "notifications.discussion.new",
-    "description": "Status message for notifications",
-    "defaultMessage": "New discussion published:",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "notifications.proposal.accepted",
-    "description": "Status message for notifications",
-    "defaultMessage": "got accepted!",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "notifications.proposal.new",
-    "description": "Status message for notifications",
-    "defaultMessage": "New proposal published:",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "notifications.proposal.proposed",
-    "description": "Status message for notifications",
-    "defaultMessage": "was proposed!",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "notifications.proposal.rejected",
-    "description": "Status message for notifications",
-    "defaultMessage": "was rejected!",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "notifications.proposal.revoked",
-    "description": "Status message for notifications",
-    "defaultMessage": "was revoked!",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "notifications.proposal.voting",
-    "description": "Status message for notifications",
-    "defaultMessage": "opened voting phase!",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "notifications.statement.new",
-    "description": "Status message for notifications",
-    "defaultMessage": "wrote a statement on",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "notifications.survey.closed",
-    "description": "Status message for notifications",
-    "defaultMessage": "was closed",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "notifications.survey.new",
-    "description": "Status message for notifications",
-    "defaultMessage": "New survey published:",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
     "id": "label.locale",
     "description": "Label locale",
     "defaultMessage": "Language",
     "message": "",
     "files": ["src/components/UserSettings/UserSettings.js"]
-  },
-  {
-    "id": "label.notifications",
-    "description": "Notifications label",
-    "defaultMessage": "Notifications",
-    "message": "",
-    "files": [
-      "src/components/NotificationDrop/NotificationDrop.js",
-      "src/components/NotificationSettings/NotificationSettings.js",
-      "src/routes/notifications/NotificationListContainer.js"
-    ]
-  },
-  {
-    "id": "discussion.create",
-    "description": "Label for Manager",
-    "defaultMessage": "Create discussion",
-    "message": "",
-    "files": ["src/routes/workTeamManager/WorkTeamManagement.js"]
-  },
-  {
-    "id": "label.requests",
-    "description": "Label request",
-    "defaultMessage": "Requests",
-    "message": "",
-    "files": ["src/routes/workTeamManager/WorkTeamManagement.js"]
-  },
-  {
-    "id": "contact",
-    "description": "Contact label",
-    "defaultMessage": "Contact",
-    "message": "",
-    "files": ["src/components/InfoPage/InfoPage.js"]
-  },
-  {
-    "id": "help.pushavailability",
-    "description": "Notice",
-    "defaultMessage": "(available only in Chrome and Firefox browsers)",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "label.notificationSettings",
-    "description": "Label for notification settings",
-    "defaultMessage": "Notification settings",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "notifications.message",
-    "description": "Status message for notifications",
-    "defaultMessage": "Message from",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "notifications.user.update.roleAdded",
-    "description": "Status message for notifications",
-    "defaultMessage": "You got a new role:",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "notifications.user.update.roleLost",
-    "description": "Status message for notifications",
-    "defaultMessage": "You lost your role:",
-    "message": "",
-    "files": ["src/components/UserNotification/UserNotification.js"]
-  },
-  {
-    "id": "label.messages",
-    "description": "Messages label",
-    "defaultMessage": "Messages",
-    "message": "",
-    "files": [
-      "src/components/NotificationSettings/NotificationSettings.js",
-      "src/components/UserPanel/UserPanel.js",
-      "src/routes/account/AccountContainer.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
-  },
-  {
-    "id": "label.discussions",
-    "description": "Label discussions",
-    "defaultMessage": "Discussions",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "label.newDiscussions",
-    "description": "Label for notifications on new discussions",
-    "defaultMessage": "New Discussions",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "label.newProposals",
-    "description": "Label new proposals",
-    "defaultMessage": "New Proposals",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "label.newSurveys",
-    "description": "Label new surveys",
-    "defaultMessage": "New Surveys",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "label.notificationSettings.comments",
-    "description": "Label for notifications on new comments",
-    "defaultMessage": "Comments",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "label.notificationSettings.messages",
-    "description": "Label for notifications on new messages",
-    "defaultMessage": "Messages",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "label.notificationSettings.replies",
-    "description": "Label for notifications on new replies",
-    "defaultMessage": "Replies",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "label.notificationSettings.statements",
-    "description": "Label for notifications on new statements",
-    "defaultMessage": "Statements",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "label.onWatchedDiscussions",
-    "description": "Label for notifications on watched discussions",
-    "defaultMessage": "on watched discussions",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "label.onWatchedProposals",
-    "description": "Label for watched proposals/surveys",
-    "defaultMessage": "on watched proposals/surveys",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "label.proposalAndSurveys",
-    "description": "Label proposal and surveys",
-    "defaultMessage": "Proposals and Surveys",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
-  },
-  {
-    "id": "label.stateUpdates",
-    "description": "Label for state updates",
-    "defaultMessage": "State updates",
-    "message": "",
-    "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "privacy.consent",
@@ -1528,61 +712,5 @@
     "defaultMessage": "Read our {link}",
     "message": "",
     "files": ["src/components/SignUp/SignUp.js"]
-  },
-  {
-    "id": "settings.uploadCall",
-    "description": "Notification to upload photo",
-    "defaultMessage": "Please upload a photo of yourself",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "settings.waitCall",
-    "description": "Notification to upload photo",
-    "defaultMessage": "You will be contacted as soon as possible",
-    "message": "",
-    "files": ["src/routes/account/AccountContainer.js"]
-  },
-  {
-    "id": "proposal.votingRequested",
-    "description": "Poll reached its limit",
-    "defaultMessage": "Voting requested!",
-    "message": "",
-    "files": ["src/components/Activity/Activity.js"]
-  },
-  {
-    "id": "survey.closed",
-    "description": "Survey closed",
-    "defaultMessage": "Closed!",
-    "message": "",
-    "files": ["src/components/Activity/Activity.js"]
-  },
-  {
-    "id": "proposals.accepted",
-    "description": "Filter for accepted proposals",
-    "defaultMessage": "accepted",
-    "message": "",
-    "files": ["src/components/StateFilter/StateFilter.js"]
-  },
-  {
-    "id": "proposals.repelled",
-    "description": "Filter for repelled proposals",
-    "defaultMessage": "repelled",
-    "message": "",
-    "files": ["src/components/StateFilter/StateFilter.js"]
-  },
-  {
-    "id": "resource.active",
-    "description": "Filter for active proposals/surveys/discussions",
-    "defaultMessage": "active",
-    "message": "",
-    "files": ["src/components/StateFilter/StateFilter.js"]
-  },
-  {
-    "id": "resource.closed",
-    "description": "Filter for closed proposals/surveys/discussions",
-    "defaultMessage": "closed",
-    "message": "",
-    "files": ["src/components/StateFilter/StateFilter.js"]
   }
 ]

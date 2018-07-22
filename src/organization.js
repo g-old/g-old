@@ -23,7 +23,7 @@ export const Groups = {
   ADMIN: 2,
   USER: 4,
   GUEST: 8,
-  SYSTEM:16,
+  SYSTEM: 16,
 };
 
 /* eslint-disable no-bitwise */
@@ -39,8 +39,8 @@ const guestMask =
 const superUserMask =
   Permissions.CHANGE_OWN_PROFILE | Permissions.MUTATE_PROFILES;
 
-  const userMask = guestMask;
-  const adminMask = userMask;
+const userMask = guestMask;
+const adminMask = userMask;
 /* Add new privileges here - DON'T FORGET TO UPDATE THE SCHEMA */
 export const Privileges = {
   NONE: 0,

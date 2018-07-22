@@ -57,15 +57,6 @@ process.on('unhandledRejection', (reason, p) => {
   }
 });
 
-
-
-
-
-
-
-
-
-
 const app = express();
 
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the
@@ -126,8 +117,6 @@ app.use(passport.session());
 // if (__DEV__) {
 app.enable('trust proxy');
 // }
-
-
 
 app.post(
   '/',
@@ -271,9 +260,6 @@ app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
     .catch(e => res.status(500).json({ message: e.message }));
 });
 
-
-
-
 app.get('/test', (req, res, next) => {
   knex('users')
     .where({ name: 'admin' })
@@ -310,13 +296,16 @@ app.use('/graphql', graphqlMiddleware);
 app.get('*', async (req, res, next) => {
   try {
     const css = new Set();
-
+    console.log('CSS INSERTING')
     // Enables critical path CSS rendering
     // https://github.com/kriasoft/isomorphic-style-loader
     const insertCss = (...styles) => {
+      console.log('STYLES SSR',{styles})
       // eslint-disable-next-line no-underscore-dangle
       styles.forEach(style => css.add(style._getCss()));
     };
+        console.log('AFTER CSS INSERTING/Generation');
+
 
     // Universal HTTP client
     const fetch = createFetch(nodeFetch, {
@@ -395,13 +384,13 @@ app.get('*', async (req, res, next) => {
       res.redirect(route.status || 302, route.redirect);
       return;
     }
-
     const data = { ...route };
+    console.log('BEFORE RENDERING TO STRING', {data,css})
     data.children = ReactDOM.renderToString(
       <App context={context} /* store={store} */>{route.component}</App>,
     );
     data.styles = [{ id: 'css', cssText: [...css].join('') }];
-
+    console.log('DATA STYLES', {styles: data.styles})
     const scripts = new Set();
     const addChunk = chunk => {
       if (chunks[chunk]) {
@@ -426,7 +415,6 @@ app.get('*', async (req, res, next) => {
       state: context.store.getState(),
       lang: locale,
     };
-
     const html = ReactDOM.renderToStaticMarkup(<Html {...data} />);
     res.status(route.status || 200);
     res.send(`<!doctype html>${html}`);

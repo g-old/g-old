@@ -9,7 +9,7 @@ import Label from '../Label';
 import Form from '../Form';
 
 import { nameValidation, createValidator } from '../../core/validation';
-import Notification from '../../components/Notification';
+import Notification from '../Notification';
 
 const messages = defineMessages({
   empty: {

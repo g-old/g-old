@@ -14,7 +14,6 @@ import messages from './messages';
 import copy from './copy';
 import bundle from './bundle';
 import render from './render';
-import compileEmails from './compileEmails';
 import pkg from '../package.json';
 
 /**
@@ -24,7 +23,6 @@ import pkg from '../package.json';
 async function build() {
   await run(clean);
   await run(messages);
-  await run(compileEmails);
   await run(copy);
   await run(bundle);
 
