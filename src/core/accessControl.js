@@ -5,6 +5,7 @@ import {
   PrivilegesSchema,
   PermissionsSchema,
   isCoordinator,
+  isAdmin,
 } from '../organization';
 /* eslint-disable no-bitwise */
 // TODO make object
@@ -125,8 +126,11 @@ function userWriteControl(viewer, data) {
     }
   }
   if (viewer.permissions & Permissions.MUTATE_PROFILES) {
-    if (data.thumbnail || data.dataUrl || data.name || data.surname) {
-      return true;
+    if (
+      !data.groups &&
+      (data.thumbnail || data.dataUrl || data.name || data.surname)
+    ) {
+      if (viewer.groups === Groups.GUEST || isAdmin(viewer)) return true;
     }
     if (data.groups != null) {
       if (

@@ -8,13 +8,13 @@ import history from '../../history';
 import Button from '../Button';
 import Layer from '../Layer';
 import MessageForm from '../MessageForm';
-import { Groups } from '../../organization';
+import { Groups, isAdmin } from '../../organization';
 import RoleBadge from './RoleBadge';
 import { ICONS } from '../../constants';
 
 const isContactable = (workteams, accountId, accountRoles, visitor) => {
   // eslint-disable-next-line no-bitwise
-  if (accountRoles & Groups.CONTACTEE) {
+  if (accountRoles && accountRoles & Groups.CONTACTEE) {
     return true;
   }
   /* eslint-disable eqeqeq */
@@ -112,6 +112,7 @@ class UserProfile extends React.Component {
       updates,
       onSend,
       messageUpdates,
+      sessionUser,
     } = this.props;
 
     if (!user) return null;
@@ -125,7 +126,9 @@ class UserProfile extends React.Component {
       numLikes,
       workTeams,
     } = user;
-    const canChangeImg = ownAccount;
+    const canChangeImg =
+      (ownAccount && sessionUser && sessionUser.groups === Groups.GUEST) ||
+      isAdmin(sessionUser);
 
     return (
       <Box column align>

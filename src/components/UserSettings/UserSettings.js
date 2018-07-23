@@ -7,6 +7,7 @@ import FormField from '../FormField';
 import EmailField from './EmailField';
 import Select from '../Select';
 import { locales } from '../../actions/intl';
+import NameInput from './NameInput';
 // import Select from '../Select';
 import {
   createValidator,
@@ -14,8 +15,8 @@ import {
   passwordAgainValidation,
   emailValidation,
   nameValidation,
-  capitalizeFirstLetter,
 } from '../../core/validation';
+import { isAdmin, Groups } from '../../organization';
 
 const fieldNames = [
   'passwordOld',
@@ -133,16 +134,7 @@ const messages = defineMessages({
     defaultMessage: 'Name',
     description: 'Heading of name section',
   },
-  name: {
-    id: 'settings.name',
-    defaultMessage: 'Name',
-    description: 'First name',
-  },
-  surname: {
-    id: 'settings.surname',
-    defaultMessage: 'Surname',
-    description: 'Surname',
-  },
+
   locale: {
     id: 'label.locale',
     defaultMessage: 'Language',
@@ -211,7 +203,6 @@ class UserSettings extends React.Component {
     this.handleValueChange = this.handleValueChange.bind(this);
     this.handleEmailUpdate = this.handleEmailUpdate.bind(this);
     this.handlePasswordUpdate = this.handlePasswordUpdate.bind(this);
-    this.handleNameUpdate = this.handleNameUpdate.bind(this);
     this.handleLocaleUpdate = this.handleLocaleUpdate.bind(this);
     const testValues = {
       passwordOld: { fn: 'password' },
@@ -240,7 +231,9 @@ class UserSettings extends React.Component {
   }
 
   componentWillReceiveProps({ updates, requestUpdates, user }) {
-    if (user.locale !== this.props.user.locale) {
+    const { user: oldUser } = this.props;
+    const { invalidEmails, email, errors } = this.state;
+    if (user.locale !== oldUser.locale) {
       this.setState({
         locale: {
           label: locales[user.locale],
@@ -252,12 +245,9 @@ class UserSettings extends React.Component {
       if (requestUpdates.error === 'request-email-exists') {
         this.setState({
           showEmailInput: true,
-          invalidEmails: [
-            ...this.state.invalidEmails,
-            this.state.email.trim().toLowerCase(),
-          ],
+          invalidEmails: [...invalidEmails, email.trim().toLowerCase()],
           errors: {
-            ...this.state.errors,
+            ...errors,
             email: {
               touched: true,
               errorName: 'emailTaken',
@@ -266,7 +256,6 @@ class UserSettings extends React.Component {
         });
       } else {
         this.setState({
-          emailError: true,
           showEmailInput: false,
         });
       }
@@ -277,7 +266,7 @@ class UserSettings extends React.Component {
           this.setState({
             passwordOld: '',
             errors: {
-              ...this.state.errors,
+              ...errors,
               passwordOld: { touched: true, errorName: 'wrongPassword' },
             },
           });
@@ -294,7 +283,7 @@ class UserSettings extends React.Component {
           passwordOld: '',
         });
       }
-      if (updates.locale && updates.locale.success) {
+      /* if (updates.locale && updates.locale.success) {
         this.setState({
           localeSuccess: true,
           localeError: false,
@@ -304,16 +293,15 @@ class UserSettings extends React.Component {
           localeSuccess: false,
           localeError: true,
         });
-      }
-      if (
+      } */
+      /* if (
         (updates.name && updates.name.success) ||
         (updates.surname && updates.surname.success)
       ) {
         this.setState({
           nameSuccess: true,
           nameUpdateError: false,
-          name: '',
-          surname: '',
+
         });
       }
       if (
@@ -323,114 +311,102 @@ class UserSettings extends React.Component {
         this.setState({
           nameSuccess: false,
           nameUpdateError: true,
-          name: '',
-          surname: '',
+
         });
-      }
+      } */
     }
   }
+
   onEditEmail() {
-    this.setState({
-      showEmailInput: !this.state.showEmailInput,
+    this.setState(prevState => ({
+      showEmailInput: !prevState.showEmailInput,
       email: '', // this.props.user.email,
-      errors: { ...this.state.errors, email: { touched: false } },
-    });
+      errors: { ...prevState.errors, email: { touched: false } },
+    }));
   }
 
   handleValueChange(e) {
+    const { errors } = this.state;
     const { name: field, value } = e.target;
-    if (this.state.errors[field].touched) {
-      this.setState({
+    if (errors[field].touched) {
+      this.setState(prevState => ({
         errors: {
-          ...this.state.errors,
-          [field]: { ...this.state.errors[field], touched: false },
+          ...prevState.errors,
+          [field]: { ...prevState.errors[field], touched: false },
         },
-      });
+      }));
     }
     this.setState({ [field]: value });
   }
 
   handleValidation(fields) {
     const validated = this.Validator(fields);
-    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
+    this.setState(prevState => ({
+      errors: { ...prevState.errors, ...validated.errors },
+    }));
     return validated.failed === 0;
   }
 
   handleBlur(e) {
+    const { passwordAgain } = this.state;
     const fields = [];
     const currentField = e.target.name;
     fields.push(e.target.name);
     if (currentField) {
-      if (currentField === 'password' && this.state.passwordAgain.length > 0) {
+      if (currentField === 'password' && passwordAgain.length > 0) {
         fields.push('passwordAgain');
       }
       this.handleValidation(fields);
     }
   }
+
   visibleErrors(errorNames) {
+    const { errors } = this.state;
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
-      if (this.state.errors[curr].touched) {
-        acc[err] = (
-          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
-        );
+      if (errors[curr].touched) {
+        acc[err] = <FormattedMessage {...messages[errors[curr].errorName]} />;
       }
       return acc;
     }, {});
   }
+
   handlePasswordUpdate() {
     if (this.handleValidation(fieldNames.slice(0, 3))) {
-      this.props.updateUser({
-        id: this.props.user.id,
-        passwordOld: this.state.passwordOld.trim(),
-        password: this.state.password.trim(),
+      const { updateUser: update, user } = this.props;
+      const { passwordOld, password } = this.state;
+      update({
+        id: user.id,
+        passwordOld: passwordOld.trim(),
+        password: password.trim(),
       });
     }
   }
 
-  handleNameUpdate() {
-    const fields = [];
-
-    if (this.state.name) {
-      fields.push('name');
-    }
-    if (this.state.surname) {
-      fields.push('surname');
-    }
-    if (!fields.length) {
-      return;
-    }
-    const args = fields.reduce(
-      (acc, curr) => {
-        acc[curr] = capitalizeFirstLetter(this.state[curr]);
-        return acc;
-      },
-      { id: this.props.user.id },
-    );
-    if (this.handleValidation(fields)) {
-      this.props.updateUser(args);
-    }
-  }
-
   handleLocaleUpdate() {
-    if (this.props.user.locale !== this.state.locale.value) {
-      this.props.updateUser({
-        id: this.props.user.id,
-        locale: this.state.locale.value,
+    const { user, updateUser: update } = this.props;
+    const { locale } = this.state;
+
+    if (user.locale !== locale.value) {
+      update({
+        id: user.id,
+        locale: locale.value,
       });
     }
   }
 
   handleEmailUpdate() {
+    const { email } = this.state;
+    const { user, createRequest: makeRequest } = this.props;
     if (this.handleValidation(['email'])) {
-      const newEmail = this.state.email.trim().toLowerCase();
-      if (this.props.user.email) {
-        if (newEmail !== this.props.user.email.trim().toLowerCase()) {
+      const newEmail = email.trim().toLowerCase();
+      if (user.email) {
+        if (newEmail !== user.email.trim().toLowerCase()) {
           // this.props.updateUser({ id: this.props.user.id, email: newEmail });
-          this.props.createRequest({
+          makeRequest({
             type: 'changeEmail',
             content: JSON.stringify({
-              id: this.props.user.id,
+              id: user.id,
               email: newEmail,
             }),
           });
@@ -438,17 +414,31 @@ class UserSettings extends React.Component {
       }
     }
   }
+
   render() {
-    const { showEmailInput } = this.state;
+    const {
+      showEmailInput,
+      locale,
+      email,
+      passwordError: passwordUpdateError,
+      passwordOld,
+      password,
+      passwordAgain,
+      passwordSuccess: passwordUpdateSuccess,
+    } = this.state;
     const {
       updates,
       requestUpdates,
       user,
       resendEmail,
       deleteRequest,
+      smallSize,
+      updateUser: update,
     } = this.props;
-    /* const emailPending = updates && updates.email && updates.email.pending;
-    const emailSuccess = updates && updates.email && updates.email.success; */
+
+    const canChangeName =
+      user && (user.groups === Groups.GUEST || isAdmin(user));
+
     const emailPending = requestUpdates && requestUpdates.pending;
     const emailSuccess =
       (updates && updates.verifyEmail && updates.verifyEmail.success) ||
@@ -457,22 +447,15 @@ class UserSettings extends React.Component {
       updates && updates.password && updates.password.pending;
     const passwordSuccess =
       updates && updates.password && updates.password.success;
-    // const verifyError = updates && updates.verifyEmail && updates.verifyEmail.error;
-    /* const verifyPending =
-      updates && updates.verifyEmail && updates.verifyEmail.pending;
-    const verifySuccess =
-      updates && updates.verifyEmail && updates.verifyEmail.success;
-    const updateEmailBtn = this.state.showEmailInput ? (
-      <Button
-        disabled={emailPending}
-        onClick={this.handleEmailUpdate}
-        label={<FormattedMessage {...messages.change} />}
-      />
-    ) : null; */
+
     const nameSuccess =
       updates &&
       ((updates.name && updates.name.success) ||
         (updates.surname && updates.surname.success));
+    const nameError =
+      updates &&
+      ((updates.name && updates.name.error) ||
+        (updates.surname && updates.surname.error));
     const namePending = updates && updates.name && updates.name.pending;
 
     const localeSuccess = updates && (updates.locale && updates.locale.success);
@@ -482,8 +465,6 @@ class UserSettings extends React.Component {
       passwordError,
       passwordAgainError,
       emailError,
-      nameError,
-      surnameError,
       localeError,
     } = this.visibleErrors([...fieldNames, 'email']);
 
@@ -512,7 +493,7 @@ class UserSettings extends React.Component {
               inField
               options={availableLanguages}
               onSearch={false}
-              value={this.state.locale}
+              value={locale}
               onChange={e => {
                 this.handleValueChange({
                   target: {
@@ -534,46 +515,26 @@ class UserSettings extends React.Component {
             />
           )}
         </Box>
-        <legend>{<FormattedMessage {...messages.nameHeading} />}</legend>
-        <fieldset>
-          <FormField
-            label={<FormattedMessage {...messages.name} />}
-            error={nameError}
-          >
-            <input
-              type="text"
-              onChange={this.handleValueChange}
-              value={this.state.name}
-              name="name"
-              placeholder={this.props.user.name}
+
+        {canChangeName && (
+          <React.Fragment>
+            <legend>{<FormattedMessage {...messages.nameHeading} />}</legend>
+
+            <NameInput
+              updates={{
+                error: nameError,
+                success: nameSuccess,
+                pending: namePending,
+              }}
+              user={user}
+              onUpdate={update}
             />
-          </FormField>
-          <FormField
-            label={<FormattedMessage {...messages.surname} />}
-            error={surnameError}
-          >
-            <input
-              type="text"
-              onChange={this.handleValueChange}
-              value={this.state.surname}
-              placeholder={this.props.user.surname}
-              name="surname"
-            />
-          </FormField>
-        </fieldset>
-        <Box justify>
-          {!nameSuccess && (
-            <Button
-              primary
-              disabled={namePending}
-              onClick={this.handleNameUpdate}
-              label={<FormattedMessage {...messages.change} />}
-            />
-          )}
-        </Box>
+          </React.Fragment>
+        )}
+
         <legend>{<FormattedMessage {...messages.emailHeading} />}</legend>
         <EmailField
-          smallSize={this.props.smallSize}
+          smallSize={smallSize}
           emailSuccess={emailSuccess}
           request={emailChangeRequest}
           resendEmail={resendEmail}
@@ -587,12 +548,12 @@ class UserSettings extends React.Component {
           emailVerified={user.emailVerified}
           showEmailInput={showEmailInput}
           email={user.email}
-          value={showEmailInput ? this.state.email : this.props.user.email}
+          value={showEmailInput ? email : user.email}
         />
         <legend>{<FormattedMessage {...messages.passwordHeading} />}</legend>
 
         <fieldset>
-          {this.state.passwordError && (
+          {passwordUpdateError && (
             <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
               <FormattedMessage {...messages.error} />
             </div>
@@ -605,7 +566,7 @@ class UserSettings extends React.Component {
               name="passwordOld"
               type="password"
               onChange={this.handleValueChange}
-              value={this.state.passwordOld}
+              value={passwordOld}
             />
           </FormField>
           <FormField
@@ -616,7 +577,7 @@ class UserSettings extends React.Component {
               name="password"
               type="password"
               onChange={this.handleValueChange}
-              value={this.state.password}
+              value={password}
             />
           </FormField>
           <FormField
@@ -627,10 +588,10 @@ class UserSettings extends React.Component {
               name="passwordAgain"
               type="password"
               onChange={this.handleValueChange}
-              value={this.state.passwordAgain}
+              value={passwordAgain}
             />
           </FormField>
-          {this.state.passwordSuccess && (
+          {passwordUpdateSuccess && (
             <div style={{ backgroundColor: 'rgba(140, 200, 0, 0.3)' }}>
               <FormattedMessage {...messages.success} />
             </div>
