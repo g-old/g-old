@@ -63,32 +63,7 @@ const messages = defineMessages({
     defaultMessage: 'Next step',
     description: 'Next',
   },
-  empty: {
-    id: 'form.error-empty',
-    defaultMessage: "You can't leave this empty",
-    description: 'Help for empty fields',
-  },
-  shortPassword: {
-    id: 'form.error-shortPassword',
-    defaultMessage:
-      'Short passwords are easy to guess. Try one with at least 6 characters ',
-    description: 'Help for short passwords',
-  },
-  passwordMismatch: {
-    id: 'form.error-passwordMismatch',
-    defaultMessage: "These passwords don't match. Try again?",
-    description: 'Help for mismatching passwords',
-  },
-  invalidEmail: {
-    id: 'form.error-invalidEmail',
-    defaultMessage: 'Your email address seems to be invalid',
-    description: 'Help for email',
-  },
-  emailTaken: {
-    id: 'form.error-emailTaken',
-    defaultMessage: 'Email address already in use',
-    description: 'Help for not unique email',
-  },
+
   error: {
     id: 'signup.error',
     defaultMessage: 'Could not create your account',
@@ -140,6 +115,13 @@ const consentValidation = consent => {
 };
 
 class SignUp extends React.Component {
+  static removeScript() {
+    const script = document.getElementById(SCRIPT_ID);
+    if (script) {
+      script.parentNode.removeChild(script);
+    }
+  }
+
   static propTypes = {
     onCreateUser: PropTypes.func.isRequired,
     error: PropTypes.bool,
@@ -154,12 +136,6 @@ class SignUp extends React.Component {
     notUniqueEmail: false,
   };
 
-  static removeScript() {
-    const script = document.getElementById(SCRIPT_ID);
-    if (script) {
-      script.parentNode.removeChild(script);
-    }
-  }
   constructor(props) {
     super(props);
     this.state = {
@@ -180,27 +156,29 @@ class SignUp extends React.Component {
 
   componentWillReceiveProps({ notUniqueEmail }) {
     if (notUniqueEmail) {
-      if (this.state.validatedInputs && this.state.validatedInputs.email) {
+      const { validatedInputs } = this.state;
+      if (validatedInputs && validatedInputs.email) {
         this.setState(
-          {
-            ...this.state,
+          prevState => ({
             invalidEmails: [
-              ...this.state.invalidEmails,
-              this.state.validatedInputs.email.trim().toLowerCase(),
+              ...prevState.invalidEmails,
+              prevState.validatedInputs.email.trim().toLowerCase(),
             ],
-          },
+          }),
           this.handleInvalidEmail,
         );
       }
     }
   }
+
   componentWillUnmount() {
     // SignUp.removeScript();
   }
 
   onSubmit() {
-    if (this.state.validatedInputs) {
-      let { name, surname, email, password } = this.state.validatedInputs;
+    const { validatedInputs, captchaResponse, onCreateUser } = this.state;
+    if (validatedInputs) {
+      let { name, surname, email, password } = validatedInputs;
       name = name.trim();
       name = capitalizeFirstLetter(name);
       surname = surname.trim();
@@ -214,7 +192,7 @@ class SignUp extends React.Component {
         password,
       };
       //  alert(JSON.stringify(data));
-      this.props.onCreateUser(data, this.state.captchaResponse);
+      onCreateUser(data, captchaResponse);
     }
   }
 
@@ -222,16 +200,11 @@ class SignUp extends React.Component {
     this.setState({ hasError: true });
   }
 
-  handleValidation(fields) {
-    const validated = this.Validator(fields);
-    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
-    return validated.failed === 0;
-  }
-
   handleInvalidEmail() {
     this.resetRecaptcha();
+    const { invalidEmails } = this.state;
     this.form.enforceValidation(['email'], {
-      invalidEmails: this.state.invalidEmails,
+      invalidEmails,
     });
   }
 
@@ -251,18 +224,23 @@ class SignUp extends React.Component {
       () => this.recaptchaInstance.execute(),
     );
   }
+
   handlePasswordVisibility(e) {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    this.setState({ passwordsVisible: !this.state.passwordsVisible });
+    this.setState(prevState => ({
+      passwordsVisible: !prevState.passwordsVisible,
+    }));
   }
+
   resetRecaptcha() {
     if (this.recaptchaInstance) {
       this.recaptchaInstance.reset();
     }
   }
+
   renderScript() {
     let script = document.getElementById(SCRIPT_ID);
     if (!script) {
@@ -279,20 +257,45 @@ class SignUp extends React.Component {
   }
 
   render() {
-    const { pending } = this.props;
+    const { pending, error, notUniqueEmail, recaptchaKey } = this.props;
+    const {
+      hasError,
+      invalidEmails,
+      passwordsVisible,
+      captchaPending,
+    } = this.state;
 
-    const loginError = this.props.error ? (
+    const loginError = error ? (
       <div style={{ backgroundColor: 'rgba(255, 50, 77, 0.3)' }}>
         <FormattedMessage {...messages.error} />
       </div>
     ) : null;
-    if (this.state.hasError) {
+    if (hasError) {
       return <h1>Please reload the page</h1>;
     }
     return (
       <Box tag="article" align column pad>
         <FormValidation // eslint-disable-next-line
-          ref={el => (this.form = el)} eager onBlur={onBlurValidation} options={{ invalidEmails: this.state.invalidEmails }} validations={{ name: { args: { required: true, min: 2 } }, surname: { args: { required: true, min: 2 } }, password: { fn: passwordValidation, args: { required: true, min: 6 } }, passwordAgain: { fn: passwordAgainValidation, args: { required: true, min: 6 } }, email: { fn: emailValidation, args: { required: true } }, consent: { fn: consentValidation, args: { required: true } } }} submit={this.executeCaptcha}>
+          ref={el => (this.form = el)}
+          eager
+          onBlur={onBlurValidation}
+          options={{ invalidEmails }}
+          validations={{
+            name: { args: { required: true, min: 2 } },
+            surname: { args: { required: true, min: 2 } },
+            password: {
+              fn: passwordValidation,
+              args: { required: true, min: 6 },
+            },
+            passwordAgain: {
+              fn: passwordAgainValidation,
+              args: { required: true, min: 6 },
+            },
+            email: { fn: emailValidation, args: { required: true } },
+            consent: { fn: consentValidation, args: { required: true } },
+          }}
+          submit={this.executeCaptcha}
+        >
           {({
             errorMessages,
             onBlur,
@@ -344,7 +347,7 @@ class SignUp extends React.Component {
                 >
                   <input
                     id="password"
-                    type={this.state.passwordsVisible ? 'text' : 'password'}
+                    type={passwordsVisible ? 'text' : 'password'}
                     name="password"
                     value={values.password}
                     onChange={handleValueChanges}
@@ -373,7 +376,7 @@ class SignUp extends React.Component {
                           <path
                             d={
                               ICONS[
-                                this.state.passwordsVisible
+                                passwordsVisible
                                   ? 'visibility'
                                   : 'visibilityOff'
                               ]
@@ -386,7 +389,7 @@ class SignUp extends React.Component {
                 >
                   <input
                     id="passwordAgain"
-                    type={this.state.passwordsVisible ? 'text' : 'password'}
+                    type={passwordsVisible ? 'text' : 'password'}
                     name="passwordAgain"
                     value={values.passwordAgain}
                     onChange={handleValueChanges}
@@ -412,7 +415,7 @@ class SignUp extends React.Component {
                     onBlur={onBlur}
                   />
                 </FormField>
-                {!this.props.notUniqueEmail && loginError}
+                {!notUniqueEmail && loginError}
               </fieldset>
               <fieldset>
                 <FormField
@@ -452,21 +455,19 @@ class SignUp extends React.Component {
                 </a>
               </p>
 
-              <Button
-                primary
-                fill
-                disabled={this.state.captchaPending || pending}
-              >
+              <Button primary fill disabled={captchaPending || pending}>
                 <FormattedMessage {...messages.nextStep} />
               </Button>
             </Form>
           )}
         </FormValidation>
-        <Recaptcha ref={e => (this.recaptchaInstance = e) // eslint-disable-line
+        <Recaptcha
+          ref={
+            e => (this.recaptchaInstance = e) // eslint-disable-line
           }
           size="invisible"
           render="explicit"
-          sitekey={this.props.recaptchaKey}
+          sitekey={recaptchaKey}
           verifyCallback={this.verifyCallback}
           onloadCallback={() =>
             this.setState({
