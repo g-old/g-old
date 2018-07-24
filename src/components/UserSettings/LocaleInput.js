@@ -1,25 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage, defineMessages } from 'react-intl';
+import { locales } from '../../actions/intl';
 import FormField from '../FormField';
 import Box from '../Box';
 import Button from '../Button';
 import FormValidation from '../FormValidation';
-import { capitalizeFirstLetter } from '../../core/validation';
 import Notification from '../Notification';
+import Select from '../Select';
 
-const sanitizeName = name => capitalizeFirstLetter(name.trim());
-
+const availableLanguages = Object.keys(locales).map(code => ({
+  label: locales[code],
+  value: code,
+}));
 const messages = defineMessages({
-  name: {
-    id: 'settings.name',
-    defaultMessage: 'Name',
-    description: 'First name',
-  },
-  surname: {
-    id: 'settings.surname',
-    defaultMessage: 'Surname',
-    description: 'Surname',
+  locale: {
+    id: 'label.locale',
+    defaultMessage: 'Language',
+    description: 'Label locale',
   },
   change: {
     id: 'commands.change',
@@ -28,7 +26,7 @@ const messages = defineMessages({
   },
 });
 
-class NameInput extends React.Component {
+class LocaleInput extends React.Component {
   static propTypes = {
     updates: PropTypes.shape({}),
     user: PropTypes.shape({}).isRequired,
@@ -46,15 +44,13 @@ class NameInput extends React.Component {
 
   onSubmit(values) {
     const { onUpdate, user } = this.props;
-    let name;
-    let surname;
-    if (values.name) {
-      name = sanitizeName(values.name);
+    let locale;
+    if (values.locale) {
+      locale = values.locale.value;
+      if (locale && locale !== user.locale) {
+        onUpdate({ locale, id: user.id });
+      }
     }
-    if (values.surname) {
-      surname = sanitizeName(values.surname);
-    }
-    onUpdate({ name, surname, id: user.id });
   }
 
   render() {
@@ -62,11 +58,8 @@ class NameInput extends React.Component {
     return (
       <FormValidation
         key={user.id}
-        data={{ name: user.name, surname: user.surname }}
-        validations={{
-          name: { args: { min: 2 } },
-          surname: { args: { min: 2 } },
-        }}
+        data={{ locale: locales[user.locale] }}
+        validations={{ locale: { args: { required: true } } }}
         submit={this.onSubmit}
       >
         {({
@@ -82,27 +75,22 @@ class NameInput extends React.Component {
             )}
             <fieldset>
               <FormField
-                label={<FormattedMessage {...messages.name} />}
-                error={errorMessages.nameError}
+                label={<FormattedMessage {...messages.locale} />}
+                error={errorMessages.localeError}
               >
-                <input
-                  type="text"
-                  onChange={handleValueChanges}
-                  value={values.name}
-                  name="name"
-                  placeholder={user.name}
-                />
-              </FormField>
-              <FormField
-                label={<FormattedMessage {...messages.surname} />}
-                error={errorMessages.surnameError}
-              >
-                <input
-                  type="text"
-                  onChange={handleValueChanges}
-                  value={values.surname}
-                  placeholder={user.surname}
-                  name="surname"
+                <Select
+                  inField
+                  options={availableLanguages}
+                  onSearch={false}
+                  value={values.locale}
+                  onChange={e => {
+                    handleValueChanges({
+                      target: {
+                        name: 'locale',
+                        value: e.value,
+                      },
+                    });
+                  }}
                 />
               </FormField>
             </fieldset>
@@ -123,4 +111,4 @@ class NameInput extends React.Component {
   }
 }
 
-export default NameInput;
+export default LocaleInput;
