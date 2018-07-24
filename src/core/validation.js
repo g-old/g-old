@@ -2,8 +2,9 @@ import { validateEmail, concatDateAndTime, utcCorrectedDate } from './helpers';
 
 export function passwordValidation(
   password,
-  values,
+  { invalidPasswords = [] },
   { minPasswordLength = 0 },
+  fieldName,
 ) {
   const pw = password.trim();
   let result = {
@@ -20,6 +21,9 @@ export function passwordValidation(
       touched: true,
       errorName: 'shortPassword',
     };
+  }
+  if (fieldName === 'passwordOld' && invalidPasswords.includes(pw)) {
+    result = { touched: true, errorName: 'wrongPassword' };
   }
   return result;
 }
@@ -180,8 +184,12 @@ export function createValidator(
         if ('valuesResolver' in allValues[curr]) {
           state = allValues[curr].valuesResolver(obj);
         }
-
-        const errors = validators[allValues[curr].fn](value, state, options);
+        const errors = validators[allValues[curr].fn](
+          value,
+          state,
+          options,
+          curr,
+        );
         // eslint-disable-next-line no-param-reassign
         acc.errors[curr] = {
           ...errors,

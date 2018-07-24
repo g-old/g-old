@@ -23,6 +23,10 @@ const NOTIFICATION_FIELDS = [
   'message',
   'statement',
 ];
+const MIN_PASSWORD_LENGTH = 6;
+
+const validatePassword = password =>
+  password && password.trim().length >= MIN_PASSWORD_LENGTH;
 
 export type UserProps = {
   id: ID,
@@ -172,10 +176,10 @@ class User {
       return { errors: ['Permission denied!'] };
     }
     // validate - if something seems corrupted, return.
-    if (data.password && data.password.trim().length <= 6)
-      return { errors: ['Wrong argument'] };
-    if (data.passwordOld && data.passwordOld.trim().length <= 6)
-      return { errors: ['Wrong argument'] };
+    if (data.password && !validatePassword(data.password))
+      return { errors: ['password-wrong-size'] };
+    if (data.passwordOld && !validatePassword(data.passwordOld))
+      return { errors: ['password-wrong-size'] };
     // TODO write fn which gets all the props with the right name
     // TODO Allow only specific updates, take care of role
     const newData = { updated_at: new Date() };
@@ -422,7 +426,7 @@ class User {
     // validate
     if (!data) return null;
     if (!canMutate(viewer, data, Models.USER)) return null;
-    let { name, surname, email, password } = data;
+    let { name, surname, email } = data;
 
     name = sanitizeName(name);
 
@@ -431,14 +435,14 @@ class User {
     email = email.trim().toLowerCase();
     if (!email) return null;
     if (!validateEmail(email)) return null;
-    password = password.trim();
-    if (!password) return null;
-    if (password.length < 6) return null;
+    if (!validatePassword(data.password)) {
+      return null;
+    }
     // eslint-disable-next-line camelcase
     // const thumbnail = `https://api.adorable.io/avatars/32/${name}${surname}.io.png`;
     // create
     // TODO check if locking with forUpdate is necessary (duplicate emails)
-    const hash = await bcrypt.hash(data.password, 10);
+    const hash = await bcrypt.hash(data.password.trim(), 10);
     if (!hash) throw Error('Something went wrong');
     const newUserData = {
       name,
