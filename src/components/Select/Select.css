@@ -41,7 +41,7 @@
 }
 
 .drop {
-  position: absolute;
+  position: fixed;
   background-color: rgba(248, 248, 248, 0.95);
   border: none;
   box-shadow: none;

@@ -20,10 +20,14 @@ type tOptions = {
   className?: string,
   context: any,
 };
+
 class Drop {
   control: any;
+
   content: any;
+
   options: tOptions;
+
   state: {
     container: any,
     control: any,
@@ -82,6 +86,7 @@ class Drop {
     // position content
     this.place();
   }
+
   listen() {
     const { scrollParents } = this.state;
     scrollParents.forEach(scrollParent => {
@@ -111,6 +116,7 @@ class Drop {
 
     this.place();
   }
+
   place() {
     const {
       control,
@@ -220,24 +226,35 @@ class Drop {
       }
     }
     /* eslint-enable prefer-destructuring */
-
+    // Old way, probably problems on mobile
     // for Chrome, Safari, and Opera, use document.body
     // for Firefox and IE, use document.documentElement
-    const scrollTop =
+    /* const scrollTop =
       (document.documentElement && document.documentElement.scrollTop) ||
       document.body.scrollTop;
 
+       container.style.left = `${left}px`;
+       container.style.width = `${width}px`;
+       // We use position:absolute and the body element's position
+       // to handle mobile browsers better. We used to use position:fixed
+       // but that didn't work on mobile browsers as well.
+       container.style.top = `${top + scrollTop}px`;
+       container.style.maxHeight = `${windowHeight - (top + scrollTop)}px`; */
     container.style.left = `${left}px`;
-    container.style.width = `${width}px`;
-    // We use position:absolute and the body element's position
-    // to handle mobile browsers better. We used to use position:fixed
-    // but that didn't work on mobile browsers as well.
-    container.style.top = `${top + scrollTop}px`;
-    container.style.maxHeight = `${windowHeight - (top + scrollTop)}px`;
+    // offset width by 0.1 to avoid a bug in ie11 that
+    // unnecessarily wraps the text if width is the same
+    container.style.width = `${width + 0.1}px`;
+    // the (position:absolute + scrollTop)
+    // is presenting issues with desktop scroll flickering
+    container.style.top = `${top}px`;
+    container.style.maxHeight = `${windowHeight - top}px`;
   }
 
   render(content) {
-    const { container, options: { context } } = this.state;
+    const {
+      container,
+      options: { context },
+    } = this.state;
     const originalScrollPosition = container.scrollTop;
     render(
       <DropContents content={content} context={context} />,
