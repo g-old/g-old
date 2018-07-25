@@ -34,15 +34,7 @@ const RequestsView = ({
       checkedIndices={[]}
       assets={requests || []}
       row={RequestRow}
-      tableHeaders={[
-        'name',
-        'request',
-        'processor',
-        'created_at',
-        'denied_at',
-        '',
-        '',
-      ]}
+      tableHeaders={['Requester', 'Created', 'Denied', 'Processor']}
     />
   );
 };

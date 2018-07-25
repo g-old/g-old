@@ -176,7 +176,8 @@ class SignUp extends React.Component {
   }
 
   onSubmit() {
-    const { validatedInputs, captchaResponse, onCreateUser } = this.state;
+    const { validatedInputs, captchaResponse } = this.state;
+    const { onCreateUser } = this.props;
     if (validatedInputs) {
       let { name, surname, email, password } = validatedInputs;
       name = name.trim();

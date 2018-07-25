@@ -2,13 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FormattedRelative } from 'react-intl';
 import TableRow from '../../components/TableRow';
-import Avatar from '../../components/Avatar';
-import Box from '../../components/Box';
+import UserThumbnail from '../../components/UserThumbnail';
 
 function RequestTableRow({
   requester,
   processor,
-  type,
   deniedAt,
   createdAt,
   id,
@@ -20,17 +18,11 @@ function RequestTableRow({
   return (
     <TableRow onClick={() => onClickMenu('EDIT', id)}>
       <td style={{ minWidth: '84px' }}>
-        <Box pad align>
-          {requester && <Avatar user={requester} />}
-          {requester && ` ${requester.name} ${requester.surname}`}
-        </Box>
+        {requester && <UserThumbnail user={requester} />}
       </td>
-      <td>
-        <span>{type}</span>
-      </td>
-      <td>{processor && `${processor.name} ${processor.surname}`}</td>
       <td>{createdAt && <FormattedRelative value={createdAt} />}</td>
       <td>{deniedAt && <FormattedRelative value={deniedAt} />}</td>
+      <td> {processor && <UserThumbnail user={processor} />}</td>
     </TableRow>
   );
 }
@@ -40,7 +32,6 @@ RequestTableRow.propTypes = {
   onClickMenu: PropTypes.func.isRequired,
   requester: PropTypes.shape({}).isRequired,
   processor: PropTypes.shape({}),
-  type: PropTypes.string.isRequired,
   deniedAt: PropTypes.string,
   id: PropTypes.string.isRequired,
 };

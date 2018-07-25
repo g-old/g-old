@@ -140,9 +140,9 @@ class Request {
       let request;
       if (data.type) {
         if (data.type === 'joinWT' || data.type === 'changeEmail') {
-          if (data.type === 'joinWT' && data.contentId) {
+          if (data.type === 'joinWT' && data.contentId && data.requesterId) {
             [request] = await knex('requests')
-              .where({ type: 'joinWT' })
+              .where({ type: 'joinWT', requester_id: data.requesterId })
               .whereRaw("content->> 'id' = ?", [data.contentId])
               .select();
           } else {

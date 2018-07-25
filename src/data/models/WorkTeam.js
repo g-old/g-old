@@ -280,7 +280,7 @@ class WorkTeam {
       // delete request ;
       const deletedRequest = await Request.delete(
         viewer,
-        { type: 'joinWT', contentId: this.id },
+        { type: 'joinWT', contentId: this.id, requesterId: requester.id },
         loaders,
       );
       if (!deletedRequest) {
