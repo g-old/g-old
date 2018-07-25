@@ -217,11 +217,13 @@ class WorkTeam {
         // insert into sessions;
         if (workTeaminDB) {
           await this.addMembershipToSessions(requester.id);
-          // update viewer
-          // eslint-disable-next-line no-param-reassign
-          viewer.wtMemberships = viewer.wtMemberships
-            ? [...viewer.wtMemberships, this.id]
-            : [this.id];
+          if (!memberId) {
+            // update viewer
+            // eslint-disable-next-line no-param-reassign
+            viewer.wtMemberships = viewer.wtMemberships
+              ? [...viewer.wtMemberships, this.id]
+              : [this.id];
+          }
         }
         // TODO  should be sent via sse too in case viewer != requester.
         return workTeaminDB;

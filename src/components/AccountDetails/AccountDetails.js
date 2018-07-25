@@ -128,9 +128,9 @@ class AccountDetails extends React.Component {
     };
   }
 
-  componentDidMount(props) {
+  componentDidMount() {
     const { fetchUser: loadUser, accountId } = this.props;
-    if (props && props.accountId) {
+    if (accountId) {
       loadUser({ id: accountId });
     }
   }

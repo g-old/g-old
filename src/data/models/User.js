@@ -605,11 +605,19 @@ class User {
                 .where({ requester_id: data.id })
                 .del();
               // wt memberships
-              await knex('user_work_teams')
+              const workTeamIds = await knex('user_work_teams')
                 .transacting(transaction)
                 .forUpdate()
                 .where({ user_id: data.id })
-                .del();
+                .del()
+                .returning('work_team_id');
+              if (workTeamIds && workTeamIds.length) {
+                await knex('work_teams')
+                  .transacting(transaction)
+                  .forUpdate()
+                  .whereIn('id', workTeamIds)
+                  .decrement('num_members', 1);
+              }
               // messages
               // ???
 

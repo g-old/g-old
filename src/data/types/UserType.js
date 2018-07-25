@@ -206,7 +206,12 @@ const UserType = new ObjectType({
           ? knex('notification_settings')
               .where({ user_id: parent.id })
               .select('settings')
-              .then(([data]) => JSON.stringify(data.settings || {}))
+              .then(
+                ([data]) =>
+                  data
+                    ? JSON.stringify(data.settings || {})
+                    : JSON.stringify({}),
+              )
           : {},
     },
   }),
