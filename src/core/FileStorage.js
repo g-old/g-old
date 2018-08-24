@@ -75,9 +75,9 @@ const deleteFromCloudinary = async ({ viewer, data: { id, thumbnail } }) => {
 // TODO Integrate with Usermodel!
 
 const saveToCloudinary = async ({ viewer, data: { dataUrl, id }, loaders }) => {
-  if (!canMutate(viewer, { dataUrl, id }, Models.USER)) return null;
   const userId = id || viewer.id;
   const user = await User.gen(viewer, userId, loaders);
+  if (!canMutate(viewer, { dataUrl, id, user }, Models.USER)) return null;
   if (user.thumbnail) {
     /*  if (user.avatar.indexOf('cloudinary') !== -1) {
       throw new Error('Avatar already set');
@@ -88,7 +88,7 @@ const saveToCloudinary = async ({ viewer, data: { dataUrl, id }, loaders }) => {
   const matches = dataUrl.match(regex);
   const img = matches[2];
 
-  const buffer = new Buffer(img, 'base64');
+  const buffer = Buffer.from(img, 'base64');
 
   // update
   // utf8 encoding! Problem?
@@ -98,10 +98,7 @@ const saveToCloudinary = async ({ viewer, data: { dataUrl, id }, loaders }) => {
   if (user.thumbnail && user.thumbnail.indexOf('adorable') === -1) {
     const publicId = getPublicIdFromUrl(user.thumbnail);
     await deleteFileOnCloudinary(publicId).catch(err => {
-      log.error(
-        { err, viewer, data: { dataUrl, id } },
-        'Cloudinary delete error',
-      );
+      log.error({ err, viewer, data: { id } }, 'Cloudinary delete error');
     });
   }
 
@@ -178,9 +175,10 @@ const saveLocal = async (
   folder,
 ) => {
   // throw Error('TEST');
-  if (!canMutate(viewer, { dataUrl, id }, Models.USER)) return null;
   const userId = id || viewer.id;
   const user = await User.gen(viewer, userId, loaders);
+  if (!canMutate(viewer, { dataUrl, id, user }, Models.USER)) return null;
+
   if (user.thumbnail) {
     if (user.thumbnail.indexOf('cloudinary') !== -1) {
       //  throw new Error('Avatar already set');
@@ -202,7 +200,7 @@ const saveLocal = async (
     `c_scale,w_32,h_32/`,
     name,
   );
-  const buffer = new Buffer(img, 'base64');
+  const buffer = Buffer.from(img, 'base64');
   await sharp(buffer)
     .resize(32)
     .toBuffer()

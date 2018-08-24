@@ -130,7 +130,7 @@ function userWriteControl(viewer, data) {
       !data.groups &&
       (data.thumbnail || data.dataUrl || data.name || data.surname)
     ) {
-      if (viewer.groups === Groups.GUEST || isAdmin(viewer)) return true;
+      if (data.user.groups === Groups.GUEST || isAdmin(viewer)) return true;
     }
     if (data.groups != null) {
       if (

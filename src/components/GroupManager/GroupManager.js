@@ -82,6 +82,7 @@ class GroupManager extends React.Component {
       pending: PropTypes.bool,
     }),
   };
+
   static defaultProps = {
     updates: {},
   };
@@ -94,12 +95,13 @@ class GroupManager extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    const { user, updates } = this.props;
     if (nextProps.updates && nextProps.updates.error) {
-      const old = this.props.updates || {};
+      const old = updates || {};
       this.setState({ error: !old.error });
     }
     if (nextProps !== this.props) {
-      this.availableGroups = getAvailableGroups(this.props.user);
+      this.availableGroups = getAvailableGroups(user);
       const newState = calcState(
         this.availableGroups,
         nextProps.account.groups,
@@ -109,30 +111,34 @@ class GroupManager extends React.Component {
   }
 
   onChange(e) {
-    const {
-      user,
-      account: { groups, id, emailVerified, workTeams, thumbnail },
-    } = this.props;
+    const { user, account, updateFn } = this.props;
     // TODO VALIDATION FN
     // dont allow change from guest if no profile, no workteam and no email verification
     /* eslint-disable no-bitwise */
+    const { emailVerified, thumbnail, groups, id } = account;
     if (
       (user.groups & (Groups.ADMIN | Groups.SUPER_USER)) > 0 ||
-      (emailVerified && thumbnail && workTeams && workTeams.length)
+      (emailVerified && thumbnail)
     ) {
+      // eslint-disable-next-line react/destructuring-assignment
       if (this.state[e.target.name].status === true) {
         // remove
+        // eslint-disable-next-line react/destructuring-assignment
         if (groups & this.state[e.target.name].value) {
           const updatedGroups = groups & ~Groups[e.target.name];
-          if (canChangeGroups(user, this.props.account, updatedGroups)) {
-            this.props.updateFn({ id, groups: updatedGroups });
+          if (canChangeGroups(user, account, updatedGroups)) {
+            updateFn({
+              id,
+              groups: updatedGroups,
+            });
           }
         }
+        // eslint-disable-next-line react/destructuring-assignment
       } else if ((groups & this.state[e.target.name].value) === 0) {
         // assign
         const updatedGroups = groups | Groups[e.target.name];
-        if (canChangeGroups(user, this.props.account, updatedGroups)) {
-          this.props.updateFn({ id, groups: updatedGroups });
+        if (canChangeGroups(user, account, updatedGroups)) {
+          updateFn({ id, groups: updatedGroups });
         }
       }
     }
@@ -142,6 +148,7 @@ class GroupManager extends React.Component {
   render() {
     let promoteButton = null;
     const { user, updates, account } = this.props;
+    const { error } = this.state;
     if (
       (user.privileges & Groups.MEMBER_MANAGER) > 0 && // eslint-disable-line no-bitwise
       account.groups === Groups.GUEST
@@ -151,12 +158,13 @@ class GroupManager extends React.Component {
           primary
           label={<FormattedMessage {...messages.unlock} />}
           onClick={() =>
-            this.onChange({ target: { name: getGroupName(Groups.VIEWER) } })}
+            this.onChange({ target: { name: getGroupName(Groups.VIEWER) } })
+          }
         />
       );
     }
 
-    const error = this.state.error && <FormattedMessage {...messages.error} />;
+    const errorMessage = error && <FormattedMessage {...messages.error} />;
     let input;
     if (promoteButton) {
       input = promoteButton;
@@ -164,13 +172,14 @@ class GroupManager extends React.Component {
       input = (
         <FormField
           label={<FormattedMessage {...messages.role} />}
-          error={error}
+          error={errorMessage}
         >
           {!promoteButton &&
             this.availableGroups.map(r => (
               <CheckBox
                 label={r}
                 disabled={updates && updates.pending}
+                // eslint-disable-next-line
                 checked={this.state[r].status}
                 onChange={this.onChange}
                 name={r}

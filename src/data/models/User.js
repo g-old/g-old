@@ -172,7 +172,9 @@ class User {
     // throw Error('TESTERROR');
     const errors = [];
     if (!data.id) return { errors: ['Arguments missing'] };
-    if (!canMutate(viewer, data, Models.USER)) {
+    const userInDB = await User.gen(viewer, data.id, loaders);
+
+    if (!canMutate(viewer, { ...data, user: userInDB }, Models.USER)) {
       return { errors: ['Permission denied!'] };
     }
     // validate - if something seems corrupted, return.
@@ -293,14 +295,12 @@ class User {
       if (!hash) throw Error('Hash generation failed');
       newData.password_hash = hash;
     }
-    let userInDB;
 
     if (data.groups != null) {
       // check i valid roles
       /* eslint-disable no-bitwise */
       const groups = Number(data.groups);
       // TODO make it a member method - pro -cons?
-      userInDB = await User.gen(viewer, data.id, loaders);
       if (!canChangeGroups(viewer, userInDB, groups)) {
         log.warn({ data, viewer }, 'Group change denied!');
         return { user: null, errors: ['Permission denied'] };
