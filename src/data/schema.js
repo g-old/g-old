@@ -81,6 +81,7 @@ import clearNotifications from './mutations/clearNotifications';
 import message from './queries/message';
 import messageConnection from './queries/messageConnection';
 import discussionConnection from './queries/discussionConnection';
+import activityConnection from './queries/activityConnection';
 
 /* GENERATOR */
 
@@ -113,6 +114,7 @@ const schema = new Schema({
       discussionConnection,
       message,
       messageConnection,
+      activityConnection,
       /* GENERATOR_QUERIES */
     },
   }),

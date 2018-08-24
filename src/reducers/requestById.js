@@ -4,6 +4,7 @@ import {
   UPDATE_REQUEST_SUCCESS,
   LOAD_WORKTEAM_SUCCESS,
   FETCH_USER_SUCCESS,
+  LOAD_ACTIVITIES_SUCCESS,
 } from '../constants';
 
 const parseRequests = requests =>
@@ -25,6 +26,7 @@ export default function byId(state = {}, action) {
     case UPDATE_REQUEST_SUCCESS:
     case LOAD_WORKTEAM_SUCCESS:
     case FETCH_USER_SUCCESS:
+    case LOAD_ACTIVITIES_SUCCESS:
     case CREATE_REQUEST_SUCCESS: {
       return action.payload.entities.requests
         ? {

@@ -162,14 +162,17 @@ export function createSSESub() {
                 message.data.activities,
                 activitySchema,
               );
-              let filter = null;
+              let proposalFilter = null;
               if (message.data.activities.type === 'proposal') {
-                filter = getFilter(message.data.activities.object.state);
+                proposalFilter = getFilter(
+                  message.data.activities.object.state,
+                );
               }
               dispatch({
                 type: SSE_UPDATE_SUCCESS,
                 payload: normalizedData,
-                filter,
+                proposalFilter,
+                filter: 'feed',
                 userId: user.id,
               });
               break;

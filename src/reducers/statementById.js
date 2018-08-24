@@ -14,6 +14,7 @@ import {
   LOAD_FEED_SUCCESS,
   SSE_UPDATE_SUCCESS,
   LOAD_NOTIFICATIONS_SUCCESS,
+  LOAD_ACTIVITIES_SUCCESS,
 } from '../constants';
 
 export default function statements(state = {}, action) {
@@ -51,6 +52,7 @@ export default function statements(state = {}, action) {
       }
       return merge({}, state, action.payload.entities.statements);
     }
+    case LOAD_ACTIVITIES_SUCCESS:
     case LOAD_FEED_SUCCESS: {
       return merge({}, state, action.payload.entities.statements);
     }

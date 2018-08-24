@@ -16,6 +16,7 @@ import {
   UPDATE_PROPOSAL_SUCCESS,
   LOAD_WORKTEAM_SUCCESS,
   SSE_UPDATE_SUCCESS,
+  LOAD_ACTIVITIES_SUCCESS,
 } from '../constants';
 
 const updatePolls = (state, action) => {
@@ -101,11 +102,8 @@ export default function polls(state = {}, action) {
       // return [...new Set([...state, ...newEntries])];
       return {
         ...state,
-        [action.id]: {
-          ...state[action.id],
-          votes: [...action.payload.result], // TODO merge!
-        },
-      };
+        [action.id]: { ...state[action.id], votes: [...action.payload.result] },
+      }; // TODO merge!
     case LOAD_NOTIFICATIONS_SUCCESS:
     case UPDATE_PROPOSAL_SUCCESS:
     case CREATE_PROPOSAL_SUCCESS:
@@ -126,6 +124,7 @@ export default function polls(state = {}, action) {
     case LOAD_PROPOSAL_LIST_SUCCESS: {
       return merge({}, state, action.payload.entities.polls);
     }
+    case LOAD_ACTIVITIES_SUCCESS:
     case LOAD_FEED_SUCCESS: {
       return merge({}, state, action.payload.entities.polls);
     }
@@ -195,7 +194,8 @@ export default function polls(state = {}, action) {
           ...state[statement.pollId],
           ownStatement: null,
           statements: state[statement.pollId].statements.filter(
-            id => id != statement.id, // eslint-disable-line eqeqeq
+            // eslint-disable-next-line eqeqeq
+            id => id != statement.id,
           ),
         },
       };
@@ -206,24 +206,19 @@ export default function polls(state = {}, action) {
       likedStatements = [...likedStatements, action.payload.result];
       return {
         ...state,
-        [action.pollId]: {
-          ...state[action.pollId],
-          likedStatements,
-        },
+        [action.pollId]: { ...state[action.pollId], likedStatements },
       };
     }
 
     case DELETE_LIKE_SUCCESS: {
       let likedStatements = state[action.pollId].likedStatements || [];
       likedStatements = likedStatements.filter(
-        id => id != action.payload.result, // eslint-disable-line eqeqeq
+        // eslint-disable-next-line eqeqeq
+        id => id != action.payload.result,
       );
       return {
         ...state,
-        [action.pollId]: {
-          ...state[action.pollId],
-          likedStatements,
-        },
+        [action.pollId]: { ...state[action.pollId], likedStatements },
       };
     }
 

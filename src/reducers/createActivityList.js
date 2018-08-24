@@ -3,38 +3,40 @@ import {
   LOAD_FEED_SUCCESS,
   LOAD_FEED_START,
   LOAD_FEED_ERROR,
+  LOAD_ACTIVITIES_START,
+  LOAD_ACTIVITIES_SUCCESS,
+  LOAD_ACTIVITIES_ERROR,
   SSE_UPDATE_SUCCESS,
 } from '../constants';
-
-// TODO handle DELETE_USER
 
 const createList = filter => {
   const ids = (state = [], action) => {
     switch (action.type) {
+      case LOAD_ACTIVITIES_SUCCESS:
       case LOAD_FEED_SUCCESS: {
-        if (filter) {
-          return action.log
-            ? [...new Set([...action.payload.result, ...state])]
-            : state;
-        }
-        return action.log
-          ? state
-          : [...new Set([...action.payload.result, ...state])];
+        return filter === action.filter
+          ? [...new Set([...action.payload.result, ...state])]
+          : state;
       }
       case SSE_UPDATE_SUCCESS: {
-        return filter ? state : [action.payload.result, ...state];
+        return filter === action.filter
+          ? [action.payload.result, ...state]
+          : state;
       }
       default:
         return state;
     }
   };
   const isFetching = (state = false, action) => {
-    if (filter) {
-      if (!action.log) return state;
-    } else if (action.log) return state;
+    if (action.filter !== filter) {
+      return state;
+    }
     switch (action.type) {
+      case LOAD_ACTIVITIES_START:
       case LOAD_FEED_START:
         return true;
+      case LOAD_ACTIVITIES_SUCCESS:
+      case LOAD_ACTIVITIES_ERROR:
       case LOAD_FEED_SUCCESS:
       case LOAD_FEED_ERROR:
         return false;
@@ -44,13 +46,16 @@ const createList = filter => {
   };
 
   const errorMessage = (state = null, action) => {
-    if (filter) {
-      if (!action.log) return state;
-    } else if (action.log) return state;
+    if (action.filter !== filter) {
+      return state;
+    }
 
     switch (action.type) {
+      case LOAD_ACTIVITIES_ERROR:
       case LOAD_FEED_ERROR:
         return action.message;
+      case LOAD_ACTIVITIES_START:
+      case LOAD_ACTIVITIES_SUCCESS:
       case LOAD_FEED_START:
       case LOAD_FEED_SUCCESS:
         return null;

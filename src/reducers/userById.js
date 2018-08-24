@@ -28,6 +28,7 @@ import {
   LOAD_MESSAGES_SUCCESS,
   UPDATE_NOTIFICATION_SUCCESS,
   CLEAR_NOTIFICATIONS_SUCCESS,
+  LOAD_ACTIVITIES_SUCCESS,
 } from '../constants';
 
 const handleUsers = (state, action) => {
@@ -95,6 +96,7 @@ export default function byId(state = {}, action) {
     case LOAD_WORKTEAM_SUCCESS:
     case LOAD_MESSAGE_SUCCESS:
     case LOAD_MESSAGES_SUCCESS:
+    case LOAD_ACTIVITIES_SUCCESS:
     case SESSION_LOGIN_SUCCESS: {
       return merge({}, state, action.payload.entities.users);
     }

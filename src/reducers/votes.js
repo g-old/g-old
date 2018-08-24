@@ -9,6 +9,7 @@ import {
   CREATE_STATEMENT_SUCCESS,
   LOAD_FLAGGEDSTMTS_SUCCESS,
   LOAD_FEED_SUCCESS,
+  LOAD_ACTIVITIES_SUCCESS,
   SSE_UPDATE_SUCCESS,
 } from '../constants';
 
@@ -18,6 +19,7 @@ export default function votes(state = {}, action) {
       return merge({}, state, action.payload.entities.votes);
     case LOAD_VOTES_SUCCESS:
       return merge({}, state, action.payload.entities.votes);
+    case LOAD_ACTIVITIES_SUCCESS:
     case LOAD_FEED_SUCCESS:
       return merge({}, state, action.payload.entities.votes);
     case LOAD_FLAGGEDSTMTS_SUCCESS: {

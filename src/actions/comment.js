@@ -24,7 +24,7 @@ import {
 import { genStatusIndicators } from '../core/helpers';
 import { subscriptionFields } from './subscription';
 
-const commentFields = `
+export const commentFields = `
 id
 parentId
 content

@@ -4,11 +4,12 @@ import { denormalize } from 'normalizr';
 import byId from './activityById';
 // import allIds, * as fromList from './activityList';
 import createList, * as fromList from './createActivityList';
-import { activityArray as activityArraySchema } from './../store/schema';
+import { activityArray as activityArraySchema } from '../store/schema';
 
 const listByFilter = combineReducers({
-  all: createList(),
-  log: createList(true),
+  feed: createList('feed'),
+  log: createList('log'),
+  all: createList('all'),
 });
 
 export default combineReducers({
@@ -28,6 +29,7 @@ const hydrateActivities = (state, data, entities) =>
       statements: entities.statements.byId,
       comments: entities.comments.byId,
       discussions: entities.discussions.byId,
+      messages: entities.messages.byId,
     },
   );
 

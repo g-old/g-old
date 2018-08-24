@@ -8,11 +8,13 @@ import {
   SSE_UPDATE_SUCCESS,
   LOAD_WORKTEAM_SUCCESS,
   LOAD_NOTIFICATIONS_SUCCESS,
+  LOAD_ACTIVITIES_SUCCESS,
 } from '../constants';
 
 export default function pollingModes(state = {}, action) {
   switch (action.type) {
     case LOAD_FEED_SUCCESS:
+    case LOAD_ACTIVITIES_SUCCESS:
     case LOAD_PROPOSAL_SUCCESS:
     case CREATE_PROPOSAL_SUCCESS:
     case UPDATE_PROPOSAL_SUCCESS:

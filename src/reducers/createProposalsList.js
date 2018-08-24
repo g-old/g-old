@@ -41,7 +41,7 @@ const createList = filter => {
         if (!activity.type === 'proposal') {
           return state;
         }
-        return filter === action.filter
+        return filter === action.proposalFilter
           ? [...new Set([activity.objectId, ...state])]
           : state;
       }

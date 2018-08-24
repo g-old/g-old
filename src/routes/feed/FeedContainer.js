@@ -22,7 +22,7 @@ class FeedContainer extends React.Component {
       }),
     ).isRequired,
     isFetching: PropTypes.bool.isRequired,
-    loadFeed: PropTypes.func.isRequired,
+    fetchFeed: PropTypes.func.isRequired,
     errorMessage: PropTypes.string,
     locale: PropTypes.string.isRequired,
   };
@@ -30,9 +30,15 @@ class FeedContainer extends React.Component {
   static defaultProps = {
     errorMessage: '',
   };
-  isReady() {
-    // Probably superflue bc we are awaiting the LOAD_PROPOSAL_xxx flow
-    return this.props.activities != null;
+
+  constructor(props) {
+    super(props);
+    this.fetchFeed = this.fetchFeed.bind(this);
+  }
+
+  fetchFeed() {
+    const { fetchFeed } = this.props;
+    fetchFeed();
   }
 
   render() {
@@ -51,12 +57,7 @@ class FeedContainer extends React.Component {
     }
 
     if (errorMessage && !activities.length) {
-      return (
-        <FetchError
-          message={errorMessage}
-          onRetry={() => this.props.loadFeed()}
-        />
-      );
+      return <FetchError message={errorMessage} onRetry={this.fetchFeed} />;
     }
 
     const outDated = {};
@@ -139,16 +140,17 @@ class FeedContainer extends React.Component {
 }
 // TODO implement memoiziation with reselect
 const mapStateToProps = state => ({
-  activities: getActivities(state, 'all'),
-  isFetching: getFeedIsFetching(state, 'all'),
-  errorMessage: getFeedErrorMessage(state, 'all'),
+  activities: getActivities(state, 'feed'),
+  isFetching: getFeedIsFetching(state, 'feed'),
+  errorMessage: getFeedErrorMessage(state, 'feed'),
   locale: state.intl.locale,
 });
 
 const mapDispatch = {
-  loadFeed,
+  fetchFeed: loadFeed,
 };
 
-export default connect(mapStateToProps, mapDispatch)(
-  withstyles(s)(FeedContainer),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(withstyles(s)(FeedContainer));

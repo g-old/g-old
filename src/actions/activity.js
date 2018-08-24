@@ -1,36 +1,30 @@
 /* eslint-disable import/prefer-default-export */
 import { normalize } from 'normalizr';
 import {
-  LOAD_FEED_START,
-  LOAD_FEED_SUCCESS,
-  LOAD_FEED_ERROR,
+  LOAD_ACTIVITIES_START,
+  LOAD_ACTIVITIES_SUCCESS,
+  LOAD_ACTIVITIES_ERROR,
 } from '../constants';
 
 import { activityArray as activitiesSchema } from '../store/schema';
-import { getFeedIsFetching, getSessionUser } from '../reducers';
+import { getFeedIsFetching } from '../reducers';
+import { userFields } from './user';
+import { commentFields } from './comment';
 import { pollFieldsForList } from './proposal';
+import { requestFields } from './request';
+import { messageFields } from './message';
+import { genActivityPageKey } from '../reducers/pageInfo';
 
-const userFields = `
-id
-name
-surname
-thumbnail`;
-
-const commentFields = `
-id
-parentId
-content
-numReplies
-discussionId
-createdAt
-editedAt
-author{
-${userFields}
-}
-`;
-
-export const activityFields = `
-id
+const activityConnection = `
+query($first:Int, $after:String, $filter:ActivityFilter){
+  activityConnection(first:$first after:$after, filterBy:$filter){
+    pageInfo{
+      endCursor
+      hasNextPage
+    }
+    edges{
+      node{
+        id
   type
   objectId
   verb
@@ -44,6 +38,15 @@ id
   }
   object {
     __typename
+    ... on Request {
+      ${requestFields}
+    }
+    ... on Message {
+      ${messageFields}
+    }
+    ... on User {
+      ${userFields}
+    }
     ... on Discussion {
       id
       createdAt
@@ -109,47 +112,51 @@ id
       }
     }
 
-  }`;
-const feed = `
-query($userId:ID){
-  feed (userId:$userId) {
-  ${activityFields}
+  }
+      }
+    }
+  }
 }
-}
+
 `;
-export function loadFeed(log) {
+export function loadActivities({ after, filter }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
     const state = await getState();
-    if (getFeedIsFetching(state, log ? 'log' : 'feed')) {
+    if (getFeedIsFetching(state, 'all')) {
       return false;
     }
-    let userId;
-    if (log) {
-      userId = getSessionUser(state).id;
-    }
+    const pageKey = genActivityPageKey();
     dispatch({
-      type: LOAD_FEED_START,
-      log,
-      filter: log ? 'log' : 'feed',
+      type: LOAD_ACTIVITIES_START,
+      filter: 'all',
+      pageKey,
     });
 
     try {
-      const { data } = await graphqlRequest(feed, { userId });
-      const normalizedData = normalize(data.feed, activitiesSchema);
+      const { data } = await graphqlRequest(activityConnection, {
+        after,
+        filter,
+      });
+      const activities = data.activityConnection.edges.map(p => p.node);
+
+      const normalizedData = normalize(activities, activitiesSchema);
       dispatch({
-        type: LOAD_FEED_SUCCESS,
+        type: LOAD_ACTIVITIES_SUCCESS,
         payload: normalizedData,
-        filter: log ? 'log' : 'feed',
+        filter: 'all',
+        pageKey,
+        pagination: data.activityConnection.pageInfo,
       });
     } catch (error) {
       dispatch({
-        type: LOAD_FEED_ERROR,
+        type: LOAD_ACTIVITIES_ERROR,
         payload: {
           error,
         },
         message: error.message || 'Something went wrong',
-        filter: log ? 'log' : 'feed',
+        filter: 'all',
+        pageKey,
       });
       return false;
     }

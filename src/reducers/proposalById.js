@@ -10,6 +10,7 @@ import {
   LOAD_NOTIFICATIONS_SUCCESS,
   CREATE_SUBSCRIPTION_SUCCESS,
   DELETE_SUBSCRIPTION_SUCCESS,
+  LOAD_ACTIVITIES_SUCCESS,
 } from '../constants';
 
 export default function byId(state = {}, action) {
@@ -20,6 +21,7 @@ export default function byId(state = {}, action) {
     };
   } */
   switch (action.type) {
+    case LOAD_ACTIVITIES_SUCCESS:
     case LOAD_FEED_SUCCESS: {
       return merge({}, state, action.payload.entities.proposals);
     }

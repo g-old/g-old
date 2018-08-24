@@ -6,6 +6,9 @@ import {
   LOAD_USERS_START,
   LOAD_USERS_SUCCESS,
   LOAD_USERS_ERROR,
+  LOAD_ACTIVITIES_START,
+  LOAD_ACTIVITIES_SUCCESS,
+  LOAD_ACTIVITIES_ERROR,
 } from '../constants';
 
 const handlePageInfo = (state, action) => {
@@ -75,6 +78,11 @@ export default combineReducers({
     LOAD_USERS_SUCCESS,
     LOAD_USERS_ERROR,
   ]),
+  activities: createPageInfo([
+    LOAD_ACTIVITIES_START,
+    LOAD_ACTIVITIES_SUCCESS,
+    LOAD_ACTIVITIES_ERROR,
+  ]),
 });
 
 export const genProposalPageKey = ({
@@ -87,6 +95,7 @@ export const genProposalPageKey = ({
 export const genUsersPageKey = ({ union = false, group = 'group' }) =>
   `${group}$${union}`;
 
+export const genActivityPageKey = () => `$activity$`;
 export const getPageInfo = (state, resource, pageKey) => {
   const data = state[resource][pageKey] || {
     errorMessage: null,

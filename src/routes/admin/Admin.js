@@ -17,6 +17,7 @@ import ProposalPanel from '../../components/ProposalPanel';
 import SupervisionPanel from '../../components/SupervisionPanel';
 import TechPanel from '../../components/TechPanel';
 import WorkTeamPanel from '../../components/WorkTeamPanel';
+import ActivityPanel from '../../components/ActivityPanel';
 
 class Admin extends React.Component {
   static propTypes = {};
@@ -39,6 +40,9 @@ class Admin extends React.Component {
           </Tab>
           <Tab title="WORKTEAMS">
             <WorkTeamPanel />
+          </Tab>
+          <Tab title="ACTIVITIES">
+            <ActivityPanel />
           </Tab>
         </Tabs>
       </div>
