@@ -169,7 +169,7 @@ class ActivityLayer extends React.Component {
                 <span className={s.key}>Operation</span>
                 <span>
                   {infoData.diff}
-                  {infoData.added ? ' added' : 'removed'}
+                  {infoData.added ? ' added' : ' removed'}
                 </span>
               </div>,
             );
@@ -212,7 +212,7 @@ class ActivityLayer extends React.Component {
         details.push(
           <div className={s.data}>
             <span className={s.key}>Content</span>
-            dataObject{' '}
+            <span>{dataObject.text} </span>
           </div>,
         );
         break;

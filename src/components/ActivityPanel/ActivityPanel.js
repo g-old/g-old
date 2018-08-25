@@ -79,11 +79,17 @@ class ActivityPanel extends React.Component {
   handleFilterChange(data) {
     this.setState(prevState => {
       if (prevState.filter[data.type]) {
+        let toDelete;
+        if (prevState.filter.objectId && data.type === 'type') {
+          toDelete = true;
+        }
+
         const { [data.type]: omit, ...filter } = prevState.filter;
         return {
           filter: {
             ...filter,
             ...(omit === data.value ? [] : { [data.type]: data.value }),
+            ...(toDelete ? { objectId: undefined } : []),
           },
         };
       }

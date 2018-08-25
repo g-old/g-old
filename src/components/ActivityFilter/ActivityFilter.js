@@ -31,7 +31,9 @@ class ActivityFilter extends React.Component {
 
     onSelect({ type: field, value: values[field] });
     if (field === 'actorId') {
-      this.searchField.reset();
+      this.searchFieldUsers.reset();
+    } else if (field === 'objectId' || field === 'USER') {
+      this.searchFieldObjects.reset();
     }
   }
 
@@ -112,9 +114,8 @@ class ActivityFilter extends React.Component {
             {this.renderResetButton('actorId')}
           </span>
           <FormField overflow label="Username">
-            <SearchField
-              // eslint-disable-next-line no-return-assign
-              onRef={elm => (this.searchField = elm)}
+            <SearchField // eslint-disable-next-line no-return-assign
+              onRef={elm => (this.searchFieldUsers = elm)}
               data={userData}
               fetch={fetchUser}
               displaySelected={data =>
@@ -122,6 +123,24 @@ class ActivityFilter extends React.Component {
               }
             />
           </FormField>
+          {values.type === 'USER' && (
+            <Box column>
+              <span>
+                <Label>Object</Label>
+                {this.renderResetButton('objectId')}
+              </span>
+              <FormField overflow label="Username">
+                <SearchField // eslint-disable-next-line no-return-assign
+                  onRef={elm => (this.searchFieldObjects = elm)}
+                  data={userData}
+                  fetch={fetchUser}
+                  displaySelected={data =>
+                    onSelect({ type: 'objectId', value: data.id })
+                  }
+                />
+              </FormField>
+            </Box>
+          )}
         </Box>
       </Box>
     );
