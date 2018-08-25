@@ -79,7 +79,7 @@ class AccountList extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  userList: getVisibleUsers(state, 'all'),
+  userList: getVisibleUsers(state, ACTIVE_USER),
   pageInfo: getResourcePageInfo(
     state,
     'users',

@@ -7,6 +7,8 @@ import CheckBox from '../CheckBox';
 import Label from '../Label';
 import SearchField from '../SearchField';
 import Button from '../Button';
+import FormField from '../FormField';
+
 import { ICONS } from '../../constants';
 
 class ActivityFilter extends React.Component {
@@ -109,15 +111,17 @@ class ActivityFilter extends React.Component {
             <Label>Actor</Label>
             {this.renderResetButton('actorId')}
           </span>
-          <SearchField
-            // eslint-disable-next-line no-return-assign
-            onRef={elm => (this.searchField = elm)}
-            data={userData}
-            fetch={fetchUser}
-            displaySelected={data =>
-              onSelect({ type: 'actorId', value: data.id })
-            }
-          />
+          <FormField overflow label="Username">
+            <SearchField
+              // eslint-disable-next-line no-return-assign
+              onRef={elm => (this.searchField = elm)}
+              data={userData}
+              fetch={fetchUser}
+              displaySelected={data =>
+                onSelect({ type: 'actorId', value: data.id })
+              }
+            />
+          </FormField>
         </Box>
       </Box>
     );
