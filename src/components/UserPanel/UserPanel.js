@@ -17,7 +17,6 @@ import FormField from '../FormField';
 import Layer from '../Layer';
 import UserListEntry from './UserListEntry';
 import { Groups } from '../../organization';
-import MessageInput from '../MessageInput';
 import {
   getVisibleUsers,
   getUsersStatus,
@@ -121,9 +120,6 @@ class UserPanel extends React.Component {
       user,
       findUser: fetchUser,
       updateUser: mutateUser,
-      updateMessage: mutateMessage,
-      createMessage: makeMessage,
-      messageUpdates,
       loadUserList: loadUsers,
     } = this.props;
     const { showAccount, accountId } = this.state;
@@ -153,17 +149,6 @@ class UserPanel extends React.Component {
         )}
         <div style={{ width: '100%' }}>
           <Accordion openMulti>
-            <AccordionPanel
-              heading={<FormattedMessage {...messages.messages} />}
-            >
-              <MessageInput
-                updateMessage={mutateMessage}
-                draftMode
-                messageType="NOTE"
-                notifyUser={makeMessage}
-                updates={messageUpdates}
-              />
-            </AccordionPanel>
             <AccordionPanel
               heading="Guest accounts"
               onActive={() => {
