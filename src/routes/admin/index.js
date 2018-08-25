@@ -19,7 +19,8 @@ async function action({ store, path }) {
   const user = getSessionUser(store.getState());
   if (!user) {
     return { redirect: `/?redirect=${path}` };
-  } else if (!canAccess(user, title)) {
+  }
+  if (!canAccess(user, title)) {
     return { component: <div> You have to login as admin or mod!</div> };
   }
 
@@ -28,7 +29,7 @@ async function action({ store, path }) {
     chunks: ['admin'],
     component: (
       <Layout>
-        <Admin title={title} />
+        <Admin title={title} user={user} />
       </Layout>
     ),
   };
