@@ -14,6 +14,7 @@ import { pollFieldsForList } from './proposal';
 import { requestFields } from './request';
 import { messageFields } from './message';
 import { genActivityPageKey } from '../reducers/pageInfo';
+import { workTeamFields } from './workTeam';
 
 const activityConnection = `
 query($first:Int, $after:String, $filter:ActivityFilter){
@@ -43,6 +44,15 @@ query($first:Int, $after:String, $filter:ActivityFilter){
     }
     ... on Message {
       ${messageFields}
+      recipientType
+      recipients{
+        ... on User{
+          ${userFields}
+        }
+        ... on WorkTeam{
+          ${workTeamFields}
+        }
+      }
     }
     ... on User {
       ${userFields}
@@ -146,6 +156,7 @@ export function loadActivities({ after, filter }) {
         payload: normalizedData,
         filter: 'all',
         pageKey,
+        purge: !after,
         pagination: data.activityConnection.pageInfo,
       });
     } catch (error) {

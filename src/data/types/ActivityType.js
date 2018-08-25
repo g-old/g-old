@@ -17,6 +17,7 @@ import Vote from '../models/Vote';
 import Discussion from '../models/Discussion';
 import Comment from '../models/Comment';
 import WorkTeam from '../models/WorkTeam';
+import Request from '../models/Request';
 import { ActivityType as AType } from '../models/Activity';
 
 const addProposalInfo = async (viewer, loaders, pollId) => {
@@ -170,6 +171,9 @@ const ActivityType = new GraphQLObjectType({
         }
         if (parent.type === AType.USER) {
           return User.gen(viewer, parent.objectId, loaders);
+        }
+        if (parent.type === AType.REQUEST) {
+          return Request.gen(viewer, parent.objectId, loaders);
         }
         return null;
       },

@@ -31,7 +31,11 @@ export const createConnection = (
     const first = args.first || 10;
     const after = args.after || '';
     const [cursorDate, cursorId] = extractCursors(after);
-    const data = await resolverFn(cursorDate, cursorId, first, args);
+    const data = await resolverFn(
+      viewer,
+      { cursorDate, cursorId, batchSize: first },
+      args,
+    );
 
     const queries = data.map(p => resultModel.gen(viewer, p.id, loaders));
     const dataSet = data.reduce((acc, curr) => {

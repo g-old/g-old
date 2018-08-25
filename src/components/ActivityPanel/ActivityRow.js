@@ -11,7 +11,13 @@ function ActivityTableRow({ type, onClickMenu, verb, actor, createdAt }) {
   /* eslint-disable jsx-a11y/click-events-have-key-events */
   /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
   return (
-    <TableRow onClick={() => onClickMenu('SHOW')}>
+    <TableRow
+      onClick={e => {
+        e.stopPropagation();
+        e.preventDefault();
+        onClickMenu('SHOW');
+      }}
+    >
       <td style={{ textAlign: 'left' }}>
         <UserThumbnail user={actor} />
       </td>

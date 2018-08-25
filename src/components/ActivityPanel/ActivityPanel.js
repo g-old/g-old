@@ -8,11 +8,18 @@ import s from './ActivityPanel.css';
 import Box from '../Box';
 import { genActivityPageKey } from '../../reducers/pageInfo';
 
-import { getActivities, getResourcePageInfo } from '../../reducers';
+import {
+  getActivities,
+  getResourcePageInfo,
+  getVisibleUsers,
+} from '../../reducers';
 import { loadActivities } from '../../actions/activity';
+import { findUser } from '../../actions/user';
 import AssetsTable from '../AssetsTable';
 import ActivityRow from './ActivityRow';
 import Button from '../Button';
+import ActivityLayer from '../ActivityLayer';
+import ActivityFilter from '../ActivityFilter';
 
 const messages = defineMessages({
   loadMore: {
@@ -27,25 +34,35 @@ class ActivityPanel extends React.Component {
     activities: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     pageInfo: PropTypes.shape({}).isRequired,
     fetchActivities: PropTypes.func.isRequired,
+    fetchUser: PropTypes.func.isRequired,
+    userData: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   };
 
   static defaultProps = {};
 
   constructor(props) {
     super(props);
-    this.state = { filter: {} };
+    this.state = {
+      filter: {
+        type: undefined,
+        verb: undefined,
+        actorId: undefined,
+        objectId: undefined,
+      },
+    };
     this.fetchActivities = this.fetchActivities.bind(this);
     this.onMenuClick = this.onMenuClick.bind(this);
     this.handleLoadMore = this.handleLoadMore.bind(this);
+    this.toggleLayer = this.toggleLayer.bind(this);
+    this.handleFilterChange = this.handleFilterChange.bind(this);
   }
 
   componentDidMount() {
     this.fetchActivities();
   }
 
-  onMenuClick(activity) {
-    alert('TO IMPLEMENT');
-    this.setState({ currentActivity: activity, showLayer: true });
+  onMenuClick(action, data) {
+    this.setState({ currentActivity: data, showLayer: true });
   }
 
   fetchActivities(after) {
@@ -59,11 +76,36 @@ class ActivityPanel extends React.Component {
     this.fetchActivities(pageInfo.pagination.endCursor);
   }
 
+  handleFilterChange(data) {
+    this.setState(prevState => {
+      if (prevState.filter[data.type]) {
+        const { [data.type]: omit, ...filter } = prevState.filter;
+        return {
+          filter: {
+            ...filter,
+            ...(omit === data.value ? [] : { [data.type]: data.value }),
+          },
+        };
+      }
+      return { filter: { ...prevState.filter, [data.type]: data.value } };
+    }, this.fetchActivities);
+  }
+
+  toggleLayer() {
+    this.setState(prevState => ({ showLayer: !prevState.showLayer }));
+  }
+
   render() {
-    const { activities = [], pageInfo } = this.props;
-    const { showLayer, currentActivity } = this.state;
+    const { activities = [], pageInfo, fetchUser, userData } = this.props;
+    const { showLayer, currentActivity, filter } = this.state;
     return (
       <Box column>
+        <ActivityFilter
+          values={filter}
+          onSelect={this.handleFilterChange}
+          fetchUser={fetchUser}
+          userData={userData}
+        />
         <AssetsTable
           onClickMenu={this.onMenuClick}
           allowMultiSelect
@@ -82,7 +124,9 @@ class ActivityPanel extends React.Component {
             label={<FormattedMessage {...messages.loadMore} />}
           />
         )}
-        {showLayer && <div> {JSON.stringify(currentActivity)}</div>}
+        {showLayer && (
+          <ActivityLayer {...currentActivity} onClose={this.toggleLayer} />
+        )}
       </Box>
     );
   }
@@ -93,10 +137,12 @@ const mapStateToProps = state => ({
     (a, b) => Number(b.id) - Number(a.id),
   ),
   pageInfo: getResourcePageInfo(state, 'activities', genActivityPageKey()),
+  userData: getVisibleUsers(state, 'all'),
 });
 
 const mapDispatch = {
   fetchActivities: loadActivities,
+  fetchUser: findUser,
 };
 export default connect(
   mapStateToProps,

@@ -39,6 +39,9 @@ const ActivityTypeEnum = new GraphQLEnumType({
     LIKE: {
       value: 'like',
     },
+    VOTE: {
+      value: 'vote',
+    },
     MESSAGE: {
       value: 'message',
     },

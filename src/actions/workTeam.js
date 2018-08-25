@@ -66,7 +66,7 @@ const discussionFields = `
   workTeamId
 `;
 
-const workTeamFields = `
+export const workTeamFields = `
   id
   displayName
   numMembers

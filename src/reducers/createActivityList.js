@@ -15,7 +15,12 @@ const createList = filter => {
       case LOAD_ACTIVITIES_SUCCESS:
       case LOAD_FEED_SUCCESS: {
         return filter === action.filter
-          ? [...new Set([...action.payload.result, ...state])]
+          ? [
+              ...new Set([
+                ...action.payload.result,
+                ...(action.purge ? [] : state),
+              ]),
+            ]
           : state;
       }
       case SSE_UPDATE_SUCCESS: {
