@@ -1,0 +1,27 @@
+@import '../variables';
+
+.key {
+  font-size: inherit;
+  padding-right: 1em;
+}
+
+.data {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  .key {
+    font-weight: 600;
+  }
+}
+
+.container {
+  > * {
+    padding-bottom: 1em;
+  }
+}
+
+.root {
+  width: 100%;
+  padding: 1em;
+}
