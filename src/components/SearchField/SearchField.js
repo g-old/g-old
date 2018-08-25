@@ -52,13 +52,17 @@ class SearchField extends React.Component {
     onChange: PropTypes.func,
     clear: PropTypes.bool,
     value: PropTypes.string,
+    onRef: PropTypes.func,
   };
+
   static defaultProps = {
     onChange: null,
     clear: false,
     data: null,
     value: null,
+    onRef: null,
   };
+
   constructor(props) {
     super();
     this.state = {
@@ -69,22 +73,38 @@ class SearchField extends React.Component {
     this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
   }
 
+  componentDidMount() {
+    const { onRef } = this.props;
+    if (onRef) {
+      onRef(this);
+    }
+  }
+
   componentWillReceiveProps({ clear, value }) {
-    if (clear && !this.props.clear) {
+    const { value: oldValue, clear: oldClear } = this.props;
+    if (clear && !oldClear) {
       this.setState({ value: '' });
     }
 
-    if (value && !this.props.value) {
+    if (value && !oldValue) {
       this.setState({ value });
     }
   }
 
+  componentWillUnmount() {
+    const { onRef } = this.props;
+    if (onRef) {
+      onRef(null);
+    }
+  }
+
   onChange = (event, { newValue }) => {
+    const { onChange } = this.props;
     this.setState({
       value: newValue,
     });
-    if (this.props.onChange) {
-      this.props.onChange({ value: newValue });
+    if (onChange) {
+      onChange({ value: newValue });
     }
   };
 
@@ -107,22 +127,27 @@ class SearchField extends React.Component {
     event,
     { suggestion /* suggestionValue, suggestionIndex, sectionIndex, method */ },
   ) {
-    this.props.displaySelected(suggestion);
+    const { displaySelected } = this.props;
+    displaySelected(suggestion);
   }
 
   getSuggestions(value) {
+    const { data, fetch } = this.props;
     const escapedValue = escapeRegexCharacters(value.trim());
 
     if (escapedValue === '') {
       return [];
     }
-    this.props.fetch({ term: escapedValue });
+    fetch({ term: escapedValue });
     const regex = new RegExp(`\\b${escapedValue}`, 'i');
-    const res = this.props.data.filter(person =>
-      regex.test(getSuggestionValue(person)),
-    );
+    const res = data.filter(person => regex.test(getSuggestionValue(person)));
     return res;
   }
+
+  reset() {
+    this.setState({ value: '' });
+  }
+
   render() {
     const { value, suggestions } = this.state;
 
