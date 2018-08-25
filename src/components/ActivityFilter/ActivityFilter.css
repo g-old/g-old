@@ -1,0 +1,6 @@
+@import '../variables';
+
+.container {
+  padding-top: 1em;
+  padding-left: 1.5em;
+}
