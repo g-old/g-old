@@ -4,6 +4,10 @@
   background-color: var(--color-accent-3-shade);
 }
 
+.big {
+  font-size: 1.1825em;
+}
+
 .root {
   padding: 0.1em 0.3em;
   border-radius: 4px;

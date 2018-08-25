@@ -461,12 +461,9 @@ class WorkTeam extends React.Component {
       <Box align column padding="medium" pad fill>
         {picture}
         <Heading tag="h2">{displayName}</Heading>
-        <Box>
-          <UserThumbnail
-            marked
-            label={<FormattedMessage {...messages.coordinator} />}
-            user={coordinator}
-          />
+        <Box column align>
+          <FormattedMessage {...messages.coordinator} />
+          <UserThumbnail big marked user={coordinator} />
         </Box>
         <Box wrap>
           <Value

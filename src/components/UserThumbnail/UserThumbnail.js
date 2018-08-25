@@ -5,10 +5,13 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './UserThumbnail.css';
 import Link from '../Link';
 
-const UserThumbnail = ({ user, label, marked }) => {
+const UserThumbnail = ({ user, label, marked, big }) => {
   const fullName = user ? `${user.name} ${user.surname}` : '';
   return user ? ( // eslint-disable-next-line jsx-a11y/anchor-is-valid
-    <Link to={`/accounts/${user.id}`} className={cn(marked && s.mark, s.root)}>
+    <Link
+      to={`/accounts/${user.id}`}
+      className={cn(marked && s.mark, s.root, big && s.big)}
+    >
       <img src={user.thumbnail} alt={fullName} />
       {label}
       <span>{fullName}</span>
@@ -22,10 +25,12 @@ UserThumbnail.propTypes = {
   user: PropTypes.shape({}).isRequired,
   label: PropTypes.string,
   marked: PropTypes.string,
+  big: PropTypes.string,
 };
 UserThumbnail.defaultProps = {
   label: null,
   marked: null,
+  big: null,
 };
 
 export default withStyles(s)(UserThumbnail);
