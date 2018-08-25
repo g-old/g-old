@@ -1,12 +1,14 @@
+@import '../../components/variables.css';
+
 .selectable {
   text-decoration: inherit;
   cursor: pointer;
 }
 
 .row {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-accent-3-shade);
 
   &:hover {
-    background-color: #eee;
+    background-color: var(--color-accent-3-shade);
   }
 }
