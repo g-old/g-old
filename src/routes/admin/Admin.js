@@ -36,6 +36,10 @@ class Admin extends React.Component {
         <Tab title="USERMANAGEMENT">
           <UserPanel />
         </Tab>,
+      );
+    }
+    if (user.groups & Groups.MODERATOR) {
+      panels.push(
         <Tab title="SUPERVISION">
           <SupervisionPanel />
         </Tab>,
