@@ -31,7 +31,10 @@ class Admin extends React.Component {
     const { user } = this.props;
     const panels = [];
     /* eslint-disable no-bitwise */
-    if (user.groups & Groups.MEMBER_MANAGER) {
+    if (
+      user.groups & Groups.MEMBER_MANAGER ||
+      user.groups & Groups.SUPER_USER
+    ) {
       panels.push(
         <Tab title="USERMANAGEMENT">
           <UserPanel />
@@ -59,14 +62,14 @@ class Admin extends React.Component {
         </Tab>,
       );
     }
-    if (user.groups & Groups.TEAM_LEADER) {
+    if (user.groups & Groups.TEAM_LEADER || isAdmin(user)) {
       panels.push(
         <Tab title="WORKTEAMS">
           <WorkTeamPanel />
         </Tab>,
       );
     }
-    if (isAdmin(user)) {
+    if (isAdmin(user) || user.groups & Groups.SUPER_USER) {
       panels.push(
         <Tab title="TECH">
           <TechPanel />
