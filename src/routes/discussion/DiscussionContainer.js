@@ -14,6 +14,7 @@ import {
   loadComments,
   updateComment,
   deleteComment,
+  scrollToResource,
 } from '../../actions/comment';
 import {
   // getCommentUpdates,
@@ -22,6 +23,7 @@ import {
   getDiscussionError,
   getCommentUpdates,
   getSubscriptionUpdates,
+  getScrollCount,
 } from '../../reducers';
 import {
   createSubscription,
@@ -43,6 +45,7 @@ import { Groups } from '../../organization';
 const handleProfileClick = ({ id }) => {
   if (id) history.push(`/accounts/${id}`);
 };
+
 class DiscussionContainer extends React.Component {
   static propTypes = {
     discussion: PropTypes.shape({
@@ -68,41 +71,118 @@ class DiscussionContainer extends React.Component {
     updateSubscription: PropTypes.func.isRequired,
     deleteSubscription: PropTypes.func.isRequired,
     updateDiscussion: PropTypes.func.isRequired,
-
+    scrollToResource: PropTypes.func.isRequired,
     subscriptionStatus: PropTypes.shape({}).isRequired,
+    scrollCounter: PropTypes.shape({
+      childId: PropTypes.string,
+      id: PropTypes.string,
+      containerId: PropTypes.string,
+      type: PropTypes.string,
+    }),
   };
 
   static defaultProps = {
     errorMessage: null,
     childId: null,
+    scrollCounter: null,
   };
 
   constructor(props) {
     super(props);
-    this.state = {};
-    this.scrollToId = props.childId || props.commentId;
-    //  this.handleSubscription = this.handleSubscription.bind(this);
+    const scrollTargetId =
+      (props.scrollCounter.type === 'comment' &&
+        props.scrollCounter.containerId === props.id &&
+        props.scrollCounter.childId) ||
+      props.scrollCounter.id;
+    this.state = {
+      scrollTargetId,
+    };
     this.handleCommentCreation = this.handleCommentCreation.bind(this);
     this.handleCommentFetching = this.handleCommentFetching.bind(this);
     this.handleReply = this.handleReply.bind(this);
     this.handleSubscription = this.handleSubscription.bind(this);
     this.handleDiscussionClosing = this.handleDiscussionClosing.bind(this);
     this.fetchDiscussion = this.fetchDiscussion.bind(this);
+    this.scrollToComment = this.scrollToComment.bind(this);
+    this.setRef = this.setRef.bind(this);
+    this.scrollToComment = this.scrollToComment.bind(this);
+    this.checkCommentExists = this.checkCommentExists.bind(this);
+    this.handleScrollToResource = this.handleScrollToResource.bind(this);
   }
 
   componentDidMount() {
-    if (this.commentTo) {
-      // TODO let comment handle scrollto and focus
-      // eslint-disable-next-line
-      const node = findDOMNode(this.commentTo);
-      if (node) {
-        setTimeout(
-          () =>
-            // or use window.scrollTo(0, node.offsetTop);
-            node.scrollIntoView({ block: 'center', behavior: 'smooth' }),
-          100,
-        );
+    this.findComment();
+  }
+
+  componentDidUpdate(prevProps) {
+    const { scrollCounter } = this.props;
+    if (
+      prevProps.scrollCounter.counter &&
+      prevProps.scrollCounter.counter !== scrollCounter.counter
+    ) {
+      this.findComment();
+    }
+  }
+
+  setRef(node) {
+    // eslint-disable-next-line
+    if (node /* && node.props.id === this.state.scrollTargetId*/) {
+      // this.scrollTarget = node;
+      this[`comment$${node.props.id}`] = node;
+    }
+  }
+
+  findComment() {
+    const { scrollCounter, id } = this.props;
+    if (scrollCounter.containerId !== id) return;
+    if (this.checkCommentExists(scrollCounter)) {
+      this.setState(
+        { scrollTargetId: scrollCounter.childId || scrollCounter.id },
+        this.scrollToComment,
+      );
+    } else {
+      // load comment and scroll
+      this.handleCommentFetching({ parentId: scrollCounter.id }, true);
+    }
+  }
+
+  checkCommentExists({ id, childId }) {
+    const { discussion } = this.props;
+    if (discussion && discussion.comments) {
+      const comment = discussion.comments.find(c => c.id === id);
+      if (comment) {
+        if (childId) {
+          const reply =
+            comment.replies && comment.replies.find(r => r.id === childId);
+          if (!reply) {
+            return false;
+          }
+        }
+        return true;
       }
+    }
+    return false;
+  }
+
+  scrollToComment() {
+    // TODO let comment handle scrollto and focus
+    const { scrollTargetId } = this.state;
+    const target = this[`comment$${scrollTargetId}`];
+    // eslint-disable-next-line
+    const node = findDOMNode(target);
+    if (node) {
+      if (this.timer) {
+        clearTimeout(this.timer);
+      }
+      this.timer = setTimeout(() =>
+        // or use window.scrollTo(0, node.offsetTop);
+        {
+          node.scrollIntoView({
+            block: 'center',
+            behavior: 'smooth',
+          });
+          this.timer = undefined;
+        }, 100);
     }
   }
 
@@ -121,9 +201,16 @@ class DiscussionContainer extends React.Component {
     makeComment({ ...data, discussionId: id, targetId });
   }
 
-  handleCommentFetching({ parentId }) {
+  handleCommentFetching({ parentId }, scrollTo) {
     const { loadComments: fetchComments } = this.props;
-    fetchComments({ parentId });
+    fetchComments({ parentId }).then(
+      scrollTo ? this.handleScrollToResource : () => {},
+    );
+  }
+
+  handleScrollToResource() {
+    const { scrollToResource: scrollTo, scrollCounter } = this.props;
+    scrollTo(scrollCounter);
   }
 
   handleDiscussionClosing() {
@@ -178,14 +265,13 @@ class DiscussionContainer extends React.Component {
       isFetching,
       errorMessage,
       user,
-      commentId,
-      childId,
+      scrollCounter,
       subscriptionStatus,
       updates,
       updateComment: mutateComment,
       deleteComment: eraseComment,
     } = this.props;
-    const { replying } = this.state;
+    const { replying, scrollTargetId } = this.state;
     if (isFetching && !discussion) {
       return <p>{'Loading...'} </p>;
     }
@@ -196,10 +282,13 @@ class DiscussionContainer extends React.Component {
     }
     if (this.isReady()) {
       let closingElement;
+      /* eslint-disable eqeqeq, no-bitwise */
       if (
-        discussion.workTeam.coordinatorId == user.id || // eslint-disable-line
-        user.groups & Groups.ADMIN // eslint-disable-line
+        (discussion.workTeam && discussion.workTeam.coordinatorId == user.id) ||
+        user.groups & Groups.ADMIN
       ) {
+        /* eslint-enable eqeqeq, no-bitwise */
+
         closingElement = (
           <Button
             plain
@@ -274,12 +363,13 @@ class DiscussionContainer extends React.Component {
                   updates={updates['0000'] || {}}
                 />
               )}
-
               {discussion.comments &&
                 discussion.comments.map(c => (
                   <Comment
                     {...c}
-                    showReplies={c.id === commentId && childId}
+                    showReplies={
+                      c.id === scrollCounter.id && scrollCounter.childId
+                    }
                     onReply={!discussion.closedAt && this.handleReply}
                     loadReplies={this.handleCommentFetching}
                     onCreate={this.handleCommentCreation}
@@ -291,12 +381,8 @@ class DiscussionContainer extends React.Component {
                     own={c.author.id == user.id}
                     user={user}
                     updates={updates[c.id]}
-                    ref={
-                      c.id === this.scrollToId
-                        ? node => (this.commentTo = node) // eslint-disable-line
-                        : null
-                    }
-                    active={c.id === this.scrollToId}
+                    ref={this.setRef}
+                    active={c.id === scrollTargetId}
                   >
                     {c.replies &&
                       c.replies.map(r => (
@@ -313,12 +399,8 @@ class DiscussionContainer extends React.Component {
                           own={r.author.id == user.id}
                           updates={updates[c.id]}
                           user={user}
-                          ref={
-                            r.id === this.scrollToId
-                              ? node => (this.commentTo = node) // eslint-disable-line
-                              : null
-                          }
-                          active={r.id === this.scrollToId}
+                          ref={this.setRef}
+                          active={r.id === scrollTargetId}
                         />
                       ))}
                   </Comment>
@@ -340,6 +422,7 @@ const mapStateToProps = (state, { id }) => ({
   errorMessage: getDiscussionError(state, id),
   updates: getCommentUpdates(state),
   subscriptionStatus: getSubscriptionUpdates(state),
+  scrollCounter: getScrollCount(state),
 });
 
 const mapDispatch = {
@@ -352,6 +435,7 @@ const mapDispatch = {
   updateSubscription,
   deleteSubscription,
   updateDiscussion,
+  scrollToResource,
 };
 
 export default connect(

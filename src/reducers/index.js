@@ -8,6 +8,7 @@ import consent from './consent';
 import statistics from './statistics';
 import system from './system';
 import pageInfo, * as fromPageInfo from './pageInfo';
+import scrollToCounter from './scrollToCounter';
 
 export default combineReducers({
   user,
@@ -19,13 +20,14 @@ export default combineReducers({
   statistics,
   system,
   pageInfo,
+  scrollToCounter,
 });
 
 /* GENERATOR */
 
 export const getResourcePageInfo = (state, resource, filter) =>
   fromPageInfo.getPageInfo(state.pageInfo, resource, filter);
-
+export const getScrollCount = state => state.scrollToCounter;
 export const getDiscussionPageInfo = (state, filter) =>
   fromEntity.getDiscussionPageInfo(state.entities, filter);
 export const getWTDiscussionsByState = (state, id, filter) =>

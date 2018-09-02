@@ -937,7 +937,6 @@ class NotificationService {
           }
           return acc;
         }, {});
-
       if (Object.keys(activityMap).length) {
         const groupedActivities = this.groupBySubject(activityMap);
         const activitiesAndSubscribers = await this.addSubscribers(

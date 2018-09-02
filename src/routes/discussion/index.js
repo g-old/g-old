@@ -1,6 +1,8 @@
 import React from 'react';
 import Layout from '../../components/Layout';
 import { loadDiscussion } from '../../actions/discussion';
+import { scrollToResource } from '../../actions/comment';
+
 import DiscussionContainer from './DiscussionContainer';
 import { getSessionUser, getNotification } from '../../reducers';
 import { canAccess } from '../../organization';
@@ -14,13 +16,24 @@ async function action({ store, path, query }, { id }) {
   const user = getSessionUser(state);
   if (!user) {
     return { redirect: createRedirectLink(path, query) };
-  } else if (!canAccess(user, title)) {
+  }
+  if (!canAccess(user, title)) {
     return { redirect: '/' };
   }
   if (!process.env.BROWSER) {
     await store.dispatch(loadDiscussion({ id, parentId: query.comment }));
   } else {
-    await store.dispatch(loadDiscussion({ id, parentId: query.comment }));
+    store.dispatch(loadDiscussion({ id, parentId: query.comment }));
+    if (query && (query.comment || query.child)) {
+      store.dispatch(
+        scrollToResource({
+          id: query.comment,
+          childId: query.child,
+          containerId: id,
+          type: 'comment',
+        }),
+      );
+    }
     const referrer = ['email', 'push', 'notification'];
     if (query && referrer.includes(query.ref)) {
       if (query.ref === 'notification' && query.id) {
@@ -61,12 +74,7 @@ async function action({ store, path, query }, { id }) {
     title,
     component: (
       <Layout>
-        <DiscussionContainer
-          id={id}
-          user={user}
-          commentId={query.comment}
-          childId={query.child}
-        />
+        <DiscussionContainer id={id} user={user} />
       </Layout>
     ),
   };

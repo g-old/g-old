@@ -152,7 +152,9 @@
 }
 
 .active {
-  animation: highlight 3s;
+  background-color: #dfae0070;
+
+  /* animation: highlight 3s; */
 }
 
 .textEdit {

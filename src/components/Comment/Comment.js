@@ -15,7 +15,6 @@ import s from './Comment.css';
 import { ICONS } from '../../constants';
 // import Notification from '../Notification';
 import { Permissions } from '../../organization';
-
 import Menu from '../Menu';
 import Button from '../Button';
 
@@ -162,11 +161,12 @@ class Comment extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      textArea: { val: this.props.content || '' },
+      textArea: { val: props.content || '' },
       editing: props.asInput === true,
       pending: false,
       collapsed: false,
       open: props.openInput,
+      active: props.active,
       showReplies: props.showReplies,
     };
     this.onDeleteComment = this.onDeleteComment.bind(this);
@@ -186,7 +186,8 @@ class Comment extends React.Component {
   }
 
   componentDidMount() {
-    if (!this.state.editing) {
+    const { editing } = this.state;
+    if (!editing) {
       // 3 * 1.3 em lineheight
       if (this.textBox && this.textBox.clientHeight > 3.9 * 16) {
         // eslint-disable-next-line react/no-did-mount-set-state
@@ -195,27 +196,44 @@ class Comment extends React.Component {
     }
   }
 
-  componentWillReceiveProps({ updates = {}, openInput }) {
+  componentWillReceiveProps({ updates = {}, openInput, active, showReplies }) {
+    const { updates: oldUpdates } = this.props;
+
+    /* eslint-disable react/destructuring-assignment */
     if (updates) {
-      if (
-        updates.success &&
-        (!this.props.updates || !this.props.updates.success)
-      ) {
+      if (updates.success && (!oldUpdates || !oldUpdates.success)) {
         this.onEndEditing();
       }
       if (updates.pending !== this.state.pending) {
-        this.setState({ pending: updates.pending });
+        this.setState({
+          pending: updates.pending,
+        });
       }
 
       if (updates.errorMessage) {
         this.setState({
-          textArea: { val: (updates.comment && updates.comment.content) || '' },
+          textArea: {
+            val: (updates.comment && updates.comment.content) || '',
+          },
         });
       }
     }
     if (openInput !== this.props.openInput) {
-      this.setState({ open: openInput });
+      this.setState({
+        open: openInput,
+      });
     }
+    if (active !== this.state.active) {
+      this.setState({
+        active,
+      });
+    }
+    if (showReplies) {
+      this.setState({
+        showReplies,
+      });
+    }
+    /* eslint-enable react/destructuring-assignment */
   }
 
   onDeleteComment() {
@@ -235,21 +253,27 @@ class Comment extends React.Component {
   }
 
   onTextChange(e) {
-    this.setState({ ...this.state, textArea: { val: e.target.value } });
+    const val = e.target.value;
+    this.setState(prevState => ({
+      ...prevState,
+      textArea: { val },
+    }));
   }
 
   onTextSubmit(e) {
-    const content = this.state.textArea.val.trim();
-    if (content && content !== this.props.content) {
+    const { textArea } = this.state;
+    const { content, onUpdate, id, onCreate, parentId } = this.props;
+    const newContent = textArea.val.trim();
+    if (newContent && newContent !== content) {
       // TODO validation
-      if (this.props.content) {
+      if (content) {
         // update;
-        this.props.onUpdate({ id: this.props.id, content });
+        onUpdate({ id, content: newContent });
       } else {
-        this.props.onCreate({
-          content,
-          ...(this.props.id && {
-            parentId: this.props.parentId || this.props.id,
+        onCreate({
+          content: newContent,
+          ...(id && {
+            parentId: parentId || id,
           }),
         });
       }
@@ -262,36 +286,43 @@ class Comment extends React.Component {
 
   onEndEditing() {
     const { asInput, content } = this.props;
-    this.setState({
-      ...this.state,
-      textArea: { ...this.state.textArea, val: asInput ? '' : content },
+    this.setState(prevState => ({
+      ...prevState,
+      textArea: { ...prevState.textArea, val: asInput ? '' : content },
       editing: false,
       open: false,
-    });
+    }));
   }
-  handleEditing() {
-    this.handleReply();
 
+  handleEditing() {
+    const { content } = this.props;
+    this.handleReply();
     this.setState({
-      textArea: { val: this.props.content },
+      textArea: { val: content },
       editing: true,
       open: true,
     });
   }
+
   toggleContent(e) {
     e.preventDefault();
     e.stopPropagation();
-    return this.setState({ collapsed: !this.state.collapsed });
+    return this.setState(prevState => ({ collapsed: !prevState.collapsed }));
   }
+
   toggleReplies(e) {
     const { showReplies } = this.state;
+    const { loadReplies, id } = this.props;
     e.preventDefault();
     e.stopPropagation();
     if (!showReplies) {
-      this.props.loadReplies({ parentId: this.props.id });
+      loadReplies({ parentId: id });
     }
-    return this.setState({ showReplies: !showReplies });
+    this.setState(prevState => ({
+      showReplies: !prevState.showReplies,
+    }));
   }
+
   handleFlag() {
     const { id, content, onFlagging } = this.props;
     if (onFlagging) {
@@ -333,14 +364,19 @@ class Comment extends React.Component {
   }
 
   handleReply() {
-    this.props.onReply({ id: this.props.id });
+    const { onReply, id } = this.props;
+    if (onReply) {
+      onReply({ id });
+    }
     this.setState({ editing: false });
   }
-  renderMenu(asInput) {
-    let menu;
-    const hasMinimumInput = this.state.textArea.val.length >= 5;
 
-    if (asInput || this.state.editing) {
+  renderMenu(asInput) {
+    const { textArea, editing } = this.state;
+    let menu;
+    const hasMinimumInput = textArea.val.length >= 5;
+
+    if (asInput || editing) {
       menu = (
         <span>
           <Button
@@ -361,7 +397,7 @@ class Comment extends React.Component {
           <Button
             plain
             onClick={this.onEndEditing}
-            disabled={this.props.asInput && !hasMinimumInput}
+            disabled={asInput && !hasMinimumInput}
             icon={
               <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
                 <path
@@ -376,7 +412,7 @@ class Comment extends React.Component {
         </span>
       );
     } else {
-      const { own, deletedAt, user } = this.props;
+      const { own, deletedAt, user, onReply } = this.props;
       let canDelete;
       let canFlag;
 
@@ -384,7 +420,7 @@ class Comment extends React.Component {
       if (user) {
         // canLike = !asInput && !own && (user.permissions & Permissions.LIKE) > 0;
         canDelete =
-          (own && this.props.onReply) ||
+          (own && onReply) ||
           (!deletedAt && (user.permissions & Permissions.DELETE_COMMENTS) > 0);
         canFlag =
           !own &&
@@ -412,7 +448,7 @@ class Comment extends React.Component {
         );
       }
 
-      if (own && this.props.onReply) {
+      if (own && onReply) {
         menuFields.push(
           <Button
             onClick={this.handleEditing}
@@ -445,15 +481,16 @@ class Comment extends React.Component {
   }
 
   renderHeader(actor, asInput) {
-    const menu = this.props.preview ? null : this.renderMenu(asInput);
+    const { preview, own, createdAt, editedAt, intl } = this.props;
+    const menu = preview ? null : this.renderMenu(asInput);
 
     return (
       <div className={s.header}>
         {/* eslint-disable jsx-a11y/interactive-supports-focus */}
         {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */}
         <img // eslint-disable-line
-          onClick={this.props.own ? null : this.handleProfileClick}
-          className={cn(s.avatar, this.props.own ? null : s.clickable)}
+          onClick={own ? null : this.handleProfileClick}
+          className={cn(s.avatar, own ? null : s.clickable)}
           src={actor && actor.thumbnail}
           alt="IMG"
         />
@@ -464,17 +501,17 @@ class Comment extends React.Component {
             <span className={s.author}>{`${actor.name} ${actor.surname}`}</span>
             {menu}
           </div>
-          {this.props.createdAt && (
+          {createdAt && (
             <div className={s.date}>
-              {this.props.editedAt ? (
+              {editedAt ? (
                 <FormattedMessage
                   {...messages.edited}
                   values={{
-                    time: this.props.intl.formatRelative(this.props.editedAt),
+                    time: intl.formatRelative(editedAt),
                   }}
                 />
               ) : (
-                <FormattedRelative value={this.props.createdAt} />
+                <FormattedRelative value={createdAt} />
               )}
             </div>
           )}
@@ -485,48 +522,53 @@ class Comment extends React.Component {
 
   renderFooter(user) {
     const footer = [];
-    if (this.props.onReply) {
+    const {
+      onReply,
+      id,
+      parentId,
+      onCreate,
+      updates,
+      numReplies,
+      children,
+    } = this.props;
+    const { open, editing, showReplies } = this.state;
+    if (onReply) {
       footer.push(
-        <button onClick={this.handleReply} className={s.command}>
+        <button type="button" onClick={this.handleReply} className={s.command}>
           <FormattedMessage {...messages.reply} />
         </button>,
       );
     }
-    if (this.state.open && !this.state.editing) {
+    if (open && !editing) {
       footer.push(
         <div style={{ marginLeft: '3rem' }}>
           <Comment
-            id={this.props.id}
-            parentId={this.props.parentId}
-            onCreate={this.props.onCreate}
+            id={id}
+            parentId={parentId}
+            onCreate={onCreate}
             user={user}
             asInput
-            updates={this.props.updates || {}}
+            updates={updates || {}}
           />
         </div>,
       );
     }
 
-    if (this.props.numReplies) {
-      const expandLabel =
-        this.props.numReplies === 1 ? 'expandReply' : 'expandReplies';
-      const pending =
-        !this.props.children &&
-        this.props.updates &&
-        this.props.updates.pending;
+    if (numReplies) {
+      const expandLabel = numReplies === 1 ? 'expandReply' : 'expandReplies';
+      const pending = !children && updates && updates.pending;
       footer.push(
         <button
-          disabled={this.props.updates && this.props.updates.pending}
+          type="button"
+          disabled={updates && updates.pending}
           onClick={this.toggleReplies}
           className={cn(s.more, s.command)}
         >
           <FormattedMessage
             {...messages[
-              this.state.showReplies && this.props.children
-                ? 'collapseReplies'
-                : expandLabel
+              showReplies && children ? 'collapseReplies' : expandLabel
             ]}
-            values={{ cnt: this.props.numReplies }}
+            values={{ cnt: numReplies }}
           />
           {pending ? (
             <svg
@@ -559,17 +601,15 @@ class Comment extends React.Component {
                 stroke="#000"
                 strokeWidth="2"
                 points="18 9 12 15 6 9"
-                transform={
-                  this.state.showReplies ? 'matrix(1 0 0 -1 0 24)' : ''
-                }
+                transform={showReplies ? 'matrix(1 0 0 -1 0 24)' : ''}
               />
             </svg>
           )}
         </button>,
       );
     }
-    if (this.state.showReplies) {
-      footer.push(<div className={s.replies}>{this.props.children} </div>);
+    if (showReplies) {
+      footer.push(<div className={s.replies}>{children} </div>);
     }
     return footer;
   }
@@ -583,9 +623,19 @@ class Comment extends React.Component {
       author,
       asInput,
       user,
+      preview,
 
       //  updates,
     } = this.props;
+    const {
+      active,
+      textArea,
+      pending,
+      editing,
+      open,
+      collapsed,
+      contentOverflows,
+    } = this.state;
     //  let canLik
 
     let header;
@@ -597,46 +647,48 @@ class Comment extends React.Component {
         <Textarea
           useCacheForDOMMeasurements
           placeholder="Add a comment"
-          value={this.state.textArea.val}
+          value={textArea.val}
           onChange={this.onTextChange}
           className={s.textEdit}
           minRows={2}
-          disabled={this.state.pending}
+          disabled={pending}
         />,
       );
     } else {
       header = this.renderHeader(author, asInput);
-      if (!this.state.editing) {
+      if (!editing) {
         body.push(
-          <div className={this.state.collapsed ? s.collapsed : s.expanded}>
-            {content}
-          </div>,
+          <div className={collapsed ? s.collapsed : s.expanded}>{content}</div>,
         );
-        if (this.state.contentOverflows) {
+        if (contentOverflows) {
           body.push(
-            <button onClick={this.toggleContent} className={s.contentToggle}>
+            <button
+              type="button"
+              onClick={this.toggleContent}
+              className={s.contentToggle}
+            >
               <FormattedMessage
-                {...messages[this.state.collapsed ? 'expand' : 'collapse']}
+                {...messages[collapsed ? 'expand' : 'collapse']}
               />
             </button>,
           );
         }
-      } else if (this.state.open) {
+      } else if (open) {
         body.push(
           <Textarea
             useCacheForDOMMeasurements
-            value={this.state.textArea.val}
+            value={textArea.val}
             onChange={this.onTextChange}
             className={s.textEdit}
             minRows={2}
-            disabled={this.state.pending}
+            disabled={pending}
           />,
         );
       }
-      footer = this.props.preview ? null : this.renderFooter(user);
+      footer = preview ? null : this.renderFooter(user);
     }
     return (
-      <div className={cn(s.root, this.props.active ? s.active : null)}>
+      <div className={cn(s.root, active ? s.active : null)}>
         {header}
         {/* eslint-disable no-return-assign */}
         <div className={s.text} ref={ref => (this.textBox = ref)}>

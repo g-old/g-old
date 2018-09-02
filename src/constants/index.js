@@ -1,6 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 
 /* GENERATOR */
+export const SCROLL_TO_RESOURCE = 'SCROLL_TO_RESOURCE';
 export const CREATE_MESSAGE_START = 'CREATE_MESSAGE_START';
 export const CREATE_MESSAGE_SUCCESS = 'CREATE_MESSAGE_SUCCESS';
 export const CREATE_MESSAGE_ERROR = 'CREATE_MESSAGE_ERROR';

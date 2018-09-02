@@ -15,6 +15,7 @@ import {
   DELETE_COMMENT_SUCCESS,
   DELETE_COMMENT_ERROR,
   CREATE_SUBSCRIPTION_SUCCESS,
+  SCROLL_TO_RESOURCE,
 } from '../constants';
 import {
   subscription as subscriptionSchema,
@@ -233,6 +234,17 @@ export function loadComments(comment) {
       });
       return false;
     }
+
+    return true;
+  };
+}
+
+export function scrollToResource({ id, childId, type, containerId }) {
+  return async dispatch => {
+    dispatch({
+      type: SCROLL_TO_RESOURCE,
+      payload: { id, childId, type, containerId },
+    });
 
     return true;
   };
