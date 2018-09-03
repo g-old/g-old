@@ -2,11 +2,10 @@ import React from 'react';
 import Layout from '../../components/Layout';
 import { loadDiscussion } from '../../actions/discussion';
 import { scrollToResource } from '../../actions/comment';
-
+import updateNotificationStatus from '../notificationHelper';
 import DiscussionContainer from './DiscussionContainer';
-import { getSessionUser, getNotification } from '../../reducers';
+import { getSessionUser } from '../../reducers';
 import { canAccess } from '../../organization';
-import { updateNotification } from '../../actions/notification';
 import { createRedirectLink } from '../utils';
 
 const title = 'Discussion';
@@ -34,39 +33,7 @@ async function action({ store, path, query }, { id }) {
         }),
       );
     }
-    const referrer = ['email', 'push', 'notification'];
-    if (query && referrer.includes(query.ref)) {
-      if (query.ref === 'notification' && query.id) {
-        // check if notification in store
-        const notification = getNotification(state, query.id);
-        if (notification) {
-          if (!notification.read) {
-            store.dispatch(
-              updateNotification({
-                id: query.id,
-                read: true,
-              }),
-            );
-          }
-        } else {
-          store.dispatch(
-            updateNotification({
-              id: query.refId,
-              read: true,
-            }),
-          );
-        }
-        // do nothing
-      } else {
-        // email or push referrer
-        store.dispatch(
-          updateNotification({
-            activityId: query.refId,
-            read: true,
-          }),
-        );
-      }
-    }
+    updateNotificationStatus(store, query);
   }
 
   return {

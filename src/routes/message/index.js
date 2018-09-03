@@ -1,8 +1,9 @@
 import React from 'react';
 import Layout from '../../components/Layout';
-import { getSessionUser, getNotification } from '../../reducers';
+import { getSessionUser } from '../../reducers';
+import updateNotificationStatus from '../notificationHelper';
+
 import { loadMessage } from '../../actions/message';
-import { updateNotification } from '../../actions/notification';
 import MessageContainer from './MessageContainer';
 import { createRedirectLink } from '../utils';
 
@@ -16,41 +17,8 @@ async function action({ store, path, query }, { id }) {
   }
   await store.dispatch(loadMessage(id));
 
-  if (process.env.BROWSER) {
-    const referrer = ['email', 'push', 'notification'];
-    if (query && referrer.includes(query.ref)) {
-      if (query.ref === 'notification' && query.id) {
-        // check if notification in store
-        const notification = getNotification(state, query.id);
-        if (notification) {
-          if (!notification.read) {
-            store.dispatch(
-              updateNotification({
-                id: query.id,
-                read: true,
-              }),
-            );
-          }
-        } else {
-          store.dispatch(
-            updateNotification({
-              id: query.id,
-              read: true,
-            }),
-          );
-        }
-        // do nothing
-      } else {
-        // email or push referrer
-        store.dispatch(
-          updateNotification({
-            activityId: query.refId,
-            read: true,
-          }),
-        );
-      }
-    }
-  }
+  updateNotificationStatus(store, query);
+
   return {
     title,
     chunks: ['message'],

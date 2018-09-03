@@ -97,7 +97,7 @@ class UserNotification extends React.Component {
     let message = <span>Not found</span>;
     if (!activity.object) return { message };
     const info = JSON.parse(activity.info);
-    const param = `?ref=notification&id=${id}`;
+    const param = `?ref=notification&refId=${id}`;
     let path = '';
     let thumbnail = '/tile.png';
     // console.log('ACtivity', { activity });
@@ -181,7 +181,7 @@ class UserNotification extends React.Component {
             activity.object.discussionId
           }?comment=${parent || activity.object.id}${
             child ? `&child=${child}` : ''
-          }&ref=notification&id=${id}`;
+          }&ref=notification&refId=${id}`;
         }
         break;
       }
@@ -247,10 +247,7 @@ class UserNotification extends React.Component {
     const data = this.computeData(activity);
     return (
       // eslint-disable-next-line
-      <Link
-        to={data.path}
-        className={cn(s.root,read ? null : s.unread)}
-      >
+      <Link to={data.path} className={cn(s.root, read ? null : s.unread)}>
         <div className={s.container}>
           <div>
             <img alt="" src={data.thumbnail || '/tile.png'} />

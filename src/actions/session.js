@@ -90,17 +90,6 @@ export function login(data) {
       redirect = `${query.redirect}`;
       delete query.redirect;
       redirect += `?${queryString.stringify(query)}`;
-      /* redirect = `${query.redirect}`;
-
-      if (query.ref) {
-        redirect += `?${queryString.stringify({
-          ref: query.ref,
-          refId: query.refId,
-        })}`;
-      }
-      if(query.comment){
-
-      } */
     }
     dispatch({
       type: SESSION_LOGIN_START,
