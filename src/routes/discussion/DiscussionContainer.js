@@ -116,12 +116,13 @@ class DiscussionContainer extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { scrollCounter } = this.props;
-    if (
-      prevProps.scrollCounter.counter &&
-      prevProps.scrollCounter.counter !== scrollCounter.counter
-    ) {
-      this.findComment();
-    }
+    this.compareScrollCount(prevProps.scrollCounter, scrollCounter);
+  }
+
+  componentWillUnmount() {
+    const { scrollToResource: scrollTo } = this.props;
+    // clear
+    scrollTo({ id: null, type: null, childId: null, containerId: null });
   }
 
   setRef(node) {
@@ -132,9 +133,19 @@ class DiscussionContainer extends React.Component {
     }
   }
 
+  compareScrollCount(prevScrollCounter, scrollCounter) {
+    if (scrollCounter.type === 'comment') {
+      if (prevScrollCounter.containerId !== scrollCounter.containerId) {
+        // discussion changed
+        this.findComment();
+      } else if (prevScrollCounter.counter !== scrollCounter.counter) {
+        this.findComment();
+      }
+    }
+  }
+
   findComment() {
-    const { scrollCounter, id } = this.props;
-    if (scrollCounter.containerId !== id) return;
+    const { scrollCounter } = this.props;
     if (this.checkCommentExists(scrollCounter)) {
       this.setState(
         { scrollTargetId: scrollCounter.childId || scrollCounter.id },
@@ -168,8 +179,13 @@ class DiscussionContainer extends React.Component {
     // TODO let comment handle scrollto and focus
     const { scrollTargetId } = this.state;
     const target = this[`comment$${scrollTargetId}`];
-    // eslint-disable-next-line
-    const node = findDOMNode(target);
+    let node;
+    try {
+      // eslint-disable-next-line
+      node = findDOMNode(target);
+    } catch (e) {
+      console.error(e);
+    }
     if (node) {
       if (this.timer) {
         clearTimeout(this.timer);
