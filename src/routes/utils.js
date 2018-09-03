@@ -45,7 +45,7 @@ export const sortClosedProposals = (a, b) => {
 
 export const surveyStateFilter = (survey, filter) => {
   if (filter === 'active') {
-    return !survey.pollOne.closedAt;
+    return survey.pollOne && !survey.pollOne.closedAt;
   }
-  return survey.pollOne.closedAt;
+  return survey.pollOne && survey.pollOne.closedAt;
 };
