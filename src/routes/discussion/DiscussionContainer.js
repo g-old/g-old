@@ -153,7 +153,20 @@ class DiscussionContainer extends React.Component {
       );
     } else {
       // load comment and scroll
-      this.handleCommentFetching({ parentId: scrollCounter.id }, true);
+      const { lastCommentFetched } = this.state;
+      if (lastCommentFetched) {
+        if (
+          lastCommentFetched.id === scrollCounter.id &&
+          lastCommentFetched.childId === scrollCounter.childId
+        ) {
+          // comment cannot be fetched successfully
+          return;
+        }
+      }
+      this.setState(
+        { lastCommentFetched: scrollCounter },
+        this.handleCommentFetching({ parentId: scrollCounter.id }, true),
+      );
     }
   }
 
