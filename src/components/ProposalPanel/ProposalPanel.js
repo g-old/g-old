@@ -96,15 +96,18 @@ class ProposalPanel extends React.Component {
     updateProposal: PropTypes.func.isRequired,
     proposals: PropTypes.arrayOf(PropTypes.shape({})),
     pageInfo: PropTypes.shape({}).isRequired,
+    surveys: PropTypes.arrayOf(PropTypes.shape({})),
   };
 
   static defaultProps = {
     proposals: null,
+    surveys: null,
   };
 
   constructor(props) {
     super(props);
     this.fetchProposals = this.fetchProposals.bind(this);
+    this.fetchSurveys = this.fetchSurveys.bind(this);
     this.fetchTags = this.fetchTags.bind(this);
   }
 
@@ -118,8 +121,18 @@ class ProposalPanel extends React.Component {
     loadProposals({ state: 'active', first: 50, after });
   }
 
+  fetchSurveys({ after } = {}) {
+    const { loadProposalsList: loadProposals } = this.props;
+    loadProposals({ state: 'survey', first: 50, after });
+  }
+
   render() {
-    const { proposals, pageInfo, updateProposal: mutateProposal } = this.props;
+    const {
+      proposals,
+      pageInfo,
+      updateProposal: mutateProposal,
+      surveys,
+    } = this.props;
     return (
       <div>
         <Accordion>
@@ -140,10 +153,27 @@ class ProposalPanel extends React.Component {
             <ProposalsManager
               pollOptions={pollOptions}
               defaultPollValues={defaultPollValues}
-              proposals={proposals || []}
+              proposals={(proposals || [])
+                .filter(p => p.state === 'proposed')
+                .sort(
+                  (a, b) =>
+                    new Date(a.pollOne.endTime) - new Date(b.pollOne.endTime),
+                )}
               pageInfo={pageInfo}
               updateProposal={mutateProposal}
               loadProposals={this.fetchProposals}
+            />
+          </AccordionPanel>
+          <AccordionPanel heading="Manage surveys" onActive={this.fetchSurveys}>
+            <ProposalsManager
+              pollOptions={pollOptions}
+              defaultPollValues={defaultPollValues}
+              proposals={(surveys || []).filter(
+                s => (s.pollOne ? !s.pollOne.closedAt : false),
+              )}
+              pageInfo={pageInfo}
+              updateProposal={mutateProposal}
+              loadProposals={this.fetchSurveys}
             />
           </AccordionPanel>
           <AccordionPanel
@@ -160,6 +190,12 @@ class ProposalPanel extends React.Component {
 
 const mapStateToProps = state => ({
   proposals: getVisibleProposals(state, 'active').filter(p => !p.workTeamId),
+  surveys: getVisibleProposals(state, 'survey').filter(p => !p.workTeamId),
+  surveyPageInfo: getResourcePageInfo(
+    state,
+    'proposals',
+    genProposalPageKey({ state: 'survey' }),
+  ),
   pageInfo: getResourcePageInfo(
     state,
     'proposals',

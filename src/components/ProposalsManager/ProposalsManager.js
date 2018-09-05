@@ -160,13 +160,13 @@ class ProposalsManager extends React.Component {
     if (errorMessage && !proposals.length) {
       return <FetchError message={errorMessage} onRetry={loadProposals} />;
     }
-    const toRender = proposals.filter(p => p.state === 'proposed');
+    /*  const toRender = proposals.filter(p => p.state === 'proposed');
     toRender.sort(
       (a, b) => new Date(a.pollOne.endTime) - new Date(b.pollOne.endTime),
     );
-
+*/
     return (
-      <Box column pad>
+      <Box column>
         {showDetails && (
           <Layer onClose={this.handleLayerClosing}>
             <ProposalActions
@@ -179,17 +179,18 @@ class ProposalsManager extends React.Component {
             />
           </Layer>
         )}
-
-        <AssetsTable
-          onClickCheckbox={this.onClickCheckbox}
-          onClickMenu={this.handleProposalClick}
-          searchTerm=""
-          noRequestsFound="No messages found"
-          checkedIndices={[]}
-          assets={toRender}
-          row={ProposalRow}
-          tableHeaders={['Title', 'Poll', 'Endtime', '']}
-        />
+        <Box pad>
+          <AssetsTable
+            onClickCheckbox={this.onClickCheckbox}
+            onClickMenu={this.handleProposalClick}
+            searchTerm=""
+            noRequestsFound="No messages found"
+            checkedIndices={[]}
+            assets={proposals}
+            row={ProposalRow}
+            tableHeaders={['Title', 'State', 'Poll', 'Endtime', '']}
+          />
+        </Box>
 
         {pagination.hasNextPage && (
           <Button

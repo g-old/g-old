@@ -4,7 +4,7 @@ import { FormattedDate } from 'react-intl';
 import TableRow from '../TableRow';
 import PollState from '../PollState';
 
-function ProposalRow({ id, title, pollOne, onClickMenu }) {
+function ProposalRow({ id, title, pollOne, state, onClickMenu }) {
   /* eslint-disable react/no-danger */
   /* eslint-disable jsx-a11y/click-events-have-key-events */
   /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
@@ -12,6 +12,7 @@ function ProposalRow({ id, title, pollOne, onClickMenu }) {
   return (
     <TableRow onClick={() => onClickMenu({ id })}>
       <td>{title}</td>
+      <td>{state}</td>
       <td>
         <PollState
           compact
@@ -42,6 +43,7 @@ ProposalRow.propTypes = {
   title: PropTypes.string.isRequired,
   pollOne: PropTypes.shape({}).isRequired,
   id: PropTypes.string.isRequired,
+  state: PropTypes.string.isRequired,
 };
 
 export default ProposalRow;

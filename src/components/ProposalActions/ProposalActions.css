@@ -1,13 +1,15 @@
 .root {
-  padding-top: 2em;
   padding-bottom: 2em;
 }
 
-.proposal {
-  margin: 0 1em !important;
-  min-width: 10em;
-}
+.keyValue {
+  padding-bottom: 2em;
 
-.details {
-  min-width: 12em;
+  th {
+    text-align: left;
+  }
+
+  td {
+    text-align: right;
+  }
 }

@@ -2,13 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import {
-  defineMessages,
-  FormattedMessage,
-  FormattedRelative,
-} from 'react-intl';
+import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import s from './ProposalActions.css';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
+import KeyValueRow from './KeyValueRow';
 import {
   getProposal,
   getIsProposalFetching,
@@ -28,6 +25,7 @@ import {
 import Notification from '../Notification';
 import Label from '../Label';
 import PollState from '../PollState';
+import Heading from '../Heading';
 
 const messages = defineMessages({
   confirmation: {
@@ -52,9 +50,9 @@ const messages = defineMessages({
     description: 'Revoke proposal',
   },
   close: {
-    id: 'manager.close',
-    defaultMessage: 'Close proposal',
-    description: 'Close the proposal',
+    id: 'command.close',
+    defaultMessage: 'Close',
+    description: 'Close',
   },
   empty: {
     id: 'form.error-empty',
@@ -101,11 +99,13 @@ class ProposalActions extends React.Component {
     pending: PropTypes.bool,
     success: PropTypes.bool,
   };
+
   static defaultProps = {
     error: null,
     pending: false,
     success: false,
   };
+
   constructor(props) {
     super(props);
     this.handleValueChanges = this.handleValueChanges.bind(this);
@@ -141,36 +141,44 @@ class ProposalActions extends React.Component {
       obj => obj.state.settings,
     );
   }
+
   componentWillReceiveProps({ success, error }) {
+    const { onFinish, error: errorMessage } = this.props;
     if (success === true) {
-      this.props.onFinish();
+      onFinish();
     }
     if (error) {
-      this.setState({ error: !this.props.error });
+      this.setState({ error: !errorMessage });
     }
   }
+
   handleValidation(fields) {
     const validated = this.Validator(fields);
-    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
+    this.setState(prevState => ({
+      errors: { ...prevState.errors, ...validated.errors },
+    }));
     return validated.failed === 0;
   }
+
   handleBlur(e) {
     const field = e.target.name;
-    if (this.state.settings[field]) {
+    const { settings } = this.state;
+    if (settings[field]) {
       this.handleValidation([field]);
     }
   }
+
   visibleErrors(errorNames) {
+    const { errors } = this.state;
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
-      if (this.state.errors[curr].touched) {
-        acc[err] = (
-          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
-        );
+      if (errors[curr].touched) {
+        acc[err] = <FormattedMessage {...messages[errors[curr].errorName]} />;
       }
       return acc;
     }, {});
   }
+
   handleValueChanges(e) {
     let value;
     switch (e.target.name) {
@@ -194,17 +202,22 @@ class ProposalActions extends React.Component {
       default:
         throw Error(`Element not recognized: ${e.target.name}`);
     }
-    this.setState({
-      settings: { ...this.state.settings, [e.target.name]: value },
-    });
+    this.setState(prevState => ({
+      settings: { ...prevState.settings, [e.target.name]: value },
+    }));
   }
 
   handleStateChange() {
-    this.props.updateProposal({
-      id: this.props.proposal.id,
-      state: 'revoked',
-      ...(this.props.proposal.workTeamId && {
-        workTeamId: this.props.proposal.workTeamId,
+    const {
+      proposal: { id, workTeamId, state },
+      updateProposal,
+    } = this.props;
+
+    updateProposal({
+      id,
+      state: state === 'survey' ? 'survey' : 'revoked',
+      ...(workTeamId && {
+        workTeamId,
       }),
     });
   }
@@ -214,38 +227,39 @@ class ProposalActions extends React.Component {
     // TODO refactor - is the same as in ProposalsInput
 
     if (this.handleValidation(formFields)) {
+      const {
+        settings: {
+          dateTo,
+          timeTo,
+          pollOption,
+          withStatements,
+          secret,
+          threshold,
+          thresholdRef,
+          unipolar,
+        },
+      } = this.state;
+      const {
+        updateProposal,
+        proposal: { id, defaultPollValues, workTeamId },
+      } = this.props;
       const startTime = null;
       let endTime = null;
-      const { dateTo, timeTo, pollOption } = this.state.settings;
-      // currently not in use
-      /*  if (dateFrom || timeFrom) {
-        dateFrom = dateFrom || new Date();
-        timeFrom = timeFrom || utcCorrectedDate().slice(11, 16);
-        startTime = concatDateAndTime(dateFrom, timeFrom);
-      }
-      */
+
       if (dateTo || timeTo) {
         const date = dateTo || utcCorrectedDate(3).slice(0, 10);
         const time = timeTo || utcCorrectedDate().slice(11, 16);
 
         endTime = concatDateAndTime(date, time);
       }
-      const {
-        withStatements,
-        secret,
-        threshold,
-        thresholdRef,
-        unipolar,
-      } = this.state.settings;
-      this.props.updateProposal({
-        id: this.props.proposal.id,
+
+      updateProposal({
+        id,
         poll: {
           startTime,
           endTime,
           secret,
-          threshold:
-            threshold ||
-            this.props.defaultPollValues[pollOption.value].threshold,
+          threshold: threshold || defaultPollValues[pollOption.value].threshold,
           mode: {
             withStatements,
             id: pollOption.value,
@@ -253,111 +267,190 @@ class ProposalActions extends React.Component {
             thresholdRef,
           },
         },
-        ...(this.props.proposal.workTeamId && {
-          workTeamId: this.props.proposal.workTeamId,
+        ...(workTeamId && {
+          workTeamId,
         }),
       });
     }
   }
+
   toggleSettings() {
-    this.setState({ displaySettings: !this.state.displaySettings });
+    this.setState(prevState => ({
+      displaySettings: !prevState.displaySettings,
+    }));
   }
 
-  render() {
-    const { settings } = this.state;
-    const { error, pending, proposal } = this.props;
+  renderPollState() {
+    const { proposal } = this.props;
+    const result = [];
+    if (proposal.state === 'survey') {
+      result.push(<Label>Survey</Label>);
+    } else {
+      result.push(<Label>Poll One</Label>);
+    }
     const { pollOne } = proposal;
-    const thresholdPassed = isThresholdPassed(pollOne);
-    const numVotersForThreshold = Math.ceil(
-      pollOne.allVoters * pollOne.threshold / 100,
-    );
+    if (pollOne) {
+      result.push(
+        <div>
+          <PollState
+            compact
+            allVoters={pollOne.allVoters}
+            upvotes={pollOne.upvotes}
+            downvotes={pollOne.downvotes}
+            thresholdRef={pollOne.mode.thresholdRef}
+            threshold={pollOne.threshold}
+            unipolar={pollOne.mode.unipolar}
+          />
+        </div>,
+      );
+    }
 
-    const panels = [];
+    return result;
+  }
+
+  renderActions() {
+    const {
+      defaultPollValues,
+      pending,
+      pollOptions,
+      intl,
+      proposal: { pollOne, state },
+    } = this.props;
+    const { settings, displaySettings } = this.state;
+    const actions = [];
     if (!pollOne.closedAt) {
-      panels.push(
-        <AccordionPanel heading={<FormattedMessage {...messages.revoke} />}>
+      actions.push(
+        <AccordionPanel
+          heading={
+            <FormattedMessage
+              {...messages[state === 'survey' ? 'close' : 'revoke']}
+            />
+          }
+        >
           <Box pad column justify>
             <Button
               disabled={pending}
               onClick={this.handleStateChange}
               primary
-              label={<FormattedMessage {...messages.revokeShort} />}
+              label={
+                <FormattedMessage
+                  {...messages[state === 'survey' ? 'close' : 'revokeShort']}
+                />
+              }
             />
           </Box>
         </AccordionPanel>,
       );
     }
-    panels.push(
-      <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
-        <Box column pad>
-          <PollInput
-            onValueChange={this.handleValueChanges}
-            handleDateChange={this.handleValueChanges}
-            selectedPMode={this.state.settings.pollOption}
-            displaySettings={this.state.displaySettings}
-            defaultPollValues={this.props.defaultPollValues}
-            pollValues={settings}
-            toggleSettings={this.toggleSettings}
-            pollOptions={this.props.pollOptions}
-            intl={this.props.intl}
-            formErrors={this.visibleErrors(formFields)}
-            handleBlur={this.handleBlur}
-          />
-          <Button
-            disabled={pending}
-            label={<FormattedMessage {...messages.open} />}
-            primary
-            onClick={this.handleOnSubmit}
-          />
-          {/* <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '} */}
-        </Box>
-      </AccordionPanel>,
-    );
+
+    if (state !== 'survey') {
+      actions.push(
+        <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
+          <Box column pad>
+            <PollInput
+              onValueChange={this.handleValueChanges}
+              handleDateChange={this.handleValueChanges}
+              selectedPMode={settings.pollOption}
+              displaySettings={displaySettings}
+              defaultPollValues={defaultPollValues}
+              pollValues={settings}
+              toggleSettings={this.toggleSettings}
+              pollOptions={pollOptions}
+              intl={intl}
+              formErrors={this.visibleErrors(formFields)}
+              handleBlur={this.handleBlur}
+            />
+            <Button
+              disabled={pending}
+              label={<FormattedMessage {...messages.open} />}
+              primary
+              onClick={this.handleOnSubmit}
+            />
+            {/* <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '} */}
+          </Box>
+        </AccordionPanel>,
+      );
+    }
+
+    return actions.length ? <Accordion>{actions}</Accordion> : [];
+  }
+
+  renderNotifications() {
+    const {
+      proposal: { state, pollOne },
+    } = this.props;
+    let result;
+    if (
+      state !== 'survey' &&
+      (pollOne.closedAt || isThresholdPassed(pollOne))
+    ) {
+      result = <Notification type="alert" message="Ready for voting" />;
+    }
+    return result;
+  }
+
+  renderDetails() {
+    const {
+      proposal: { pollOne, state },
+    } = this.props;
+    const details = [<KeyValueRow name="Upvotes" value={pollOne.upvotes} />];
+
+    if (state === 'survey') {
+      details.push(<KeyValueRow name="Downvotes" value={pollOne.downvotes} />);
+    } else {
+      const numVotersForThreshold = Math.ceil(
+        (pollOne.allVoters * pollOne.threshold) / 100,
+      );
+      details.push(
+        <KeyValueRow name="Threshold (votes)" value={numVotersForThreshold} />,
+        <KeyValueRow
+          name="Votes left for threshold"
+          value={numVotersForThreshold - pollOne.upvotes}
+        />,
+      );
+    }
+    if (!pollOne.closedAt) {
+      details.push(
+        <KeyValueRow
+          name="Endtime"
+          value={
+            <FormattedDate
+              value={pollOne.endTime}
+              day="numeric"
+              month="numeric"
+              year="numeric"
+              hour="numeric"
+              minute="numeric"
+            />
+          }
+        />,
+      );
+    }
 
     return (
-      <Box className={s.root} flex wrap>
-        <Box flex column pad className={s.proposal}>
-          {this.state.error && <Notification type="error" message={error} />}
-          <Label>{proposal.title}</Label>
-          <Label>Poll One</Label>
-          {pollOne && (
-            <div>
-              <PollState
-                compact
-                allVoters={pollOne.allVoters}
-                upvotes={pollOne.upvotes}
-                downvotes={pollOne.downvotes}
-                thresholdRef={pollOne.mode.thresholdRef}
-                threshold={pollOne.threshold}
-                unipolar={pollOne.mode.unipolar}
-              />
-            </div>
-          )}
-          <span>
-            {'Upvotes:'} {pollOne.upvotes}
-          </span>
-          <span>
-            {'Threshold (votes): '}
-            {numVotersForThreshold}
-          </span>
-          {!thresholdPassed && (
-            <span>
-              {'Votes left for threshold: '}{' '}
-              {numVotersForThreshold - pollOne.upvotes}
-            </span>
-          )}
-          {!pollOne.closedAt && (
-            <span>
-              {'Endtime: '}
-              {<FormattedRelative value={pollOne.endTime} />}
-            </span>
-          )}
-          {(pollOne.closedAt || thresholdPassed) && (
-            <Notification type="alert" message="Ready for voting" />
-          )}
+      <table className={s.keyValue}>
+        <tbody>{details}</tbody>
+      </table>
+    );
+  }
+
+  render() {
+    const { error: errorMessage, proposal } = this.props;
+    const { error } = this.state;
+
+    return (
+      <Box column fill className={s.root}>
+        <Box pad>
+          <Heading tag="h3">{proposal.title}</Heading>
         </Box>
-        <Box flex className={s.details}>
-          <Accordion>{panels}</Accordion>
+        <Box flex align justify wrap>
+          <Box column>
+            {error && <Notification type="error" message={errorMessage} />}
+            {this.renderPollState()}
+            {this.renderDetails()}
+            {this.renderNotifications()}
+          </Box>
+          {this.renderActions()}
         </Box>
       </Box>
     );
