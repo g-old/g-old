@@ -1,0 +1,7 @@
+@import '../../components/variables.css';
+
+.messageBox {
+  > div {
+    overflow-y: scroll;
+  }
+}

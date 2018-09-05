@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
-
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import s from './NoticeLayer.css';
 import Layer from '../Layer';
 import Box from '../Box';
 import Button from '../Button';
@@ -23,16 +24,16 @@ const messages = defineMessages({
 const getContent = textHtml => {
   const res = {};
   if (textHtml) {
-    res.de = textHtml.de || Object.values(textHtml).find(s => s);
+    res.de = textHtml.de || Object.values(textHtml).find(t => t);
 
-    res.it = textHtml.it || Object.values(textHtml).find(s => s);
+    res.it = textHtml.it || Object.values(textHtml).find(t => t);
   }
   return res;
 };
 
 const NoticeLayer = ({ message, onSend, onClose, updates }) => {
   const content = (
-    <Box column align>
+    <Box column align className={s.messageBox}>
       <Label> DEUTSCH </Label>
       <Message
         subject={getContent(message.subject).de}
@@ -62,9 +63,11 @@ const NoticeLayer = ({ message, onSend, onClose, updates }) => {
 
   return (
     <Layer onClose={onClose}>
-      {content}
-      <Box justify padding="medium">
-        {dialog}
+      <Box column>
+        {content}
+        <Box justify padding="medium">
+          {dialog}
+        </Box>
       </Box>
     </Layer>
   );
@@ -78,4 +81,4 @@ NoticeLayer.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default NoticeLayer;
+export default withStyles(s)(NoticeLayer);
