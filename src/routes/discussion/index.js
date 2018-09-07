@@ -4,7 +4,7 @@ import { loadDiscussion } from '../../actions/discussion';
 import { scrollToResource } from '../../actions/comment';
 import updateNotificationStatus from '../notificationHelper';
 import DiscussionContainer from './DiscussionContainer';
-import { getSessionUser, getDiscussion } from '../../reducers';
+import { getSessionUser } from '../../reducers';
 import { canAccess } from '../../organization';
 import { createRedirectLink } from '../utils';
 
@@ -21,45 +21,18 @@ async function action({ store, path, query }, { id }) {
   if (!process.env.BROWSER) {
     await store.dispatch(loadDiscussion({ id, parentId: query.comment }));
   } else {
-    const discussion = getDiscussion(state, id);
-    if (discussion && discussion.comments) {
-      // discussion is here,comments too - do we need to reload?
-
+    store.dispatch(loadDiscussion({ id, parentId: query.comment })).then(() => {
       if (query && (query.comment || query.child)) {
-        // eslint-disable-next-line eqeqeq
-        if (discussion.comments.find(c => c.id == query.comment)) {
-          // parent is here - no need to reload discussion
-          store.dispatch(
-            scrollToResource({
-              id: query.comment,
-              childId: query.child,
-              containerId: id,
-              type: 'comment',
-            }),
-          );
-        }
+        store.dispatch(
+          scrollToResource({
+            id: query.comment,
+            childId: query.child,
+            containerId: id,
+            type: 'comment',
+          }),
+        );
       }
-
-      if (!discussion.title || !discussion.content) {
-        // no info available
-        store.dispatch(loadDiscussion({ id, parentId: query.comment }));
-      }
-    } else {
-      store
-        .dispatch(loadDiscussion({ id, parentId: query.comment }))
-        .then(() => {
-          if (query && (query.comment || query.child)) {
-            store.dispatch(
-              scrollToResource({
-                id: query.comment,
-                childId: query.child,
-                containerId: id,
-                type: 'comment',
-              }),
-            );
-          }
-        });
-    }
+    });
 
     updateNotificationStatus(store, query);
   }
