@@ -9,7 +9,6 @@ import { canAccess } from '../../organization';
 import { createRedirectLink } from '../utils';
 
 const title = 'Discussion';
-
 async function action({ store, path, query }, { id }) {
   const state = store.getState();
   const user = getSessionUser(state);
@@ -22,17 +21,19 @@ async function action({ store, path, query }, { id }) {
   if (!process.env.BROWSER) {
     await store.dispatch(loadDiscussion({ id, parentId: query.comment }));
   } else {
-    store.dispatch(loadDiscussion({ id, parentId: query.comment }));
-    if (query && (query.comment || query.child)) {
-      store.dispatch(
-        scrollToResource({
-          id: query.comment,
-          childId: query.child,
-          containerId: id,
-          type: 'comment',
-        }),
-      );
-    }
+    store.dispatch(loadDiscussion({ id, parentId: query.comment })).then(() => {
+      if (query && (query.comment || query.child)) {
+        store.dispatch(
+          scrollToResource({
+            id: query.comment,
+            childId: query.child,
+            containerId: id,
+            type: 'comment',
+          }),
+        );
+      }
+    });
+
     updateNotificationStatus(store, query);
   }
 
