@@ -105,7 +105,6 @@ class DiscussionContainer extends React.Component {
     this.fetchDiscussion = this.fetchDiscussion.bind(this);
     this.scrollToComment = this.scrollToComment.bind(this);
     this.setRef = this.setRef.bind(this);
-    this.scrollToComment = this.scrollToComment.bind(this);
     this.checkCommentExists = this.checkCommentExists.bind(this);
     this.handleScrollToResource = this.handleScrollToResource.bind(this);
   }
@@ -163,10 +162,12 @@ class DiscussionContainer extends React.Component {
           return;
         }
       }
-      this.setState(
-        { lastCommentFetched: scrollCounter },
-        this.handleCommentFetching({ parentId: scrollCounter.id }, true),
-      );
+      if (scrollCounter.id) {
+        this.setState(
+          { lastCommentFetched: scrollCounter },
+          this.handleCommentFetching({ parentId: scrollCounter.id }, true),
+        );
+      }
     }
   }
 
@@ -200,18 +201,21 @@ class DiscussionContainer extends React.Component {
       console.error(e);
     }
     if (node) {
-      if (this.timer) {
-        clearTimeout(this.timer);
-      }
-      this.timer = setTimeout(() =>
-        // or use window.scrollTo(0, node.offsetTop);
-        {
-          node.scrollIntoView({
-            block: 'center',
-            behavior: 'smooth',
-          });
-          this.timer = undefined;
-        }, 100);
+      // hack, otherwise setting to active has no effect on page load
+      this.setState({ activeId: scrollTargetId }, () => {
+        if (this.timer) {
+          clearTimeout(this.timer);
+        }
+        this.timer = setTimeout(() =>
+          // or use window.scrollTo(0, node.offsetTop);
+          {
+            node.scrollIntoView({
+              block: 'center',
+              behavior: 'smooth',
+            });
+            this.timer = undefined;
+          }, 100);
+      });
     }
   }
 
@@ -300,7 +304,7 @@ class DiscussionContainer extends React.Component {
       updateComment: mutateComment,
       deleteComment: eraseComment,
     } = this.props;
-    const { replying, scrollTargetId } = this.state;
+    const { replying, activeId } = this.state;
     if (isFetching && !discussion) {
       return <p>{'Loading...'} </p>;
     }
@@ -343,7 +347,7 @@ class DiscussionContainer extends React.Component {
         );
       }
       // return proposal, poll, statementslist
-      if (!discussion.comments) return <span>NOTHING TO SEE</span>;
+      // if (!discussion.comments) return <span>NOTHING TO SEE</span>;
       if (discussion.deletedAt)
         return (
           <Notification type="alert" message="Discussion not accessible!" />
@@ -359,11 +363,13 @@ class DiscussionContainer extends React.Component {
               }}
             >
               <Box between>
-                <WorkteamHeader
-                  displayName={discussion.workTeam.displayName}
-                  id={discussion.workTeam.id}
-                  logo={discussion.workTeam.logo}
-                />
+                {discussion.workTeam && (
+                  <WorkteamHeader
+                    displayName={discussion.workTeam.displayName}
+                    id={discussion.workTeam.id}
+                    logo={discussion.workTeam.logo}
+                  />
+                )}
 
                 {closingElement}
               </Box>
@@ -393,47 +399,51 @@ class DiscussionContainer extends React.Component {
                 />
               )}
               {discussion.comments &&
-                discussion.comments.map(c => (
-                  <Comment
-                    {...c}
-                    showReplies={
-                      c.id === scrollCounter.id && scrollCounter.childId
-                    }
-                    onReply={!discussion.closedAt && this.handleReply}
-                    loadReplies={this.handleCommentFetching}
-                    onCreate={this.handleCommentCreation}
-                    onUpdate={mutateComment}
-                    onDelete={eraseComment}
-                    onProfileClick={handleProfileClick}
-                    openInput={c.id === replying}
-                    // eslint-disable-next-line eqeqeq
-                    own={c.author.id == user.id}
-                    user={user}
-                    updates={updates[c.id]}
-                    ref={this.setRef}
-                    active={c.id === scrollTargetId}
-                  >
-                    {c.replies &&
-                      c.replies.map(r => (
-                        <Comment
-                          {...r}
-                          onReply={!discussion.closedAt && this.handleReply}
-                          reply
-                          onCreate={this.handleCommentCreation}
-                          onUpdate={mutateComment}
-                          onDelete={eraseComment}
-                          openInput={r.id === replying}
-                          onProfileClick={handleProfileClick}
-                          // eslint-disable-next-line eqeqeq
-                          own={r.author.id == user.id}
-                          updates={updates[c.id]}
-                          user={user}
-                          ref={this.setRef}
-                          active={r.id === scrollTargetId}
-                        />
-                      ))}
-                  </Comment>
-                ))}
+                discussion.comments
+                  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                  .map(c => (
+                    <Comment
+                      {...c}
+                      showReplies={
+                        c.id === scrollCounter.id && scrollCounter.childId
+                      }
+                      key={c.id}
+                      onReply={!discussion.closedAt && this.handleReply}
+                      loadReplies={this.handleCommentFetching}
+                      onCreate={this.handleCommentCreation}
+                      onUpdate={mutateComment}
+                      onDelete={eraseComment}
+                      onProfileClick={handleProfileClick}
+                      openInput={c.id === replying}
+                      // eslint-disable-next-line eqeqeq
+                      own={c.author.id == user.id}
+                      user={user}
+                      updates={updates[c.id]}
+                      ref={this.setRef}
+                      active={c.id === activeId}
+                    >
+                      {c.replies &&
+                        c.replies.map(r => (
+                          <Comment
+                            {...r}
+                            key={r.id}
+                            onReply={!discussion.closedAt && this.handleReply}
+                            reply
+                            onCreate={this.handleCommentCreation}
+                            onUpdate={mutateComment}
+                            onDelete={eraseComment}
+                            openInput={r.id === replying}
+                            onProfileClick={handleProfileClick}
+                            // eslint-disable-next-line eqeqeq
+                            own={r.author.id == user.id}
+                            updates={updates[c.id]}
+                            user={user}
+                            ref={this.setRef}
+                            active={r.id === activeId}
+                          />
+                        ))}
+                    </Comment>
+                  ))}
             </Box>
           </Box>
         </div>

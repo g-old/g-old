@@ -75,7 +75,7 @@ const deleteCommentMutation = `
 `;
 
 const commentsQuery = `
-query($parentId:ID){
+query($parentId:ID!){
   comments(parentId:$parentId){
     ${commentFields}
   }

@@ -43,10 +43,49 @@ export default function byId(state = {}, action) {
     case LOAD_DISCUSSIONS_SUCCESS:
     case LOAD_DISCUSSION_SUCCESS:
     case UPDATE_COMMENT_SUCCESS:
-    case LOAD_NOTIFICATIONS_SUCCESS:
     case LOAD_ACTIVITIES_SUCCESS:
     case LOAD_FEED_SUCCESS:
       return merge({}, state, action.payload.entities.comments);
+    case LOAD_NOTIFICATIONS_SUCCESS: {
+      const replies = Object.keys(
+        action.payload.entities.comments || [],
+      ).reduce((acc, commentId) => {
+        const comment = action.payload.entities.comments[commentId];
+
+        if (comment.parentId) {
+          if (acc[comment.parentId]) {
+            acc[comment.parentId].push(comment.id);
+          } else {
+            acc[comment.parentId] = [comment.id];
+          }
+        }
+        return acc;
+      }, {});
+
+      const tempState = Object.keys(replies).reduce((acc, parentId) => {
+        const parent =
+          state[parentId] || action.payload.entities.comments[parentId] || {};
+        if (parent) {
+          acc[parent.id] = {
+            ...parent,
+            replies: [
+              ...new Set([
+                ...replies[parentId],
+                ...(parent.replies ? parent.replies : []),
+              ]),
+            ],
+          };
+        }
+        return acc;
+      }, {});
+      return {
+        ...state,
+        ...(action.payload.entities.comments
+          ? action.payload.entities.comments
+          : []),
+        ...tempState,
+      };
+    }
 
     case DELETE_COMMENT_SUCCESS: {
       const comment = action.payload.entities.comments[action.payload.result];

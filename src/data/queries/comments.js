@@ -1,4 +1,4 @@
-import { GraphQLID, GraphQLList } from 'graphql';
+import { GraphQLID, GraphQLList, GraphQLNonNull } from 'graphql';
 import knex from '../knex';
 
 import CommentType from '../types/CommentType';
@@ -9,7 +9,7 @@ const comments = {
   type: new GraphQLList(CommentType),
   args: {
     parentId: {
-      type: GraphQLID,
+      type: GraphQLNonNull(GraphQLID),
     },
   },
   resolve: (data, { parentId }, { viewer, loaders }) =>

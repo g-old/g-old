@@ -8,7 +8,7 @@ export const TargetType = {
   ROLE: 'role',
 };
 
-export const groupAndSumtBy = function group(data, key, countKey) {
+export const groupAndSumBy = function group(data, key, countKey) {
   return data.reduce((res, x) => {
     const entry = res[x[key]];
     if (entry) {
