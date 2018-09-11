@@ -52,7 +52,7 @@ const options = {
   ],
   // URL schemes we permit
   allowedSchemes: ['http', 'https', 'ftp', 'mailto'],
-  allowedSchemesByTag: {},
+  allowedSchemesByTag: { img: ['data'] },
   allowedSchemesAppliedToAttributes: ['href', 'src', 'cite'],
   allowProtocolRelative: true,
   allowedIframeHostnames: ['www.youtube.com', 'player.vimeo.com'],

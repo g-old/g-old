@@ -177,7 +177,7 @@ class UserNotification extends React.Component {
               <span className={s.important}>{info && info.title}</span>
             </React.Fragment>
           );
-          path = `/workteams/${info.workTeamId}/discussions/${
+          path = `/workteams/${info && info.workTeamId}/discussions/${
             activity.object.discussionId
           }?comment=${parent || activity.object.id}${
             child ? `&child=${child}` : ''
