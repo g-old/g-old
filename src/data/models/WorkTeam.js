@@ -97,7 +97,8 @@ class WorkTeam {
       /* eslint-disable eqeqeq */
       if (
         requester.id == this.coordinatorId ||
-        viewer.id == this.coordinatorId
+        viewer.id == this.coordinatorId ||
+        isAdmin(viewer)
       ) {
         return true;
       }
