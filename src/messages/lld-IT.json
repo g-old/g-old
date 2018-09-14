@@ -60,12 +60,10 @@
       "src/components/MessageInput/MessageInput.js",
       "src/components/ProposalActions/ProposalActions.js",
       "src/components/ProposalInput/ProposalInput.js",
-      "src/components/SignUp/SignUp.js",
       "src/components/TagForm/TagForm.js",
       "src/components/UserSettings/UserSettings.js",
       "src/components/WorkTeamForm/WorkTeamForm.js",
       "src/components/WorkTeamInput/WorkTeamInput.js",
-      "src/components/WorkTeamManager/WorkTeamManager.js",
       "src/routes/passwordRecovery/PasswordRecovery.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
@@ -172,7 +170,6 @@
     "files": [
       "src/components/FormValidation/FormValidation.js",
       "src/components/Login/Login.js",
-      "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js",
       "src/routes/passwordRecovery/PasswordRecovery.js"
@@ -274,8 +271,12 @@
     "defaultMessage": "Change",
     "message": "mudé",
     "files": [
+      "src/components/ConfirmLayer/ConfirmLayer.js",
       "src/components/GroupManager/GroupManager.js",
       "src/components/UserSettings/EmailField.js",
+      "src/components/UserSettings/LocaleInput.js",
+      "src/components/UserSettings/NameInput.js",
+      "src/components/UserSettings/PasswordInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -435,8 +436,7 @@
     "id": "manager.close",
     "description": "Close the proposal",
     "defaultMessage": "Close proposal",
-    "message": "Sclú la proposta",
-    "files": ["src/components/ProposalActions/ProposalActions.js"]
+    "message": "Sclú la proposta"
   },
   {
     "id": "manager.open",
@@ -473,7 +473,6 @@
     "message": "Email bel en doura",
     "files": [
       "src/components/FormValidation/FormValidation.js",
-      "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -483,24 +482,14 @@
     "description": "Help for mismatching passwords",
     "defaultMessage": "These passwords don't match. Try again?",
     "message": "password fauza. Prové da nuef?",
-    "files": [
-      "src/components/FormValidation/FormValidation.js",
-      "src/components/SignUp/SignUp.js",
-      "src/components/UserSettings/UserSettings.js"
-    ]
+    "files": ["src/components/FormValidation/FormValidation.js"]
   },
   {
     "id": "form.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage":
-      "Short passwords are easy to guess. Try one with at least 6 characters",
-    "message":
-      "Passwords curtes é saurides da giaté ora. Prova una con almanco 6 caraters",
-    "files": [
-      "src/components/FormValidation/FormValidation.js",
-      "src/components/SignUp/SignUp.js",
-      "src/components/UserSettings/UserSettings.js"
-    ]
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
+    "message": "Passwords curtes é saurides da giaté ora. Prova una con almanco 6 caraters",
+    "files": ["src/components/FormValidation/FormValidation.js"]
   },
   {
     "id": "form.forename",
@@ -551,7 +540,7 @@
     "message": "Crié na password",
     "files": [
       "src/components/SignUp/SignUp.js",
-      "src/components/UserSettings/UserSettings.js",
+      "src/components/UserSettings/PasswordInput.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
   },
@@ -562,7 +551,7 @@
     "message": "Confermé vosta password",
     "files": [
       "src/components/SignUp/SignUp.js",
-      "src/components/UserSettings/UserSettings.js",
+      "src/components/UserSettings/PasswordInput.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
   },
@@ -617,6 +606,7 @@
     "message": "Suzés!",
     "files": [
       "src/components/UserSettings/EmailField.js",
+      "src/components/UserSettings/PasswordInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -677,14 +667,14 @@
     "description": "Wrong password entered",
     "defaultMessage": "Wrong password",
     "message": "Password fauza",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": ["src/components/FormValidation/FormValidation.js"]
   },
   {
     "id": "userSettings.oldPW",
     "description": "Current account password for form label",
     "defaultMessage": "Enter your current password",
     "message": "Dé ite vosta password atuala",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": ["src/components/UserSettings/PasswordInput.js"]
   },
   {
     "id": "navigation.about",
@@ -731,19 +721,15 @@
   {
     "id": "passwordRecovery.stepOne",
     "description": "Password recovery instruction",
-    "defaultMessage":
-      "Enter your email address below and we'll send you a link to reset your password",
-    "message":
-      "Dede ite vosta adressa email y ves menaron en link por fé l reset dla password",
+    "defaultMessage": "Enter your email address below and we'll send you a link to reset your password",
+    "message": "Dede ite vosta adressa email y ves menaron en link por fé l reset dla password",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
     "id": "passwordRecovery.stepTwo",
     "description": "Password recovery instruction",
-    "defaultMessage":
-      "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
-    "message":
-      "Cialede te vosta posta por i proscims varesc. Sce ne aveis nia giaté na email, y ala ne é nia ruvada tl spam, possel ester che i ves eis anunzié cun en autra adressa",
+    "defaultMessage": "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
+    "message": "Cialede te vosta posta por i proscims varesc. Sce ne aveis nia giaté na email, y ala ne é nia ruvada tl spam, possel ester che i ves eis anunzié cun en autra adressa",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
@@ -762,10 +748,8 @@
   {
     "id": "signup.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage":
-      "Short passwords are easy to guess. Try one with at least 6 characters",
-    "message":
-      "Passwords curtes é saurides da giaté ora. Prova una con almanco 6 caraters",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
+    "message": "Passwords curtes é saurides da giaté ora. Prova una con almanco 6 caraters",
     "files": ["src/routes/passwordReset/PasswordReset.js"]
   },
   {
@@ -938,8 +922,7 @@
   },
   {
     "id": "form.error-select",
-    "description":
-      "Help for selection, when input does not match with a suggestion",
+    "description": "Help for selection, when input does not match with a suggestion",
     "defaultMessage": "You selection is not correct. Click on a suggestion",
     "message": "",
     "files": [
@@ -948,8 +931,7 @@
       "src/components/ProposalInput/ProposalInput.js",
       "src/components/TagForm/TagForm.js",
       "src/components/WorkTeamForm/WorkTeamForm.js",
-      "src/components/WorkTeamInput/WorkTeamInput.js",
-      "src/components/WorkTeamManager/WorkTeamManager.js"
+      "src/components/WorkTeamInput/WorkTeamInput.js"
     ]
   },
   {
@@ -986,9 +968,9 @@
     "defaultMessage": "Load more",
     "message": "",
     "files": [
+      "src/components/ActivityPanel/ActivityPanel.js",
       "src/components/ListView/ListView.js",
       "src/components/UserPanel/UserPanel.js",
-      "src/routes/accountList/AccountListContainer.js",
       "src/routes/memberList/MemberListContainer.js",
       "src/routes/notifications/NotificationListContainer.js"
     ]
@@ -1008,14 +990,14 @@
     "description": "First name",
     "defaultMessage": "Name",
     "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": ["src/components/UserSettings/NameInput.js"]
   },
   {
     "id": "settings.surname",
     "description": "Surname",
     "defaultMessage": "Surname",
     "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": ["src/components/UserSettings/NameInput.js"]
   },
   {
     "id": "join",
@@ -1136,8 +1118,7 @@
   {
     "id": "settings.verificationCall",
     "description": "Notification to verify mail address",
-    "defaultMessage":
-      "Confirm your email address. A confirmation message was sent to ({email})",
+    "defaultMessage": "Confirm your email address. A confirmation message was sent to ({email})",
     "message": "",
     "files": ["src/routes/account/AccountContainer.js"]
   },
@@ -1468,7 +1449,10 @@
     "description": "Label locale",
     "defaultMessage": "Language",
     "message": "",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/LocaleInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "label.notifications",
@@ -1702,5 +1686,26 @@
     "defaultMessage": "closed",
     "message": "",
     "files": ["src/components/StateFilter/StateFilter.js"]
+  },
+  {
+    "id": "command.close",
+    "description": "Close",
+    "defaultMessage": "Close",
+    "message": "",
+    "files": ["src/components/ProposalActions/ProposalActions.js"]
+  },
+  {
+    "id": "labels.viewer",
+    "description": "Label viewer",
+    "defaultMessage": "Viewer",
+    "message": "",
+    "files": ["src/components/UserProfile/RoleBadge.js"]
+  },
+  {
+    "id": "labels.voter",
+    "description": "Label voter",
+    "defaultMessage": "Voter",
+    "message": "",
+    "files": ["src/components/UserProfile/RoleBadge.js"]
   }
 ]

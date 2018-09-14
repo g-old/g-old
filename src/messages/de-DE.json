@@ -37,7 +37,7 @@
     "message": "Passwort bestätigen",
     "files": [
       "src/components/SignUp/SignUp.js",
-      "src/components/UserSettings/UserSettings.js",
+      "src/components/UserSettings/PasswordInput.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
   },
@@ -82,10 +82,8 @@
   {
     "id": "signup.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage":
-      "Short passwords are easy to guess. Try one with at least 6 characters",
-    "message":
-      "Kurze Passwörter sind leicht zu erraten. Bitte verwenden Sie mindestens 6 Zeichen",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
+    "message": "Kurze Passwörter sind leicht zu erraten. Bitte verwenden Sie mindestens 6 Zeichen",
     "files": ["src/routes/passwordReset/PasswordReset.js"]
   },
   {
@@ -109,7 +107,7 @@
     "message": "Passwort erstellen",
     "files": [
       "src/components/SignUp/SignUp.js",
-      "src/components/UserSettings/UserSettings.js",
+      "src/components/UserSettings/PasswordInput.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
   },
@@ -355,12 +353,10 @@
       "src/components/MessageInput/MessageInput.js",
       "src/components/ProposalActions/ProposalActions.js",
       "src/components/ProposalInput/ProposalInput.js",
-      "src/components/SignUp/SignUp.js",
       "src/components/TagForm/TagForm.js",
       "src/components/UserSettings/UserSettings.js",
       "src/components/WorkTeamForm/WorkTeamForm.js",
       "src/components/WorkTeamInput/WorkTeamInput.js",
-      "src/components/WorkTeamManager/WorkTeamManager.js",
       "src/routes/passwordRecovery/PasswordRecovery.js",
       "src/routes/passwordReset/PasswordReset.js"
     ]
@@ -373,7 +369,6 @@
     "files": [
       "src/components/FormValidation/FormValidation.js",
       "src/components/Login/Login.js",
-      "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js",
       "src/routes/passwordRecovery/PasswordRecovery.js"
@@ -392,7 +387,6 @@
     "message": "Diese E-Mail-Adresse wird bereits verwendet",
     "files": [
       "src/components/FormValidation/FormValidation.js",
-      "src/components/SignUp/SignUp.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -402,24 +396,14 @@
     "description": "Help for mismatching passwords",
     "defaultMessage": "These passwords don't match. Try again?",
     "message": "Die Passwörter stimmen nicht überein. Nochmal versuchen?",
-    "files": [
-      "src/components/FormValidation/FormValidation.js",
-      "src/components/SignUp/SignUp.js",
-      "src/components/UserSettings/UserSettings.js"
-    ]
+    "files": ["src/components/FormValidation/FormValidation.js"]
   },
   {
     "id": "form.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage":
-      "Short passwords are easy to guess. Try one with at least 6 characters",
-    "message":
-      "Kurze Passwörter sind leicht zu erraten. Bitte mindestens 6 Zeichen verwenden",
-    "files": [
-      "src/components/FormValidation/FormValidation.js",
-      "src/components/SignUp/SignUp.js",
-      "src/components/UserSettings/UserSettings.js"
-    ]
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
+    "message": "Kurze Passwörter sind leicht zu erraten. Bitte mindestens 6 Zeichen verwenden",
+    "files": ["src/components/FormValidation/FormValidation.js"]
   },
   {
     "id": "form.forename",
@@ -462,8 +446,12 @@
     "defaultMessage": "Change",
     "message": "Ändern",
     "files": [
+      "src/components/ConfirmLayer/ConfirmLayer.js",
       "src/components/GroupManager/GroupManager.js",
       "src/components/UserSettings/EmailField.js",
+      "src/components/UserSettings/LocaleInput.js",
+      "src/components/UserSettings/NameInput.js",
+      "src/components/UserSettings/PasswordInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -483,7 +471,7 @@
     "description": "Current account password for form label",
     "defaultMessage": "Enter your current password",
     "message": "Aktuelles Passwort eingeben",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": ["src/components/UserSettings/PasswordInput.js"]
   },
   {
     "id": "settings.title",
@@ -521,8 +509,7 @@
     "id": "manager.close",
     "description": "Close the proposal",
     "defaultMessage": "Close proposal",
-    "message": "Beschluss schließen",
-    "files": ["src/components/ProposalActions/ProposalActions.js"]
+    "message": "Beschluss schließen"
   },
   {
     "id": "date.to",
@@ -681,9 +668,9 @@
     "defaultMessage": "Load more",
     "message": "Mehr",
     "files": [
+      "src/components/ActivityPanel/ActivityPanel.js",
       "src/components/ListView/ListView.js",
       "src/components/UserPanel/UserPanel.js",
-      "src/routes/accountList/AccountListContainer.js",
       "src/routes/memberList/MemberListContainer.js",
       "src/routes/notifications/NotificationListContainer.js"
     ]
@@ -704,8 +691,7 @@
   },
   {
     "id": "form.error-select",
-    "description":
-      "Help for selection, when input does not match with a suggestion",
+    "description": "Help for selection, when input does not match with a suggestion",
     "defaultMessage": "You selection is not correct. Click on a suggestion",
     "message": "Bitte auf einen Vorschlag klicken",
     "files": [
@@ -714,8 +700,7 @@
       "src/components/ProposalInput/ProposalInput.js",
       "src/components/TagForm/TagForm.js",
       "src/components/WorkTeamForm/WorkTeamForm.js",
-      "src/components/WorkTeamInput/WorkTeamInput.js",
-      "src/components/WorkTeamManager/WorkTeamManager.js"
+      "src/components/WorkTeamInput/WorkTeamInput.js"
     ]
   },
   {
@@ -974,8 +959,7 @@
     "id": "cookieBanner",
     "description": "Cookie banner, should comply to EU regulations",
     "defaultMessage": "By using this site you accept our privacy policy.",
-    "message":
-      "Wenn Sie diese Seite benützen, akzeptieren Sie damit unsere Datenschutzregelung ",
+    "message": "Wenn Sie diese Seite benützen, akzeptieren Sie damit unsere Datenschutzregelung ",
     "files": ["src/components/Layout/Layout.js"]
   },
   {
@@ -1021,6 +1005,7 @@
     "message": "Erfolgreich durchgeführt!",
     "files": [
       "src/components/UserSettings/EmailField.js",
+      "src/components/UserSettings/PasswordInput.js",
       "src/components/UserSettings/UserSettings.js"
     ]
   },
@@ -1040,21 +1025,21 @@
     "description": "Wrong password entered",
     "defaultMessage": "Wrong password",
     "message": "Falsches Passwort",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": ["src/components/FormValidation/FormValidation.js"]
   },
   {
     "id": "settings.name",
     "description": "First name",
     "defaultMessage": "Name",
     "message": "Vorname",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": ["src/components/UserSettings/NameInput.js"]
   },
   {
     "id": "settings.surname",
     "description": "Surname",
     "defaultMessage": "Surname",
     "message": "Nachname",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": ["src/components/UserSettings/NameInput.js"]
   },
   {
     "id": "settings.workTeams",
@@ -1103,19 +1088,15 @@
   {
     "id": "passwordRecovery.stepOne",
     "description": "Password recovery instruction",
-    "defaultMessage":
-      "Enter your email address below and we'll send you a link to reset your password",
-    "message":
-      "Fügen Sie ihre E-Mail-Adresse ein. Sie erhalten eine E-Mail mit einem Link, über den sie das Passwort zurücksetzen können.",
+    "defaultMessage": "Enter your email address below and we'll send you a link to reset your password",
+    "message": "Fügen Sie ihre E-Mail-Adresse ein. Sie erhalten eine E-Mail mit einem Link, über den sie das Passwort zurücksetzen können.",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
     "id": "passwordRecovery.stepTwo",
     "description": "Password recovery instruction",
-    "defaultMessage":
-      "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
-    "message":
-      "Öffnen sie die E-Mail, die an sie versendet wurde, und führen sie die dort beschriebenen Schritte aus. Haben Sie keine E-Mail erhalten? Vielleicht haben Sie bei der Anmeludng eine andere E-Mail-Adresse angegeben. ",
+    "defaultMessage": "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
+    "message": "Öffnen sie die E-Mail, die an sie versendet wurde, und führen sie die dort beschriebenen Schritte aus. Haben Sie keine E-Mail erhalten? Vielleicht haben Sie bei der Anmeludng eine andere E-Mail-Adresse angegeben. ",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
@@ -1221,10 +1202,8 @@
   {
     "id": "settings.verificationCall",
     "description": "Notification to verify mail address",
-    "defaultMessage":
-      "Confirm your email address. A confirmation message was sent to ({email})",
-    "message":
-      "Bitte bestätigen Sie ihre E-Mail-Adresse. Eine Bestätigungsmail wurde an ({email}) verschickt.",
+    "defaultMessage": "Confirm your email address. A confirmation message was sent to ({email})",
+    "message": "Bitte bestätigen Sie ihre E-Mail-Adresse. Eine Bestätigungsmail wurde an ({email}) verschickt.",
     "files": ["src/routes/account/AccountContainer.js"]
   },
   {
@@ -1560,7 +1539,10 @@
     "description": "Label locale",
     "defaultMessage": "Language",
     "message": "Spracheinstellung",
-    "files": ["src/components/UserSettings/UserSettings.js"]
+    "files": [
+      "src/components/UserSettings/LocaleInput.js",
+      "src/components/UserSettings/UserSettings.js"
+    ]
   },
   {
     "id": "notifications",
@@ -1800,5 +1782,26 @@
     "defaultMessage": "closed",
     "message": "geschlossen",
     "files": ["src/components/StateFilter/StateFilter.js"]
+  },
+  {
+    "id": "command.close",
+    "description": "Close",
+    "defaultMessage": "Close",
+    "message": "",
+    "files": ["src/components/ProposalActions/ProposalActions.js"]
+  },
+  {
+    "id": "labels.viewer",
+    "description": "Label viewer",
+    "defaultMessage": "Viewer",
+    "message": "",
+    "files": ["src/components/UserProfile/RoleBadge.js"]
+  },
+  {
+    "id": "labels.voter",
+    "description": "Label voter",
+    "defaultMessage": "Voter",
+    "message": "",
+    "files": ["src/components/UserProfile/RoleBadge.js"]
   }
 ]
