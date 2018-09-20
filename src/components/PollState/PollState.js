@@ -43,25 +43,37 @@ class PollState extends React.Component {
   }
 
   componentWillReceiveProps({ pollId }) {
-    if (pollId !== this.props.pollId) {
+    const { pollId: oldPollId } = this.props;
+    if (pollId !== oldPollId) {
       this.setState({ expand: false });
     }
   }
+
   onToggleExpand() {
-    const newExpand = !this.state.expand;
-    this.setState({ ...this.state, expand: newExpand });
-    if (newExpand) this.props.getVotes();
+    const { expand } = this.state;
+    const { getVotes } = this.props;
+    this.setState(prevState => ({ expand: !prevState.expand }));
+    if (!expand) getVotes();
   }
 
   render() {
-    const { compact, unipolar, updates } = this.props;
-    const voteClass = this.props.unipolar ? s.unipolar : s.bipolar;
+    const {
+      compact,
+      unipolar,
+      updates,
+      threshold,
+      votes,
+      getVotes,
+      upvotes,
+      downvotes,
+      allVoters,
+    } = this.props;
+    const { expand } = this.state;
+    const voteClass = unipolar ? s.unipolar : s.bipolar;
 
-    const sum = this.props.unipolar
-      ? this.props.allVoters
-      : this.props.upvotes + this.props.downvotes;
+    const sum = unipolar ? allVoters : upvotes + downvotes;
 
-    const upPercent = sum > 0 ? 100 * (this.props.upvotes / sum) : 0;
+    const upPercent = sum > 0 ? 100 * (upvotes / sum) : 0;
     const voteBar = (
       <div className={cn(s.bar)} style={{ width: `${upPercent}%` }} />
     );
@@ -72,7 +84,7 @@ class PollState extends React.Component {
       if (!unipolar) {
         numDownVotes = (
           <Value
-            value={this.props.downvotes}
+            value={downvotes}
             trendIcon={
               <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
                 <path
@@ -94,7 +106,7 @@ class PollState extends React.Component {
               <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.up} />
             </svg>
           }
-          value={this.props.upvotes}
+          value={upvotes}
         />
       );
     }
@@ -104,8 +116,8 @@ class PollState extends React.Component {
 
     return (
       <div
-        className={cn(s.root, this.props.compact && s.compact, voteClass)}
-        onClick={this.props.compact ? null : this.onToggleExpand}
+        className={cn(s.root, compact && s.compact, voteClass)}
+        onClick={compact ? null : this.onToggleExpand}
         role="button"
       >
         <div className={s.header}>
@@ -115,25 +127,23 @@ class PollState extends React.Component {
             <div
               className={cn(s.threshold)}
               style={{
-                marginLeft: `${this.props.threshold}%`,
+                marginLeft: `${threshold}%`,
               }}
             />
           </div>
           {numDownVotes}
         </div>
-        {this.state.expand && (
+        {expand && (
           <div className={s.votesList}>
             <VotesList
               autoLoadVotes
-              unipolar={this.props.unipolar}
-              votes={this.props.votes}
+              unipolar={unipolar}
+              votes={votes}
               isFetching={(updates && updates.isPending) || false}
               errorMessage={updates && updates.error}
-              getVotes={this.props.getVotes}
+              getVotes={getVotes}
             />
-            {!this.props.unipolar && this.props.threshold < 50
-              ? ' (IMPOSSIBLE)'
-              : ''}
+            {!unipolar && threshold < 50 ? ' (IMPOSSIBLE)' : ''}
           </div>
         )}
       </div>

@@ -24,24 +24,24 @@ import {
 } from '../store/schema';
 import { subscriptionFields } from './subscription';
 import { getVoteUpdates } from '../reducers';
+import { userFields } from './user';
 
-const voteInfo = `{
-  id
-  position
-  pollId
-  voter{
+export const voteFields = `
     id
-    name
-    surname
-    thumbnail
-  }
-}`;
+    positions{
+      pos
+      value
+    }
+    pollId
+    voter{
+      ${userFields}
+    }`;
 
 const resultFields = `
   subscription{
     ${subscriptionFields}
   }
-  resource ${voteInfo}
+  resource {${voteFields}}
 `;
 const createVoteMutation = `
   mutation($pollId:ID! $position:Position! $targetId:ID) {
@@ -52,28 +52,20 @@ const createVoteMutation = `
 `;
 const updateVoteMutation = `
   mutation($pollId:ID! $position:Position! $id:ID) {
-    updateVote (vote:{pollId:$pollId position:$position id:$id}) ${voteInfo}
+    updateVote (vote:{pollId:$pollId position:$position id:$id}) ${voteFields}
   }
 `;
 
 const deleteVoteMutation = `
   mutation($pollId:ID! $position:Position! $id:ID) {
-    deleteVote (vote:{pollId:$pollId position:$position id:$id}) ${voteInfo}
+    deleteVote (vote:{pollId:$pollId position:$position id:$id}) ${voteFields}
   }
 `;
 
 const votesList = `
   query ($pollId:ID!) {
     votes (pollId:$pollId) {
-    id
-    position
-    pollId
-    voter{
-      id
-      name
-      surname
-      thumbnail
-    }
+   ${voteFields}
     }
   }
 `;

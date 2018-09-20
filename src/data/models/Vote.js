@@ -9,9 +9,10 @@ class Vote {
   constructor(data) {
     this.id = data.id;
     this.userId = data.user_id;
-    this.position = data.position;
+    this.positions = data.positions;
     this.pollId = data.poll_id;
   }
+
   static async gen(viewer, id, loaders) {
     if (!id) return null;
     const data = await loaders.votes.load(id);
@@ -26,7 +27,7 @@ class Vote {
     if (!poll || !poll.isVotable()) return null;
 
     const proposal = await Proposal.genByPoll(viewer, poll.id, loaders);
-    if (!proposal || !await proposal.isVotable(viewer)) return null;
+    if (!proposal || !(await proposal.isVotable(viewer))) return null;
 
     const voteInDB = await knex('votes')
       .transacting(trx)
@@ -239,7 +240,7 @@ class Vote {
 
     if (!poll || !poll.isVotable()) return null;
 
-    if (!proposal || !await proposal.isVotable(viewer)) return null;
+    if (!proposal || !(await proposal.isVotable(viewer))) return null;
 
     let position = data.position === 1 ? 'pro' : 'con';
 

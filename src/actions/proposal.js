@@ -26,6 +26,7 @@ import {
 import { getProposalsIsFetching, getIsProposalFetching } from '../reducers';
 import { getFilter } from '../core/helpers';
 import { subscriptionFields } from './subscription';
+import { voteFields } from './vote';
 
 const userFields = `
         id
@@ -34,14 +35,6 @@ const userFields = `
         thumbnail
 `;
 
-const voteFields = `
-    id
-    position
-    pollId
-    voter{
-      ${userFields}
-    }
-`;
 const statementFields = `
     id
     likes
@@ -51,17 +44,18 @@ const statementFields = `
     updatedAt
     deletedAt
     vote{
-      id
-      position
-      voter{
-       ${userFields}
-      }
-      pollId
+      ${voteFields}
     }
     author{
       ${userFields}
     }
 
+`;
+const optionFields = `
+pos
+order
+description
+numVotes
 `;
 const pollFields = `{
   id
@@ -73,11 +67,12 @@ const pollFields = `{
     ${voteFields}
   }
   ownStatement {${statementFields} deletedAt}
-  upvotes
-  downvotes
+  options{
+    ${optionFields}
+  }
   threshold
   closedAt
-  start_time
+  startTime
   endTime
   allVoters
   followees{
@@ -127,10 +122,11 @@ const query = `
 
 export const pollFieldsForList = `
   id
-  upvotes
-  downvotes
+  options{
+    ${optionFields}
+  }
   threshold
-  start_time
+  startTime
   endTime
   allVoters
   closedAt

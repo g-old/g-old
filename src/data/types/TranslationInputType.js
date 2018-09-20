@@ -14,6 +14,9 @@ const TranslationInputType = new GraphQLInputObjectType({
     lld: {
       type: String,
     },
+    _default: {
+      type: String,
+    },
   },
 });
 export default TranslationInputType;

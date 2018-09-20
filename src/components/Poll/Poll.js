@@ -87,6 +87,7 @@ class Poll extends React.Component {
     closedAt: null,
     canVote: null,
   };
+
   constructor(props) {
     super(props);
     this.state = {};
@@ -94,10 +95,11 @@ class Poll extends React.Component {
   }
 
   componentWillReceiveProps({ updates, id }) {
-    if (id === this.props.id && updates.vote) {
+    const { id: oldId, updates: oldUpdates } = this.props;
+    if (id === oldId && updates.vote) {
       let voteError;
       if (updates.vote.error) {
-        const oldStatus = this.props.updates.vote || {};
+        const oldStatus = oldUpdates.vote || {};
         voteError = !oldStatus.error;
       }
       if (updates.vote.success) {
@@ -108,27 +110,26 @@ class Poll extends React.Component {
   }
 
   getFolloweeVotes(pos) {
-    if (!this.props.followeeVotes) {
+    const { followeeVotes } = this.props;
+    if (!followeeVotes) {
       return null;
     }
-    return this.props.followeeVotes
-      .filter(user => user.position === pos)
-      .map(user => (
-        <img // eslint-disable-line
-          onClick={() => {
-            history.push(`/accounts/${user.voter.id}`);
-          }}
-          key={user.id}
-          className={s.followee}
-          src={user.voter.thumbnail}
-          title={`${user.voter.name} ${user.voter.surname}`}
-          alt="IMG"
-        />
-      ));
+    return followeeVotes.filter(user => user.position === pos).map(user => (
+      <img // eslint-disable-line
+        onClick={() => {
+          history.push(`/accounts/${user.voter.id}`);
+        }}
+        key={user.id}
+        className={s.followee}
+        src={user.voter.thumbnail}
+        title={`${user.voter.name} ${user.voter.surname}`}
+        alt="IMG"
+      />
+    ));
   }
 
   canVote(position) {
-    const { ownVote, ownStatement, id } = this.props;
+    const { ownVote, ownStatement, id, onVote } = this.props;
     let method; // or take methods better directly in and connect to redux
     let info = null;
 
@@ -144,13 +145,13 @@ class Poll extends React.Component {
       info = ownStatement.id;
       this.setState({
         confirmationFunc: () => {
-          this.props.onVote({ position, pollId: id, id: voteId }, method, info);
+          onVote({ position, pollId: id, id: voteId }, method, info);
           this.setState({ confirmationFunc: null });
         },
       });
       return;
     }
-    this.props.onVote({ position, pollId: id, id: voteId }, method, info);
+    onVote({ position, pollId: id, id: voteId }, method, info);
   }
 
   handleRetractVote() {
@@ -165,8 +166,7 @@ class Poll extends React.Component {
       id,
       ownVote,
       allVoters,
-      upvotes,
-      downvotes,
+      options,
       threshold,
       mode,
       closedAt,
@@ -176,7 +176,15 @@ class Poll extends React.Component {
       onFetchVoters,
       canVote,
     } = this.props;
-
+    const { confirmationFunc, voteError } = this.state;
+    let upvotes = 0;
+    let downvotes = 0;
+    if (mode.unipolar) {
+      upvotes = options[0].numVotes;
+    } else {
+      upvotes = options[1].numVotes;
+      downvotes = options[0].numVotes;
+    }
     let votingButtons = null;
     /* eslint-disable max-len */
     const votePending = updates.vote ? updates.vote.pending : false;
@@ -267,7 +275,7 @@ class Poll extends React.Component {
 
     return (
       <div>
-        {this.state.confirmationFunc && (
+        {confirmationFunc && (
           <Layer>
             <Box column pad className={s.confirmationBox}>
               <Notification
@@ -275,10 +283,7 @@ class Poll extends React.Component {
                 message={<FormattedMessage {...messages.notify} />}
               />
               <Box justify>
-                <Button
-                  onClick={() => this.state.confirmationFunc()}
-                  label="Ok"
-                />
+                <Button onClick={() => confirmationFunc()} label="Ok" />
                 <Button
                   primary
                   label={<FormattedMessage {...messages.cancel} />}
@@ -296,7 +301,8 @@ class Poll extends React.Component {
           ) : (
             <FormattedMessage {...messages.closing} />
           )}
-          &nbsp;<FormattedRelative value={closedAt || endTime} />
+          &nbsp;
+          <FormattedRelative value={closedAt || endTime} />
         </p>
         <div className={s.pollState}>
           <PollState
@@ -320,7 +326,7 @@ class Poll extends React.Component {
         </div>
 
         <Box justify>{votingButtons}</Box>
-        {this.state.voteError && (
+        {voteError && (
           <Notification
             type="error"
             message={<FormattedMessage {...messages.error} />}

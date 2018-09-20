@@ -57,3 +57,5 @@ export const createConnection = (
     return { edges, pageInfo: { startCursor: null, endCursor, hasNextPage } };
   },
 });
+
+export const localeToLang = { 'de-DE': 'de', 'it-IT': 'it', 'lld-IT': 'lld' };

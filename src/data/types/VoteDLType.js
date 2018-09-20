@@ -1,11 +1,12 @@
 import {
-  GraphQLString,
+  GraphQLList,
   GraphQLObjectType as ObjectType,
   GraphQLID,
   GraphQLNonNull,
 } from 'graphql';
 import User from '../models/User';
 import UserType from './UserType';
+import PositionType from './PositionType';
 
 const VoteType = new ObjectType({
   name: 'VoteDL',
@@ -14,14 +15,11 @@ const VoteType = new ObjectType({
     id: {
       type: new GraphQLNonNull(GraphQLID),
     },
-
-    position: {
-      type: GraphQLString,
-      resolve: data => data.position,
+    positions: {
+      type: new GraphQLList(PositionType),
     },
     voter: {
       type: UserType,
-      // resolve: (data) => data.user_id,
       resolve: (parent, args, { viewer, loaders }) =>
         User.gen(viewer, parent.userId, loaders),
     },

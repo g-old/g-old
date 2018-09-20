@@ -28,8 +28,10 @@ import {
   flaggedStatementArray as flaggedArraySchema,
   flaggedStatement as flaggedStatementSchema,
 } from '../store/schema';
+import { userFields } from './user';
+import { voteFields } from './vote';
 
-const statementResult = `{
+export const statementFields = `
   id
   likes
   text
@@ -38,42 +40,32 @@ const statementResult = `{
   updatedAt
   deletedAt
   vote{
-    id
-    position
+    ${voteFields}
   }
   author{
-    id
-    name
-    surname
-    thumbnail
+    ${userFields}
   }
-}
+
 `;
 
 const createStatementMutation = `
   mutation ($text:String! $pollId:ID! $voteId:ID!) {
-    createStatement (statement:{ text:$text pollId:$pollId  voteId:$voteId})${statementResult}
+    createStatement (statement:{ text:$text pollId:$pollId  voteId:$voteId}){${statementFields}}
   }
 `;
 
 const updateStatementMutation = `
   mutation ( $text:String!  $id: ID!) {
-    updateStatement (statement:{ text:$text id:$id })${statementResult}
+    updateStatement (statement:{ text:$text id:$id }){${statementFields}}
   }
 `;
 
 const deleteStatementMutation = `
   mutation ($pollId:ID! $id: ID) {
-    deleteStatement (statement:{pollId:$pollId id:$id })${statementResult}
+    deleteStatement (statement:{pollId:$pollId id:$id }){${statementFields}}
   }
 `;
-const userFields = `
-id,
-    name,
-    surname,
-    thumbnail
-    groups
-    `;
+
 const flaggedStatement = `
 id,
 flagger{
@@ -82,7 +74,7 @@ flagger{
 flaggedUser{
   ${userFields}
 },
-statement ${statementResult}
+statement {${statementFields}}
 content,
 count,
 createdAt,

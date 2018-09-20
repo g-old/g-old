@@ -53,19 +53,28 @@ class ProposalPreview extends React.Component {
     if (!poll) {
       return <div />;
     }
+    let upvotes = 0;
+    let downvotes = 0;
+    if (poll.mode.thresholdRef === 'all') {
+      upvotes = poll.options[0].numVotes;
+    } else {
+      upvotes = poll.options[1].numVotes;
+      downvotes = poll.options[0].numVotes;
+    }
 
     const pollPreview = [
       <svg key="0" viewBox="0 0 24 24" width="16px" height="16px" role="img">
         <path fill="none" stroke="#666" strokeWidth="2" d={ICONS.up} />
       </svg>,
-      poll.upvotes,
+      upvotes,
       <div key="2" className={s.pollState}>
         <PollState
           compact
+          upvotes={upvotes}
+          downvotes={downvotes}
           pollId={poll.id}
           allVoters={poll.allVoters}
-          upvotes={poll.upvotes}
-          downvotes={poll.downvotes}
+          options={poll.options}
           thresholdRef={poll.mode.thresholdRef}
           threshold={poll.threshold}
           unipolar={poll.mode.unipolar}
@@ -74,7 +83,7 @@ class ProposalPreview extends React.Component {
     ];
 
     if (!poll.mode.unipolar) {
-      pollPreview.push(poll.downvotes);
+      pollPreview.push(downvotes);
       pollPreview.push(
         <svg key="4" viewBox="0 0 24 24" width="16px" height="16px" role="img">
           <path
@@ -83,7 +92,8 @@ class ProposalPreview extends React.Component {
             strokeWidth="2"
             d={ICONS.up}
             transform="matrix(1 0 0 -1 0 24)"
-          />,
+          />
+          ,
         </svg>,
       );
     }

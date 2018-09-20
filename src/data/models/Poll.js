@@ -17,9 +17,12 @@ class Poll {
     this.upvotes = data.upvotes;
     this.downvotes = data.downvotes;
     this.numVoter = data.num_voter;
-    this.start_time = data.start_time;
+    this.startTime = data.start_time;
     this.endTime = data.end_time;
     this.closedAt = data.closed_at;
+    this.extended = data.extended;
+    this.multipeChoice = data.multipe_choice;
+    this.options = data.options;
   }
 
   static async gen(viewer, id, { polls }) {

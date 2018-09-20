@@ -5,148 +5,28 @@ import {
   LOAD_LOGS_SUCCESS,
   LOAD_LOGS_ERROR,
 } from '../constants';
-import { requestFields } from './request';
 
 import { logList as logsSchema } from '../store/schema';
 import { getLogIsFetching, getSessionUser } from '../reducers';
-
-const userFields = `
-id
-name
-surname
-thumbnail`;
-
-const commentFields = `
-id
-parentId
-content
-numReplies
-discussionId
-createdAt
-editedAt
-author{
-${userFields}
-}
-`;
+import { objectFields } from './activity';
+import { userFields } from './user';
 
 const logs = `
 query($userId:ID){
-  logs (userId:$userId) {
-  id
-  type
-  objectId
-  verb
-  createdAt
-  info
-  actor {
+  logs (userId:$userId){
     id
-    name
-    surname
-    thumbnail
-  }
-  object {
-    __typename
-    ... on ProposalDL {
-      id
-      title
-      publishedAt
-      deletedAt
-      state
-      body
-      votes
-      pollOne {
-        id
-        upvotes
-        downvotes
-        threshold
-        start_time
-        endTime
-        allVoters
-        closedAt
-        mode{
-          id
-          withStatements
-          unipolar
-          thresholdRef
-        }
-      }
-      pollTwo {
-        id
-        upvotes
-        downvotes
-        threshold
-        start_time
-        endTime
-        allVoters
-        closedAt
-        mode{
-          id
-          withStatements
-          unipolar
-          thresholdRef
-        }
-      }
-    }
-    ... on StatementDL {
-      id
-      likes
-      text
-      pollId
-      createdAt
-      updatedAt
-      position
-      author{
-        id
-        name
-        surname
-        thumbnail
-      }
-
-    }
-    ... on VoteDL {
-      id
-      position
-      pollId
-      voter{
-        id
-        name
-        surname
-        thumbnail
-      }
-    }
-    ... on Comment {
-      ${commentFields}
-    }
-        ... on User {
+    type
+    objectId
+    verb
+    createdAt
+    info
+    actor{
       ${userFields}
     }
-    ... on Message {
-      id
-      sender {
-        name
-        surname
-        thumbnail
-        id
-      }
-      recipients{
-        __typename
-        ... on User{
-        ${userFields}
-        }
-        ... on WorkTeam{
-          id
-          displayName
-          logo
-        }
-
-      }
-      subject
-    }
-    ... on Request {
-      ${requestFields}
+    object{
+      ${objectFields}
     }
   }
-}
 }
 `;
 export function loadLogs() {
