@@ -211,7 +211,6 @@ class Statement {
             author_id: viewer.id,
             poll_id: data.pollId,
             body: data.text,
-            position: vote.position,
             vote_id: vote.id,
             created_at: new Date(),
           },

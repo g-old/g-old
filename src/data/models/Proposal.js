@@ -52,7 +52,7 @@ export const computeNextState = (state, poll, tRef) => {
 
   ref *= poll.threshold / 100;
 
-  if (poll.options[tRef === 'voters' ? 1 : 0].numVotes >= ref) {
+  if (poll.options[0].numVotes >= ref) {
     switch (state) {
       case 'proposed': {
         newState = 'proposed';

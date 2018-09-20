@@ -44,21 +44,25 @@ const resultFields = `
   resource {${voteFields}}
 `;
 const createVoteMutation = `
-  mutation($pollId:ID! $position:Position! $targetId:ID) {
-    createVote (vote:{pollId:$pollId position:$position} targetId:$targetId) {
+  mutation($vote:VoteInput! $targetId:ID) {
+    createVote (vote:$vote targetId:$targetId) {
       ${resultFields}
     }
   }
 `;
 const updateVoteMutation = `
-  mutation($pollId:ID! $position:Position! $id:ID) {
-    updateVote (vote:{pollId:$pollId position:$position id:$id}) ${voteFields}
+  mutation($vote:VoteInput!) {
+    updateVote (vote:$vote) {
+      ${voteFields}
+    }
   }
 `;
 
 const deleteVoteMutation = `
-  mutation($pollId:ID! $position:Position! $id:ID) {
-    deleteVote (vote:{pollId:$pollId position:$position id:$id}) ${voteFields}
+  mutation($vote: VoteInput!) {
+    deleteVote (vote:$vote) {
+      ${voteFields}
+    }
   }
 `;
 

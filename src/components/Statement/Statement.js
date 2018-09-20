@@ -192,7 +192,7 @@ class Statement extends React.Component {
         // update;
         onUpdate({ id, text: textContent });
       } else {
-        onCreate({ pollId, text, voteId: vote.id });
+        onCreate({ pollId, text: textContent, voteId: vote.id });
       }
     } else {
       // nothing changed
@@ -422,7 +422,7 @@ class Statement extends React.Component {
       <div
         className={cn(
           s.rootAlt,
-          vote && vote.positions[0].pos === 1 && vote.positions[0].value
+          vote && vote.positions[0].pos === 0 && vote.positions[0].value
             ? s.pro
             : s.contra,
           inactive && s.inactive,

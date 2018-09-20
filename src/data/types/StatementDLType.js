@@ -29,12 +29,11 @@ const StatementType = new ObjectType({
         Vote.gen(viewer, data.voteId, loaders),
     },
 
-    position: {
+    /* position: {
       type: GraphQLString,
-    },
+    }, */
     text: {
       type: GraphQLString,
-      sqlColumn: 'body',
     },
 
     likes: {
@@ -44,19 +43,6 @@ const StatementType = new ObjectType({
     pollId: {
       type: ID,
     },
-
-    /* pollInfo: {
-      type: new ObjectType({
-        name: 'PollInfo',
-        fields: {
-          id: { type: ID },
-          upvotes: { type: GraphQLInt },
-          downvotes: { type: GraphQLInt },
-          allVoters: { type: GraphQLInt, resolve: data => data.numVoter },
-        },
-      }),
-      resolve: (data, { id }, { viewer, loaders }) => Poll.gen(viewer, data.pollId, loaders),
-    }, */
 
     createdAt: {
       type: GraphQLString,

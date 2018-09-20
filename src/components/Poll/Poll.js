@@ -91,7 +91,8 @@ class Poll extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
-    this.handleRetractVote = this.handleRetractVote.bind(this);
+    this.voteUp = this.voteUp.bind(this);
+    this.voteDown = this.voteDown.bind(this);
   }
 
   componentWillReceiveProps({ updates, id }) {
@@ -128,14 +129,14 @@ class Poll extends React.Component {
     ));
   }
 
-  canVote(position) {
+  canVote(positions) {
     const { ownVote, ownStatement, id, onVote } = this.props;
     let method; // or take methods better directly in and connect to redux
     let info = null;
 
     if (!ownVote) {
       method = 'create';
-    } else if (ownVote.position !== position) {
+    } else if (ownVote.positions[0].pos !== positions[0].pos) {
       method = 'update';
     } else {
       method = 'del';
@@ -145,20 +146,21 @@ class Poll extends React.Component {
       info = ownStatement.id;
       this.setState({
         confirmationFunc: () => {
-          onVote({ position, pollId: id, id: voteId }, method, info);
+          onVote({ vote: { positions, pollId: id, id: voteId } }, method, info);
           this.setState({ confirmationFunc: null });
         },
       });
       return;
     }
-    onVote({ position, pollId: id, id: voteId }, method, info);
+    onVote({ vote: { positions, pollId: id, id: voteId } }, method, info);
   }
 
-  handleRetractVote() {
-    const { ownVote, ownStatement } = this.props;
-    // TODO Add some sort of validation
-    // will delete vote and the statement too bc of cascade on delete
-    this.canVote(ownVote.position, ownStatement.id);
+  voteUp() {
+    this.canVote([{ pos: 0, value: 1 }]);
+  }
+
+  voteDown() {
+    this.canVote([{ pos: 1, value: 1 }]);
   }
 
   render() {
@@ -177,13 +179,10 @@ class Poll extends React.Component {
       canVote,
     } = this.props;
     const { confirmationFunc, voteError } = this.state;
-    let upvotes = 0;
+    const upvotes = options[0].numVotes;
     let downvotes = 0;
-    if (mode.unipolar) {
-      upvotes = options[0].numVotes;
-    } else {
-      upvotes = options[1].numVotes;
-      downvotes = options[0].numVotes;
+    if (!mode.unipolar) {
+      downvotes = options[1].numVotes;
     }
     let votingButtons = null;
     /* eslint-disable max-len */
@@ -192,15 +191,13 @@ class Poll extends React.Component {
       // TODO Find better check
       // eslint-disable-next-line no-nested-ternary
       const proBtnColor =
-        ownVote && ownVote.position === 'pro' ? s.proBtnColor : '';
+        ownVote && ownVote.positions[0] && ownVote.positions[0].pos === 0
+          ? s.proBtnColor
+          : '';
       if (mode.unipolar) {
         votingButtons = (
           <div>
-            <Button
-              disabled={votePending}
-              onClick={() => this.canVote('pro')}
-              plain
-            >
+            <Button disabled={votePending} onClick={this.voteUp} plain>
               <img
                 style={{ maxWidth: '5em', maxHeight: '5em' }}
                 alt="Vote"
@@ -220,15 +217,13 @@ class Poll extends React.Component {
       } else {
         // eslint-disable-next-line no-nested-ternary
         const conBtnColor =
-          ownVote && ownVote.position === 'con' ? s.conBtnColor : '';
+          ownVote && ownVote.positions[0] && ownVote.positions[0].pos === 1
+            ? s.conBtnColor
+            : '';
         votingButtons = (
           <div style={{ paddingBottom: '2em' }}>
             <Box pad>
-              <Button
-                plain
-                onClick={() => this.canVote('pro')}
-                disabled={votePending}
-              >
+              <Button plain onClick={this.voteUp} disabled={votePending}>
                 <img
                   style={{ maxWidth: '5em', maxHeight: '5em' }}
                   alt="Vote"
@@ -245,11 +240,7 @@ class Poll extends React.Component {
                   />
               </svg> */}
               </Button>
-              <Button
-                plain
-                onClick={() => this.canVote('con')}
-                disabled={votePending}
-              >
+              <Button plain onClick={this.voteDown} disabled={votePending}>
                 <img
                   style={{ maxWidth: '5em', maxHeight: '5em' }}
                   alt="Vote"

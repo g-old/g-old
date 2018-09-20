@@ -13,18 +13,18 @@ const convertPoll = pollData => {
     result.options = [wantVotingOption];
   } else {
     const downVotingOption = {
-      pos: 0,
-      order: 0,
+      pos: 1,
+      order: 1,
       description: { _default: 'down' },
       numVotes: downvotes,
     };
     const upVotingOption = {
-      pos: 1,
-      order: 1,
+      pos: 0,
+      order: 0,
       description: { _default: 'up' },
       numVotes: upvotes,
     };
-    result.options = [downVotingOption, upVotingOption];
+    result.options = [upVotingOption, downVotingOption];
     // result.num_votes = [downvotes, upvotes];
   }
 
@@ -101,6 +101,9 @@ exports.up = function(knex, Promise) {
       knex.schema.table('votes', table => {
         table.dropColumn('position');
         table.jsonb('positions').defaultsTo('[]');
+      }),
+      knex.schema.table('statements', table => {
+        table.dropColumn('position');
       }),
     ]);
 
@@ -194,6 +197,9 @@ exports.down = function(knex, Promise) {
     }),
     knex.schema.table('votes', table => {
       table.dropColumn('positions');
+      table.enu('position', ['pro', 'con']);
+    }),
+    knex.schema.table('statements', table => {
       table.enu('position', ['pro', 'con']);
     }),
   ]);
