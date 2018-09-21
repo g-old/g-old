@@ -205,7 +205,7 @@ class Activity extends React.Component {
 
   renderVote(info) {
     const {
-      content: { position, pollId, voter },
+      content: { positions, pollId, voter },
     } = this.props;
     const thumb = (
       <svg
@@ -217,10 +217,12 @@ class Activity extends React.Component {
       >
         <path
           fill="none"
-          stroke={position === 'pro' ? '#8cc800' : '#ff324d'}
+          stroke={positions[0].pos === 0 ? '#8cc800' : '#ff324d'}
           strokeWidth="2"
           d={ICONS.thumbUpAlt}
-          transform={position === 'pro' ? '' : 'scale(1,-1) translate(0,-24)'}
+          transform={
+            positions[0].pos === 0 ? '' : 'scale(1,-1) translate(0,-24)'
+          }
         />
       </svg>
     );

@@ -71,7 +71,7 @@ const getVote = async (viewer, parent, loaders) => {
     vote = new Vote({
       id: parent.content.id,
       user_id: parent.content.userId,
-      position: parent.content.position,
+      positions: parent.content.positions,
       poll_id: parent.content.pollId,
     });
   } else {

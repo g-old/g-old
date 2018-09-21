@@ -34,7 +34,7 @@ export type ProposalProps = {
   deleted_at: ?string,
 };
 
-export const computeNextState = (state, poll, tRef) => {
+export const computeNextState = (state: ProposalState, poll, tRef: number) => {
   let newState;
   let ref;
 

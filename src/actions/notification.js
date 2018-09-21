@@ -25,25 +25,10 @@ import {
 import { genStatusIndicators } from '../core/helpers';
 import { pollFieldsForList } from './proposal';
 import { getSessionUser } from '../reducers';
-
-const userFields = `
-id
-name
-surname
-thumbnail`;
-
-const commentFields = `
-id
-parentId
-content
-numReplies
-discussionId
-createdAt
-editedAt
-author{
-${userFields}
-}
-`;
+import { discussionFields } from './discussion';
+import { userFields } from './user';
+import { voteFields } from './vote';
+import { commentFields } from './comment';
 
 const notificationFields = `
       id
@@ -55,7 +40,9 @@ const notificationFields = `
           ...on StatementDL{
             id
             pollId
-            position
+            vote{
+              ${voteFields}
+            }
             text
           }
           ...on ProposalDL{
@@ -78,16 +65,8 @@ const notificationFields = `
            }
 
           ... on Discussion {
-          id
-          createdAt
-          title
-          numComments
-          closedAt
-         content
-         author{
-        ${userFields}
-      }
-    }
+            ${discussionFields}
+          }
           ... on Message {
               id
               sender{
