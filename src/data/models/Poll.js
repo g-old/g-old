@@ -8,6 +8,76 @@ function checkCanSee(viewer, data) {
   return true;
 }
 
+const MAX_DESCRIPTION_LENGTH = 10000;
+
+const checkOption = (option, counters) => {
+  const validated = {};
+  if ('pos' in option) {
+    // check uniqness of pos
+    if (
+      option.pos > counters.currentPos &&
+      !counters.otherPos.includes(option.pos)
+    ) {
+      validated.pos = option.pos;
+      counters.currentPos = option.pos; // eslint-disable-line
+      counters.otherPos.push(option.pos);
+    }
+  }
+  if ('order' in option) {
+    // check right order
+    if (
+      option.order > counters.currentOrder &&
+      !counters.otherOrders.includes(option.order)
+    ) {
+      validated.order = option.order;
+      counters.currentOrder = option.order; // eslint-disable-line
+      counters.otherOrders.push(option.order);
+    }
+  }
+  if ('description' in option) {
+    // check keys , content
+    const description = Object.keys(option.description).reduce(
+      (obj, locale) => {
+        const text =
+          option.description[locale] && option.description[locale].trim();
+        if (text.length < MAX_DESCRIPTION_LENGTH && text.length > 0) {
+          obj[locale] = text; // eslint-disable-line
+        }
+        return obj;
+      },
+      {},
+    );
+    if (Object.keys(description).length) {
+      validated.description = description;
+    }
+  }
+  if ('numVotes' in option) {
+    //
+  } else {
+    validated.numVotes = 0;
+  }
+
+  if (
+    'pos' in validated &&
+    'order' in validated &&
+    'description' in validated &&
+    'numVotes' in validated
+  ) {
+    return validated;
+  }
+  throw new Error('Option not correct');
+};
+const validateOptions = options => {
+  const counters = {
+    currentPos: -1,
+    currentOrder: -1,
+    otherPos: [],
+    otherOrders: [],
+  };
+  const data = options.map(option => checkOption(option, counters));
+  return data;
+};
+
 class Poll {
   constructor(data) {
     this.id = data.id;
@@ -65,15 +135,49 @@ class Poll {
     if (!canMutate(viewer, data, Models.POLL)) return null;
 
     // validate
-    if (!data.polling_mode_id) return null;
+    if (!data.pollingModeId) return null;
     if (!data.threshold) return null;
-    if (!data.end_time) return null;
+    if (!data.endTime) return null;
+
+    const newData = { created_at: new Date() };
+
+    if (data.options) {
+      // check options
+      const validatedOptions = validateOptions(data.options);
+      newData.options = JSON.stringify(validatedOptions);
+    }
+    if ('extended' in data) {
+      if (newData.options.length) {
+        newData.extended = data.extended;
+      }
+    }
+    if ('multipleChoice' in data) {
+      newData.multipe_choice = data.multipeChoice;
+    }
+    if ('secret' in data) {
+      newData.secret = data.secret;
+    }
+
+    if (data.startTime) {
+      newData.start_time = data.startTime;
+    }
+    if (data.endTime) {
+      newData.end_time = data.endTime;
+    }
+    if (data.pollingModeId) {
+      newData.polling_mode_id = data.pollingModeId;
+    }
+
+    if (data.threshold) {
+      newData.threshold = data.threshold;
+    }
 
     // create
-    const newPollId = await knex.transaction(async trx => {
+
+    const newPoll = await knex.transaction(async trx => {
       const pollingMode = await PollingMode.gen(
         viewer,
-        data.polling_mode_id,
+        data.pollingModeId,
         loaders,
       );
       if (!pollingMode) throw Error('No valid PollingMode provided');
@@ -97,26 +201,19 @@ class Poll {
         numVoter = Number(numVoter[0].count);
         if (numVoter < 1) throw Error('Not enough user');
       }
-      if (data.workTeamId) {
-        delete data.workTeamId; // eslint-disable-line
+
+      if (numVoter) {
+        newData.num_voter = numVoter;
       }
-      if ('workTeam' in data) {
-        delete data.workTeam; // eslint-disable-line
-      }
-      const id = await trx
-        .insert(
-          {
-            ...data,
-            num_voter: numVoter,
-            created_at: new Date(),
-          },
-          'id',
-        )
-        .into('polls');
-      return id[0];
+
+      const [pollinDB = null] = await knex('polls')
+        .transacting(trx)
+        .insert(newData)
+        .returning('*');
+      return pollinDB;
     });
-    if (!newPollId) return null;
-    return Poll.gen(viewer, newPollId, loaders) || null;
+    if (!newPoll) return null;
+    return new Poll(newPoll);
   }
 
   static async update(viewer, data, loaders) {

@@ -31,6 +31,12 @@ const PollInputType = new GraphQLInputObjectType({
     options: {
       type: new GraphQLList(OptionInputType),
     },
+    multipleChoice: {
+      type: GraphQLBoolean,
+    },
+    extended: {
+      type: GraphQLBoolean,
+    },
 
     id: {
       type: ID,

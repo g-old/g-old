@@ -171,7 +171,61 @@ export default function polls(state = {}, action) {
       const index = positions[0].pos === 0 ? 0 : 1;
       const statementId = action.info;
       const newOptions = [];
-      const { options } = state[pollId];
+      const { options, extended } = state[pollId];
+      if (extended) {
+        let added = false;
+        let changedOptionPos;
+        // TODO extract fn
+        const newPositions = positions.reduce((obj, position) => {
+          // eslint-disable-next-line
+          obj[position.pos] = position;
+          return obj;
+        }, {});
+        const oldPositions = action.oldVote.positions.reduce(
+          (obj, position) => {
+            // eslint-disable-next-line
+            obj[position.pos] = position;
+            return obj;
+          },
+          {},
+        );
+        if (positions.length > action.oldVote.positions.length) {
+          added = true;
+          // vote was added - get new position and update options.numVotes
+          positions.forEach(element => {
+            if (!oldPositions[element.pos]) {
+              changedOptionPos = element.pos;
+            }
+          });
+        } else {
+          action.oldVote.positions.forEach(element => {
+            if (!newPositions[element.pos]) {
+              changedOptionPos = element.pos;
+            }
+          });
+        }
+
+        // update options
+        for (let i = 0; i < options.length; i += 1) {
+          const option = options[i];
+          if (option.pos === changedOptionPos) {
+            newOptions.push({
+              ...option,
+              numVotes: added ? option.numVotes + 1 : option.numVotes - 1,
+            });
+          } else {
+            newOptions.push(option);
+          }
+        }
+        return {
+          ...state,
+          [pollId]: {
+            ...poll,
+            options: newOptions,
+            ownStatement: statementId ? null : state[pollId].ownStatement,
+          },
+        };
+      }
       for (let i = 0; i < options.length; i += 1) {
         const option = options[i];
         if (option.pos === index) {

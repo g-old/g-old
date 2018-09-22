@@ -57,8 +57,28 @@ order
 description
 numVotes
 `;
-const pollFields = `{
+export const pollFieldsForList = `
   id
+  options{
+    ${optionFields}
+  }
+  threshold
+  extended
+  multipleChoice
+  startTime
+  endTime
+  allVoters
+  closedAt
+  mode{
+    id
+    withStatements
+    unipolar
+    thresholdRef
+  }
+
+`;
+const pollFields = `{
+  ${pollFieldsForList}
   likedStatements{
     id
     statementId
@@ -67,22 +87,8 @@ const pollFields = `{
     ${voteFields}
   }
   ownStatement {${statementFields} deletedAt}
-  options{
-    ${optionFields}
-  }
-  threshold
-  closedAt
-  startTime
-  endTime
-  allVoters
   followees{
     ${voteFields}
-  }
-  mode{
-    id
-    withStatements
-    unipolar
-    thresholdRef
   }
   statements {${statementFields}}
 }
@@ -118,25 +124,6 @@ const query = `
       canVote
     }
   }
-`;
-
-export const pollFieldsForList = `
-  id
-  options{
-    ${optionFields}
-  }
-  threshold
-  startTime
-  endTime
-  allVoters
-  closedAt
-  mode{
-    id
-    withStatements
-    unipolar
-    thresholdRef
-  }
-
 `;
 
 const tagsQuery = `

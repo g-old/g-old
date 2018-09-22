@@ -329,7 +329,7 @@ const mapStateToProps = (state, { pollId, proposalId }) => ({
   isFetching: getIsProposalFetching(state, proposalId),
   errorMessage: getProposalErrorMessage(state, proposalId),
   followees: getFollowees(state),
-  voteUpdates: getVoteUpdates(state, pollId),
+  voteUpdates: getVoteUpdates(state),
   followeeVotes: getFolloweeVotesByPoll(state, pollId),
   subscriptionStatus: getSubscriptionUpdates(state),
 });

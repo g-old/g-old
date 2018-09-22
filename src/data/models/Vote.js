@@ -166,8 +166,9 @@ class Vote {
           true,
         );
         if (!oldVote || !oldVote.positions) {
-          if (oldVote.positions[0].pos === data.positions[0].pos)
+          /* if (oldVote.positions[0].pos === data.positions[0].pos)
             throw Error('Position mismatch');
+            */
         }
         // eslint-disable-next-line eqeqeq
         if (data.id != oldVote.id) throw Error('Id mismatch');
@@ -191,22 +192,65 @@ class Vote {
             .del();
         }
 
-        const newPositions = data.positions;
+        const updatedData = { updated_at: new Date() };
+        if (data.positions) {
+          const oldPositions = oldVote.positions.reduce((obj, position) => {
+            // eslint-disable-next-line
+            obj[position.pos] = position;
+            return obj;
+          }, {});
+
+          const dataPositions = data.positions.reduce((obj, position) => {
+            // eslint-disable-next-line
+            obj[position.pos] = position;
+            return obj;
+          }, {});
+
+          const newPositions = poll.options.reduce((obj, option) => {
+            if (oldPositions[option.pos]) {
+              if (dataPositions[option.pos]) {
+                // take new
+                if (dataPositions[option.pos].value) {
+                  obj.push(dataPositions[option.pos]);
+                }
+              } else {
+                obj.push(oldPositions[option.pos]);
+              }
+            } else if (dataPositions[option.pos]) {
+              if (dataPositions[option.pos].value) {
+                obj.push(dataPositions[option.pos]);
+              }
+            }
+            return obj;
+          }, []);
+
+          if (!newPositions.length) {
+            throw new Error('Position missing');
+          }
+          updatedData.positions = JSON.stringify(newPositions);
+        }
+
         // eslint-disable-next-line newline-per-chained-call
         await knex('votes')
           .transacting(trx)
           .forUpdate()
           .where({ id: data.id })
-          .update({
-            positions: JSON.stringify(newPositions),
-            updated_at: new Date(),
-          });
+          .update(updatedData);
         // update votecount
         const updatedOptions = [];
         // better allow only one position?
         for (let i = 0; i < poll.options.length; i += 1) {
           const option = poll.options[i];
-          if (option.pos === data.positions[0].pos && data.positions[0].value) {
+          if (poll.extended) {
+            if (option.pos === data.positions[0].pos) {
+              option.numVotes = data.positions[0].value
+                ? option.numVotes + 1
+                : option.numVotes - 1;
+            }
+          } else if (
+            option.pos === data.positions[0].pos &&
+            data.positions[0].value
+          ) {
             option.numVotes += 1;
           } else {
             option.numVotes -= 1;
@@ -276,12 +320,12 @@ class Vote {
         if (await poll.isUnipolar(viewer, loaders)) {
           positions = JSON.stringify([{ pos: 0, value: 1 }]);
         }
-        const voteInDB = await knex('votes') // TODO prob. superflue bc constraint
+        /*    const voteInDB = await knex('votes') // TODO prob. superflue bc constraint
           .transacting(trx)
           .forUpdate()
           .where({ poll_id: data.pollId, user_id: viewer.id })
           .pluck('id');
-        if (voteInDB.length !== 0) throw Error('Already voted!');
+        if (voteInDB.length !== 0) throw Error('Already voted!'); */
         const id = await knex('votes')
           .transacting(trx)
           .forUpdate()

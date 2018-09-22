@@ -23,8 +23,8 @@ import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 import Button from '../Button';
 import FormField from '../FormField';
 import Box from '../Box';
-import Layer from '../Layer';
-import Proposal from '../Proposal';
+import PreviewLayer from './PreviewLayer';
+import OptionInput from './OptionInput';
 // import { ICONS } from '../../constants';
 import {
   nameValidation,
@@ -80,6 +80,7 @@ const standardValues = {
   currentTagIds: [],
   spokesmanValue: undefined,
   clearSpokesman: false,
+  options: [],
   errors: {
     title: {
       touched: false,
@@ -138,9 +139,6 @@ class ProposalInput extends React.Component {
     this.onTextChange = this.onTextChange.bind(this);
     this.onTextSelect = this.onTextSelect.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
-    this.onModeChange = this.onModeChange.bind(this);
-    this.onTRefChange = this.onTRefChange.bind(this);
-    this.onTitleChange = this.onTitleChange.bind(this);
     this.handleTagInputChange = this.handleTagInputChange.bind(this);
     this.handleKeys = this.handleKeys.bind(this);
     this.onStrong = this.onStrong.bind(this);
@@ -155,6 +153,10 @@ class ProposalInput extends React.Component {
       this,
     );
 
+    this.handleAddTag = this.handleAddTag.bind(this);
+    this.handleRemoveTag = this.handleRemoveTag.bind(this);
+    this.togglePreview = this.togglePreview.bind(this);
+    this.handleAddOption = this.handleAddOption.bind(this);
     this.md = new MarkdownIt({
       // html: true,
       linkify: true,
@@ -189,8 +191,9 @@ class ProposalInput extends React.Component {
   }
 
   componentWillReceiveProps({ success, errorMessage }) {
+    const { success: oldSuccess, errorMessage: oldErrorMessage } = this.props;
     if (success) {
-      if (!this.props.success) {
+      if (!oldSuccess) {
         this.setState({
           ...standardValues,
           success: true,
@@ -207,42 +210,38 @@ class ProposalInput extends React.Component {
       } */
     }
     if (errorMessage) {
-      this.setState({ error: !this.props.errorMessage });
+      this.setState({ error: !oldErrorMessage });
     }
     //
   }
 
   onTextChange(e) {
-    const html = this.md.render(this.state.textArea.val);
+    const { textArea } = this.state;
+    const html = this.md.render(textArea.val);
 
-    this.setState({
-      ...this.state,
+    this.setState(prevState => ({
       markup: html,
       textArea: {
-        ...this.state.textArea,
+        ...prevState.textArea,
         val: e.target.value,
       },
-    });
+    }));
   }
+
   onTextSelect(e) {
     this.setState({
-      ...this.state,
       textSelection: [e.target.selectionStart, e.target.selectionEnd],
     });
-  }
-  onTitleChange(e) {
-    this.setState({ ...this.state, title: { val: e.target.value } });
-  }
-  onModeChange(e) {
-    this.setState({ ...this.state, value: e.target.value });
   }
 
   onStrong() {
     if (this.isSomethingSelected()) this.insertAtSelection('****', '****');
   }
+
   onItalic() {
     if (this.isSomethingSelected()) this.insertAtSelection('*', '*');
   }
+
   onAddLink() {
     const url = prompt('URL', 'https://');
     if (url) {
@@ -253,16 +252,13 @@ class ProposalInput extends React.Component {
     }
   }
 
-  onTRefChange(e) {
-    this.setState({ thresholdRef: e.target.value });
-  }
-
   onSubmit() {
     // TODO validate
     if (this.handleValidation(formFields)) {
+      const { settings, currentTagIds, tags, options } = this.state;
       const startTime = null;
       let endTime = null;
-      const { dateTo, timeTo, body, title, pollOption } = this.state.settings;
+      const { dateTo, timeTo, body, title, pollOption } = settings;
       // currently not in use
       /*  if (dateFrom || timeFrom) {
         dateFrom = dateFrom || new Date();
@@ -283,15 +279,20 @@ class ProposalInput extends React.Component {
         thresholdRef,
         unipolar,
         spokesman,
-      } = this.state.settings;
+      } = settings;
+      const {
+        createProposal: create,
+        workTeamId,
+        defaultPollValues,
+      } = this.props;
 
       /* eslint-disable no-confusing-arrow */
-      const tags =
-        this.state.currentTagIds.map(
+      const newTags =
+        currentTagIds.map(
           id =>
-            this.state.tags[id].id.indexOf('xt') === 0
-              ? { text: this.state.tags[id].text }
-              : { id: this.state.tags[id].id },
+            tags[id].id.indexOf('xt') === 0
+              ? { text: tags[id].text }
+              : { id: tags[id].id },
         ) || null;
       /* eslint-enable no-confusing-arrow */
       let state;
@@ -302,29 +303,33 @@ class ProposalInput extends React.Component {
       }
 
       const spokesmanId = spokesman ? spokesman.id : null;
-      this.props.createProposal({
-        ...(this.props.workTeamId && { workTeamId: this.props.workTeamId }),
+      create({
+        ...(workTeamId && { workTeamId }),
         title: title.trim(),
         text: body,
         state,
         poll: {
+          options: options.map((o, i) => ({
+            description: { de: o.description },
+            pos: i,
+            order: i,
+          })),
+          extended: !!options.length,
           startTime,
           endTime,
           secret,
-          threshold:
-            threshold ||
-            this.props.defaultPollValues[pollOption.value].threshold,
+          threshold: threshold || defaultPollValues[pollOption.value].threshold,
           mode: {
             withStatements:
               withStatements === undefined
-                ? this.props.defaultPollValues[pollOption.value].withStatements
+                ? defaultPollValues[pollOption.value].withStatements
                 : withStatements,
             id: pollOption.value,
             unipolar,
             thresholdRef,
           },
         },
-        tags,
+        tags: newTags,
         spokesmanId,
       });
     }
@@ -335,32 +340,36 @@ class ProposalInput extends React.Component {
   }
 
   handleSpokesmanValueChange(e) {
-    this.setState({ spokesmanValue: e.value });
+    alert('NOT WORKING');
+    this.setState({ spokesmanValue: e.value }); // eslint-disable-line
   }
 
   visibleErrors(errorNames) {
+    const { errors } = this.state;
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
-      if (this.state.errors[curr].touched) {
-        acc[err] = (
-          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
-        );
+      if (errors[curr].touched) {
+        acc[err] = <FormattedMessage {...messages[errors[curr].errorName]} />;
       }
       return acc;
     }, {});
   }
 
   handleValidation(fields) {
+    const { errors } = this.state;
     const validated = this.Validator(fields);
-    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
+    this.setState({ errors: { ...errors, ...validated.errors } });
     return validated.failed === 0;
   }
+
   handleBlur(e) {
     const field = e.target.name;
-    if (this.state.settings[field]) {
+    const { settings } = this.state;
+    if (settings[field]) {
       this.handleValidation([field]);
     }
   }
+
   handleValueChanges(e) {
     let value;
     switch (e.target.name) {
@@ -389,57 +398,120 @@ class ProposalInput extends React.Component {
         throw Error(`Element not recognized: ${e.target.name}`);
     }
     this.setState({
-      settings: { ...this.state.settings, [e.target.name]: value },
+      settings: { [e.target.name]: value },
     });
   }
+
   toggleSettings() {
-    this.setState({ displaySettings: !this.state.displaySettings });
+    this.setState(prevState => ({ showSettings: !prevState.showSettings }));
   }
 
   isSomethingSelected() {
-    return this.state.textSelection[0] !== this.state.textSelection[1];
+    const { textSelection } = this.state;
+    return textSelection[0] !== textSelection[1];
   }
+
   insertAtSelection(pre, post) {
-    let val = this.state.settings.body;
-    let sel = this.state.textSelection;
+    const { settings, textSelection } = this.state;
+    let val = settings.body;
+    let sel = textSelection;
     val = `${val.substring(0, sel[0])}${pre}${val.substring(
       sel[0],
       sel[1],
     )}${post}${val.substring(sel[1])}`;
     sel = [val.length, val.length];
 
-    this.setState({
-      ...this.state,
+    this.setState(prevState => ({
       settings: {
-        ...this.state.settings,
+        ...prevState.settings,
         body: val,
       },
       textSelection: sel,
-    });
+    }));
   }
 
   handleTagInputChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
+
   handleKeys(e) {
     if (e.key === 'Enter') {
-      if (this.state.tagInput) {
-        this.setState({
-          tags: { ...this.state.tags, [this.state.tagId]: this.state.tagInput },
+      const { tagInput } = this.state;
+      if (tagInput) {
+        this.setState(prevState => ({
+          tags: { ...prevState.tags, [prevState.tagId]: prevState.tagInput },
           showInput: false,
-        });
+        }));
       }
     }
   }
 
+  handleAddTag(tag) {
+    const { maxTags, tags } = this.props;
+    const { currentTagIds } = this.state;
+    let newTag = tag;
+    if (currentTagIds.length < maxTags) {
+      const duplicate = Object.keys(tags).find(
+        id => tags[id].text.toLowerCase() === newTag.text.toLowerCase(),
+      );
+      if (duplicate) {
+        newTag = tags[duplicate];
+      }
+
+      this.setState(prevState => ({
+        tags: { ...tags, [tag.id]: tag },
+        currentTagIds: [...new Set([...prevState.currentTagIds, newTag.id])],
+      }));
+    }
+  }
+
+  handleRemoveTag(tagId) {
+    this.setState(prevState => ({
+      currentTagIds: prevState.currentTagIds.filter(tId => tId !== tagId),
+    }));
+  }
+
+  togglePreview() {
+    this.setState(prevState => ({ showPreview: !prevState.showPreview }));
+  }
+
+  handleAddOption(newOption) {
+    this.setState(prevState => ({
+      options: [...prevState.options, newOption],
+    }));
+  }
+
   render() {
-    const { title, body, spokesman } = this.state.settings;
+    const {
+      defaultPollValues,
+      pollOptions,
+      tags: availableTags,
+      userArray,
+      findUser: fetchUser,
+      success,
+      errorMessage,
+      isPending,
+    } = this.props;
+    const {
+      showSettings,
+      settings,
+      initialValue,
+      currentTagIds,
+      tags,
+      clearSpokesman,
+      showPreview,
+      options,
+      success: successState,
+      error: errorState,
+    } = this.state;
+    const { title, body, spokesman, pollOption } = settings;
     const {
       titleError,
       bodyError,
       spokesmanError,
       ...pollErrors
     } = this.visibleErrors(formFields);
+    const showOptionInput = pollOption.value === '3';
     return (
       <div className={s.root}>
         <Box column pad>
@@ -449,13 +521,13 @@ class ProposalInput extends React.Component {
             <PollInput
               onValueChange={this.handleValueChanges}
               handleDateChange={this.handleValueChanges}
-              selectedPMode={this.state.settings.pollOption}
-              displaySettings={this.state.displaySettings}
-              defaultPollValues={this.props.defaultPollValues}
-              pollValues={this.state.settings}
+              selectedPMode={pollOption}
+              showSettings={showSettings}
+              defaultPollValues={defaultPollValues}
+              pollValues={settings}
               toggleSettings={this.toggleSettings}
-              pollOptions={this.props.pollOptions}
-              intl={this.context.intl}
+              pollOptions={pollOptions}
+              intl={this.context.intl} // eslint-disable-line
               formErrors={pollErrors}
               handleBlur={this.handleBlur}
             />
@@ -470,9 +542,10 @@ class ProposalInput extends React.Component {
             </FormField>
             <FormField error={bodyError} label="Body">
               <MainEditor
-                // eslint-disable-next-line
-                ref={elm => (this.editor = elm)}
-                initialValue={this.state.initialValue}
+                ref={
+                  elm => (this.editor = elm) // eslint-disable-line
+                }
+                initialValue={initialValue}
                 className={s.editor}
                 value={body}
                 onChange={value => {
@@ -501,86 +574,48 @@ class ProposalInput extends React.Component {
                 onBlur={this.handleBlur}
               /> */}
             </FormField>
+            {showOptionInput && (
+              <FormField label="Options">
+                <OptionInput
+                  options={options}
+                  onAddOption={this.handleAddOption}
+                />
+              </FormField>
+            )}
 
             <FormField label="Tags">
               <TagInput
                 name="tagInput"
-                tags={this.state.currentTagIds.map(t => this.state.tags[t])}
-                availableTags={Object.keys(this.props.tags).map(
-                  t => this.props.tags[t],
+                tags={currentTagIds.map(t => tags[t])}
+                availableTags={Object.keys(availableTags).map(
+                  t => availableTags[t],
                 )}
-                handleAddition={t => {
-                  if (this.state.currentTagIds.length < this.props.maxTags) {
-                    let tag = t;
-                    const duplicate = Object.keys(this.props.tags).find(
-                      id =>
-                        this.props.tags[id].text.toLowerCase() ===
-                        t.text.toLowerCase(),
-                    );
-                    if (duplicate) {
-                      tag = this.props.tags[duplicate];
-                    }
-
-                    this.setState({
-                      tags: { ...this.state.tags, [tag.id]: tag },
-                      currentTagIds: [
-                        ...new Set([...this.state.currentTagIds, tag.id]),
-                      ],
-                    });
-                  }
-                }}
-                handleDelete={id => {
-                  this.setState({
-                    currentTagIds: this.state.currentTagIds.filter(
-                      tId => tId !== id,
-                    ),
-                  });
-                }}
+                handleAddition={this.handleAddTag}
+                handleDelete={this.handleRemoveTag}
               />
             </FormField>
             <FormField overflow label="Spokesman" error={spokesmanError}>
               <SearchField
                 onChange={this.handleSpokesmanValueChange}
-                data={this.props.userArray}
-                fetch={this.props.findUser}
-                clear={this.state.clearSpokesman}
+                data={userArray}
+                fetch={fetchUser}
+                clear={clearSpokesman}
                 displaySelected={data => {
-                  this.setState({
-                    settings: { ...this.state.settings, spokesman: data },
-                  });
+                  this.setState(prevState => ({
+                    settings: { ...prevState.settings, spokesman: data },
+                  }));
                 }}
               />
-              {/*              <input
-                name="spokesman"
-                type="text"
-                value={spokesman}
-                onChange={this.handleValueChanges}
-              /> */}
             </FormField>
           </div>
-          {this.state.showPreview && (
-            <Layer
-              onClose={() => {
-                this.setState({ showPreview: false });
-              }}
-            >
-              <Proposal
-                {...{
-                  id: '0000',
-                  state:
-                    this.state.settings.pollOption.value === '3'
-                      ? 'survey'
-                      : 'proposed',
-                  title:
-                    title.trim().length < 3
-                      ? 'Title is missing!'
-                      : title.trim(),
-                  body: body.length < 3 ? 'Body is missing' : body,
-                  publishedAt: new Date(),
-                  spokesman,
-                }}
-              />
-            </Layer>
+          {showPreview && (
+            <PreviewLayer
+              state={pollOption.value === '3' ? 'survey' : 'proposed'}
+              title={title}
+              body={body}
+              spokesman={spokesman}
+              onClose={this.togglePreview}
+            />
           )}
 
           <Box pad>
@@ -590,19 +625,12 @@ class ProposalInput extends React.Component {
               onClick={this.onSubmit}
               disabled={this.isPending}
             />
-            <Button
-              label="Preview"
-              onClick={() => {
-                this.setState({ showPreview: true });
-              }}
-            />
+            <Button label="Preview" onClick={this.togglePreview} />
           </Box>
 
-          {this.props.isPending && <span>...submitting</span>}
-          {this.state.error && (
-            <Notification type="error" message={this.props.errorMessage} />
-          )}
-          {this.state.success && (
+          {isPending && <span>...submitting</span>}
+          {errorState && <Notification type="error" message={errorMessage} />}
+          {successState && (
             <Notification
               type="success"
               message={<FormattedMessage {...messages.success} />}
@@ -626,7 +654,7 @@ class ProposalInput extends React.Component {
                     </svg>
                   }
                   onClick={() => {
-                    history.push(`/proposal/${this.props.success}`);
+                    history.push(`/proposal/${success}`);
                   }}
                   label="Visit"
                 />
@@ -652,8 +680,9 @@ const mapDispatch = {
   findUser,
 };
 ProposalInput.contextTypes = {
-  intl: PropTypes.object,
+  intl: PropTypes.shape({}),
 };
-export default connect(mapStateToProps, mapDispatch)(
-  withStyles(s)(ProposalInput),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(withStyles(s)(ProposalInput));

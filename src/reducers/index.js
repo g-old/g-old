@@ -110,12 +110,6 @@ export const getProposalUpdates = (state, id) =>
 export const getProposalErrorMessage = (state, id) =>
   fromUi.getProposalErrorMessage(state.ui, id);
 
-export const getVotingListIsFetching = (state, id) =>
-  fromUi.getVotingListIsFetching(state.ui, id);
-
-export const getVotingListErrorMessage = (state, id) =>
-  fromUi.getVotingListErrorMessage(state.ui, id);
-
 export const getVoteUpdates = (state, id) =>
   fromUi.getVoteUpdates(state.ui, id);
 

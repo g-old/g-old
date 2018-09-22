@@ -1,25 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
-
-import CheckBox from '../CheckBox';
-import { utcCorrectedDate } from '../../core/helpers';
+import DateInput from './DateInput';
+import PollSettings from './PollSettings';
 import Select from '../Select';
 import Button from '../Button';
 import FormField from '../FormField';
 import { ICONS } from '../../constants';
 
 const messages = defineMessages({
-  dateTo: {
-    id: 'date.to',
-    defaultMessage: 'End date',
-    description: 'Date until',
-  },
-  timeTo: {
-    id: 'time.to',
-    defaultMessage: 'End time',
-    description: 'Time until',
-  },
   type: {
     id: 'poll.type',
     defaultMessage: 'Poll type',
@@ -36,164 +25,10 @@ const messages = defineMessages({
     description: 'Threshold reference of poll',
   },
 });
-const DateInput = ({ dateToError, handleChange, handleBlur, timeToError }) => (
-  <div>
-    {/*  <p>
-      <label htmlFor="dateFrom">DATE FROM</label>
-      <input
-        type="date"
-        defaultValue={utcCorrectedDate().slice(0, 10)}
-        onChange={props.handleChange}
-        pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
-        name="dateFrom"
-      />
-    </p>
-    <p>
-      <label htmlFor="timeFrom">TIME FROM</label>
-      <input
-        type="time"
-        defaultValue={utcCorrectedDate().slice(11, 16)}
-        onChange={props.handleChange}
-        name="timeFrom"
-      />
-    </p> */}
-    <FormField
-      label={<FormattedMessage {...messages.dateTo} />}
-      error={dateToError}
-    >
-      <input
-        type="date"
-        defaultValue={utcCorrectedDate(3).slice(0, 10)}
-        onChange={handleChange}
-        pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
-        name="dateTo"
-        onBlur={handleBlur}
-      />
-    </FormField>
-    <FormField
-      label={<FormattedMessage {...messages.timeTo} />}
-      error={timeToError}
-    >
-      <input
-        type="time"
-        name="timeTo"
-        defaultValue={utcCorrectedDate().slice(11, 16)}
-        onChange={handleChange}
-        onBlur={handleBlur}
-      />
-    </FormField>
-
-    {/*  <p>
-      <label htmlFor="dateTo">DATE TO</label>
-      <input
-        type="date"
-        defaultValue={utcCorrectedDate(3).slice(0, 10)}
-        onChange={props.handleChange}
-        pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
-        name="dateTo"
-      />
-    </p>
-    <p>
-      <label htmlFor="timeTo">TIME TO</label>
-      <input
-        type="time"
-        name="timeTo"
-        defaultValue={utcCorrectedDate().slice(11, 16)}
-        onChange={props.handleChange}
-      />
-  </p> */}
-  </div>
-);
-
-DateInput.propTypes = {
-  handleChange: PropTypes.func.isRequired,
-  handleBlur: PropTypes.func.isRequired,
-  dateToError: PropTypes.shape({}),
-  timeToError: PropTypes.shape({}),
-};
-DateInput.defaultProps = {
-  dateToError: null,
-  timeToError: null,
-};
-
-const PollSettings = ({
-  withStatements,
-  onValueChange,
-  secret,
-  unipolar,
-  threshold,
-  thresholdRef,
-}) => (
-  <div>
-    <FormField>
-      <CheckBox
-        label="with statements"
-        checked={withStatements}
-        name="withStatements"
-        onChange={onValueChange}
-      />
-      <CheckBox
-        label="secret"
-        name="secret"
-        checked={secret}
-        onChange={onValueChange}
-      />
-      <CheckBox
-        name="unipolar"
-        label="unipolar"
-        checked={unipolar}
-        onChange={onValueChange}
-      />
-    </FormField>
-
-    <FormField
-      label={<FormattedMessage {...messages.threshold} />}
-      help={threshold}
-    >
-      <input
-        value={threshold}
-        onChange={onValueChange}
-        min={10}
-        step={5}
-        max={90}
-        type="range"
-        name="threshold"
-      />
-    </FormField>
-    <FormField label={<FormattedMessage {...messages.reference} />}>
-      <Select
-        inField
-        options={[
-          { value: 'all', label: <span>ALL</span> },
-          { value: 'voters', label: <span>VOTERS</span> },
-        ]}
-        onSearch={false}
-        value={{
-          value: thresholdRef,
-          label: thresholdRef === 'all' ? 'ALL' : 'VOTERS',
-        }}
-        onChange={e => {
-          onValueChange({
-            target: { name: 'thresholdRef', value: e.value },
-          });
-        }}
-      />
-    </FormField>
-  </div>
-);
-
-PollSettings.propTypes = {
-  withStatements: PropTypes.bool.isRequired,
-  secret: PropTypes.bool.isRequired,
-  unipolar: PropTypes.bool.isRequired,
-  threshold: PropTypes.number.isRequired,
-  thresholdRef: PropTypes.string.isRequired,
-  onValueChange: PropTypes.func.isRequired,
-};
 
 const PollInput = ({
   selectedPMode,
-  displaySettings,
+  showSettings,
   defaultPollValues,
   pollValues,
   pollOptions,
@@ -206,7 +41,7 @@ const PollInput = ({
 }) => {
   const selected = selectedPMode;
   let settings;
-  if (displaySettings) {
+  if (showSettings) {
     const defaultVal = defaultPollValues[selected.value];
     const {
       withStatements,
@@ -231,6 +66,8 @@ const PollInput = ({
     label: intl.messages[msg.mId] || intl.messages,
     value: msg.value,
   };
+
+  //
 
   return (
     <div>
@@ -267,7 +104,7 @@ const PollInput = ({
         }
       />
 
-      {displaySettings && (
+      {showSettings && (
         <PollSettings
           onValueChange={onValueChange}
           withStatements={settings.withStatements}
@@ -298,7 +135,7 @@ PollInput.propTypes = {
     thresholdRef: PropTypes.string,
   }).isRequired,
   onValueChange: PropTypes.func.isRequired,
-  displaySettings: PropTypes.bool,
+  showSettings: PropTypes.bool,
   selectedPMode: PropTypes.shape({ value: PropTypes.string }).isRequired,
   toggleSettings: PropTypes.func.isRequired,
   pollOptions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
@@ -308,7 +145,7 @@ PollInput.propTypes = {
 };
 
 PollInput.defaultProps = {
-  displaySettings: false,
+  showSettings: false,
 };
 
 export default PollInput;

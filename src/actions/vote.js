@@ -123,6 +123,7 @@ export function createVote(vote) {
 export function updateVote(vote, stmtId = null) {
   return async (dispatch, getState, { graphqlRequest }) => {
     const properties = genStatusIndicators(['vote']);
+    const oldVote = getState().entities.votes[vote.vote.id];
 
     dispatch({
       type: UPDATE_VOTE_START,
@@ -138,6 +139,7 @@ export function updateVote(vote, stmtId = null) {
         info: stmtId,
         id: vote.pollId,
         properties,
+        oldVote,
       });
     } catch (error) {
       dispatch({

@@ -183,9 +183,10 @@ const validatePoll = async (viewer, poll, loaders) => {
   }
   const pollData = {
     secret: poll.secret || false,
-    start_time: startTime,
-    end_time: endTime,
+    startTime,
+    endTime,
     threshold: threshold || 50,
+    ...(poll.options ? { options: poll.options } : {}),
     ...(poll.workTeamId && { workTeamId: poll.workTeamId }),
   };
 
@@ -207,7 +208,7 @@ const validateStateChange = async (
   if (state !== 'voting') {
     // check times
     // poll mast have been ended!
-    if (new Date(pollInDB.end_time) > new Date()) return false;
+    if (new Date(pollInDB.endTime) > new Date()) return false;
   }
   const pollingModeinDB = await PollingMode.gen(
     viewer,
@@ -345,7 +346,7 @@ class Proposal {
         }
 
         const pollTwoData = {
-          polling_mode_id: pId,
+          pollingModeId: pId,
           ...pollData,
         };
         const pollTwo = await Poll.create(
@@ -443,7 +444,7 @@ class Proposal {
       }
 
       const pollOneData = {
-        polling_mode_id: pId,
+        pollingModeId: pId,
         ...pollData,
       };
       const pollOne = await Poll.create(
