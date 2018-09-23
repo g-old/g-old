@@ -78,7 +78,12 @@ const getVote = async (viewer, parent, loaders) => {
     if (parent.verb === 'update') {
       loaders.votes.clear(parent.objectId);
     }
-    vote = await Vote.gen(viewer, parent.objectId, loaders);
+    vote = new Vote({
+      id: parent.content.id,
+      user_id: parent.content.userId,
+      positions: parent.content.positions,
+      poll_id: parent.content.pollId,
+    }); // await Vote.gen(viewer, parent.objectId, loaders);
   }
   return vote;
 };

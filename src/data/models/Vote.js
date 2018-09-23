@@ -97,7 +97,7 @@ class Vote {
         // better allow only one position?
         for (let i = 0; i < poll.options.length; i += 1) {
           const option = poll.options[i];
-          if (option.pos === data.positions[0].pos && data.positions[0].value) {
+          if (option.pos === data.positions[0].pos) {
             option.numVotes -= 1;
           }
           updatedOptions.push(option);
@@ -271,7 +271,12 @@ class Vote {
     if (vote) {
       EventManager.publish('onVoteUpdated', {
         viewer,
-        vote,
+        vote: {
+          id: data.id,
+          pollId: data.pollId,
+          positions: data.positions,
+          userId: viewer.id,
+        }, // or save only voteInput
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },

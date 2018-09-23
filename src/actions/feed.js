@@ -128,6 +128,17 @@ export function loadFeed(log) {
 
     try {
       const { data } = await graphqlRequest(feed, { userId });
+      if (!data.feed) {
+        dispatch({
+          type: LOAD_FEED_ERROR,
+          payload: {
+            error: data.errors,
+          },
+          message: data.message || 'Something went wrong',
+          filter: log ? 'log' : 'feed',
+        });
+        return false;
+      }
       const normalizedData = normalize(data.feed, activitiesSchema);
       dispatch({
         type: LOAD_FEED_SUCCESS,

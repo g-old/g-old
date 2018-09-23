@@ -36,12 +36,59 @@ const updatePolls = (state, action) => {
         const vote = action.payload.entities.votes[curr];
         if (state[vote.pollId]) {
           const newOptions = [];
-          const { options } = state[vote.pollId];
-          for (let i = 0; i < options.length; i += 1) {
-            const option = options[i];
-            if (vote.positions[0].pos === 0) {
-              // upvote
-              if (updateVote) {
+          const { options, extended } = state[vote.pollId];
+          if (extended) {
+            for (let i = 0; i < options.length; i += 1) {
+              const option = options[i];
+              if (vote.positions[0].pos === option.pos) {
+                if (deleteVote) {
+                  newOptions.push({ ...option, numVotes: option.numVotes - 1 });
+                } else if (vote.positions[0].value) {
+                  newOptions.push({
+                    ...option,
+                    numVotes: option.numVotes + 1,
+                  });
+                } else {
+                  newOptions.push({
+                    ...option,
+                    numVotes: option.numVotes - 1,
+                  });
+                }
+              } else {
+                newOptions.push(option);
+              }
+            }
+          } else {
+            for (let i = 0; i < options.length; i += 1) {
+              const option = options[i];
+              if (vote.positions[0].pos === 0) {
+                // upvote
+                if (updateVote) {
+                  if (option.pos === vote.positions[0].pos) {
+                    newOptions.push({
+                      ...option,
+                      numVotes: option.numVotes + 1,
+                    });
+                  } else {
+                    newOptions.push({
+                      ...option,
+                      numVotes: option.numVotes - 1,
+                    });
+                  }
+                } else if (option.pos === vote.positions[0].pos) {
+                  newOptions.push({
+                    ...option,
+                    numVotes: deleteVote
+                      ? option.numVotes - 1
+                      : option.numVotes + 1,
+                  });
+                } else {
+                  newOptions.push({
+                    ...option,
+                  });
+                }
+              } else if (updateVote) {
+                // downvote
                 if (option.pos === vote.positions[0].pos) {
                   newOptions.push({
                     ...option,
@@ -65,32 +112,9 @@ const updatePolls = (state, action) => {
                   ...option,
                 });
               }
-            } else if (updateVote) {
-              // downvote
-              if (option.pos === vote.positions[0].pos) {
-                newOptions.push({
-                  ...option,
-                  numVotes: option.numVotes + 1,
-                });
-              } else {
-                newOptions.push({
-                  ...option,
-                  numVotes: option.numVotes - 1,
-                });
-              }
-            } else if (option.pos === vote.positions[0].pos) {
-              newOptions.push({
-                ...option,
-                numVotes: deleteVote
-                  ? option.numVotes - 1
-                  : option.numVotes + 1,
-              });
-            } else {
-              newOptions.push({
-                ...option,
-              });
             }
           }
+
           // eslint-disable-next-line no-param-reassign
           agg[vote.pollId] = { ...state[vote.pollId], options: newOptions };
         }
@@ -106,7 +130,7 @@ export default function polls(state = {}, action) {
   switch (action.type) {
     case CREATE_VOTE_SUCCESS: {
       const vote = action.payload.entities.votes[action.payload.result];
-      const index = vote.positions[0].pos === 0 ? 0 : 1;
+      const index = vote.positions[0].pos;
       let votes = state[vote.pollId].votes; // eslint-disable-line
       if (votes) {
         votes = [...state[vote.pollId].votes, vote.id];
@@ -249,7 +273,7 @@ export default function polls(state = {}, action) {
     }
     case DELETE_VOTE_SUCCESS: {
       const vote = action.payload.entities.votes[action.payload.result];
-      const index = vote.positions[0].pos === 0 ? 0 : 1;
+      const index = vote.positions[0].pos;
       const poll = state[vote.pollId];
       let { statements, votes } = poll;
 

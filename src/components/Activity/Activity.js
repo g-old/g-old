@@ -230,14 +230,16 @@ class Activity extends React.Component {
       <Link // eslint-disable-line
         to={`/proposal/${info.proposalId || 'xxx'}/${pollId}`}
       >
-        <div className={s.follower}>
-          <span>
-            <Avatar user={voter} isFollowee />
-            <span>{`${voter.name} ${voter.surname}`}</span>
-          </span>
+        {voter && (
+          <div className={s.follower}>
+            <span>
+              <Avatar user={voter} isFollowee />
+              <span>{`${voter.name} ${voter.surname}`}</span>
+            </span>
 
-          {thumb}
-        </div>
+            {thumb}
+          </div>
+        )}
       </Link>
     );
   }
