@@ -39,11 +39,17 @@ function rankInPlace(activity) {
   activity.rank = affinity + content - decay; //  eslint-disable-line no-mixed-operators
 }
 const loadActivities = (viewer, ids, loaders) =>
-  Promise.all(ids.map(id => Activity.gen(viewer, id, loaders)));
+  Promise.all(
+    ids.map(id => Activity.gen(viewer, id, loaders).catch(() => undefined)),
+  );
 
 const aggregateActivities = (activities, viewer) =>
   activities.reduce(
     (agg, curr) => {
+      // only necessary if we don't stop on a failed Activity.gen
+      if (!curr) {
+        return agg;
+      }
       // filter content from wt out
       // TODO make groupId field on activities?
       if (
@@ -136,6 +142,7 @@ class Feed {
     this.content = data.content;
     this.createdAt = data.created_at;
   }
+
   static async gen(viewer, id, loaders) {
     // authorize
     // get proposalsfeed;
