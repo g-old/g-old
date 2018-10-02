@@ -1,23 +1,16 @@
+// heavily inspired by : https://github.com/prakhar1989/react-tags/
+
+/* @flow */
 import React from 'react';
-import PropTypes from 'prop-types';
+import type { ElementRef } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './TagInput.css';
 import Box from '../Box';
+import TagPreview from './TagPreview';
+import Tag from '../Tag';
+import RemoveMe from './RemoveMe';
 
-function filteredSuggestions(query, suggestions) {
-  return suggestions.filter(item => item.text.toLowerCase().indexOf(query.toLowerCase()) === 0);
-}
-// heavily inspired by : https://github.com/prakhar1989/react-tags/
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-const RemoveMe = props =>
-  (<a onClick={props.onClick}>
-    {String.fromCharCode(215)}
-  </a>);
-/* eslint-enable jsx-a11y/no-static-element-interactions */
-
-RemoveMe.propTypes = {
-  onClick: PropTypes.func.isRequired,
-};
 
 /* class Suggestions extends React.Component {
   render() {
@@ -38,91 +31,73 @@ RemoveMe.propTypes = {
   }
 } */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-const Tag = props =>
-  (<span className={props.readOnly ? s.availableTag : s.tag} onClick={props.onClick}>
-    {props.label}
-    {!props.readOnly && <RemoveMe onClick={props.onDelete} />}
-  </span>);
-/* eslint-enable jsx-a11y/no-static-element-interactions */
-Tag.propTypes = {
-  label: PropTypes.string.isRequired,
-  onDelete: PropTypes.func,
-  readOnly: PropTypes.bool,
-  onClick: PropTypes.func,
+
+export type TagType = {
+  id?: ID,
+  text: string,
 };
-Tag.defaultProps = {
-  readOnly: false,
-  onClick: () => {},
-  onDelete: () => {},
+type Props = {
+  onAddTag: TagType => void,
+  onDeleteTag: ID => void,
+  selectedTags: [TagType],
+  suggestions: [TagType],
+  name?: string,
+  predefinedTagsOnly?: boolean,
+  numTagsLimit: number,
 };
 
-class TagInput extends React.Component {
-  static propTypes = {
-    handleAddition: PropTypes.func.isRequired,
-    handleDelete: PropTypes.func.isRequired,
-    tags: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string,
-        text: PropTypes.string,
-      }),
-    ).isRequired,
-    availableTags: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string,
-        text: PropTypes.string,
-      }),
-    ).isRequired,
-    name: PropTypes.string.isRequired,
+type State = {
+  query: string,
+};
+
+class TagInput extends React.Component<Props, State> {
+  static defaultProps = {
+    predefinedTagsOnly: null,
+    name: null,
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      suggestions: this.props.tags,
-      currentTags: {},
-      tagIds: [],
       query: '',
-      selectedIndex: -1,
-      selectionMode: false,
-      nextId: 'xt0',
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.inputRef = React.createRef();
   }
 
-  componentWillReceiveProps(props) {
-    const suggestions = filteredSuggestions(this.state.query, props.tags);
-    this.setState({
-      suggestions,
-    });
-  }
+  inputRef: ?ElementRef<any>;
 
-  handleDelete(i) {
-    this.props.handleDelete(i);
+  handleInputChange: () => void;
+
+  handleKeyDown: () => void;
+
+  handleDelete(tagId: ID) {
+    const { onDeleteTag } = this.props;
+    if (onDeleteTag) {
+      onDeleteTag(tagId);
+    }
     this.setState({ query: '' });
     this.resetAndFocusInput();
   }
 
-  handleSuggestionClick(i) {
-    this.addTag(this.state.suggestions[i]);
-  }
-
   resetAndFocusInput() {
-    this.textInput.value = '';
-    this.textInput.focus();
+    if (this.inputRef && this.inputRef.current) {
+      this.inputRef.current.focus();
+      this.inputRef.current.value = '';
+    }
   }
 
-  addTag(tag) {
-    //  const possibleMatches = filteredSuggestions(tag, this.props.suggestions);
-
-    this.props.handleAddition(tag);
+  addTag(tag: TagType) {
+    const { onAddTag } = this.props;
+    if (onAddTag) {
+      onAddTag(tag);
+    }
 
     // reset the state
     this.setState({
       query: '',
-      selectionMode: false,
-      selectedIndex: -1,
     });
 
     this.resetAndFocusInput();
@@ -130,70 +105,82 @@ class TagInput extends React.Component {
 
   handleKeyDown(e) {
     if (e.keyCode === 13 || e.keyCode === 9) {
-      const query = this.state.query.trim();
+      const { query } = this.state;
+      const queryText = query.trim();
 
-      if (query) {
+      if (queryText) {
         e.preventDefault();
-        const id = this.state.nextId;
-        this.addTag({ id, text: query });
-        this.setState({ nextId: `xt${parseInt(this.state.nextId.slice(2), 10) + 1}` });
+        this.addTag({ text: queryText });
       }
     }
   }
 
   handleInputChange(e) {
     const query = e.target.value.trim();
-    const suggestions = filteredSuggestions(query, this.props.availableTags);
-
-    let selectedIndex = this.state.selectedIndex;
-    if (selectedIndex >= suggestions.length) {
-      selectedIndex = suggestions.length - 1;
-    }
-
     this.setState({
       query,
-      suggestions,
-      selectedIndex,
     });
   }
 
-  render() {
-    const tags = this.props.tags.map(i =>
-      <Tag key={i.id} label={i.text} onDelete={() => this.handleDelete(i.id)} />,
-    );
+  renderSuggestions() {
+    const { suggestions = [], onAddTag } = this.props;
+    return suggestions.map(tag => (
+      <Tag key={tag.id} id={tag.id} text={tag.text} handleTagClick={onAddTag} />
+    ));
+  }
 
-    const availableTags = this.props.availableTags.map(t =>
-      <Tag key={t.id} label={t.text} onClick={() => this.props.handleAddition(t)} readOnly />,
-    );
-    const placeholder = 'Add a new tag';
-    const maxLength = 20;
-    const tagInput = (
-      <div className={s.tagInput}>
-        <input
-          className={s.inputField}
-          ref={(input) => {
-            this.textInput = input;
-          }}
-          type="text"
-          placeholder={placeholder}
-          aria-label={placeholder}
-          onBlur={this.handleBlur}
-          onChange={this.handleInputChange}
-          onKeyDown={this.handleKeyDown}
-          onPaste={this.handlePaste}
-          name={this.props.name}
-          maxLength={maxLength}
-        />
-      </div>
-    );
-    return (
-      <Box className={s.container} pad column>
-        <Box wrap pad className={s.tags}>
-          {tags}
-          {tagInput}
+  renderSelectedTags() {
+    const { selectedTags = [] } = this.props;
+    return selectedTags.map(tag => (
+      <TagPreview
+        className={s.availableTag}
+        key={tag.id}
+        id={tag.id}
+        text={tag.text}
+        onClick={() => tag.id && this.handleDelete(tag.id)}
+      >
+        <RemoveMe />
+      </TagPreview>
+    ));
+  }
+
+  render() {
+    let inputField;
+    const {
+      predefinedTagsOnly,
+      name = 'tagInput',
+      selectedTags = [],
+      numTagsLimit = 5,
+    } = this.props;
+    if (!predefinedTagsOnly && selectedTags.length < numTagsLimit) {
+      const { query } = this.state;
+      const maxLength = 20;
+      const placeholder = 'Add a new tag';
+      inputField = (
+        <Box className={s.tagInput}>
+          <input
+            ref={this.inputRef}
+            type="text"
+            placeholder={placeholder}
+            aria-label={placeholder}
+            onChange={this.handleInputChange}
+            onKeyDown={this.handleKeyDown}
+            value={query}
+            name={name}
+            maxLength={maxLength}
+            autoComplete={false}
+          />
         </Box>
-        <Box pad wrap>
-          {availableTags}
+      );
+    }
+    return (
+      <Box className={s.container} column>
+        <Box wrap align pad>
+          {this.renderSelectedTags()}
+          {inputField}
+        </Box>
+        <Box pad wrap align>
+          {this.renderSuggestions()}
         </Box>
       </Box>
     );
