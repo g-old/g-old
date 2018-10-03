@@ -7,7 +7,7 @@ import Navigation from './Navigation';
 import TagField from '../TagInput';
 import type { TagType } from '../TagInput';
 
-const TAG_ID_SUFFIX = '$tagId';
+export const TAG_ID_SUFFIX = '$tagId';
 
 type Props = {
   selectedTags: [TagType],

@@ -1,668 +1,364 @@
+/* @flow */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import MarkdownIt from 'markdown-it';
-import { defineMessages, FormattedMessage } from 'react-intl';
-import MainEditor from '../MainEditor';
-
-// import Calendar from '../Calendar';
+import { defineMessages, injectIntl, type IntlShape } from 'react-intl';
+import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
+import StepPage from '../StepPage';
+import s from './ProposalInput.css';
+import Box from '../Box';
+import Wizard from '../Wizard';
+import Steps from '../Steps';
+import Step from '../Steps/Step';
+import Meter from '../Meter';
+import PollType from './PollType';
+import ProposalBody from './ProposalBody';
+import OptionInput from './OptionInput';
+import DateInput from './DateInput';
+import TagInput, { TAG_ID_SUFFIX } from './TagInput';
+import SpokesmanInput from './SpokesmanInput';
+import InputPreview from './InputPreview';
 import { createProposal } from '../../actions/proposal';
 import { findUser } from '../../actions/user';
-import s from './ProposalInput.css';
+import type { TagType } from '../TagInput';
+
 import {
   getTags,
   getIsProposalFetching,
   getProposalErrorMessage,
   getProposalSuccess,
   getVisibleUsers,
+  getSessionUser,
 } from '../../reducers';
-import TagInput from '../TagInput';
-import PollInput from '../PollInput';
-import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
-import Button from '../Button';
-import FormField from '../FormField';
-import Box from '../Box';
-import PreviewLayer from './PreviewLayer';
-import OptionInput from './OptionInput';
-// import { ICONS } from '../../constants';
-import {
-  nameValidation,
-  createValidator,
-  dateToValidation,
-  timeToValidation,
-  selectValidation,
-} from '../../core/validation';
-import Notification from '../Notification';
-import history from '../../history';
-import SearchField from '../SearchField';
+import { isAdmin } from '../../organization';
 
 const messages = defineMessages({
-  empty: {
-    id: 'form.error-empty',
-    defaultMessage: "You can't leave this empty",
-    description: 'Help for empty fields',
+  phaseOnePoll: {
+    id: 'proposalManager.phaseOnePoll',
+    defaultMessage: 'TR: 25 - PHASE ONE - NO STATEMENTS',
+    description: 'PhaseOnePoll presets',
   },
-  wrongSelect: {
-    id: 'form.error-select',
-    defaultMessage: 'You selection is not correct. Click on a suggestion',
-    description:
-      'Help for selection, when input does not match with a suggestion',
+  phaseTwoPoll: {
+    id: 'proposalManager.phaseTwoPoll',
+    defaultMessage: 'TR: 50 - PHASE TWO - WITH STATEMENTS',
+    description: 'PhaseTwoPoll presets',
   },
-  past: {
-    id: 'form.error-past',
-    defaultMessage: 'Time already passed',
-    description: 'Help for wrong time settings',
-  },
-  success: {
-    id: 'notification.success',
-    defaultMessage: 'Success!',
-    description: 'Should notify a successful action',
-  },
-  submit: {
-    id: 'command.submit',
-    defaultMessage: 'Submit',
-    description: 'Short command for sending data to the server',
+  survey: {
+    id: 'proposalManager.survey',
+    defaultMessage: 'Survey',
+    description: 'Survey presets',
   },
 });
+export type ValueType = { name: string, value: any };
+export type PollTypeTypes = 'proposed' | 'voting' | 'survey';
+type LocalisationShape = {
+  de?: string,
+  it?: string,
+  lld: ?string,
+  _default?: string,
+};
+export type PollSettingsShape = {
+  withStatements?: boolean,
+  secret?: boolean,
+  threshold?: number,
+  thresholdRef?: 'all' | 'voters',
+  unipolar?: boolean,
+};
+export type OptionShape = { id: ID, description: LocalisationShape };
+type State = {
+  ...PollSettingsShape,
+  dateTo?: string,
+  timeTo?: string,
+  body: string,
+  title: string,
 
-const standardValues = {
-  textArea: { val: '', selection: [0, 0] },
-  settings: {
-    pollOption: { value: '1' },
-    title: '',
-    body: '',
-    spokesman: null,
+  spokesman: UserShape,
+  pollType: { value: PollTypeTypes, label: string },
+  options?: [OptionShape],
+  tags: [TagType],
+};
+type Props = {
+  defaultPollType: PollTypeTypes,
+  intl: IntlShape,
+  user: UserShape,
+  createProposal: ({ workTeamId?: ID, ...State }) => Promise<boolean>,
+  tags: [TagType],
+  users: [UserShape],
+  findUser: () => Promise<boolean>,
+  workTeamId?: ID,
+};
+
+const defaultPollSettings = {
+  proposed: {
+    withStatements: true,
+    unipolar: true,
+    threshold: 25,
+    secret: false,
+    thresholdRef: 'all',
   },
-  tags: {},
-  showInput: false,
-  tagId: 'xt0',
-  currentTagIds: [],
-  spokesmanValue: undefined,
-  clearSpokesman: false,
-  options: [],
-  errors: {
-    title: {
-      touched: false,
-    },
-    body: {
-      touched: false,
-    },
-    dateTo: {
-      touched: false,
-    },
-    timeTo: {
-      touched: false,
-    },
-    spokesman: {
-      touched: false,
-    },
+  voting: {
+    withStatements: true,
+    unipolar: false,
+    threshold: 50,
+    secret: false,
+    thresholdRef: 'voters',
+  },
+  survey: {
+    withStatements: false,
+    unipolar: false,
+    threshold: 100,
+    secret: false,
+    thresholdRef: 'voters',
   },
 };
 
-const formFields = ['title', 'body', 'dateTo', 'timeTo', 'spokesman'];
-class ProposalInput extends React.Component {
-  static propTypes = {
-    createProposal: PropTypes.func.isRequired,
-    //  intl: PropTypes.shape({}).isRequired,
-    //  locale: PropTypes.string.isRequired,
-    maxTags: PropTypes.number.isRequired,
-    isPending: PropTypes.bool,
-    errorMessage: PropTypes.string,
-    success: PropTypes.string,
-    tags: PropTypes.arrayOf(
-      PropTypes.shape({
-        text: PropTypes.string,
-        id: PropTypes.string,
-      }),
-    ).isRequired,
-    defaultPollValues: PropTypes.shape({}).isRequired,
-    pollOptions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    userArray: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    findUser: PropTypes.func.isRequired,
-    workTeamId: PropTypes.string.isRequired,
-  };
-
+class ProposalInput extends React.Component<Props, State> {
   static defaultProps = {
-    isPending: false,
-    errorMessage: null,
-    success: null,
+    workTeamId: null,
   };
 
   constructor(props) {
     super(props);
-
     this.state = {
-      ...standardValues,
+      options: [],
+      pollType: {
+        value: props.defaultPollType || 'proposed',
+        label: props.intl.formatMessage({ ...messages.phaseOnePoll }),
+      },
+      spokesman: props.user,
+      tags: [],
+      dateTo: '',
+      timeTo: '',
+      ...defaultPollSettings[props.defaultPollType || 'proposed'],
     };
-    this.storageKey = 'ProposalContent';
-    this.onTextChange = this.onTextChange.bind(this);
-    this.onTextSelect = this.onTextSelect.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
-    this.handleTagInputChange = this.handleTagInputChange.bind(this);
-    this.handleKeys = this.handleKeys.bind(this);
-    this.onStrong = this.onStrong.bind(this);
-    this.onItalic = this.onItalic.bind(this);
-    this.onAddLink = this.onAddLink.bind(this);
-    this.handleValueChanges = this.handleValueChanges.bind(this);
-    this.toggleSettings = this.toggleSettings.bind(this);
-    this.handleValidation = this.handleValidation.bind(this);
-    this.visibleErrors = this.visibleErrors.bind(this);
-    this.handleBlur = this.handleBlur.bind(this);
-    this.handleSpokesmanValueChange = this.handleSpokesmanValueChange.bind(
-      this,
-    );
 
-    this.handleAddTag = this.handleAddTag.bind(this);
-    this.handleRemoveTag = this.handleRemoveTag.bind(this);
-    this.togglePreview = this.togglePreview.bind(this);
     this.handleAddOption = this.handleAddOption.bind(this);
-    this.md = new MarkdownIt({
-      // html: true,
-      linkify: true,
-    });
+    this.handleValueSaving = this.handleValueSaving.bind(this);
+    this.handleSubmission = this.handleSubmission.bind(this);
+    this.calculateNextStep = this.calculateNextStep.bind(this);
+  }
 
-    const testValues = {
-      title: { fn: 'name' },
-      body: { fn: 'name' },
-      dateTo: { fn: 'date' },
-      timeTo: { fn: 'time' },
-      spokesman: {
-        fn: 'spokesman',
-        valuesResolver: obj => obj.state.spokesmanValue,
-      },
-    };
-    this.Validator = createValidator(
-      testValues,
-      {
-        name: nameValidation,
-        date: dateToValidation,
-        time: timeToValidation,
-        spokesman: selectValidation,
-      },
-      this,
-      obj => obj.state.settings,
+  getNewTags() {
+    const { tags: selectedTags } = this.state;
+
+    return selectedTags.map(
+      tag =>
+        tag.id && tag.id.indexOf(TAG_ID_SUFFIX) !== -1
+          ? { text: tag.text }
+          : { id: tag.id },
     );
   }
 
-  componentDidMount() {
-    const initialValue = localStorage.getItem(this.storageKey) || '<p></p>';
-    this.editor.setInitialState(initialValue);
+  handleAddOption: OptionShape => void;
+
+  handleValueSaving: ([ValueType]) => void;
+
+  handleSubmission: () => void;
+
+  calculateNextStep: () => void;
+
+  handleAddOption(option: OptionShape) {
+    this.setState(({ options }) => ({ options: [...options, option] }));
   }
 
-  componentWillReceiveProps({ success, errorMessage }) {
-    const { success: oldSuccess, errorMessage: oldErrorMessage } = this.props;
-    if (success) {
-      if (!oldSuccess) {
-        this.setState({
-          ...standardValues,
-          success: true,
-          clearSpokesman: true,
-        });
-        this.resetEditor();
-        localStorage.setItem(this.storageKey, '<p></p>');
-      } /* else if (!this.state.success) {
-        this.setState({
-          ...standardValues,
-          success: false,
-          clearSpokesman: false,
-        });
-      } */
-    }
-    if (errorMessage) {
-      this.setState({ error: !oldErrorMessage });
-    }
-    //
-  }
-
-  onTextChange(e) {
-    const { textArea } = this.state;
-    const html = this.md.render(textArea.val);
-
-    this.setState(prevState => ({
-      markup: html,
-      textArea: {
-        ...prevState.textArea,
-        val: e.target.value,
-      },
-    }));
-  }
-
-  onTextSelect(e) {
-    this.setState({
-      textSelection: [e.target.selectionStart, e.target.selectionEnd],
-    });
-  }
-
-  onStrong() {
-    if (this.isSomethingSelected()) this.insertAtSelection('****', '****');
-  }
-
-  onItalic() {
-    if (this.isSomethingSelected()) this.insertAtSelection('*', '*');
-  }
-
-  onAddLink() {
-    const url = prompt('URL', 'https://');
-    if (url) {
-      this.insertAtSelection(
-        this.isSomethingSelected() ? '[' : '[link',
-        `](${url})`,
-      );
-    }
-  }
-
-  onSubmit() {
-    // TODO validate
-    if (this.handleValidation(formFields)) {
-      const { settings, currentTagIds, tags, options } = this.state;
-      const startTime = null;
-      let endTime = null;
-      const { dateTo, timeTo, body, title, pollOption } = settings;
-      // currently not in use
-      /*  if (dateFrom || timeFrom) {
-        dateFrom = dateFrom || new Date();
-        timeFrom = timeFrom || utcCorrectedDate().slice(11, 16);
-        startTime = concatDateAndTime(dateFrom, timeFrom);
-      }
-      */
-      if (dateTo || timeTo) {
-        const date = dateTo || utcCorrectedDate(3).slice(0, 10);
-        const time = timeTo || utcCorrectedDate().slice(11, 16);
-
-        endTime = concatDateAndTime(date, time);
-      }
-      const {
-        withStatements,
-        secret,
-        threshold,
-        thresholdRef,
-        unipolar,
-        spokesman,
-      } = settings;
-      const {
-        createProposal: create,
-        workTeamId,
-        defaultPollValues,
-      } = this.props;
-
-      /* eslint-disable no-confusing-arrow */
-      const newTags =
-        currentTagIds.map(
-          id =>
-            tags[id].id.indexOf('xt') === 0
-              ? { text: tags[id].text }
-              : { id: tags[id].id },
-        ) || null;
-      /* eslint-enable no-confusing-arrow */
-      let state;
-      if (pollOption.value === '3') {
-        state = 'survey';
-      } else {
-        state = pollOption.value === '2' ? 'voting' : 'proposed';
-      }
-
-      const spokesmanId = spokesman ? spokesman.id : null;
-      create({
-        ...(workTeamId && { workTeamId }),
-        title: title.trim(),
-        text: body,
-        state,
-        poll: {
-          options: options.map((o, i) => ({
-            description: { de: o.description },
-            pos: i,
-            order: i,
-          })),
-          extended: !!options.length,
-          startTime,
-          endTime,
-          secret,
-          threshold: threshold || defaultPollValues[pollOption.value].threshold,
-          mode: {
-            withStatements:
-              withStatements === undefined
-                ? defaultPollValues[pollOption.value].withStatements
-                : withStatements,
-            id: pollOption.value,
-            unipolar,
-            thresholdRef,
-          },
-        },
-        tags: newTags,
-        spokesmanId,
-      });
-    }
-  }
-
-  resetEditor() {
-    this.editor.reset();
-  }
-
-  handleSpokesmanValueChange(e) {
-    alert('NOT WORKING');
-    this.setState({ spokesmanValue: e.value }); // eslint-disable-line
-  }
-
-  visibleErrors(errorNames) {
-    const { errors } = this.state;
-    return errorNames.reduce((acc, curr) => {
-      const err = `${curr}Error`;
-      if (errors[curr].touched) {
-        acc[err] = <FormattedMessage {...messages[errors[curr].errorName]} />;
-      }
+  handleValueSaving(data) {
+    const newData = data.reduce((acc, curr) => {
+      acc[curr.name] = curr.value;
       return acc;
     }, {});
+    this.setState(newData);
   }
 
-  handleValidation(fields) {
-    const { errors } = this.state;
-    const validated = this.Validator(fields);
-    this.setState({ errors: { ...errors, ...validated.errors } });
-    return validated.failed === 0;
-  }
-
-  handleBlur(e) {
-    const field = e.target.name;
-    const { settings } = this.state;
-    if (settings[field]) {
-      this.handleValidation([field]);
-    }
-  }
-
-  handleValueChanges(e) {
-    let value;
-    switch (e.target.name) {
-      case 'dateTo':
-      case 'dateFrom':
-      case 'timeFrom':
-      case 'timeTo':
-      case 'threshold':
-      case 'thresholdRef':
-      case 'tagInput':
-      case 'title':
-      case 'body':
-      case 'spokesman':
-      case 'pollOption': {
-        ({ value } = e.target);
-        break;
-      }
-      case 'withStatements':
-      case 'unipolar':
-      case 'secret': {
-        value = e.target.checked;
+  calculateNextStep({ step, push }) {
+    switch (step.id) {
+      case 'body': {
+        const { pollType } = this.state;
+        push(pollType === 'survey' ? 'options' : 'spokesman');
         break;
       }
 
       default:
-        throw Error(`Element not recognized: ${e.target.name}`);
+        push();
+        break;
     }
-    this.setState({
-      settings: { [e.target.name]: value },
-    });
   }
 
-  toggleSettings() {
-    this.setState(prevState => ({ showSettings: !prevState.showSettings }));
-  }
+  handleSubmission() {
+    const { createProposal: create, workTeamId } = this.props;
+    const startTime = null;
+    let endTime = null;
+    const {
+      dateTo,
+      timeTo,
+      body,
+      title,
+      withStatements,
+      secret,
+      threshold,
+      thresholdRef,
+      unipolar,
+      spokesman,
+      pollType,
+      options,
+    } = this.state;
 
-  isSomethingSelected() {
-    const { textSelection } = this.state;
-    return textSelection[0] !== textSelection[1];
-  }
+    if (dateTo || timeTo) {
+      const date = dateTo || utcCorrectedDate(3).slice(0, 10);
+      const time = timeTo || utcCorrectedDate().slice(11, 16);
 
-  insertAtSelection(pre, post) {
-    const { settings, textSelection } = this.state;
-    let val = settings.body;
-    let sel = textSelection;
-    val = `${val.substring(0, sel[0])}${pre}${val.substring(
-      sel[0],
-      sel[1],
-    )}${post}${val.substring(sel[1])}`;
-    sel = [val.length, val.length];
+      endTime = concatDateAndTime(date, time);
+    }
 
-    this.setState(prevState => ({
-      settings: {
-        ...prevState.settings,
-        body: val,
+    const newTags = this.getNewTags();
+
+    const spokesmanId = spokesman ? spokesman.id : null;
+
+    create({
+      ...(workTeamId && { workTeamId }),
+      title: title.trim(),
+      text: body,
+      state: pollType.value,
+      poll: {
+        options: options.map((o, i) => ({
+          description: { de: o.description },
+          pos: i,
+          order: i,
+        })),
+        extended: !!options.length,
+        startTime,
+        endTime,
+        secret,
+        threshold,
+        mode: {
+          withStatements,
+          unipolar,
+          thresholdRef,
+        },
       },
-      textSelection: sel,
-    }));
-  }
-
-  handleTagInputChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
-  }
-
-  handleKeys(e) {
-    if (e.key === 'Enter') {
-      const { tagInput } = this.state;
-      if (tagInput) {
-        this.setState(prevState => ({
-          tags: { ...prevState.tags, [prevState.tagId]: prevState.tagInput },
-          showInput: false,
-        }));
-      }
-    }
-  }
-
-  handleAddTag(tag) {
-    const { maxTags, tags } = this.props;
-    const { currentTagIds } = this.state;
-    let newTag = tag;
-    if (currentTagIds.length < maxTags) {
-      const duplicate = Object.keys(tags).find(
-        id => tags[id].text.toLowerCase() === newTag.text.toLowerCase(),
-      );
-      if (duplicate) {
-        newTag = tags[duplicate];
-      }
-
-      this.setState(prevState => ({
-        tags: { ...tags, [tag.id]: tag },
-        currentTagIds: [...new Set([...prevState.currentTagIds, newTag.id])],
-      }));
-    }
-  }
-
-  handleRemoveTag(tagId) {
-    this.setState(prevState => ({
-      currentTagIds: prevState.currentTagIds.filter(tId => tId !== tagId),
-    }));
-  }
-
-  togglePreview() {
-    this.setState(prevState => ({ showPreview: !prevState.showPreview }));
-  }
-
-  handleAddOption(newOption) {
-    this.setState(prevState => ({
-      options: [...prevState.options, newOption],
-    }));
+      tags: newTags,
+      spokesmanId,
+    });
   }
 
   render() {
     const {
-      defaultPollValues,
-      pollOptions,
-      tags: availableTags,
-      userArray,
-      findUser: fetchUser,
-      success,
-      errorMessage,
-      isPending,
-    } = this.props;
-    const {
-      showSettings,
-      settings,
-      initialValue,
-      currentTagIds,
-      tags,
-      clearSpokesman,
-      showPreview,
       options,
-      success: successState,
-      error: errorState,
+      pollType,
+      body,
+      title,
+      spokesman,
+      dateTo,
+      timeTo,
+      tags: selectedTags,
+      secret,
+      unipolar,
+      withStatements,
+      threshold,
+      thresholdRef,
     } = this.state;
-    const { title, body, spokesman, pollOption } = settings;
-    const {
-      titleError,
-      bodyError,
-      spokesmanError,
-      ...pollErrors
-    } = this.visibleErrors(formFields);
-    const showOptionInput = pollOption.value === '3';
+    const { users, user, tags, findUser: fetchUser, intl } = this.props;
+
+    const pollOptions = [
+      {
+        value: 'proposed',
+        label: intl.formatMessage({
+          ...messages.phaseOnePoll,
+        }),
+      },
+      {
+        value: 'voting',
+        label: intl.formatMessage({
+          ...messages.phaseTwoPoll,
+        }),
+      },
+      {
+        value: 'survey',
+        label: intl.formatMessage({
+          ...messages.survey,
+        }),
+      },
+    ];
     return (
-      <div className={s.root}>
-        <Box column pad>
-          {/* <Calendar lang={this.props.locale} /> */}
-
-          <div>
-            <PollInput
-              onValueChange={this.handleValueChanges}
-              handleDateChange={this.handleValueChanges}
-              selectedPMode={pollOption}
-              showSettings={showSettings}
-              defaultPollValues={defaultPollValues}
-              pollValues={settings}
-              toggleSettings={this.toggleSettings}
-              pollOptions={pollOptions}
-              intl={this.context.intl} // eslint-disable-line
-              formErrors={pollErrors}
-              handleBlur={this.handleBlur}
-            />
-            <FormField label="Title" error={titleError}>
-              <input
-                name="title"
-                onBlur={this.handleBlur}
-                type="text"
-                value={title}
-                onChange={this.handleValueChanges}
+      <Box column>
+        Proposal WIZARD
+        <Wizard onNext={this.calculateNextStep} basename="">
+          {({ steps, step }) => (
+            <StepPage>
+              <Meter
+                strokeWidth={1}
+                percent={((steps.indexOf(step) + 1) / steps.length) * 100}
               />
-            </FormField>
-            <FormField error={bodyError} label="Body">
-              <MainEditor
-                ref={
-                  elm => (this.editor = elm) // eslint-disable-line
-                }
-                initialValue={initialValue}
-                className={s.editor}
-                value={body}
-                onChange={value => {
-                  this.handleValueChanges({
-                    target: { name: 'body', value },
-                  });
-                  localStorage.setItem(this.storageKey, value);
-                }}
-              />
+              <Steps>
+                <Step id="poll">
+                  <PollType
+                    availablePolls={pollOptions}
+                    defaultPollSettings={defaultPollSettings}
+                    data={{
+                      pollType,
+                      secret,
+                      unipolar,
+                      withStatements,
+                      threshold,
+                      thresholdRef,
+                    }}
+                    onExit={this.handleValueSaving}
+                    advancedModeOn={isAdmin(user)}
+                  />
+                </Step>
+                <Step id="body">
+                  <ProposalBody
+                    data={{ body, title }}
+                    onExit={this.handleValueSaving}
+                  />
+                </Step>
 
-              {/*  <Button onClick={this.onStrong} plain icon={<strong>
-                        A
-                      </strong>} />
-                  <Button onClick={this.onItalic} plain icon={<i>A</i>} />
-                  <Button plain onClick={this.onAddLink} icon={<svg viewBox="0 0 24 24" width="24px" height="24px" role="img" aria-label="link">
-                        <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.link} />
-                      </svg>} />
-                </Box>}>
+                <Step id="options">
+                  <OptionInput
+                    data={options}
+                    onExit={this.handleValueSaving}
+                    onAddOption={this.handleAddOption}
+                  />
+                </Step>
 
-              <textarea
-                className={s.textInput}
-                name="body"
-                value={body}
-                onChange={this.handleValueChanges}
-                onSelect={this.onTextSelect}
-                onBlur={this.handleBlur}
-              /> */}
-            </FormField>
-            {showOptionInput && (
-              <FormField label="Options">
-                <OptionInput
-                  options={options}
-                  onAddOption={this.handleAddOption}
-                />
-              </FormField>
-            )}
-
-            <FormField label="Tags">
-              <TagInput
-                name="tagInput"
-                tags={currentTagIds.map(t => tags[t])}
-                availableTags={Object.keys(availableTags).map(
-                  t => availableTags[t],
-                )}
-                handleAddition={this.handleAddTag}
-                handleDelete={this.handleRemoveTag}
-              />
-            </FormField>
-            <FormField overflow label="Spokesman" error={spokesmanError}>
-              <SearchField
-                onChange={this.handleSpokesmanValueChange}
-                data={userArray}
-                fetch={fetchUser}
-                clear={clearSpokesman}
-                displaySelected={data => {
-                  this.setState(prevState => ({
-                    settings: { ...prevState.settings, spokesman: data },
-                  }));
-                }}
-              />
-            </FormField>
-          </div>
-          {showPreview && (
-            <PreviewLayer
-              state={pollOption.value === '3' ? 'survey' : 'proposed'}
-              title={title}
-              body={body}
-              spokesman={spokesman}
-              onClose={this.togglePreview}
-            />
+                <Step id="spokesman">
+                  <SpokesmanInput
+                    onExit={this.handleValueSaving}
+                    data={spokesman}
+                    users={users}
+                    onFetchUser={fetchUser}
+                  />
+                </Step>
+                <Step id="date">
+                  <DateInput
+                    onExit={this.handleValueSaving}
+                    data={{ timeTo, dateTo }}
+                  />
+                </Step>
+                <Step id="tags">
+                  <TagInput
+                    suggestions={tags}
+                    selectedTags={selectedTags}
+                    maxTags={8}
+                    onExit={this.handleValueSaving}
+                  />
+                </Step>
+                <Step id="preview">
+                  <InputPreview
+                    onExit={this.handleValueSaving}
+                    state={pollType.value}
+                    spokesman={spokesman}
+                    title={title}
+                    body={body}
+                    onSubmit={this.handleSubmission}
+                  />
+                </Step>
+              </Steps>
+            </StepPage>
           )}
 
-          <Box pad>
-            <Button
-              primary
-              label={<FormattedMessage {...messages.submit} />}
-              onClick={this.onSubmit}
-              disabled={this.isPending}
-            />
-            <Button label="Preview" onClick={this.togglePreview} />
-          </Box>
-
-          {isPending && <span>...submitting</span>}
-          {errorState && <Notification type="error" message={errorMessage} />}
-          {successState && (
-            <Notification
-              type="success"
-              message={<FormattedMessage {...messages.success} />}
-              action={
-                <Button
-                  plain
-                  reverse
-                  icon={
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="24px"
-                      height="24px"
-                      role="img"
-                    >
-                      <path
-                        fill="none"
-                        stroke="#000"
-                        strokeWidth="2"
-                        d="M2,12 L22,12 M13,3 L22,12 L13,21"
-                      />
-                    </svg>
-                  }
-                  onClick={() => {
-                    history.push(`/proposal/${success}`);
-                  }}
-                  label="Visit"
-                />
-              }
-            />
-          )}
-        </Box>
-      </div>
+          {/* <Navigation /> */}
+        </Wizard>
+      </Box>
     );
   }
 }
@@ -672,17 +368,16 @@ const mapStateToProps = state => ({
   isPending: getIsProposalFetching(state, '0000'),
   errorMessage: getProposalErrorMessage(state, '0000'),
   success: getProposalSuccess(state, '0000'),
-  userArray: getVisibleUsers(state, 'all'),
+  users: getVisibleUsers(state, 'all'),
+  user: getSessionUser(state),
 });
 
 const mapDispatch = {
   createProposal,
   findUser,
 };
-ProposalInput.contextTypes = {
-  intl: PropTypes.shape({}),
-};
+
 export default connect(
   mapStateToProps,
   mapDispatch,
-)(withStyles(s)(ProposalInput));
+)(withStyles(s)(injectIntl(ProposalInput)));

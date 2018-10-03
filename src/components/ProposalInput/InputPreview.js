@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Layer from '../Layer';
+import Box from '../Box';
 import Proposal from '../Proposal';
+import Navigation from './Navigation';
 
 const validate = (name, data) => {
   let validated = data && data.trim();
@@ -13,8 +14,8 @@ const validate = (name, data) => {
   return validated;
 };
 
-const PreviewLayer = ({ state, title, body, spokesman, onClose }) => (
-  <Layer onClose={onClose}>
+const InputPreview = ({ state, title, body, spokesman, onSubmit }) => (
+  <Box column>
     <Proposal
       id="0000"
       state={state}
@@ -23,14 +24,15 @@ const PreviewLayer = ({ state, title, body, spokesman, onClose }) => (
       body={validate('Body', body)}
       spokesman={spokesman}
     />
-  </Layer>
+    <Navigation onNext={onSubmit} />
+  </Box>
 );
 
-PreviewLayer.propTypes = {
+InputPreview.propTypes = {
   state: PropTypes.oneOf(['proposed', 'survey']).isRequired,
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
   spokesman: PropTypes.shape({}).isRequired,
-  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };
-export default PreviewLayer;
+export default InputPreview;
