@@ -31,7 +31,11 @@ class ProposalBody extends React.Component<Props> {
   }
 
   componentDidMount() {
-    const initialValue = localStorage.getItem(this.storageKey) || '<p></p>';
+    const { data } = this.props;
+
+    const initialValue = data.body
+      ? data.body
+      : localStorage.getItem(this.storageKey) || '<p></p>';
     this.editor.setInitialState(initialValue);
   }
 

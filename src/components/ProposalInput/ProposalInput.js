@@ -21,12 +21,11 @@ import InputPreview from './InputPreview';
 import { createProposal } from '../../actions/proposal';
 import { findUser } from '../../actions/user';
 import type { TagType } from '../TagInput';
+import ResultPage from './ResultPage';
 
 import {
   getTags,
-  getIsProposalFetching,
-  getProposalErrorMessage,
-  getProposalSuccess,
+  getProposalUpdates,
   getVisibleUsers,
   getSessionUser,
 } from '../../reducers';
@@ -74,8 +73,8 @@ type State = {
 
   spokesman: UserShape,
   pollType: { value: PollTypeTypes, label: string },
-  options?: [OptionShape],
-  tags: [TagType],
+  options: OptionShape[],
+  tags: TagType[],
 };
 type Props = {
   defaultPollType: PollTypeTypes,
@@ -173,7 +172,7 @@ class ProposalInput extends React.Component<Props, State> {
     switch (step.id) {
       case 'body': {
         const { pollType } = this.state;
-        push(pollType === 'survey' ? 'options' : 'spokesman');
+        push(pollType.value === 'survey' ? 'options' : 'spokesman');
         break;
       }
 
@@ -235,8 +234,26 @@ class ProposalInput extends React.Component<Props, State> {
           thresholdRef,
         },
       },
-      tags: newTags,
+      ...(newTags.length ? { tags: newTags } : {}),
       spokesmanId,
+    });
+    return true;
+  }
+
+  reset() {
+    const { user, defaultPollType, intl } = this.props;
+    this.setState({
+      options: [],
+      pollType: {
+        value: defaultPollType || 'proposed',
+        label: intl.formatMessage({ ...messages.phaseOnePoll }),
+      },
+      spokesman: user,
+      tags: [],
+      dateTo: '',
+      timeTo: '',
+      title: '',
+      body: '<p></p>',
     });
   }
 
@@ -256,7 +273,14 @@ class ProposalInput extends React.Component<Props, State> {
       threshold,
       thresholdRef,
     } = this.state;
-    const { users, user, tags, findUser: fetchUser, intl } = this.props;
+    const {
+      users,
+      user,
+      tags,
+      findUser: fetchUser,
+      intl,
+      updates = {},
+    } = this.props;
 
     const pollOptions = [
       {
@@ -282,7 +306,7 @@ class ProposalInput extends React.Component<Props, State> {
       <Box column>
         Proposal WIZARD
         <Wizard onNext={this.calculateNextStep} basename="">
-          {({ steps, step }) => (
+          {({ steps, step, push }) => (
             <StepPage>
               <Meter
                 strokeWidth={1}
@@ -344,12 +368,20 @@ class ProposalInput extends React.Component<Props, State> {
                 </Step>
                 <Step id="preview">
                   <InputPreview
+                    {...this.state}
                     onExit={this.handleValueSaving}
                     state={pollType.value}
-                    spokesman={spokesman}
-                    title={title}
-                    body={body}
                     onSubmit={this.handleSubmission}
+                  />
+                </Step>
+                <Step id="final">
+                  <ResultPage
+                    success={updates.success}
+                    error={updates.error}
+                    onRestart={() => {
+                      this.reset();
+                      push('poll');
+                    }}
                   />
                 </Step>
               </Steps>
@@ -365,9 +397,7 @@ class ProposalInput extends React.Component<Props, State> {
 
 const mapStateToProps = state => ({
   tags: getTags(state),
-  isPending: getIsProposalFetching(state, '0000'),
-  errorMessage: getProposalErrorMessage(state, '0000'),
-  success: getProposalSuccess(state, '0000'),
+  updates: getProposalUpdates(state, '0000'),
   users: getVisibleUsers(state, 'all'),
   user: getSessionUser(state),
 });

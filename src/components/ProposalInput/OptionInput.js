@@ -12,8 +12,8 @@ const validateOptions = options => {
   const posNumbers = [];
   options.map((option, i) => {
     if (option.pos) {
-      if (posNumbers.includes(option.pos)) {
-        throw new Error('Pos must be unique');
+      if (posNumbers.includes(option.id)) {
+        throw new Error('Id must be unique');
       }
       return option;
     }
@@ -71,7 +71,7 @@ class OptionInput extends React.Component {
     const { onExit, data } = this.props;
     // take all, change saved option
     const newOptions = data.map(
-      option => (option.pos === newData.pos ? newData : option),
+      option => (option.id === newData.id ? newData : option),
     );
     if (onExit) {
       onExit([{ name: 'options', value: newOptions }]);
@@ -89,7 +89,7 @@ class OptionInput extends React.Component {
               {data &&
                 data.map(o => (
                   <PollOptionPreview
-                    pos={o.pos}
+                    pos={o.id}
                     description={o.description}
                     onSave={this.handleSaving}
                   />

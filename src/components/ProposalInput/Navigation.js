@@ -15,14 +15,14 @@ const Navigation = ({ onNext }) => (
       };
       return (
         <Box>
-          {steps.indexOf(step) < steps.length - 1 && (
-            <Button label="Next" onClick={onNextClick} />
-          )}
-          {steps.indexOf(step) === steps.length - 1 && (
-            <Button label="Submit" onClick={onNextClick} />
-          )}
           {steps.indexOf(step) > 0 && (
             <Button label="Back" onClick={previous} />
+          )}
+          {steps.indexOf(step) < steps.length - 2 && (
+            <Button label="Next" onClick={onNextClick} />
+          )}
+          {steps.indexOf(step) === steps.length - 2 && (
+            <Button label="Submit" onClick={onNextClick} />
           )}
         </Box>
       );
