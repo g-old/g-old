@@ -1,13 +1,11 @@
 // @flow
 import knex from '../knex';
 import Poll from './Poll';
-import User from './User';
 /* eslint-disable import/no-cycle */
 import WorkTeam from './WorkTeam';
 /* eslint-enable import/no-cycle */
 
 import PollingMode from './PollingMode';
-import { dedup } from '../../core/helpers';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import { isAdmin, Groups } from '../../organization';
 import EventManager from '../../core/EventManager';
@@ -15,8 +13,8 @@ import log from '../../logger';
 import sanitize from '../../core/htmlSanitizer';
 import Statement from './Statement'; // eslint-disable-line import/no-cycle
 import { transactify, TargetType } from './utils';
+import Tag from './Tag';
 
-type ID = string | number;
 type ProposalState = 'accepted' | 'rejected' | 'revoked' | 'survey';
 export type ProposalProps = {
   id: ID,
@@ -93,106 +91,6 @@ export const computeNextState = (state: ProposalState, poll, tRef: number) => {
   return newState;
 };
 
-const validateTags = async tags => {
-  let existingTags;
-  let newTags;
-  // max tags
-  if (!tags || tags.length > 8) return {};
-  existingTags = tags.filter(tag => 'id' in tag);
-  newTags = tags.filter(tag => 'text' in tag);
-
-  // check if new tags don't already exist
-  const queries = newTags.map(tag =>
-    knex('tags')
-      .where('text', 'ilike', tag.text)
-      .select(),
-  );
-
-  let duplicates = await Promise.all(queries);
-  duplicates = duplicates.reduce((acc, curr) => acc.concat(curr), []);
-  duplicates.forEach(dup => {
-    if (dup.id) {
-      existingTags.push(dup);
-      newTags = newTags.filter(
-        t => t.text.toLowerCase() !== dup.text.toLowerCase(),
-      );
-    }
-  });
-
-  // deduplicate
-  existingTags = dedup(existingTags);
-  newTags = dedup(newTags);
-  return { existingTags, newTags };
-};
-
-const validateDates = ({ poll }) => {
-  const serverTime = new Date();
-  const startTime =
-    poll && poll.startTime ? new Date(poll.startTime) : serverTime;
-  if (!startTime.getMonth || typeof startTime.getMonth !== 'function')
-    return null;
-
-  let endTime;
-  if (poll && poll.endTime) {
-    endTime = new Date(poll.endTime);
-  } else {
-    endTime = new Date();
-    endTime.setDate(startTime.getDate() + 3);
-  }
-  if (!endTime.getMonth || typeof endTime.getMonth !== 'function') return null;
-  if (startTime < serverTime || startTime >= endTime)
-    throw Error('DateTime wrong');
-  return { startTime, endTime };
-};
-
-// TODO  implement this  in Poll create instead
-const validatePoll = async (viewer, poll, loaders) => {
-  if (!poll) return {};
-  let pollingMode;
-  let createPollingMode = false;
-  let pollingModeData;
-  let isSurvey = false;
-  if (poll.mode && poll.mode.id) {
-    pollingMode = await PollingMode.gen(viewer, poll.mode.id, loaders);
-
-    if (!pollingMode) throw Error('PollingMode not found');
-    // check if modifications
-    const { id, ...properties } = poll.mode;
-    const keys = Object.keys(properties);
-    if (keys.length > 0) {
-      // check if values are different
-      const diff = keys.reduce((acc, curr) => {
-        if (properties[curr] !== pollingMode[curr]) {
-          // eslint-disable-next-line no-param-reassign
-          acc += 1;
-        }
-        return acc;
-      }, 0);
-      createPollingMode = diff > 0;
-      pollingModeData = { ...pollingMode, ...properties };
-      if (pollingMode.name === 'survey') {
-        isSurvey = true;
-        pollingModeData.thresholdRef = 'voters';
-      }
-    }
-  }
-  const { startTime, endTime } = validateDates({ poll });
-  let { threshold } = poll;
-  if (isSurvey) {
-    threshold = 100;
-  }
-  const pollData = {
-    secret: poll.secret || false,
-    startTime,
-    endTime,
-    threshold: threshold || 50,
-    ...(poll.options ? { options: poll.options } : {}),
-    ...(poll.workTeamId && { workTeamId: poll.workTeamId }),
-  };
-
-  return { pollData, pollingModeData, createPollingMode };
-};
-
 const validateStateChange = async (
   viewer,
   { state, proposalInDB },
@@ -207,7 +105,7 @@ const validateStateChange = async (
   if (state === 'revoked') return true; // Proposals can be revoked at any time
   if (state !== 'voting') {
     // check times
-    // poll mast have been ended!
+    // poll must have been ended!
     if (new Date(pollInDB.endTime) > new Date()) return false;
   }
   const pollingModeinDB = await PollingMode.gen(
@@ -308,12 +206,6 @@ class Proposal {
     // authorize
     if (!canMutate(viewer, { ...data, workTeam }, Models.PROPOSAL)) return null;
     // validate
-    // if (data.state && ['revoked', 'accepted'].indexOf(data.state) === -1) return null;
-    const { pollData, pollingModeData, createPollingMode } = await validatePoll(
-      viewer,
-      data.poll,
-      loaders,
-    );
 
     const newValues = { state: 'voting', updated_at: new Date() };
 
@@ -330,68 +222,63 @@ class Proposal {
         throw Error('State transition not allowed');
       }
     }
-    const proposalId = await knex.transaction(async trx => {
-      if (pollData) {
-        // create poll
-        let pId = data.poll.mode.id;
-        // TODO check if they get reverted in case of rollback
-        if (createPollingMode && pollingModeData) {
-          const pMode = await PollingMode.create(
+    const updatedProposal = await knex.transaction(async trx => {
+      // create poll
+      // TODO check if they get reverted in case of rollback
+      if (data.poll) {
+        const pollingMode = await PollingMode.createOrGet(
+          viewer,
+          data.poll.mode,
+          loaders,
+          trx,
+        );
+        if (!pollingMode) throw Error('PollingMode failed');
+        if (newValues.state === 'voting') {
+          const pollTwo = await Poll.create(
             viewer,
-            pollingModeData,
+            { ...data.poll, workTeam, pollingModeId: pollingMode.id },
             loaders,
+            trx,
           );
-          if (!pMode) throw Error('PollingMode failed');
-          pId = pMode.id;
+          if (!pollTwo) throw Error('No pollTwo provided');
+          newValues.poll_two_id = pollTwo.id;
         }
-
-        const pollTwoData = {
-          pollingModeId: pId,
-          ...pollData,
-        };
-        const pollTwo = await Poll.create(
-          viewer,
-          { ...pollTwoData, workTeam },
-          loaders,
-        );
-        if (!pollTwo) throw Error('No pollTwo provided');
-        // update/close pollOne
-        // TODO check first if not already closed?
-        const pollOne = await Poll.update(
-          viewer,
-          { id: proposalInDB.pollOneId, closedAt: new Date(), workTeam },
-          loaders,
-        );
-        if (!pollOne) throw Error('No pollOne provided');
-        newValues.poll_two_id = pollTwo.id;
       }
+      // update/close pollOne
+      // TODO check first if not already closed?
+      const pollOne = await Poll.update(
+        viewer,
+        { id: proposalInDB.pollOneId, closedAt: new Date(), workTeam },
+        loaders,
+        trx,
+      );
+      if (!pollOne) throw Error('No pollOne provided');
+
       if (newValues.state && newValues.state !== 'voting') {
         const pollId =
           proposalInDB.state === 'proposed' || proposalInDB.state === 'survey'
             ? proposalInDB.pollOneId
             : proposalInDB.pollTwoId;
-        await trx
-          .where({ id: pollId })
-          .update({ closed_at: new Date(), updated_at: new Date() })
-          .into('polls');
-        loaders.polls.clear(pollId);
+        await Poll.update(
+          viewer,
+          { id: pollId, closedAt: new Date() },
+          loaders,
+          trx,
+        );
       }
 
-      await trx
+      return knex('proposals')
+        .transacting(trx)
         .where({
           id: data.id,
         })
         .update({
           ...newValues,
         })
-        .into('proposals');
-      return data.id;
+        .returning('*');
     });
 
-    if (!proposalId) return null;
-    loaders.proposals.clear(proposalId);
-
-    const proposal = await Proposal.gen(viewer, proposalId, loaders);
+    const proposal = updatedProposal && new Proposal(updatedProposal);
     if (proposal) {
       EventManager.publish('onProposalUpdated', {
         viewer,
@@ -414,108 +301,76 @@ class Proposal {
     }
     if (!canMutate(viewer, { ...data, workTeam }, Models.PROPOSAL)) return null;
     // validate
-    const { pollData, pollingModeData, createPollingMode } = await validatePoll(
-      viewer,
-      { ...data.poll, ...(data.workTeamId && { workTeamId: data.workTeamId }) },
-      loaders,
-    );
-    const additionalData = {};
-    if (data.spokesmanId) {
-      const spokesman = await User.gen(viewer, data.spokesmanId, loaders);
-      if (spokesman) {
-        additionalData.spokesman_id = spokesman.id;
-      }
+    const newData = { created_at: new Date(), author_id: viewer.id };
+
+    if (data.title) {
+      newData.title = data.title;
     }
 
-    // tags
-    const { existingTags, newTags } = await validateTags(data.tags);
+    if (data.text) {
+      newData.body = sanitize(data.text);
+    }
 
-    const newProposalId = await knex.transaction(async trx => {
-      let pId = data.poll.mode.id;
-      // TODO check if they get reverted in case of rollback
-      if (createPollingMode && pollingModeData) {
-        const pMode = await PollingMode.create(
-          viewer,
-          pollingModeData,
-          loaders,
-        );
-        if (!pMode) throw Error('PollingMode failed');
-        pId = pMode.id;
+    if (data.workTeamId) {
+      newData.work_team_id = data.workTeamId;
+    }
+
+    if (data.spokesmanId) {
+      newData.spokesman_id = data.spokesmanId;
+    }
+    if (data.state) {
+      if (!['survey', 'proposed', 'voting'].includes(data.state)) {
+        throw new Error(`Wrong state provided: ${data.state}`);
       }
+      newData.state = data.state;
+    }
 
-      const pollOneData = {
-        pollingModeId: pId,
-        ...pollData,
-      };
+    const proposalData = await knex.transaction(async trx => {
+      const pollingMode = await PollingMode.createOrGet(
+        viewer,
+        data.poll.mode,
+        loaders,
+        trx,
+      );
+
+      if (!pollingMode) throw Error('PollingMode failed');
+
       const pollOne = await Poll.create(
         viewer,
-        { ...pollOneData, workTeam },
+        { ...data.poll, pollingModeId: pollingMode.id, workTeam },
         loaders,
+        trx,
       );
       if (!pollOne) throw Error('No pollOne provided');
+      newData.poll_one_id = pollOne.id;
 
-      if (!['survey', 'proposed', 'voting'].includes(data.state)) {
-        throw new Error('State is missing');
-      }
-      const { state } = data;
+      const [proposal = null] = await knex('proposals')
+        .transacting(trx)
+        .insert(newData)
+        .returning('*');
 
-      const pollField = state === 'voting' ? 'poll_two_id' : 'poll_one_id';
-      const [id = null] = await trx
-        .insert(
-          {
-            author_id: viewer.id,
-            title: data.title,
-            body: sanitize(data.text),
-            [pollField]: pollOne.id,
-            ...(data.workTeamId && { work_team_id: data.workTeamId }),
-            state,
-            ...additionalData,
-            created_at: new Date(),
-          },
-          'id',
-        )
-        .into('proposals');
+      if (proposal) {
+        if (data.tags) {
+          await Tag.addTagsToProposal(
+            viewer,
+            { proposal, tags: data.tags },
+            trx,
+          );
+        }
 
-      // tags
-      if (existingTags && existingTags.length) {
-        await trx
-          .insert(existingTags.map(t => ({ proposal_id: id, tag_id: t.id })))
-          .into('proposal_tags');
-
-        // update counts
-        await Promise.all(
-          existingTags.map(t =>
-            trx
-              .where({ id: t.id })
-              .increment('count', 1)
-              .into('tags'),
-          ),
-        );
+        if (data.workTeamId) {
+          await knex('work_teams')
+            .transacting(trx)
+            .forUpdate()
+            .where({ id: data.workTeamId })
+            .increment('num_proposals', 1);
+        }
       }
 
-      if (newTags && newTags.length) {
-        const ids = await trx
-          .insert(newTags.map(t => ({ text: t.text, count: 1 })))
-          .into('tags')
-          .returning('id');
-        await Promise.all(
-          ids.map(tId =>
-            trx.insert({ proposal_id: id, tag_id: tId }).into('proposal_tags'),
-          ),
-        );
-        //
-      }
-
-      if (data.workTeamId) {
-        await knex('work_teams')
-          .where({ id: data.workTeamId })
-          .increment('num_proposals', 1);
-      }
-      return id;
+      return proposal;
     });
 
-    if (!newProposalId) return null;
-    const proposal = await Proposal.gen(viewer, newProposalId, loaders);
+    const proposal = proposalData && new Proposal(proposalData);
 
     if (proposal) {
       EventManager.publish('onProposalCreated', {

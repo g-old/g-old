@@ -2,6 +2,7 @@ import knex from '../knex';
 import PollingMode from './PollingMode';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import { Groups } from '../../organization';
+import { transactify } from './utils';
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
@@ -12,15 +13,15 @@ const MAX_DESCRIPTION_LENGTH = 10000;
 
 const checkOption = (option, counters) => {
   const validated = {};
-  if ('pos' in option) {
-    // check uniqness of pos
+  if ('id' in option) {
+    // check uniqness of id
     if (
-      option.pos > counters.currentPos &&
-      !counters.otherPos.includes(option.pos)
+      option.id > counters.currentId &&
+      !counters.otherIds.includes(option.id)
     ) {
-      validated.pos = option.pos;
-      counters.currentPos = option.pos; // eslint-disable-line
-      counters.otherPos.push(option.pos);
+      validated.id = option.id;
+      counters.currentId = option.id; // eslint-disable-line
+      counters.otherIds.push(option.id);
     }
   }
   if ('order' in option) {
@@ -58,7 +59,7 @@ const checkOption = (option, counters) => {
   }
 
   if (
-    'pos' in validated &&
+    'id' in validated &&
     'order' in validated &&
     'description' in validated &&
     'numVotes' in validated
@@ -69,13 +70,33 @@ const checkOption = (option, counters) => {
 };
 const validateOptions = options => {
   const counters = {
-    currentPos: -1,
+    currentId: -1,
     currentOrder: -1,
-    otherPos: [],
+    otherIds: [],
     otherOrders: [],
   };
   const data = options.map(option => checkOption(option, counters));
   return data;
+};
+
+const validateDates = data => {
+  const serverTime = new Date();
+  const startTime =
+    data && data.startTime ? new Date(data.startTime) : serverTime;
+  if (!startTime.getMonth || typeof startTime.getMonth !== 'function')
+    return null;
+
+  let endTime;
+  if (data && data.endTime) {
+    endTime = new Date(data.endTime);
+  } else {
+    endTime = new Date();
+    endTime.setDate(startTime.getDate() + 3);
+  }
+  if (!endTime.getMonth || typeof endTime.getMonth !== 'function') return null;
+  if (startTime < serverTime || startTime >= endTime)
+    throw Error('DateTime wrong');
+  return { startTime, endTime };
 };
 
 class Poll {
@@ -130,14 +151,13 @@ class Poll {
   }
 
   /* eslint-enable class-methods-use-this */
-  static async create(viewer, data, loaders) {
+  static async create(viewer, data, loaders, trx) {
     // authorize
     if (!canMutate(viewer, data, Models.POLL)) return null;
 
     // validate
     if (!data.pollingModeId) return null;
     if (!data.threshold) return null;
-    if (!data.endTime) return null;
 
     const newData = { created_at: new Date() };
 
@@ -147,10 +167,12 @@ class Poll {
       newData.options = JSON.stringify(validatedOptions);
     }
     if ('extended' in data) {
-      if (newData.options.length) {
+      if (newData.options && newData.options.length) {
         newData.extended = data.extended;
       }
     }
+    //
+
     if ('multipleChoice' in data) {
       newData.multipe_choice = data.multipeChoice;
     }
@@ -158,11 +180,13 @@ class Poll {
       newData.secret = data.secret;
     }
 
-    if (data.startTime) {
-      newData.start_time = data.startTime;
+    const { startTime, endTime } = validateDates(data);
+
+    if (startTime) {
+      newData.start_time = startTime;
     }
-    if (data.endTime) {
-      newData.end_time = data.endTime;
+    if (endTime) {
+      newData.end_time = endTime;
     }
     if (data.pollingModeId) {
       newData.polling_mode_id = data.pollingModeId;
@@ -174,26 +198,43 @@ class Poll {
 
     // create
 
-    const newPoll = await knex.transaction(async trx => {
-      const pollingMode = await PollingMode.gen(
-        viewer,
-        data.pollingModeId,
-        loaders,
-      );
-      if (!pollingMode) throw Error('No valid PollingMode provided');
+    const createPoll = async transaction => {
+      const pollingModeData = await knex('polling_modes')
+        .transacting(transaction)
+        .where({ id: data.pollingModeId })
+        .limit(1)
+        .select('*');
+      if (!pollingModeData) throw Error('No valid PollingMode provided');
+      const pollingMode = new PollingMode(pollingModeData);
       let numVoter = 0;
+
+      if (!newData.extended) {
+        const options = [
+          { id: 0, order: 0, numVotes: 0, description: { _default: 'up' } },
+        ];
+
+        if (!pollingMode.unipolar) {
+          options.push({
+            id: 1,
+            order: 1,
+            numVotes: 0,
+            description: { _default: 'down' },
+          });
+        }
+        newData.options = JSON.stringify(options);
+      }
 
       if (pollingMode.thresholdRef === 'all') {
         // TODO change completely in case of group model
         if (data.workTeamId) {
           numVoter = await knex('user_work_teams')
-            .transacting(trx)
+            .transacting(transaction)
             .where({ work_team_id: data.workTeamId })
             .join('users', 'users.id', 'user_work_teams.user_id') // bc also viewers can be members
             .whereRaw('users.groups & ? > 0', [Groups.VIEWER]) // TODO whitelist
             .count('users.id');
         } else {
-          numVoter = await trx
+          numVoter = await transaction
             .whereRaw('groups & ? > 0', [Groups.VOTER]) // TODO whitelist
             .count('id')
             .into('users');
@@ -207,16 +248,18 @@ class Poll {
       }
 
       const [pollinDB = null] = await knex('polls')
-        .transacting(trx)
+        .transacting(transaction)
         .insert(newData)
         .returning('*');
       return pollinDB;
-    });
+    };
+
+    const newPoll = await transactify(createPoll, knex, trx);
     if (!newPoll) return null;
     return new Poll(newPoll);
   }
 
-  static async update(viewer, data, loaders) {
+  static async update(viewer, data, loaders, trx) {
     // authorize
     if (!canMutate(viewer, data, Models.POLL)) return null;
     // validate
@@ -224,21 +267,18 @@ class Poll {
     const newData = {};
     if (data.closedAt) {
       newData.closed_at = data.closedAt;
+      newData.updated_at = new Date();
     }
 
-    const pollId = await knex.transaction(async trx => {
-      await trx
+    const updatePoll = async transaction =>
+      knex('polls')
+        .transacting(transaction)
         .where({ id: data.id })
-        .update({
-          ...newData,
-          updated_at: new Date(),
-        })
-        .into('polls');
-      return data.id;
-    });
-    if (!pollId) return null;
-    loaders.polls.clear(pollId);
-    return Poll.gen(viewer, pollId, loaders);
+        .update(newData)
+        .returning('*');
+
+    const pollData = await transactify(updatePoll, knex, trx);
+    return pollData && new Poll(pollData);
   }
 }
 
