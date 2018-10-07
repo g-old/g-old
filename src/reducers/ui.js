@@ -47,6 +47,7 @@ export default (state, action) => {
 };
 
 /* GENERATOR_EXPORTS */
+
 export const getVoteUpdates = state => fromPoll.getStatus(state.polls);
 
 export const getMessageUpdates = state => fromMessage.getStatus(state.messages);
@@ -62,15 +63,6 @@ export const getWorkTeamUpdates = (state, id) =>
 
 export const getProposalUpdates = (state, id) =>
   fromProposal.getStatus(state.proposals, id);
-
-export const getIsProposalFetching = (state, id) =>
-  fromProposal.getProposal(state.proposals, id).isFetching;
-
-export const getProposalSuccess = (state, id) =>
-  fromProposal.getProposal(state.proposals, id).success;
-
-export const getProposalErrorMessage = (state, id) =>
-  fromProposal.getProposal(state.proposals, id).errorMessage;
 
 export const getStatementUpdates = state =>
   fromStatement.getUpdates(state.statements);

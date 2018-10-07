@@ -95,20 +95,8 @@ export const getComment = (state, id) =>
 export const getProposalsByTag = (state, tagId) =>
   fromEntity.getProposalsByTag(state.entities, tagId);
 
-export const getIsProposalUpdates = (state, id) =>
-  fromUi.getIsProposalFetching(state.ui, id);
-
-export const getProposalSuccess = (state, id) =>
-  fromUi.getProposalSuccess(state.ui, id);
-
-export const getIsProposalFetching = (state, id) =>
-  fromUi.getIsProposalFetching(state.ui, id);
-
 export const getProposalUpdates = (state, id) =>
   fromUi.getProposalUpdates(state.ui, id);
-
-export const getProposalErrorMessage = (state, id) =>
-  fromUi.getProposalErrorMessage(state.ui, id);
 
 export const getVoteUpdates = (state, id) =>
   fromUi.getVoteUpdates(state.ui, id);

@@ -19,8 +19,7 @@ import {
 import {
   getVoteUpdates,
   getProposal,
-  getIsProposalFetching,
-  getProposalErrorMessage,
+  getProposalUpdates,
   getFolloweeVotesByPoll,
   getFollowees,
   getSubscriptionUpdates,
@@ -288,12 +287,17 @@ class ProposalContainer extends React.Component {
   }
 
   render() {
-    const { proposal, isFetching, errorMessage } = this.props;
-    if (isFetching && !proposal) {
+    const { proposal, updates = {} } = this.props;
+    if (updates.isFetching && !proposal) {
       return <p>{'Loading...'} </p>;
     }
-    if (errorMessage && !proposal) {
-      return <FetchError message={errorMessage} onRetry={this.fetchProposal} />;
+    if (updates.errorMessage && !proposal) {
+      return (
+        <FetchError
+          message={updates.errorMessage}
+          onRetry={this.fetchProposal}
+        />
+      );
     }
     if (proposal.deletedAt) {
       return <Notification type="alert" message="Proposal not accessible!" />;
@@ -326,8 +330,7 @@ ProposalContainer.propTypes = {};
 
 const mapStateToProps = (state, { pollId, proposalId }) => ({
   proposal: getProposal(state, proposalId),
-  isFetching: getIsProposalFetching(state, proposalId),
-  errorMessage: getProposalErrorMessage(state, proposalId),
+  updates: getProposalUpdates(state, proposalId),
   followees: getFollowees(state),
   voteUpdates: getVoteUpdates(state),
   followeeVotes: getFolloweeVotesByPoll(state, pollId),

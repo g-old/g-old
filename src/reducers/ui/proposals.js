@@ -55,5 +55,4 @@ const proposals = (state = {}, action) => {
 };
 
 export default proposals;
-export const getProposal = (state, id) => state[id] || {};
 export const getStatus = (state, id) => state[id] || {};
