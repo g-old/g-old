@@ -34,8 +34,8 @@ const SELECTION = 1;
 const convertPosition = position => {
   const res = [];
   if (position === 'pro') {
-    res.push({ pos: 1, value: SELECTION });
-  } else res.push({ pos: 0, value: SELECTION });
+    res.push({ pos: 0, value: SELECTION });
+  } else res.push({ pos: 1, value: SELECTION });
   return res;
 };
 

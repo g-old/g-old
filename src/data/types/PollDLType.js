@@ -98,12 +98,6 @@ const PollType = new ObjectType({
       type: GraphQLInt,
       resolve: data => data.numVoter,
     },
-    upvotes: {
-      type: GraphQLInt,
-    },
-    downvotes: {
-      type: GraphQLInt,
-    },
     followees: {
       type: new GraphQLList(VoteType),
       description: 'Votings of followees',
