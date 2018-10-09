@@ -4,11 +4,11 @@ import { WizardContext } from '../Wizard/wizard-context';
 import Button from '../Button';
 import Box from '../Box';
 
-const Navigation = ({ onNext }) => (
+const Navigation = ({ onSubmit }) => (
   <WizardContext.Consumer>
     {({ next, previous, step, steps }) => {
       const onNextClick = () => {
-        const res = onNext();
+        const res = onSubmit();
         if (res) {
           next();
         }
@@ -19,7 +19,7 @@ const Navigation = ({ onNext }) => (
             <Button label="Back" onClick={previous} />
           )}
           {steps.indexOf(step) < steps.length - 2 && (
-            <Button label="Next" onClick={onNextClick} />
+            <Button label="Next" onClick={next} />
           )}
           {steps.indexOf(step) === steps.length - 2 && (
             <Button label="Submit" onClick={onNextClick} />
@@ -31,7 +31,7 @@ const Navigation = ({ onNext }) => (
 );
 
 Navigation.propTypes = {
-  onNext: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default Navigation;

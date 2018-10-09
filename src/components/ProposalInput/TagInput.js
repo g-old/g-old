@@ -3,22 +3,24 @@
 import React from 'react';
 import FormField from '../FormField';
 import Box from '../Box';
-import Navigation from './Navigation';
 import TagField from '../TagInput';
 import type { TagType } from '../TagInput';
+import type { ValueType, Callback } from './ProposalInput';
 
 export const TAG_ID_SUFFIX = '$tagId';
 
 type Props = {
-  selectedTags: [TagType],
-  onExit: ([{ name: string, value: [TagType] }]) => void,
+  selectedTags: TagType[],
+  onExit: (ValueType[]) => void,
   maxTags: number,
-  suggestions: [TagType],
+  suggestions: TagType[],
+  callback: Callback,
+  stepId: string,
 };
 
 type State = {
-  selectedTagIds: [ID],
-  selectedTags: [TagType],
+  selectedTagIds: ID[],
+  selectedTags: TagType[],
 };
 
 class TagInput extends React.Component<Props, State> {
@@ -31,6 +33,20 @@ class TagInput extends React.Component<Props, State> {
     this.handleNext = this.handleNext.bind(this);
     this.handleAddTag = this.handleAddTag.bind(this);
     this.handleRemoveTag = this.handleRemoveTag.bind(this);
+    this.onBeforeNextStep = this.onBeforeNextStep.bind(this);
+  }
+
+  componentDidMount() {
+    const { callback, stepId } = this.props;
+    if (callback) {
+      callback(stepId, this.onBeforeNextStep);
+    }
+  }
+
+  onBeforeNextStep: () => void;
+
+  onBeforeNextStep() {
+    return this.handleNext();
   }
 
   handleNext: () => void;
@@ -127,7 +143,6 @@ class TagInput extends React.Component<Props, State> {
             predefinedTagsOnly={false}
           />
         </FormField>
-        <Navigation onNext={this.handleNext} />
       </Box>
     );
   }

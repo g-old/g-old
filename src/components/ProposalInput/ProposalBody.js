@@ -1,18 +1,21 @@
 // @flow
 import React from 'react';
+import type { ElementRef } from 'react';
+
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import FormValidation from '../FormValidation';
 import s from './ProposalBody.css';
 import FormField from '../FormField';
 import Box from '../Box';
-import Navigation from './Navigation';
 import MainEditor from '../MainEditor';
 import { isHtmlEmpty } from '../MessageInput/validationFns';
-import type { ValueType } from './ProposalInput';
+import type { ValueType, Callback } from './ProposalInput';
 
 type Props = {
   onExit: (ValueType[]) => void,
   data: { body?: string, title?: string },
+  callback: Callback,
+  stepId: string,
 };
 
 const bodyValidation = data => {
@@ -28,20 +31,43 @@ class ProposalBody extends React.Component<Props> {
     super(props);
     this.handleNext = this.handleNext.bind(this);
     this.storageKey = 'proposalDraft';
+    this.onBeforeNextStep = this.onBeforeNextStep.bind(this);
+    this.form = React.createRef();
   }
 
   componentDidMount() {
-    const { data } = this.props;
+    const { data, callback, stepId } = this.props;
 
     const initialValue = data.body
       ? data.body
       : localStorage.getItem(this.storageKey) || '<p></p>';
     this.editor.setInitialState(initialValue);
+    if (callback) {
+      callback(stepId, this.onBeforeNextStep);
+    }
+  }
+
+  onBeforeNextStep: () => boolean;
+
+  onBeforeNextStep() {
+    if (this.form && this.form.current) {
+      const validationResult = this.form.current.enforceValidation([
+        'body',
+        'title',
+      ]);
+      if (validationResult.isValid) {
+        this.handleNext(validationResult.values);
+        return true;
+      }
+    }
+    return false;
   }
 
   storageKey: string;
 
   editor: MainEditor;
+
+  form: ?ElementRef<FormValidation>;
 
   handleNext: () => void;
 
@@ -66,6 +92,7 @@ class ProposalBody extends React.Component<Props> {
     const { data } = this.props;
     return (
       <FormValidation
+        ref={this.form}
         submit={this.handleNext}
         validations={{
           body: { fn: bodyValidation, args: { required: true } },
@@ -76,7 +103,7 @@ class ProposalBody extends React.Component<Props> {
           title: data.title,
         }}
       >
-        {({ handleValueChanges, values, onSubmit, errorMessages }) => (
+        {({ handleValueChanges, values, errorMessages }) => (
           <Box column>
             <FormField label="Title" error={errorMessages.titleError}>
               <input
@@ -99,7 +126,6 @@ class ProposalBody extends React.Component<Props> {
                 }}
               />
             </FormField>
-            <Navigation onNext={onSubmit} />
           </Box>
         )}
       </FormValidation>

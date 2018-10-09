@@ -5,12 +5,12 @@ import FormField from '../FormField';
 import Select from '../Select';
 import Box from '../Box';
 import Button from '../Button';
-import Navigation from './Navigation';
 import PollSettings from './PollSettings';
 import type {
   ValueType,
   PollTypeTypes,
   PollSettingsShape,
+  Callback,
 } from './ProposalInput';
 
 type Props = {
@@ -19,6 +19,8 @@ type Props = {
   defaultPollSettings: { [PollTypeTypes]: PollSettingsShape },
   availablePolls: PollTypeTypes[],
   advancedModeOn: boolean,
+  stepId: string,
+  callback: Callback,
 };
 
 type State = {
@@ -45,6 +47,29 @@ class PollType extends React.Component<Props, State> {
     this.handleNext = this.handleNext.bind(this);
     this.toggleSettings = this.toggleSettings.bind(this);
     this.propagatePollTypeChange = this.propagatePollTypeChange.bind(this);
+    this.onBeforeNextStep = this.onBeforeNextStep.bind(this);
+    this.form = React.createRef();
+  }
+
+  componentDidMount() {
+    const { callback, stepId } = this.props;
+    if (callback) {
+      callback(stepId, this.onBeforeNextStep);
+    }
+  }
+
+  onBeforeNextStep() {
+    if (this.form.current) {
+      const validationResult = this.form.current.enforceValidation([
+        'pollType',
+        ...settingFields,
+      ]);
+      if (validationResult.isValid) {
+        this.handleNext(validationResult.values);
+        return true;
+      }
+    }
+    return false;
   }
 
   handleNext: () => void;
@@ -84,6 +109,7 @@ class PollType extends React.Component<Props, State> {
     return (
       <FormValidation
         submit={this.handleNext}
+        ref={this.form}
         validations={{
           pollType: { args: { required: true } },
           withStatements: {},
@@ -94,7 +120,7 @@ class PollType extends React.Component<Props, State> {
         }}
         data={data}
       >
-        {({ handleValueChanges, values, onSubmit, errorMessages }) => (
+        {({ handleValueChanges, values, errorMessages }) => (
           <Box column>
             <FormField label="PollType" error={errorMessages.pollTypeError}>
               <Select
@@ -131,7 +157,6 @@ class PollType extends React.Component<Props, State> {
                   unipolar={values.unipolar}
                 />
               )}
-            <Navigation onNext={onSubmit} />
           </Box>
         )}
       </FormValidation>

@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Box from '../Box';
 import Proposal from '../Proposal';
-import Navigation from './Navigation';
 import Poll from '../Poll';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 
@@ -25,7 +24,6 @@ const InputPreview = ({
   thresholdRef,
   unipolar,
   withStatements,
-  onSubmit,
   options,
   dateTo,
   timeTo,
@@ -73,7 +71,6 @@ const InputPreview = ({
         onVote={() => {}}
         mode={{ withStatements, unipolar, thresholdRef }}
       />
-      <Navigation onNext={onSubmit} />
     </Box>
   );
 };
@@ -83,7 +80,6 @@ InputPreview.propTypes = {
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
   spokesman: PropTypes.shape({}).isRequired,
-  onSubmit: PropTypes.func.isRequired,
   threshold: PropTypes.number.isRequired,
   thresholdRef: PropTypes.string.isRequired,
   unipolar: PropTypes.bool.isRequired,

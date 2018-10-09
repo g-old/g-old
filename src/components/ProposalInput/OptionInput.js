@@ -5,7 +5,6 @@ import Button from '../Button';
 import Box from '../Box';
 import CheckBox from '../CheckBox';
 import PollOptionPreview from './PollOptionPreview';
-import Navigation from './Navigation';
 import FormValidation from '../FormValidation';
 
 const validateOptions = options => {
@@ -31,6 +30,8 @@ class OptionInput extends React.Component {
     onAddOption: PropTypes.func.isRequired,
     data: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     onExit: PropTypes.func.isRequired,
+    stepId: PropTypes.string.isRequired,
+    callback: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -40,6 +41,26 @@ class OptionInput extends React.Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleNext = this.handleNext.bind(this);
     this.handleSaving = this.handleSaving.bind(this);
+    this.onBeforeNextStep = this.onBeforeNextStep.bind(this);
+    this.form = React.createRef();
+  }
+
+  componentDidMount() {
+    const { callback, stepId } = this.props;
+    if (callback) {
+      callback(stepId, this.onBeforeNextStep);
+    }
+  }
+
+  onBeforeNextStep() {
+    if (this.form.current) {
+      const validationResult = this.form.current.enforceValidation(['options']);
+      if (validationResult.isValid) {
+        this.handleNext(validationResult.values);
+        return true;
+      }
+    }
+    return false;
   }
 
   handleNext(values) {
@@ -82,8 +103,12 @@ class OptionInput extends React.Component {
     const { data } = this.props;
     const { description } = this.state;
     return (
-      <FormValidation submit={this.handleNext} validations={{ options: {} }}>
-        {({ onSubmit }) => (
+      <FormValidation
+        ref={this.form}
+        submit={this.handleNext}
+        validations={{ options: {} }}
+      >
+        {() => (
           <Box column pad>
             <Box column>
               {data &&
@@ -105,7 +130,6 @@ class OptionInput extends React.Component {
               minRows={2}
             />
             <Button onClick={this.handleAddOption} label="Add" />
-            <Navigation onNext={onSubmit} />
           </Box>
         )}
       </FormValidation>

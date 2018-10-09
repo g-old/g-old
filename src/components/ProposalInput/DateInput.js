@@ -5,7 +5,6 @@ import FormField from '../FormField';
 import { utcCorrectedDate } from '../../core/helpers';
 import Box from '../Box';
 import FormValidation from '../FormValidation';
-import Navigation from './Navigation';
 import { dateToValidation, timeToValidation } from '../../core/validation';
 
 const messages = defineMessages({
@@ -25,6 +24,29 @@ class DateInput extends React.Component {
     super(props);
 
     this.handleNext = this.handleNext.bind(this);
+    this.onBeforeNextStep = this.onBeforeNextStep.bind(this);
+    this.form = React.createRef();
+  }
+
+  componentDidMount() {
+    const { callback, stepId } = this.props;
+    if (callback) {
+      callback(stepId, this.onBeforeNextStep);
+    }
+  }
+
+  onBeforeNextStep() {
+    if (this.form.current) {
+      const validationResult = this.form.current.enforceValidation([
+        'dateTo',
+        'timeTo',
+      ]);
+      if (validationResult.isValid) {
+        this.handleNext(validationResult.values);
+        return true;
+      }
+    }
+    return false;
   }
 
   handleNext(values) {
@@ -47,8 +69,9 @@ class DateInput extends React.Component {
           timeTo: { fn: timeToValidation },
         }}
         data={data}
+        ref={this.form}
       >
-        {({ handleValueChanges, errorMessages, onBlur, values, onSubmit }) => (
+        {({ handleValueChanges, errorMessages, onBlur, values }) => (
           <Box column>
             <FormField
               label={<FormattedMessage {...messages.dateTo} />}
@@ -77,7 +100,6 @@ class DateInput extends React.Component {
                 onBlur={onBlur}
               />
             </FormField>
-            <Navigation onNext={onSubmit} />
           </Box>
         )}
       </FormValidation>

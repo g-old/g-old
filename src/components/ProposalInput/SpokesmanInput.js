@@ -4,22 +4,45 @@ import React from 'react';
 import FormValidation from '../FormValidation';
 import FormField from '../FormField';
 import Box from '../Box';
-import Navigation from './Navigation';
 import SearchField from '../SearchField';
 import { selectValidation } from '../../core/validation';
 import ProfilePicture from '../ProfilePicture';
-import type { ValueType } from './ProposalInput';
+import type { ValueType, Callback } from './ProposalInput';
 
 type Props = {
   onExit: ([ValueType]) => void,
   data: UserShape,
-  users: [UserShape],
+  users: UserShape[],
   onFetchUser: () => Promise<boolean>,
+  callback: Callback,
+  stepId: string,
 };
 class SpokesmanInput extends React.Component<Props> {
   constructor(props: Props) {
     super(props);
     this.handleNext = this.handleNext.bind(this);
+    this.onBeforeNextStep = this.onBeforeNextStep.bind(this);
+    this.form = React.createRef();
+  }
+
+  componentDidMount() {
+    const { callback, stepId } = this.props;
+    if (callback) {
+      callback(stepId, this.onBeforeNextStep);
+    }
+  }
+
+  onBeforeNextStep() {
+    if (this.form.current) {
+      const validationResult = this.form.current.enforceValidation([
+        'spokesman',
+      ]);
+      if (validationResult.isValid) {
+        this.handleNext(validationResult.values);
+        return true;
+      }
+    }
+    return false;
   }
 
   handleNext: () => void;
@@ -35,6 +58,7 @@ class SpokesmanInput extends React.Component<Props> {
     const { users, onFetchUser, data } = this.props;
     return (
       <FormValidation
+        ref={this.form}
         submit={this.handleNext}
         validations={{
           spokesman: {
@@ -45,7 +69,7 @@ class SpokesmanInput extends React.Component<Props> {
         }}
         data={{ spokesman: data }}
       >
-        {({ handleValueChanges, values, onSubmit, errorMessages }) => (
+        {({ handleValueChanges, values, errorMessages }) => (
           <Box column>
             <Box justify>
               <ProfilePicture user={values.spokesman} />
@@ -77,7 +101,6 @@ class SpokesmanInput extends React.Component<Props> {
                 }}
               />
             </FormField>
-            <Navigation onNext={onSubmit} />
           </Box>
         )}
       </FormValidation>

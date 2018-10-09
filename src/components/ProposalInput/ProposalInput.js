@@ -2,7 +2,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { defineMessages, injectIntl, type IntlShape } from 'react-intl';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 import StepPage from '../StepPage';
 import s from './ProposalInput.css';
@@ -22,6 +21,7 @@ import { createProposal } from '../../actions/proposal';
 import { findUser } from '../../actions/user';
 import type { TagType } from '../TagInput';
 import ResultPage from './ResultPage';
+import Navigation from './Navigation';
 
 import {
   getTags,
@@ -31,23 +31,7 @@ import {
 } from '../../reducers';
 import { isAdmin } from '../../organization';
 
-const messages = defineMessages({
-  phaseOnePoll: {
-    id: 'proposalManager.phaseOnePoll',
-    defaultMessage: 'TR: 25 - PHASE ONE - NO STATEMENTS',
-    description: 'PhaseOnePoll presets',
-  },
-  phaseTwoPoll: {
-    id: 'proposalManager.phaseTwoPoll',
-    defaultMessage: 'TR: 50 - PHASE TWO - WITH STATEMENTS',
-    description: 'PhaseTwoPoll presets',
-  },
-  survey: {
-    id: 'proposalManager.survey',
-    defaultMessage: 'Survey',
-    description: 'Survey presets',
-  },
-});
+export type Callback = (string, () => boolean) => boolean;
 export type ValueType = { name: string, value: any };
 export type PollTypeTypes = 'proposed' | 'voting' | 'survey';
 type LocalisationShape = {
@@ -78,37 +62,12 @@ type State = {
 };
 type Props = {
   defaultPollType: PollTypeTypes,
-  intl: IntlShape,
   user: UserShape,
   createProposal: ({ workTeamId?: ID, ...State }) => Promise<boolean>,
-  tags: [TagType],
-  users: [UserShape],
+  tags: TagType[],
+  users: UserShape[],
   findUser: () => Promise<boolean>,
   workTeamId?: ID,
-};
-
-const defaultPollSettings = {
-  proposed: {
-    withStatements: true,
-    unipolar: true,
-    threshold: 25,
-    secret: false,
-    thresholdRef: 'all',
-  },
-  voting: {
-    withStatements: true,
-    unipolar: false,
-    threshold: 50,
-    secret: false,
-    thresholdRef: 'voters',
-  },
-  survey: {
-    withStatements: false,
-    unipolar: false,
-    threshold: 100,
-    secret: false,
-    thresholdRef: 'voters',
-  },
 };
 
 class ProposalInput extends React.Component<Props, State> {
@@ -120,15 +79,15 @@ class ProposalInput extends React.Component<Props, State> {
     super(props);
     this.state = {
       options: [],
-      pollType: {
-        value: props.defaultPollType || 'proposed',
-        label: props.intl.formatMessage({ ...messages.phaseOnePoll }),
-      },
+      pollType:
+        props.availablePolls.find(
+          poll => poll.value === props.defaultPollType,
+        ) || props.availablePolls[0],
       spokesman: props.user,
       tags: [],
       dateTo: '',
       timeTo: '',
-      ...defaultPollSettings[props.defaultPollType || 'proposed'],
+      ...props.defaultPollSettings[props.defaultPollType || 'proposed'],
     };
 
     this.handleAddOption = this.handleAddOption.bind(this);
@@ -150,7 +109,7 @@ class ProposalInput extends React.Component<Props, State> {
 
   handleAddOption: OptionShape => void;
 
-  handleValueSaving: ([ValueType]) => void;
+  handleValueSaving: (ValueType[]) => void;
 
   handleSubmission: () => void;
 
@@ -241,13 +200,12 @@ class ProposalInput extends React.Component<Props, State> {
   }
 
   reset() {
-    const { user, defaultPollType, intl } = this.props;
+    const { user, defaultPollType, availablePolls } = this.props;
     this.setState({
       options: [],
-      pollType: {
-        value: defaultPollType || 'proposed',
-        label: intl.formatMessage({ ...messages.phaseOnePoll }),
-      },
+      pollType:
+        availablePolls.find(poll => poll.value === defaultPollType) ||
+        availablePolls[0],
       spokesman: user,
       tags: [],
       dateTo: '',
@@ -278,30 +236,11 @@ class ProposalInput extends React.Component<Props, State> {
       user,
       tags,
       findUser: fetchUser,
-      intl,
+      availablePolls,
+      defaultPollSettings,
       updates = {},
     } = this.props;
 
-    const pollOptions = [
-      {
-        value: 'proposed',
-        label: intl.formatMessage({
-          ...messages.phaseOnePoll,
-        }),
-      },
-      {
-        value: 'voting',
-        label: intl.formatMessage({
-          ...messages.phaseTwoPoll,
-        }),
-      },
-      {
-        value: 'survey',
-        label: intl.formatMessage({
-          ...messages.survey,
-        }),
-      },
-    ];
     return (
       <Box column>
         Proposal WIZARD
@@ -315,7 +254,7 @@ class ProposalInput extends React.Component<Props, State> {
               <Steps>
                 <Step id="poll">
                   <PollType
-                    availablePolls={pollOptions}
+                    availablePolls={availablePolls}
                     defaultPollSettings={defaultPollSettings}
                     data={{
                       pollType,
@@ -371,7 +310,6 @@ class ProposalInput extends React.Component<Props, State> {
                     {...this.state}
                     onExit={this.handleValueSaving}
                     state={pollType.value}
-                    onSubmit={this.handleSubmission}
                   />
                 </Step>
                 <Step id="final">
@@ -385,10 +323,9 @@ class ProposalInput extends React.Component<Props, State> {
                   />
                 </Step>
               </Steps>
+              <Navigation onSubmit={this.handleSubmission} />
             </StepPage>
           )}
-
-          {/* <Navigation /> */}
         </Wizard>
       </Box>
     );
@@ -410,4 +347,4 @@ const mapDispatch = {
 export default connect(
   mapStateToProps,
   mapDispatch,
-)(withStyles(s)(injectIntl(ProposalInput)));
+)(withStyles(s)(ProposalInput));
