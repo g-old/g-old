@@ -16,11 +16,13 @@ class Wizard extends React.Component {
 
   constructor(props) {
     super(props);
+    this.callbackRegistry = new Map();
     this.history = props.history || createMemoryHistory();
     this.init = this.init.bind(this);
     this.push = this.push.bind(this);
     this.replace = this.replace.bind(this);
     this.next = this.next.bind(this);
+    this.registerCallback = this.registerCallback.bind(this);
     this.state = {
       step: { id: null },
       steps: [],
@@ -31,6 +33,7 @@ class Wizard extends React.Component {
       previous: this.history.goBack,
       push: this.push,
       replace: this.replace,
+      registerCallback: this.registerCallback,
     };
   }
 
@@ -42,7 +45,7 @@ class Wizard extends React.Component {
     const { onNext } = this.props;
 
     if (onNext) {
-      onNext();
+      onNext(this.state);
     }
   }
 
@@ -65,6 +68,10 @@ class Wizard extends React.Component {
     return this.ids[this.ids.indexOf(step.id) + 1];
   }
 
+  get callbacks() {
+    return this.callbackRegistry;
+  }
+
   init(steps) {
     this.setState({ steps }, () => {
       const step = this.pathToStep(this.history.location.pathname);
@@ -83,8 +90,15 @@ class Wizard extends React.Component {
     return step || defaultStep;
   }
 
-  push(step = this.nextStep) {
-    this.history.push(`${this.basename}${step}`);
+  push(nextStep = this.nextStep) {
+    const { step } = this.state;
+
+    if (this.callbackRegistry.has(step.id)) {
+      if (!this.callbackRegistry.get(step.id)()) {
+        return;
+      }
+    }
+    this.history.push(`${this.basename}${nextStep}`);
   }
 
   replace(step = this.nextStep) {
@@ -101,11 +115,18 @@ class Wizard extends React.Component {
     }
   }
 
+  registerCallback(id, callback) {
+    if (!this.callbacks.has('id')) {
+      this.callbacks.set(id, callback);
+    }
+  }
+
   render() {
     const { children } = this.props;
+
     return (
       <WizardContext.Provider value={this.state}>
-        {children}
+        {children(this.state)}
       </WizardContext.Provider>
     );
   }
