@@ -27,10 +27,18 @@ export const Models = {
   MESSAGE: 16384,
   NOTE: 32768,
   COMMUNICATION: 65536,
+  POLLING_MODE: 13172,
 };
 
 /* GENERATOR_FN */
 /* eslint-disable no-unused-vars */
+function pollingModeReadControl(viewer, data) {
+  console.error('Access control for PollingMode not implemented');
+  return true;
+}
+function pollingModeWriteControl(viewer, data) {
+  return viewer.groups & Groups.RELATOR;
+}
 function communicationReadControl(viewer, data) {
   console.error('Access control for Communication not implemented');
   return true;
@@ -514,6 +522,10 @@ const accessFilter = {
   [Models.COMMENT]: {
     [ATypes.WRITE]: commentWriteControl,
     [ATypes.READ]: commentReadControl,
+  },
+  [Models.POLLING_MODE]: {
+    [ATypes.WRITE]: pollingModeWriteControl,
+    [ATypes.READ]: pollingModeReadControl,
   },
 };
 

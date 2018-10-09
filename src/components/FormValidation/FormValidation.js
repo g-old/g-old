@@ -59,6 +59,11 @@ const messages = defineMessages({
     defaultMessage: "These passwords don't match. Try again?",
     description: 'Help for mismatching passwords',
   },
+  dateTime: {
+    id: 'form.error-past',
+    defaultMessage: 'Time already passed',
+    description: 'Help for wrong time settings',
+  },
 });
 
 const genInitialState = (fields, values) =>
@@ -236,7 +241,7 @@ class FormValidation extends React.Component {
       errors: { ...errors, ...validationResult.errors },
     };
     if (validationResult.failed === 0 || lazy) {
-      this.setState(newState, () => {
+      /* this.setState(newState, () => {
         const newValues = getChangedFields(
           this.formFields,
           this.state,
@@ -245,10 +250,21 @@ class FormValidation extends React.Component {
         if (submit) {
           submit(newValues, this.state, options);
         }
-      });
-    } else {
+      }); */
       this.setState(newState);
+
+      if (submit) {
+        const nextState = { ...this.state, ...newState };
+        const newValues = getChangedFields(
+          this.formFields,
+          nextState,
+          data || {},
+        );
+        submit(newValues, nextState, options);
+      }
+      return true;
     }
+    return this.setState(newState);
   }
 
   handleBlur(e) {
@@ -275,18 +291,26 @@ class FormValidation extends React.Component {
     return this.Validator(fields);
   }
 
-  enforceValidation(fields, options) {
+  // TODO refactor
+  enforceValidation(fields = this.formFields, options) {
     const validate = () => {
       const validationResult = this.validate(fields);
+      const { data } = this.props;
+      const { errors } = this.state;
       this.setState(prevState => ({
         errors: { ...prevState.errors, ...validationResult.errors },
       }));
+      const newState = { errors: { ...errors, ...validationResult.errors } };
+      const nextState = { ...this.state, ...newState };
+
+      const newValues = getChangedFields(fields, nextState, data || {});
+      return { isValid: validationResult.failed === 0, values: newValues };
     };
     if (options) {
       this.setState({ ...options }, validate);
-    } else {
-      validate();
+      return false; // TODO not sure how to handle response
     }
+    return validate();
   }
 
   visibleErrors(errorNames) {
