@@ -1,1 +1,9 @@
 @import '../variables';
+
+.meter {
+  max-height: 1em;
+}
+
+.root {
+  margin: 1em 0 !important;
+}
