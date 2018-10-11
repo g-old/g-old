@@ -63,6 +63,10 @@ const PollType = new ObjectType({
     multipleChoice: {
       type: GraphQLBoolean,
     },
+
+    numVotes: {
+      type: GraphQLInt,
+    },
     likedStatements: {
       type: new GraphQLList(StatementLikeType),
 

@@ -107,7 +107,10 @@ class Vote {
           .transacting(trx)
           .forUpdate()
           .where({ id: data.pollId })
-          .update({ options: JSON.stringify(updatedOptions) });
+          .update({
+            num_votes: poll.numVotes - 1,
+            options: JSON.stringify(updatedOptions),
+          });
         return oldVote;
       });
     } catch (e) {
@@ -206,23 +209,39 @@ class Vote {
             return obj;
           }, {});
 
-          const newPositions = poll.options.reduce((obj, option) => {
-            if (oldPositions[option.pos]) {
-              if (dataPositions[option.pos]) {
-                // take new
+          // if not extended or not multiple choice
+          let newPositions;
+          if (!poll.extended || !poll.multipleChoice) {
+            // check which option was already voted, clear it and mark new option
+            const votePosition = data.positions.find(
+              position => position.value,
+            );
+            newPositions = poll.options.reduce((obj, option) => {
+              if (votePosition.pos === option.pos) {
+                obj.push(votePosition);
+              }
+              return obj;
+            }, []);
+          } else {
+            newPositions = poll.options.reduce((obj, option) => {
+              if (oldPositions[option.pos]) {
+                // position exists
+                if (dataPositions[option.pos]) {
+                  // take new
+                  if (dataPositions[option.pos].value) {
+                    obj.push(dataPositions[option.pos]);
+                  }
+                } else {
+                  obj.push(oldPositions[option.pos]);
+                }
+              } else if (dataPositions[option.pos]) {
                 if (dataPositions[option.pos].value) {
                   obj.push(dataPositions[option.pos]);
                 }
-              } else {
-                obj.push(oldPositions[option.pos]);
               }
-            } else if (dataPositions[option.pos]) {
-              if (dataPositions[option.pos].value) {
-                obj.push(dataPositions[option.pos]);
-              }
-            }
-            return obj;
-          }, []);
+              return obj;
+            }, []);
+          }
 
           if (!newPositions.length) {
             throw new Error('Position missing');
@@ -242,10 +261,21 @@ class Vote {
         for (let i = 0; i < poll.options.length; i += 1) {
           const option = poll.options[i];
           if (poll.extended) {
-            if (option.pos === data.positions[0].pos) {
-              option.numVotes = data.positions[0].value
-                ? option.numVotes + 1
-                : option.numVotes - 1;
+            if (poll.multipleChoice) {
+              if (option.pos === data.positions[0].pos) {
+                option.numVotes = data.positions[0].value
+                  ? option.numVotes + 1
+                  : option.numVotes - 1;
+              }
+            } else {
+              // get new vote position, count up, get old position, count down
+              if (option.pos === data.positions[0].pos) {
+                option.numVotes += 1;
+              }
+              if (option.pos === oldVote.positions[0].pos) {
+                // only one bc not multiplechoice
+                option.numVotes -= 1;
+              }
             }
           } else if (
             option.pos === data.positions[0].pos &&
@@ -363,7 +393,10 @@ class Vote {
           // OR with jsonb?
           // https://stackoverflow.com/questions/25957937/how-to-increment-value-in-postgres-update-statement-on-json-key
           // SET data = jsonb_set(data, '{bar}', (COALESCE(data->>'bar','0')::int + 1)::text::jsonb)
-          .update({ options: JSON.stringify(updatedOptions) });
+          .update({
+            num_votes: poll.numVotes + 1,
+            options: JSON.stringify(updatedOptions),
+          });
         return id[0];
       });
     } catch (e) {

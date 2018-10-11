@@ -152,6 +152,7 @@ export default function polls(state = {}, action) {
           ...state[vote.pollId],
           ownVote: vote.id,
           options: newOptions,
+          numVotes: state[vote.pollId].numVotes + 1,
           votes,
         },
       };
@@ -195,8 +196,33 @@ export default function polls(state = {}, action) {
       const index = positions[0].pos === 0 ? 0 : 1;
       const statementId = action.info;
       const newOptions = [];
-      const { options, extended } = state[pollId];
+      const { options, extended, multipleChoice } = state[pollId];
       if (extended) {
+        if (!multipleChoice) {
+          // vote has only one position, actualVote
+          for (let i = 0; i < options.length; i += 1) {
+            const option = options[i];
+            if (option.pos === action.oldVote.positions[0].pos) {
+              newOptions.push({ ...option, numVotes: option.numVotes - 1 });
+            } else if (option.pos === positions[0].pos) {
+              newOptions.push({
+                ...option,
+                numVotes: option.numVotes + 1,
+              });
+            } else {
+              newOptions.push(option);
+            }
+          }
+
+          return {
+            ...state,
+            [pollId]: {
+              ...poll,
+              options: newOptions,
+              ownStatement: statementId ? null : state[pollId].ownStatement,
+            },
+          };
+        }
         let added = false;
         let changedOptionPos;
         // TODO extract fn
@@ -306,6 +332,7 @@ export default function polls(state = {}, action) {
           ownVote: null,
           ownStatement: null,
           options: newOptions,
+          numVotes: poll.numVotes - 1,
           statements,
           votes,
         },

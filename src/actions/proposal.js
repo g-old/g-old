@@ -68,6 +68,7 @@ export const pollFieldsForList = `
   startTime
   endTime
   allVoters
+  numVotes
   closedAt
   mode{
     id
@@ -199,7 +200,7 @@ export function loadProposal({ id, pollId }) {
     // Dont fetch if pending
     const state = await getState();
     if (process.env.BROWSER) {
-      if (id && getProposalUpdates(state, id)) {
+      if (id && getProposalUpdates(state, id).isFetching) {
         return false;
       }
     }
