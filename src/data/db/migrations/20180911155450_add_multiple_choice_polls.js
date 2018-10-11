@@ -46,10 +46,23 @@ const mapVoteEnumTo = voteData => {
     positions: convertPosition(voteData.position),
   };
 };
-
-const convertActivity = (activity, voteData) => ({
-  content: voteData[activity.object_id],
+const convertVoteData = voteData => ({
+  positions: voteData.positions,
+  id: voteData.id,
+  userId: voteData.user_id,
+  pollId: voteData.poll_id,
+  ...(voteData.created_at ? { createdAt: voteData.created_at } : {}),
+  ...(voteData.updated_at ? { updatedAt: voteData.updated_at } : {}),
 });
+
+const convertVoteActivity = (activity, voteData) => {
+  if (!voteData[activity.object_id]) {
+    return null;
+  }
+  return {
+    content: convertVoteData(voteData[activity.object_id]),
+  };
+};
 
 exports.up = function(knex, Promise) {
   const voteData = {};
@@ -92,7 +105,8 @@ exports.up = function(knex, Promise) {
   const addFields = () =>
     Promise.all([
       knex.schema.table('polls', table => {
-        table.jsonb('options').defaultsTo('{}');
+        table.jsonb('options').defaultsTo('[]');
+        table.integer('num_votes').defaultsTo(0);
         table.boolean('multiple_choice').defaultsTo('false');
         table.dropColumn('upvotes');
         table.dropColumn('downvotes');
@@ -128,7 +142,10 @@ exports.up = function(knex, Promise) {
   const computeNewActivityData = () => {
     Object.keys(activityData).reduce((acc, activityId) => {
       const activity = activityData[activityId];
-      acc[activityId] = convertActivity(activity, newVoteData);
+      const convertedActivity = convertVoteActivity(activity, newVoteData);
+      if (convertedActivity) {
+        acc[activityId] = convertedActivity;
+      }
       return acc;
     }, newActivityData);
     return Promise.resolve(newActivityData);
@@ -161,14 +178,13 @@ exports.up = function(knex, Promise) {
     const activityPromises = [];
     Object.keys(newActivityData).forEach(activityId => {
       const activity = newActivityData[activityId];
-      if (!activity) {
-        throw new Error();
+      if (activity && activity.content) {
+        activityPromises.push(
+          knex('activities')
+            .update({ content: JSON.stringify(activity.content) })
+            .where({ id: activityId }),
+        );
       }
-      activityPromises.push(
-        knex('activities')
-          .update({ content: JSON.stringify(activity.content) })
-          .where({ id: activityId }),
-      );
     });
     return Promise.all([...votePromises, ...pollPromises, ...activityPromises]);
   };
@@ -194,6 +210,7 @@ exports.down = function(knex, Promise) {
       table.integer('upvotes');
       table.integer('downvotes');
       table.dropColumn('extended');
+      table.dropColumn('num_votes');
     }),
     knex.schema.table('votes', table => {
       table.dropColumn('positions');
