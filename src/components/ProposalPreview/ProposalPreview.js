@@ -8,6 +8,7 @@ import PollState from '../PollState';
 import history from '../../history';
 import ProposalState from '../ProposalState';
 import { ICONS } from '../../constants';
+import Meter from '../Meter';
 
 import { getLastActivePoll } from '../../core/helpers';
 // import { DOMParser } from 'xmldom';
@@ -61,41 +62,77 @@ class ProposalPreview extends React.Component {
       upvotes = poll.options[1].numVotes;
       downvotes = poll.options[0].numVotes;
     }
-
-    const pollPreview = [
-      <svg key="0" viewBox="0 0 24 24" width="16px" height="16px" role="img">
-        <path fill="none" stroke="#666" strokeWidth="2" d={ICONS.up} />
-      </svg>,
-      upvotes,
-      <div key="2" className={s.pollState}>
-        <PollState
-          compact
-          upvotes={upvotes}
-          downvotes={downvotes}
-          pollId={poll.id}
-          allVoters={poll.allVoters}
-          options={poll.options}
-          thresholdRef={poll.mode.thresholdRef}
-          threshold={poll.threshold}
-          unipolar={poll.mode.unipolar}
-        />
-      </div>,
-    ];
-
-    if (!poll.mode.unipolar) {
-      pollPreview.push(downvotes);
-      pollPreview.push(
-        <svg key="4" viewBox="0 0 24 24" width="16px" height="16px" role="img">
-          <path
-            fill="none"
-            stroke="#666"
-            strokeWidth="2"
-            d={ICONS.up}
-            transform="matrix(1 0 0 -1 0 24)"
+    // 3 small meters , allvotes
+    let pollPreview;
+    if (poll.extended) {
+      pollPreview = [
+        <div className={s.pollOptions}>
+          <Meter
+            trailWidth={1}
+            trailColor="#eee"
+            strokeColor="#8cc800"
+            strokeWidth={6}
+            percent={90}
           />
-          ,
+          <Meter
+            trailWidth={1}
+            trailColor="#eee"
+            strokeColor="#8cc800"
+            strokeWidth={6}
+            percent={60}
+          />
+          <Meter
+            trailWidth={1}
+            trailColor="#eee"
+            strokeColor="#8cc800"
+            strokeWidth={6}
+            percent={30}
+          />
+        </div>,
+        poll.numVotes,
+      ];
+    } else {
+      pollPreview = [
+        <svg key="0" viewBox="0 0 24 24" width="16px" height="16px" role="img">
+          <path fill="none" stroke="#666" strokeWidth="2" d={ICONS.up} />
         </svg>,
-      );
+        upvotes,
+        <div key="2" className={s.pollState}>
+          <PollState
+            compact
+            upvotes={upvotes}
+            downvotes={downvotes}
+            pollId={poll.id}
+            allVoters={poll.allVoters}
+            options={poll.options}
+            thresholdRef={poll.mode.thresholdRef}
+            threshold={poll.threshold}
+            unipolar={poll.mode.unipolar}
+          />
+        </div>,
+      ];
+
+      if (!poll.mode.unipolar) {
+        pollPreview.push(downvotes);
+        pollPreview.push(
+          <svg
+            key="4"
+            viewBox="0 0 24 24"
+            width="16px"
+            height="16px"
+            role="img"
+          >
+            <path
+              fill="none"
+              stroke="#666"
+              strokeWidth="2"
+              d={ICONS.up}
+              transform="matrix(1 0 0 -1 0 24)"
+            />
+            ,
+          </svg>,
+        );
+      }
     }
 
     return (
