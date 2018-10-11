@@ -14,14 +14,16 @@ class CheckBox extends React.Component {
     onChange: PropTypes.func,
     toggle: PropTypes.bool,
   };
+
   static defaultProps = {
     checked: false,
     disabled: false,
-    label: 'No label',
+    label: '',
     onChange: null,
     name: 'name',
     toggle: false,
   };
+
   render() {
     const { checked, disabled, name, label, onChange, toggle } = this.props;
 
@@ -47,7 +49,11 @@ class CheckBox extends React.Component {
           onChange={onChange}
         />
         <span className={s.control}>
-          <svg className={s.check} viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet">
+          <svg
+            className={s.check}
+            viewBox="0 0 24 24"
+            preserveAspectRatio="xMidYMid meet"
+          >
             <path fill="none" d="M6,11.3 L10.3,16 L18,6.2" />
           </svg>
         </span>
@@ -56,9 +62,14 @@ class CheckBox extends React.Component {
     ];
 
     return (
-      /* eslint-disable jsx-a11y/label-has-for */
-      <label className={cn(s.checkBox, disabled ? s.disabled : null, toggle ? s.toggle : null)}>
-
+      /* eslint-disable jsx-a11y/label-has-for , jsx-a11y/label-has-associated-control */
+      <label
+        className={cn(
+          s.checkBox,
+          disabled ? s.disabled : null,
+          toggle ? s.toggle : null,
+        )}
+      >
         {children}
         {hidden}
       </label>

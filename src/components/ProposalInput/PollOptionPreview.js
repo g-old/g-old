@@ -10,6 +10,8 @@ type Props = {
   data: { body?: string, title?: string },
   description: string,
   onSave: OptionShape => void,
+  onDelete: number => void,
+  pos: number,
 };
 
 type State = { description: string, isEditing?: boolean };
@@ -21,6 +23,7 @@ class PollOptionPreview extends React.Component<Props, State> {
     this.handleEditing = this.handleEditing.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSaving = this.handleSaving.bind(this);
+    this.handleDeletion = this.handleDeletion.bind(this);
   }
 
   handleEditing: () => void;
@@ -39,12 +42,22 @@ class PollOptionPreview extends React.Component<Props, State> {
     this.setState({ description: e.target.value });
   }
 
+  handleDeletion() {
+    const { onDelete, pos } = this.props;
+
+    if (onDelete) {
+      onDelete(pos);
+      this.setState({ isEditing: false });
+    }
+  }
+
   handleSaving() {
     const { onSave } = this.props;
 
     if (onSave) {
       const { description } = this.state;
       onSave({ ...this.props, description });
+      this.setState({ isEditing: false });
     }
   }
 
@@ -64,7 +77,7 @@ class PollOptionPreview extends React.Component<Props, State> {
         />
       );
     } else {
-      text = <span>{description}</span>;
+      text = <span style={{ whiteSpace: 'pre-line' }}>{description}</span>;
     }
 
     return (

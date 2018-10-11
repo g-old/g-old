@@ -1,0 +1,17 @@
+.input {
+  background: #fff !important;
+  height: 75px;
+  margin: 0;
+  min-height: 75px;
+  padding: 9px 11px;
+  padding-bottom: 0;
+  width: 100%;
+  resize: none;
+  outline: none;
+}
+
+.inputField {
+  display: flex;
+  background-color: #fff;
+  border-radius: 3px;
+}

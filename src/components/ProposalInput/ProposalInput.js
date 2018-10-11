@@ -47,7 +47,11 @@ export type PollSettingsShape = {
   thresholdRef?: 'all' | 'voters',
   unipolar?: boolean,
 };
-export type OptionShape = { id: ID, description: LocalisationShape };
+export type OptionShape = {
+  pos: number,
+  description: LocalisationShape,
+  numVotes: number,
+};
 type State = {
   ...PollSettingsShape,
   dateTo?: string,
@@ -116,7 +120,13 @@ class ProposalInput extends React.Component<Props, State> {
   calculateNextStep: () => void;
 
   handleAddOption(option: OptionShape) {
-    this.setState(({ options }) => ({ options: [...options, option] }));
+    // add pos to all of them
+    this.setState(({ options }) => {
+      const newOptions = [...options, option];
+      return {
+        options: newOptions.map((op, index) => ({ ...op, pos: index })),
+      };
+    });
   }
 
   handleValueSaving(data) {
@@ -183,6 +193,7 @@ class ProposalInput extends React.Component<Props, State> {
           order: i,
         })),
         extended: !!options.length,
+        multipleChoice: true,
         startTime,
         endTime,
         secret,
@@ -243,11 +254,13 @@ class ProposalInput extends React.Component<Props, State> {
 
     return (
       <Box column>
-        Proposal WIZARD
         <Wizard onNext={this.calculateNextStep} basename="">
           {({ steps, step, push }) => (
             <StepPage>
               <Meter
+                trailWidth={2}
+                trailColor="#eee"
+                strokeColor="#930793"
                 strokeWidth={1}
                 percent={((steps.indexOf(step) + 1) / steps.length) * 100}
               />

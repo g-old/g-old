@@ -5,19 +5,19 @@ import React from 'react';
 
 type Props = {
   percent: number,
-  strokeColor?: string,
-  strokeLinecap?: string,
   strokeWidth: number,
   trailColor: string,
   trailWidth: number,
-  inlineStrokeColor?: string,
+  className?: string,
+  strokeColor?: string,
+  strokeLinecap?: string,
 };
 
 const Meter = ({
+  className,
   percent,
   strokeColor = '#540b97',
   strokeLinecap = 'round',
-  inlineStrokeColor = '#d9d9d9',
   strokeWidth,
   trailColor,
   trailWidth,
@@ -36,11 +36,16 @@ const Meter = ({
   const viewBoxString = `0 0 100 ${strokeWidth}`;
 
   return (
-    <svg viewBox={viewBoxString} preserveAspectRatio="none" {...restProps}>
+    <svg
+      className={className}
+      viewBox={viewBoxString}
+      preserveAspectRatio="none"
+      {...restProps}
+    >
       <path
         d={pathString}
         strokeLinecap={strokeLinecap}
-        stroke={inlineStrokeColor}
+        stroke={trailColor}
         strokeWidth={trailWidth || strokeWidth}
         fillOpacity="0"
       />
@@ -58,8 +63,8 @@ const Meter = ({
 
 Meter.defaultProps = {
   strokeColor: null,
-  strokeLinecap: null,
-  inlineStrokeColor: null,
+  strokeLinecap: '',
+  className: '',
 };
 
 export default Meter;

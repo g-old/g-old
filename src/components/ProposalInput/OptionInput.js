@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import Textarea from 'react-textarea-autosize';
 import Button from '../Button';
 import Box from '../Box';
 import CheckBox from '../CheckBox';
 import PollOptionPreview from './PollOptionPreview';
 import FormValidation from '../FormValidation';
+
+import s from './OptionInput.css';
 
 const validateOptions = options => {
   const posNumbers = [];
@@ -42,6 +45,7 @@ class OptionInput extends React.Component {
     this.handleNext = this.handleNext.bind(this);
     this.handleSaving = this.handleSaving.bind(this);
     this.onBeforeNextStep = this.onBeforeNextStep.bind(this);
+    this.handleDeletion = this.handleDeletion.bind(this);
     this.form = React.createRef();
   }
 
@@ -92,8 +96,18 @@ class OptionInput extends React.Component {
     const { onExit, data } = this.props;
     // take all, change saved option
     const newOptions = data.map(
-      option => (option.id === newData.id ? newData : option),
+      option => (option.pos === newData.pos ? newData : option),
     );
+    if (onExit) {
+      onExit([{ name: 'options', value: newOptions }]);
+    }
+  }
+
+  handleDeletion(pos) {
+    const { onExit, data } = this.props;
+    // take all, change saved option
+    const newOptions = data.filter(option => option.pos !== pos);
+
     if (onExit) {
       onExit([{ name: 'options', value: newOptions }]);
     }
@@ -106,29 +120,36 @@ class OptionInput extends React.Component {
       <FormValidation
         ref={this.form}
         submit={this.handleNext}
-        validations={{ options: {} }}
+        validations={{ options: { args: { min: 2, required: false } } }}
+        data={{ options: data.length ? data : undefined }}
       >
-        {() => (
-          <Box column pad>
+        {({ errorMessages }) => (
+          <Box column>
             <Box column>
               {data &&
                 data.map(o => (
                   <PollOptionPreview
-                    pos={o.id}
+                    key={o.pos}
+                    pos={o.pos}
                     description={o.description}
                     onSave={this.handleSaving}
+                    onDelete={this.handleDeletion}
                   />
                 ))}
             </Box>
             <CheckBox disabled checked label="multiple choice" />
-            <Textarea
-              placeholder="Enter some text"
-              name="option"
-              useCacheForDOMMeasurements
-              value={description}
-              onChange={this.handleInputChange}
-              minRows={2}
-            />
+            <div className={s.inputField}>
+              <Textarea
+                className={s.input}
+                placeholder="Enter some text"
+                name="option"
+                useCacheForDOMMeasurements
+                value={description}
+                onChange={this.handleInputChange}
+                minRows={2}
+              />
+            </div>
+            {errorMessages.optionsError}
             <Button onClick={this.handleAddOption} label="Add" />
           </Box>
         )}
@@ -137,4 +158,4 @@ class OptionInput extends React.Component {
   }
 }
 
-export default OptionInput;
+export default withStyles(s)(OptionInput);
