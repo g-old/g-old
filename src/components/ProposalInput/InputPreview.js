@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import Box from '../Box';
 import Proposal from '../Proposal';
 import Poll from '../Poll';
+import Statement from '../Statement';
+
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 
 const validate = (name, data) => {
@@ -27,22 +29,24 @@ const InputPreview = ({
   options,
   dateTo,
   timeTo,
+  pollOnly,
 }) => {
   const date = dateTo || utcCorrectedDate(3).slice(0, 10);
   const time = timeTo || utcCorrectedDate().slice(11, 16);
-
+  const fakeVote = { id: 1, positions: [{ pos: 0, value: 1 }] };
   const endTime = concatDateAndTime(date, time);
-
   return (
     <Box column>
-      <Proposal
-        id="0000"
-        state={state}
-        publishedAt={new Date()}
-        title={validate('Title', title)}
-        body={validate('Body', body)}
-        spokesman={spokesman}
-      />
+      {!pollOnly && (
+        <Proposal
+          id="0000"
+          state={state}
+          publishedAt={new Date()}
+          title={validate('Title', title)}
+          body={validate('Body', body)}
+          spokesman={spokesman}
+        />
+      )}
       <Poll
         extended={state === 'survey' && options.length > 1}
         endTime={endTime}
@@ -71,6 +75,14 @@ const InputPreview = ({
         onVote={() => {}}
         mode={{ withStatements, unipolar, thresholdRef }}
       />
+      <Box>
+        <Statement
+          onCreate={() => {}}
+          vote={fakeVote}
+          author={spokesman}
+          asInput
+        />
+      </Box>
     </Box>
   );
 };
@@ -87,6 +99,7 @@ InputPreview.propTypes = {
   options: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   dateTo: PropTypes.string,
   timeTo: PropTypes.string,
+  pollOnly: PropTypes.bool.isRequired,
 };
 InputPreview.defaultProps = {
   dateTo: null,

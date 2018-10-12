@@ -3,7 +3,6 @@ import { defineMessages, FormattedMessage } from 'react-intl';
 import Notification from '../Notification';
 import Box from '../Box';
 import Button from '../Button';
-import history from '../../history';
 
 const messages = defineMessages({
   success: {
@@ -13,11 +12,11 @@ const messages = defineMessages({
   },
 });
 
-const ResultPage = ({ success, onRestart, error }) => {
+const ResultPage = ({ success, onRestart, error, onSuccess }) => {
   let component;
   if (error) {
     component = <Notification type="error" message={error} />;
-  } else if (success) {
+  } else if (success && onSuccess) {
     component = (
       <Notification
         type="success"
@@ -36,9 +35,7 @@ const ResultPage = ({ success, onRestart, error }) => {
                 />
               </svg>
             }
-            onClick={() => {
-              history.push(`/proposal/${success}`);
-            }}
+            onClick={onSuccess}
             label="Visit"
           />
         }

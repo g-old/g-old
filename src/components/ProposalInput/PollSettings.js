@@ -30,6 +30,7 @@ const PollSettings = ({
   unipolar,
   threshold,
   thresholdRef,
+  referenceOptions,
 }) => (
   <div>
     <FormField>
@@ -70,10 +71,7 @@ const PollSettings = ({
     <FormField label={<FormattedMessage {...messages.reference} />}>
       <Select
         inField
-        options={[
-          { value: 'all', label: 'ALL' },
-          { value: 'voters', label: 'VOTERS' },
-        ]}
+        options={referenceOptions}
         onSearch={false}
         value={{
           value: thresholdRef.value,

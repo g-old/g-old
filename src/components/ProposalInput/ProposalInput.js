@@ -22,6 +22,7 @@ import { findUser } from '../../actions/user';
 import type { TagType } from '../TagInput';
 import ResultPage from './ResultPage';
 import Navigation from './Navigation';
+import history from '../../history';
 
 import {
   getTags,
@@ -34,12 +35,7 @@ import { isAdmin } from '../../organization';
 export type Callback = (string, () => boolean) => boolean;
 export type ValueType = { name: string, value: any };
 export type PollTypeTypes = 'proposed' | 'voting' | 'survey';
-type LocalisationShape = {
-  de?: string,
-  it?: string,
-  lld: ?string,
-  _default?: string,
-};
+
 export type PollSettingsShape = {
   withStatements?: boolean,
   secret?: boolean,
@@ -47,11 +43,7 @@ export type PollSettingsShape = {
   thresholdRef?: 'all' | 'voters',
   unipolar?: boolean,
 };
-export type OptionShape = {
-  pos: number,
-  description: LocalisationShape,
-  numVotes: number,
-};
+
 type State = {
   ...PollSettingsShape,
   dateTo?: string,
@@ -72,6 +64,7 @@ type Props = {
   users: UserShape[],
   findUser: () => Promise<boolean>,
   workTeamId?: ID,
+  defaultPollSettings: { [PollTypeTypes]: PollSettingsShape },
 };
 
 class ProposalInput extends React.Component<Props, State> {
@@ -94,10 +87,13 @@ class ProposalInput extends React.Component<Props, State> {
       ...props.defaultPollSettings[props.defaultPollType || 'proposed'],
     };
 
+    this.storageKey = `proposalDraft${props.workTeamId}`;
+
     this.handleAddOption = this.handleAddOption.bind(this);
     this.handleValueSaving = this.handleValueSaving.bind(this);
     this.handleSubmission = this.handleSubmission.bind(this);
     this.calculateNextStep = this.calculateNextStep.bind(this);
+    this.handleOnSuccess = this.handleOnSuccess.bind(this);
   }
 
   getNewTags() {
@@ -180,7 +176,7 @@ class ProposalInput extends React.Component<Props, State> {
     const newTags = this.getNewTags();
 
     const spokesmanId = spokesman ? spokesman.id : null;
-
+    const extended = !!options.length;
     create({
       ...(workTeamId && { workTeamId }),
       title: title.trim(),
@@ -192,8 +188,8 @@ class ProposalInput extends React.Component<Props, State> {
           pos: i,
           order: i,
         })),
-        extended: !!options.length,
-        multipleChoice: true,
+        extended,
+        multipleChoice: extended,
         startTime,
         endTime,
         secret,
@@ -224,6 +220,16 @@ class ProposalInput extends React.Component<Props, State> {
       title: '',
       body: '<p></p>',
     });
+
+    localStorage.removeItem(this.storageKey);
+  }
+
+  handleOnSuccess() {
+    const {
+      updates: { success },
+    } = this.props;
+    localStorage.removeItem(this.storageKey);
+    history.push(`/proposal/${success}`);
   }
 
   render() {
@@ -283,6 +289,7 @@ class ProposalInput extends React.Component<Props, State> {
                 </Step>
                 <Step id="body">
                   <ProposalBody
+                    storageKey={this.storageKey}
                     data={{ body, title }}
                     onExit={this.handleValueSaving}
                   />
@@ -329,6 +336,7 @@ class ProposalInput extends React.Component<Props, State> {
                   <ResultPage
                     success={updates.success}
                     error={updates.error}
+                    onSuccess={this.handleOnSuccess}
                     onRestart={() => {
                       this.reset();
                       push('poll');

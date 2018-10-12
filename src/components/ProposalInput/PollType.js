@@ -106,6 +106,11 @@ class PollType extends React.Component<Props, State> {
   render() {
     const { data, availablePolls, advancedModeOn } = this.props;
     const { showSettings } = this.state;
+
+    const referenceOptions = [{ value: 'voters', label: 'VOTERS' }];
+    if (data.pollType.value === 'proposed') {
+      referenceOptions.push({ value: 'all', label: 'ALL' });
+    }
     return (
       <FormValidation
         submit={this.handleNext}
@@ -149,6 +154,7 @@ class PollType extends React.Component<Props, State> {
             {showSettings &&
               advancedModeOn && (
                 <PollSettings
+                  referenceOptions={referenceOptions}
                   onValueChange={handleValueChanges}
                   withStatements={values.withStatements}
                   secret={values.secret}

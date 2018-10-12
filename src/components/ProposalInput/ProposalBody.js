@@ -16,6 +16,7 @@ type Props = {
   data: { body?: string, title?: string },
   callback: Callback,
   stepId: string,
+  storageKey: string,
 };
 
 const bodyValidation = data => {
@@ -30,17 +31,16 @@ class ProposalBody extends React.Component<Props> {
   constructor(props) {
     super(props);
     this.handleNext = this.handleNext.bind(this);
-    this.storageKey = 'proposalDraft';
     this.onBeforeNextStep = this.onBeforeNextStep.bind(this);
     this.form = React.createRef();
   }
 
   componentDidMount() {
-    const { data, callback, stepId } = this.props;
+    const { data, callback, stepId, storageKey } = this.props;
 
     const initialValue = data.body
       ? data.body
-      : localStorage.getItem(this.storageKey) || '<p></p>';
+      : localStorage.getItem(storageKey) || '<p></p>';
     this.editor.setInitialState(initialValue);
     if (callback) {
       callback(stepId, this.onBeforeNextStep);
@@ -72,7 +72,7 @@ class ProposalBody extends React.Component<Props> {
   handleNext: () => void;
 
   handleNext(values) {
-    const { onExit, data } = this.props;
+    const { onExit, data, storageKey } = this.props;
     if (onExit) {
       onExit([
         {
@@ -80,7 +80,7 @@ class ProposalBody extends React.Component<Props> {
           value:
             values.body ||
             data.body ||
-            localStorage.getItem(this.storageKey) ||
+            localStorage.getItem(storageKey) ||
             '<p></p>',
         },
         { name: 'title', value: values.title || data.title },
@@ -89,7 +89,7 @@ class ProposalBody extends React.Component<Props> {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, storageKey } = this.props;
     return (
       <FormValidation
         ref={this.form}
@@ -99,7 +99,7 @@ class ProposalBody extends React.Component<Props> {
           title: { args: { required: true, min: 3 } },
         }}
         data={{
-          body: data.body || localStorage.getItem(this.storageKey) || '<p></p>',
+          body: data.body || localStorage.getItem(storageKey) || '<p></p>',
           title: data.title,
         }}
       >
@@ -122,7 +122,7 @@ class ProposalBody extends React.Component<Props> {
                 value={values.body}
                 onChange={value => {
                   handleValueChanges({ target: { name: 'body', value } });
-                  localStorage.setItem(this.storageKey, value);
+                  localStorage.setItem(storageKey, value);
                 }}
               />
             </FormField>
