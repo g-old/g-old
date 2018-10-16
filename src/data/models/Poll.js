@@ -1,3 +1,5 @@
+// @flow
+
 import knex from '../knex';
 import PollingMode from './PollingMode';
 import { canSee, canMutate, Models } from '../../core/accessControl';
@@ -13,15 +15,15 @@ const MAX_DESCRIPTION_LENGTH = 10000;
 
 const checkOption = (option, counters) => {
   const validated = {};
-  if ('id' in option) {
-    // check uniqness of id
+  if ('pos' in option) {
+    // check uniqness of pos
     if (
-      option.id > counters.currentId &&
-      !counters.otherIds.includes(option.id)
+      option.pos > counters.currentPos &&
+      !counters.otherPos.includes(option.pos)
     ) {
-      validated.id = option.id;
-      counters.currentId = option.id; // eslint-disable-line
-      counters.otherIds.push(option.id);
+      validated.pos = option.pos;
+      counters.currentPos = option.pos; // eslint-disable-line
+      counters.otherPos.push(option.pos);
     }
   }
   if ('order' in option) {
@@ -59,7 +61,7 @@ const checkOption = (option, counters) => {
   }
 
   if (
-    'id' in validated &&
+    'pos' in validated &&
     'order' in validated &&
     'description' in validated &&
     'numVotes' in validated
@@ -70,9 +72,9 @@ const checkOption = (option, counters) => {
 };
 const validateOptions = options => {
   const counters = {
-    currentId: -1,
+    currentPos: -1,
     currentOrder: -1,
-    otherIds: [],
+    otherPos: [],
     otherOrders: [],
   };
   const data = options.map(option => checkOption(option, counters));
@@ -100,23 +102,46 @@ const validateDates = data => {
 };
 
 class Poll {
+  id: ID;
+
+  pollingModeId: ID;
+
+  secret: boolean;
+
+  threshold: number;
+
+  numVoter: number;
+
+  startTime: ?string;
+
+  endTime: string;
+
+  closedAt: ?string;
+
+  extended: boolean;
+
+  multipleChoice: boolean;
+
+  options: OptionShape[];
+
+  numVotes: number;
+
   constructor(data) {
     this.id = data.id;
     this.pollingModeId = data.polling_mode_id;
     this.secret = data.secret;
     this.threshold = data.threshold;
-    this.upvotes = data.upvotes;
-    this.downvotes = data.downvotes;
     this.numVoter = data.num_voter;
     this.startTime = data.start_time;
     this.endTime = data.end_time;
     this.closedAt = data.closed_at;
     this.extended = data.extended;
-    this.multipeChoice = data.multipe_choice;
+    this.multipleChoice = data.multiple_choice;
     this.options = data.options;
+    this.numVotes = data.num_votes;
   }
 
-  static async gen(viewer, id, { polls }) {
+  static async gen(viewer: ViewerShape, id: ID, { polls }) {
     if (!id) return null;
     const data = await polls.load(id);
     if (data === null) return null;
@@ -132,12 +157,16 @@ class Poll {
     return true;
   }
 
-  async isUnipolar(viewer, loaders) {
+  hasEnded() {
+    return new Date(this.endTime) <= new Date();
+  }
+
+  async isUnipolar(viewer: ViewerShape, loaders) {
     const mode = await PollingMode.gen(viewer, this.pollingModeId, loaders);
     return mode.unipolar === true;
   }
 
-  async isCommentable(viewer, loaders) {
+  async isCommentable(viewer: ViewerShape, loaders) {
     if (this.closedAt) return false;
     const mode = await PollingMode.gen(viewer, this.pollingModeId, loaders);
     return mode.withStatements === true;
@@ -151,7 +180,7 @@ class Poll {
   }
 
   /* eslint-enable class-methods-use-this */
-  static async create(viewer, data, loaders, trx) {
+  static async create(viewer: ViewerShape, data, loaders, trx) {
     // authorize
     if (!canMutate(viewer, data, Models.POLL)) return null;
 
@@ -174,7 +203,7 @@ class Poll {
     //
 
     if ('multipleChoice' in data) {
-      newData.multipe_choice = data.multipeChoice;
+      newData.multiple_choice = data.multipleChoice;
     }
     if ('secret' in data) {
       newData.secret = data.secret;
@@ -199,7 +228,7 @@ class Poll {
     // create
 
     const createPoll = async transaction => {
-      const pollingModeData = await knex('polling_modes')
+      const [pollingModeData = null] = await knex('polling_modes')
         .transacting(transaction)
         .where({ id: data.pollingModeId })
         .limit(1)
@@ -210,12 +239,12 @@ class Poll {
 
       if (!newData.extended) {
         const options = [
-          { id: 0, order: 0, numVotes: 0, description: { _default: 'up' } },
+          { pos: 0, order: 0, numVotes: 0, description: { _default: 'up' } },
         ];
 
         if (!pollingMode.unipolar) {
           options.push({
-            id: 1,
+            pos: 1,
             order: 1,
             numVotes: 0,
             description: { _default: 'down' },
