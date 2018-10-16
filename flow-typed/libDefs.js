@@ -53,6 +53,10 @@ declare type UserShape = {
   surname: string,
 };
 
+declare type ViewerShape = {
+  ...UserShape,
+};
+
 declare type VoteShape = {
   id: ID,
   pollId: ID,
