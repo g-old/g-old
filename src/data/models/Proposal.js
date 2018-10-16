@@ -261,7 +261,6 @@ class Proposal {
     // throw Error('TESTERROR');
 
     if (!data || !data.id) return null;
-
     const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
     if (!proposalInDB) return null;
     let workTeam;
@@ -279,18 +278,22 @@ class Proposal {
       if (!activePoll) {
         throw new Error('Could no load poll');
       }
-      if (data.state && proposalInDB.state !== data.state) {
-        const { thresholdReference } = await PollingMode.gen(
+      if (data.state) {
+        const pollingMode = await PollingMode.gen(
           viewer, // $FlowFixMe
           activePoll.pollingModeId,
-          viewer,
+          loaders,
         );
+
+        if (!pollingMode) {
+          throw new Error('Could not load pollingmode');
+        }
 
         if (
           proposalInDB.canChangeToState(
             data.state,
             activePoll,
-            thresholdReference,
+            pollingMode.thresholdRef,
           )
         ) {
           await proposalInDB.closeOpenPolls(viewer, loaders, trx);
@@ -333,17 +336,17 @@ class Proposal {
         .returning('*');
     });
 
-    const proposalinDB = updatedProposal && new Proposal(updatedProposal);
-    if (proposalinDB) {
+    const proposal = updatedProposal && new Proposal(updatedProposal);
+    if (proposal) {
       EventManager.publish('onProposalUpdated', {
         viewer,
-        proposalinDB,
+        proposal,
         ...(newValues.state && { info: { newState: newValues.state } }),
         ...(data.workTeamId && { groupId: data.workTeamId }),
         subjectId: data.workTeamId,
       });
     }
-    return proposalinDB;
+    return proposal;
   }
 
   static async create(viewer, data, loaders) {
