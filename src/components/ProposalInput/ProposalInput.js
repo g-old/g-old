@@ -197,7 +197,7 @@ class ProposalInput extends React.Component<Props, State> {
         mode: {
           withStatements,
           unipolar,
-          thresholdRef,
+          thresholdRef: thresholdRef.value,
         },
       },
       ...(newTags.length ? { tags: newTags } : {}),
