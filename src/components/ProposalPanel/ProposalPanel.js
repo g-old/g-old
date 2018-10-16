@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import ProposalInput from '../ProposalInput';
 import ProposalsManager from '../ProposalsManager';
 import Accordion from '../Accordion';
@@ -48,21 +48,21 @@ const messages = defineMessages({
   },
 });
 const defaultPollValues = {
-  1: {
+  proposed: {
     withStatements: true,
     unipolar: true,
     threshold: 25,
     secret: false,
     thresholdRef: 'all',
   },
-  2: {
+  voting: {
     withStatements: true,
     unipolar: false,
     threshold: 50,
     secret: false,
     thresholdRef: 'voters',
   },
-  3: {
+  survey: {
     withStatements: false,
     unipolar: false,
     threshold: 100,
@@ -70,24 +70,6 @@ const defaultPollValues = {
     thresholdRef: 'voters',
   },
 };
-
-const pollOptions = [
-  {
-    value: '1',
-    label: <FormattedMessage {...messages.phaseOnePoll} />,
-    mId: messages.phaseOnePoll.id,
-  },
-  {
-    value: '2',
-    label: <FormattedMessage {...messages.phaseTwoPoll} />,
-    mId: messages.phaseTwoPoll.id,
-  },
-  {
-    value: '3',
-    label: <FormattedMessage {...messages.survey} />,
-    mId: messages.survey.id,
-  },
-];
 
 class ProposalPanel extends React.Component {
   static propTypes = {
@@ -109,6 +91,24 @@ class ProposalPanel extends React.Component {
     this.fetchProposals = this.fetchProposals.bind(this);
     this.fetchSurveys = this.fetchSurveys.bind(this);
     this.fetchTags = this.fetchTags.bind(this);
+  }
+
+  getPollOptions() {
+    const { intl } = this.props;
+    return [
+      {
+        value: 'proposed',
+        label: intl.formatMessage(messages.phaseOnePoll),
+      },
+      {
+        value: 'voting',
+        label: intl.formatMessage(messages.phaseTwoPoll),
+      },
+      {
+        value: 'survey',
+        label: intl.formatMessage(messages.survey),
+      },
+    ];
   }
 
   fetchTags() {
@@ -142,8 +142,8 @@ class ProposalPanel extends React.Component {
           >
             <ProposalInput
               maxTags={8}
-              pollOptions={pollOptions}
-              defaultPollValues={defaultPollValues}
+              availablePolls={this.getPollOptions()}
+              defaultPollSettings={defaultPollValues}
             />
           </AccordionPanel>
           <AccordionPanel
@@ -151,7 +151,7 @@ class ProposalPanel extends React.Component {
             onActive={this.fetchProposals}
           >
             <ProposalsManager
-              pollOptions={pollOptions}
+              availablePolls={this.getPollOptions()}
               defaultPollValues={defaultPollValues}
               proposals={(proposals || [])
                 .filter(p => p.state === 'proposed')
@@ -166,7 +166,7 @@ class ProposalPanel extends React.Component {
           </AccordionPanel>
           <AccordionPanel heading="Manage surveys" onActive={this.fetchSurveys}>
             <ProposalsManager
-              pollOptions={pollOptions}
+              availablePolls={this.getPollOptions()}
               defaultPollValues={defaultPollValues}
               proposals={(surveys || []).filter(
                 s => (s.pollOne ? !s.pollOne.closedAt : false),
@@ -211,4 +211,4 @@ const mapDispatch = {
 export default connect(
   mapStateToProps,
   mapDispatch,
-)(ProposalPanel);
+)(injectIntl(ProposalPanel));
