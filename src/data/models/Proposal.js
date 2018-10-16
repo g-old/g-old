@@ -15,27 +15,29 @@ import Statement from './Statement'; // eslint-disable-line import/no-cycle
 import { transactify, TargetType } from './utils';
 import Tag from './Tag';
 
-type ProposalState = 'accepted' | 'rejected' | 'revoked' | 'survey';
-export type ProposalProps = {
-  id: ID,
-  author_id: ID,
-  title: string,
-  body: string,
-  votes: number,
-  poll_one_id: ID,
-  poll_two_id: ID,
-  state: ProposalState,
-  created_at: string,
-  spokesman_id: ID,
-  notified_at: string,
-  work_team_id: ID,
-  deleted_at: ?string,
+type ProposalRowType = $Shape<ProposalProps>;
+type ProposalInputArgs = {
+  id?: ID,
+  poll?: $Shape<PollShape>,
+  workTeamId: ID,
+  state: ProposalStateType,
 };
 
-export const computeNextState = (state: ProposalState, poll, tRef: number) => {
+export const computeNextState = (
+  state: ProposalStateType,
+  poll: Poll,
+  tRef: number,
+) => {
   let newState;
   let ref;
-
+  // TODO !! in case of extended
+  if (poll.extended) {
+    return state;
+    // what to do?
+    // cases survey: state survey
+    // state proposed :  not possible?
+    // state voting : state voting : copy wining option as proposal
+  }
   switch (tRef) {
     case 'voters':
       ref = poll.options[0].numVotes + poll.options[1].numVotes;
@@ -91,42 +93,43 @@ export const computeNextState = (state: ProposalState, poll, tRef: number) => {
   return newState;
 };
 
-const validateStateChange = async (
-  viewer,
-  { state, proposalInDB },
-  loaders,
-) => {
-  const pollId =
-    proposalInDB.state === 'proposed' || proposalInDB.state === 'survey'
-      ? proposalInDB.pollOneId
-      : proposalInDB.pollTwoId;
-  const pollInDB = await Poll.gen(viewer, pollId, loaders);
-  if (pollInDB.closedAt) return false; // Dont allow alteration after closing;
-  if (state === 'revoked') return true; // Proposals can be revoked at any time
-  if (state !== 'voting') {
-    // check times
-    // poll must have been ended!
-    if (new Date(pollInDB.endTime) > new Date()) return false;
+async function closePoll(viewer, id, loaders, trx) {
+  const poll = await Poll.gen(viewer, id, loaders);
+  if (!poll) {
+    throw new Error('Could not load poll');
   }
-  const pollingModeinDB = await PollingMode.gen(
+  if (!poll.closedAt) {
+    const updatedPoll = await Poll.update(
+      viewer,
+      { id: poll.id, closedAt: new Date() },
+      loaders,
+      trx,
+    );
+    if (!updatedPoll) {
+      throw new Error('Could not update poll');
+    }
+  }
+}
+
+const createNewPoll = async (viewer, data, loaders, trx) => {
+  const pollingMode = await PollingMode.createOrGet(
     viewer,
-    pollInDB.pollingModeId,
+    data.mode,
     loaders,
+    trx,
   );
-  if (!pollingModeinDB) throw Error('PollingMode not found');
-  if (
-    state !==
-    computeNextState(proposalInDB.state, pollInDB, pollingModeinDB.thresholdRef)
-  ) {
-    return false;
+  if (!pollingMode) throw Error('PollingMode failed');
+  const newPoll = await Poll.create(viewer, data, loaders, trx);
+  if (!newPoll) {
+    throw new Error('Could not create poll');
   }
-  return true;
+  return newPoll;
 };
 
 class Proposal {
   id: ID;
 
-  state: ProposalState;
+  state: ProposalStateType;
 
   authorId: ID;
 
@@ -150,6 +153,8 @@ class Proposal {
 
   deletedAt: ?string;
 
+  updatedAt: ?string;
+
   constructor(data: ProposalProps) {
     this.id = data.id;
     this.authorId = data.author_id;
@@ -164,9 +169,26 @@ class Proposal {
     this.notifiedAt = data.notified_at;
     this.workTeamId = data.work_team_id;
     this.deletedAt = data.deleted_at;
+    this.updatedAt = data.updated_at;
   }
 
-  static async gen(viewer, id, { proposals }) {
+  async getActivePoll(viewer: ViewerShape, loaders) {
+    const poll = await Poll.gen(
+      viewer,
+      this.pollTwoId || this.pollOneId,
+      loaders,
+    );
+    if (poll) {
+      return poll;
+    }
+    throw new Error(`Could not load poll: ${poll.id}`);
+  }
+
+  static async gen(
+    viewer: ViewerShape,
+    id: ID,
+    { proposals }: { proposals: DataLoader<ID, ProposalProps> },
+  ) {
     const data = await proposals.load(id);
     if (data == null) return null;
     const result = new Proposal(data); // for isMember check in accessControl;
@@ -175,7 +197,7 @@ class Proposal {
     // return canSee ? new Proposal(data) : new Proposal(data.email = null);
   }
 
-  static async genByPoll(viewer, pollId, { proposalsByPoll }) {
+  static async genByPoll(viewer: ViewerShape, pollId: ID, { proposalsByPoll }) {
     const data = await proposalsByPoll.load(pollId);
     if (!data) return null;
     const result = new Proposal(data); // for isMember check in accessControl;
@@ -192,79 +214,114 @@ class Proposal {
       */
   }
 
+  isNewPollRequired(newState: ProposalStateType) {
+    return (
+      this.state === 'proposed' &&
+      this.pollOneId &&
+      newState === 'voting' &&
+      !this.pollTwoId
+    );
+  }
+
+  canChangeToState(
+    newState: ProposalStateType,
+    poll: Poll,
+    thresholdReference: number,
+  ): boolean {
+    // active poll must be open
+    if (!this.deletedAt && !poll.closedAt) {
+      if (newState === 'revoked') {
+        return true;
+      }
+      const transitionResult = computeNextState(
+        this.state,
+        poll,
+        thresholdReference,
+      );
+      return newState === transitionResult;
+    }
+    return false;
+  }
+
+  async closeOpenPolls(viewer: ViewerShape, loaders, trx) {
+    if (this.pollOneId) {
+      await closePoll(viewer, this.pollOneId, loaders, trx);
+    }
+    if (this.pollTwoId) {
+      await closePoll(viewer, this.pollTwoId, loaders, trx);
+    }
+  }
+
   // TODO make member method
-  static async update(viewer, data, loaders) {
+  static async update(
+    viewer: ViewerShape,
+    data: ProposalInputArgs,
+    loaders: DataLoaders,
+  ) {
     // throw Error('TESTERROR');
+
     if (!data || !data.id) return null;
+
     const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
     if (!proposalInDB) return null;
     let workTeam;
     if (proposalInDB.workTeamId) {
       workTeam = await WorkTeam.gen(viewer, proposalInDB.workTeamId, loaders);
     }
-
     // authorize
     if (!canMutate(viewer, { ...data, workTeam }, Models.PROPOSAL)) return null;
     // validate
 
-    const newValues = { state: 'voting', updated_at: new Date() };
+    const newValues: ProposalRowType = { updated_at: new Date() };
 
-    // update
-    if (data.state) {
-      const isValid = await validateStateChange(
-        viewer,
-        { state: data.state, proposalInDB },
-        loaders,
-      );
-      if (isValid) {
-        newValues.state = data.state;
-      } else {
-        throw Error('State transition not allowed');
+    const [updatedProposal = null] = await knex.transaction(async trx => {
+      const activePoll = await proposalInDB.getActivePoll(viewer, loaders);
+      if (!activePoll) {
+        throw new Error('Could no load poll');
       }
-    }
-    const updatedProposal = await knex.transaction(async trx => {
-      // create poll
-      // TODO check if they get reverted in case of rollback
-      if (data.poll) {
-        const pollingMode = await PollingMode.createOrGet(
+      if (data.state && proposalInDB.state !== data.state) {
+        const { thresholdReference } = await PollingMode.gen(
+          viewer, // $FlowFixMe
+          activePoll.pollingModeId,
           viewer,
-          data.poll.mode,
-          loaders,
-          trx,
         );
-        if (!pollingMode) throw Error('PollingMode failed');
-        if (newValues.state === 'voting') {
-          const pollTwo = await Poll.create(
-            viewer,
-            { ...data.poll, workTeam, pollingModeId: pollingMode.id },
-            loaders,
-            trx,
+
+        if (
+          proposalInDB.canChangeToState(
+            data.state,
+            activePoll,
+            thresholdReference,
+          )
+        ) {
+          await proposalInDB.closeOpenPolls(viewer, loaders, trx);
+
+          if (proposalInDB.isNewPollRequired(data.state)) {
+            if (!data.poll || !data.poll.mode) {
+              throw new Error('Poll data is missing');
+            }
+            const pollTwo = await createNewPoll(
+              viewer,
+              data.poll,
+              loaders,
+              trx,
+            );
+
+            newValues.poll_two_id = pollTwo.id;
+          }
+
+          newValues.state = data.state;
+        } else {
+          throw new Error(
+            `State transition not allowed from ${proposalInDB.state} to ${
+              data.state
+            }`,
           );
-          if (!pollTwo) throw Error('No pollTwo provided');
-          newValues.poll_two_id = pollTwo.id;
         }
       }
-      // update/close pollOne
-      // TODO check first if not already closed?
-      const pollOne = await Poll.update(
-        viewer,
-        { id: proposalInDB.pollOneId, closedAt: new Date(), workTeam },
-        loaders,
-        trx,
-      );
-      if (!pollOne) throw Error('No pollOne provided');
 
-      if (newValues.state && newValues.state !== 'voting') {
-        const pollId =
-          proposalInDB.state === 'proposed' || proposalInDB.state === 'survey'
-            ? proposalInDB.pollOneId
-            : proposalInDB.pollTwoId;
-        await Poll.update(
-          viewer,
-          { id: pollId, closedAt: new Date() },
-          loaders,
-          trx,
-        );
+      // Allow surveys to close
+      if (data.poll && data.poll.closedAt && proposalInDB.state === 'survey') {
+        await closePoll(viewer, activePoll.id, loaders, trx);
       }
 
       return knex('proposals')
@@ -272,23 +329,21 @@ class Proposal {
         .where({
           id: data.id,
         })
-        .update({
-          ...newValues,
-        })
+        .update(newValues)
         .returning('*');
     });
 
-    const proposal = updatedProposal && new Proposal(updatedProposal);
-    if (proposal) {
+    const proposalinDB = updatedProposal && new Proposal(updatedProposal);
+    if (proposalinDB) {
       EventManager.publish('onProposalUpdated', {
         viewer,
-        proposal,
+        proposalinDB,
         ...(newValues.state && { info: { newState: newValues.state } }),
         ...(data.workTeamId && { groupId: data.workTeamId }),
         subjectId: data.workTeamId,
       });
     }
-    return proposal;
+    return proposalinDB;
   }
 
   static async create(viewer, data, loaders) {
@@ -337,7 +392,11 @@ class Proposal {
 
       const pollOne = await Poll.create(
         viewer,
-        { ...data.poll, pollingModeId: pollingMode.id, workTeam },
+        {
+          ...data.poll,
+          pollingModeId: pollingMode.id,
+          workTeamId: data.workTeamId,
+        },
         loaders,
         trx,
       );
