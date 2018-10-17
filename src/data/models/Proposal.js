@@ -101,7 +101,7 @@ async function closePoll(viewer, id, loaders, trx) {
   if (!poll.closedAt) {
     const updatedPoll = await Poll.update(
       viewer,
-      { id: poll.id, closedAt: new Date() },
+      { id, closedAt: new Date() },
       loaders,
       trx,
     );
@@ -111,20 +111,99 @@ async function closePoll(viewer, id, loaders, trx) {
   }
 }
 
-const createNewPoll = async (viewer, data, loaders, trx) => {
-  const pollingMode = await PollingMode.createOrGet(
-    viewer,
-    data.mode,
-    loaders,
-    trx,
-  );
-  if (!pollingMode) throw Error('PollingMode failed');
-  const newPoll = await Poll.create(viewer, data, loaders, trx);
-  if (!newPoll) {
-    throw new Error('Could not create poll');
+class StateTransitionHelper {
+  viewer: ViewerShape;
+
+  newState: ProposalStateType;
+
+  trx: Transaction;
+
+  poll: Poll;
+
+  loaders: DataLoaders;
+
+  constructor(props) {
+    this.viewer = props.viewer;
+    this.newState = props.newState;
+    this.trx = props.trx;
+    this.poll = props.activePoll;
+    this.loaders = props.loaders;
   }
-  return newPoll;
-};
+
+  pollIsReady(proposal) {
+    return !proposal.deletedAt && !this.poll.closedAt; // active poll must be open
+  }
+
+  async checkNextState(proposal, pollingMode) {
+    const transitionResult = computeNextState(
+      proposal.state,
+      this.poll,
+      pollingMode.thresholdRef,
+    );
+    return this.newState === transitionResult;
+  }
+
+  async getPollingMode() {
+    return PollingMode.gen(
+      this.viewer,
+      this.poll.pollingModeId,
+      this.loaders,
+      this.trx,
+    );
+  }
+
+  async canTransition(proposal) {
+    if (this.pollIsReady(proposal)) {
+      if (this.newState === 'revoked') {
+        return true;
+      }
+      const pollingMode = await this.getPollingMode(); // $FlowFixMe
+
+      if (!pollingMode) {
+        throw new Error('Could not load pollingMode');
+      }
+      return this.checkNextState(proposal, pollingMode);
+    }
+
+    return false;
+  }
+
+  async closePoll(pollId) {
+    return closePoll(this.viewer, pollId, this.loaders, this.trx);
+  }
+
+  async closeOpenPolls(proposal) {
+    if (proposal.pollOneId) {
+      await this.closePoll(proposal.pollOneId);
+    }
+    if (proposal.pollTwoId) {
+      await this.closePoll(proposal.pollTwoId);
+    }
+  }
+
+  async createNextPoll(pollData) {
+    if (!pollData || !pollData.mode) {
+      throw new Error('Poll data is missing');
+    }
+    const pollingMode = await PollingMode.createOrGet(
+      this.viewer,
+      pollData.mode,
+      this.loaders,
+      this.trx,
+    );
+    if (!pollingMode) throw Error('PollingMode failed');
+    const newPoll = await Poll.create(
+      this.viewer,
+      pollData,
+      this.loaders,
+      this.trx,
+    );
+    if (!newPoll) {
+      throw new Error('Could not create poll');
+    }
+    return newPoll;
+  }
+}
 
 class Proposal {
   id: ID;
@@ -223,33 +302,8 @@ class Proposal {
     );
   }
 
-  canChangeToState(
-    newState: ProposalStateType,
-    poll: Poll,
-    thresholdReference: number,
-  ): boolean {
-    // active poll must be open
-    if (!this.deletedAt && !poll.closedAt) {
-      if (newState === 'revoked') {
-        return true;
-      }
-      const transitionResult = computeNextState(
-        this.state,
-        poll,
-        thresholdReference,
-      );
-      return newState === transitionResult;
-    }
-    return false;
-  }
-
-  async closeOpenPolls(viewer: ViewerShape, loaders, trx) {
-    if (this.pollOneId) {
-      await closePoll(viewer, this.pollOneId, loaders, trx);
-    }
-    if (this.pollTwoId) {
-      await closePoll(viewer, this.pollTwoId, loaders, trx);
-    }
+  isSurveyAndShouldClose(pollData) {
+    return pollData && pollData.closedAt && this.state === 'survey';
   }
 
   // TODO make member method
@@ -279,36 +333,18 @@ class Proposal {
         throw new Error('Could no load poll');
       }
       if (data.state) {
-        const pollingMode = await PollingMode.gen(
-          viewer, // $FlowFixMe
-          activePoll.pollingModeId,
+        const helper = new StateTransitionHelper({
+          viewer,
+          newState: data.state,
+          trx,
           loaders,
-        );
-
-        if (!pollingMode) {
-          throw new Error('Could not load pollingmode');
-        }
-
-        if (
-          proposalInDB.canChangeToState(
-            data.state,
-            activePoll,
-            pollingMode.thresholdRef,
-          )
-        ) {
-          await proposalInDB.closeOpenPolls(viewer, loaders, trx);
+          activePoll,
+        });
+        if (helper.canTransition(proposalInDB)) {
+          await helper.closeOpenPolls(proposalInDB);
 
           if (proposalInDB.isNewPollRequired(data.state)) {
-            if (!data.poll || !data.poll.mode) {
-              throw new Error('Poll data is missing');
-            }
-            const pollTwo = await createNewPoll(
-              viewer,
-              data.poll,
-              loaders,
-              trx,
-            );
-
+            const pollTwo = await helper.createNextPoll(data.poll);
             newValues.poll_two_id = pollTwo.id;
           }
 
@@ -322,8 +358,7 @@ class Proposal {
         }
       }
 
-      // Allow surveys to close
-      if (data.poll && data.poll.closedAt && proposalInDB.state === 'survey') {
+      if (proposalInDB.isSurveyAndShouldClose(data.poll)) {
         await closePoll(viewer, activePoll.id, loaders, trx);
       }
 

@@ -53,6 +53,8 @@ declare type UserShape = {
   surname: string,
 };
 
+declare type Transaction = Knex$Transaction<any>;
+
 declare type ViewerShape = {
   ...UserShape,
 };
