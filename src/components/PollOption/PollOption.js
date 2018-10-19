@@ -68,7 +68,7 @@ class PollOption extends React.Component<PollOptionProps, State> {
       showVotes,
       allVotes,
       isCollapsed,
-      followeeVotes,
+      followeeVotes = [],
       votes,
       onLoadVotes,
       updates,

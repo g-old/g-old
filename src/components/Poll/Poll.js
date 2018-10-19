@@ -15,7 +15,7 @@ import Box from '../Box';
 import Layer from '../Layer';
 import Notification from '../Notification';
 import history from '../../history';
-import PollOption from '../PollOption';
+import PollOptionsView from '../PollOptionsView';
 
 const messages = defineMessages({
   closed: {
@@ -228,22 +228,24 @@ class Poll extends React.Component {
       mode,
       extended,
       options,
+      numVotes,
+      followeeVotes,
+      votes,
     } = this.props;
     const { pollOptions } = this.state;
     let component;
     if (extended) {
       component = (
-        <Box column>
-          {options &&
-            options.map(o => (
-              <PollOption
-                {...o}
-                checked={pollOptions[o.pos].checked}
-                disabled={updates.pending}
-                onChange={this.handleOptionSelection}
-              />
-            ))}
-        </Box>
+        <PollOptionsView
+          onLoadVotes={this.fetchVoters}
+          pollOptions={pollOptions}
+          numVotes={numVotes}
+          updates={updates}
+          followeeVotes={followeeVotes}
+          votes={votes}
+          onChange={this.handleOptionSelection}
+          options={options}
+        />
       );
       return component;
     }

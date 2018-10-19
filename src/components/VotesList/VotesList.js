@@ -67,18 +67,22 @@ class VotesList extends React.Component {
     const { unipolar, votes = [], getVotes } = this.props;
     const { showVotes } = this.state;
     if (showVotes && votes) {
-      votes.forEach(vote => {
-        if (vote && vote.positions[0].pos === 0 && vote.positions[0].value)
-          pro.push(vote);
-        else con.push(vote);
-      });
+      if (unipolar) {
+        pro.push(...votes);
+      } else {
+        votes.forEach(vote => {
+          if (vote && vote.positions[0].pos === 0 && vote.positions[0].value)
+            pro.push(vote);
+          else con.push(vote);
+        });
+      }
     }
 
     const { isFetching, errorMessage } = this.props;
-    if (isFetching && !votes.length) {
+    if (isFetching && (!votes || !votes.length)) {
       return <p>{'Loading...'} </p>;
     }
-    if (errorMessage && !votes.length) {
+    if (errorMessage && (!votes || !votes.length)) {
       return (
         <FetchError
           message={errorMessage}
