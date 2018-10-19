@@ -53,7 +53,7 @@ declare type UserShape = {
   surname: string,
 };
 
-declare type Transaction = Knex$Transaction<any>;
+declare type Transaction = Knex$Transaction<mixed>;
 
 declare type ViewerShape = {
   ...UserShape,

@@ -216,6 +216,8 @@ class Poll {
     }
     if (endTime) {
       newData.end_time = endTime;
+    } else {
+      throw new Error('No endTime provided');
     }
     if (data.pollingModeId) {
       newData.polling_mode_id = data.pollingModeId;
@@ -276,11 +278,11 @@ class Poll {
         newData.num_voter = numVoter;
       }
 
-      const [pollinDB = null] = await knex('polls')
+      const [pollInDB = null] = await knex('polls')
         .transacting(transaction)
         .insert(newData)
         .returning('*');
-      return pollinDB;
+      return pollInDB;
     };
 
     const newPoll = await transactify(createPoll, knex, trx);
@@ -307,6 +309,7 @@ class Poll {
         .returning('*');
 
     const pollData = await transactify(updatePoll, knex, trx);
+    loaders.polls.clear(data.id);
     return pollData && new Poll(pollData);
   }
 }

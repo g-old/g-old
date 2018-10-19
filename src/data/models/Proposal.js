@@ -157,8 +157,7 @@ class StateTransitionHelper {
       if (this.newState === 'revoked') {
         return true;
       }
-      const pollingMode = await this.getPollingMode(); // $FlowFixMe
-
+      const pollingMode = await this.getPollingMode();
       if (!pollingMode) {
         throw new Error('Could not load pollingMode');
       }
@@ -194,7 +193,7 @@ class StateTransitionHelper {
     if (!pollingMode) throw Error('PollingMode failed');
     const newPoll = await Poll.create(
       this.viewer,
-      pollData,
+      { ...pollData, pollingModeId: pollingMode.id },
       this.loaders,
       this.trx,
     );
@@ -340,6 +339,7 @@ class Proposal {
           loaders,
           activePoll,
         });
+
         if (helper.canTransition(proposalInDB)) {
           await helper.closeOpenPolls(proposalInDB);
 
@@ -361,7 +361,6 @@ class Proposal {
       if (proposalInDB.isSurveyAndShouldClose(data.poll)) {
         await closePoll(viewer, activePoll.id, loaders, trx);
       }
-
       return knex('proposals')
         .transacting(trx)
         .where({
