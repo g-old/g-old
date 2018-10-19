@@ -20,7 +20,9 @@ import PollState from '../PollState';
 import Heading from '../Heading';
 import PhaseTwoWizard from './PhaseTwoWizard';
 import type { PollTypeTypes, PollSettingsShape } from '../ProposalInput';
+import withPollSettings from '../ProposalInput/withPollSettings';
 
+const WizardWithSettings = withPollSettings(PhaseTwoWizard, ['voting']);
 const messages = defineMessages({
   confirmation: {
     id: 'confirmation',
@@ -176,11 +178,9 @@ class ProposalActions extends React.Component<Props, State> {
 
   renderActions() {
     const {
-      defaultPollSettings,
       updates = {},
       proposal: { pollOne, state, id, workTeamId },
       updateProposal,
-      availablePolls,
       user,
     } = this.props;
     const actions = [];
@@ -213,11 +213,9 @@ class ProposalActions extends React.Component<Props, State> {
       actions.push(
         <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
           <Box column>
-            <PhaseTwoWizard
+            <WizardWithSettings
               workTeamId={workTeamId}
               proposalId={id}
-              availablePolls={availablePolls}
-              defaultPollSettings={defaultPollSettings}
               defaultPollType="voting"
               user={user}
               onUpdate={updateProposal}

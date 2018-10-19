@@ -151,9 +151,7 @@ class PhaseTwoWizard extends React.Component<Props, State> {
               </Step>
               <Step id="poll">
                 <PollType
-                  availablePolls={availablePolls.filter(
-                    poll => poll.value === 'voting',
-                  )}
+                  availablePolls={availablePolls}
                   defaultPollSettings={defaultPollSettings}
                   data={{
                     pollType,

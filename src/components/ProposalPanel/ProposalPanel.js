@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import ProposalInput from '../ProposalInput';
 import ProposalsManager from '../ProposalsManager';
 import Accordion from '../Accordion';
@@ -15,6 +15,8 @@ import TagManager from '../TagManager';
 import { getVisibleProposals, getResourcePageInfo } from '../../reducers';
 import { genProposalPageKey } from '../../reducers/pageInfo';
 
+import withPollSettings from '../ProposalInput/withPollSettings';
+
 const messages = defineMessages({
   proposalInput: {
     id: 'proposalInput',
@@ -26,50 +28,15 @@ const messages = defineMessages({
     defaultMessage: 'Manage proposals',
     description: 'Manage proposals',
   },
-  phaseOnePoll: {
-    id: 'proposalManager.phaseOnePoll',
-    defaultMessage: 'TR: 25 - PHASE ONE - NO STATEMENTS',
-    description: 'PhaseOnePoll presets',
-  },
-  phaseTwoPoll: {
-    id: 'proposalManager.phaseTwoPoll',
-    defaultMessage: 'TR: 50 - PHASE TWO - WITH STATEMENTS',
-    description: 'PhaseTwoPoll presets',
-  },
-  survey: {
-    id: 'proposalManager.survey',
-    defaultMessage: 'Survey',
-    description: 'Survey presets',
-  },
+
   tags: {
     id: 'tags',
     defaultMessage: 'Tags',
     description: 'Tags',
   },
 });
-const defaultPollValues = {
-  proposed: {
-    withStatements: true,
-    unipolar: true,
-    threshold: 25,
-    secret: false,
-    thresholdRef: 'all',
-  },
-  voting: {
-    withStatements: true,
-    unipolar: false,
-    threshold: 50,
-    secret: false,
-    thresholdRef: 'voters',
-  },
-  survey: {
-    withStatements: false,
-    unipolar: false,
-    threshold: 100,
-    secret: false,
-    thresholdRef: 'voters',
-  },
-};
+
+const ProposalInputAllSettings = withPollSettings(ProposalInput);
 
 class ProposalPanel extends React.Component {
   static propTypes = {
@@ -91,24 +58,6 @@ class ProposalPanel extends React.Component {
     this.fetchProposals = this.fetchProposals.bind(this);
     this.fetchSurveys = this.fetchSurveys.bind(this);
     this.fetchTags = this.fetchTags.bind(this);
-  }
-
-  getPollOptions() {
-    const { intl } = this.props;
-    return [
-      {
-        value: 'proposed',
-        label: intl.formatMessage(messages.phaseOnePoll),
-      },
-      {
-        value: 'voting',
-        label: intl.formatMessage(messages.phaseTwoPoll),
-      },
-      {
-        value: 'survey',
-        label: intl.formatMessage(messages.survey),
-      },
-    ];
   }
 
   fetchTags() {
@@ -140,19 +89,13 @@ class ProposalPanel extends React.Component {
             heading={<FormattedMessage {...messages.proposalInput} />}
             onActive={this.fetchTags}
           >
-            <ProposalInput
-              maxTags={8}
-              availablePolls={this.getPollOptions()}
-              defaultPollSettings={defaultPollValues}
-            />
+            <ProposalInputAllSettings maxTags={8} />
           </AccordionPanel>
           <AccordionPanel
             heading={<FormattedMessage {...messages.proposalManager} />}
             onActive={this.fetchProposals}
           >
             <ProposalsManager
-              availablePolls={this.getPollOptions()}
-              defaultPollValues={defaultPollValues}
               proposals={(proposals || [])
                 .filter(p => p.state === 'proposed')
                 .sort(
@@ -166,8 +109,6 @@ class ProposalPanel extends React.Component {
           </AccordionPanel>
           <AccordionPanel heading="Manage surveys" onActive={this.fetchSurveys}>
             <ProposalsManager
-              availablePolls={this.getPollOptions()}
-              defaultPollValues={defaultPollValues}
               proposals={(surveys || []).filter(
                 s => (s.pollOne ? !s.pollOne.closedAt : false),
               )}
@@ -211,4 +152,4 @@ const mapDispatch = {
 export default connect(
   mapStateToProps,
   mapDispatch,
-)(injectIntl(ProposalPanel));
+)(ProposalPanel);
