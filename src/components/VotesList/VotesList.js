@@ -68,7 +68,7 @@ class VotesList extends React.Component {
     const { showVotes } = this.state;
     if (showVotes && votes) {
       votes.forEach(vote => {
-        if (vote && vote.positions[0].pos === 1 && vote.positions[0].value)
+        if (vote && vote.positions[0].pos === 0 && vote.positions[0].value)
           pro.push(vote);
         else con.push(vote);
       });

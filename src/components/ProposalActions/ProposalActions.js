@@ -178,7 +178,6 @@ class ProposalActions extends React.Component<Props, State> {
     const {
       defaultPollSettings,
       updates = {},
-      pollOptions,
       proposal: { pollOne, state, id, workTeamId },
       updateProposal,
       availablePolls,
@@ -213,13 +212,12 @@ class ProposalActions extends React.Component<Props, State> {
     if (state !== 'survey') {
       actions.push(
         <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
-          <Box column pad>
+          <Box column>
             <PhaseTwoWizard
               workTeamId={workTeamId}
               proposalId={id}
-              pollOptions={pollOptions}
-              defaultPollSettings={defaultPollSettings}
               availablePolls={availablePolls}
+              defaultPollSettings={defaultPollSettings}
               defaultPollType="voting"
               user={user}
               onUpdate={updateProposal}

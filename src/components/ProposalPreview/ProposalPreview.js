@@ -59,8 +59,8 @@ class ProposalPreview extends React.Component {
     if (poll.mode.thresholdRef === 'all') {
       upvotes = poll.options[0].numVotes;
     } else {
-      upvotes = poll.options[1].numVotes;
-      downvotes = poll.options[0].numVotes;
+      upvotes = poll.options[0].numVotes;
+      downvotes = poll.options[1].numVotes;
     }
     // 3 small meters , allvotes
     let pollPreview;

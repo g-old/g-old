@@ -86,6 +86,7 @@ class PhaseTwoWizard extends React.Component<Props, State> {
       thresholdRef,
       unipolar,
       options,
+      pollType,
     } = this.state;
 
     if (dateTo || timeTo) {
@@ -94,18 +95,19 @@ class PhaseTwoWizard extends React.Component<Props, State> {
 
       endTime = concatDateAndTime(date, time);
     }
-
+    const extended = !!options.length;
     onUpdate({
       ...(workTeamId && { workTeamId }),
       id: proposalId,
-      // state: pollType.value,
+      state: pollType.value,
       poll: {
         options: options.map((o, i) => ({
           description: { de: o.description },
           pos: i,
           order: i,
         })),
-        extended: !!options.length,
+        extended,
+        multipleChoice: extended,
         startTime,
         endTime,
         secret,
@@ -113,7 +115,7 @@ class PhaseTwoWizard extends React.Component<Props, State> {
         mode: {
           withStatements,
           unipolar,
-          thresholdRef,
+          thresholdRef: thresholdRef.value,
         },
       },
     });
