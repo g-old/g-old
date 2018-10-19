@@ -73,10 +73,7 @@ const PollSettings = ({
         inField
         options={referenceOptions}
         onSearch={false}
-        value={{
-          value: thresholdRef.value,
-          label: thresholdRef.value === 'all' ? 'ALL' : 'VOTERS',
-        }}
+        value={thresholdRef}
         onChange={e => {
           onValueChange({
             target: { name: 'thresholdRef', value: e.value },

@@ -17,6 +17,7 @@ type Props = {
   callback: Callback,
   stepId: string,
   storageKey: string,
+  withOptions: boolean,
 };
 
 const bodyValidation = data => {
@@ -89,13 +90,13 @@ class ProposalBody extends React.Component<Props> {
   }
 
   render() {
-    const { data, storageKey } = this.props;
+    const { data, storageKey, withOptions } = this.props;
     return (
       <FormValidation
         ref={this.form}
         submit={this.handleNext}
         validations={{
-          body: { fn: bodyValidation, args: { required: true } },
+          body: { fn: bodyValidation, args: { required: !withOptions } },
           title: { args: { required: true, min: 3 } },
         }}
         data={{

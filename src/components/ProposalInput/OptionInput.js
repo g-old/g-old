@@ -35,6 +35,7 @@ class OptionInput extends React.Component {
     onExit: PropTypes.func.isRequired,
     stepId: PropTypes.string.isRequired,
     callback: PropTypes.func.isRequired,
+    withOptions: PropTypes.bool.isRequired,
   };
 
   constructor(props) {
@@ -114,13 +115,13 @@ class OptionInput extends React.Component {
   }
 
   render() {
-    const { data } = this.props;
+    const { data, withOptions } = this.props;
     const { description } = this.state;
     return (
       <FormValidation
         ref={this.form}
         submit={this.handleNext}
-        validations={{ options: { args: { min: 2, required: false } } }}
+        validations={{ options: { args: { min: 2, required: withOptions } } }}
         data={{ options: data.length ? data : undefined }}
       >
         {({ errorMessages }) => (

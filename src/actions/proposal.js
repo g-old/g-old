@@ -130,6 +130,7 @@ const query = `
 const tagsQuery = `
 query{
   tags{
+    displayName
     id
     text
     count

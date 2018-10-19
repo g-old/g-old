@@ -6,6 +6,7 @@ import Select from '../Select';
 import Box from '../Box';
 import Button from '../Button';
 import PollSettings from './PollSettings';
+import CheckBox from '../CheckBox';
 import type {
   ValueType,
   PollTypeTypes,
@@ -13,11 +14,12 @@ import type {
   Callback,
 } from './ProposalInput';
 
+type PollPresetOption = { value: PollTypeTypes, label: string };
 type Props = {
   onExit: (ValueType[]) => void,
   data: { body?: string, title?: string },
   defaultPollSettings: { [PollTypeTypes]: PollSettingsShape },
-  availablePolls: PollTypeTypes[],
+  availablePolls: PollPresetOption[],
   advancedModeOn: boolean,
   stepId: string,
   callback: Callback,
@@ -32,6 +34,7 @@ const settingFields = [
   'unipolar',
   'threshold',
   'thresholdRef',
+  'withOptions',
 ];
 
 const createNameValuePairs = (fields, values, data) =>
@@ -122,6 +125,7 @@ class PollType extends React.Component<Props, State> {
           unipolar: {},
           threshold: {},
           thresholdRef: {},
+          withOptions: {},
         }}
         data={data}
       >
@@ -144,6 +148,14 @@ class PollType extends React.Component<Props, State> {
                 }}
               />
             </FormField>
+            {values.pollType.value === 'survey' && (
+              <CheckBox
+                name="withOptions"
+                onChange={handleValueChanges}
+                checked={values.withOptions}
+                label="with options"
+              />
+            )}
             {!showSettings &&
               advancedModeOn && (
                 <Button

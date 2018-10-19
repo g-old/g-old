@@ -50,7 +50,7 @@ type State = {
   timeTo?: string,
   body: string,
   title: string,
-
+  withOptions: boolean,
   spokesman: UserShape,
   pollType: { value: PollTypeTypes, label: string },
   options: OptionShape[],
@@ -84,6 +84,7 @@ class ProposalInput extends React.Component<Props, State> {
       tags: [],
       dateTo: '',
       timeTo: '',
+      withOptions: false,
       ...props.defaultPollSettings[props.defaultPollType || 'proposed'],
     };
 
@@ -136,8 +137,10 @@ class ProposalInput extends React.Component<Props, State> {
   calculateNextStep({ step, push }) {
     switch (step.id) {
       case 'body': {
-        const { pollType } = this.state;
-        push(pollType.value === 'survey' ? 'options' : 'spokesman');
+        const { pollType, withOptions } = this.state;
+        push(
+          pollType.value === 'survey' && withOptions ? 'options' : 'spokesman',
+        );
         break;
       }
 
@@ -174,7 +177,6 @@ class ProposalInput extends React.Component<Props, State> {
     }
 
     const newTags = this.getNewTags();
-
     const spokesmanId = spokesman ? spokesman.id : null;
     const extended = !!options.length;
     create({
@@ -247,6 +249,7 @@ class ProposalInput extends React.Component<Props, State> {
       withStatements,
       threshold,
       thresholdRef,
+      withOptions,
     } = this.state;
     const {
       users,
@@ -257,7 +260,6 @@ class ProposalInput extends React.Component<Props, State> {
       defaultPollSettings,
       updates = {},
     } = this.props;
-
     return (
       <Box column>
         <Wizard onNext={this.calculateNextStep} basename="">
@@ -282,6 +284,7 @@ class ProposalInput extends React.Component<Props, State> {
                       withStatements,
                       threshold,
                       thresholdRef,
+                      withOptions,
                     }}
                     onExit={this.handleValueSaving}
                     advancedModeOn={isAdmin(user)}
@@ -292,6 +295,7 @@ class ProposalInput extends React.Component<Props, State> {
                     storageKey={this.storageKey}
                     data={{ body, title }}
                     onExit={this.handleValueSaving}
+                    withOptions={withOptions}
                   />
                 </Step>
 
@@ -300,6 +304,7 @@ class ProposalInput extends React.Component<Props, State> {
                     data={options}
                     onExit={this.handleValueSaving}
                     onAddOption={this.handleAddOption}
+                    withOptions={withOptions}
                   />
                 </Step>
 
@@ -335,7 +340,7 @@ class ProposalInput extends React.Component<Props, State> {
                 <Step id="final">
                   <ResultPage
                     success={updates.success}
-                    error={updates.error}
+                    error={updates.errorMessage}
                     onSuccess={this.handleOnSuccess}
                     onRestart={() => {
                       this.reset();
