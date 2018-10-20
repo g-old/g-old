@@ -128,6 +128,12 @@ const LogType = new GraphQLObjectType({
             added: parent.content.added,
           });
         }
+        if (parent.type === ActivityType.VOTE) {
+          return JSON.stringify({
+            extended: parent.content.extended,
+            positionAdded: parent.content.positionAdded,
+          });
+        }
         return JSON.stringify({});
       },
     },

@@ -20,13 +20,13 @@ import WorkTeam from '../models/WorkTeam';
 import Request from '../models/Request';
 import { ActivityType as AType } from '../models/Activity';
 
-const addProposalInfo = async (viewer, loaders, pollId) => {
+const addProposalInfo = async (viewer, loaders, pollId, data = {}) => {
   if (!pollId) {
     return JSON.stringify({});
   }
   const { id, title } = await Proposal.genByPoll(viewer, pollId, loaders);
 
-  return JSON.stringify({ proposalId: id, proposalTitle: title });
+  return JSON.stringify({ proposalId: id, proposalTitle: title, ...data });
 };
 
 const addWorkTeamInfo = async (viewer, loaders, workTeamId) => {
@@ -65,7 +65,7 @@ const addDiscussionInfo = async (viewer, loaders, discussionId) => {
   });
 };
 
-const getVote = async (viewer, parent, loaders) => {
+const getVote = (viewer, parent, loaders) => {
   let vote;
   if (parent.verb === 'delete') {
     vote = new Vote({
@@ -192,16 +192,13 @@ const ActivityType = new GraphQLObjectType({
         switch (parent.type) {
           case AType.STATEMENT: {
             const statement = await getStatement(viewer, parent, loaders);
-            return addProposalInfo(
-              viewer,
-              loaders,
-              statement.pollId,
-              statement,
-            );
+            return addProposalInfo(viewer, loaders, statement.pollId);
           }
           case AType.VOTE: {
-            const vote = await getVote(viewer, parent, loaders);
-            return addProposalInfo(viewer, loaders, vote && vote.pollId, vote);
+            const vote = getVote(viewer, parent, loaders);
+            return addProposalInfo(viewer, loaders, vote && vote.pollId, {
+              extended: parent.content.extended,
+            });
           }
           case AType.PROPOSAL: {
             return addWorkTeamInfo(viewer, loaders, parent.content.workTeamId);

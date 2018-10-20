@@ -80,7 +80,51 @@ class ActivityLog extends React.Component {
 
       case 'VoteDL': {
         let displayVote;
-        if (verb === 'update') {
+        const { info } = this.props;
+        const infoData = JSON.parse(info);
+        if (infoData.extended) {
+          if (verb === 'create' || infoData.positionAdded) {
+            displayVote = (
+              <span>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="60px"
+                  height="24px"
+                  role="img"
+                  aria-label="halt"
+                >
+                  <path
+                    fill="none"
+                    stroke="#8cc800"
+                    strokeWidth="1"
+                    d={ICONS.thumbUpAlt}
+                  />
+                </svg>{' '}
+                +1
+              </span>
+            );
+          } else {
+            displayVote = (
+              <span>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="60px"
+                  height="24px"
+                  role="img"
+                  aria-label="halt"
+                >
+                  <path
+                    fill="none"
+                    stroke="#ff324d"
+                    strokeWidth="1"
+                    d={ICONS.thumbUpAlt}
+                  />
+                </svg>{' '}
+                -1
+              </span>
+            );
+          }
+        } else if (verb === 'update') {
           displayVote = (
             <span>
               <svg

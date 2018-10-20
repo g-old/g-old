@@ -149,6 +149,8 @@ class Vote {
     if (!canMutate(viewer, { ...data, proposal }, Models.VOTE)) return null;
 
     let deletedStatement;
+    let poll;
+    let oldVote;
     try {
       await knex.transaction(async trx => {
         const [pollData = null] = await knex('polls')
@@ -156,18 +158,11 @@ class Vote {
           .forUpdate()
           .where({ id: data.pollId })
           .select();
-        const poll = new Poll(pollData);
+        poll = new Poll(pollData);
         if (await poll.isUnipolar(viewer, loaders)) {
           throw new Error('Poll is unipolar'); // delete is the right method
         }
-        const oldVote = await Vote.validate(
-          viewer,
-          data,
-          loaders,
-          poll,
-          trx,
-          true,
-        );
+        oldVote = await Vote.validate(viewer, data, loaders, poll, trx, true);
         if (!oldVote || !oldVote.positions) {
           /* if (oldVote.positions[0].pos === data.positions[0].pos)
             throw Error('Position mismatch');
@@ -306,6 +301,8 @@ class Vote {
           pollId: data.pollId,
           positions: data.positions,
           userId: viewer.id,
+          extended: poll.extended,
+          ...(poll.extended ? { positionAdded: data.positions[0].value } : {}),
         }, // or save only voteInput
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
@@ -342,6 +339,7 @@ class Vote {
     if (!proposal || !(await proposal.isVotable(viewer))) return null;
 
     let newVoteId;
+    let poll;
     try {
       let positions = JSON.stringify(data.positions);
       newVoteId = await knex.transaction(async trx => {
@@ -350,7 +348,7 @@ class Vote {
           .forUpdate()
           .where({ id: data.pollId })
           .select(); // Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
-        const poll = new Poll(pollData);
+        poll = new Poll(pollData);
         if (!poll || !poll.isVotable()) throw new Error('Poll error');
         if (await poll.isUnipolar(viewer, loaders)) {
           positions = JSON.stringify([{ pos: 0, value: 1 }]);
@@ -407,7 +405,8 @@ class Vote {
     if (newVote) {
       EventManager.publish('onVoteCreated', {
         viewer,
-        vote: newVote,
+        vote: { ...newVote, extended: poll.extended },
+
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },

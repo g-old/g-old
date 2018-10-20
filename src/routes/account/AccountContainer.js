@@ -452,16 +452,38 @@ class AccountContainer extends React.Component {
 
     let displayLog;
     if (logs && logs.length) {
-      displayLog = logs.map(a => (
-        <ActivityLog
-          key={a.id}
-          actor={a.actor}
-          date={a.createdAt}
-          verb={a.verb}
-          content={a.object}
-          info={a.info}
-        />
-      ));
+      const deletedVotes = {};
+      // TODO refactor
+      displayLog = logs.map(a => {
+        // eslint-disable-next-line no-underscore-dangle
+        if (a.object && a.object.__typename === 'VoteDL') {
+          if (deletedVotes[a.objectId]) {
+            return (
+              <ActivityLog
+                key={a.id}
+                actor={a.actor}
+                date={a.createdAt}
+                verb="delete"
+                content={a.object}
+                info={a.info}
+              />
+            );
+          }
+          if (a.verb === 'delete') {
+            deletedVotes[a.objectId] = true;
+          }
+        }
+        return (
+          <ActivityLog
+            key={a.id}
+            actor={a.actor}
+            date={a.createdAt}
+            verb={a.verb}
+            content={a.object}
+            info={a.info}
+          />
+        );
+      });
     } else if (logPending) {
       displayLog = 'Loading...';
     } else if (logError) {

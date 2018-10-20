@@ -207,6 +207,7 @@ class Activity extends React.Component {
     const {
       content: { positions, pollId, voter },
     } = this.props;
+    /* eslint-disable no-nested-ternary */
     const thumb = (
       <svg
         viewBox="0 0 24 24"
@@ -217,18 +218,32 @@ class Activity extends React.Component {
       >
         <path
           fill="none"
-          stroke={positions[0].pos === 0 ? '#8cc800' : '#ff324d'}
+          stroke={
+            info.extended
+              ? '#8cc800'
+              : positions[0].pos === 0
+                ? '#8cc800'
+                : '#ff324d'
+          }
           strokeWidth="2"
           d={ICONS.thumbUpAlt}
           transform={
-            positions[0].pos === 0 ? '' : 'scale(1,-1) translate(0,-24)'
+            info.extended
+              ? ''
+              : positions[0].pos === 0
+                ? ''
+                : 'scale(1,-1) translate(0,-24)'
           }
         />
       </svg>
     );
+    /* eslint-enable no-nested-ternary */
+
     return (
-      <Link // eslint-disable-line
-        to={`/proposal/${info.proposalId || 'xxx'}/${pollId}`}
+      <Link
+        to={`/proposal/${
+          info.proposalId || 'xxx' // eslint-disable-line
+        }/${pollId}`}
       >
         {voter && (
           <div className={s.follower}>
