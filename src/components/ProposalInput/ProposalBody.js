@@ -20,9 +20,9 @@ type Props = {
   withOptions: boolean,
 };
 
-const bodyValidation = data => {
+const bodyValidation = (data, state) => {
   let result = { touched: false };
-  if (isHtmlEmpty(data)) {
+  if (isHtmlEmpty(data) && !state.withOptions) {
     result = { touched: true, errorName: 'empty' };
   }
   return result;
@@ -98,10 +98,12 @@ class ProposalBody extends React.Component<Props> {
         validations={{
           body: { fn: bodyValidation, args: { required: !withOptions } },
           title: { args: { required: true, min: 3 } },
+          withOptions: {}, // hack to circumvent isEmpty check
         }}
         data={{
           body: data.body || localStorage.getItem(storageKey) || '<p></p>',
           title: data.title,
+          withOptions,
         }}
       >
         {({ handleValueChanges, values, errorMessages }) => (

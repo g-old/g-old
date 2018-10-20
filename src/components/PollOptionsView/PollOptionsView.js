@@ -67,7 +67,7 @@ class PollOptionsView extends React.Component<Props, State> {
       pollOptions,
       onChange,
       numVotes,
-      followeeVotes,
+      followeeVotes = [],
       votes,
       onLoadVotes,
     } = this.props;
