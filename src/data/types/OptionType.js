@@ -4,21 +4,21 @@ import {
   GraphQLInt,
 } from 'graphql';
 
-import { localeToLang } from '../utils';
+import { buildLocalizedFieldResolver } from '../utils';
+
+const descriptionResolver = buildLocalizedFieldResolver('description');
+const titleResolver = buildLocalizedFieldResolver('title');
 
 const OptionType = new GraphQLObjectType({
   name: 'OptionType',
   fields: {
+    title: {
+      type: String,
+      resolve: titleResolver,
+    },
     description: {
       type: String,
-      resolve: (parent, args, params, { rootValue }) => {
-        const locale = rootValue.request.language;
-        if (parent.description[localeToLang[locale]]) {
-          return parent.description[localeToLang[locale]];
-        }
-        // find one translation that is not emty or default translation
-        return Object.values(parent.description).find(t => t);
-      },
+      resolve: descriptionResolver,
     },
     pos: {
       type: GraphQLInt,

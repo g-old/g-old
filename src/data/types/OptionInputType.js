@@ -14,6 +14,9 @@ const OptionInputType = new GraphQLInputObjectType({
     description: {
       type: TranslationInputType,
     },
+    title: {
+      type: TranslationInputType,
+    },
   },
 });
 export default OptionInputType;

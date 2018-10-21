@@ -12,7 +12,29 @@ function checkCanSee(viewer, data) {
 }
 
 const MAX_DESCRIPTION_LENGTH = 10000;
+const MAX_TITLE_LENGTH = 100;
+function isDescriptionLongEnough(text) {
+  return text.length < MAX_DESCRIPTION_LENGTH && text.length > 0;
+}
+function isTitleLongEnough(text) {
+  return text.length < MAX_TITLE_LENGTH && text.length > 0;
+}
 
+const buildLocaleInputValidation = (fieldName, predicate) => option =>
+  Object.keys(option.title).reduce((obj, locale) => {
+    const text = option[fieldName][locale] && option[fieldName][locale].trim();
+    if (predicate(text)) {
+      obj[locale] = text; // eslint-disable-line
+    }
+    return obj;
+  }, {});
+
+const descriptionValidation = buildLocaleInputValidation(
+  'description',
+  isDescriptionLongEnough,
+);
+
+const titleValidation = buildLocaleInputValidation('title', isTitleLongEnough);
 const checkOption = (option, counters) => {
   const validated = {};
   if ('pos' in option) {
@@ -37,19 +59,15 @@ const checkOption = (option, counters) => {
       counters.otherOrders.push(option.order);
     }
   }
+  if ('title' in option) {
+    const title = titleValidation(option);
+    if (Object.keys(title).length) {
+      validated.title = title;
+    }
+  }
   if ('description' in option) {
     // check keys , content
-    const description = Object.keys(option.description).reduce(
-      (obj, locale) => {
-        const text =
-          option.description[locale] && option.description[locale].trim();
-        if (text.length < MAX_DESCRIPTION_LENGTH && text.length > 0) {
-          obj[locale] = text; // eslint-disable-line
-        }
-        return obj;
-      },
-      {},
-    );
+    const description = descriptionValidation(option);
     if (Object.keys(description).length) {
       validated.description = description;
     }
@@ -63,7 +81,7 @@ const checkOption = (option, counters) => {
   if (
     'pos' in validated &&
     'order' in validated &&
-    'description' in validated &&
+    'title' in validated &&
     'numVotes' in validated
   ) {
     return validated;

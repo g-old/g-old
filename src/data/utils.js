@@ -59,3 +59,18 @@ export const createConnection = (
 });
 
 export const localeToLang = { 'de-DE': 'de', 'it-IT': 'it', 'lld-IT': 'lld' };
+
+export const buildLocalizedFieldResolver = fieldName => (
+  parent,
+  args,
+  params,
+  { rootValue },
+) => {
+  if (!parent[fieldName]) return '';
+  const locale = rootValue.request.language;
+  if (parent[fieldName][localeToLang[locale]]) {
+    return parent[fieldName][localeToLang[locale]];
+  }
+  // find one translation that is not emty or default translation
+  return Object.values(parent[fieldName]).find(t => t);
+};
