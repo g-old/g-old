@@ -237,6 +237,8 @@ class Poll extends React.Component {
     if (extended) {
       component = (
         <PollOptionsView
+          canVote={canVote}
+          closedAt={closedAt}
           onLoadVotes={this.fetchVoters}
           pollOptions={pollOptions}
           numVotes={numVotes}

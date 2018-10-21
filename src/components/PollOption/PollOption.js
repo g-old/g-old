@@ -9,9 +9,11 @@ import Value from '../Value';
 import Card from '../Card';
 import UserThumbnail from '../UserThumbnail';
 import VotesList from '../VotesList';
+import Label from '../Label';
 
 type PollOptionProps = {
   description: string,
+  title: string,
   onChange: ({ pos: number }) => void,
   checked: boolean,
   disabled: boolean,
@@ -24,6 +26,7 @@ type PollOptionProps = {
   followeeVotes: VoteShape[],
   votes: VoteShape[],
   updates: UpdatesShape,
+  inactive: boolean,
 };
 
 type State = {
@@ -72,12 +75,14 @@ class PollOption extends React.Component<PollOptionProps, State> {
       votes,
       onLoadVotes,
       updates,
+      title,
+      inactive,
     } = this.props;
 
     const { votesExpanded } = this.state;
-    let text = description;
-    if (isCollapsed && text.length > 27) {
-      text = `${text.slice(0, 30)} ...`;
+    let titleLine = title;
+    if (isCollapsed && titleLine.length > 27) {
+      titleLine = `${titleLine.slice(0, 30)} ...`;
     }
 
     return (
@@ -85,12 +90,19 @@ class PollOption extends React.Component<PollOptionProps, State> {
         <Box column>
           <Box between align>
             <Box align>
-              <CheckBox
-                checked={checked}
-                disabled={disabled}
-                onChange={this.handleChange}
-              />
-              <span>{text}</span>
+              {!inactive && (
+                <CheckBox
+                  checked={checked}
+                  disabled={disabled}
+                  onChange={this.handleChange}
+                />
+              )}
+              <div>
+                <Label>{titleLine}</Label>
+                {!isCollapsed && (
+                  <div dangerouslySetInnerHTML={{ __html: description }} />
+                )}
+              </div>
             </Box>
             <Value value={numVotes} />
           </Box>

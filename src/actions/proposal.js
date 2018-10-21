@@ -56,6 +56,7 @@ pos
 order
 description
 numVotes
+title
 `;
 export const pollFieldsForList = `
   id
