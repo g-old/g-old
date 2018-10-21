@@ -23,12 +23,14 @@ import type { TagType } from '../TagInput';
 import ResultPage from './ResultPage';
 import Navigation from './Navigation';
 import history from '../../history';
+import { isHtmlEmpty } from '../MessageInput/validationFns';
 
 import {
   getTags,
   getProposalUpdates,
   getVisibleUsers,
   getSessionUser,
+  getLocale,
 } from '../../reducers';
 import { isAdmin } from '../../organization';
 
@@ -151,7 +153,7 @@ class ProposalInput extends React.Component<Props, State> {
   }
 
   handleSubmission() {
-    const { createProposal: create, workTeamId } = this.props;
+    const { createProposal: create, workTeamId, locale } = this.props;
     const startTime = null;
     let endTime = null;
     const {
@@ -186,7 +188,10 @@ class ProposalInput extends React.Component<Props, State> {
       state: pollType.value,
       poll: {
         options: options.map((o, i) => ({
-          description: { de: o.description },
+          ...(isHtmlEmpty(o.description)
+            ? {}
+            : { description: { [locale]: o.description } }),
+          title: { [locale]: o.title },
           pos: i,
           order: i,
         })),
@@ -259,6 +264,7 @@ class ProposalInput extends React.Component<Props, State> {
       availablePolls,
       defaultPollSettings,
       updates = {},
+      workTeamId,
     } = this.props;
     return (
       <Box column>
@@ -298,13 +304,13 @@ class ProposalInput extends React.Component<Props, State> {
                     withOptions={withOptions}
                   />
                 </Step>
-
                 <Step id="options">
                   <OptionInput
                     data={options}
                     onExit={this.handleValueSaving}
                     onAddOption={this.handleAddOption}
                     withOptions={withOptions}
+                    workTeamId={workTeamId}
                   />
                 </Step>
 
@@ -363,6 +369,7 @@ const mapStateToProps = state => ({
   updates: getProposalUpdates(state, '0000'),
   users: getVisibleUsers(state, 'all'),
   user: getSessionUser(state),
+  locale: getLocale(state).split('-')[0],
 });
 
 const mapDispatch = {

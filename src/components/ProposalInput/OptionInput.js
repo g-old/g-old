@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import Textarea from 'react-textarea-autosize';
 import Button from '../Button';
 import Box from '../Box';
 import CheckBox from '../CheckBox';
 import PollOptionPreview from './PollOptionPreview';
 import FormValidation from '../FormValidation';
 
-import s from './OptionInput.css';
+import ProposalBody from './ProposalBody';
 
 const validateOptions = options => {
   const posNumbers = [];
@@ -36,6 +34,11 @@ class OptionInput extends React.Component {
     stepId: PropTypes.string.isRequired,
     callback: PropTypes.func.isRequired,
     withOptions: PropTypes.bool.isRequired,
+    workTeamId: PropTypes.string,
+  };
+
+  static defaultProps = {
+    workTeamId: null,
   };
 
   constructor(props) {
@@ -47,7 +50,10 @@ class OptionInput extends React.Component {
     this.handleSaving = this.handleSaving.bind(this);
     this.onBeforeNextStep = this.onBeforeNextStep.bind(this);
     this.handleDeletion = this.handleDeletion.bind(this);
+    this.register = this.register.bind(this);
+    this.triggerCb = this.triggerCb.bind(this);
     this.form = React.createRef();
+    this.storageKey = `optionDraft${props.workTeamId}`;
   }
 
   componentDidMount() {
@@ -80,13 +86,21 @@ class OptionInput extends React.Component {
     }
   }
 
-  handleAddOption() {
+  handleAddOption(values) {
     const { onAddOption } = this.props;
-    const { description } = this.state;
-    if (description) {
-      onAddOption({ description });
-      this.setState({ description: '' });
+    if (values) {
+      onAddOption({
+        description: values.find(val => val.name === 'body').value,
+        title: values.find(val => val.name === 'title').value,
+      });
+      this.setState({ description: '<p></p>', title: '' });
+      localStorage.removeItem(this.storageKey);
     }
+  }
+
+  triggerCb() {
+    const { dataCb } = this.state;
+    dataCb();
   }
 
   handleInputChange(e) {
@@ -101,6 +115,7 @@ class OptionInput extends React.Component {
     );
     if (onExit) {
       onExit([{ name: 'options', value: newOptions }]);
+      this.setState({ description: '', title: '' });
     }
   }
 
@@ -114,9 +129,13 @@ class OptionInput extends React.Component {
     }
   }
 
+  register(data, cb) {
+    this.setState({ dataCb: cb });
+  }
+
   render() {
     const { data, withOptions } = this.props;
-    const { description } = this.state;
+    const { description, title } = this.state;
     return (
       <FormValidation
         ref={this.form}
@@ -133,25 +152,23 @@ class OptionInput extends React.Component {
                     key={o.pos}
                     pos={o.pos}
                     description={o.description}
+                    title={o.title}
                     onSave={this.handleSaving}
                     onDelete={this.handleDeletion}
                   />
                 ))}
             </Box>
             <CheckBox disabled checked label="multiple choice" />
-            <div className={s.inputField}>
-              <Textarea
-                className={s.input}
-                placeholder="Enter some text"
-                name="option"
-                useCacheForDOMMeasurements
-                value={description}
-                onChange={this.handleInputChange}
-                minRows={2}
-              />
-            </div>
+            <ProposalBody
+              storageKey={this.storageKey}
+              onExit={this.handleAddOption}
+              callback={this.register}
+              data={{ body: description, title }}
+              withOptions
+            />
+
             {errorMessages.optionsError}
-            <Button onClick={this.handleAddOption} label="Add" />
+            <Button onClick={this.triggerCb} label="Add" />
           </Box>
         )}
       </FormValidation>
@@ -159,4 +176,4 @@ class OptionInput extends React.Component {
   }
 }
 
-export default withStyles(s)(OptionInput);
+export default OptionInput;

@@ -75,14 +75,16 @@ const InputPreview = ({
         onVote={() => {}}
         mode={{ withStatements, unipolar, thresholdRef }}
       />
-      <Box>
-        <Statement
-          onCreate={() => {}}
-          vote={fakeVote}
-          author={spokesman}
-          asInput
-        />
-      </Box>
+      {withStatements && (
+        <Box>
+          <Statement
+            onCreate={() => {}}
+            vote={fakeVote}
+            author={spokesman}
+            asInput
+          />
+        </Box>
+      )}
     </Box>
   );
 };
