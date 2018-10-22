@@ -454,7 +454,7 @@ class Proposal {
           );
         }
 
-        if (data.workTeamId) {
+        if (data.workTeamId && proposal.state !== 'survey') {
           await knex('work_teams')
             .transacting(trx)
             .forUpdate()
@@ -582,7 +582,7 @@ class Proposal {
           .del();
 
         // decrement counters
-        if (proposalInDB.workTeamId) {
+        if (proposalInDB.workTeamId && proposalInDB.state !== 'survey') {
           await knex('work_teams')
             .transacting(transaction)
             .forUpdate()
