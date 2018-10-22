@@ -9,9 +9,10 @@ class Vote {
   constructor(data) {
     this.id = data.id;
     this.userId = data.user_id;
-    this.position = data.position;
+    this.positions = data.positions;
     this.pollId = data.poll_id;
   }
+
   static async gen(viewer, id, loaders) {
     if (!id) return null;
     const data = await loaders.votes.load(id);
@@ -26,7 +27,7 @@ class Vote {
     if (!poll || !poll.isVotable()) return null;
 
     const proposal = await Proposal.genByPoll(viewer, poll.id, loaders);
-    if (!proposal || !await proposal.isVotable(viewer)) return null;
+    if (!proposal || !(await proposal.isVotable(viewer))) return null;
 
     const voteInDB = await knex('votes')
       .transacting(trx)
@@ -44,11 +45,16 @@ class Vote {
     if (!data.pollId) return null;
     const proposal = await Proposal.genByPoll(viewer, data.pollId, loaders);
     if (!canMutate(viewer, { ...data, proposal }, Models.VOTE)) return null;
-    const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
     let deletedStatement;
     let deletedVote;
     try {
       deletedVote = await knex.transaction(async trx => {
+        const [pollData] = await knex('polls')
+          .transacting(trx)
+          .forUpdate()
+          .where({ id: data.pollId })
+          .select('*');
+        const poll = new Poll(pollData);
         const oldVote = await Vote.validate(
           viewer,
           data,
@@ -57,21 +63,21 @@ class Vote {
           trx,
           true,
         );
-        if (!oldVote || !oldVote.position) throw Error('Request invalid!');
+        if (!oldVote || !oldVote.positions) throw Error('Request invalid!');
         // eslint-disable-next-line eqeqeq
         if (data.id != oldVote.id) throw Error('Request invalid!');
-        const newPosition = data.position === 1 ? 'pro' : 'con'; // dangerous?
-        if (newPosition !== oldVote.position) throw Error('Request invalid!');
+        if (data.positions[0].pos !== oldVote.positions[0].pos) {
+          // ???
+          throw Error('Request invalid!');
+        }
         // eslint-disable-next-line newline-per-chained-call
         // check if statements exists, check if it can be deleted (cascading)
-
-        let statementInDB = await knex('statements')
+        const [statementInDB = null] = await knex('statements')
           .transacting(trx)
           .forUpdate()
           .where({ vote_id: data.id })
           .select();
-        statementInDB = statementInDB[0] || {};
-        if (statementInDB.id) {
+        if (statementInDB) {
           if (statementInDB.deleted_at) {
             throw Error('Cannot be modified!');
           }
@@ -86,13 +92,25 @@ class Vote {
           .where({ id: data.id })
           .del();
         // update votecount
-        const columns = ['upvotes', 'downvotes'];
-        const index = newPosition === 'con' ? 1 : 0;
+
+        const updatedOptions = [];
+        // better allow only one position?
+        for (let i = 0; i < poll.options.length; i += 1) {
+          const option = poll.options[i];
+          if (option.pos === data.positions[0].pos) {
+            option.numVotes -= 1;
+          }
+          updatedOptions.push(option);
+        }
+
         await knex('polls')
           .transacting(trx)
           .forUpdate()
           .where({ id: data.pollId })
-          .decrement(columns[index], 1);
+          .update({
+            num_votes: poll.numVotes - 1,
+            options: JSON.stringify(updatedOptions),
+          });
         return oldVote;
       });
     } catch (e) {
@@ -129,33 +147,36 @@ class Vote {
     if (!data.pollId) return null;
     const proposal = await Proposal.genByPoll(viewer, data.pollId, loaders);
     if (!canMutate(viewer, { ...data, proposal }, Models.VOTE)) return null;
-    const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
-    if (await poll.isUnipolar(viewer, loaders)) {
-      return null; // delete is the right method
-    }
 
     let deletedStatement;
+    let poll;
+    let oldVote;
     try {
       await knex.transaction(async trx => {
-        const oldVote = await Vote.validate(
-          viewer,
-          data,
-          loaders,
-          poll,
-          trx,
-          true,
-        );
-        if (!oldVote || !oldVote.position) throw Error('Position mismatch');
+        const [pollData = null] = await knex('polls')
+          .transacting(trx)
+          .forUpdate()
+          .where({ id: data.pollId })
+          .select();
+        poll = new Poll(pollData);
+        if (await poll.isUnipolar(viewer, loaders)) {
+          throw new Error('Poll is unipolar'); // delete is the right method
+        }
+        oldVote = await Vote.validate(viewer, data, loaders, poll, trx, true);
+        if (!oldVote || !oldVote.positions) {
+          /* if (oldVote.positions[0].pos === data.positions[0].pos)
+            throw Error('Position mismatch');
+            */
+        }
         // eslint-disable-next-line eqeqeq
         if (data.id != oldVote.id) throw Error('Id mismatch');
 
-        let statementInDB = await knex('statements')
+        const [statementInDB = null] = await knex('statements')
           .transacting(trx)
           .forUpdate()
           .where({ vote_id: data.id })
           .select();
-        statementInDB = statementInDB[0] || {};
-        if (statementInDB.id) {
+        if (statementInDB) {
           if (statementInDB.deleted_at) {
             throw Error('Cannot be modified!');
           }
@@ -169,31 +190,104 @@ class Vote {
             .del();
         }
 
-        const newPosition = data.position === 1 ? 'pro' : 'con'; // dangerous?
-        if (newPosition === oldVote.position) throw Error('Request invalid');
+        const updatedData = { updated_at: new Date() };
+        if (data.positions) {
+          const oldPositions = oldVote.positions.reduce((obj, position) => {
+            // eslint-disable-next-line
+            obj[position.pos] = position;
+            return obj;
+          }, {});
+
+          const dataPositions = data.positions.reduce((obj, position) => {
+            // eslint-disable-next-line
+            obj[position.pos] = position;
+            return obj;
+          }, {});
+
+          // if not extended or not multiple choice
+          let newPositions;
+          if (!poll.extended || !poll.multipleChoice) {
+            // check which option was already voted, clear it and mark new option
+            const votePosition = data.positions.find(
+              position => position.value,
+            );
+            newPositions = poll.options.reduce((obj, option) => {
+              if (votePosition.pos === option.pos) {
+                obj.push(votePosition);
+              }
+              return obj;
+            }, []);
+          } else {
+            newPositions = poll.options.reduce((obj, option) => {
+              if (oldPositions[option.pos]) {
+                // position exists
+                if (dataPositions[option.pos]) {
+                  // take new
+                  if (dataPositions[option.pos].value) {
+                    obj.push(dataPositions[option.pos]);
+                  }
+                } else {
+                  obj.push(oldPositions[option.pos]);
+                }
+              } else if (dataPositions[option.pos]) {
+                if (dataPositions[option.pos].value) {
+                  obj.push(dataPositions[option.pos]);
+                }
+              }
+              return obj;
+            }, []);
+          }
+
+          if (!newPositions.length) {
+            throw new Error('Position missing');
+          }
+          updatedData.positions = JSON.stringify(newPositions);
+        }
+
         // eslint-disable-next-line newline-per-chained-call
         await knex('votes')
           .transacting(trx)
           .forUpdate()
           .where({ id: data.id })
-          .update({
-            position: newPosition,
-            updated_at: new Date(),
-          });
+          .update(updatedData);
         // update votecount
-        const columns = ['upvotes', 'downvotes'];
-        let index = newPosition === 'con' ? 1 : 0;
+        const updatedOptions = [];
+        // better allow only one position?
+        for (let i = 0; i < poll.options.length; i += 1) {
+          const option = poll.options[i];
+          if (poll.extended) {
+            if (poll.multipleChoice) {
+              if (option.pos === data.positions[0].pos) {
+                option.numVotes = data.positions[0].value
+                  ? option.numVotes + 1
+                  : option.numVotes - 1;
+              }
+            } else {
+              // get new vote position, count up, get old position, count down
+              if (option.pos === data.positions[0].pos) {
+                option.numVotes += 1;
+              }
+              if (option.pos === oldVote.positions[0].pos) {
+                // only one bc not multiplechoice
+                option.numVotes -= 1;
+              }
+            }
+          } else if (
+            option.pos === data.positions[0].pos &&
+            data.positions[0].value
+          ) {
+            option.numVotes += 1;
+          } else {
+            option.numVotes -= 1;
+          }
+          updatedOptions.push(option);
+        }
 
         await knex('polls')
           .transacting(trx)
           .forUpdate()
           .where({ id: data.pollId })
-          .increment(columns[index], 1);
-        await knex('polls')
-          .transacting(trx)
-          .forUpdate()
-          .where({ id: data.pollId })
-          .decrement(columns[(index = 1 - index)], 1);
+          .update({ options: JSON.stringify(updatedOptions) });
       });
     } catch (e) {
       return { updatedVote: null, deletedStatement: null };
@@ -202,7 +296,14 @@ class Vote {
     if (vote) {
       EventManager.publish('onVoteUpdated', {
         viewer,
-        vote,
+        vote: {
+          id: data.id,
+          pollId: data.pollId,
+          positions: data.positions,
+          userId: viewer.id,
+          extended: poll.extended,
+          ...(poll.extended ? { positionAdded: data.positions[0].value } : {}),
+        }, // or save only voteInput
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },
@@ -235,26 +336,29 @@ class Vote {
 
     if (!canMutate(viewer, { ...data, proposal }, Models.VOTE)) return null;
 
-    const poll = await Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
+    if (!proposal || !(await proposal.isVotable(viewer))) return null;
 
-    if (!poll || !poll.isVotable()) return null;
-
-    if (!proposal || !await proposal.isVotable(viewer)) return null;
-
-    let position = data.position === 1 ? 'pro' : 'con';
-
-    if (await poll.isUnipolar(viewer, loaders)) {
-      position = 'pro';
-    }
     let newVoteId;
+    let poll;
     try {
+      let positions = JSON.stringify(data.positions);
       newVoteId = await knex.transaction(async trx => {
-        const voteInDB = await knex('votes') // TODO prob. superflue bc constraint
+        const [pollData] = await knex('polls')
+          .transacting(trx)
+          .forUpdate()
+          .where({ id: data.pollId })
+          .select(); // Poll.gen(viewer, data.pollId, loaders); // auth should happen here ...
+        poll = new Poll(pollData);
+        if (!poll || !poll.isVotable()) throw new Error('Poll error');
+        if (await poll.isUnipolar(viewer, loaders)) {
+          positions = JSON.stringify([{ pos: 0, value: 1 }]);
+        }
+        /*    const voteInDB = await knex('votes') // TODO prob. superflue bc constraint
           .transacting(trx)
           .forUpdate()
           .where({ poll_id: data.pollId, user_id: viewer.id })
           .pluck('id');
-        if (voteInDB.length !== 0) throw Error('Already voted!');
+        if (voteInDB.length !== 0) throw Error('Already voted!'); */
         const id = await knex('votes')
           .transacting(trx)
           .forUpdate()
@@ -262,7 +366,7 @@ class Vote {
             {
               user_id: viewer.id,
               poll_id: data.pollId,
-              position,
+              positions,
               created_at: new Date(),
             },
             'id',
@@ -270,13 +374,27 @@ class Vote {
         if (id.length === 0) throw Error('No Id returned');
         // update votecount;
         // TODO these updates are sequential - can db-ops be parallel in transactions?
-        const columns = ['upvotes', 'downvotes'];
-        const index = position === 'con' ? 1 : 0;
+
+        const updatedOptions = [];
+        // better allow only one position?
+        for (let i = 0; i < poll.options.length; i += 1) {
+          const option = poll.options[i];
+          if (option.pos === data.positions[0].pos && data.positions[0].value) {
+            option.numVotes += 1;
+          }
+          updatedOptions.push(option);
+        }
         await knex('polls')
           .transacting(trx)
           .forUpdate()
           .where({ id: data.pollId })
-          .increment(columns[index], 1);
+          // OR with jsonb?
+          // https://stackoverflow.com/questions/25957937/how-to-increment-value-in-postgres-update-statement-on-json-key
+          // SET data = jsonb_set(data, '{bar}', (COALESCE(data->>'bar','0')::int + 1)::text::jsonb)
+          .update({
+            num_votes: poll.numVotes + 1,
+            options: JSON.stringify(updatedOptions),
+          });
         return id[0];
       });
     } catch (e) {
@@ -287,7 +405,8 @@ class Vote {
     if (newVote) {
       EventManager.publish('onVoteCreated', {
         viewer,
-        vote: newVote,
+        vote: { ...newVote, extended: poll.extended },
+
         ...(proposal.workTeamId && {
           groupId: proposal.workTeamId,
           info: { workTeamId: proposal.workTeamId },

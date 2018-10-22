@@ -1,32 +1,28 @@
+// @flow
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import s from './ProposalActions.css';
-import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 import KeyValueRow from './KeyValueRow';
 import {
   getProposal,
-  getIsProposalFetching,
-  getProposalErrorMessage,
-  getProposalSuccess,
+  getProposalUpdates,
+  getSessionUser,
 } from '../../reducers';
 import Box from '../Box';
 import Button from '../Button';
 import Accordion from '../Accordion';
 import AccordionPanel from '../AccordionPanel';
-import PollInput from '../PollInput';
-import {
-  createValidator,
-  dateToValidation,
-  timeToValidation,
-} from '../../core/validation';
 import Notification from '../Notification';
 import Label from '../Label';
 import PollState from '../PollState';
 import Heading from '../Heading';
+import PhaseTwoWizard from './PhaseTwoWizard';
+import type { PollTypeTypes, PollSettingsShape } from '../ProposalInput';
+import withPollSettings from '../ProposalInput/withPollSettings';
 
+const WizardWithSettings = withPollSettings(PhaseTwoWizard, ['voting']);
 const messages = defineMessages({
   confirmation: {
     id: 'confirmation',
@@ -66,40 +62,49 @@ const messages = defineMessages({
   },
 });
 
-const formFields = ['dateTo', 'timeTo'];
 const isThresholdPassed = poll => {
   let ref;
+  if (poll.extended) {
+    return false;
+  }
   const tRef = poll.mode.thresholdRef;
+  const upvotes = poll.options[0].numVotes;
+  const downvotes = poll.options[1] ? poll.options[1].numVotes : 0;
   switch (tRef) {
     case 'voters':
-      ref = poll.upvotes + poll.downvotes;
+      ref = upvotes + downvotes;
       break;
     case 'all':
       ref = poll.allVoters;
       break;
 
     default:
-      throw Error(`Threshold reference not implemented: ${tRef}`);
+      throw Error(
+        `Threshold reference not implemented: ${tRef || 'undefined'}`,
+      );
   }
   ref *= poll.threshold / 100;
-  return poll.upvotes >= ref;
+  return upvotes ? upvotes >= ref : false;
 };
-class ProposalActions extends React.Component {
-  static propTypes = {
-    updateProposal: PropTypes.func.isRequired,
-    defaultPollValues: PropTypes.shape({}).isRequired,
-    pollOptions: PropTypes.shape({}).isRequired,
-    intl: PropTypes.shape({}).isRequired,
-    onFinish: PropTypes.func.isRequired,
-    error: PropTypes.shape({}),
-    proposal: PropTypes.shape({
-      id: PropTypes.string,
-      workTeamId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    }).isRequired,
-    pending: PropTypes.bool,
-    success: PropTypes.bool,
-  };
+type Props = {
+  updateProposal: () => Promise<boolean>,
+  pollOptions: PollTypeTypes[],
+  updates: {
+    isFetching: boolean,
+    errorMessage?: string,
+    success: boolean,
+  },
+  onFinish: () => void,
+  proposal: ProposalShape,
+  defaultPollSettings: { [PollTypeTypes]: PollSettingsShape },
+  availablePolls: PollTypeTypes[],
+  user: UserShape,
+};
 
+type State = {
+  error: boolean,
+};
+class ProposalActions extends React.Component<Props, State> {
   static defaultProps = {
     error: null,
     pending: false,
@@ -108,104 +113,25 @@ class ProposalActions extends React.Component {
 
   constructor(props) {
     super(props);
-    this.handleValueChanges = this.handleValueChanges.bind(this);
-    this.handleOnSubmit = this.handleOnSubmit.bind(this);
     this.handleStateChange = this.handleStateChange.bind(this);
-    this.toggleSettings = this.toggleSettings.bind(this);
-    this.handleValidation = this.handleValidation.bind(this);
-    this.handleBlur = this.handleBlur.bind(this);
-    this.visibleErrors = this.visibleErrors.bind(this);
     this.state = {
-      settings: { pollOption: { value: '2' } },
       error: false,
-      errors: {
-        dateTo: {
-          touched: false,
-        },
-        timeTo: {
-          touched: false,
-        },
-      },
     };
-    const testValues = {
-      dateTo: { fn: 'date' },
-      timeTo: { fn: 'time' },
-    };
-    this.Validator = createValidator(
-      testValues,
-      {
-        date: dateToValidation,
-        time: timeToValidation,
-      },
-      this,
-      obj => obj.state.settings,
-    );
   }
 
-  componentWillReceiveProps({ success, error }) {
-    const { onFinish, error: errorMessage } = this.props;
-    if (success === true) {
-      onFinish();
-    }
-    if (error) {
-      this.setState({ error: !errorMessage });
-    }
-  }
-
-  handleValidation(fields) {
-    const validated = this.Validator(fields);
-    this.setState(prevState => ({
-      errors: { ...prevState.errors, ...validated.errors },
-    }));
-    return validated.failed === 0;
-  }
-
-  handleBlur(e) {
-    const field = e.target.name;
-    const { settings } = this.state;
-    if (settings[field]) {
-      this.handleValidation([field]);
-    }
-  }
-
-  visibleErrors(errorNames) {
-    const { errors } = this.state;
-    return errorNames.reduce((acc, curr) => {
-      const err = `${curr}Error`;
-      if (errors[curr].touched) {
-        acc[err] = <FormattedMessage {...messages[errors[curr].errorName]} />;
+  componentDidUpdate(prevProps) {
+    const { updates, onFinish } = this.props;
+    if (prevProps.updates !== updates) {
+      if (updates.success) {
+        onFinish();
+      } else if (updates.errorMessage) {
+        // eslint-disable-next-line react/no-did-update-set-state
+        this.setState({ error: !!updates.errorMessage });
       }
-      return acc;
-    }, {});
-  }
-
-  handleValueChanges(e) {
-    let value;
-    switch (e.target.name) {
-      case 'dateTo':
-      case 'dateFrom':
-      case 'timeFrom':
-      case 'timeTo':
-      case 'threshold':
-      case 'thresholdRef':
-      case 'pollOption': {
-        value = e.target.value; // eslint-disable-line
-        break;
-      }
-      case 'withStatements':
-      case 'unipolar':
-      case 'secret': {
-        value = e.target.checked;
-        break;
-      }
-
-      default:
-        throw Error(`Element not recognized: ${e.target.name}`);
     }
-    this.setState(prevState => ({
-      settings: { ...prevState.settings, [e.target.name]: value },
-    }));
   }
+
+  handleStateChange: () => void;
 
   handleStateChange() {
     const {
@@ -220,64 +146,6 @@ class ProposalActions extends React.Component {
         workTeamId,
       }),
     });
-  }
-
-  handleOnSubmit() {
-    // TODO sanitize input
-    // TODO refactor - is the same as in ProposalsInput
-
-    if (this.handleValidation(formFields)) {
-      const {
-        settings: {
-          dateTo,
-          timeTo,
-          pollOption,
-          withStatements,
-          secret,
-          threshold,
-          thresholdRef,
-          unipolar,
-        },
-      } = this.state;
-      const {
-        updateProposal,
-        proposal: { id, defaultPollValues, workTeamId },
-      } = this.props;
-      const startTime = null;
-      let endTime = null;
-
-      if (dateTo || timeTo) {
-        const date = dateTo || utcCorrectedDate(3).slice(0, 10);
-        const time = timeTo || utcCorrectedDate().slice(11, 16);
-
-        endTime = concatDateAndTime(date, time);
-      }
-
-      updateProposal({
-        id,
-        poll: {
-          startTime,
-          endTime,
-          secret,
-          threshold: threshold || defaultPollValues[pollOption.value].threshold,
-          mode: {
-            withStatements,
-            id: pollOption.value,
-            unipolar,
-            thresholdRef,
-          },
-        },
-        ...(workTeamId && {
-          workTeamId,
-        }),
-      });
-    }
-  }
-
-  toggleSettings() {
-    this.setState(prevState => ({
-      displaySettings: !prevState.displaySettings,
-    }));
   }
 
   renderPollState() {
@@ -295,8 +163,8 @@ class ProposalActions extends React.Component {
           <PollState
             compact
             allVoters={pollOne.allVoters}
-            upvotes={pollOne.upvotes}
-            downvotes={pollOne.downvotes}
+            upvotes={pollOne.options[0].numVotes}
+            downvotes={pollOne.options[1] && pollOne.options[1].numVotes}
             thresholdRef={pollOne.mode.thresholdRef}
             threshold={pollOne.threshold}
             unipolar={pollOne.mode.unipolar}
@@ -310,13 +178,11 @@ class ProposalActions extends React.Component {
 
   renderActions() {
     const {
-      defaultPollValues,
-      pending,
-      pollOptions,
-      intl,
-      proposal: { pollOne, state },
+      updates = {},
+      proposal: { pollOne, state, id, workTeamId },
+      updateProposal,
+      user,
     } = this.props;
-    const { settings, displaySettings } = this.state;
     const actions = [];
     if (!pollOne.closedAt) {
       actions.push(
@@ -329,7 +195,7 @@ class ProposalActions extends React.Component {
         >
           <Box pad column justify>
             <Button
-              disabled={pending}
+              disabled={updates.isFetching}
               onClick={this.handleStateChange}
               primary
               label={
@@ -346,27 +212,14 @@ class ProposalActions extends React.Component {
     if (state !== 'survey') {
       actions.push(
         <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
-          <Box column pad>
-            <PollInput
-              onValueChange={this.handleValueChanges}
-              handleDateChange={this.handleValueChanges}
-              selectedPMode={settings.pollOption}
-              displaySettings={displaySettings}
-              defaultPollValues={defaultPollValues}
-              pollValues={settings}
-              toggleSettings={this.toggleSettings}
-              pollOptions={pollOptions}
-              intl={intl}
-              formErrors={this.visibleErrors(formFields)}
-              handleBlur={this.handleBlur}
+          <Box column>
+            <WizardWithSettings
+              workTeamId={workTeamId}
+              proposalId={id}
+              defaultPollType="voting"
+              user={user}
+              onUpdate={updateProposal}
             />
-            <Button
-              disabled={pending}
-              label={<FormattedMessage {...messages.open} />}
-              primary
-              onClick={this.handleOnSubmit}
-            />
-            {/* <button onClick={this.handleOnSubmit}>START PHASE 2 </button>{' '} */}
           </Box>
         </AccordionPanel>,
       );
@@ -393,21 +246,30 @@ class ProposalActions extends React.Component {
     const {
       proposal: { pollOne, state },
     } = this.props;
-    const details = [<KeyValueRow name="Upvotes" value={pollOne.upvotes} />];
+    const details = [
+      <KeyValueRow name="Upvotes" value={pollOne.options[0].numVotes} />,
+    ];
 
     if (state === 'survey') {
-      details.push(<KeyValueRow name="Downvotes" value={pollOne.downvotes} />);
+      details.push(
+        <KeyValueRow name="Downvotes" value={pollOne.options[1].numVotes} />,
+      );
     } else {
       const numVotersForThreshold = Math.ceil(
         (pollOne.allVoters * pollOne.threshold) / 100,
       );
-      details.push(
-        <KeyValueRow name="Threshold (votes)" value={numVotersForThreshold} />,
-        <KeyValueRow
-          name="Votes left for threshold"
-          value={numVotersForThreshold - pollOne.upvotes}
-        />,
-      );
+      if (pollOne.options[0]) {
+        details.push(
+          <KeyValueRow
+            name="Threshold (votes)"
+            value={numVotersForThreshold}
+          />,
+          <KeyValueRow
+            name="Votes left for threshold"
+            value={numVotersForThreshold - pollOne.options[0].numVotes}
+          />,
+        );
+      }
     }
     if (!pollOne.closedAt) {
       details.push(
@@ -435,7 +297,10 @@ class ProposalActions extends React.Component {
   }
 
   render() {
-    const { error: errorMessage, proposal } = this.props;
+    const {
+      updates: { errorMessage },
+      proposal,
+    } = this.props;
     const { error } = this.state;
 
     return (
@@ -458,10 +323,9 @@ class ProposalActions extends React.Component {
 }
 
 const mapStateToProps = (state, { id }) => ({
-  success: getProposalSuccess(state, id),
-  pending: getIsProposalFetching(state, id),
-  error: getProposalErrorMessage(state, id),
+  updates: getProposalUpdates(state, id),
   proposal: getProposal(state, id),
+  user: getSessionUser(state),
 });
 
 export default connect(mapStateToProps)(withStyles(s)(ProposalActions));

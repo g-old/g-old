@@ -90,7 +90,7 @@ export function dateToValidation(date) {
     if (testDate < referenceDate) {
       result = {
         touched: true,
-        errorName: 'past',
+        errorName: 'dateTime',
       };
     }
   }
@@ -112,7 +112,7 @@ export function timeToValidation(time, { dateTo }) {
     if (endTime < new Date()) {
       result = {
         touched: true,
-        errorName: 'past',
+        errorName: 'dateTime',
       };
     }
   }

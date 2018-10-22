@@ -15,7 +15,59 @@ import { requestFields } from './request';
 import { messageFields } from './message';
 import { genActivityPageKey } from '../reducers/pageInfo';
 import { workTeamFields } from './workTeam';
+import { statementFields } from './statement';
+import { voteFields } from './vote';
+import { discussionFields } from './discussion';
 
+export const objectFields = `
+__typename
+... on Request {
+  ${requestFields}
+}
+... on Message {
+  ${messageFields}
+  recipientType
+  recipients{
+    ... on User{
+      ${userFields}
+    }
+    ... on WorkTeam{
+      ${workTeamFields}
+    }
+  }
+}
+... on User {
+  ${userFields}
+}
+... on Discussion {
+  ${discussionFields}
+}
+... on Comment {
+  ${commentFields}
+}
+... on ProposalDL {
+  id
+  title
+  publishedAt
+  state
+  body
+  votes
+  workTeamId
+  deletedAt
+  pollOne {
+    ${pollFieldsForList}
+  }
+  pollTwo {
+    ${pollFieldsForList}
+  }
+}
+... on StatementDL {
+  ${statementFields}
+}
+... on VoteDL {
+  ${voteFields}
+}
+`;
 const activityConnection = `
 query($first:Int, $after:String, $filter:ActivityFilter){
   activityConnection(first:$first after:$after, filterBy:$filter){
@@ -26,103 +78,17 @@ query($first:Int, $after:String, $filter:ActivityFilter){
     edges{
       node{
         id
-  type
-  objectId
-  verb
-  info
-  createdAt
-  actor {
-    id
-    name
-    surname
-    thumbnail
-  }
-  object {
-    __typename
-    ... on Request {
-      ${requestFields}
-    }
-    ... on Message {
-      ${messageFields}
-      recipientType
-      recipients{
-        ... on User{
+        type
+        objectId
+        verb
+        info
+        createdAt
+        actor {
           ${userFields}
         }
-        ... on WorkTeam{
-          ${workTeamFields}
+        object {
+         ${objectFields}
         }
-      }
-    }
-    ... on User {
-      ${userFields}
-    }
-    ... on Discussion {
-      id
-      createdAt
-      title
-      numComments
-      closedAt
-      content
-      deletedAt
-      author{
-        ${userFields}
-      }
-
-    }
-
-    ... on Comment {
-      ${commentFields}
-    }
-    ... on ProposalDL {
-      id
-      title
-      publishedAt
-      state
-      body
-      votes
-      workTeamId
-      deletedAt
-      pollOne {
-        ${pollFieldsForList}
-      }
-      pollTwo {
-        ${pollFieldsForList}
-
-      }
-    }
-    ... on StatementDL {
-      id
-      likes
-      text
-      pollId
-      createdAt
-      updatedAt
-      vote{
-        id
-        position
-      }
-      author{
-        id
-        name
-        surname
-        thumbnail
-      }
-
-    }
-    ... on VoteDL {
-      id
-      position
-      pollId
-      voter{
-        id
-        name
-        surname
-        thumbnail
-      }
-    }
-
-  }
       }
     }
   }

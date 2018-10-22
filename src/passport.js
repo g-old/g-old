@@ -32,7 +32,7 @@ passport.use(
     },
     (emailField, password, done) => {
       if (typeof emailField !== 'string' || emailField.length > 254) {
-        done(null, false);
+        return done(null, false);
       }
       const email = emailField.trim().toLowerCase();
       return knex('users')
@@ -53,7 +53,8 @@ passport.use(
         .then(userData => {
           const user = userData[0];
           if (!user) {
-            return done(null, false);
+            done(null, false);
+            return null;
           }
           return verifyUser(user, password).then(verified => {
             if (verified) {

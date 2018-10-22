@@ -52,7 +52,6 @@ const LogType = new GraphQLObjectType({
               deleted_at: s.deletedAt,
               updated_at: s.updatedAt,
               likes: s.likes,
-              position: s.position,
               vote_id: s.voteId,
               body: s.text,
             });
@@ -62,7 +61,7 @@ const LogType = new GraphQLObjectType({
             return new Vote({
               id: parent.content.id,
               user_id: parent.content.userId,
-              position: parent.content.position,
+              positions: parent.content.positions,
               poll_id: parent.content.pollId,
             });
           }
@@ -127,6 +126,12 @@ const LogType = new GraphQLObjectType({
             changedValue: parent.content.changedValue,
             diff: parent.content.diff,
             added: parent.content.added,
+          });
+        }
+        if (parent.type === ActivityType.VOTE) {
+          return JSON.stringify({
+            extended: parent.content.extended,
+            positionAdded: parent.content.positionAdded,
           });
         }
         return JSON.stringify({});

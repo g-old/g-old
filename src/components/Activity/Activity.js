@@ -205,8 +205,9 @@ class Activity extends React.Component {
 
   renderVote(info) {
     const {
-      content: { position, pollId, voter },
+      content: { positions, pollId, voter },
     } = this.props;
+    /* eslint-disable no-nested-ternary */
     const thumb = (
       <svg
         viewBox="0 0 24 24"
@@ -217,25 +218,43 @@ class Activity extends React.Component {
       >
         <path
           fill="none"
-          stroke={position === 'pro' ? '#8cc800' : '#ff324d'}
+          stroke={
+            info.extended
+              ? '#8cc800'
+              : positions[0].pos === 0
+                ? '#8cc800'
+                : '#ff324d'
+          }
           strokeWidth="2"
           d={ICONS.thumbUpAlt}
-          transform={position === 'pro' ? '' : 'scale(1,-1) translate(0,-24)'}
+          transform={
+            info.extended
+              ? ''
+              : positions[0].pos === 0
+                ? ''
+                : 'scale(1,-1) translate(0,-24)'
+          }
         />
       </svg>
     );
-    return (
-      <Link // eslint-disable-line
-        to={`/proposal/${info.proposalId || 'xxx'}/${pollId}`}
-      >
-        <div className={s.follower}>
-          <span>
-            <Avatar user={voter} isFollowee />
-            <span>{`${voter.name} ${voter.surname}`}</span>
-          </span>
+    /* eslint-enable no-nested-ternary */
 
-          {thumb}
-        </div>
+    return (
+      <Link
+        to={`/proposal/${
+          info.proposalId || 'xxx' // eslint-disable-line
+        }/${pollId}`}
+      >
+        {voter && (
+          <div className={s.follower}>
+            <span>
+              <Avatar user={voter} isFollowee />
+              <span>{`${voter.name} ${voter.surname}`}</span>
+            </span>
+
+            {thumb}
+          </div>
+        )}
       </Link>
     );
   }

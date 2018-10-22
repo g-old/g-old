@@ -219,18 +219,23 @@ const getStatementLikesById = likeIds =>
   });
 
 const getActivitiesById = activityIds =>
-  new Promise(resolve => {
+  new Promise((resolve, reject) => {
     knex('activities')
       .whereIn('id', activityIds)
       .select()
-      .then(data =>
-        resolve(
-          activityIds.map(
-            id =>
-              data.find(row => row.id == id) || // eslint-disable-line eqeqeq
-              new Error(`Row not found: ${id}`),
+      .then(
+        data =>
+          resolve(
+            activityIds.map(
+              id =>
+                // eslint-disable-next-line
+                data.find(row => row.id == id) ||
+                new Error(`Row not found: ${id}`),
+            ),
           ),
-        ),
+        e => {
+          reject(e);
+        },
       );
   });
 

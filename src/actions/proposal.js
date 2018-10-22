@@ -23,9 +23,10 @@ import {
   proposalList as proposalListSchema,
   tagArray as tagArraySchema,
 } from '../store/schema';
-import { getProposalsIsFetching, getIsProposalFetching } from '../reducers';
+import { getProposalsIsFetching, getProposalUpdates } from '../reducers';
 import { getFilter } from '../core/helpers';
 import { subscriptionFields } from './subscription';
+import { voteFields } from './vote';
 
 const userFields = `
         id
@@ -34,14 +35,6 @@ const userFields = `
         thumbnail
 `;
 
-const voteFields = `
-    id
-    position
-    pollId
-    voter{
-      ${userFields}
-    }
-`;
 const statementFields = `
     id
     likes
@@ -51,20 +44,43 @@ const statementFields = `
     updatedAt
     deletedAt
     vote{
-      id
-      position
-      voter{
-       ${userFields}
-      }
-      pollId
+      ${voteFields}
     }
     author{
       ${userFields}
     }
 
 `;
-const pollFields = `{
+const optionFields = `
+pos
+order
+description
+numVotes
+title
+`;
+export const pollFieldsForList = `
   id
+  options{
+    ${optionFields}
+  }
+  threshold
+  extended
+  multipleChoice
+  startTime
+  endTime
+  allVoters
+  numVotes
+  closedAt
+  mode{
+    id
+    withStatements
+    unipolar
+    thresholdRef
+  }
+
+`;
+const pollFields = `{
+  ${pollFieldsForList}
   likedStatements{
     id
     statementId
@@ -73,21 +89,8 @@ const pollFields = `{
     ${voteFields}
   }
   ownStatement {${statementFields} deletedAt}
-  upvotes
-  downvotes
-  threshold
-  closedAt
-  start_time
-  endTime
-  allVoters
   followees{
     ${voteFields}
-  }
-  mode{
-    id
-    withStatements
-    unipolar
-    thresholdRef
   }
   statements {${statementFields}}
 }
@@ -125,27 +128,10 @@ const query = `
   }
 `;
 
-export const pollFieldsForList = `
-  id
-  upvotes
-  downvotes
-  threshold
-  start_time
-  endTime
-  allVoters
-  closedAt
-  mode{
-    id
-    withStatements
-    unipolar
-    thresholdRef
-  }
-
-`;
-
 const tagsQuery = `
 query{
   tags{
+    displayName
     id
     text
     count
@@ -216,7 +202,7 @@ export function loadProposal({ id, pollId }) {
     // Dont fetch if pending
     const state = await getState();
     if (process.env.BROWSER) {
-      if (id && getIsProposalFetching(state, id)) {
+      if (id && getProposalUpdates(state, id).isFetching) {
         return false;
       }
     }
@@ -262,13 +248,9 @@ export function loadProposalsList({
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
     // Dont fetch if pending
-    const reduxState = await getState();
-    if (!reduxState) {
-      console.error('REDUX IS NOT READY!', { state, first, after });
-      return false;
-    }
+
     if (process.env.BROWSER) {
-      if (getProposalsIsFetching(reduxState, state)) {
+      if (getProposalsIsFetching(getState(), state)) {
         return false;
       }
     }
@@ -329,7 +311,8 @@ export function createProposal(proposalData) {
     const virtualId = '0000';
     if (process.env.BROWSER) {
       const state = getState();
-      const isPending = getIsProposalFetching(state, virtualId);
+      const updates = getProposalUpdates(state, virtualId);
+      const isPending = updates.isFetching;
 
       if (isPending) {
         return false;

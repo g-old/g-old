@@ -20,8 +20,9 @@ import {
   //  tagArray as tagArraySchema,
 } from '../store/schema';
 import { getIsDiscussionFetching, getDiscussionUpdates } from '../reducers';
+import { userFields } from './user';
 
-const discussionFields = `
+export const discussionFields = `
   id
   title
   createdAt
@@ -29,14 +30,12 @@ const discussionFields = `
   deletedAt
   numComments
   workTeamId
+  content
+  author{
+    ${userFields}
+  }
 `;
 
-const authorFields = `
-id
-name
-surname
-thumbnail
-        `;
 const discussionConnection = `query($first:Int, $after:String, $workteamId:ID $closed:Boolean){
   discussionConnection(first:$first after:$after, workteamId:$workteamId closed:$closed){
     pageInfo{
@@ -53,10 +52,7 @@ const discussionConnection = `query($first:Int, $after:String, $workteamId:ID $c
 
 const discussionFragment = `
 ${discussionFields}
-  content
-  author{
-    ${authorFields}
-  }
+
   workTeam{
     id
     displayName
@@ -71,7 +67,7 @@ ${discussionFields}
     createdAt
     editedAt
     author{
-      ${authorFields}
+      ${userFields}
     }
   }`;
 const discussionQuery = `query($id:ID $parentId:ID){

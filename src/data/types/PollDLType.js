@@ -17,6 +17,7 @@ import StatementLike from '../models/StatementLike';
 import Vote from '../models/Vote';
 import knex from '../knex';
 import PollingMode from '../models/PollingMode';
+import OptionType from './OptionType';
 
 const PollType = new ObjectType({
   name: 'PollDL',
@@ -31,7 +32,7 @@ const PollType = new ObjectType({
     endTime: {
       type: GraphQLString,
     },
-    start_time: {
+    startTime: {
       type: GraphQLString,
     },
     closedAt: {
@@ -52,6 +53,19 @@ const PollType = new ObjectType({
             .then(id => (id[0] ? Vote.gen(viewer, id[0], loaders) : null)),
         );
       },
+    },
+    options: {
+      type: new GraphQLList(OptionType),
+    },
+    extended: {
+      type: GraphQLBoolean,
+    },
+    multipleChoice: {
+      type: GraphQLBoolean,
+    },
+
+    numVotes: {
+      type: GraphQLInt,
     },
     likedStatements: {
       type: new GraphQLList(StatementLikeType),
@@ -87,12 +101,6 @@ const PollType = new ObjectType({
     allVoters: {
       type: GraphQLInt,
       resolve: data => data.numVoter,
-    },
-    upvotes: {
-      type: GraphQLInt,
-    },
-    downvotes: {
-      type: GraphQLInt,
     },
     followees: {
       type: new GraphQLList(VoteType),

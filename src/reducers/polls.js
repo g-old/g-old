@@ -35,40 +35,89 @@ const updatePolls = (state, action) => {
       (agg, curr) => {
         const vote = action.payload.entities.votes[curr];
         if (state[vote.pollId]) {
-          if (vote.position === 'pro') {
-            /* eslint-disable no-param-reassign */
-            if (updateVote) {
-              agg[vote.pollId] = {
-                ...state[vote.pollId],
-                upvotes: state[vote.pollId].upvotes + 1,
-                downvotes: state[vote.pollId].downvotes - 1,
-              };
-            } else {
-              agg[vote.pollId] = {
-                ...state[vote.pollId],
-                upvotes: deleteVote
-                  ? state[vote.pollId].upvotes - 1
-                  : state[vote.pollId].upvotes + 1,
-              };
+          const newOptions = [];
+          const { options, extended } = state[vote.pollId];
+          if (extended) {
+            for (let i = 0; i < options.length; i += 1) {
+              const option = options[i];
+              if (vote.positions[0].pos === option.pos) {
+                if (deleteVote) {
+                  newOptions.push({ ...option, numVotes: option.numVotes - 1 });
+                } else if (vote.positions[0].value) {
+                  newOptions.push({
+                    ...option,
+                    numVotes: option.numVotes + 1,
+                  });
+                } else {
+                  newOptions.push({
+                    ...option,
+                    numVotes: option.numVotes - 1,
+                  });
+                }
+              } else {
+                newOptions.push(option);
+              }
             }
-          } else if (updateVote) {
-            agg[vote.pollId] = {
-              ...state[vote.pollId],
-              upvotes: state[vote.pollId].upvotes - 1,
-              downvotes: state[vote.pollId].downvotes + 1,
-            };
           } else {
-            // eslint-disable-next-line no-param-reassign
-            agg[vote.pollId] = {
-              ...state[vote.pollId],
-              downvotes: deleteVote
-                ? state[vote.pollId].downvotes - 1
-                : state[vote.pollId].downvotes + 1,
-            };
+            for (let i = 0; i < options.length; i += 1) {
+              const option = options[i];
+              if (vote.positions[0].pos === 0) {
+                // upvote
+                if (updateVote) {
+                  if (option.pos === vote.positions[0].pos) {
+                    newOptions.push({
+                      ...option,
+                      numVotes: option.numVotes + 1,
+                    });
+                  } else {
+                    newOptions.push({
+                      ...option,
+                      numVotes: option.numVotes - 1,
+                    });
+                  }
+                } else if (option.pos === vote.positions[0].pos) {
+                  newOptions.push({
+                    ...option,
+                    numVotes: deleteVote
+                      ? option.numVotes - 1
+                      : option.numVotes + 1,
+                  });
+                } else {
+                  newOptions.push({
+                    ...option,
+                  });
+                }
+              } else if (updateVote) {
+                // downvote
+                if (option.pos === vote.positions[0].pos) {
+                  newOptions.push({
+                    ...option,
+                    numVotes: option.numVotes + 1,
+                  });
+                } else {
+                  newOptions.push({
+                    ...option,
+                    numVotes: option.numVotes - 1,
+                  });
+                }
+              } else if (option.pos === vote.positions[0].pos) {
+                newOptions.push({
+                  ...option,
+                  numVotes: deleteVote
+                    ? option.numVotes - 1
+                    : option.numVotes + 1,
+                });
+              } else {
+                newOptions.push({
+                  ...option,
+                });
+              }
+            }
           }
-        }
-        /* eslint-enable no-param-reassign */
 
+          // eslint-disable-next-line no-param-reassign
+          agg[vote.pollId] = { ...state[vote.pollId], options: newOptions };
+        }
         return agg;
       },
       {},
@@ -81,18 +130,29 @@ export default function polls(state = {}, action) {
   switch (action.type) {
     case CREATE_VOTE_SUCCESS: {
       const vote = action.payload.entities.votes[action.payload.result];
-      const voteColumns = ['upvotes', 'downvotes'];
-      const index = vote.position === 'pro' ? 0 : 1;
+      const index = vote.positions[0].pos;
       let votes = state[vote.pollId].votes; // eslint-disable-line
       if (votes) {
         votes = [...state[vote.pollId].votes, vote.id];
+      }
+      // index === 0 means upvote, -> options[index].numVotes + = 1;
+      const newOptions = [];
+      const { options } = state[vote.pollId];
+      for (let i = 0; i < options.length; i += 1) {
+        const option = options[i];
+        if (option.pos === index) {
+          newOptions.push({ ...option, numVotes: option.numVotes + 1 });
+        } else {
+          newOptions.push({ ...option });
+        }
       }
       return {
         ...state,
         [vote.pollId]: {
           ...state[vote.pollId],
           ownVote: vote.id,
-          [voteColumns[index]]: state[vote.pollId][voteColumns[index]] + 1,
+          options: newOptions,
+          numVotes: state[vote.pollId].numVotes + 1,
           votes,
         },
       };
@@ -129,27 +189,117 @@ export default function polls(state = {}, action) {
       return merge({}, state, action.payload.entities.polls);
     }
     case UPDATE_VOTE_SUCCESS: {
-      const { pollId, position } = action.payload.entities.votes[
+      const { pollId, positions } = action.payload.entities.votes[
         action.payload.result
       ];
       const poll = state[pollId];
-      const voteColumns = ['upvotes', 'downvotes'];
-      const index = position === 'pro' ? 0 : 1;
+      const index = positions[0].pos === 0 ? 0 : 1;
       const statementId = action.info;
+      const newOptions = [];
+      const { options, extended, multipleChoice } = state[pollId];
+      if (extended) {
+        if (!multipleChoice) {
+          // vote has only one position, actualVote
+          for (let i = 0; i < options.length; i += 1) {
+            const option = options[i];
+            if (option.pos === action.oldVote.positions[0].pos) {
+              newOptions.push({ ...option, numVotes: option.numVotes - 1 });
+            } else if (option.pos === positions[0].pos) {
+              newOptions.push({
+                ...option,
+                numVotes: option.numVotes + 1,
+              });
+            } else {
+              newOptions.push(option);
+            }
+          }
+
+          return {
+            ...state,
+            [pollId]: {
+              ...poll,
+              options: newOptions,
+              ownStatement: statementId ? null : state[pollId].ownStatement,
+            },
+          };
+        }
+        let added = false;
+        let changedOptionPos;
+        // TODO extract fn
+        const newPositions = positions.reduce((obj, position) => {
+          // eslint-disable-next-line
+          obj[position.pos] = position;
+          return obj;
+        }, {});
+        const oldPositions = action.oldVote.positions.reduce(
+          (obj, position) => {
+            // eslint-disable-next-line
+            obj[position.pos] = position;
+            return obj;
+          },
+          {},
+        );
+        if (positions.length > action.oldVote.positions.length) {
+          added = true;
+          // vote was added - get new position and update options.numVotes
+          positions.forEach(element => {
+            if (!oldPositions[element.pos]) {
+              changedOptionPos = element.pos;
+            }
+          });
+        } else {
+          action.oldVote.positions.forEach(element => {
+            if (!newPositions[element.pos]) {
+              changedOptionPos = element.pos;
+            }
+          });
+        }
+
+        // update options
+        for (let i = 0; i < options.length; i += 1) {
+          const option = options[i];
+          if (option.pos === changedOptionPos) {
+            newOptions.push({
+              ...option,
+              numVotes: added ? option.numVotes + 1 : option.numVotes - 1,
+            });
+          } else {
+            newOptions.push(option);
+          }
+        }
+        return {
+          ...state,
+          [pollId]: {
+            ...poll,
+            options: newOptions,
+            ownStatement: statementId ? null : state[pollId].ownStatement,
+          },
+        };
+      }
+      for (let i = 0; i < options.length; i += 1) {
+        const option = options[i];
+        if (option.pos === index) {
+          newOptions.push({ ...option, numVotes: option.numVotes + 1 });
+        } else {
+          newOptions.push({
+            ...option,
+            numVotes: option.numVotes - 1,
+          });
+        }
+      }
+
       return {
         ...state,
         [pollId]: {
           ...poll,
-          [voteColumns[index]]: poll[voteColumns[index]] + 1,
-          [voteColumns[1 - index]]: poll[voteColumns[1 - index]] - 1,
+          options: newOptions,
           ownStatement: statementId ? null : state[pollId].ownStatement,
         },
       };
     }
     case DELETE_VOTE_SUCCESS: {
       const vote = action.payload.entities.votes[action.payload.result];
-      const voteColumns = ['upvotes', 'downvotes'];
-      const index = vote.position === 'pro' ? 0 : 1;
+      const index = vote.positions[0].pos;
       const poll = state[vote.pollId];
       let { statements, votes } = poll;
 
@@ -161,6 +311,19 @@ export default function polls(state = {}, action) {
         // eslint-disable-next-line eqeqeq
         votes = poll.votes.filter(id => id != poll.ownVote);
       }
+      const newOptions = [];
+      const { options } = state[vote.pollId];
+      for (let i = 0; i < options.length; i += 1) {
+        const option = options[i];
+        if (option.pos === index) {
+          newOptions.push({
+            ...option,
+            numVotes: option.numVotes - 1,
+          });
+        } else {
+          newOptions.push({ ...option });
+        }
+      }
 
       return {
         ...state,
@@ -168,8 +331,9 @@ export default function polls(state = {}, action) {
           ...state[vote.pollId],
           ownVote: null,
           ownStatement: null,
+          options: newOptions,
+          numVotes: poll.numVotes - 1,
           statements,
-          [voteColumns[index]]: state[vote.pollId][voteColumns[index]] - 1,
           votes,
         },
       };

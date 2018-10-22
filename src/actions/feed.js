@@ -9,6 +9,7 @@ import {
 import { activityArray as activitiesSchema } from '../store/schema';
 import { getFeedIsFetching, getSessionUser } from '../reducers';
 import { pollFieldsForList } from './proposal';
+import { voteFields } from './vote';
 
 const userFields = `
 id
@@ -86,8 +87,7 @@ id
       createdAt
       updatedAt
       vote{
-        id
-        position
+        ${voteFields}
       }
       author{
         id
@@ -98,15 +98,7 @@ id
 
     }
     ... on VoteDL {
-      id
-      position
-      pollId
-      voter{
-        id
-        name
-        surname
-        thumbnail
-      }
+      ${voteFields}
     }
 
   }`;
@@ -136,6 +128,17 @@ export function loadFeed(log) {
 
     try {
       const { data } = await graphqlRequest(feed, { userId });
+      if (!data.feed) {
+        dispatch({
+          type: LOAD_FEED_ERROR,
+          payload: {
+            error: data.errors,
+          },
+          message: data.message || 'Something went wrong',
+          filter: log ? 'log' : 'feed',
+        });
+        return false;
+      }
       const normalizedData = normalize(data.feed, activitiesSchema);
       dispatch({
         type: LOAD_FEED_SUCCESS,

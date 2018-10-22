@@ -47,6 +47,9 @@ export default (state, action) => {
 };
 
 /* GENERATOR_EXPORTS */
+
+export const getVoteUpdates = state => fromPoll.getStatus(state.polls);
+
 export const getMessageUpdates = state => fromMessage.getStatus(state.messages);
 
 export const getNotificationUpdates = state =>
@@ -60,66 +63,6 @@ export const getWorkTeamUpdates = (state, id) =>
 
 export const getProposalUpdates = (state, id) =>
   fromProposal.getStatus(state.proposals, id);
-
-// TODO Different design
-const getMutationPending = state => {
-  if (state && state.mutations) {
-    return state.mutations.pending;
-  }
-  return false;
-};
-
-const getMutationError = state => {
-  if (state && state.mutations) {
-    return state.mutations.error;
-  }
-  return null;
-};
-
-const getMutationSuccess = state => {
-  if (state && state.mutations) {
-    return state.mutations.success;
-  }
-  return false;
-};
-const getVotingListFetching = state => {
-  if (state && state.pollFetching) {
-    return state.pollFetching.isFetching;
-  }
-  return false;
-};
-const getVotingListError = state => {
-  if (state && state.pollFetching) {
-    return state.pollFetching.errorMessage;
-  }
-  return null;
-};
-export const getIsProposalFetching = (state, id) =>
-  fromProposal.getProposal(state.proposals, id).isFetching;
-
-export const getProposalSuccess = (state, id) =>
-  fromProposal.getProposal(state.proposals, id).success;
-
-export const getProposalErrorMessage = (state, id) =>
-  fromProposal.getProposal(state.proposals, id).errorMessage;
-
-export const getVotingListIsFetching = (state, id) =>
-  getVotingListFetching(fromPoll.getPoll(state.polls, id));
-
-export const getVotingListErrorMessage = (state, id) =>
-  getVotingListError(fromPoll.getPoll(state.polls, id));
-
-export const getVoteMutationIsPending = (state, id) =>
-  getMutationPending(fromPoll.getPoll(state.polls, id));
-
-export const getVoteMutationSuccess = (state, id) =>
-  getMutationSuccess(fromPoll.getPoll(state.polls, id));
-
-export const getVoteMutationError = (state, id) =>
-  getMutationError(fromPoll.getPoll(state.polls, id));
-
-export const getVoteUpdates = (state, id) =>
-  fromPoll.getUpdates(state.polls, id);
 
 export const getStatementUpdates = state =>
   fromStatement.getUpdates(state.statements);

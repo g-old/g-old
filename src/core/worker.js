@@ -37,8 +37,8 @@ async function proposalPolling() {
       'proposals.poll_one_id as pollOneId',
       'polls.closed_at as closedAt',
       'polls.threshold as threshold',
-      'polls.upvotes as upvotes',
-      'polls.downvotes as downvotes',
+      'polls.options as options',
+      'polls.extended as extended',
       'polls.num_voter as numVoter',
       'polling_modes.threshold_ref as ref',
     );

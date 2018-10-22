@@ -4,8 +4,10 @@ import {
   GraphQLID as ID,
   GraphQLBoolean,
   GraphQLInt,
+  GraphQLList,
 } from 'graphql';
 
+import OptionInputType from './OptionInputType';
 import PollingModeInput from './PollingModeInputType';
 
 const PollInputType = new GraphQLInputObjectType({
@@ -25,6 +27,15 @@ const PollInputType = new GraphQLInputObjectType({
     },
     mode: {
       type: PollingModeInput,
+    },
+    options: {
+      type: new GraphQLList(OptionInputType),
+    },
+    multipleChoice: {
+      type: GraphQLBoolean,
+    },
+    extended: {
+      type: GraphQLBoolean,
     },
 
     id: {

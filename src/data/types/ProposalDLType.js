@@ -56,7 +56,7 @@ const ProposalType = new ObjectType({
         ),
     },
     workTeamId: {
-      type: GraphQLString,
+      type: ID,
     },
     workteam: {
       type: WorkTeamType,

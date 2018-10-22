@@ -13,23 +13,22 @@ import {
   DELETE_VOTE_ERROR,
 } from '../../constants';
 
-import { getErrors, getSuccessState } from '../../core/helpers';
-
-const polls = (state = {}, action) => {
+const initState = {
+  mutation: {
+    success: false,
+    error: '',
+    pending: false,
+  },
+};
+const polls = (state = initState, action) => {
   switch (action.type) {
     case LOAD_VOTES_SUCCESS:
     case UPDATE_VOTE_SUCCESS:
     case DELETE_VOTE_SUCCESS:
     case CREATE_VOTE_SUCCESS: {
-      const id = action.id; // Is initial id!
-      const current = state[id];
-      const newState = getSuccessState(current, action);
       return {
         ...state,
-        [id]: {
-          ...state[id],
-          ...newState,
-        },
+        mutation: { pending: false, success: true, error: '' },
       };
     }
     case LOAD_VOTES_START:
@@ -38,24 +37,16 @@ const polls = (state = {}, action) => {
     case CREATE_VOTE_START: {
       return {
         ...state,
-        [action.id]: {
-          ...state[action.id],
-          ...action.properties,
-        },
+        mutation: { pending: true, success: false, error: '' },
       };
     }
     case LOAD_VOTES_ERROR:
     case UPDATE_VOTE_ERROR:
     case DELETE_VOTE_ERROR:
     case CREATE_VOTE_ERROR: {
-      const current = state[action.id];
-      const newState = getErrors(current, action);
       return {
         ...state,
-        [action.id]: {
-          ...state[action.id],
-          ...newState,
-        },
+        mutation: { pending: false, success: false, error: action.message },
       };
     }
 
@@ -65,5 +56,4 @@ const polls = (state = {}, action) => {
 };
 
 export default polls;
-export const getPoll = (state, id) => state[id] || {};
-export const getUpdates = (state, id) => state[id] || {};
+export const getStatus = state => state.mutation || {};

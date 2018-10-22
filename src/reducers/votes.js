@@ -36,7 +36,11 @@ export default function votes(state = {}, action) {
         : state;
     }
     case UPDATE_VOTE_SUCCESS:
-      return merge({}, state, action.payload.entities.votes);
+      return {
+        ...state,
+        [action.payload.result]:
+          action.payload.entities.votes[action.payload.result],
+      };
     case DELETE_VOTE_SUCCESS: {
       // eslint-disable-next-line no-unused-vars
       const { [action.payload.result]: omit, ...other } = state;

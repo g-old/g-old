@@ -15,6 +15,7 @@ import Box from '../Box';
 import Layer from '../Layer';
 import Notification from '../Notification';
 import history from '../../history';
+import PollOptionsView from '../PollOptionsView';
 
 const messages = defineMessages({
   closed: {
@@ -50,6 +51,22 @@ const messages = defineMessages({
   },
 });
 
+const mapOptions = (options, ownVote) => {
+  let positions = [];
+  if (ownVote && ownVote.positions) {
+    ({ positions } = ownVote);
+  }
+  return options.reduce((obj, option) => {
+    // eslint-disable-next-line
+    obj[option.pos] = {
+      ...option,
+      checked: positions.some(p => p.pos === option.pos && p.value),
+      disabled: false,
+    };
+    return obj;
+  }, {});
+};
+
 class Poll extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
@@ -64,7 +81,7 @@ class Poll extends React.Component {
     votes: PropTypes.arrayOf(PropTypes.shape({})),
     ownVote: PropTypes.shape({
       id: PropTypes.string,
-      position: PropTypes.string,
+      positions: PropTypes.string,
       pollId: PropTypes.string,
     }),
     mode: PropTypes.shape({
@@ -87,55 +104,72 @@ class Poll extends React.Component {
     closedAt: null,
     canVote: null,
   };
+
   constructor(props) {
     super(props);
-    this.state = {};
-    this.handleRetractVote = this.handleRetractVote.bind(this);
+    this.state = { pollOptions: mapOptions(props.options, props.ownVote) };
+    this.voteUp = this.voteUp.bind(this);
+    this.voteDown = this.voteDown.bind(this);
+    this.fetchVoters = this.fetchVoters.bind(this);
+    this.handleOptionSelection = this.handleOptionSelection.bind(this);
   }
 
-  componentWillReceiveProps({ updates, id }) {
-    if (id === this.props.id && updates.vote) {
+  componentWillReceiveProps({ updates, id, options, ownVote }) {
+    const { id: oldId, updates: oldUpdates } = this.props;
+    if (id === oldId && updates) {
       let voteError;
-      if (updates.vote.error) {
-        const oldStatus = this.props.updates.vote || {};
+      if (updates.error) {
+        const oldStatus = oldUpdates || {};
         voteError = !oldStatus.error;
       }
-      if (updates.vote.success) {
+      if (updates.success) {
         voteError = false;
       }
-      this.setState({ voteError });
+      this.setState({
+        voteError,
+        pollOptions: mapOptions(options, ownVote),
+      });
     }
   }
 
   getFolloweeVotes(pos) {
-    if (!this.props.followeeVotes) {
+    const { followeeVotes } = this.props;
+    if (!followeeVotes) {
       return null;
     }
-    return this.props.followeeVotes
-      .filter(user => user.position === pos)
-      .map(user => (
-        <img // eslint-disable-line
-          onClick={() => {
-            history.push(`/accounts/${user.voter.id}`);
-          }}
-          key={user.id}
-          className={s.followee}
-          src={user.voter.thumbnail}
-          title={`${user.voter.name} ${user.voter.surname}`}
-          alt="IMG"
-        />
-      ));
+    return followeeVotes.filter(user => user.position === pos).map(user => (
+      <img // eslint-disable-line
+        onClick={() => {
+          history.push(`/accounts/${user.voter.id}`);
+        }}
+        key={user.id}
+        className={s.followee}
+        src={user.voter.thumbnail}
+        title={`${user.voter.name} ${user.voter.surname}`}
+        alt="IMG"
+      />
+    ));
   }
 
-  canVote(position) {
-    const { ownVote, ownStatement, id } = this.props;
+  canVote(positions) {
+    const { ownVote, ownStatement, id, onVote, extended } = this.props;
     let method; // or take methods better directly in and connect to redux
     let info = null;
 
     if (!ownVote) {
       method = 'create';
-    } else if (ownVote.position !== position) {
-      method = 'update';
+    } else if (ownVote.positions[0].pos !== positions[0].pos || extended) {
+      if (
+        // delete last selected option
+        extended &&
+        ownVote.positions.length === 1 &&
+        ownVote.positions[0].pos === positions[0].pos &&
+        positions[0].value === 0
+      ) {
+        method = 'del';
+      } else {
+        method = 'update';
+      }
     } else {
       method = 'del';
     }
@@ -144,55 +178,92 @@ class Poll extends React.Component {
       info = ownStatement.id;
       this.setState({
         confirmationFunc: () => {
-          this.props.onVote({ position, pollId: id, id: voteId }, method, info);
+          onVote({ vote: { positions, pollId: id, id: voteId } }, method, info);
           this.setState({ confirmationFunc: null });
         },
       });
       return;
     }
-    this.props.onVote({ position, pollId: id, id: voteId }, method, info);
+    onVote({ vote: { positions, pollId: id, id: voteId } }, method, info);
   }
 
-  handleRetractVote() {
-    const { ownVote, ownStatement } = this.props;
-    // TODO Add some sort of validation
-    // will delete vote and the statement too bc of cascade on delete
-    this.canVote(ownVote.position, ownStatement.id);
+  voteUp() {
+    this.canVote([{ pos: 0, value: 1 }]);
   }
 
-  render() {
+  voteDown() {
+    this.canVote([{ pos: 1, value: 1 }]);
+  }
+
+  fetchVoters() {
+    const { onFetchVoters, id } = this.props;
+    onFetchVoters(id);
+  }
+
+  handleOptionSelection(data) {
+    // const { multipleChoice } = this.props;
+    const { pollOptions } = this.state;
+    if (data) {
+      const option = pollOptions[data.pos];
+      this.canVote([{ pos: option.pos, value: option.checked ? 0 : 1 }]);
+      // set all options to disabled
+      /* this.setState(prevState => ({
+          pollOptions: {
+            ...prevState.pollOptions,
+            [data.pos]: {
+              ...prevState.pollOptions[data.pos],
+              checked: !prevState.pollOptions[data.pos].checked,
+            },
+          },
+        })); */
+    }
+  }
+
+  renderVotingComponent() {
     const {
-      id,
-      ownVote,
-      allVoters,
-      upvotes,
-      downvotes,
-      threshold,
-      mode,
-      closedAt,
-      endTime,
-      votes,
       updates,
-      onFetchVoters,
       canVote,
+      closedAt,
+      ownVote,
+      mode,
+      extended,
+      options,
+      numVotes,
+      followeeVotes,
+      votes,
     } = this.props;
+    const { pollOptions } = this.state;
+    let component;
+    if (extended) {
+      component = (
+        <PollOptionsView
+          canVote={canVote}
+          closedAt={closedAt}
+          onLoadVotes={this.fetchVoters}
+          pollOptions={pollOptions}
+          numVotes={numVotes}
+          updates={updates}
+          followeeVotes={followeeVotes}
+          votes={votes}
+          onChange={this.handleOptionSelection}
+          options={options}
+        />
+      );
+      return component;
+    }
 
-    let votingButtons = null;
     /* eslint-disable max-len */
-    const votePending = updates.vote ? updates.vote.pending : false;
     if (canVote && !closedAt) {
       // TODO Find better check
       // eslint-disable-next-line no-nested-ternary
       const proBtnColor =
-        ownVote && ownVote.position === 'pro' ? s.proBtnColor : '';
+        ownVote && ownVote.positions[0] && ownVote.positions[0].pos === 0
+          ? s.proBtnColor
+          : '';
       if (mode.unipolar) {
-        votingButtons = (
+        component = (
           <div>
-            <Button
-              disabled={votePending}
-              onClick={() => this.canVote('pro')}
-              plain
-            >
+            <Button disabled={updates.pending} onClick={this.voteUp} plain>
               <img
                 style={{ maxWidth: '5em', maxHeight: '5em' }}
                 alt="Vote"
@@ -212,15 +283,13 @@ class Poll extends React.Component {
       } else {
         // eslint-disable-next-line no-nested-ternary
         const conBtnColor =
-          ownVote && ownVote.position === 'con' ? s.conBtnColor : '';
-        votingButtons = (
+          ownVote && ownVote.positions[0] && ownVote.positions[0].pos === 1
+            ? s.conBtnColor
+            : '';
+        component = (
           <div style={{ paddingBottom: '2em' }}>
             <Box pad>
-              <Button
-                plain
-                onClick={() => this.canVote('pro')}
-                disabled={votePending}
-              >
+              <Button plain onClick={this.voteUp} disabled={updates.pending}>
                 <img
                   style={{ maxWidth: '5em', maxHeight: '5em' }}
                   alt="Vote"
@@ -237,11 +306,7 @@ class Poll extends React.Component {
                   />
               </svg> */}
               </Button>
-              <Button
-                plain
-                onClick={() => this.canVote('con')}
-                disabled={votePending}
-              >
+              <Button plain onClick={this.voteDown} disabled={updates.pending}>
                 <img
                   style={{ maxWidth: '5em', maxHeight: '5em' }}
                   alt="Vote"
@@ -264,10 +329,62 @@ class Poll extends React.Component {
         );
       }
     }
+    return component;
+  }
+
+  renderPollVisualization() {
+    const {
+      id,
+      allVoters,
+      mode,
+      threshold,
+      votes,
+      updates,
+      options,
+      extended,
+    } = this.props;
+    if (extended) {
+      return [];
+    }
+    const upvotes = options[0].numVotes;
+    let downvotes = 0;
+    if (!mode.unipolar) {
+      downvotes = options[1].numVotes;
+    }
+    return (
+      <React.Fragment>
+        <div className={s.pollState}>
+          <PollState
+            pollId={id}
+            allVoters={allVoters}
+            upvotes={upvotes}
+            downvotes={downvotes}
+            unipolar={mode.unipolar}
+            threshold={threshold}
+            thresholdRef={mode.thresholdRef}
+            votes={votes}
+            getVotes={this.fetchVoters}
+            updates={updates}
+          />
+        </div>
+        <div className={s.followeeContainer}>
+          <div className={s.followeeBlock}>{this.getFolloweeVotes('pro')}</div>
+          <div className={cn(s.followeeBlock, s.contra)}>
+            {this.getFolloweeVotes('con')}
+          </div>
+        </div>
+      </React.Fragment>
+    );
+  }
+
+  render() {
+    const { closedAt, endTime } = this.props;
+    const { confirmationFunc, voteError } = this.state;
+    const votingComponent = this.renderVotingComponent();
 
     return (
       <div>
-        {this.state.confirmationFunc && (
+        {confirmationFunc && (
           <Layer>
             <Box column pad className={s.confirmationBox}>
               <Notification
@@ -275,10 +392,7 @@ class Poll extends React.Component {
                 message={<FormattedMessage {...messages.notify} />}
               />
               <Box justify>
-                <Button
-                  onClick={() => this.state.confirmationFunc()}
-                  label="Ok"
-                />
+                <Button onClick={() => confirmationFunc()} label="Ok" />
                 <Button
                   primary
                   label={<FormattedMessage {...messages.cancel} />}
@@ -296,31 +410,12 @@ class Poll extends React.Component {
           ) : (
             <FormattedMessage {...messages.closing} />
           )}
-          &nbsp;<FormattedRelative value={closedAt || endTime} />
+          &nbsp;
+          <FormattedRelative value={closedAt || endTime} />
         </p>
-        <div className={s.pollState}>
-          <PollState
-            pollId={id}
-            allVoters={allVoters}
-            upvotes={upvotes}
-            downvotes={downvotes}
-            unipolar={mode.unipolar}
-            threshold={threshold}
-            thresholdRef={mode.thresholdRef}
-            votes={votes}
-            getVotes={() => onFetchVoters(id)}
-            updates={updates.fetchVoters || {}}
-          />
-        </div>
-        <div className={s.followeeContainer}>
-          <div className={s.followeeBlock}>{this.getFolloweeVotes('pro')}</div>
-          <div className={cn(s.followeeBlock, s.contra)}>
-            {this.getFolloweeVotes('con')}
-          </div>
-        </div>
-
-        <Box justify>{votingButtons}</Box>
-        {this.state.voteError && (
+        {this.renderPollVisualization()}
+        <Box justify>{votingComponent}</Box>
+        {voteError && (
           <Notification
             type="error"
             message={<FormattedMessage {...messages.error} />}

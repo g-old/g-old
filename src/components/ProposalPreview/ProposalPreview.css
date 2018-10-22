@@ -88,3 +88,13 @@ a:visited {
 .tag:hover {
   background-color: rgba(37, 20, 155, 0.5); /* #7f4d4e */
 }
+
+.pollOptions {
+  display: flex;
+  flex-direction: column;
+  width: 2.5em;
+
+  > svg:not(:last-child) {
+    margin-bottom: 0.5em;
+  }
+}

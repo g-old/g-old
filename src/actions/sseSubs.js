@@ -10,108 +10,13 @@ import { activity as activitySchema } from '../store/schema';
 import { getFilter } from '../core/helpers';
 import { getSessionUser } from '../reducers';
 import { canAccess } from '../organization';
+import { activityFields } from './feed';
 
 const activitiesSubscription = `
 subscription{
   activities {
-  id
-  type
-  info
-  objectId
-  verb
-  createdAt
-  actor {
-    id
-    name
-    surname
-    thumbnail
-  }
-  object {
-    __typename
-    ... on ProposalDL {
-      id
-      title
-      publishedAt
-      state
-      body
-      votes
-      tags {
-        id
-        text
-        count
-      }
-      pollOne {
-        id
-        upvotes
-        downvotes
-        threshold
-        start_time
-        endTime
-        allVoters
-        closedAt
-        mode{
-          id
-          withStatements
-          unipolar
-          thresholdRef
-        }
-      }
-      pollTwo {
-        id
-        upvotes
-        downvotes
-        threshold
-        start_time
-        endTime
-        allVoters
-        closedAt
-        mode{
-          id
-          withStatements
-          unipolar
-          thresholdRef
-        }
-      }
-    }
-    ... on StatementDL {
-      id
-      likes
-      text
-      pollId
-      createdAt
-      updatedAt
-      vote{
-        id
-        position
-        pollId
-        voter{
-          id
-          name
-          surname
-          thumbnail
-        }
-      }
-      author{
-        id
-        name
-        surname
-        thumbnail
-      }
-
-    }
-    ... on VoteDL {
-      id
-      position
-      pollId
-      voter{
-        id
-        name
-        surname
-        thumbnail
-      }
-    }
-  }
-}
+ ${activityFields}
+ }
 }
 `;
 

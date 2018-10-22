@@ -112,7 +112,7 @@ class Statement extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      textArea: { val: this.props.text || '' },
+      textArea: { val: props.text || '' },
       edit: props.asInput === true,
       pending: false,
       collapsed: false,
@@ -126,10 +126,12 @@ class Statement extends React.Component {
     this.handleFollowing = this.handleFollowing.bind(this);
     this.handleLiking = this.handleLiking.bind(this);
     this.handleProfileClick = this.handleProfileClick.bind(this);
+    this.toggleFullText = this.toggleFullText.bind(this);
   }
 
   componentDidMount() {
-    if (!this.state.edit) {
+    const { edit } = this.state;
+    if (!edit) {
       // 3 * 1.3 em lineheight
       if (this.textBox && this.textBox.clientHeight > 3.9 * 16) {
         // eslint-disable-next-line react/no-did-mount-set-state
@@ -140,10 +142,11 @@ class Statement extends React.Component {
 
   componentWillReceiveProps({ updates }) {
     if (updates) {
+      const { pending } = this.state;
       if (updates.success) {
         this.onEndEditing();
       }
-      if (updates.pending !== this.state.pending) {
+      if (updates.pending !== pending) {
         this.setState({ pending: updates.pending });
       }
 
@@ -171,23 +174,25 @@ class Statement extends React.Component {
   }
 
   onEditStatement() {
-    this.setState({ textArea: { val: this.props.text }, edit: true });
+    const { text } = this.props;
+    this.setState({ textArea: { val: text }, edit: true });
   }
 
   onTextChange(e) {
-    this.setState({ ...this.state, textArea: { val: e.target.value } });
+    this.setState({ textArea: { val: e.target.value } });
   }
 
   onTextSubmit(e) {
-    const { pollId, vote } = this.props;
-    const text = this.state.textArea.val.trim();
-    if (text && text !== this.props.text) {
+    const { pollId, vote, text, onUpdate, id, onCreate } = this.props;
+    const { textArea } = this.state;
+    const textContent = textArea.val.trim();
+    if (textContent && textContent !== text) {
       // TODO validation
-      if (this.props.text) {
+      if (text) {
         // update;
-        this.props.onUpdate({ id: this.props.id, text });
+        onUpdate({ id, text: textContent });
       } else {
-        this.props.onCreate({ pollId, text, voteId: vote.id });
+        onCreate({ pollId, text: textContent, voteId: vote.id });
       }
     } else {
       // nothing changed
@@ -199,12 +204,12 @@ class Statement extends React.Component {
 
   onEndEditing() {
     const { asInput, text } = this.props;
-    this.setState({
-      ...this.state,
-      textArea: { ...this.state.textArea, val: asInput ? '' : text },
-      edit: this.props.asInput === true,
-    });
+    this.setState(prevState => ({
+      textArea: { ...prevState.textArea, val: asInput ? '' : text },
+      edit: asInput === true,
+    }));
   }
+
   handleFlag() {
     const { id, text, onFlagging } = this.props;
     onFlagging({
@@ -249,6 +254,14 @@ class Statement extends React.Component {
     }
   }
 
+  toggleFullText(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    this.setState(prevState => ({ collapsed: !prevState.collapsed }));
+  }
+
   render() {
     //  const { mutationIsPending, mutationSuccess, mutationError } = this.props;
     // TODO create authorization decorator
@@ -266,7 +279,9 @@ class Statement extends React.Component {
       updates,
       pollClosed,
       onProfileClick,
+      ownLike,
     } = this.props;
+    const { textArea, edit, pending, collapsed, contentOverflows } = this.state;
     let canLike;
     let canDelete;
     let canFollow;
@@ -288,8 +303,8 @@ class Statement extends React.Component {
     }
     /* eslint-enable no-bitwise */
 
-    const isEmpty = this.state.textArea.val.length === 0;
-    const hasMinimumInput = this.state.textArea.val.length >= 5;
+    const isEmpty = textArea.val.length === 0;
+    const hasMinimumInput = textArea.val.length >= 5;
     const inactive = asInput && isEmpty;
 
     let menu = null;
@@ -301,7 +316,7 @@ class Statement extends React.Component {
           onEndEditing={this.onEndEditing}
           onEdit={this.onEditStatement}
           onDelete={this.onDeleteStatement}
-          isEditing={this.state.edit}
+          isEditing={edit}
           disabled={deletedAt || pollClosed}
           enableSubmit={hasMinimumInput}
         />
@@ -367,42 +382,36 @@ class Statement extends React.Component {
     }
 
     const textBox = [];
-    if (this.state.edit) {
+    if (edit) {
       textBox.push(
         <Textarea
           key="0"
           useCacheForDOMMeasurements
           placeholder="Leave a statement (optional)"
-          value={this.state.textArea.val}
+          value={textArea.val}
           onChange={this.onTextChange}
           className={s.textEdit}
           minRows={2}
-          disabled={this.state.pending}
+          disabled={pending}
         />,
       );
     } else {
       textBox.push(
-        <div
-          key="1"
-          className={this.state.collapsed ? s.collapsed : s.expanded}
-        >
+        <div key="1" className={collapsed ? s.collapsed : s.expanded}>
           {text}
         </div>,
       );
 
-      if (this.state.contentOverflows) {
+      if (contentOverflows) {
         textBox.push(
           <button
+            type="button"
             key="2"
-            onClick={e => {
-              e.preventDefault();
-              e.stopPropagation();
-              return this.setState({ collapsed: !this.state.collapsed });
-            }}
+            onClick={this.toggleFullText}
             className={s.contentToggle}
           >
             <FormattedMessage
-              {...messages[this.state.collapsed ? 'expand' : 'collapse']}
+              {...messages[collapsed ? 'expand' : 'collapse']}
             />
           </button>,
         );
@@ -413,7 +422,9 @@ class Statement extends React.Component {
       <div
         className={cn(
           s.rootAlt,
-          vote && vote.position === 'pro' ? s.pro : s.contra,
+          vote && vote.positions[0].pos === 0 && vote.positions[0].value
+            ? s.pro
+            : s.contra,
           inactive && s.inactive,
         )}
       >
@@ -451,7 +462,7 @@ class Statement extends React.Component {
                         <svg viewBox="0 0 24 24" width="16px" height="16px">
                           <path
                             fill="none"
-                            stroke={this.props.ownLike ? '#8cc800' : '#666'}
+                            stroke={ownLike ? '#8cc800' : '#666'}
                             strokeWidth="1"
                             d={ICONS.thumbUpAlt}
                           />

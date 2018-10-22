@@ -56,33 +56,39 @@ class VotesList extends React.Component {
   }
 
   onGetVotes() {
-    this.setState({ ...this.state, showVotes: true });
-    this.props.getVotes();
+    const { getVotes } = this.props;
+    this.setState({ showVotes: true });
+    getVotes();
   }
 
   render() {
     const pro = [];
     const con = [];
-    const { unipolar } = this.props;
-    const votes = this.props.votes || [];
-    if (this.state.showVotes && votes) {
-      votes.forEach(vote => {
-        if (vote && vote.position === 'pro') pro.push(vote);
-        else con.push(vote);
-      });
+    const { unipolar, votes = [], getVotes } = this.props;
+    const { showVotes } = this.state;
+    if (showVotes && votes) {
+      if (unipolar) {
+        pro.push(...votes);
+      } else {
+        votes.forEach(vote => {
+          if (vote && vote.positions[0].pos === 0 && vote.positions[0].value)
+            pro.push(vote);
+          else con.push(vote);
+        });
+      }
     }
 
     const { isFetching, errorMessage } = this.props;
-    if (isFetching && !votes.length) {
+    if (isFetching && (!votes || !votes.length)) {
       return <p>{'Loading...'} </p>;
     }
-    if (errorMessage && !votes.length) {
+    if (errorMessage && (!votes || !votes.length)) {
       return (
         <FetchError
           message={errorMessage}
           onRetry={e => {
             e.stopPropagation();
-            this.props.getVotes();
+            getVotes();
           }}
         />
       );
@@ -90,7 +96,7 @@ class VotesList extends React.Component {
     /* eslint-disable css-modules/no-undef-class */
     return (
       <div>
-        {this.state.showVotes ? (
+        {showVotes ? (
           <div className={cn(!unipolar && s.bipolar)}>
             <div className={cn(s.votes)}>
               {pro.map(vote => VotesList.renderVote(vote))}
@@ -102,7 +108,9 @@ class VotesList extends React.Component {
             )}
           </div>
         ) : (
-          <button onClick={this.onGetVotes}> GETVOTES</button>
+          <button type="button" onClick={this.onGetVotes}>
+            GETVOTES
+          </button>
         )}
       </div>
     );

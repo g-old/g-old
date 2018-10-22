@@ -14,7 +14,8 @@ const sortStatementsByPoll = (stmts, votes) =>
     const statement = stmts[curr];
     const vote = votes[statement.vote];
     if (!vote) return {};
-    const votePos = vote.position;
+    const votePos =
+      vote.positions[0].pos === 1 && vote.positions[0].value ? 'pro' : 'con';
 
     return {
       ...acc,
@@ -59,7 +60,7 @@ const byPoll = (state = {}, action) => {
       if (!stmts) return state;
       const activity =
         action.payload.entities.activities[action.payload.result];
-      const pollId = stmts[activity.objectId].pollId;
+      const { pollId } = stmts[activity.objectId];
 
       if (activity.type === 'statement' && activity.verb === 'delete') {
         // check first if polls are in store
@@ -99,7 +100,7 @@ const byPoll = (state = {}, action) => {
       const stmts = action.payload.entities.statements;
       if (!stmts) return state;
       const sorted = sortStatementsByPoll(stmts, action.payload.entities.votes);
-      const pollId = stmts[action.payload.result].pollId;
+      const { pollId } = stmts[action.payload.result];
       const currentState = state[pollId] || [];
       return {
         ...state,

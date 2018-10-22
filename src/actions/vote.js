@@ -24,56 +24,52 @@ import {
 } from '../store/schema';
 import { subscriptionFields } from './subscription';
 import { getVoteUpdates } from '../reducers';
+import { userFields } from './user';
 
-const voteInfo = `{
-  id
-  position
-  pollId
-  voter{
+export const voteFields = `
     id
-    name
-    surname
-    thumbnail
-  }
-}`;
+    positions{
+      pos
+      value
+    }
+    pollId
+    voter{
+      ${userFields}
+    }`;
 
 const resultFields = `
   subscription{
     ${subscriptionFields}
   }
-  resource ${voteInfo}
+  resource {${voteFields}}
 `;
 const createVoteMutation = `
-  mutation($pollId:ID! $position:Position! $targetId:ID) {
-    createVote (vote:{pollId:$pollId position:$position} targetId:$targetId) {
+  mutation($vote:VoteInput! $targetId:ID) {
+    createVote (vote:$vote targetId:$targetId) {
       ${resultFields}
     }
   }
 `;
 const updateVoteMutation = `
-  mutation($pollId:ID! $position:Position! $id:ID) {
-    updateVote (vote:{pollId:$pollId position:$position id:$id}) ${voteInfo}
+  mutation($vote:VoteInput!) {
+    updateVote (vote:$vote) {
+      ${voteFields}
+    }
   }
 `;
 
 const deleteVoteMutation = `
-  mutation($pollId:ID! $position:Position! $id:ID) {
-    deleteVote (vote:{pollId:$pollId position:$position id:$id}) ${voteInfo}
+  mutation($vote: VoteInput!) {
+    deleteVote (vote:$vote) {
+      ${voteFields}
+    }
   }
 `;
 
 const votesList = `
   query ($pollId:ID!) {
     votes (pollId:$pollId) {
-    id
-    position
-    pollId
-    voter{
-      id
-      name
-      surname
-      thumbnail
-    }
+   ${voteFields}
     }
   }
 `;
@@ -127,6 +123,7 @@ export function createVote(vote) {
 export function updateVote(vote, stmtId = null) {
   return async (dispatch, getState, { graphqlRequest }) => {
     const properties = genStatusIndicators(['vote']);
+    const oldVote = getState().entities.votes[vote.vote.id];
 
     dispatch({
       type: UPDATE_VOTE_START,
@@ -142,6 +139,7 @@ export function updateVote(vote, stmtId = null) {
         info: stmtId,
         id: vote.pollId,
         properties,
+        oldVote,
       });
     } catch (error) {
       dispatch({

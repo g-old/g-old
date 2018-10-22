@@ -1,31 +1,18 @@
 import {
   GraphQLNonNull as NonNull,
-  GraphQLEnumType,
   GraphQLID as ID,
   GraphQLInputObjectType,
+  GraphQLList,
 } from 'graphql';
 
+import PositionInput from './PositionInputType';
 
 const VoteInputType = new GraphQLInputObjectType({
   name: 'VoteInput',
 
-
   fields: {
-
-    position: {
-      type: new NonNull(new GraphQLEnumType({
-        name: 'Position',
-        values: {
-          pro: {
-            value: 1,
-            description: 'You support the proposal',
-          },
-          con: {
-            value: 0,
-            description: 'You are against the proposal',
-          },
-        },
-      })),
+    positions: {
+      type: new NonNull(new GraphQLList(PositionInput)),
     },
 
     pollId: {
@@ -36,6 +23,5 @@ const VoteInputType = new GraphQLInputObjectType({
       description: 'Must be provided for mutations',
     },
   },
-
 });
 export default VoteInputType;
