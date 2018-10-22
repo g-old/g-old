@@ -16,7 +16,7 @@
     "@babel/polyfill": "7.0.0-beta.51",
     "@sendgrid/mail": "^6.1.4",
     "autosuggest-highlight": "^3.1.0",
-    "bcrypt": "^3.0.0",
+    "bcrypt": "2.0.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.2",
     "bunyan": "^1.8.12",
