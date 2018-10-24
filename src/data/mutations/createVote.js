@@ -8,7 +8,7 @@ import { TargetType } from '../models/utils';
 import WithSubscriptionResultType from '../types/WithSubscriptionResultType';
 
 const createVote = {
-  type: new GraphQLNonNull(new WithSubscriptionResultType(VoteType)),
+  type: new GraphQLNonNull(WithSubscriptionResultType(VoteType)),
   args: {
     vote: {
       type: VoteInputType,

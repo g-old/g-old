@@ -8,7 +8,7 @@ import { TargetType } from '../models/utils';
 import WithSubscriptionResultType from '../types/WithSubscriptionResultType';
 
 const createComment = {
-  type: new GraphQLNonNull(new WithSubscriptionResultType(CommentType)),
+  type: new GraphQLNonNull(WithSubscriptionResultType(CommentType)),
   args: {
     comment: {
       type: CommentInput,
