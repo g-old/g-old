@@ -73,13 +73,14 @@ class Option {
 
   title: ?mixed;
 
-  description: {};
+  description: ?{};
 
   constructor(props: OptionProps) {
     this.pos = props.pos;
     this.order = props.order;
     this.title = props.title;
     this.description = props.description || null;
+    this.numVotes = 0;
   }
 
   validateDescription() {
