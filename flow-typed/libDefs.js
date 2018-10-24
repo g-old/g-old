@@ -10,8 +10,10 @@ declare type LocalisationShape = {
 
 declare type OptionShape = {
   pos: number,
-  description: LocalisationShape,
+  description?: LocalisationShape,
   numVotes: number,
+  title: string,
+  order: number,
 };
 declare type ProposalStateType =
   | 'voting'

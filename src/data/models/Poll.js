@@ -5,99 +5,178 @@ import PollingMode from './PollingMode';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import { Groups } from '../../organization';
 import { transactify } from './utils';
+import sanitize from '../../core/htmlSanitizer';
+
+const MAX_DESCRIPTION_LENGTH = 10000;
+const MAX_TITLE_LENGTH = 100;
+
+const isAscendingUniqueNumber = (value, lastIndex, bucket) => {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return false;
+  }
+  if (bucket.includes(value)) {
+    return false;
+  }
+
+  if (value <= lastIndex) {
+    return false;
+  }
+
+  bucket.push(value);
+  return true;
+};
+
+class Translation {
+  de: ?string;
+
+  it: ?string;
+
+  lld: ?string;
+
+  _default: ?string;
+
+  constructor(props) {
+    this.de = props.de;
+    this.it = props.it;
+    this.lld = props.lld;
+    this._default = props._default; // eslint-disable-line
+  }
+
+  validate(predicate) {
+    // eslint-disable-next-line no-underscore-dangle
+    const translations = [this.de, this.it, this.lld, this._default];
+    const atleastOneTranslation = translations.some(t => t);
+
+    if (!atleastOneTranslation) {
+      throw new Error('No key found');
+    }
+    translations.forEach(text => {
+      if (text) {
+        if (!predicate(text)) {
+          throw new Error(`Argument error: ${text}`);
+        }
+      }
+    });
+  }
+}
+
+const isValidTitle = text => text.length < MAX_TITLE_LENGTH && text.length > 0;
+
+const isValidDescription = text =>
+  text.length < MAX_DESCRIPTION_LENGTH && text.length > 0;
+
+type OptionProps = $Shape<OptionShape>;
+class Option {
+  pos: ?number;
+
+  order: ?number;
+
+  title: ?mixed;
+
+  description: {};
+
+  constructor(props: OptionProps) {
+    this.pos = props.pos;
+    this.order = props.order;
+    this.title = props.title;
+    this.description = props.description || null;
+  }
+
+  validateDescription() {
+    if (this.description) {
+      this.checkDescriptionShape();
+    }
+  }
+
+  sanitizeDescription() {
+    if (this.description && typeof this.description === 'object') {
+      const sanitizedDescription = Object.keys(this.description).reduce(
+        (obj, locale) => {
+          const text = this.description[locale].trim();
+          if (!text) {
+            return obj;
+          }
+          obj[locale] = sanitize(text); // eslint-disable-line
+          return obj;
+        },
+        {},
+      );
+      if (sanitizedDescription) {
+        this.description = sanitizedDescription;
+      }
+    }
+  }
+
+  validateTitle() {
+    if (!this.title) {
+      throw new Error('Title missing');
+    }
+    const title = new Translation(this.title);
+    // TODO should use translation obj as it makes sure the keys are correct
+    title.validate(isValidTitle);
+  }
+
+  checkDescriptionShape() {
+    const description = new Translation(this.description);
+    description.validate(isValidDescription);
+  }
+}
+
+class OptionsValidator {
+  pos: number;
+
+  order: number;
+
+  takenPositions: number[];
+
+  takenOrders: number[];
+
+  constructor() {
+    this.pos = -1;
+    this.order = -1;
+    this.takenPositions = [];
+    this.takenOrders = [];
+  }
+
+  validate(optionData) {
+    const option = new Option(optionData);
+    const validPosition = isAscendingUniqueNumber(
+      option.pos,
+      this.pos,
+      this.takenPositions,
+    );
+    if (!validPosition) {
+      throw new Error(`Position wrong: ${option.pos}`);
+    }
+    const validOrder = isAscendingUniqueNumber(
+      option.order,
+      this.order,
+      this.takenOrders,
+    );
+
+    if (!validOrder) {
+      throw new Error(`Order wrong${option.order}`);
+    }
+
+    option.validateTitle();
+    option.validateDescription();
+
+    if (option.description) {
+      // facultative
+      option.sanitizeDescription();
+    }
+    return option;
+  }
+
+  getValidatedOptions(options) {
+    return options.map(this.validate, this);
+  }
+}
 // eslint-disable-next-line no-unused-vars
 function checkCanSee(viewer, data) {
   // TODO change data returned based on permissions
   return true;
 }
-
-const MAX_DESCRIPTION_LENGTH = 10000;
-const MAX_TITLE_LENGTH = 100;
-function isDescriptionLongEnough(text) {
-  return text.length < MAX_DESCRIPTION_LENGTH && text.length > 0;
-}
-function isTitleLongEnough(text) {
-  return text.length < MAX_TITLE_LENGTH && text.length > 0;
-}
-
-const buildLocaleInputValidation = (fieldName, predicate) => option =>
-  Object.keys(option.title).reduce((obj, locale) => {
-    const text = option[fieldName][locale] && option[fieldName][locale].trim();
-    if (predicate(text)) {
-      obj[locale] = text; // eslint-disable-line
-    }
-    return obj;
-  }, {});
-
-const descriptionValidation = buildLocaleInputValidation(
-  'description',
-  isDescriptionLongEnough,
-);
-
-const titleValidation = buildLocaleInputValidation('title', isTitleLongEnough);
-const checkOption = (option, counters) => {
-  const validated = {};
-  if ('pos' in option) {
-    // check uniqness of pos
-    if (
-      option.pos > counters.currentPos &&
-      !counters.otherPos.includes(option.pos)
-    ) {
-      validated.pos = option.pos;
-      counters.currentPos = option.pos; // eslint-disable-line
-      counters.otherPos.push(option.pos);
-    }
-  }
-  if ('order' in option) {
-    // check right order
-    if (
-      option.order > counters.currentOrder &&
-      !counters.otherOrders.includes(option.order)
-    ) {
-      validated.order = option.order;
-      counters.currentOrder = option.order; // eslint-disable-line
-      counters.otherOrders.push(option.order);
-    }
-  }
-  if ('title' in option) {
-    const title = titleValidation(option);
-    if (Object.keys(title).length) {
-      validated.title = title;
-    }
-  }
-  if ('description' in option) {
-    // check keys , content
-    const description = descriptionValidation(option);
-    if (Object.keys(description).length) {
-      validated.description = description;
-    }
-  }
-  if ('numVotes' in option) {
-    //
-  } else {
-    validated.numVotes = 0;
-  }
-
-  if (
-    'pos' in validated &&
-    'order' in validated &&
-    'title' in validated &&
-    'numVotes' in validated
-  ) {
-    return validated;
-  }
-  throw new Error('Option not correct');
-};
-const validateOptions = options => {
-  const counters = {
-    currentPos: -1,
-    currentOrder: -1,
-    otherPos: [],
-    otherOrders: [],
-  };
-  const data = options.map(option => checkOption(option, counters));
-  return data;
-};
 
 const validateDates = data => {
   const serverTime = new Date();
@@ -210,7 +289,8 @@ class Poll {
 
     if (data.options) {
       // check options
-      const validatedOptions = validateOptions(data.options);
+      const validator = new OptionsValidator();
+      const validatedOptions = validator.getValidatedOptions(data.options);
       newData.options = JSON.stringify(validatedOptions);
     }
     if ('extended' in data) {
