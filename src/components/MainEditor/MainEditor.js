@@ -28,38 +28,11 @@ function insertImage(change, src, target) {
     data: { src },
   });
 }
-const getType = chars => {
-  switch (chars) {
-    case '*':
-    case '-':
-    case '+':
-      return 'list-item';
-    case '>':
-      return 'block-quote';
-    case '#':
-      return 'heading-one';
-    case '##':
-      return 'heading-two';
-    case '###':
-      return 'heading-three';
-    case '####':
-      return 'heading-four';
-    case '#####':
-      return 'heading-five';
-    case '######':
-      return 'heading-six';
-    default:
-      return null;
-  }
-};
 
 function wrapLink(change, href) {
-  change.wrapInline({
-    type: 'link',
-    data: { href },
-  });
+  change.wrapInline({ type: 'link', data: { href } });
 
-  change.collapseToEnd();
+  change.moveToEnd();
 }
 
 class MainEditor extends React.Component {
@@ -67,7 +40,9 @@ class MainEditor extends React.Component {
     onChange: PropTypes.func.isRequired,
     className: PropTypes.string,
   };
+
   static defaultProps = { className: null };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -105,9 +80,11 @@ class MainEditor extends React.Component {
 
   onChange = ({ value }) => {
     // TODO check if localstorage is available
+    const { onChange } = this.props;
+    // eslint-disable-next-line
     if (value.document !== this.state.value.document) {
       const string = html.serialize(value);
-      this.props.onChange(string);
+      onChange(string);
       // localStorage.setItem('content', string);
     }
     this.setState({ value });
@@ -115,106 +92,112 @@ class MainEditor extends React.Component {
 
   onClickMark(event, type) {
     event.preventDefault();
-    const { value } = this.state;
-    const change = value.change().toggleMark(type);
-    this.onChange(change);
+    this.editor.change(change => {
+      const { value } = change;
+      value.change().toggleMark(type);
+    });
   }
+
   onClickBlock(event, type) {
     event.preventDefault();
-    const { value } = this.state;
-    const change = value.change();
-    const { document } = value;
 
-    // Handle everything but list buttons.
-    if (type !== 'bulleted-list' && type !== 'numbered-list') {
-      const isActive = this.hasBlock(type);
-      const isList = this.hasBlock('list-item');
+    this.editor.change(change => {
+      const { value } = change;
+      const { document } = value;
+      // Handle everything but list buttons.
+      if (type !== 'bulleted-list' && type !== 'numbered-list') {
+        const isActive = this.hasBlock(type);
+        const isList = this.hasBlock('list-item');
 
-      if (isList) {
-        change
-          .setBlocks(isActive ? DEFAULT_NODE : type)
-          .unwrapBlock('bulleted-list')
-          .unwrapBlock('numbered-list');
+        if (isList) {
+          change
+            .setBlocks(isActive ? DEFAULT_NODE : type)
+            .unwrapBlock('bulleted-list')
+            .unwrapBlock('numbered-list');
+        } else {
+          change.setBlocks(isActive ? DEFAULT_NODE : type);
+        }
       } else {
-        change.setBlocks(isActive ? DEFAULT_NODE : type);
-      }
-    } else {
-      // Handle the extra wrapping required for list buttons.
-      const isList = this.hasBlock('list-item');
-      const isType = value.blocks.some(
-        block =>
-          !!document.getClosest(block.key, parent => parent.type === type),
-      );
+        // Handle the extra wrapping required for list buttons.
+        const isList = this.hasBlock('list-item');
+        const isType = value.blocks.some(
+          block =>
+            !!document.getClosest(block.key, parent => parent.type === type),
+        );
 
-      if (isList && isType) {
-        change
-          .setBlocks(DEFAULT_NODE)
-          .unwrapBlock('bulleted-list')
-          .unwrapBlock('numbered-list');
-      } else if (isList) {
-        change
-          .unwrapBlock(
-            type === 'bulleted-list' ? 'numbered-list' : 'bulleted-list',
-          )
-          .wrapBlock(type);
-      } else {
-        change.setBlocks('list-item').wrapBlock(type);
+        if (isList && isType) {
+          change
+            .setBlocks(DEFAULT_NODE)
+            .unwrapBlock('bulleted-list')
+            .unwrapBlock('numbered-list');
+        } else if (isList) {
+          change
+            .unwrapBlock(
+              type === 'bulleted-list' ? 'numbered-list' : 'bulleted-list',
+            )
+            .wrapBlock(type);
+        } else {
+          change.setBlocks('list-item').wrapBlock(type);
+        }
       }
-    }
-
-    this.onChange(change);
+    });
   }
 
   onClickLink = event => {
     event.preventDefault();
-    const { value } = this.state;
-    const hasLinks = this.hasLinks();
-    const change = value.change();
 
-    if (hasLinks) {
-      change.call(unwrapLink);
-    } else if (value.isExpanded) {
-      const href = window.prompt('Enter the URL of the link:', 'https://');
-      if (href) {
-        change.call(wrapLink, href);
-      }
-    } else {
-      const href = window.prompt('Enter the URL of the link:', 'https://');
-      const text = window.prompt('Enter the text for the link:');
-      if (href && text) {
+    this.editor.change(change => {
+      const { value } = change;
+      const hasLinks = this.hasLinks();
+      if (hasLinks) {
+        change.call(unwrapLink);
+      } else if (value.selection.isExpanded) {
+        const href = window.prompt('Enter the URL of the link:', 'https://');
+        if (href) {
+          change.call(wrapLink, href);
+        }
+      } else {
+        const href = window.prompt('Enter the URL of the link:', 'https://');
+        if (href === null) {
+          return;
+        }
+        const text = window.prompt('Enter the text for the link:');
+        if (text === null) {
+          return;
+        }
         change
           .insertText(text)
-          .extend(0 - text.length)
+          .moveFocusBackward(text.length)
           .call(wrapLink, href);
       }
-    }
-
-    this.onChange(change);
+    });
   };
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, change, next) => {
     switch (event.key) {
       case ' ':
-        return this.onSpace(event, change);
+        return this.onSpace(event, change, next);
       case 'Backspace':
-        return this.onBackspace(event, change);
+        return this.onBackspace(event, change, next);
       case 'Enter':
-        return this.onEnter(event, change);
+        return this.onEnter(event, change, next);
       default:
-        return undefined;
+        return next();
     }
   };
 
-  onSpace = (event, change) => {
+  onSpace = (event, change, next) => {
     const { value } = change;
-    if (value.isExpanded) return false;
+    const { selection } = value;
+    if (value.isExpanded) return next();
 
-    const { startBlock, startOffset } = value;
-    const chars = startBlock.text.slice(0, startOffset).replace(/\s*/g, '');
-    const type = getType(chars);
+    const { startBlock } = value;
+    const { start } = selection;
+    const chars = startBlock.text.slice(0, start.offset).replace(/\s*/g, '');
+    const type = this.getType(chars);
 
-    if (!type) return false;
-    if (type === 'list-item' && startBlock.type === 'list-item') return false;
+    if (!type) return next();
+    if (type === 'list-item' && startBlock.type === 'list-item') return next();
     event.preventDefault();
 
     change.setBlocks(type);
@@ -223,17 +206,18 @@ class MainEditor extends React.Component {
       change.wrapBlock('bulleted-list');
     }
 
-    change.extendToStartOf(startBlock).delete();
-    return true;
+    change.moveFocusToStartOfNode(startBlock).delete();
+    return next();
   };
 
-  onBackspace = (event, change) => {
+  onBackspace = (event, change, next) => {
     const { value } = change;
-    if (value.isExpanded) return undefined;
-    if (value.startOffset !== 0) return undefined;
+    const { selection } = value;
+    if (selection.isExpanded) return next();
+    if (selection.start.offset !== 0) return next();
 
     const { startBlock } = value;
-    if (startBlock.type === 'paragraph') return undefined;
+    if (startBlock.type === 'paragraph') return next();
 
     event.preventDefault();
     change.setBlocks('paragraph');
@@ -241,18 +225,19 @@ class MainEditor extends React.Component {
     if (startBlock.type === 'list-item') {
       change.unwrapBlock('bulleted-list');
     }
-
-    return true;
+    return next();
   };
 
-  onEnter = (event, change) => {
+  onEnter = (event, change, next) => {
     const { value } = change;
-    if (value.isExpanded) return undefined;
+    const { selection } = value;
+    const { start, end, isExpanded } = selection;
+    if (isExpanded) return next();
 
-    const { startBlock, startOffset, endOffset } = value;
-    if (startOffset === 0 && startBlock.text.length === 0)
-      return this.onBackspace(event, change);
-    if (endOffset !== startBlock.text.length) return undefined;
+    const { startBlock } = value;
+    if (start.offset === 0 && startBlock.text.length === 0)
+      return this.onBackspace(event, change, next);
+    if (end.offset !== startBlock.text.length) return next();
 
     if (
       startBlock.type !== 'heading-one' &&
@@ -263,12 +248,12 @@ class MainEditor extends React.Component {
       startBlock.type !== 'heading-six' &&
       startBlock.type !== 'block-quote'
     ) {
-      return undefined;
+      return next();
     }
 
     event.preventDefault();
     change.splitBlock().setBlocks('paragraph');
-    return true;
+    return next();
   };
 
   onClickImage(event) {
@@ -276,10 +261,33 @@ class MainEditor extends React.Component {
     const src = window.prompt('Enter the URL of the image:');
     if (!src) return;
 
-    const change = this.state.value.change().call(insertImage, src);
-
-    this.onChange(change);
+    this.editor.change(insertImage, src);
   }
+
+  getType = chars => {
+    switch (chars) {
+      case '*':
+      case '-':
+      case '+':
+        return 'list-item';
+      case '>':
+        return 'block-quote';
+      case '#':
+        return 'heading-one';
+      case '##':
+        return 'heading-two';
+      case '###':
+        return 'heading-three';
+      case '####':
+        return 'heading-four';
+      case '#####':
+        return 'heading-five';
+      case '######':
+        return 'heading-six';
+      default:
+        return null;
+    }
+  };
 
   hasLinks = () => {
     const { value } = this.state;
@@ -290,14 +298,20 @@ class MainEditor extends React.Component {
     const { value } = this.state;
     return value.activeMarks.some(mark => mark.type === type);
   };
+
   hasBlock = type => {
     const { value } = this.state;
     return value.blocks.some(node => node.type === type);
   };
 
+  ref = editor => {
+    this.editor = editor;
+  };
+
   reset() {
     this.setState({ value: html.deserialize('<p></p>') });
   }
+
   setInitialState(value) {
     this.setState({ value: html.deserialize(value) });
   }
@@ -415,7 +429,8 @@ class MainEditor extends React.Component {
   };
 */
   /* eslint-disable class-methods-use-this  */
-  renderMark(props) {
+
+  renderMark(props, next) {
     const { children, mark, attributes } = props;
     switch (mark.type) {
       case 'bold':
@@ -427,11 +442,11 @@ class MainEditor extends React.Component {
       case 'underline':
         return <u {...attributes}>{children}</u>;
       default:
-        throw new Error(`Type not recognized: ${mark.type}`);
+        return next;
     }
   }
 
-  renderNode = props => {
+  renderNode = (props, next) => {
     const { attributes, children, node } = props;
     switch (node.type) {
       case 'paragraph':
@@ -480,7 +495,7 @@ class MainEditor extends React.Component {
         );
       }
       default:
-        throw new Error(`Type not recognized: ${node.type}`);
+        return next();
     }
   };
 
@@ -489,7 +504,8 @@ class MainEditor extends React.Component {
     return (
       <Editor
         placeholder="Enter some text..."
-        value={this.state.value}
+        value={this.state.value} // eslint-disable-line
+        ref={this.ref}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
@@ -500,8 +516,9 @@ class MainEditor extends React.Component {
   }
 
   render() {
+    const { className } = this.props;
     return (
-      <div className={this.props.className}>
+      <div className={className}>
         {this.renderToolbar()}
         {this.renderEditor()}
       </div>
