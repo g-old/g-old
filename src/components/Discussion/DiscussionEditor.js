@@ -105,11 +105,7 @@ class DiscussionEditor extends React.Component<Props, State> {
                 type="alert"
                 message="Unsaved content found!"
                 action={
-                  <Button
-                    primary
-                    label="Restore"
-                    onClick={this.deleteChanges}
-                  />
+                  <Button primary label="Revert" onClick={this.deleteChanges} />
                 }
               />
             )}

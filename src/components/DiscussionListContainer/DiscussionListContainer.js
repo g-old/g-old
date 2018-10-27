@@ -7,6 +7,7 @@ import { ListContainerShape } from '../ProposalListContainer';
 
 class DiscussionListContainer extends React.Component {
   static propTypes = ListContainerShape;
+
   render() {
     const {
       discussions,
@@ -26,7 +27,9 @@ class DiscussionListContainer extends React.Component {
 }
 
 const mapStateToProps = (state, { status, id }) => ({
-  discussions: getWTDiscussionsByState(state, id, status),
+  discussions: getWTDiscussionsByState(state, id, status).sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+  ),
   pageInfo: getDiscussionPageInfo(state, status),
 });
 
