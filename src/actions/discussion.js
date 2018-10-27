@@ -28,6 +28,7 @@ export const discussionFields = `
   createdAt
   closedAt
   deletedAt
+  updatedAt
   numComments
   workTeamId
   content
