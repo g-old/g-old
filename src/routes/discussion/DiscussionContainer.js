@@ -107,6 +107,10 @@ class DiscussionContainer extends React.Component {
     this.setRef = this.setRef.bind(this);
     this.checkCommentExists = this.checkCommentExists.bind(this);
     this.handleScrollToResource = this.handleScrollToResource.bind(this);
+    this.toggleEditing = this.toggleEditing.bind(this);
+    this.handleDiscussionUpdate = this.handleDiscussionUpdate.bind(this);
+    this.storageKey = `discussionMutation${props.discussion.id}`;
+    this.deleteStoredData = this.deleteStoredData.bind(this);
   }
 
   componentDidMount() {
@@ -255,6 +259,37 @@ class DiscussionContainer extends React.Component {
     });
   }
 
+  handleDiscussionUpdate(values) {
+    const { discussion, updateDiscussion: mutateDiscussion } = this.props;
+    const content =
+      values.content || localStorage.getItem(`${this.storageKey}content`);
+
+    const title =
+      values.title || localStorage.getItem(`${this.storageKey}title`);
+    mutateDiscussion({
+      id: discussion.id,
+      ...(content ? { content } : {}),
+      ...(title ? { title } : {}),
+      workTeamId: discussion.workTeam.id,
+    }).then(() => {
+      this.deleteStoredData();
+      this.setState({ isEditing: false });
+    });
+  }
+
+  toggleEditing() {
+    const { isEditing } = this.state;
+    if (isEditing) {
+      this.deleteStoredData();
+    }
+    this.setState(prevState => ({ isEditing: !prevState.isEditing }));
+  }
+
+  deleteStoredData() {
+    localStorage.removeItem(`${this.storageKey}content`);
+    localStorage.removeItem(`${this.storageKey}title`);
+  }
+
   handleReply({ id }) {
     const { discussion } = this.props;
     if (!discussion.closedAt) {
@@ -304,7 +339,7 @@ class DiscussionContainer extends React.Component {
       updateComment: mutateComment,
       deleteComment: eraseComment,
     } = this.props;
-    const { replying, activeId } = this.state;
+    const { replying, activeId, isEditing } = this.state;
     if (isFetching && !discussion) {
       return <p>{'Loading...'} </p>;
     }
@@ -314,7 +349,7 @@ class DiscussionContainer extends React.Component {
       );
     }
     if (this.isReady()) {
-      let closingElement;
+      let menu;
       /* eslint-disable eqeqeq, no-bitwise */
       if (
         (discussion.workTeam && discussion.workTeam.coordinatorId == user.id) ||
@@ -322,28 +357,51 @@ class DiscussionContainer extends React.Component {
       ) {
         /* eslint-enable eqeqeq, no-bitwise */
 
-        closingElement = (
-          <Button
-            plain
-            onClick={this.handleDiscussionClosing}
-            icon={
-              <svg
-                version="1.1"
-                viewBox="0 0 24 24"
-                width="24px"
-                height="24px"
-                role="img"
-                aria-label="lock"
-              >
-                <path
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  d={ICONS[discussion.closedAt ? 'lock' : 'unlock']}
-                />
-              </svg>
-            }
-          />
+        menu = (
+          <Box>
+            <Button
+              plain
+              onClick={this.toggleEditing}
+              icon={
+                <svg
+                  version="1.1"
+                  viewBox="0 0 24 24"
+                  width="24px"
+                  height="24px"
+                  role="img"
+                  aria-label="lock"
+                >
+                  <path
+                    fill="none"
+                    stroke="#000"
+                    strokeWidth="2"
+                    d={ICONS[isEditing ? 'close' : 'editBig']}
+                  />
+                </svg>
+              }
+            />
+            <Button
+              plain
+              onClick={this.handleDiscussionClosing}
+              icon={
+                <svg
+                  version="1.1"
+                  viewBox="0 0 24 24"
+                  width="24px"
+                  height="24px"
+                  role="img"
+                  aria-label="lock"
+                >
+                  <path
+                    fill="none"
+                    stroke="#000"
+                    strokeWidth="2"
+                    d={ICONS[discussion.closedAt ? 'lock' : 'unlock']}
+                  />
+                </svg>
+              }
+            />
+          </Box>
         );
       }
       // return proposal, poll, statementslist
@@ -371,14 +429,18 @@ class DiscussionContainer extends React.Component {
                   />
                 )}
 
-                {closingElement}
+                {menu}
               </Box>
               <Discussion
                 title={discussion.title}
                 content={discussion.content}
                 createdAt={discussion.createdAt}
                 closedAt={discussion.closedAt}
-                spokesman={discussion.spokesman}
+                updatedAt={discussion.updatedAt}
+                author={discussion.author}
+                onUpdate={this.handleDiscussionUpdate}
+                isEditing={isEditing}
+                storageKey={this.storageKey}
               />
               {!discussion.closedAt && (
                 <SubscriptionButton

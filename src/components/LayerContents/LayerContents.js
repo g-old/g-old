@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '../Button';
+import { ICONS } from '../../constants';
 
 class LayerContents extends React.Component {
   static propTypes = {
@@ -82,7 +83,7 @@ class LayerContents extends React.Component {
                   fill="none"
                   stroke="#000"
                   strokeWidth="2"
-                  d="M3,3 L21,21 M3,21 L21,3"
+                  d={ICONS.close}
                 />
               </svg>
             </span>

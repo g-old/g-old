@@ -6,6 +6,7 @@ import { transactify } from './utils';
 
 import WorkTeam from './WorkTeam'; // eslint-disable-line import/no-cycle
 import Comment from './Comment';
+import sanitize from '../../core/htmlSanitizer';
 
 type ID = number | string;
 export type DiscussionProps = {
@@ -91,7 +92,7 @@ class Discussion {
         .insert({
           author_id: viewer.id,
           title: data.title.trim(),
-          content: data.content.trim(),
+          content: sanitize(data.content.trim()),
           work_team_id: data.workTeamId,
           created_at: new Date(),
         })
@@ -139,6 +140,12 @@ class Discussion {
     const newData = { updated_at: new Date() };
     if ('close' in data) {
       newData.closed_at = data.close === true ? new Date() : null;
+    }
+    if (data.content) {
+      newData.content = sanitize(data.content.trim());
+    }
+    if (data.title) {
+      newData.title = data.title;
     }
 
     const [discussion = null] = await knex('discussions')
