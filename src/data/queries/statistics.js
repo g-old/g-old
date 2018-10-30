@@ -9,6 +9,7 @@ import BucketInfoType from '../types/BucketInfoType';
 import ServerInfoType from '../types/ServerInfoType';
 import RoutePerformance from '../types/RoutePerformance';
 import knex from '../knex';
+import log from '../../logger';
 
 let bucketResult;
 let lastFetchTime = new Date(1970, 0, 1);
@@ -266,9 +267,11 @@ const statistics = {
             lastFetchTime = new Date();
 
             lastFetchTask = new Promise((resolve, reject) => {
-              cloudinary.v2.api.usage(
-                (error, result) => (error ? reject(error) : resolve(result)),
-              );
+              cloudinary.v2.api
+                .usage(
+                  (error, result) => (error ? reject(error) : resolve(result)),
+                )
+                .catch(err => log.error({ err }, 'Cloudinary error'));
             })
               .then(data => {
                 if (data) {
