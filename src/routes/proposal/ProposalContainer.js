@@ -245,7 +245,11 @@ class ProposalContainer extends React.Component {
       hideOwnStatement = false;
     }
     let filterNode = null;
-    if (poll.mode && poll.mode.withStatements && !poll.mode.unipolar) {
+    if (
+      poll.mode &&
+      poll.mode.withStatements &&
+      !(poll.mode.unipolar || poll.extended)
+    ) {
       filterNode = <Filter filter={filter} filterFn={this.filterStatements} />;
     }
     return (

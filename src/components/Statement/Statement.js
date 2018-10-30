@@ -280,6 +280,7 @@ class Statement extends React.Component {
       pollClosed,
       onProfileClick,
       ownLike,
+      neutral,
     } = this.props;
     const { textArea, edit, pending, collapsed, contentOverflows } = this.state;
     let canLike;
@@ -418,16 +419,16 @@ class Statement extends React.Component {
       }
     }
 
+    let statementPosition;
+    if (!neutral) {
+      statementPosition =
+        vote && vote.positions[0].pos === 0 && vote.positions[0].value
+          ? s.pro
+          : s.contra;
+    }
+
     return (
-      <div
-        className={cn(
-          s.rootAlt,
-          vote && vote.positions[0].pos === 0 && vote.positions[0].value
-            ? s.pro
-            : s.contra,
-          inactive && s.inactive,
-        )}
-      >
+      <div className={cn(s.rootAlt, statementPosition, inactive && s.inactive)}>
         {/* eslint-disable jsx-a11y/interactive-supports-focus */}
         {!inactive && (
           // eslint-disable-next-line

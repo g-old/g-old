@@ -75,25 +75,43 @@ class StatementsContainer extends React.Component {
     this.state = {};
     this.handleStatementSubmission = this.handleStatementSubmission.bind(this);
   }
-  handleStatementSubmission({ id, text }, update) {
-    if (update) {
-      this.props.updateStatement({ id, text });
+
+  handleStatementSubmission({ id, text }, makeUpdate) {
+    const { updateStatement: update } = this.props;
+    if (makeUpdate) {
+      update({ id, text });
     }
   }
 
   render() {
     const {
-      poll: { ownStatement, ownVote, id, likedStatements, mode },
+      poll: {
+        ownStatement,
+        ownVote,
+        id,
+        likedStatements,
+        mode,
+        extended,
+        closedAt,
+      },
       user,
       hideOwnStatement,
       followees,
       updates,
       statements,
+      createStatement: create,
+      updateStatement: update,
+      deleteStatement: deleteStmt,
+      createLike: makeLike,
+      deleteLike: delLike,
+      updateUser: follow,
+      flag: createFlag,
+      solveFlag: mutateFlag,
     } = this.props;
     let ownStatementsNode = null;
     let statementsList = [];
     if (mode.withStatements) {
-      if (!ownStatement && ownVote && !this.props.poll.closedAt) {
+      if (!ownStatement && ownVote && !closedAt) {
         const data = {
           vote: ownVote,
           author: user,
@@ -103,13 +121,14 @@ class StatementsContainer extends React.Component {
         };
         ownStatementsNode = (
           <Statement
+            neutral={extended}
             user={user}
-            pollClosed={this.props.poll.closedAt}
+            pollClosed={closedAt}
             key="0000"
             updates={updates['0000']}
             {...data}
-            onCreate={this.props.createStatement}
-            asInput={!this.props.poll.closedAt}
+            onCreate={create}
+            asInput={!closedAt}
             followees={followees}
           />
         );
@@ -117,7 +136,8 @@ class StatementsContainer extends React.Component {
       if (ownStatement && !hideOwnStatement) {
         ownStatementsNode = (
           <Statement
-            pollClosed={this.props.poll.closedAt}
+            neutral={extended}
+            pollClosed={closedAt}
             user={user}
             onSubmit={this.handleStatementSubmission}
             key={ownStatement.id}
@@ -125,9 +145,9 @@ class StatementsContainer extends React.Component {
             updates={updates[ownStatement.id]}
             ownStatement
             followees={followees}
-            onUpdate={this.props.updateStatement}
-            onCreate={this.props.createStatement}
-            onDelete={this.props.deleteStatement}
+            onUpdate={update}
+            onCreate={create}
+            onDelete={deleteStmt}
           />
         );
       }
@@ -151,19 +171,20 @@ class StatementsContainer extends React.Component {
         {toRender.map(s => (
           <Statement
             {...s}
+            neutral={extended}
             user={user}
             key={s.id}
             ownLike={
               likedStatements &&
               likedStatements.find(data => data.statementId === s.id)
             }
-            onLike={this.props.createLike}
-            onDeleteLike={this.props.deleteLike}
-            onFollow={this.props.updateUser}
-            onDelete={this.props.deleteStatement}
-            onModeration={this.props.solveFlag}
+            onLike={makeLike}
+            onDeleteLike={delLike}
+            onFollow={follow}
+            onDelete={deleteStmt}
+            onModeration={mutateFlag}
             onProfileClick={handleProfileClick}
-            onFlagging={this.props.flag}
+            onFlagging={createFlag}
             followees={followees}
             isFollowee={followees.some(f => f.id === s.author.id)}
           />
@@ -191,6 +212,7 @@ const mapDispatch = {
   updateUser,
 };
 
-export default connect(mapStateToProps, mapDispatch)(
-  withStyles(css)(StatementsContainer),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(withStyles(css)(StatementsContainer));
