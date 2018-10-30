@@ -4,13 +4,13 @@ import ActivityFilterType from '../types/ActivityFilterType';
 import Activity from '../models/Activity';
 import knex from '../knex';
 import { createConnection } from '../utils';
-import { isAdmin } from '../../organization';
+import { isAdmin, isSuperuser } from '../../organization';
 
 const allActivities = createConnection(
   ActivityType,
   Activity,
   async (viewer, { cursorDate, cursorId, batchSize }, args) =>
-    isAdmin(viewer)
+    isAdmin(viewer) || isSuperuser(viewer)
       ? knex('activities')
           .whereRaw('(activities.created_at, activities.id) < (?,?)', [
             cursorDate,
