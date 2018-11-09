@@ -60,9 +60,11 @@ class UserFaker {
       const userName = increase
         ? this.createName(name, i)
         : name || faker.name.firstName();
+
+      const userLastname = increase ? faker.name.lastName() : surname;
       result.push({
         name: userName,
-        surname,
+        surname: userLastname,
         password_hash: this.passwordHash,
         email: increase
           ? this.createEmail(email || name, i)
@@ -120,7 +122,10 @@ exports.seed = async function seed(knex, Promise) {
 
   const testUsers = userFaker.createAndStoreUsers({ name: 'user' }, 4);
 
-  const users = userFaker.createAndStoreUsers({}, 30);
+  const users = userFaker.createAndStoreUsers(
+    { groups: Groups.GUEST | Groups.VIEWER | Groups.VOTER },
+    30,
+  );
 
   const testViewers = userFaker.createAndStoreUsers(
     { name: 'viewer', groups: Groups.GUEST | Groups.VIEWER },
