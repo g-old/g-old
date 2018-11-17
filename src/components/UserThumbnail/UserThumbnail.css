@@ -18,9 +18,10 @@
   > *:not(:last-child) {
     margin-right: 0.5rem;
   }
+}
 
-  img {
-    width: 1em;
-    height: 1em;
-  }
+.thumbnail {
+  width: 1em;
+  height: 1em;
+  stroke: #aaa;
 }

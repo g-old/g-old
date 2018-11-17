@@ -17,6 +17,7 @@ import { ICONS } from '../../constants';
 import { Permissions } from '../../organization';
 import Menu from '../Menu';
 import Button from '../Button';
+import Avatar from '../Avatar';
 
 const messages = defineMessages({
   flag: {
@@ -486,16 +487,11 @@ class Comment extends React.Component {
 
     return (
       <div className={s.header}>
-        {/* eslint-disable jsx-a11y/interactive-supports-focus */}
-        {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */}
-        <img // eslint-disable-line
+        <Avatar
+          user={actor}
           onClick={own ? null : this.handleProfileClick}
-          className={cn(s.avatar, own ? null : s.clickable)}
-          src={actor && actor.thumbnail}
-          alt="IMG"
+          className={s.avatar}
         />
-
-        {/* eslint-enable jsx-a11y/interactive-supports-focus */}
         <div className={s.details}>
           <div className={s.bar}>
             <span className={s.author}>{`${actor.name} ${actor.surname}`}</span>
@@ -506,9 +502,7 @@ class Comment extends React.Component {
               {editedAt ? (
                 <FormattedMessage
                   {...messages.edited}
-                  values={{
-                    time: intl.formatRelative(editedAt),
-                  }}
+                  values={{ time: intl.formatRelative(editedAt) }}
                 />
               ) : (
                 <FormattedRelative value={createdAt} />

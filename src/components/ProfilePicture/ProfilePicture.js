@@ -7,6 +7,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './ProfilePicture.css';
 import Button from '../Button';
 import { ICONS } from '../../constants';
+import Avatar from '../Avatar';
 
 const getUrl = thumbnail => {
   const stIndex = thumbnail.indexOf('c_scale');
@@ -32,12 +33,16 @@ class ProfilePicture extends React.Component {
   static defaultProps = {
     canChange: false,
   };
+
   constructor(props) {
     super(props);
 
     this.state = {
       loading: false,
-      image: props.user.avatar ? props.user.avatar : props.user.thumbnail,
+      owner: {
+        ...props.user,
+        thumbnail: props.user.avatar ? props.user.avatar : props.user.thumbnail,
+      },
     };
     this.onLoad = this.onLoad.bind(this);
     this.onError = this.onError.bind(this);
@@ -45,7 +50,9 @@ class ProfilePicture extends React.Component {
   }
 
   componentDidMount() {
-    const { user: { thumbnail, avatar } } = this.props;
+    const {
+      user: { thumbnail, avatar },
+    } = this.props;
     const url = avatar || thumbnail;
     if (url) {
       this.loadImage(getUrl(url));
@@ -53,14 +60,26 @@ class ProfilePicture extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { user: { avatar, thumbnail } } = nextProps;
+    const {
+      user: { avatar, thumbnail },
+    } = nextProps;
+    // eslint-disable-next-line react/destructuring-assignment
     if (thumbnail !== this.props.user.thumbnail) {
       if (!avatar) {
-        this.setState({ image: thumbnail, loading: true }, () => {
-          this.loadImage(getUrl(thumbnail));
-        });
+        this.setState(
+          prevState => ({
+            owner: { ...prevState.owner, thumbnail },
+            loading: true,
+          }),
+          () => {
+            this.loadImage(getUrl(thumbnail));
+          },
+        );
       } else {
-        this.setState({ image: avatar, loading: false });
+        this.setState(prevState => ({
+          owner: { ...prevState.owner, thumbnail: avatar },
+          loading: false,
+        }));
       }
     }
   }
@@ -73,16 +92,17 @@ class ProfilePicture extends React.Component {
   }
 
   onLoad() {
-    this.setState({
-      image: this.image.src,
+    this.setState(prevState => ({
+      owner: { ...prevState.owner, thumbnail: this.image.src },
       loading: false,
-    });
+    }));
   }
 
   // eslint-disable-next-line class-methods-use-this
   onError() {
     console.error('Could not load image');
   }
+
   loadImage(src) {
     if (src) {
       if (this.image) {
@@ -100,6 +120,7 @@ class ProfilePicture extends React.Component {
   render() {
     let uploadBnt = null;
     const { canChange, updates, onChange } = this.props;
+    const { loading, owner } = this.state;
     if (canChange) {
       uploadBnt = (
         <Button plain onClick={onChange} disabled={updates && updates.pending}>
@@ -115,55 +136,14 @@ class ProfilePicture extends React.Component {
           </span>
         </Button>
       );
-      /*  uploadBnt = (
-        <Button
-          icon={
-            <svg viewBox="0 0 24 24" width="24px" height="24px">
-              <path
-                fill="none"
-                stroke="#000"
-                strokeWidth="2"
-                d={ICONS.editBig}
-              />
-            </svg>
-          }
-          plain
-          onClick={onChange}
-          disabled={updates && updates.pending}
-        />
-      ); */
     }
-    let picture;
-    if (this.state.image) {
-      picture = (
-        <img
-          className={cn(s.avatar, this.state.loading ? s.imgSmall : s.loaded)}
-          src={this.state.image}
-          alt="IMG"
-        />
-      );
-    } else {
-      picture = (
-        <svg
-          version="1.1"
-          viewBox="0 0 24 24"
-          width="256px"
-          height="256px"
-          role="img"
-          aria-label="user"
-        >
-          <path
-            fill="none"
-            stroke=""
-            strokeWidth="2"
-            d="M8,24 L8,19 M16,24 L16,19 M3,24 L3,19 C3,14.0294373 7.02943725,11 12,11 C16.9705627,11 21,14.0294373 21,19 L21,24 M12,11 C14.7614237,11 17,8.76142375 17,6 C17,3.23857625 14.7614237,1 12,1 C9.23857625,1 7,3.23857625 7,6 C7,8.76142375 9.23857625,11 12,11 Z"
-          />
-        </svg>
-      );
-    }
+
     return (
       <div className={cn(s.container, s.placeholder)}>
-        {picture}
+        <Avatar
+          user={owner}
+          className={cn(s.avatar, loading ? s.imgSmall : s.loaded)}
+        />
         <div className={s.overlay}>{uploadBnt}</div>
       </div>
     );

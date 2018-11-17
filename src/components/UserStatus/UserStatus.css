@@ -1,0 +1,9 @@
+.root {
+  margin-left: 0.15rem;
+  box-shadow: 0 0 0 2px white;
+  border-radius: 2px;
+  height: 2.2rem;
+  width: 2.2rem;
+  vertical-align: bottom;
+  stroke: #e9ca57;
+}

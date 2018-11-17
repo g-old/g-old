@@ -1,11 +1,14 @@
-.avatar {
+.default {
   width: 2.2em;
   height: 2.2em;
+  stroke: #bbb;
 }
 
 .followee {
-  width: 2.2em;
-  height: 2.2em;
   border-radius: 12px;
   border: 6px solid #25149b;
+}
+
+.clickable {
+  cursor: pointer;
 }

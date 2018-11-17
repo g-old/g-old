@@ -4,15 +4,17 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './UserThumbnail.css';
 import Link from '../Link';
+import Avatar from '../Avatar';
 
 const UserThumbnail = ({ user, label, marked, big }) => {
   const fullName = user ? `${user.name} ${user.surname}` : '';
+
   return user ? ( // eslint-disable-next-line jsx-a11y/anchor-is-valid
     <Link
       to={`/accounts/${user.id}`}
       className={cn(marked && s.mark, s.root, big && s.big)}
     >
-      <img src={user.thumbnail} alt={fullName} />
+      <Avatar user={user} className={s.thumbnail} />
       {label}
       <span>{fullName}</span>
     </Link>
