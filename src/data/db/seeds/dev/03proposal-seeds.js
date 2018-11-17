@@ -2,9 +2,10 @@ const Groups = require('../oldseeds/groups');
 const VotingProposal = require('../oldseeds/VotingProposal');
 const ProposedProposal = require('../oldseeds/ProposedProposals');
 const AcceptedFaker = require('../oldseeds/AcceptedFaker');
+const SurveyFaker = require('../oldseeds/SurveyFaker');
 
 exports.seed = async function seed(knex, Promise) {
-  const [proposed, voting] = await knex('polling_modes')
+  const [proposed, voting, survey] = await knex('polling_modes')
     .insert([
       {
         name: 'propose',
@@ -46,6 +47,9 @@ exports.seed = async function seed(knex, Promise) {
 
   const acceptedFaker = new AcceptedFaker({ numVoter: count, authorIds }, knex);
   const acceptedProposals = acceptedFaker.create([proposed, voting], 40);
+
+  const surveyFaker = new SurveyFaker({ numVoter: count, authorIds }, knex);
+  const surveys = surveyFaker.create(survey, 40);
   /*
   const repelledFaker = new RepelledFaker({ numVoter: count, authorIds }, knex);
   const repelledProposals = repelledFaker.create([proposed, voting], 40);
@@ -62,6 +66,7 @@ exports.seed = async function seed(knex, Promise) {
     ...proposedProposals,
     ...votingProposals,
     ...acceptedProposals,
+    ...surveys,
     // ...repelledProposals,
     // ...revokedProposals,
   ]);
