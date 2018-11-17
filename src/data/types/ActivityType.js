@@ -24,29 +24,37 @@ const addProposalInfo = async (viewer, loaders, pollId, data = {}) => {
   if (!pollId) {
     return JSON.stringify({});
   }
-  const { id, title } = await Proposal.genByPoll(viewer, pollId, loaders);
+  const proposalData = await Proposal.genByPoll(viewer, pollId, loaders);
 
-  return JSON.stringify({ proposalId: id, proposalTitle: title, ...data });
+  return JSON.stringify(
+    proposalData
+      ? {
+          proposalId: proposalData.id,
+          proposalTitle: proposalData.title,
+          ...data,
+        }
+      : data,
+  );
 };
 
 const addWorkTeamInfo = async (viewer, loaders, workTeamId) => {
   if (!workTeamId) {
     return JSON.stringify({});
   }
-  const { id, name, deName, itName, lldName, logo } = await WorkTeam.gen(
-    viewer,
-    workTeamId,
-    loaders,
-  );
+  const data = await WorkTeam.gen(viewer, workTeamId, loaders);
 
-  return JSON.stringify({
-    workTeamId: id,
-    name,
-    logo,
-    itName,
-    deName,
-    lldName,
-  });
+  return JSON.stringify(
+    data
+      ? {
+          workTeamId: data.id,
+          name: data.name,
+          logo: data.logo,
+          itName: data.itName,
+          deName: data.deName,
+          lldName: data.lldName,
+        }
+      : {},
+  );
 };
 
 // TODO store this in activity - would not be a problem
@@ -54,15 +62,15 @@ const addDiscussionInfo = async (viewer, loaders, discussionId) => {
   if (!discussionId) {
     return JSON.stringify({});
   }
-  const { workTeamId, title } = await Discussion.gen(
-    viewer,
-    discussionId,
-    loaders,
+  const data = await Discussion.gen(viewer, discussionId, loaders);
+  return JSON.stringify(
+    data
+      ? {
+          workTeamId: data.workTeamId,
+          title: data.title,
+        }
+      : {},
   );
-  return JSON.stringify({
-    workTeamId,
-    title,
-  });
 };
 
 const getVote = (viewer, parent, loaders) => {
@@ -140,7 +148,7 @@ const ActivityType = new GraphQLObjectType({
             loaders.polls.clearAll(); // or specify
           }
           result = await Proposal.gen(viewer, parent.objectId, loaders);
-          if (result.deletedAt) {
+          if (result && result.deletedAt) {
             return new Proposal({
               id: result.id,
               deleted_at: result.deletedAt,
@@ -161,7 +169,7 @@ const ActivityType = new GraphQLObjectType({
         }
         if (parent.type === AType.DISCUSSION) {
           result = await Discussion.gen(viewer, parent.objectId, loaders);
-          if (result.deletedAt) {
+          if (result && result.deletedAt) {
             return new Discussion({
               id: result.id,
               deleted_at: result.deletedAt,
@@ -192,7 +200,11 @@ const ActivityType = new GraphQLObjectType({
         switch (parent.type) {
           case AType.STATEMENT: {
             const statement = await getStatement(viewer, parent, loaders);
-            return addProposalInfo(viewer, loaders, statement.pollId);
+            return addProposalInfo(
+              viewer,
+              loaders,
+              statement && statement.pollId,
+            );
           }
           case AType.VOTE: {
             const vote = getVote(viewer, parent, loaders);
