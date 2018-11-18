@@ -16,6 +16,7 @@ import Layer from '../Layer';
 import Notification from '../Notification';
 import history from '../../history';
 import PollOptionsView from '../PollOptionsView';
+import Avatar from '../Avatar';
 
 const messages = defineMessages({
   closed: {
@@ -137,18 +138,17 @@ class Poll extends React.Component {
     if (!followeeVotes) {
       return null;
     }
-    return followeeVotes.filter(user => user.position === pos).map(user => (
-      <img // eslint-disable-line
-        onClick={() => {
-          history.push(`/accounts/${user.voter.id}`);
-        }}
-        key={user.id}
-        className={s.followee}
-        src={user.voter.thumbnail}
-        title={`${user.voter.name} ${user.voter.surname}`}
-        alt="IMG"
-      />
-    ));
+    return followeeVotes
+      .filter(vote => vote.positions[0].pos === (pos === 'pro' ? 0 : 1))
+      .map(vote => (
+        <Avatar
+          onClick={() => {
+            history.push(`/accounts/${vote.voter.id}`);
+          }}
+          className={s.followee}
+          user={vote.voter}
+        />
+      ));
   }
 
   canVote(positions) {

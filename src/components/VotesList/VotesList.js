@@ -5,6 +5,7 @@ import cn from 'classnames';
 import s from './VotesList.css';
 import FetchError from '../FetchError';
 import history from '../../history';
+import Avatar from '../Avatar';
 
 const onThumbnailClick = (event, id) => {
   if (event) {
@@ -34,15 +35,12 @@ class VotesList extends React.Component {
 
   static renderVote(vote) {
     return (
-      <img // eslint-disable-line
-        key={vote.id}
+      <Avatar
+        user={vote.voter}
         className={s.avatar}
         onClick={e => {
           onThumbnailClick(e, vote.voter.id);
         }}
-        src={vote.voter.thumbnail}
-        title={`${vote.voter.name} ${vote.voter.surname}`}
-        alt="IMG"
       />
     );
   }

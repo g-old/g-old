@@ -35,6 +35,7 @@
 .followee {
   width: 2em;
   margin: 0.2em;
+  stroke: #bbb;
 }
 
 .confirmationBox {

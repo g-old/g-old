@@ -1,4 +1,4 @@
-@import "../../components/variables.css";
+@import '../../components/variables.css';
 
 /*
 .root {
@@ -47,6 +47,7 @@
   margin-right: 0.4em;
   width: 2.2em;
   height: 2.2em;
+  stroke: #ddd;
 }
 
 .pro {

@@ -11,6 +11,7 @@ import { ICONS } from '../../constants';
 import Notification from '../Notification';
 import { Permissions } from '../../organization';
 import EditMenu from './EditMenu';
+import Avatar from '../Avatar';
 
 import Menu from '../Menu';
 import Button from '../Button';
@@ -278,7 +279,6 @@ class Statement extends React.Component {
       deletedAt,
       updates,
       pollClosed,
-      onProfileClick,
       ownLike,
       neutral,
     } = this.props;
@@ -432,17 +432,12 @@ class Statement extends React.Component {
         {/* eslint-disable jsx-a11y/interactive-supports-focus */}
         {!inactive && (
           // eslint-disable-next-line
-          <div
-            role="button"
-            style={{ cursor: onProfileClick ? 'pointer' : 'auto' }}
+
+          <Avatar
+            user={author}
+            className={s.avatar}
             onClick={this.handleProfileClick}
-          >
-            <img
-              className={cn(s.avatar)}
-              src={author && author.thumbnail}
-              alt="IMG"
-            />
-          </div>
+          />
         )}
         {/* eslint-enable jsx-a11y/interactive-supports-focus */}
         <div style={{ width: '100%' }}>

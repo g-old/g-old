@@ -26,15 +26,18 @@ function Avatar({ user, isFollowee, className, onClick }: Props) {
     return (
       // eslint-disable-next-line jsx-a11y/click-events-have-key-events
       <img
+        key={user.id}
         onClick={onClick}
         className={classNames}
         src={user.thumbnail}
         alt={user.name}
+        title={`${user.name} ${user.surname}`}
       />
     );
   }
   return (
     <svg
+      key={user.id}
       onClick={onClick}
       className={classNames}
       version="1.1"
