@@ -1147,7 +1147,7 @@
     "id": "workTeams",
     "description": "Workteam label",
     "defaultMessage": "Workteams",
-    "message": "Grup de laour",
+    "message": "Grups de laour",
     "files": [
       "src/components/Navigation/Navigation.js",
       "src/routes/workTeamList/WorkTeamListContainer.js"
