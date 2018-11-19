@@ -10,6 +10,8 @@ import {
   loadMessages,
   deleteUser,
 } from '../../actions/user';
+import { logout } from '../../actions/session';
+
 import { verifyEmail } from '../../actions/verifyEmail';
 import { loadLogs } from '../../actions/log';
 import { Groups } from '../../organization';
@@ -381,6 +383,7 @@ class AccountContainer extends React.Component {
       leaveWorkTeam: leave,
       workTeams,
       deleteUser: deleteAccount,
+      logout: onLogout,
     } = this.props;
 
     const {
@@ -506,10 +509,7 @@ class AccountContainer extends React.Component {
           {showUpload && (
             <ImageUpload
               uploadAvatar={data => {
-                saveAvatar({
-                  ...data,
-                  id: user.id,
-                });
+                saveAvatar({ ...data, id: user.id });
               }}
               uploadPending={updates.dataUrl && updates.dataUrl.pending}
               uploadError={updates.dataUrl && updates.dataUrl.error}
@@ -554,6 +554,7 @@ class AccountContainer extends React.Component {
                     onLeaveWorkTeam={leave}
                     workTeams={workTeams}
                     onDeleteAccount={deleteAccount}
+                    onLogout={onLogout}
                   />
                 </div>
               </AccordionPanel>
@@ -600,6 +601,7 @@ const mapDispatch = {
   loadMessages,
   createMessage,
   deleteUser,
+  logout,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getUser(state, user.id) || user,
