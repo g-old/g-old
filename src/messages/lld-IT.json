@@ -132,7 +132,7 @@
     "id": "commands.cancel",
     "description": "Short command to cancel a operation",
     "defaultMessage": "Cancel",
-    "message": "straiché",
+    "message": "Anulé",
     "files": [
       "src/components/ConfirmLayer/ConfirmLayer.js",
       "src/components/ImageUpload/ImageUpload.js",
