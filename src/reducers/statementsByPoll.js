@@ -15,7 +15,7 @@ const sortStatementsByPoll = (stmts, votes) =>
     const vote = votes[statement.vote];
     if (!vote) return {};
     const votePos =
-      vote.positions[0].pos === 1 && vote.positions[0].value ? 'pro' : 'con';
+      vote.positions[0].pos === 0 && vote.positions[0].value ? 'pro' : 'con';
 
     return {
       ...acc,
