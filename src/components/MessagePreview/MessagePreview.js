@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import { FormattedRelative } from 'react-intl';
+import Avatar from '../Avatar';
 
 import s from './MessagePreview.css';
 
@@ -10,7 +11,8 @@ const MessagePreview = ({ sender, subject, numReplies, createdAt }) => {
   return (
     <div className={s.preview}>
       <div>
-        <img alt="img" src={sender.thumbnail} />
+        {/* <img alt="img" src={sender.thumbnail} /> */}
+        <Avatar user={sender} />
         <span className={s.subject}>{subject}</span>
         {messageCount}
       </div>

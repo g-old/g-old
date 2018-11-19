@@ -14,7 +14,8 @@
     align-items: center;
   }
 
-  img {
+  img,
+  svg {
     height: 2em;
     width: 2em;
     border-radius: 6px;
