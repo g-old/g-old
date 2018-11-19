@@ -101,7 +101,10 @@ class UserProfile extends React.Component {
 
   toggleLayer() {
     const { layerOpen } = this.state;
-    this.setState({ layerOpen: !layerOpen });
+    const { ownAccount } = this.props;
+    if (!ownAccount) {
+      this.setState({ layerOpen: !layerOpen });
+    }
   }
 
   render() {
@@ -203,6 +206,7 @@ class UserProfile extends React.Component {
         {contactable && (
           <Button
             onClick={this.toggleLayer}
+            disabled={sessionUser.id === user.id}
             icon={
               <svg
                 viewBox="0 0 24 24"
