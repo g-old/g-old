@@ -117,6 +117,10 @@ function userWriteControl(viewer, data) {
     viewer &&
     viewer.id == data.id // eslint-disable-line eqeqeq
   ) {
+    if (data.password) {
+      // allow deletion of oneself
+      return true;
+    }
     if (!(viewer.permissions & Permissions.CHANGE_OWN_PROFILE)) {
       return false;
     }

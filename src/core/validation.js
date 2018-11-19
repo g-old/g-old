@@ -22,7 +22,7 @@ export function passwordValidation(
       errorName: 'shortPassword',
     };
   }
-  if (fieldName === 'passwordOld' && invalidPasswords.includes(pw)) {
+  if (fieldName === 'currentPassword' && invalidPasswords.includes(pw)) {
     result = { touched: true, errorName: 'wrongPassword' };
   }
   return result;

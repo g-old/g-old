@@ -60,6 +60,11 @@ const sanitizeName = name =>
         })
         .join(' ')
     : name;
+
+const protectedAccount = (account, viewer) =>
+  // eslint-disable-next-line eqeqeq
+  account.id != viewer.id && account.groups !== Groups.GUEST;
+
 class User {
   id: ID;
 
@@ -512,12 +517,22 @@ class User {
       result.errors.push('Permission denied');
       return result;
     }
+    // eslint-disable-next-line eqeqeq
+    if (data.id == viewer.id && data.password) {
+      const [hash = ''] = await knex('users')
+        .where({ id: data.id })
+        .pluck('password_hash');
+      if (!(await bcrypt.compare(data.password, hash))) {
+        result.errors.push('password');
+        return result;
+      }
+    }
     let deletedUser;
     try {
       deletedUser = await knex.transaction(async trx => {
         const userInDB = await User.gen(viewer, data.id, loaders);
 
-        if (!userInDB || userInDB.groups !== Groups.GUEST) {
+        if (!userInDB || protectedAccount(userInDB, viewer)) {
           throw new Error(userInDB ? 'Permission denied' : 'User not found');
         }
         let rowCount;

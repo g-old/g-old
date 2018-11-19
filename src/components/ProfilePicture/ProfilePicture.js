@@ -9,7 +9,7 @@ import Button from '../Button';
 import { ICONS } from '../../constants';
 import Avatar from '../Avatar';
 
-const getUrl = thumbnail => {
+const getUrl = (thumbnail = '') => {
   const stIndex = thumbnail.indexOf('c_scale');
   let src = thumbnail;
   if (stIndex > 0) {

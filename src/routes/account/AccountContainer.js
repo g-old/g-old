@@ -8,6 +8,7 @@ import {
   fetchUser,
   fetchProfileData,
   loadMessages,
+  deleteUser,
 } from '../../actions/user';
 import { verifyEmail } from '../../actions/verifyEmail';
 import { loadLogs } from '../../actions/log';
@@ -379,6 +380,7 @@ class AccountContainer extends React.Component {
       joinWorkTeam: join,
       leaveWorkTeam: leave,
       workTeams,
+      deleteUser: deleteAccount,
     } = this.props;
 
     const {
@@ -551,6 +553,7 @@ class AccountContainer extends React.Component {
                     onJoinWorkTeam={join}
                     onLeaveWorkTeam={leave}
                     workTeams={workTeams}
+                    onDeleteAccount={deleteAccount}
                   />
                 </div>
               </AccordionPanel>
@@ -596,6 +599,7 @@ const mapDispatch = {
   deleteRequest,
   loadMessages,
   createMessage,
+  deleteUser,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getUser(state, user.id) || user,

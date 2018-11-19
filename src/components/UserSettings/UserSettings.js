@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import Box from '../Box';
+import ConfirmDelete from './ConfirmDelete';
+import Button from '../Button';
 import EmailField from './EmailField';
 import NameInput from './NameInput';
 import LocaleInput from './LocaleInput';
@@ -160,6 +162,8 @@ class UserSettings extends React.Component {
     this.handleEmailUpdate = this.handleEmailUpdate.bind(this);
     this.handlePasswordUpdate = this.handlePasswordUpdate.bind(this);
     this.handleLocaleUpdate = this.handleLocaleUpdate.bind(this);
+    this.toggleDeleteLayer = this.toggleDeleteLayer.bind(this);
+    this.handleAccountDeletion = this.handleAccountDeletion.bind(this);
     const testValues = {
       email: { fn: 'email' },
     };
@@ -322,12 +326,22 @@ class UserSettings extends React.Component {
     }
   }
 
+  handleAccountDeletion(password) {
+    const { onDeleteAccount, user } = this.props;
+    onDeleteAccount({ id: user.id, password });
+  }
+
+  toggleDeleteLayer() {
+    this.setState(({ showDelete }) => ({ showDelete: !showDelete }));
+  }
+
   render() {
     const {
       showEmailInput,
       email,
       passwordError: passwordUpdateError,
       passwordSuccess: passwordUpdateSuccess,
+      showDelete,
     } = this.state;
     const {
       updates,
@@ -441,6 +455,31 @@ class UserSettings extends React.Component {
           user={user}
           onUpdate={update}
         />
+        <legend>Account</legend>
+        <Box>
+          <Button
+            label="Delete account"
+            primary
+            onClick={this.toggleDeleteLayer}
+          />
+          {showDelete && (
+            <ConfirmDelete
+              onClose={this.toggleDeleteLayer}
+              onDelete={this.handleAccountDeletion}
+              invalidPassword={
+                updates &&
+                updates.password &&
+                updates.password.error &&
+                updates.password.error.password
+              }
+              updates={{
+                error: passwordUpdateError,
+                pending: passwordPending,
+                success: passwordUpdateSuccess,
+              }}
+            />
+          )}
+        </Box>
       </Box>
     );
   }

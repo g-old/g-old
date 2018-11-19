@@ -166,8 +166,8 @@ mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $pass
 `;
 
 const deleteUserMutation = `
-mutation($id:ID){
-  deleteUser(user:{id:$id}){
+mutation($user:UserInput){
+  deleteUser(user:$user){
     user{${userFields}
     groups
   }
@@ -498,43 +498,72 @@ export function fetchProfileData({ id }) {
   };
 }
 
-export function deleteUser({ id }) {
+export function deleteUser({ id, password }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // eslint-disable-next-line no-unused-vars
+    const initState = {
+      pending: true,
+      success: false,
+      error: null,
+    };
+    const properties = {
+      deleted: { ...initState },
+      ...(password
+        ? {
+            password: {
+              ...initState,
+            },
+          }
+        : {}),
+    };
 
     dispatch({
       type: DELETE_USER_START,
       id,
-      properties: {
-        deleted: {
-          pending: true,
-          success: false,
-          error: null,
-        },
-      },
+      properties,
     });
 
     try {
-      const { data } = await graphqlRequest(deleteUserMutation, { id });
+      const { data } = await graphqlRequest(deleteUserMutation, {
+        user: {
+          id,
+          password,
+        },
+      });
       const { errors } = data.deleteUser;
       if (errors.length) {
         /* eslint-disable no-return-assign */
-        const standardError = errors.reduce(
+        /* const standardError = errors.reduce(
           (acc, curr) => (acc[curr] = { [curr]: { [curr]: true } }),
           {},
-        );
+        ); */
         /* eslint-enable no-return-assign */
-
+        const standardError = errors.reduce((acc, curr) => {
+          if (curr in properties) {
+            acc[curr] = { [curr]: { [curr]: true } };
+            return acc;
+          }
+          acc.err = curr;
+          return acc;
+        }, {});
+        let message;
+        if (standardError.err) {
+          message = standardError.err;
+        } else {
+          message = { fields: standardError };
+        }
         dispatch({
           type: DELETE_USER_ERROR,
+          id,
+          message,
           payload: {
             errors,
           },
-
-          message: { fields: standardError },
+          properties,
         });
         return false;
       }
+
       const normalizedData = normalize(data.deleteUser.user, userSchema);
       dispatch({
         type: DELETE_USER_SUCCESS,

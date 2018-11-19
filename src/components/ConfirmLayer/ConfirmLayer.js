@@ -41,7 +41,16 @@ const messages = defineMessages({
   },
 });
 
-function ConfirmLayer({ action, note, onClose, title, intl, onSubmit }) {
+function ConfirmLayer({
+  action,
+  note,
+  onClose,
+  title,
+  intl,
+  onSubmit,
+  children,
+  pending,
+}) {
   const actionId = action || 'delete';
   let message;
   if (note) {
@@ -55,29 +64,36 @@ function ConfirmLayer({ action, note, onClose, title, intl, onSubmit }) {
   }
   return (
     <Layer onClose={onClose}>
-      <Form>
-        <Header pad="medium" direction="column">
-          <Heading tag="h2" margin="none">
-            {title || <FormattedMessage {...messages.confirm} />}
-          </Heading>
-        </Header>
-        {message}
-        <Box tag="footer" justify padding="medium">
-          <div>
-            <Button
-              label={intl.formatMessage({
-                ...messages[actionId],
-              })}
-              onClick={onSubmit}
-            />{' '}
-            <Button
-              label={intl.formatMessage({ ...messages.cancel })}
-              primary
-              onClick={onClose}
-            />
-          </div>
-        </Box>
-      </Form>
+      <Box justify>
+        <Form>
+          <Header pad="medium" direction="column">
+            <Heading tag="h2" margin="none">
+              {title || <FormattedMessage {...messages.confirm} />}
+            </Heading>
+          </Header>
+          {message}
+          {children}
+          <Box tag="footer" justify padding="medium">
+            <div>
+              <Button
+                label={intl.formatMessage({
+                  ...messages[actionId],
+                })}
+                onClick={onSubmit}
+                disabled={pending}
+              />{' '}
+              <Button
+                label={intl.formatMessage({
+                  ...messages.cancel,
+                })}
+                primary
+                disabled={pending}
+                onClick={onClose}
+              />
+            </div>
+          </Box>
+        </Form>
+      </Box>
     </Layer>
   );
 }

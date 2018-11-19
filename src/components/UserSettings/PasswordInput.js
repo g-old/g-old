@@ -59,6 +59,7 @@ class PasswordInput extends React.Component {
     this.onSubmit = this.onSubmit.bind(this);
     this.handleInvalidPassword = this.handleInvalidPassword.bind(this);
     this.state = { invalidPasswords: [] };
+    this.form = React.createRef();
   }
 
   componentDidUpdate(prevProps) {
@@ -69,7 +70,7 @@ class PasswordInput extends React.Component {
         prevState => ({
           invalidPasswords: [
             ...prevState.invalidPasswords,
-            prevState.validated.passwordOld.trim(),
+            prevState.validated.currentPassword.trim(),
           ],
         }),
         this.handleInvalidPassword,
@@ -81,7 +82,7 @@ class PasswordInput extends React.Component {
     const { onUpdate, user } = this.props;
     onUpdate({
       id: user.id,
-      passwordOld: values.passwordOld.trim(),
+      passwordOld: values.currentPassword.trim(),
       password: values.password.trim(),
     });
     this.setState({ validated: values });
@@ -89,7 +90,7 @@ class PasswordInput extends React.Component {
 
   handleInvalidPassword() {
     const { invalidPasswords } = this.state;
-    this.form.enforceValidation(['passwordOld'], {
+    this.form.current.enforceValidation(['currentPassword'], {
       invalidPasswords,
     });
   }
@@ -99,11 +100,13 @@ class PasswordInput extends React.Component {
     const { invalidPasswords } = this.state;
     return (
       <FormValidation
-        ref={el => (this.form = el)} // eslint-disable-line
-        key={user.id}
+        ref={this.form}
+        key={
+          user.id // eslint-disable-line
+        }
         options={{ invalidPasswords }}
         validations={{
-          passwordOld: {
+          currentPassword: {
             fn: passwordValidation,
             args: { required: true, min: 6 },
           },
@@ -132,13 +135,13 @@ class PasswordInput extends React.Component {
             <fieldset>
               <FormField
                 label={<FormattedMessage {...messages.currentPassword} />}
-                error={errorMessages.passwordOldError}
+                error={errorMessages.currentPasswordError}
               >
                 <input
-                  name="passwordOld"
+                  name="currentPassword"
                   type="password"
                   onChange={handleValueChanges}
-                  value={values.passwordOld}
+                  value={values.currentPassword}
                 />
               </FormField>
               <FormField
