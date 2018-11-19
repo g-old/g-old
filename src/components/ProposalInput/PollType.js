@@ -156,6 +156,12 @@ class PollType extends React.Component<Props, State> {
                 label="with options"
               />
             )}
+            <CheckBox
+              name="withStatements"
+              onChange={handleValueChanges}
+              checked={values.withStatements}
+              label="with statements"
+            />
             {!showSettings &&
               advancedModeOn && (
                 <Button
@@ -168,7 +174,6 @@ class PollType extends React.Component<Props, State> {
                 <PollSettings
                   referenceOptions={referenceOptions}
                   onValueChange={handleValueChanges}
-                  withStatements={values.withStatements}
                   secret={values.secret}
                   threshold={values.threshold}
                   thresholdRef={values.thresholdRef}

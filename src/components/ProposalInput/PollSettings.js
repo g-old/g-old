@@ -24,7 +24,6 @@ const messages = defineMessages({
 });
 
 const PollSettings = ({
-  withStatements,
   onValueChange,
   secret,
   unipolar,
@@ -34,12 +33,6 @@ const PollSettings = ({
 }) => (
   <div>
     <FormField>
-      <CheckBox
-        label="with statements"
-        checked={withStatements}
-        name="withStatements"
-        onChange={onValueChange}
-      />
       <CheckBox
         label="secret"
         name="secret"
