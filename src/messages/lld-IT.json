@@ -132,7 +132,7 @@
     "id": "commands.cancel",
     "description": "Short command to cancel a operation",
     "defaultMessage": "Cancel",
-    "message": "straiché",
+    "message": "Anulé",
     "files": [
       "src/components/ConfirmLayer/ConfirmLayer.js",
       "src/components/ImageUpload/ImageUpload.js",
@@ -1126,7 +1126,7 @@
     "id": "proposals",
     "description": "Proposals label",
     "defaultMessage": "Proposals",
-    "message": "",
+    "message": "Propostes",
     "files": [
       "src/components/Navigation/Navigation.js",
       "src/components/WorkTeam/WorkTeam.js",
@@ -1174,7 +1174,7 @@
     "id": "discussions",
     "description": "Discussions label",
     "defaultMessage": "Discussions",
-    "message": "",
+    "message": "Discuscions",
     "files": [
       "src/components/WorkTeam/WorkTeam.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
@@ -1184,7 +1184,7 @@
     "id": "members",
     "description": "Members label",
     "defaultMessage": "Members",
-    "message": "",
+    "message": "Membres",
     "files": [
       "src/components/WorkTeam/WorkTeam.js",
       "src/routes/memberList/MemberListContainer.js"
@@ -1204,7 +1204,7 @@
     "id": "spokesman",
     "description": "Spokesman label",
     "defaultMessage": "Spokesman",
-    "message": "",
+    "message": "Referent",
     "files": ["src/components/Proposal/Proposal.js"]
   },
   {
@@ -1329,7 +1329,7 @@
     "id": "subscribed",
     "description": "Label subscribed",
     "defaultMessage": "Subscribed ({subType})",
-    "message": "",
+    "message": "Sotscrit ({subType})",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
@@ -1371,7 +1371,7 @@
     "id": "notifications.comment.new",
     "description": "Status message for notifications",
     "defaultMessage": "wrote a comment on",
-    "message": "À scrit n coment sun",
+    "message": "à scrit n coment sun",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1420,7 +1420,7 @@
     "id": "notifications.proposal.voting",
     "description": "Status message for notifications",
     "defaultMessage": "opened voting phase!",
-    "message": "Vatazion daverta",
+    "message": "Votazion daverta",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1434,7 +1434,7 @@
     "id": "notifications.survey.closed",
     "description": "Status message for notifications",
     "defaultMessage": "was closed",
-    "message": "é scluta",
+    "message": "scluta",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1525,7 +1525,7 @@
     "id": "label.messages",
     "description": "Messages label",
     "defaultMessage": "Messages",
-    "message": "",
+    "message": "Messajes",
     "files": [
       "src/components/NotificationSettings/NotificationSettings.js",
       "src/components/UserPanel/UserPanel.js",
@@ -1536,8 +1536,8 @@
   {
     "id": "label.discussions",
     "description": "Label discussions",
-    "defaultMessage": "Discuscions",
-    "message": "",
+    "defaultMessage": "Discussions",
+    "message": "Discuscions",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
