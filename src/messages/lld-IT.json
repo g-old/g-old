@@ -44,14 +44,14 @@
     "id": "account.role",
     "description": "Role of the user",
     "defaultMessage": "Role",
-    "message": "pert",
+    "message": "derc",
     "files": ["src/components/GroupManager/GroupManager.js"]
   },
   {
     "id": "form.error-empty",
     "description": "Help for empty fields",
     "defaultMessage": "You can't leave this empty",
-    "message": "Nia lascé lede",
+    "message": "Nia lascé vuet",
     "files": [
       "src/components/AccountDetails/AccountDetails.js",
       "src/components/DiscussionInput/DiscussionInput.js",
@@ -72,13 +72,13 @@
     "id": "privilege.header",
     "description": "Header of privilegemanager",
     "defaultMessage": "Set & Change Privileges",
-    "message": "dé y mudé privileje"
+    "message": "dé y mudé privilejes"
   },
   {
     "id": "roles.header",
     "description": "Header of groupsemanager",
     "defaultMessage": "Set & Change Groups",
-    "message": "dé y mudé pert",
+    "message": "dé y mudé grup",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
@@ -220,7 +220,7 @@
     "id": "poll.retractVote",
     "description": "Drawing back the vote",
     "defaultMessage": "Retract your vote",
-    "message": "Tré endò vosta ousc",
+    "message": "Tré derevers vosta ousc",
     "files": ["src/components/Poll/Poll.js"]
   },
   {
@@ -389,7 +389,7 @@
     "id": "proposalManager",
     "description": "Manage proposals",
     "defaultMessage": "Manage proposals",
-    "message": "???",
+    "message": "Manajé les propostes",
     "files": [
       "src/components/ProposalPanel/ProposalPanel.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
@@ -429,7 +429,7 @@
     "id": "confirmation",
     "description": "Ask for confirmation",
     "defaultMessage": "Are you sure?",
-    "message": "Siede segur?",
+    "message": "Este segur?",
     "files": ["src/components/ProposalActions/ProposalActions.js"]
   },
   {
@@ -449,7 +449,7 @@
     "id": "manager.revoke",
     "description": "Revoke proposal",
     "defaultMessage": "Revoke proposal",
-    "message": "Tré endo la proposta",
+    "message": "Tré derevers la proposta",
     "files": ["src/components/ProposalActions/ProposalActions.js"]
   },
   {
@@ -509,7 +509,7 @@
     "id": "form.surname",
     "description": "Surname",
     "defaultMessage": "Surname",
-    "message": "sourainom",
+    "message": "Sourainom",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
@@ -597,13 +597,13 @@
     "id": "settings.title",
     "description": "Header for settings",
     "defaultMessage": "Settings",
-    "message": "Settings"
+    "message": "Impostazions"
   },
   {
     "id": "action.success",
     "description": "Short success notification",
     "defaultMessage": "Success!",
-    "message": "Suzés!",
+    "message": "Suzes!",
     "files": [
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/PasswordInput.js",
@@ -756,125 +756,125 @@
     "id": "otherPoll",
     "description": "Button for switching between polls",
     "defaultMessage": "Switch poll",
-    "message": "???"
+    "message": "jì derevers"
   },
   {
     "id": "account.workTeamMissing",
     "description": "No team choosen",
     "defaultMessage": "No team choosen",
-    "message": "",
+    "message": "Nia chirì fora en grup de laour",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "rights.header",
     "description": "Header of privilegemanager",
     "defaultMessage": "Rights",
-    "message": "",
+    "message": "Derc",
     "files": ["src/components/AccountDetails/AccountDetails.js"]
   },
   {
     "id": "discussion.new",
     "description": "Title for activity",
     "defaultMessage": "New discussion",
-    "message": "",
+    "message": "Nueva discuscion",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.failed",
     "description": "Votation against proposal",
     "defaultMessage": "Failed!",
-    "message": "",
+    "message": "Nia ju a bon fin",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.new",
     "description": "Title for activity",
     "defaultMessage": "New proposal",
-    "message": "",
+    "message": "Nueva proposta",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.rejected",
     "description": "Proposal got rejected",
     "defaultMessage": "Rejected",
-    "message": "",
+    "message": "Refudé",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.revoked",
     "description": "Proposal was revoked",
     "defaultMessage": "Revoked",
-    "message": "",
+    "message": "Revoché",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.valid",
     "description": "Proposal turned valid",
     "defaultMessage": "Proposal accepted!",
-    "message": "",
+    "message": "Proposta azetada",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposal.voting",
     "description": "Proposal can be voted from now on",
     "defaultMessage": "Voting open",
-    "message": "",
+    "message": "Votazion daverta",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "survey.new",
     "description": "Title for activity",
     "defaultMessage": "New survey",
-    "message": "",
+    "message": "Nueva enrescida",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "commands.collapseReplies",
     "description": "Hide replies",
     "defaultMessage": "Hide replies",
-    "message": "",
+    "message": "Ascogne les respostes",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "commands.edit",
     "description": "Edit",
     "defaultMessage": "Edit",
-    "message": "",
+    "message": "Edit",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "commands.expandReplies",
     "description": "Show replies",
     "defaultMessage": "View all {cnt} replies",
-    "message": "",
+    "message": "Vedei dutes les {cnt} respostes",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "commands.expandReply",
     "description": "Show reply",
     "defaultMessage": "View reply",
-    "message": "",
+    "message": "Vedei la resposta",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "commands.reply",
     "description": "Btn to reply",
     "defaultMessage": "Reply",
-    "message": "",
+    "message": "Respone",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "label.edited",
     "description": "Comment edited",
     "defaultMessage": "{time} (edited)",
-    "message": "",
+    "message": "{time} (modifiché)",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
     "id": "statements.collapse",
     "description": "Btn to collapse statements",
     "defaultMessage": "Show less",
-    "message": "",
+    "message": "Mostra manco",
     "files": [
       "src/components/Comment/Comment.js",
       "src/components/Statement/Statement.js"
@@ -884,7 +884,7 @@
     "id": "statements.delete",
     "description": "Menu entry on statements to delete statement",
     "defaultMessage": "delete",
-    "message": "",
+    "message": "cancelé",
     "files": [
       "src/components/Comment/Comment.js",
       "src/components/Statement/Statement.js"
@@ -894,7 +894,7 @@
     "id": "statements.expand",
     "description": "Btn to expand statements",
     "defaultMessage": "Read more",
-    "message": "",
+    "message": "lieje deplu",
     "files": [
       "src/components/Comment/Comment.js",
       "src/components/Statement/Statement.js"
@@ -959,14 +959,14 @@
     "id": "navigation.feed",
     "description": "Feed label",
     "defaultMessage": "Feed",
-    "message": "",
+    "message": "Bacheca",
     "files": ["src/components/Navigation/Navigation.js"]
   },
   {
     "id": "command.loadMore",
     "description": "To get more data",
     "defaultMessage": "Load more",
-    "message": "",
+    "message": "Deplù dac",
     "files": [
       "src/components/ActivityPanel/ActivityPanel.js",
       "src/components/ListView/ListView.js",
@@ -979,7 +979,7 @@
     "id": "tags",
     "description": "Tags",
     "defaultMessage": "Tags",
-    "message": "",
+    "message": "Tags",
     "files": [
       "src/components/ProposalPanel/ProposalPanel.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
@@ -989,63 +989,63 @@
     "id": "settings.name",
     "description": "First name",
     "defaultMessage": "Name",
-    "message": "",
+    "message": "Inom",
     "files": ["src/components/UserSettings/NameInput.js"]
   },
   {
     "id": "settings.surname",
     "description": "Surname",
     "defaultMessage": "Surname",
-    "message": "",
+    "message": "Sourainom",
     "files": ["src/components/UserSettings/NameInput.js"]
   },
   {
     "id": "join",
     "description": "Button label",
     "defaultMessage": "Join",
-    "message": "",
+    "message": "Jì ite",
     "files": ["src/components/WorkTeam/WorkTeam.js"]
   },
   {
     "id": "join.withdraw",
     "description": "Cancel join request",
     "defaultMessage": "Dismiss request",
-    "message": "",
+    "message": "Tra derevers la domanda",
     "files": ["src/components/WorkTeam/WorkTeam.js"]
   },
   {
     "id": "leave",
     "description": "Leave team",
     "defaultMessage": "Leave",
-    "message": "",
+    "message": "Jì fora",
     "files": ["src/components/WorkTeam/WorkTeam.js"]
   },
   {
     "id": "proposal",
     "description": "Switch to proposal poll",
     "defaultMessage": "Proposal",
-    "message": "",
+    "message": "Proposta",
     "files": ["src/routes/proposal/ProposalContainer.js"]
   },
   {
     "id": "voting",
     "description": "Switch to voting poll",
     "defaultMessage": "Voting",
-    "message": "",
+    "message": "Votazion",
     "files": ["src/routes/proposal/ProposalContainer.js"]
   },
   {
     "id": "action.leave",
     "description": "Label",
     "defaultMessage": "Leave",
-    "message": "",
+    "message": "Jì fora",
     "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
   },
   {
     "id": "header.confirmation",
     "description": "Confirmation components header",
     "defaultMessage": "Please confirm",
-    "message": "",
+    "message": "Preibel confermé",
     "files": ["src/components/ConfirmLayer/ConfirmLayer.js"]
   },
   {
@@ -1074,7 +1074,7 @@
     "id": "label.name",
     "description": "Heading of name section",
     "defaultMessage": "Name",
-    "message": "Password",
+    "message": "Inom",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
   {
@@ -1095,7 +1095,7 @@
     "id": "action.save",
     "description": "Label",
     "defaultMessage": "Save",
-    "message": "",
+    "message": "Salvé",
     "files": [
       "src/components/NotificationSettings/NotificationSettings.js",
       "src/components/UserSettings/EmailField.js"
@@ -1137,7 +1137,7 @@
     "id": "users",
     "description": "Users label",
     "defaultMessage": "Users",
-    "message": "",
+    "message": "Utenc",
     "files": [
       "src/components/Navigation/Navigation.js",
       "src/routes/accountList/AccountListContainer.js"
@@ -1147,7 +1147,7 @@
     "id": "workTeams",
     "description": "Workteam label",
     "defaultMessage": "Workteams",
-    "message": "",
+    "message": "Grup de laour",
     "files": [
       "src/components/Navigation/Navigation.js",
       "src/routes/workTeamList/WorkTeamListContainer.js"
@@ -1157,14 +1157,14 @@
     "id": "logout",
     "description": "Label for logout",
     "defaultMessage": "Logout",
-    "message": "",
+    "message": "Jì fora",
     "files": ["src/components/UserStatus/UserStatus.js"]
   },
   {
     "id": "profile",
     "description": "Label for profile link",
     "defaultMessage": "Profile",
-    "message": "",
+    "message": "Profil",
     "files": [
       "src/components/Navigation/Navigation.js",
       "src/components/UserStatus/UserStatus.js"
@@ -1194,7 +1194,7 @@
     "id": "settings",
     "description": "Label for settings",
     "defaultMessage": "Settings",
-    "message": "",
+    "message": "Impostazions",
     "files": [
       "src/routes/account/AccountContainer.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
@@ -1211,7 +1211,7 @@
     "id": "command.visit",
     "description": "Short command to visit something",
     "defaultMessage": "Visit",
-    "message": "",
+    "message": "Cialé ite",
     "files": ["src/components/DiscussionInput/DiscussionInput.js"]
   },
   {
@@ -1235,7 +1235,7 @@
     "id": "faq",
     "description": "FAQ label",
     "defaultMessage": "Frequently asked questions",
-    "message": "",
+    "message": "Domandes fates gonot",
     "files": ["src/components/InfoPage/InfoPage.js"]
   },
   {
@@ -1252,7 +1252,7 @@
     "id": "coordinator",
     "description": "Label coordinator",
     "defaultMessage": "Coordinator",
-    "message": "",
+    "message": "Coordiné da",
     "files": ["src/components/WorkTeam/WorkTeam.js"]
   },
   {
@@ -1273,35 +1273,35 @@
     "id": "label.signup",
     "description": "Label signup",
     "defaultMessage": "Sign Up",
-    "message": "",
+    "message": "Scrive ite",
     "files": ["src/routes/home/Home.js"]
   },
   {
     "id": "label.or",
     "description": "Label or",
     "defaultMessage": "OR",
-    "message": "",
+    "message": "O",
     "files": ["src/routes/home/Home.js"]
   },
   {
     "id": "label.markRead",
     "description": "Label mark as read",
     "defaultMessage": "Mark all as read",
-    "message": "",
+    "message": "Segné desche liet",
     "files": ["src/components/NotificationDrop/NotificationDrop.js"]
   },
   {
     "id": "label.notificationsLink",
     "description": "Label notifications link",
     "defaultMessage": "See all notifications",
-    "message": "",
+    "message": "Cialé dutes les notifiches",
     "files": ["src/components/NotificationDrop/NotificationDrop.js"]
   },
   {
     "id": "notificationType.email",
     "description": "Label email",
     "defaultMessage": "Email",
-    "message": "",
+    "message": "Email",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
@@ -1315,14 +1315,14 @@
     "id": "confirm",
     "description": "Label okay",
     "defaultMessage": "Subscribing for {subType}",
-    "message": "",
+    "message": "Iscrizion a {subType}",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
     "id": "subscribe",
     "description": "Label subscribe",
     "defaultMessage": "Subscribe",
-    "message": "",
+    "message": "Iscrive",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
@@ -1336,14 +1336,14 @@
     "id": "subscriptionType.all",
     "description": "Subscribe for all available events",
     "defaultMessage": "All",
-    "message": "",
+    "message": "DUT",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
     "id": "subscriptionType.delete",
     "description": "Deleting subscription",
     "defaultMessage": "Unsubscribe",
-    "message": "",
+    "message": "Cancelé iscrizion",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
@@ -1357,98 +1357,98 @@
     "id": "subscriptionType.replies",
     "description": "Subscribe for replies",
     "defaultMessage": "Replies",
-    "message": "",
+    "message": "Respostes",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
     "id": "subscriptionType.updates",
     "description": "Subscribe for state updates",
     "defaultMessage": "State updates",
-    "message": "",
+    "message": "Mudament de status",
     "files": ["src/components/SubscriptionButton/SubscriptionButton.js"]
   },
   {
     "id": "notifications.comment.new",
     "description": "Status message for notifications",
     "defaultMessage": "wrote a comment on",
-    "message": "",
+    "message": "À scrit n coment sun",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.discussion.new",
     "description": "Status message for notifications",
     "defaultMessage": "New discussion published:",
-    "message": "",
+    "message": "Nueva discuscion",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.accepted",
     "description": "Status message for notifications",
     "defaultMessage": "got accepted!",
-    "message": "",
+    "message": "Azeté",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.new",
     "description": "Status message for notifications",
     "defaultMessage": "New proposal published:",
-    "message": "",
+    "message": "Nueva proposta",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.proposed",
     "description": "Status message for notifications",
     "defaultMessage": "was proposed!",
-    "message": "",
+    "message": "Proponù",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.rejected",
     "description": "Status message for notifications",
     "defaultMessage": "was rejected!",
-    "message": "",
+    "message": "Refudé",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.revoked",
     "description": "Status message for notifications",
     "defaultMessage": "was revoked!",
-    "message": "",
+    "message": "Trat derevers",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.proposal.voting",
     "description": "Status message for notifications",
     "defaultMessage": "opened voting phase!",
-    "message": "",
+    "message": "Vatazion daverta",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.statement.new",
     "description": "Status message for notifications",
     "defaultMessage": "wrote a statement on",
-    "message": "",
+    "message": "à scrit na declarazion",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.survey.closed",
     "description": "Status message for notifications",
     "defaultMessage": "was closed",
-    "message": "",
+    "message": "é scluta",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.survey.new",
     "description": "Status message for notifications",
     "defaultMessage": "New survey published:",
-    "message": "",
+    "message": "Nueva enrescida",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "label.locale",
     "description": "Label locale",
     "defaultMessage": "Language",
-    "message": "",
+    "message": "Lingaz",
     "files": [
       "src/components/UserSettings/LocaleInput.js",
       "src/components/UserSettings/UserSettings.js"
@@ -1458,7 +1458,7 @@
     "id": "label.notifications",
     "description": "Notifications label",
     "defaultMessage": "Notifications",
-    "message": "",
+    "message": "Notifiches",
     "files": [
       "src/components/NotificationDrop/NotificationDrop.js",
       "src/components/NotificationSettings/NotificationSettings.js",
@@ -1469,21 +1469,21 @@
     "id": "discussion.create",
     "description": "Label for Manager",
     "defaultMessage": "Create discussion",
-    "message": "",
+    "message": "Crié na discuscion",
     "files": ["src/routes/workTeamManager/WorkTeamManagement.js"]
   },
   {
     "id": "label.requests",
     "description": "Label request",
     "defaultMessage": "Requests",
-    "message": "",
+    "message": "Domanda",
     "files": ["src/routes/workTeamManager/WorkTeamManagement.js"]
   },
   {
     "id": "contact",
     "description": "Contact label",
     "defaultMessage": "Contact",
-    "message": "",
+    "message": "Contat",
     "files": ["src/components/InfoPage/InfoPage.js"]
   },
   {
@@ -1497,14 +1497,14 @@
     "id": "label.notificationSettings",
     "description": "Label for notification settings",
     "defaultMessage": "Notification settings",
-    "message": "",
+    "message": "Impostazion dles notifiches",
     "files": ["src/routes/account/AccountContainer.js"]
   },
   {
     "id": "notifications.message",
     "description": "Status message for notifications",
     "defaultMessage": "Message from",
-    "message": "",
+    "message": "Messaje da",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1536,7 +1536,7 @@
   {
     "id": "label.discussions",
     "description": "Label discussions",
-    "defaultMessage": "Discussions",
+    "defaultMessage": "Discuscions",
     "message": "",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
@@ -1544,49 +1544,49 @@
     "id": "label.newDiscussions",
     "description": "Label for notifications on new discussions",
     "defaultMessage": "New Discussions",
-    "message": "",
+    "message": "Nueves discuscions",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.newProposals",
     "description": "Label new proposals",
     "defaultMessage": "New Proposals",
-    "message": "",
+    "message": "Nueves propostes",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.newSurveys",
     "description": "Label new surveys",
     "defaultMessage": "New Surveys",
-    "message": "",
+    "message": "Nueves enrescides",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.notificationSettings.comments",
     "description": "Label for notifications on new comments",
     "defaultMessage": "Comments",
-    "message": "",
+    "message": "Comentars",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.notificationSettings.messages",
     "description": "Label for notifications on new messages",
     "defaultMessage": "Messages",
-    "message": "",
+    "message": "Messajes",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.notificationSettings.replies",
     "description": "Label for notifications on new replies",
     "defaultMessage": "Replies",
-    "message": "",
+    "message": "Respostes",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.notificationSettings.statements",
     "description": "Label for notifications on new statements",
     "defaultMessage": "Statements",
-    "message": "",
+    "message": "Detlarazions",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
@@ -1607,7 +1607,7 @@
     "id": "label.proposalAndSurveys",
     "description": "Label proposal and surveys",
     "defaultMessage": "Proposals and Surveys",
-    "message": "",
+    "message": "Propostes y enrescides",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
@@ -1621,21 +1621,21 @@
     "id": "privacy.consent",
     "description": "Signup consent notice",
     "defaultMessage": "I accept the {policy}",
-    "message": "",
+    "message": "I azeti la {policy}",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
     "id": "privacy.readCall",
     "description": "Call to read linked privac policy",
     "defaultMessage": "Read our {link}",
-    "message": "",
+    "message": "Lieje nosc {link}",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
     "id": "settings.uploadCall",
     "description": "Notification to upload photo",
     "defaultMessage": "Please upload a photo of yourself",
-    "message": "",
+    "message": "Preibel ciarié na tia foto",
     "files": ["src/routes/account/AccountContainer.js"]
   },
   {
@@ -1656,42 +1656,42 @@
     "id": "survey.closed",
     "description": "Survey closed",
     "defaultMessage": "Closed!",
-    "message": "",
+    "message": "Scluta!",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
     "id": "proposals.accepted",
     "description": "Filter for accepted proposals",
     "defaultMessage": "accepted",
-    "message": "",
+    "message": "aprovades",
     "files": ["src/components/StateFilter/StateFilter.js"]
   },
   {
     "id": "proposals.repelled",
     "description": "Filter for repelled proposals",
     "defaultMessage": "repelled",
-    "message": "",
+    "message": "refudades",
     "files": ["src/components/StateFilter/StateFilter.js"]
   },
   {
     "id": "resource.active",
     "description": "Filter for active proposals/surveys/discussions",
     "defaultMessage": "active",
-    "message": "",
+    "message": "atives",
     "files": ["src/components/StateFilter/StateFilter.js"]
   },
   {
     "id": "resource.closed",
     "description": "Filter for closed proposals/surveys/discussions",
     "defaultMessage": "closed",
-    "message": "",
+    "message": "sclut",
     "files": ["src/components/StateFilter/StateFilter.js"]
   },
   {
     "id": "command.close",
     "description": "Close",
     "defaultMessage": "Close",
-    "message": "",
+    "message": "Sclù",
     "files": ["src/components/ProposalActions/ProposalActions.js"]
   },
   {
