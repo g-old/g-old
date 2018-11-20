@@ -5,6 +5,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import css from './StatementsContainer.css';
 import Statement from '../Statement';
+import ConfirmLayer from '../ConfirmLayer';
 import {
   deleteStatement,
   flag,
@@ -74,6 +75,8 @@ class StatementsContainer extends React.Component {
     super(props);
     this.state = {};
     this.handleStatementSubmission = this.handleStatementSubmission.bind(this);
+    this.toggleConfirmationLayer = this.toggleConfirmationLayer.bind(this);
+    this.handleStatementDeletion = this.handleStatementDeletion.bind(this);
   }
 
   handleStatementSubmission({ id, text }, makeUpdate) {
@@ -81,6 +84,23 @@ class StatementsContainer extends React.Component {
     if (makeUpdate) {
       update({ id, text });
     }
+  }
+
+  toggleConfirmationLayer(val) {
+    this.setState(prevState => ({
+      showLayer: !prevState.showLayer,
+      toDelete: val,
+    }));
+  }
+
+  handleStatementDeletion(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const { toDelete } = this.state;
+    const { deleteStatement: deleteStmt } = this.props;
+    deleteStmt(toDelete).then(() => this.toggleConfirmationLayer());
   }
 
   render() {
@@ -108,6 +128,7 @@ class StatementsContainer extends React.Component {
       flag: createFlag,
       solveFlag: mutateFlag,
     } = this.props;
+    const { showLayer } = this.state;
     let ownStatementsNode = null;
     let statementsList = [];
     if (mode.withStatements) {
@@ -147,7 +168,7 @@ class StatementsContainer extends React.Component {
             followees={followees}
             onUpdate={update}
             onCreate={create}
-            onDelete={deleteStmt}
+            onDelete={this.toggleConfirmationLayer}
           />
         );
       }
@@ -167,28 +188,36 @@ class StatementsContainer extends React.Component {
     toRender.sort((a, b) => b.likes - a.likes);
     return (
       <div className={cn(css.list)}>
-        {ownStatementsNode}
-        {toRender.map(s => (
-          <Statement
-            {...s}
-            neutral={extended}
-            user={user}
-            key={s.id}
-            ownLike={
-              likedStatements &&
-              likedStatements.find(data => data.statementId === s.id)
-            }
-            onLike={makeLike}
-            onDeleteLike={delLike}
-            onFollow={follow}
-            onDelete={deleteStmt}
-            onModeration={mutateFlag}
-            onProfileClick={handleProfileClick}
-            onFlagging={createFlag}
-            followees={followees}
-            isFollowee={followees.some(f => f.id === s.author.id)}
+        <div>
+          {ownStatementsNode}
+          {toRender.map(s => (
+            <Statement
+              {...s}
+              neutral={extended}
+              user={user}
+              key={s.id}
+              ownLike={
+                likedStatements &&
+                likedStatements.find(data => data.statementId === s.id)
+              }
+              onLike={makeLike}
+              onDeleteLike={delLike}
+              onFollow={follow}
+              onDelete={deleteStmt}
+              onModeration={mutateFlag}
+              onProfileClick={handleProfileClick}
+              onFlagging={createFlag}
+              followees={followees}
+              isFollowee={followees.some(f => f.id === s.author.id)}
+            />
+          ))}
+        </div>
+        {showLayer && (
+          <ConfirmLayer
+            onSubmit={this.handleStatementDeletion}
+            onClose={this.toggleConfirmationLayer}
           />
-        ))}
+        )}
       </div>
     );
   }
