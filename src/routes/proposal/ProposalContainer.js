@@ -310,7 +310,7 @@ class ProposalContainer extends React.Component {
       // return proposal, poll, statementslist
       return (
         <div>
-          <Box column pad>
+          <Box column padding="medium">
             <div>
               {proposal.workteam && (
                 <WorkteamHeader
