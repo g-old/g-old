@@ -7,6 +7,7 @@ import {
   calcRights,
   Groups,
   getUpdatedGroup,
+  isSuperuser,
 } from '../../organization';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import log from '../../logger';
@@ -62,8 +63,9 @@ const sanitizeName = name =>
     : name;
 
 const protectedAccount = (account, viewer) =>
+  isSuperuser(account) ||
   // eslint-disable-next-line eqeqeq
-  account.id != viewer.id && account.groups !== Groups.GUEST;
+  (account.id != viewer.id && account.groups !== Groups.GUEST);
 
 class User {
   id: ID;

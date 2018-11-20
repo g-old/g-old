@@ -596,6 +596,7 @@ class Proposal {
     return transactify(deleteProposal, knex, trx);
   }
 
+  // TODO better move to poll?
   async isVotable(viewer) {
     if (['proposed', 'voting', 'survey'].indexOf(this.state) !== -1 && viewer) {
       // eslint-disable-next-line no-bitwise
