@@ -12,13 +12,11 @@
 */
 .rootAlt {
   display: flex;
-  border-left: solid 4px gray;
-  border-right: solid 4px gray;
   padding: 0.4em;
   margin: 0.1em 0.1em 0;
-  font-size: 0.9em;
   transition: margin 0.5s;
-  color: #000;
+  color: #121212;
+  max-width: 35em;
 }
 
 .header {
@@ -28,6 +26,14 @@
 
 .author {
   font-weight: bold;
+  font-size: 0.9em;
+  margin-right: 4px;
+}
+
+.date {
+  font-size: 0.9em;
+  margin-right: 1em;
+  color: #666;
 }
 
 /*
@@ -43,25 +49,61 @@
   outline: none;
 }
 */
-.avatar {
+.avatarSlot {
   margin-right: 0.4em;
-  width: 2.2em;
-  height: 2.2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar {
+  width: 2.5em;
+  height: 2.5em;
   stroke: #ddd;
+  border-radius: 6px;
+  margin-bottom: 0.5em;
+  box-shadow: 0 0 4px 2px;
+}
+
+.likes {
+  text-align: center;
+  border-radius: 6px;
+  width: 100%;
+  background-color: inherit;
 }
 
 .pro {
   margin-right: 10%;
-  background-color: #fafffa;
+
+  /* align-self: flex-start; */
   border-right: 0;
-  border-color: var(--color-green);
+
+  img,
+  svg {
+    color: var(--color-green);
+    stroke: var(--color-green);
+  }
+
+  .likes {
+    background-color: var(--color-green);
+  }
 }
 
 .contra {
   margin-left: 10%;
-  background-color: #fffafa;
+
+  /* align-self: flex-end; */
   border-left: 0;
-  border-color: var(--color-red);
+
+  img,
+  svg {
+    color: var(--color-red);
+    stroke: var(--color-red);
+  }
+
+  .likes {
+    background-color: var(--color-red);
+  }
 }
 
 .text {
@@ -90,17 +132,12 @@
   border: none;
   height: auto;
   background: transparent;
-  color: #167ac6;
-  font-weight: normal;
-  font-size: inherit;
+  color: #000;
+  font-weight: 600;
   text-decoration: none;
   box-shadow: none;
   outline: 0;
   display: inline-block;
-}
-
-.contentToggle:hover {
-  text-decoration: underline;
 }
 
 .textEdit {
@@ -126,4 +163,18 @@
 
 .contra.inactive {
   margin-left: 50%;
+}
+
+.menu {
+  color: #666;
+  font-size: 0.9em;
+
+  button {
+    outline: none;
+    background-color: transparent;
+    border: 0;
+    color: #666;
+    padding: 0 0.5em 0 0;
+    cursor: pointer;
+  }
 }

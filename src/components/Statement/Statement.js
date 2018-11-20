@@ -3,7 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import cn from 'classnames';
 import s from './Statement.css';
@@ -12,8 +12,6 @@ import Notification from '../Notification';
 import { Permissions } from '../../organization';
 import EditMenu from './EditMenu';
 import Avatar from '../Avatar';
-
-import Menu from '../Menu';
 import Button from '../Button';
 
 const messages = defineMessages({
@@ -48,7 +46,7 @@ class Statement extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
     vote: PropTypes.shape({
-      position: PropTypes.string.isRequired,
+      positions: PropTypes.arrayOf(PropTypes.shape({})),
       id: PropTypes.string.isRequired,
     }).isRequired,
     pollId: PropTypes.string.isRequired,
@@ -134,7 +132,7 @@ class Statement extends React.Component {
     const { edit } = this.state;
     if (!edit) {
       // 3 * 1.3 em lineheight
-      if (this.textBox && this.textBox.clientHeight > 3.9 * 16) {
+      if (this.textBox && this.textBox.clientHeight > 5 * 16) {
         // eslint-disable-next-line react/no-did-mount-set-state
         this.setState({ contentOverflows: true, collapsed: true });
       }
@@ -281,6 +279,8 @@ class Statement extends React.Component {
       pollClosed,
       ownLike,
       neutral,
+      createdAt,
+      intl,
     } = this.props;
     const { textArea, edit, pending, collapsed, contentOverflows } = this.state;
     let canLike;
@@ -307,60 +307,6 @@ class Statement extends React.Component {
     const isEmpty = textArea.val.length === 0;
     const hasMinimumInput = textArea.val.length >= 5;
     const inactive = asInput && isEmpty;
-
-    let menu = null;
-    if (ownStatement || asInput) {
-      menu = (
-        <EditMenu
-          isInput={ownStatement || asInput}
-          onTextSubmit={this.onTextSubmit}
-          onEndEditing={this.onEndEditing}
-          onEdit={this.onEditStatement}
-          onDelete={this.onDeleteStatement}
-          isEditing={edit}
-          disabled={deletedAt || pollClosed}
-          enableSubmit={hasMinimumInput}
-        />
-      );
-    } else if (canFlag || canFollow || canDelete) {
-      menu = (
-        <Menu
-          dropAlign={{ top: 'top', right: 'right' }}
-          icon={
-            <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-              <path
-                fill="none"
-                stroke="#666"
-                strokeWidth="2"
-                d="M3,13 L3,11 L5,11 L5,13 L3,13 Z M11,12.9995001 L11,11 L12.9995001,11 L12.9995001,12.9995001 L11,12.9995001 Z M19,12.9995001 L19,11 L20.9995001,11 L20.9995001,12.9995001 L19,12.9995001 Z"
-              />
-            </svg>
-          }
-        >
-          {canFollow && (
-            <Button
-              onClick={this.handleFollowing}
-              plain
-              label={<FormattedMessage {...messages.follow} />}
-            />
-          )}
-          {canFlag && (
-            <Button
-              onClick={this.handleFlag}
-              plain
-              label={<FormattedMessage {...messages.flag} />}
-            />
-          )}
-          {canDelete && (
-            <Button
-              onClick={this.onDeleteStatement}
-              plain
-              label={<FormattedMessage {...messages.delete} />}
-            />
-          )}
-        </Menu>
-      );
-    }
 
     if (updates && updates.errorMessage) {
       return (
@@ -426,18 +372,77 @@ class Statement extends React.Component {
           ? s.pro
           : s.contra;
     }
+    let altMenu;
+    if (ownStatement || asInput) {
+      altMenu = (
+        <div className={s.menu}>
+          <EditMenu
+            isInput={ownStatement || asInput}
+            onTextSubmit={this.onTextSubmit}
+            onEndEditing={this.onEndEditing}
+            onEdit={this.onEditStatement}
+            onDelete={this.onDeleteStatement}
+            isEditing={edit}
+            disabled={deletedAt || pollClosed}
+            enableSubmit={hasMinimumInput}
+          />
+        </div>
+      );
+    } else {
+      altMenu = (
+        <div className={s.menu}>
+          {canFollow && (
+            <button type="button" onClick={this.handleFollowing}>
+              <FormattedMessage {...messages.follow} />
+            </button>
+          )}
+          {canFlag && (
+            <button type="button" onClick={this.handleFlag}>
+              <FormattedMessage {...messages.flag} />
+            </button>
+          )}
+          {canDelete && (
+            <button type="button" onClick={this.onDeleteStatement}>
+              <FormattedMessage {...messages.delete} />
+            </button>
+          )}
+        </div>
+      );
+    }
 
     return (
       <div className={cn(s.rootAlt, statementPosition, inactive && s.inactive)}>
         {/* eslint-disable jsx-a11y/interactive-supports-focus */}
         {!inactive && (
-          // eslint-disable-next-line
+          <div
+            className={
+              s.avatarSlot // eslint-disable-next-line
+            }
+          >
+            <Avatar
+              className={s.avatar}
+              user={author}
+              onClick={this.handleProfileClick}
+            />
+            <div className={s.likes}> {likes}</div>
 
-          <Avatar
-            user={author}
-            className={s.avatar}
-            onClick={this.handleProfileClick}
-          />
+            {canLike && (
+              <Button
+                onClick={this.handleLiking}
+                plain
+                icon={
+                  <svg viewBox="0 0 24 24" width="16px" height="16px">
+                    <path
+                      fill="none"
+                      stroke={ownLike ? 'inherit' : '#666'}
+                      strokeWidth="2"
+                      d={ICONS.thumbUpAlt}
+                    />
+                  </svg>
+                }
+              />
+            )}
+          </div>
         )}
         {/* eslint-enable jsx-a11y/interactive-supports-focus */}
         <div style={{ width: '100%' }}>
@@ -447,33 +452,14 @@ class Statement extends React.Component {
                 <span className={s.author}>
                   {author && author.name} {author && author.surname}
                 </span>
-                <span>
-                  {likes ? ` (+${likes})` : ''}
-
-                  {canLike && (
-                    <Button
-                      onClick={this.handleLiking}
-                      plain
-                      icon={
-                        <svg viewBox="0 0 24 24" width="16px" height="16px">
-                          <path
-                            fill="none"
-                            stroke={ownLike ? '#8cc800' : '#666'}
-                            strokeWidth="1"
-                            d={ICONS.thumbUpAlt}
-                          />
-                        </svg>
-                      }
-                    />
-                  )}
-                </span>
+                <span className={s.date}>{intl.formatRelative(createdAt)}</span>
               </div>
-              {menu}
             </div>
           )}
           {/* eslint-disable no-return-assign */}
           <div className={s.text} ref={ref => (this.textBox = ref)}>
             {textBox}
+            {altMenu}
           </div>
           {/* eslint-enable no-return-assign */}
         </div>
@@ -482,4 +468,4 @@ class Statement extends React.Component {
   }
 }
 
-export default withStyles(s)(Statement);
+export default withStyles(s)(injectIntl(Statement));
