@@ -7,7 +7,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import cn from 'classnames';
 import s from './Statement.css';
-import { ICONS } from '../../constants';
 import Notification from '../Notification';
 import { Permissions } from '../../organization';
 import EditMenu from './EditMenu';
@@ -424,31 +423,24 @@ class Statement extends React.Component {
               user={author}
               onClick={this.handleProfileClick}
             />
-            <div className={s.likes}> {likes}</div>
-
-            {canLike && (
-              <Button
-                onClick={this.handleLiking}
-                plain
-                icon={
-                  <svg viewBox="0 0 24 24" width="16px" height="16px">
-                    <path
-                      fill="none"
-                      stroke={ownLike ? 'inherit' : '#666'}
-                      strokeWidth="2"
-                      d={ICONS.thumbUpAlt}
-                    />
-                  </svg>
-                }
-              />
-            )}
+            <button
+              type="button"
+              onClick={canLike && this.handleLiking}
+              className={cn(
+                s.likes,
+                ownLike && s.liked,
+                canLike && s.clickable,
+              )}
+            >
+              {`+${likes}`}
+            </button>
           </div>
         )}
         {/* eslint-enable jsx-a11y/interactive-supports-focus */}
         <div style={{ width: '100%' }}>
           {!inactive && (
             <div className={s.header}>
-              <div>
+              <div className={s.details}>
                 <span className={s.author}>
                   {author && author.name} {author && author.surname}
                 </span>

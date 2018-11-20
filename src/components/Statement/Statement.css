@@ -12,7 +12,12 @@
 
 .header {
   display: flex;
-  justify-content: space-between;
+}
+
+.details {
+  border-bottom: 2px solid;
+  border-bottom-color: inherit;
+  margin-bottom: 0.3em;
 }
 
 .author {
@@ -48,21 +53,32 @@
   text-align: center;
   border-radius: 6px;
   width: 100%;
-  background-color: inherit;
+  border: 1px solid #aaa;
+  outline: none;
+  background-color: transparent;
+}
+
+.liked {
+  border: none;
+  background-color: #eee;
+}
+
+.clickable {
+  cursor: pointer;
 }
 
 .pro {
   /* margin-right: 10%; */
 
   /* align-self: flex-start; */
+  .header {
+    border-bottom-color: var(--color-green);
+  }
+
   img,
   svg {
     color: var(--color-green);
     stroke: var(--color-green);
-  }
-
-  .likes {
-    background-color: var(--color-green);
   }
 }
 
@@ -71,14 +87,14 @@
 
   align-self: flex-end;
 
+  .header {
+    border-bottom-color: var(--color-red);
+  }
+
   img,
   svg {
     color: var(--color-red);
     stroke: var(--color-red);
-  }
-
-  .likes {
-    background-color: var(--color-red);
   }
 }
 
