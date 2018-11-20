@@ -452,14 +452,16 @@ class Statement extends React.Component {
                 <span className={s.author}>
                   {author && author.name} {author && author.surname}
                 </span>
-                <span className={s.date}>{intl.formatRelative(createdAt)}</span>
+                <span className={s.date}>
+                  {createdAt && intl.formatRelative(createdAt)}
+                </span>
               </div>
             </div>
           )}
           {/* eslint-disable no-return-assign */}
           <div className={s.text} ref={ref => (this.textBox = ref)}>
             {textBox}
-            {altMenu}
+            {!inactive && altMenu}
           </div>
           {/* eslint-enable no-return-assign */}
         </div>

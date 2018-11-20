@@ -1,9 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import cn from 'classnames';
-import css from './StatementsContainer.css';
+
+import Box from '../Box';
 import Statement from '../Statement';
 import ConfirmLayer from '../ConfirmLayer';
 import {
@@ -187,38 +186,36 @@ class StatementsContainer extends React.Component {
 
     toRender.sort((a, b) => b.likes - a.likes);
     return (
-      <div className={cn(css.list)}>
-        <div>
-          {ownStatementsNode}
-          {toRender.map(s => (
-            <Statement
-              {...s}
-              neutral={extended}
-              user={user}
-              key={s.id}
-              ownLike={
-                likedStatements &&
-                likedStatements.find(data => data.statementId === s.id)
-              }
-              onLike={makeLike}
-              onDeleteLike={delLike}
-              onFollow={follow}
-              onDelete={deleteStmt}
-              onModeration={mutateFlag}
-              onProfileClick={handleProfileClick}
-              onFlagging={createFlag}
-              followees={followees}
-              isFollowee={followees.some(f => f.id === s.author.id)}
-            />
-          ))}
-        </div>
+      <Box column>
+        {ownStatementsNode}
+        {toRender.map(s => (
+          <Statement
+            {...s}
+            neutral={extended}
+            user={user}
+            key={s.id}
+            ownLike={
+              likedStatements &&
+              likedStatements.find(data => data.statementId === s.id)
+            }
+            onLike={makeLike}
+            onDeleteLike={delLike}
+            onFollow={follow}
+            onDelete={deleteStmt}
+            onModeration={mutateFlag}
+            onProfileClick={handleProfileClick}
+            onFlagging={createFlag}
+            followees={followees}
+            isFollowee={followees.some(f => f.id === s.author.id)}
+          />
+        ))}
         {showLayer && (
           <ConfirmLayer
             onSubmit={this.handleStatementDeletion}
             onClose={this.toggleConfirmationLayer}
           />
         )}
-      </div>
+      </Box>
     );
   }
 }
@@ -244,4 +241,4 @@ const mapDispatch = {
 export default connect(
   mapStateToProps,
   mapDispatch,
-)(withStyles(css)(StatementsContainer));
+)(StatementsContainer);

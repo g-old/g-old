@@ -1,22 +1,13 @@
 @import '../../components/variables.css';
 
-/*
-.root {
-  display: flex;
-  border: solid 1px gray;
-  padding: 0.4em;
-  margin: 0.1em 0.1em 0.4em;
-  font-size: 0.9em;
-  transition: margin 0.5s;
-}
-*/
 .rootAlt {
   display: flex;
-  padding: 0.4em;
-  margin: 0.1em 0.1em 0;
+
+  /* margin: 0.1em 0.1em 0; */
   transition: margin 0.5s;
   color: #121212;
   max-width: 35em;
+  width: 100%;
 }
 
 .header {
@@ -36,19 +27,6 @@
   color: #666;
 }
 
-/*
-.menu {
-  font-style: italic;
-  font-size: 0.9em;
-} */
-
-/*
-.like {
-  border: none;
-  background: none;
-  outline: none;
-}
-*/
 .avatarSlot {
   margin-right: 0.4em;
   display: flex;
@@ -62,7 +40,8 @@
   stroke: #ddd;
   border-radius: 6px;
   margin-bottom: 0.5em;
-  box-shadow: 0 0 4px 2px;
+
+  /* box-shadow: 0 0 4px 2px; */
 }
 
 .likes {
@@ -73,11 +52,9 @@
 }
 
 .pro {
-  margin-right: 10%;
+  /* margin-right: 10%; */
 
   /* align-self: flex-start; */
-  border-right: 0;
-
   img,
   svg {
     color: var(--color-green);
@@ -90,10 +67,9 @@
 }
 
 .contra {
-  margin-left: 10%;
+  /* margin-left: 10%; */
 
-  /* align-self: flex-end; */
-  border-left: 0;
+  align-self: flex-end;
 
   img,
   svg {
@@ -126,7 +102,7 @@
 }
 
 .contentToggle {
-  margin: -8px 0 10px;
+  margin: -8px 0;
   cursor: pointer;
   padding: 0;
   border: none;
@@ -143,7 +119,8 @@
 .textEdit {
   font-family: var(--font-family-base);
   width: 99%;
-  line-height: 1.3em;
+
+  /* line-height: 1.3em; */
   box-sizing: border-box;
 }
 
@@ -158,16 +135,19 @@
 }
 
 .pro.inactive {
-  margin-right: 50%;
+  /* margin-right: 50%; */
+  align-self: flex-start;
 }
 
 .contra.inactive {
-  margin-left: 50%;
+  /* margin-left: 50%; */
+  align-self: flex-end;
 }
 
 .menu {
   color: #666;
   font-size: 0.9em;
+  margin-top: 0.5em;
 
   button {
     outline: none;
