@@ -463,7 +463,12 @@ class WorkTeam extends React.Component {
         <Heading tag="h2">{displayName}</Heading>
         <Box column align>
           <FormattedMessage {...messages.coordinator} />
-          <UserThumbnail big marked user={coordinator} />
+          <Box align>
+            <svg viewBox="0 0 24 24" width="24px" height="24px">
+              <path fill="#222" d={ICONS.coordinator} />
+            </svg>
+            <UserThumbnail big marked user={coordinator} />
+          </Box>
         </Box>
         <Box wrap>
           <Value
