@@ -408,7 +408,7 @@
     "id": "statements.follow",
     "description": "Menu entry on statements to follow author",
     "defaultMessage": "follow",
-    "message": "segui",
+    "message": "Segui",
     "files": [
       "src/components/Comment/Comment.js",
       "src/components/Statement/Statement.js"

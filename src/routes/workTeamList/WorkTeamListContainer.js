@@ -8,12 +8,10 @@ import {
   getWorkTeamsIsFetching,
   getWorkTeamsErrorMessage,
 } from '../../reducers';
-import List from '../../components/List';
-import ListItem from '../../components/ListItem';
 import Heading from '../../components/Heading';
-import FetchError from '../../components/FetchError';
 import Box from '../../components/Box';
-import { ICONS } from '../../constants';
+import ListView from '../../components/ListView';
+import WorkteamItem from './WorkteamItem';
 
 import history from '../../history';
 
@@ -39,45 +37,34 @@ class WorkTeamListContainer extends React.Component {
   static defaultProps = {
     error: null,
   };
+
+  constructor(props) {
+    super(props);
+    this.handleOnRetry = this.handleOnRetry.bind(this);
+  }
+
+  handleOnRetry() {
+    const { loadWorkTeams: fetchTeams } = this.props;
+    fetchTeams();
+  }
+
   render() {
     const { workTeams, pending, error } = this.props;
     return (
       <Box pad column>
-        <Heading tag="h2">
-          <FormattedMessage {...messages.workTeams} />{' '}
+        <Heading tag="h3">
+          <div style={{ paddingLeft: '0.5em' }}>
+            <FormattedMessage {...messages.workTeams} />
+          </div>
         </Heading>
-        {pending && !workTeams.length && <p>Loading...</p>}
-        {!pending && !workTeams.length && !error && <p> No data</p>}
-        {error && (
-          <FetchError
-            message={error}
-            onRetry={() => this.props.loadWorkTeams()}
-          />
-        )}
-        <List>
-          {workTeams.map(u => (
-            <ListItem onClick={() => handleItemClick(u.id)}>
-              <Box pad>
-                <svg
-                  version="1.1"
-                  viewBox="0 0 24 24"
-                  width="24px"
-                  height="24px"
-                  role="img"
-                  aria-label="organization"
-                >
-                  <path
-                    fill="none"
-                    stroke="#000"
-                    strokeWidth="2"
-                    d={ICONS.workteam}
-                  />
-                </svg>
-                <span>{u.displayName}</span>
-              </Box>
-            </ListItem>
-          ))}
-        </List>
+        <ListView
+          onRetry={this.handleOnRetry}
+          pageInfo={{ pending, errorMessage: error }}
+        >
+          {workTeams.map(
+            w => w && <WorkteamItem workteam={w} onClick={handleItemClick} />,
+          )}
+        </ListView>
       </Box>
     );
   }
@@ -93,4 +80,7 @@ const mapDispatch = {
   loadWorkTeams,
 };
 
-export default connect(mapStateToProps, mapDispatch)(WorkTeamListContainer);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(WorkTeamListContainer);
