@@ -265,7 +265,7 @@ class Poll extends React.Component {
           <div>
             <Button disabled={updates.pending} onClick={this.voteUp} plain>
               <img
-                style={{ maxWidth: '5em', maxHeight: '5em' }}
+                style={{ maxWidth: '3em', maxHeight: '3em' }}
                 alt="Vote"
                 src={proBtnColor ? '/abstimmung-01.png' : '/abstimmung-02.png'}
               />
@@ -291,7 +291,7 @@ class Poll extends React.Component {
             <Box pad>
               <Button plain onClick={this.voteUp} disabled={updates.pending}>
                 <img
-                  style={{ maxWidth: '5em', maxHeight: '5em' }}
+                  style={{ maxWidth: '3em', maxHeight: '3em' }}
                   alt="Vote"
                   src={
                     proBtnColor ? '/abstimmung-03.png' : '/abstimmung-04.png'
@@ -308,7 +308,7 @@ class Poll extends React.Component {
               </Button>
               <Button plain onClick={this.voteDown} disabled={updates.pending}>
                 <img
-                  style={{ maxWidth: '5em', maxHeight: '5em' }}
+                  style={{ maxWidth: '3em', maxHeight: '3em' }}
                   alt="Vote"
                   src={
                     conBtnColor ? '/abstimmung-05.png' : '/abstimmung-06.png'

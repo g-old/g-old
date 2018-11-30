@@ -30,12 +30,14 @@
   --color-accent-4: #4080ff;
   --color-accent-3-shade: #eee7f5;
   --color-accent-5: #8078c8;
+  --color-border: #bbb;
 
   /*
    * Layout
    * ======================================================================== */
 
   --max-content-width: 1000px;
+  --border-radius: 5px;
 
   /*
    * Media queries breakpoints

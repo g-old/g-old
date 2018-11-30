@@ -4,8 +4,6 @@ import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './PollState.css';
 import VotesList from '../VotesList';
-import Value from '../Value';
-import { ICONS } from '../../constants';
 
 class PollState extends React.Component {
   static propTypes = {
@@ -82,33 +80,9 @@ class PollState extends React.Component {
     let numDownVotes = null;
     if (!compact) {
       if (!unipolar) {
-        numDownVotes = (
-          <Value
-            value={downvotes}
-            trendIcon={
-              <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-                <path
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  d={ICONS.up}
-                  transform="matrix(1 0 0 -1 0 24)"
-                />
-              </svg>
-            }
-          />
-        );
+        numDownVotes = <div>{downvotes}</div>;
       }
-      numUpVotes = (
-        <Value
-          trendIcon={
-            <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-              <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.up} />
-            </svg>
-          }
-          value={upvotes}
-        />
-      );
+      numUpVotes = <div>{upvotes}</div>;
     }
     /* eslint-disable jsx-a11y/no-static-element-interactions */
     /* eslint-disable jsx-a11y/interactive-supports-focus */
@@ -121,7 +95,11 @@ class PollState extends React.Component {
         role="button"
       >
         <div className={s.header}>
-          {numUpVotes}
+          <span className={cn(s.voteCount)}>
+            {numUpVotes}
+            {numDownVotes}
+          </span>
+
           <div className={s.barContainer}>
             {voteBar}
             <div
@@ -131,7 +109,6 @@ class PollState extends React.Component {
               }}
             />
           </div>
-          {numDownVotes}
         </div>
         {expand && (
           <div className={s.votesList}>
