@@ -59,7 +59,7 @@
 }
 
 .liked {
-  border: none;
+  border-color: #eee;
   background-color: #eee;
 }
 

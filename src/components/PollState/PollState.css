@@ -54,9 +54,9 @@
     background-color: #ddd;
   }
 
-  /*  .bar {
+  .bar {
     background-color: var(--color-accent-2);
-  } */
+  }
 }
 
 .bipolar {

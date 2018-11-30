@@ -432,7 +432,7 @@ class Statement extends React.Component {
                 canLike && s.clickable,
               )}
             >
-              {`+${likes}`}
+              {`+${likes || ''}`}
             </button>
           </div>
         )}
