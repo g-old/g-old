@@ -1,0 +1,6 @@
+{
+  "name": "AccountsView",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./AccountsView.js"
+}

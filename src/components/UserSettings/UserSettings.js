@@ -328,7 +328,9 @@ class UserSettings extends React.Component {
 
   handleAccountDeletion(password) {
     const { onDeleteAccount, user, onLogout } = this.props;
-    onDeleteAccount({ id: user.id, password }).then(() => onLogout());
+    onDeleteAccount({ id: user.id, password }).then(
+      success => success && onLogout(),
+    );
   }
 
   toggleDeleteLayer() {

@@ -242,6 +242,11 @@ class UserProfile extends React.Component {
                 </svg>
 
                 <span>{t.displayName}</span>
+                {t.coordinatorId === user.id && (
+                  <svg viewBox="0 0 24 24" width="24px" height="24px">
+                    <path fill="#222" d={ICONS.coordinator} />
+                  </svg>
+                )}
               </Box>
             ))}
         </Box>

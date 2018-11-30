@@ -1,27 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { defineMessages, FormattedMessage } from 'react-intl';
 import { loadUserList } from '../../actions/user';
 import { Groups } from '../../organization';
 import { getVisibleUsers, getResourcePageInfo } from '../../reducers';
-
-import Box from '../../components/Box';
-import Heading from '../../components/Heading';
-import ListView from '../../components/ListView';
 import { genUsersPageKey } from '../../reducers/pageInfo';
-import UserListItem from './UserListItem';
 import history from '../../history';
+import AccountsView from '../../components/AccountsView';
 
 // eslint-disable-next-line no-bitwise
 const ACTIVE_USER = Groups.VIEWER | Groups.VOTER;
-const messages = defineMessages({
-  users: {
-    id: 'users',
-    defaultMessage: 'Users',
-    description: 'Users label',
-  },
-});
+
 const onUserClick = id => {
   history.push(`/accounts/${id}`);
 };
@@ -58,22 +47,14 @@ class AccountList extends React.Component {
   render() {
     const { userList, pageInfo } = this.props;
     return (
-      <Box pad column>
-        <Heading tag="h3">
-          <div style={{ paddingLeft: '0.5em' }}>
-            <FormattedMessage {...messages.users} /> ({pageInfo.totalCount})
-          </div>
-        </Heading>
-        <ListView
-          onRetry={this.handleOnRetry}
-          onLoadMore={this.handleLoadMore}
-          pageInfo={pageInfo}
-        >
-          {userList.map(
-            u => u && <UserListItem user={u} onClick={onUserClick} />,
-          )}
-        </ListView>
-      </Box>
+      <AccountsView
+        userCount={pageInfo.totalCount}
+        onRetry={this.handleOnRetry}
+        onLoadMore={this.handleLoadMore}
+        pageInfo={pageInfo}
+        onUserClick={onUserClick}
+        users={userList}
+      />
     );
   }
 }

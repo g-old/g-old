@@ -170,6 +170,9 @@ class Message {
               loaders,
               tra,
             );
+            if (!object) {
+              throw new Error('Note creation failed');
+            }
           }
         } else if (data.messageType === 'communication') {
           object = await Communication.create(
@@ -336,7 +339,9 @@ const userStatusTranslations = {
   },
   team_leader_lost: {
     de: `Sie sind ab jetzt kein "Teamleader" mehr. ${helpNotice.de}`,
-    it: `Da questo momento non sei più coordinatore di un gruppo di lavoro. ${helpNotice.it}`,
+    it: `Da questo momento non sei più coordinatore di un gruppo di lavoro. ${
+      helpNotice.it
+    }`,
     lld: `Sie sind ab jetzt kein "Teamleader" mehr. ${helpNotice.lld}`,
   },
 
@@ -348,9 +353,7 @@ const userStatusTranslations = {
 
   district_keeper_lost: {
     de: `Sie sind ab jetzt kein "District keeper" mehr. ${helpNotice.de}`,
-    it: `Da questo momento non sei più responsabile di zona. ${
-      helpNotice.it
-    }`,
+    it: `Da questo momento non sei più responsabile di zona. ${helpNotice.it}`,
     lld: `translate: Sie sind ab jetzt kein "District keeper" mehr. ${
       helpNotice.lld
     }`,
@@ -365,7 +368,9 @@ const userStatusTranslations = {
   },
   contactee_lost: {
     de: `Sie sind ab jetzt kein "Contactee" mehr. ${helpNotice.de}`,
-    it: `Da questo momento non sei più "persona di riferimento". ${helpNotice.it}`,
+    it: `Da questo momento non sei più "persona di riferimento". ${
+      helpNotice.it
+    }`,
     lld: `translate: Sie sind ab jetzt kein "Contactee" mehr. ${
       helpNotice.lld
     }`,

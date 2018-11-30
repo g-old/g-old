@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Avatar from '../../components/Avatar';
-import Box from '../../components/Box';
+import Avatar from '../Avatar';
+import Box from '../Box';
 
 const UserListItem = ({ user, onClick }) => (
   <Box pad onClick={() => onClick(user.id)} align>

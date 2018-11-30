@@ -55,7 +55,7 @@ class ListView extends React.Component {
   render() {
     const {
       children,
-      pageInfo: { pending, errorMessage, pagination },
+      pageInfo: { pending, errorMessage, pagination = {} },
       onRetry,
     } = this.props;
     if (pending && !children.length) {
