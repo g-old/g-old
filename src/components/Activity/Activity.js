@@ -222,8 +222,8 @@ class Activity extends React.Component {
             info.extended
               ? '#8cc800'
               : positions[0].pos === 0
-                ? '#8cc800'
-                : '#ff324d'
+              ? '#8cc800'
+              : '#ff324d'
           }
           strokeWidth="2"
           d={ICONS.thumbUpAlt}
@@ -231,8 +231,8 @@ class Activity extends React.Component {
             info.extended
               ? ''
               : positions[0].pos === 0
-                ? ''
-                : 'scale(1,-1) translate(0,-24)'
+              ? ''
+              : 'scale(1,-1) translate(0,-24)'
           }
         />
       </svg>
@@ -287,6 +287,7 @@ class Activity extends React.Component {
         result.content = (
           <Link // eslint-disable-line
             to={`/proposal/${infoData.proposalId || 'xxx'}/${content.pollId}`}
+            style={{ outline: 'none' }}
           >
             <Statement {...content} />
           </Link>
