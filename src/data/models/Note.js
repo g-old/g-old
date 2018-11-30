@@ -5,7 +5,7 @@ import sanitize from '../../core/htmlSanitizer';
 const sanititzeTextnput = textHtml => {
   const input = Object.keys(textHtml).reduce((acc, locale) => {
     const text = textHtml[locale];
-    if (text.length < 10000 && text.length > 0) {
+    if (text.length < 50000 && text.length > 0) {
       acc[locale] = sanitize(text);
     }
     return acc;
@@ -36,7 +36,6 @@ class Note {
   static async create(viewer, data, loaders, trx) {
     if (!data) return null;
     if (!canMutate(viewer, data, Models.NOTE)) return null;
-
     const newData = {
       created_at: new Date(),
     };
@@ -58,7 +57,6 @@ class Note {
     if ('isPublished' in data) {
       newData.is_published = data.isPublished;
     }
-
     const [note = null] = await knex('notes')
       .modify(queryBuilder => {
         if (trx) {
