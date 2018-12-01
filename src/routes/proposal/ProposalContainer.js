@@ -32,8 +32,17 @@ import Button from '../../components/Button';
 import Poll from '../../components/Poll';
 import Filter from '../../components/Filter';
 import SubscriptionButton from '../../components/SubscriptionButton';
-import WorkteamHeader from '../../components/WorkteamHeader/WorkteamHeader';
+import PollNotice from './PollNotice';
 
+function getCurrentPoll(proposal, pollId) {
+  let poll;
+  if (proposal.pollOne) {
+    poll = proposal.pollOne.id === pollId ? proposal.pollOne : proposal.pollTwo;
+  } else {
+    poll = proposal.pollTwo;
+  }
+  return poll;
+}
 const messages = defineMessages({
   voting: {
     id: 'voting',
@@ -193,13 +202,7 @@ class ProposalContainer extends React.Component {
     }
     const showSubscription = ['proposed', 'voting'].includes(proposal.state);
     const { filter } = this.state;
-    let poll;
-    if (proposal.pollOne) {
-      poll =
-        proposal.pollOne.id === pollId ? proposal.pollOne : proposal.pollTwo;
-    } else {
-      poll = proposal.pollTwo;
-    }
+    const poll = getCurrentPoll(proposal, pollId);
     const canSwitchPolls = !!(proposal.pollOne && proposal.pollTwo);
     if (!poll) {
       return <div>SOMETHING GOT REALLY WRONG</div>;
@@ -291,7 +294,7 @@ class ProposalContainer extends React.Component {
   }
 
   render() {
-    const { proposal, updates = {} } = this.props;
+    const { proposal, updates = {}, pollId } = this.props;
     if (updates.isFetching && !proposal) {
       return <p>{'Loading...'} </p>;
     }
@@ -308,19 +311,12 @@ class ProposalContainer extends React.Component {
     }
     if (this.isReady()) {
       // return proposal, poll, statementslist
+      const poll = getCurrentPoll(proposal, pollId);
       return (
         <div>
           <Box column padding="medium">
-            <div>
-              {proposal.workteam && (
-                <WorkteamHeader
-                  displayName={proposal.workteam.displayName}
-                  id={proposal.workteam.id}
-                  logo={proposal.workteam.logo}
-                />
-              )}
-              <Proposal {...proposal} />
-            </div>
+            {!poll.closedAt && <PollNotice poll={poll} />}
+            <Proposal {...proposal} />
             {this.renderInteractions()}
           </Box>
         </div>
