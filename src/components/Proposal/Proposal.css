@@ -11,7 +11,8 @@
 
 .root {
   width: 100%;
-  max-width: var(--max-content-width);
+  max-width: 35em;
+  margin: 0 auto;
 }
 
 .headline {
@@ -49,7 +50,6 @@
 
 .body {
   padding-top: 1em;
-  max-width: 35em;
   text-align: justify;
 
   /* TODO implement with html-sanitizer */

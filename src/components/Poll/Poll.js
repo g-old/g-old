@@ -378,7 +378,7 @@ class Poll extends React.Component {
   }
 
   render() {
-    const { closedAt, endTime } = this.props;
+    const { closedAt } = this.props;
     const { confirmationFunc, voteError } = this.state;
     const votingComponent = this.renderVotingComponent();
 
@@ -404,15 +404,12 @@ class Poll extends React.Component {
             </Box>
           </Layer>
         )}
-        <p>
-          {closedAt ? (
-            <FormattedMessage {...messages.closed} />
-          ) : (
-            <FormattedMessage {...messages.closing} />
-          )}
-          &nbsp;
-          <FormattedRelative value={closedAt || endTime} />
-        </p>
+        {closedAt && (
+          <p>
+            <FormattedMessage {...messages.closed} />{' '}
+            <FormattedRelative value={closedAt} />
+          </p>
+        )}
         {this.renderPollVisualization()}
         <Box justify>{votingComponent}</Box>
         {voteError && (
