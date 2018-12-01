@@ -68,7 +68,9 @@ const NotificationDrop = ({
         </div>
         <List>
           {notifications.map(n => (
-            <ListItem key={n.id}>{<Component {...n} />}</ListItem>
+            <ListItem className={s.listItem} key={n.id}>
+              {<Component {...n} />}
+            </ListItem>
           ))}
         </List>
       </div>

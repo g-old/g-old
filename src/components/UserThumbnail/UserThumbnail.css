@@ -21,6 +21,11 @@
   }
 }
 
+.root:active {
+  color: white;
+  background-color: var(--color-clicked);
+}
+
 .thumbnail {
   width: 1em;
   height: 1em;

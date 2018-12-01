@@ -3,6 +3,7 @@
 .root {
   color: #000;
   width: 100%;
+  outline: none;
 }
 
 .unread {
