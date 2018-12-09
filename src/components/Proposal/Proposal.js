@@ -10,6 +10,7 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Proposal.css';
 import UserThumbnail from '../UserThumbnail';
 import WorkteamHeader from '../WorkteamHeader';
+import { ICONS } from '../../constants';
 
 const messages = defineMessages({
   spokesman: {
@@ -70,6 +71,20 @@ class Proposal extends React.Component {
               </div>
             )}
             <div className={s.date}>
+              <svg
+                version="1.1"
+                viewBox="0 0 24 24"
+                width="24px"
+                height="24px"
+                role="img"
+              >
+                <path
+                  fill="none"
+                  stroke="#666"
+                  strokeWidth="2"
+                  d={ICONS.edit}
+                />
+              </svg>{' '}
               <FormattedRelative value={publishedAt} />
             </div>
           </div>

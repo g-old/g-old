@@ -106,9 +106,21 @@ class VoteArea extends React.Component<Props> {
                 role="img"
                 aria-label="halt"
               >
+                <defs>
+                  <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop
+                      offset="0%"
+                      style={{ stopColor: 'rgb(255, 255, 0)', stopOpacity: 1 }}
+                    />
+                    <stop
+                      offset="100%"
+                      style={{ stopColor: 'rgb(255, 0, 0)', stopOpacity: 1 }}
+                    />
+                  </linearGradient>
+                </defs>
                 <path
                   fill="none"
-                  stroke={userVotedUp ? '#8cc800' : '#666'}
+                  stroke={userVotedUp ? 'url(#grad1)' : '#666'}
                   strokeWidth="1"
                   d={ICONS.thumbUpAlt}
                 />

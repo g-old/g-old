@@ -1,7 +1,7 @@
 @import '../../components/variables.css';
 
 .root {
-  background-color: var(--color-red);
+  background-color: #ff9a0d;
   border-radius: 3px;
   text-align: center;
   padding: 0.3em;
