@@ -47,7 +47,24 @@
   }
 
   .menu {
-    position: relative;
-    display: block;
+    display: flex;
+    font-size: 0.6em;
+  }
+}
+
+.navIcon {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  svg {
+    stroke: #f3e80e;
+  }
+}
+
+.active {
+  svg {
+    stroke: #000;
   }
 }

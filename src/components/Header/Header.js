@@ -8,40 +8,31 @@
  */
 
 import React from 'react';
-import { defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Header.css';
 import Navigation from '../Navigation';
-import UserStatus from '../UserStatus';
 import NotificationMenu from '../NotificationMenu';
-
-const messages = defineMessages({
-  brand: {
-    id: 'header.brand',
-    defaultMessage: 'M5',
-    description: 'Brand name displayed in header',
-  },
-  bannerTitle: {
-    id: 'header.banner.title',
-    defaultMessage: 'G O L D',
-    description: 'Title in page header',
-  },
-});
 
 class Header extends React.Component {
   render() {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <UserStatus />
-          <span className={s.brand}>
-            <FormattedMessage {...messages.bannerTitle} />
-          </span>
-          <div className={s.right}>
-            <Navigation />
-            <NotificationMenu />
-          </div>
+          <Navigation />
+          <NotificationMenu />
         </div>
+        <svg
+          fillRule="evenodd"
+          clipRule="evenodd"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-labelledby="title"
+          viewBox="0 0 1920 240"
+          fill="#fff"
+        >
+          <g>
+            <path d="M1920,144.5l0,95.5l-1920,0l0,-65.5c196,-36 452.146,-15.726 657.5,8.5c229.698,27.098 870,57 1262.5,-38.5Z" />
+          </g>
+        </svg>
       </div>
     );
   }

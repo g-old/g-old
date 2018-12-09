@@ -18,6 +18,7 @@ import s from './Navigation.css';
 import Link from '../Link';
 import Menu from '../Menu';
 import { canAccess } from '../../organization';
+import { ICONS } from '../../constants';
 
 const messages = defineMessages({
   feed: {
@@ -60,6 +61,11 @@ const messages = defineMessages({
     defaultMessage: 'Workteams',
     description: 'Workteam label',
   },
+  notifications: {
+    id: 'label.notifications',
+    description: 'Notifications label',
+    defaultMessage: 'Notifications',
+  },
 });
 
 const contents = [
@@ -97,6 +103,7 @@ class Navigation extends React.Component {
     path: PropTypes.string.isRequired,
     user: PropTypes.shape({}),
   };
+
   static defaultProps = {
     user: null,
   };
@@ -113,6 +120,7 @@ class Navigation extends React.Component {
       document.title = `(${notice}) ${oldTitle}`;
     }
   }
+
   getMenu() {
     const { activityCounter, path, user } = this.props;
 
@@ -135,12 +143,115 @@ class Navigation extends React.Component {
     }
     return links;
   }
+
   render() {
+    const { path } = this.props;
     return (
       <span role="navigation" style={{ margin: '0 0.2em' }}>
         <div className={s.navBar}>{this.getMenu()}</div>
 
         <div className={s.menu}>
+          <Link
+            className={cn(
+              s.link,
+              s.navIcon,
+              path.includes('/proposal') && s.active,
+            )}
+            to="/proposals/active"
+          >
+            <svg
+              version="1.1"
+              viewBox="0 0 24 24"
+              role="img"
+              aria-label="proposal"
+              width="24px"
+              height="24px"
+            >
+              <path
+                fill="none"
+                strokeWidth="2"
+                d="M16,7 L19,7 L19,11 L16,11 L16,7 Z M9,15 L20,15 M9,11 L13,11 M9,7 L13,7 M6,18.5 C6,19.8807119 4.88071187,21 3.5,21 C2.11928813,21 1,19.8807119 1,18.5 L1,7 L6.02493781,7 M6,18.5 L6,3 L23,3 L23,18.5 C23,19.8807119 21.8807119,21 20.5,21 L3.5,21"
+              />
+            </svg>
+            <FormattedMessage {...messages.proposals} />
+          </Link>
+          <Link
+            className={cn(
+              s.link,
+              s.navIcon,
+              path.includes('/survey') && s.active,
+            )}
+            to="/surveys/active"
+          >
+            <svg
+              version="1.1"
+              viewBox="0 0 24 24"
+              width="24px"
+              height="24px"
+              role="img"
+              aria-label="proposal"
+            >
+              <path
+                fill="none"
+                strokeWidth="2"
+                d="M16,7 L19,7 L19,11 L16,11 L16,7 Z M9,15 L20,15 M9,11 L13,11 M9,7 L13,7 M6,18.5 C6,19.8807119 4.88071187,21 3.5,21 C2.11928813,21 1,19.8807119 1,18.5 L1,7 L6.02493781,7 M6,18.5 L6,3 L23,3 L23,18.5 C23,19.8807119 21.8807119,21 20.5,21 L3.5,21"
+              />
+            </svg>
+            <FormattedMessage {...messages.surveys} />
+          </Link>
+          <Link
+            className={cn(
+              s.link,
+              s.navIcon,
+              path.includes('/account') && s.active,
+            )}
+            to="/account"
+          >
+            <svg
+              width="24px"
+              height="24px"
+              version="1.1"
+              viewBox="0 0 24 24"
+              role="img"
+              aria-label="user"
+            >
+              <path fill="none" strokeWidth="2" d={ICONS.defaultAvatar} />
+            </svg>
+            <FormattedMessage {...messages.profile} />
+          </Link>
+          <Link className={cn(s.link, s.navIcon)} to="/feed">
+            <svg
+              version="1.1"
+              viewBox="0 0 24 24"
+              width="24px"
+              height="24px"
+              role="img"
+              aria-label="menu"
+            >
+              <path fill="none" strokeWidth="2" d={ICONS.bell} />
+            </svg>
+            <span>News</span>
+          </Link>
+          <Link
+            className={cn(
+              s.link,
+              s.navIcon,
+              path.includes('/workteam') && s.active,
+            )}
+            to="/workteams"
+          >
+            <svg
+              version="1.1"
+              viewBox="0 0 24 24"
+              width="24px"
+              height="24px"
+              role="img"
+              aria-label="menu"
+            >
+              <path fill="none" strokeWidth="2" d={ICONS.workteam} />
+            </svg>
+            <FormattedMessage {...messages.workTeams} />
+          </Link>
           <Menu
             withControl
             primary
@@ -177,4 +288,7 @@ const mapToProps = state => ({
   user: getSessionUser(state),
 });
 
-export default connect(mapToProps, null)(withStyles(s)(Navigation));
+export default connect(
+  mapToProps,
+  null,
+)(withStyles(s)(Navigation));
