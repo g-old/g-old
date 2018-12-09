@@ -38,19 +38,24 @@ class Layout extends React.Component {
     allowCookies: PropTypes.func.isRequired,
     consent: PropTypes.string.isRequired,
   };
+
   constructor(props) {
     super(props);
     this.consent = this.consent.bind(this);
   }
+
   componentDidMount() {
+    // eslint-disable-next-line react/destructuring-assignment
     this.props.createSSESub();
   }
+
   consent() {
+    // eslint-disable-next-line react/destructuring-assignment
     this.props.allowCookies();
   }
 
   render() {
-    const { consent } = this.props;
+    const { consent, loading, children } = this.props;
     let toast;
     if (!consent) {
       toast = (
@@ -60,18 +65,12 @@ class Layout extends React.Component {
       );
     }
 
-    const banner = (
-      <div className={s.banner}>
-        <img alt="banner" src="/banner01.jpg" />
-      </div>
-    );
     return (
       <div className={s.layout}>
-        <div className={this.props.loading ? s.loader : null} />
+        <div className={loading ? s.loader : null} />
         {toast}
-        {banner}
         <Header />
-        <div className={s.content}>{this.props.children}</div>
+        <div className={s.content}>{children}</div>
         <div className={s.footer}>
           <Footer />
         </div>
@@ -88,6 +87,7 @@ const mapStateToProps = state => ({
   loading: state.ui.loading.status,
   consent: getConsent(state),
 });
-export default connect(mapStateToProps, mapDispatch)(
-  withStyles(normalizeCss, s)(Layout),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(withStyles(normalizeCss, s)(Layout));

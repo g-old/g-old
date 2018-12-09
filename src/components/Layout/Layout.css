@@ -260,14 +260,3 @@ textarea {
     left: 100%;
   }
 }
-
-.banner {
-  overflow: hidden;
-
-  img {
-    min-width: 32rem;
-    max-width: 100%;
-    display: block;
-    margin: 0 auto;
-  }
-}
