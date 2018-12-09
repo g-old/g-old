@@ -314,6 +314,11 @@ class Poll extends React.Component {
             {this.getFolloweeVotes('con')}
           </div>
         </div>
+        <Button
+          label={isExpanded ? 'Hide votes' : 'Show votes'}
+          plain
+          onClick={this.toggleVotersBox}
+        />
         {isExpanded && (
           <div>
             <VotesList
