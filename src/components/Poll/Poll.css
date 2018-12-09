@@ -1,13 +1,5 @@
 @import '../../components/variables.css';
 
-.pollState {
-  margin-top: 1em;
-  padding: 0.2em;
-
-  /* border: solid 1px var(--color-border);
-  border-radius: var(--border-radius); */
-}
-
 .followeeContainer {
   margin: 0.4em -0.2em;
   display: flex;
@@ -24,14 +16,6 @@
 
 .contra {
   text-align: right;
-}
-
-.proBtnColor {
-  background: var(--color-green);
-}
-
-.conBtnColor {
-  background: var(--color-red);
 }
 
 .followee {

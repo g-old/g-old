@@ -7,16 +7,16 @@ import {
 } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
-import PollState from '../PollState';
 import s from './Poll.css';
-// import { ICONS } from '../../constants';
 import Button from '../Button';
 import Box from '../Box';
 import Layer from '../Layer';
+import VoteArea from './VoteArea';
 import Notification from '../Notification';
 import history from '../../history';
 import PollOptionsView from '../PollOptionsView';
 import Avatar from '../Avatar';
+import VotesList from '../VotesList';
 
 const messages = defineMessages({
   closed: {
@@ -113,6 +113,7 @@ class Poll extends React.Component {
     this.voteDown = this.voteDown.bind(this);
     this.fetchVoters = this.fetchVoters.bind(this);
     this.handleOptionSelection = this.handleOptionSelection.bind(this);
+    this.toggleVotersBox = this.toggleVotersBox.bind(this);
   }
 
   componentWillReceiveProps({ updates, id, options, ownVote }) {
@@ -149,6 +150,14 @@ class Poll extends React.Component {
           user={vote.voter}
         />
       ));
+  }
+
+  toggleVotersBox() {
+    const { isExpanded } = this.state;
+    this.setState(prevState => ({ isExpanded: !prevState.isExpanded }));
+    if (!isExpanded) {
+      this.fetchVoters();
+    }
   }
 
   canVote(positions) {
@@ -231,11 +240,11 @@ class Poll extends React.Component {
       numVotes,
       followeeVotes,
       votes,
+      threshold,
     } = this.props;
     const { pollOptions } = this.state;
-    let component;
     if (extended) {
-      component = (
+      return (
         <PollOptionsView
           canVote={canVote}
           closedAt={closedAt}
@@ -249,138 +258,26 @@ class Poll extends React.Component {
           options={options}
         />
       );
-      return component;
-    }
-
-    /* eslint-disable max-len */
-    if (canVote && !closedAt) {
-      // TODO Find better check
-      // eslint-disable-next-line no-nested-ternary
-      const proBtnColor =
-        ownVote && ownVote.positions[0] && ownVote.positions[0].pos === 0
-          ? s.proBtnColor
-          : '';
-      if (mode.unipolar) {
-        component = (
-          <div>
-            <Button disabled={updates.pending} onClick={this.voteUp} plain>
-              <img
-                style={{ maxWidth: '3em', maxHeight: '3em' }}
-                alt="Vote"
-                src={proBtnColor ? '/abstimmung-01.png' : '/abstimmung-02.png'}
-              />
-              {/* <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
-                <path
-                  fill="none"
-                  stroke={proBtnColor ? '#ff324d' : '#666'}
-                  strokeWidth="1"
-                  d={ICONS.halt}
-                />
-              </svg> */}
-            </Button>
-          </div>
-        );
-      } else {
-        // eslint-disable-next-line no-nested-ternary
-        const conBtnColor =
-          ownVote && ownVote.positions[0] && ownVote.positions[0].pos === 1
-            ? s.conBtnColor
-            : '';
-        component = (
-          <div style={{ paddingBottom: '2em' }}>
-            <Box pad>
-              <Button plain onClick={this.voteUp} disabled={updates.pending}>
-                <img
-                  style={{ maxWidth: '3em', maxHeight: '3em' }}
-                  alt="Vote"
-                  src={
-                    proBtnColor ? '/abstimmung-03.png' : '/abstimmung-04.png'
-                  }
-                />
-                {/* <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
-                  <path
-                    fill="none"
-                    stroke={proBtnColor ? '#8cc800' : '#666'}
-                    strokeWidth="1"
-                    d={ICONS.thumbUpAlt}
-                  />
-              </svg> */}
-              </Button>
-              <Button plain onClick={this.voteDown} disabled={updates.pending}>
-                <img
-                  style={{ maxWidth: '3em', maxHeight: '3em' }}
-                  alt="Vote"
-                  src={
-                    conBtnColor ? '/abstimmung-05.png' : '/abstimmung-06.png'
-                  }
-                />
-                {/* <svg viewBox="0 0 24 24" width="60px" height="60px" role="img" aria-label="halt">
-                  <path
-                    fill="none"
-                    stroke={conBtnColor ? '#ff324d' : '#666'}
-                    strokeWidth="1"
-                    d={ICONS.thumbUpAlt}
-                    transform="rotate(180 12 12)"
-                  />
-                </svg> */}
-              </Button>
-            </Box>
-          </div>
-        );
-      }
-    }
-    return component;
-  }
-
-  renderPollVisualization() {
-    const {
-      id,
-      allVoters,
-      mode,
-      threshold,
-      votes,
-      updates,
-      options,
-      extended,
-    } = this.props;
-    if (extended) {
-      return [];
-    }
-    const upvotes = options[0].numVotes;
-    let downvotes = 0;
-    if (!mode.unipolar) {
-      downvotes = options[1].numVotes;
     }
     return (
-      <React.Fragment>
-        <div className={s.pollState}>
-          <PollState
-            pollId={id}
-            allVoters={allVoters}
-            upvotes={upvotes}
-            downvotes={downvotes}
-            unipolar={mode.unipolar}
-            threshold={threshold}
-            thresholdRef={mode.thresholdRef}
-            votes={votes}
-            getVotes={this.fetchVoters}
-            updates={updates}
-          />
-        </div>
-        <div className={s.followeeContainer}>
-          <div className={s.followeeBlock}>{this.getFolloweeVotes('pro')}</div>
-          <div className={cn(s.followeeBlock, s.contra)}>
-            {this.getFolloweeVotes('con')}
-          </div>
-        </div>
-      </React.Fragment>
+      <VoteArea
+        updates={updates}
+        upvotes={options[0].numVotes}
+        downvotes={!mode.unipolar ? options[1].numVotes : 0}
+        unipolar={mode.unipolar}
+        active={canVote && !closedAt}
+        onUpvoteClick={this.voteUp}
+        onDownvoteClick={this.voteDown}
+        ownVote={ownVote}
+        threshold={threshold}
+        onClick={this.toggleVotersBox}
+      />
     );
   }
 
   render() {
-    const { closedAt } = this.props;
-    const { confirmationFunc, voteError } = this.state;
-    const votingComponent = this.renderVotingComponent();
+    const { closedAt, mode, votes, updates, threshold } = this.props;
+    const { confirmationFunc, voteError, isExpanded } = this.state;
 
     return (
       <div>
@@ -410,8 +307,26 @@ class Poll extends React.Component {
             <FormattedRelative value={closedAt} />
           </p>
         )}
-        {this.renderPollVisualization()}
-        <Box justify>{votingComponent}</Box>
+        {this.renderVotingComponent()}
+        <div className={s.followeeContainer}>
+          <div className={s.followeeBlock}>{this.getFolloweeVotes('pro')}</div>
+          <div className={cn(s.followeeBlock, s.contra)}>
+            {this.getFolloweeVotes('con')}
+          </div>
+        </div>
+        {isExpanded && (
+          <div>
+            <VotesList
+              autoLoadVotes
+              unipolar={mode.unipolar}
+              votes={votes}
+              isFetching={(updates && updates.isPending) || false}
+              errorMessage={updates && updates.error}
+              getVotes={this.fetchVoters}
+            />
+            {!mode.unipolar && threshold < 50 ? ' (IMPOSSIBLE)' : ''}
+          </div>
+        )}
         {voteError && (
           <Notification
             type="error"

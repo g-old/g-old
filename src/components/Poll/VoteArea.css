@@ -1,0 +1,9 @@
+.voteBox {
+  border: 1px solid #eee;
+  border-radius: 3px;
+}
+
+.voteDetails {
+  text-align: center;
+  font-size: 1em;
+}
