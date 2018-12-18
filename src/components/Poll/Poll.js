@@ -241,6 +241,7 @@ class Poll extends React.Component {
       followeeVotes,
       votes,
       threshold,
+      allVoters,
     } = this.props;
     const { pollOptions } = this.state;
     if (extended) {
@@ -267,6 +268,7 @@ class Poll extends React.Component {
         unipolar={mode.unipolar}
         active={canVote && !closedAt}
         onUpvoteClick={this.voteUp}
+        votersCount={allVoters}
         onDownvoteClick={this.voteDown}
         ownVote={ownVote}
         threshold={threshold}

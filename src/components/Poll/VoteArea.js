@@ -11,7 +11,7 @@ import VoteBar from '../VoteBar';
 
 type Fn = () => void;
 type Props = {
-  allVoters: number,
+  votersCount: number,
   threshold: number,
   active: boolean,
   upvotes: number,
@@ -26,7 +26,7 @@ type Props = {
 class VoteArea extends React.Component<Props> {
   render() {
     const {
-      allVoters,
+      votersCount,
       threshold,
       updates,
       ownVote,
@@ -44,12 +44,12 @@ class VoteArea extends React.Component<Props> {
     const userVotedDown =
       ownVote && ownVote.positions[0] && ownVote.positions[0].pos === 1;
 
-    const sum = unipolar ? allVoters : upvotes + downvotes;
+    const sum = unipolar ? votersCount : upvotes + downvotes;
     const upPercent = sum > 0 ? 100 * (upvotes / sum) : 50;
     let component;
     const VoteViewComponent = (
       <VoteBar
-        votersCount={allVoters}
+        votersCount={votersCount}
         upvotes={upvotes}
         downvotes={downvotes}
         unipolar={unipolar}
