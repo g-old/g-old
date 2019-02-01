@@ -161,6 +161,10 @@ class StateTransitionHelper {
       if (!pollingMode) {
         throw new Error('Could not load pollingMode');
       }
+      // don't allow double closing of phase2only proposals
+      if (proposal.pollTwoId && this.newState === 'voting') {
+        return false;
+      }
       return this.checkNextState(proposal, pollingMode);
     }
 
@@ -438,7 +442,10 @@ class Proposal {
         trx,
       );
       if (!pollOne) throw Error('No pollOne provided');
-      newData.poll_one_id = pollOne.id;
+
+      // assign direct voting polls to phase two
+      newData[newData.state === 'voting' ? 'poll_two_id' : 'poll_one_id'] =
+        pollOne.id;
 
       const [proposal = null] = await knex('proposals')
         .transacting(trx)

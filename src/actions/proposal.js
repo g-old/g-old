@@ -330,15 +330,16 @@ export function createProposal(proposalData) {
       const normalizedData = normalize(data.createProposal, proposalSchema);
       // TODO change filter structure of reducer
       const filter = getFilter(data.createProposal);
+      const proposalResult =
+        normalizedData.entities.proposals[normalizedData.result];
+      const poll = proposalResult.pollTwo || proposalResult.pollOne;
 
       dispatch({
         type: CREATE_PROPOSAL_SUCCESS,
         payload: normalizedData,
         filter,
         id: virtualId,
-        info: `${normalizedData.result}/${
-          normalizedData.entities.proposals[normalizedData.result].pollOne
-        }`,
+        info: `${normalizedData.result}/${poll}`,
       });
     } catch (error) {
       dispatch({
