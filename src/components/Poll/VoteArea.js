@@ -22,6 +22,7 @@ type Props = {
   onClick: ?Fn,
   updates: UpdatesShape,
   ownVote: [VotesShape],
+  children: React.Node,
 };
 class VoteArea extends React.Component<Props> {
   render() {
@@ -37,6 +38,7 @@ class VoteArea extends React.Component<Props> {
       onUpvoteClick,
       onDownvoteClick,
       onClick,
+      children,
     } = this.props;
     const userVotedUp =
       ownVote && ownVote.positions[0] && ownVote.positions[0].pos === 0;
@@ -106,7 +108,7 @@ class VoteArea extends React.Component<Props> {
                 role="img"
                 aria-label="halt"
               >
-                <defs>
+                {/* <defs>
                   <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop
                       offset="0%"
@@ -117,10 +119,12 @@ class VoteArea extends React.Component<Props> {
                       style={{ stopColor: 'rgb(255, 0, 0)', stopOpacity: 1 }}
                     />
                   </linearGradient>
-                </defs>
+                </defs> */}
                 <path
                   fill="none"
-                  stroke={userVotedUp ? 'url(#grad1)' : '#666'}
+                  stroke={
+                    userVotedUp ? '#8cc800' : '#666' // stroke={userVotedUp ? 'url(#grad1)' : '#666'}
+                  }
                   strokeWidth="1"
                   d={ICONS.thumbUpAlt}
                 />
@@ -157,8 +161,11 @@ class VoteArea extends React.Component<Props> {
       ];
     }
     return (
-      <Box align justify className={s.voteBox}>
-        {component}
+      <Box column align justify className={s.voteBox}>
+        <Box align justify>
+          {component}
+        </Box>
+        {children}
       </Box>
     );
   }

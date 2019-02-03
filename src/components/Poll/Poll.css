@@ -1,11 +1,5 @@
 @import '../../components/variables.css';
 
-.followeeContainer {
-  margin: 0.4em -0.2em;
-  display: flex;
-  justify-content: space-between;
-}
-
 .followeeBlock {
   width: 40%;
 
@@ -20,11 +14,20 @@
 
 .followee {
   width: 2em;
-  margin: 0.2em;
+  margin-right: 0.2em;
   stroke: #bbb;
 }
 
 .confirmationBox {
   padding-top: 2.5em;
   padding-bottom: 2.5em;
+}
+
+.votes {
+  padding: 0 1em;
+  width: 100%;
+}
+
+.active {
+  background-color: #eee;
 }

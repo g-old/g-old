@@ -213,6 +213,7 @@ class ProposalContainer extends React.Component {
       const isPollOne = poll.id === proposal.pollOne.id;
       switchPollBtn = (
         <Button
+          plain
           reverse={isPollOne}
           label={
             <FormattedMessage
@@ -257,15 +258,6 @@ class ProposalContainer extends React.Component {
     }
     return (
       <React.Fragment>
-        {showSubscription && (
-          <SubscriptionButton
-            status={subscriptionStatus}
-            targetType="PROPOSAL"
-            onSubscribe={this.handleSubscription}
-            subscription={proposal.subscription}
-          />
-        )}
-
         <Poll
           {...poll}
           canVote={proposal.canVote}
@@ -277,8 +269,23 @@ class ProposalContainer extends React.Component {
           updates={voteUpdates}
           followeeVotes={followeeVotes}
         />
-
-        {filterNode}
+        {showSubscription && (
+          <div
+            style={{
+              borderBottom: '1px solid #eee',
+              paddingBottom: '2em',
+              display: 'flex',
+              justifyContent: 'flex-end',
+            }}
+          >
+            <SubscriptionButton
+              status={subscriptionStatus}
+              targetType="PROPOSAL"
+              onSubscribe={this.handleSubscription}
+              subscription={proposal.subscription}
+            />
+          </div>
+        )}
 
         <StatementsContainer
           hideOwnStatement={hideOwnStatement}
@@ -286,7 +293,9 @@ class ProposalContainer extends React.Component {
           poll={poll}
           user={user}
           filter={filter}
-        />
+        >
+          {filterNode}
+        </StatementsContainer>
 
         {switchPollBtn}
       </React.Fragment>
@@ -312,11 +321,13 @@ class ProposalContainer extends React.Component {
     if (this.isReady()) {
       // return proposal, poll, statementslist
       const poll = getCurrentPoll(proposal, pollId);
+
       return (
         <div>
           <Box column padding="medium">
             {!poll.closedAt && <PollNotice poll={poll} />}
             <Proposal {...proposal} />
+
             {this.renderInteractions()}
           </Box>
         </div>

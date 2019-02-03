@@ -243,7 +243,7 @@ class Poll extends React.Component {
       threshold,
       allVoters,
     } = this.props;
-    const { pollOptions } = this.state;
+    const { pollOptions, isExpanded } = this.state;
     if (extended) {
       return (
         <PollOptionsView
@@ -273,12 +273,37 @@ class Poll extends React.Component {
         ownVote={ownVote}
         threshold={threshold}
         onClick={this.toggleVotersBox}
-      />
+      >
+        <div className={cn(s.votes, isExpanded && s.active)}>
+          <div>
+            {!isExpanded && (
+              <Box between>
+                <div className={s.followeeBlock}>
+                  {this.getFolloweeVotes('pro')}
+                </div>
+                <div className={cn(s.followeeBlock, s.contra)}>
+                  {this.getFolloweeVotes('con')}
+                </div>
+              </Box>
+            )}
+            {isExpanded && (
+              <VotesList
+                autoLoadVotes
+                unipolar={mode.unipolar}
+                votes={votes}
+                isFetching={(updates && updates.isPending) || false}
+                errorMessage={updates && updates.error}
+                getVotes={this.fetchVoters}
+              />
+            )}
+          </div>
+        </div>
+      </VoteArea>
     );
   }
 
   render() {
-    const { closedAt, mode, votes, updates, threshold } = this.props;
+    const { closedAt } = this.props;
     const { confirmationFunc, voteError, isExpanded } = this.state;
 
     return (
@@ -310,30 +335,13 @@ class Poll extends React.Component {
           </p>
         )}
         {this.renderVotingComponent()}
-        <div className={s.followeeContainer}>
-          <div className={s.followeeBlock}>{this.getFolloweeVotes('pro')}</div>
-          <div className={cn(s.followeeBlock, s.contra)}>
-            {this.getFolloweeVotes('con')}
-          </div>
-        </div>
+
         <Button
           label={isExpanded ? 'Hide votes' : 'Show votes'}
           plain
           onClick={this.toggleVotersBox}
         />
-        {isExpanded && (
-          <div>
-            <VotesList
-              autoLoadVotes
-              unipolar={mode.unipolar}
-              votes={votes}
-              isFetching={(updates && updates.isPending) || false}
-              errorMessage={updates && updates.error}
-              getVotes={this.fetchVoters}
-            />
-            {!mode.unipolar && threshold < 50 ? ' (IMPOSSIBLE)' : ''}
-          </div>
-        )}
+
         {voteError && (
           <Notification
             type="error"

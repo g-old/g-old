@@ -1,10 +1,10 @@
 @import '../../components/variables.css';
 
 .root {
-  background-color: #ff9a0d;
+  border-bottom: 3px solid #ff9a0d;
   border-radius: 3px;
   text-align: center;
-  padding: 0.3em;
+  padding-bottom: 1em;
 
   > span {
     text-transform: uppercase;

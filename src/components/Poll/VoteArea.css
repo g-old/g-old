@@ -1,6 +1,7 @@
 .voteBox {
   border: 1px solid #eee;
   border-radius: 3px;
+  padding: 2.5em 1em 1em 1em;
 }
 
 .voteDetails {
