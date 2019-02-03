@@ -125,7 +125,7 @@ class VoteBar extends React.Component<Props> {
 
             <path
               strokeWidth="8"
-              stroke="#340000"
+              stroke="#ddd"
               strokeLinecap="butt"
               d={arcCommands(
                 20,
