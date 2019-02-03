@@ -2,6 +2,7 @@
 
 import React from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import s from './VoteArea.css';
 import { ICONS } from '../../constants';
 import Button from '../Button';
@@ -24,6 +25,27 @@ type Props = {
   ownVote: [VotesShape],
   children: React.Node,
 };
+
+const messages = defineMessages({
+  request: {
+    id: 'poll.votingRequest',
+    defaultMessage:
+      '{requestCount, plural, =0 {No voting request} one {# voting request} other {# voting requests}}',
+    description: 'Voting requests',
+  },
+  upvote: {
+    id: 'poll.upvote',
+    defaultMessage:
+      '{count, plural, =0 {No Upvotes} one {# Upvote} other {# Upvotes}}',
+    description: 'Upvotes',
+  },
+  downvotes: {
+    id: 'poll.downvote',
+    defaultMessage:
+      '{count, plural, =0 {No Downvote} one {# Downvote} other {# Downvotes}}',
+    description: 'Upvotes',
+  },
+});
 class VoteArea extends React.Component<Props> {
   render() {
     const {
@@ -69,7 +91,12 @@ class VoteArea extends React.Component<Props> {
         <Box column align>
           <Button plain className={s.voteDetails} onClick={onClick}>
             <Value value={`${Math.round(upPercent)}%`} />
-            <div>{upvotes} Voting request</div>
+            <div>
+              <FormattedMessage
+                {...messages.request}
+                values={{ requestCount: upvotes }}
+              />
+            </div>
           </Button>
           {active && (
             <Button plain disabled={updates.pending} onClick={onUpvoteClick}>
@@ -97,7 +124,12 @@ class VoteArea extends React.Component<Props> {
         <Box column align>
           <Button plain className={s.voteDetails} onClick={onClick}>
             <Value value={`${Math.round(upPercent)}%`} />
-            <div>{upvotes} Upvotes</div>
+            <div>
+              <FormattedMessage
+                {...messages.upvote}
+                values={{ count: upvotes }}
+              />
+            </div>
           </Button>
           {active && (
             <Button plain disabled={updates.pending} onClick={onUpvoteClick}>
@@ -136,7 +168,12 @@ class VoteArea extends React.Component<Props> {
         <Box column align>
           <Button plain className={s.voteDetails} onClick={onClick}>
             <Value value={`${100 - Math.round(upPercent)}%`} />
-            <div>{downvotes} Downvotes</div>
+            <div>
+              <FormattedMessage
+                {...messages.downvotes}
+                values={{ count: downvotes }}
+              />
+            </div>
           </Button>
           {active && (
             <Button plain disabled={updates.pending} onClick={onDownvoteClick}>

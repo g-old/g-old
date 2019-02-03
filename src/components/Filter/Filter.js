@@ -14,7 +14,7 @@ const Filter = ({ filterFn, filter }) => {
             filter: states[(states.indexOf(filter) + 1) % 3],
           })
         }
-        label={filter}
+        label={filter.toUpperCase()}
         plain
         icon={
           <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">

@@ -128,6 +128,7 @@ class StatementsContainer extends React.Component {
       updateUser: follow,
       flag: createFlag,
       solveFlag: mutateFlag,
+      filter,
     } = this.props;
     const { showLayer } = this.state;
     let ownStatementsNode = null;
@@ -192,7 +193,7 @@ class StatementsContainer extends React.Component {
         <Box align>
           <Label>{`${statements.length} Statements`}</Label> {children}
         </Box>
-        {ownStatementsNode}
+        {filter === 'all' && ownStatementsNode}
         {toRender.map(s => (
           <Statement
             {...s}
