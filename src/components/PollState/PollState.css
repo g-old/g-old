@@ -7,14 +7,15 @@
 }
 
 .header {
-  display: flex;
+  display: block;
   align-items: center;
 }
 
 .barContainer {
   width: 100%;
-  height: 0.6em;
-  outline: solid 1px #555;
+  height: 0.3em;
+
+  /* outline: solid 1px #555; */
 }
 
 .compact {
@@ -27,12 +28,12 @@
   }
 }
 
-/*
 .voteCount {
-  flex-grow: 0;
-  height: 100%;
-  margin: 0 0.2em;
-} */
+  padding: 0 0.5em;
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2em;
+}
 
 .bar {
   height: 100%;
@@ -44,7 +45,8 @@
   top: -100%;
   height: 100%;
   width: 0;
-  outline: solid 1px black;
+
+  /* outline: solid 1px black; */
 }
 
 .unipolar {

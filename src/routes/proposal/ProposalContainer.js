@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import {
+  defineMessages,
+  FormattedMessage,
+  FormattedRelative,
+} from 'react-intl';
 import history from '../../history';
 import { loadProposal } from '../../actions/proposal';
 import Notification from '../../components/Notification';
@@ -32,8 +36,18 @@ import Button from '../../components/Button';
 import Poll from '../../components/Poll';
 import Filter from '../../components/Filter';
 import SubscriptionButton from '../../components/SubscriptionButton';
-import WorkteamHeader from '../../components/WorkteamHeader/WorkteamHeader';
+import PollNotice from './PollNotice';
+import ProposalState from '../../components/ProposalState';
 
+function getCurrentPoll(proposal, pollId) {
+  let poll;
+  if (proposal.pollOne) {
+    poll = proposal.pollOne.id === pollId ? proposal.pollOne : proposal.pollTwo;
+  } else {
+    poll = proposal.pollTwo;
+  }
+  return poll;
+}
 const messages = defineMessages({
   voting: {
     id: 'voting',
@@ -44,6 +58,11 @@ const messages = defineMessages({
     id: 'proposal',
     defaultMessage: 'Proposal',
     description: 'Switch to proposal poll',
+  },
+  closed: {
+    id: 'poll.closed',
+    defaultMessage: 'Ended',
+    description: 'Poll closing time',
   },
 });
 class ProposalContainer extends React.Component {
@@ -193,13 +212,7 @@ class ProposalContainer extends React.Component {
     }
     const showSubscription = ['proposed', 'voting'].includes(proposal.state);
     const { filter } = this.state;
-    let poll;
-    if (proposal.pollOne) {
-      poll =
-        proposal.pollOne.id === pollId ? proposal.pollOne : proposal.pollTwo;
-    } else {
-      poll = proposal.pollTwo;
-    }
+    const poll = getCurrentPoll(proposal, pollId);
     const canSwitchPolls = !!(proposal.pollOne && proposal.pollTwo);
     if (!poll) {
       return <div>SOMETHING GOT REALLY WRONG</div>;
@@ -210,6 +223,7 @@ class ProposalContainer extends React.Component {
       const isPollOne = poll.id === proposal.pollOne.id;
       switchPollBtn = (
         <Button
+          plain
           reverse={isPollOne}
           label={
             <FormattedMessage
@@ -254,15 +268,6 @@ class ProposalContainer extends React.Component {
     }
     return (
       <React.Fragment>
-        {showSubscription && (
-          <SubscriptionButton
-            status={subscriptionStatus}
-            targetType="PROPOSAL"
-            onSubscribe={this.handleSubscription}
-            subscription={proposal.subscription}
-          />
-        )}
-
         <Poll
           {...poll}
           canVote={proposal.canVote}
@@ -275,7 +280,33 @@ class ProposalContainer extends React.Component {
           followeeVotes={followeeVotes}
         />
 
-        {filterNode}
+        {
+          <div
+            style={{
+              borderBottom: '1px solid #eee',
+              paddingBottom: '2em',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            {!poll.closedAt && <ProposalState state={proposal.state} />}
+            {poll.closedAt && (
+              <Box align>
+                <ProposalState state={proposal.state} />{' '}
+                <FormattedRelative value={poll.closedAt} />
+              </Box>
+            )}
+            {showSubscription && (
+              <SubscriptionButton
+                status={subscriptionStatus}
+                targetType="PROPOSAL"
+                onSubscribe={this.handleSubscription}
+                subscription={proposal.subscription}
+              />
+            )}
+          </div>
+        }
 
         <StatementsContainer
           hideOwnStatement={hideOwnStatement}
@@ -283,7 +314,9 @@ class ProposalContainer extends React.Component {
           poll={poll}
           user={user}
           filter={filter}
-        />
+        >
+          {filterNode}
+        </StatementsContainer>
 
         {switchPollBtn}
       </React.Fragment>
@@ -291,7 +324,7 @@ class ProposalContainer extends React.Component {
   }
 
   render() {
-    const { proposal, updates = {} } = this.props;
+    const { proposal, updates = {}, pollId } = this.props;
     if (updates.isFetching && !proposal) {
       return <p>{'Loading...'} </p>;
     }
@@ -308,19 +341,13 @@ class ProposalContainer extends React.Component {
     }
     if (this.isReady()) {
       // return proposal, poll, statementslist
+      const poll = getCurrentPoll(proposal, pollId);
+
       return (
         <div>
           <Box column padding="medium">
-            <div>
-              {proposal.workteam && (
-                <WorkteamHeader
-                  displayName={proposal.workteam.displayName}
-                  id={proposal.workteam.id}
-                  logo={proposal.workteam.logo}
-                />
-              )}
-              <Proposal {...proposal} />
-            </div>
+            {!poll.closedAt && <PollNotice poll={poll} />}
+            <Proposal {...proposal} />
             {this.renderInteractions()}
           </Box>
         </div>

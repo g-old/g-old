@@ -10,16 +10,21 @@
 @import '../../components/variables.css';
 
 .root {
-  margin: 20px auto;
   width: 100%;
-  max-width: var(--max-content-width);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.11);
 }
 
 .headline {
-  font-size: 2rem;
-  font-weight: 300;
+  font-size: 1.5rem;
+  font-weight: 600;
   padding-top: 0;
   word-break: break-word;
+  color: #540b97;
+  text-align: center;
+}
+
+.details {
+  margin-top: 0.5em;
 }
 
 /*
@@ -29,12 +34,6 @@
   padding-top: 0;
 }
 */
-.state {
-  text-align: right;
-  float: right;
-  font-size: 0.8em;
-  font-style: italic;
-}
 
 .date {
   font-size: 0.8em;
@@ -43,8 +42,8 @@
 
 .container {
   margin: 0 auto;
-  border: solid 1px gray;
   padding: 1em;
+  max-width: 36em;
 }
 
 .deleted {
@@ -54,7 +53,9 @@
 
 .body {
   padding-top: 1em;
+  text-align: justify;
 
+  /* TODO implement with html-sanitizer */
   table {
     border-collapse: collapse;
     width: 100%;

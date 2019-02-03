@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Heading from '../Heading';
 import { ICONS } from '../../constants';
 import history from '../../history';
 
@@ -10,7 +9,7 @@ const WorkteamHeader = ({ displayName, logo, id }) => (
     style={{ cursor: 'pointer', alignSelf: 'left' }}
     onClick={() => history.push(`/workteams/${id}`)}
   >
-    <Heading tag="h3">
+    <div>
       {logo ? (
         'IMPLEMENT LOGO'
       ) : (
@@ -18,15 +17,15 @@ const WorkteamHeader = ({ displayName, logo, id }) => (
           version="1.1"
           viewBox="0 0 24 24"
           role="img"
-          width="48px"
-          height="48px"
+          width="16px"
+          height="16px"
           aria-label="cloud"
         >
           <path fill="none" stroke="#000" strokeWidth="2" d={ICONS.workteam} />
         </svg>
-      )}
+      )}{' '}
       {displayName}
-    </Heading>
+    </div>
   </div>
 );
 

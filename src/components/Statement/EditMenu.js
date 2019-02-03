@@ -31,7 +31,6 @@ const messages = defineMessages({
 });
 
 const EditMenu = ({
-  isInput,
   onTextSubmit,
   onEndEditing,
   onEdit,
@@ -49,11 +48,7 @@ const EditMenu = ({
       <button type="button" onClick={onTextSubmit} disabled={!enableSubmit}>
         <FormattedMessage {...messages.submit} />
       </button>,
-      <button
-        type="button"
-        onClick={onEndEditing}
-        disabled={isInput && !enableSubmit}
-      >
+      <button type="button" onClick={onEndEditing}>
         <FormattedMessage {...messages.cancel} />
       </button>,
     ];
@@ -75,7 +70,6 @@ const EditMenu = ({
   return content;
 };
 EditMenu.propTypes = {
-  isInput: PropTypes.bool,
   isEditing: PropTypes.bool,
   enableSubmit: PropTypes.bool,
   disabled: PropTypes.bool,
@@ -85,7 +79,6 @@ EditMenu.propTypes = {
   onDelete: PropTypes.func.isRequired,
 };
 EditMenu.defaultProps = {
-  isInput: null,
   isEditing: null,
   enableSubmit: null,
   disabled: null,

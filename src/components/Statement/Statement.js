@@ -7,7 +7,6 @@ import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import cn from 'classnames';
 import s from './Statement.css';
-import { ICONS } from '../../constants';
 import Notification from '../Notification';
 import { Permissions } from '../../organization';
 import EditMenu from './EditMenu';
@@ -39,6 +38,11 @@ const messages = defineMessages({
     id: 'statements.collapse',
     defaultMessage: 'Show less',
     description: 'Btn to collapse statements',
+  },
+  add: {
+    id: 'statements.add',
+    defaultMessage: 'Add a statement',
+    description: 'Cta to insert statement',
   },
 });
 
@@ -334,11 +338,11 @@ class Statement extends React.Component {
         <Textarea
           key="0"
           useCacheForDOMMeasurements
-          placeholder="Leave a statement (optional)"
+          placeholder={`${intl.formatMessage({ ...messages.add })} ...`}
           value={textArea.val}
           onChange={this.onTextChange}
           className={s.textEdit}
-          minRows={2}
+          minRows={1}
           disabled={pending}
         />,
       );
@@ -377,7 +381,6 @@ class Statement extends React.Component {
       altMenu = (
         <div className={s.menu}>
           <EditMenu
-            isInput={ownStatement || asInput}
             onTextSubmit={this.onTextSubmit}
             onEndEditing={this.onEndEditing}
             onEdit={this.onEditStatement}
@@ -413,7 +416,7 @@ class Statement extends React.Component {
     return (
       <div className={cn(s.rootAlt, statementPosition, inactive && s.inactive)}>
         {/* eslint-disable jsx-a11y/interactive-supports-focus */}
-        {!inactive && (
+        {
           <div
             className={
               s.avatarSlot // eslint-disable-next-line
@@ -424,31 +427,24 @@ class Statement extends React.Component {
               user={author}
               onClick={this.handleProfileClick}
             />
-            <div className={s.likes}> {likes}</div>
-
-            {canLike && (
-              <Button
-                onClick={this.handleLiking}
-                plain
-                icon={
-                  <svg viewBox="0 0 24 24" width="16px" height="16px">
-                    <path
-                      fill="none"
-                      stroke={ownLike ? 'inherit' : '#666'}
-                      strokeWidth="2"
-                      d={ICONS.thumbUpAlt}
-                    />
-                  </svg>
-                }
-              />
-            )}
+            <button
+              type="button"
+              onClick={canLike && this.handleLiking}
+              className={cn(
+                s.likes,
+                ownLike && s.liked,
+                canLike && s.clickable,
+              )}
+            >
+              {`+${likes || ''}`}
+            </button>
           </div>
-        )}
+        }
         {/* eslint-enable jsx-a11y/interactive-supports-focus */}
         <div style={{ width: '100%' }}>
           {!inactive && (
             <div className={s.header}>
-              <div>
+              <div className={s.details}>
                 <span className={s.author}>
                   {author && author.name} {author && author.surname}
                 </span>

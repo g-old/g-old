@@ -1,0 +1,14 @@
+@import '../variables';
+
+.root {
+  display: flex;
+}
+
+.clickable {
+  cursor: pointer;
+  transition: stroke-width 0.3s;
+}
+
+.clickable:hover {
+  stroke-width: 6px;
+}

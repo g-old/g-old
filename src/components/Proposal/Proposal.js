@@ -7,9 +7,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import ProposalState from '../ProposalState';
 import s from './Proposal.css';
 import UserThumbnail from '../UserThumbnail';
+import WorkteamHeader from '../WorkteamHeader';
+import { ICONS } from '../../constants';
 
 const messages = defineMessages({
   spokesman: {
@@ -42,32 +43,52 @@ class Proposal extends React.Component {
   render() {
     const {
       deletedAt,
-      state,
       title,
       publishedAt,
       body,
       spokesman,
+      workteam,
     } = this.props;
     return (
       <div className={cn(s.root, deletedAt && s.deleted)}>
         <div className={s.container}>
-          <div className={s.state}>
-            <ProposalState state={state} />
-          </div>
+          {workteam && (
+            <WorkteamHeader
+              displayName={workteam.displayName}
+              id={workteam.id}
+              logo={workteam.logo}
+            />
+          )}
           <div className={s.headline}>{title}</div>
-          <div className={s.date}>
-            <FormattedRelative value={publishedAt} />
+          <div className={s.details}>
+            {spokesman && (
+              <div>
+                <UserThumbnail
+                  marked
+                  label={<FormattedMessage {...messages.spokesman} />}
+                  user={spokesman}
+                />
+              </div>
+            )}
+            <div className={s.date}>
+              <svg
+                version="1.1"
+                viewBox="0 0 24 24"
+                width="24px"
+                height="24px"
+                role="img"
+              >
+                <path
+                  fill="none"
+                  stroke="#666"
+                  strokeWidth="2"
+                  d={ICONS.edit}
+                />
+              </svg>{' '}
+              <FormattedRelative value={publishedAt} />
+            </div>
           </div>
           <div className={s.body} dangerouslySetInnerHTML={{ __html: body }} />
-          {spokesman && (
-            <div>
-              <UserThumbnail
-                marked
-                label={<FormattedMessage {...messages.spokesman} />}
-                user={spokesman}
-              />
-            </div>
-          )}
         </div>
       </div>
     );

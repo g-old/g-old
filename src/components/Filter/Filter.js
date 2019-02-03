@@ -1,19 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '../Button';
-import { ICONS } from '../../constants';
+import Box from '../Box';
 
 const Filter = ({ filterFn, filter }) => {
   const active = filter !== 'all';
+  const states = ['all', 'pro', 'con'];
   return (
-    <span>
+    <Box>
       <Button
-        onClick={e => filterFn(e, { filter: 'all' })}
+        onClick={e =>
+          filterFn(e, {
+            filter: states[(states.indexOf(filter) + 1) % 3],
+          })
+        }
+        label={filter.toUpperCase()}
         plain
         icon={
           <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
             <polygon
-              fill={active ? '#eee7f5' : 'none'}
+              fill="none"
               opacity={active ? 1 : 0.2}
               stroke="#000"
               strokeWidth="2"
@@ -22,37 +28,7 @@ const Filter = ({ filterFn, filter }) => {
           </svg>
         }
       />
-      <Button
-        onClick={e => filterFn(e, { filter: 'pro' })}
-        plain
-        icon={
-          <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-            <path
-              fill="none"
-              stroke={filter === 'pro' ? '#8cc800' : '#000'}
-              strokeWidth="2"
-              d={ICONS.up}
-            />
-          </svg>
-        }
-      />
-      <Button
-        onClick={e => filterFn(e, { filter: 'con' })}
-        plain
-        icon={
-          <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-            <path
-              fill="none"
-              stroke={filter === 'con' ? '#ff324d' : '#000'}
-              strokeWidth="2"
-              d={ICONS.up}
-              transform="matrix(1 0 0 -1 0 24)"
-            />
-          </svg>
-        }
-      />
-
-    </span>
+    </Box>
   );
 };
 
