@@ -11,7 +11,7 @@
 
 .root {
   width: 100%;
-  max-width: 35em;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.11);
 }
 
 .headline {
@@ -20,6 +20,7 @@
   padding-top: 0;
   word-break: break-word;
   color: #540b97;
+  text-align: center;
 }
 
 .details {
@@ -41,6 +42,8 @@
 
 .container {
   margin: 0 auto;
+  padding: 1em;
+  max-width: 36em;
 }
 
 .deleted {

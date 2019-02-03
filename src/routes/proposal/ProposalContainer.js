@@ -1,7 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { defineMessages, FormattedMessage } from 'react-intl';
+import {
+  defineMessages,
+  FormattedMessage,
+  FormattedRelative,
+} from 'react-intl';
 import history from '../../history';
 import { loadProposal } from '../../actions/proposal';
 import Notification from '../../components/Notification';
@@ -33,6 +37,7 @@ import Poll from '../../components/Poll';
 import Filter from '../../components/Filter';
 import SubscriptionButton from '../../components/SubscriptionButton';
 import PollNotice from './PollNotice';
+import ProposalState from '../../components/ProposalState';
 
 function getCurrentPoll(proposal, pollId) {
   let poll;
@@ -53,6 +58,11 @@ const messages = defineMessages({
     id: 'proposal',
     defaultMessage: 'Proposal',
     description: 'Switch to proposal poll',
+  },
+  closed: {
+    id: 'poll.closed',
+    defaultMessage: 'Ended',
+    description: 'Poll closing time',
   },
 });
 class ProposalContainer extends React.Component {
@@ -269,23 +279,34 @@ class ProposalContainer extends React.Component {
           updates={voteUpdates}
           followeeVotes={followeeVotes}
         />
-        {showSubscription && (
+
+        {
           <div
             style={{
               borderBottom: '1px solid #eee',
               paddingBottom: '2em',
               display: 'flex',
-              justifyContent: 'flex-end',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}
           >
-            <SubscriptionButton
-              status={subscriptionStatus}
-              targetType="PROPOSAL"
-              onSubscribe={this.handleSubscription}
-              subscription={proposal.subscription}
-            />
+            {!poll.closedAt && <ProposalState state={proposal.state} />}
+            {poll.closedAt && (
+              <Box align>
+                <ProposalState state={proposal.state} />{' '}
+                <FormattedRelative value={poll.closedAt} />
+              </Box>
+            )}
+            {showSubscription && (
+              <SubscriptionButton
+                status={subscriptionStatus}
+                targetType="PROPOSAL"
+                onSubscribe={this.handleSubscription}
+                subscription={proposal.subscription}
+              />
+            )}
           </div>
-        )}
+        }
 
         <StatementsContainer
           hideOwnStatement={hideOwnStatement}
@@ -327,7 +348,6 @@ class ProposalContainer extends React.Component {
           <Box column padding="medium">
             {!poll.closedAt && <PollNotice poll={poll} />}
             <Proposal {...proposal} />
-
             {this.renderInteractions()}
           </Box>
         </div>

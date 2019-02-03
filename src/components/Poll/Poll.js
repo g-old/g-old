@@ -1,10 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  FormattedRelative,
-  defineMessages,
-  FormattedMessage,
-} from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import cn from 'classnames';
 import s from './Poll.css';
@@ -19,11 +15,6 @@ import Avatar from '../Avatar';
 import VotesList from '../VotesList';
 
 const messages = defineMessages({
-  closed: {
-    id: 'poll.closed',
-    defaultMessage: 'Ended',
-    description: 'Poll closing time',
-  },
   closing: {
     id: 'poll.closing',
     defaultMessage: 'Closing',
@@ -49,6 +40,16 @@ const messages = defineMessages({
     id: 'poll.voteError',
     defaultMessage: 'Voting failed!',
     description: 'Notice that voting was not successful',
+  },
+  showVotes: {
+    id: 'poll.votesShow',
+    defaultMessage: 'Show votes',
+    description: 'Show votes',
+  },
+  hideVotes: {
+    id: 'poll.votesHide',
+    defaultMessage: 'Hide votes',
+    description: 'Hide votes',
   },
 });
 
@@ -303,7 +304,7 @@ class Poll extends React.Component {
   }
 
   render() {
-    const { closedAt } = this.props;
+    const { extended } = this.props;
     const { confirmationFunc, voteError, isExpanded } = this.state;
 
     return (
@@ -328,19 +329,15 @@ class Poll extends React.Component {
             </Box>
           </Layer>
         )}
-        {closedAt && (
-          <p>
-            <FormattedMessage {...messages.closed} />{' '}
-            <FormattedRelative value={closedAt} />
-          </p>
-        )}
         {this.renderVotingComponent()}
 
-        <Button
-          label={isExpanded ? 'Hide votes' : 'Show votes'}
-          plain
-          onClick={this.toggleVotersBox}
-        />
+        {!extended && (
+          <Button plain onClick={this.toggleVotersBox}>
+            <FormattedMessage
+              {...messages[isExpanded ? 'hideVotes' : 'showVotes']}
+            />
+          </Button>
+        )}
 
         {voteError && (
           <Notification
