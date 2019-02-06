@@ -129,7 +129,7 @@
     "description": "Poll closing time",
     "defaultMessage": "Ended",
     "message": "Terminato",
-    "files": ["src/components/Poll/Poll.js"]
+    "files": ["src/routes/proposal/ProposalContainer.js"]
   },
   {
     "id": "poll.closing",
@@ -143,30 +143,21 @@
     "description": "PhaseOnePoll presets",
     "defaultMessage": "TR: 25 - PHASE ONE - NO STATEMENTS",
     "message": "Proposta con richiesta di votazione",
-    "files": [
-      "src/components/ProposalPanel/ProposalPanel.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
+    "files": ["src/components/ProposalInput/withPollSettings.js"]
   },
   {
     "id": "proposalManager.phaseTwoPoll",
     "description": "PhaseTwoPoll presets",
     "defaultMessage": "TR: 50 - PHASE TWO - WITH STATEMENTS",
     "message": "Votazione",
-    "files": [
-      "src/components/ProposalPanel/ProposalPanel.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
+    "files": ["src/components/ProposalInput/withPollSettings.js"]
   },
   {
     "id": "proposalManager.survey",
     "description": "Survey presets",
     "defaultMessage": "Survey",
     "message": "Sondaggio",
-    "files": [
-      "src/components/ProposalPanel/ProposalPanel.js",
-      "src/routes/workTeamManager/WorkTeamManagement.js"
-    ]
+    "files": ["src/components/ProposalInput/withPollSettings.js"]
   },
   {
     "id": "statements.collapse",
@@ -175,6 +166,7 @@
     "message": "Mostra meno",
     "files": [
       "src/components/Comment/Comment.js",
+      "src/components/Statement/EditMenu.js",
       "src/components/Statement/Statement.js"
     ]
   },
@@ -242,7 +234,6 @@
       "src/components/Login/Login.js",
       "src/components/MessageInput/MessageInput.js",
       "src/components/ProposalActions/ProposalActions.js",
-      "src/components/ProposalInput/ProposalInput.js",
       "src/components/TagForm/TagForm.js",
       "src/components/UserSettings/UserSettings.js",
       "src/components/WorkTeamForm/WorkTeamForm.js",
@@ -354,7 +345,10 @@
     "description": "Edit",
     "defaultMessage": "Edit",
     "message": "Modifica",
-    "files": ["src/components/Comment/Comment.js"]
+    "files": [
+      "src/components/Comment/Comment.js",
+      "src/components/Statement/EditMenu.js"
+    ]
   },
   {
     "id": "commands.expandReplies",
@@ -382,7 +376,10 @@
     "description": "Comment edited",
     "defaultMessage": "{time} (edited)",
     "message": "{time} (modificato)",
-    "files": ["src/components/Comment/Comment.js"]
+    "files": [
+      "src/components/Comment/Comment.js",
+      "src/components/Discussion/Discussion.js"
+    ]
   },
   {
     "id": "statements.delete",
@@ -391,6 +388,7 @@
     "message": "Elimina",
     "files": [
       "src/components/Comment/Comment.js",
+      "src/components/Statement/EditMenu.js",
       "src/components/Statement/Statement.js"
     ]
   },
@@ -424,7 +422,7 @@
       "src/components/MessageForm/MessageForm.js",
       "src/components/MessageInput/MessageInput.js",
       "src/components/MessageInput/NoticeLayer.js",
-      "src/components/ProposalInput/ProposalInput.js"
+      "src/components/Statement/EditMenu.js"
     ]
   },
   {
@@ -434,8 +432,8 @@
     "message": "Data superata",
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
-      "src/components/ProposalActions/ProposalActions.js",
-      "src/components/ProposalInput/ProposalInput.js"
+      "src/components/FormValidation/FormValidation.js",
+      "src/components/ProposalActions/ProposalActions.js"
     ]
   },
   {
@@ -446,7 +444,6 @@
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/FormValidation/FormValidation.js",
-      "src/components/ProposalInput/ProposalInput.js",
       "src/components/TagForm/TagForm.js",
       "src/components/WorkTeamForm/WorkTeamForm.js",
       "src/components/WorkTeamInput/WorkTeamInput.js"
@@ -459,7 +456,7 @@
     "message": "Operazione eseguita correttamente",
     "files": [
       "src/components/DiscussionInput/DiscussionInput.js",
-      "src/components/ProposalInput/ProposalInput.js"
+      "src/components/ProposalInput/ResultPage.js"
     ]
   },
   {
@@ -512,6 +509,7 @@
       "src/components/ImageUpload/ImageUpload.js",
       "src/components/MessageInput/NoticeLayer.js",
       "src/components/Poll/Poll.js",
+      "src/components/Statement/EditMenu.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js"
     ]
@@ -597,35 +595,53 @@
     "description": "Date until",
     "defaultMessage": "End date",
     "message": "Data di chiusura",
-    "files": ["src/components/PollInput/PollInput.js"]
+    "files": [
+      "src/components/PollInput/DateInput.js",
+      "src/components/ProposalInput/DateInput.js"
+    ]
   },
   {
     "id": "poll.reference",
     "description": "Threshold reference of poll",
     "defaultMessage": "Threshold reference",
     "message": "Quorum",
-    "files": ["src/components/PollInput/PollInput.js"]
+    "files": [
+      "src/components/PollInput/PollInput.js",
+      "src/components/PollInput/PollSettings.js",
+      "src/components/ProposalInput/PollSettings.js"
+    ]
   },
   {
     "id": "poll.threshold",
     "description": "Poll threshold",
     "defaultMessage": "Threshold",
     "message": "Maggioranza",
-    "files": ["src/components/PollInput/PollInput.js"]
+    "files": [
+      "src/components/PollInput/PollInput.js",
+      "src/components/PollInput/PollSettings.js",
+      "src/components/ProposalInput/PollSettings.js"
+    ]
   },
   {
     "id": "poll.type",
     "description": "Poll type",
     "defaultMessage": "Poll type",
     "message": "Tipo di proposta",
-    "files": ["src/components/PollInput/PollInput.js"]
+    "files": [
+      "src/components/PollInput/PollInput.js",
+      "src/components/PollInput/PollSettings.js",
+      "src/components/ProposalInput/PollSettings.js"
+    ]
   },
   {
     "id": "time.to",
     "description": "Time until",
     "defaultMessage": "End time",
     "message": "Ora di chiusura",
-    "files": ["src/components/PollInput/PollInput.js"]
+    "files": [
+      "src/components/PollInput/DateInput.js",
+      "src/components/ProposalInput/DateInput.js"
+    ]
   },
   {
     "id": "confirmation",
@@ -670,7 +686,6 @@
       "src/components/ActivityPanel/ActivityPanel.js",
       "src/components/ListView/ListView.js",
       "src/components/UserPanel/UserPanel.js",
-      "src/routes/memberList/MemberListContainer.js",
       "src/routes/notifications/NotificationListContainer.js"
     ]
   },
@@ -885,7 +900,10 @@
     "description": "Current account password for form label",
     "defaultMessage": "Enter your current password",
     "message": "Inserisci la tua password attuale",
-    "files": ["src/components/UserSettings/PasswordInput.js"]
+    "files": [
+      "src/components/UserSettings/ConfirmDelete.js",
+      "src/components/UserSettings/PasswordInput.js"
+    ]
   },
   {
     "id": "join",
@@ -1091,8 +1109,8 @@
     "defaultMessage": "Users",
     "message": "Utenti",
     "files": [
-      "src/components/Navigation/Navigation.js",
-      "src/routes/accountList/AccountListContainer.js"
+      "src/components/AccountsView/AccountsView.js",
+      "src/components/Navigation/Navigation.js"
     ]
   },
   {
@@ -1137,10 +1155,7 @@
     "description": "Members label",
     "defaultMessage": "Members",
     "message": "Membri",
-    "files": [
-      "src/components/WorkTeam/WorkTeam.js",
-      "src/routes/memberList/MemberListContainer.js"
-    ]
+    "files": ["src/components/WorkTeam/WorkTeam.js"]
   },
   {
     "id": "settings",
@@ -1665,5 +1680,61 @@
     "defaultMessage": "Voter",
     "message": "",
     "files": ["src/components/UserProfile/RoleBadge.js"]
+  },
+  {
+    "id": "poll.votesHide",
+    "description": "Hide votes",
+    "defaultMessage": "Hide votes",
+    "message": "",
+    "files": ["src/components/Poll/Poll.js"]
+  },
+  {
+    "id": "poll.votesShow",
+    "description": "Show votes",
+    "defaultMessage": "Show votes",
+    "message": "",
+    "files": ["src/components/Poll/Poll.js"]
+  },
+  {
+    "id": "poll.downvote",
+    "description": "Upvotes",
+    "defaultMessage": "{count, plural, =0 {No Downvote} one {# Downvote} other {# Downvotes}}",
+    "message": "",
+    "files": ["src/components/Poll/VoteArea.js"]
+  },
+  {
+    "id": "poll.upvote",
+    "description": "Upvotes",
+    "defaultMessage": "{count, plural, =0 {No Upvotes} one {# Upvote} other {# Upvotes}}",
+    "message": "",
+    "files": ["src/components/Poll/VoteArea.js"]
+  },
+  {
+    "id": "poll.votingRequest",
+    "description": "Voting requests",
+    "defaultMessage": "{requestCount, plural, =0 {No voting request} one {# voting request} other {# voting requests}}",
+    "message": "",
+    "files": ["src/components/Poll/VoteArea.js"]
+  },
+  {
+    "id": "statements.add",
+    "description": "Cta to insert statement",
+    "defaultMessage": "Add a statement",
+    "message": "",
+    "files": ["src/components/Statement/Statement.js"]
+  },
+  {
+    "id": "irreversible",
+    "description": "Action which can not be undone",
+    "defaultMessage": "Cannot be undone!",
+    "message": "",
+    "files": ["src/components/UserSettings/ConfirmDelete.js"]
+  },
+  {
+    "id": "poll.running",
+    "description": "Notice for open polls",
+    "defaultMessage": "Poll is closing",
+    "message": "",
+    "files": ["src/routes/proposal/PollNotice.js"]
   }
 ]

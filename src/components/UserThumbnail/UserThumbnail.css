@@ -1,7 +1,7 @@
 @import '../variables';
 
 .mark {
-  background-color: var(--color-accent-3-shade);
+  background-color: #e8cf0c96;
 }
 
 .big {

@@ -1,9 +1,7 @@
 @import '../../components/variables.css';
 
 .status {
-  width: 100%;
   justify-content: center;
-  margin-top: 4px;
   display: flex;
   border-radius: 4px;
 }

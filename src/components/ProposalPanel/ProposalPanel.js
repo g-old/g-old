@@ -60,6 +60,13 @@ class ProposalPanel extends React.Component {
     this.fetchTags = this.fetchTags.bind(this);
   }
 
+  getModifyableProposals() {
+    const { proposals } = this.props;
+    return (proposals || []).filter(p =>
+      ['voting', 'proposed'].includes(p.state),
+    );
+  }
+
   fetchTags() {
     const { loadTags: fetchTags } = this.props;
     fetchTags();
@@ -76,12 +83,8 @@ class ProposalPanel extends React.Component {
   }
 
   render() {
-    const {
-      proposals,
-      pageInfo,
-      updateProposal: mutateProposal,
-      surveys,
-    } = this.props;
+    const { pageInfo, updateProposal: mutateProposal, surveys } = this.props;
+    const changeableProposals = this.getModifyableProposals();
     return (
       <div>
         <Accordion>
@@ -96,12 +99,11 @@ class ProposalPanel extends React.Component {
             onActive={this.fetchProposals}
           >
             <ProposalsManager
-              proposals={(proposals || [])
-                .filter(p => p.state === 'proposed')
-                .sort(
-                  (a, b) =>
-                    new Date(a.pollOne.endTime) - new Date(b.pollOne.endTime),
-                )}
+              proposals={changeableProposals.sort(
+                (a, b) =>
+                  new Date(a.pollTwo ? a.pollTwo.endTime : a.pollOne.endTime) -
+                  new Date(b.pollTwo ? b.pollTwo.endTime : b.pollOne.endTime),
+              )}
               pageInfo={pageInfo}
               updateProposal={mutateProposal}
               loadProposals={this.fetchProposals}
@@ -109,8 +111,8 @@ class ProposalPanel extends React.Component {
           </AccordionPanel>
           <AccordionPanel heading="Manage surveys" onActive={this.fetchSurveys}>
             <ProposalsManager
-              proposals={(surveys || []).filter(
-                s => (s.pollOne ? !s.pollOne.closedAt : false),
+              proposals={(surveys || []).filter(s =>
+                s.pollOne ? !s.pollOne.closedAt : false,
               )}
               pageInfo={pageInfo}
               updateProposal={mutateProposal}

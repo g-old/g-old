@@ -39,6 +39,11 @@ const messages = defineMessages({
     defaultMessage: 'Show less',
     description: 'Btn to collapse statements',
   },
+  add: {
+    id: 'statements.add',
+    defaultMessage: 'Add a statement',
+    description: 'Cta to insert statement',
+  },
 });
 
 class Statement extends React.Component {
@@ -333,11 +338,11 @@ class Statement extends React.Component {
         <Textarea
           key="0"
           useCacheForDOMMeasurements
-          placeholder="Leave a statement (optional)"
+          placeholder={`${intl.formatMessage({ ...messages.add })} ...`}
           value={textArea.val}
           onChange={this.onTextChange}
           className={s.textEdit}
-          minRows={2}
+          minRows={1}
           disabled={pending}
         />,
       );
@@ -376,7 +381,6 @@ class Statement extends React.Component {
       altMenu = (
         <div className={s.menu}>
           <EditMenu
-            isInput={ownStatement || asInput}
             onTextSubmit={this.onTextSubmit}
             onEndEditing={this.onEndEditing}
             onEdit={this.onEditStatement}
@@ -412,7 +416,7 @@ class Statement extends React.Component {
     return (
       <div className={cn(s.rootAlt, statementPosition, inactive && s.inactive)}>
         {/* eslint-disable jsx-a11y/interactive-supports-focus */}
-        {!inactive && (
+        {
           <div
             className={
               s.avatarSlot // eslint-disable-next-line
@@ -435,7 +439,7 @@ class Statement extends React.Component {
               {`+${likes || ''}`}
             </button>
           </div>
-        )}
+        }
         {/* eslint-enable jsx-a11y/interactive-supports-focus */}
         <div style={{ width: '100%' }}>
           {!inactive && (

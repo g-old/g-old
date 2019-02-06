@@ -19,6 +19,7 @@ import {
   getVisibibleStatementsByPoll,
 } from '../../reducers';
 import history from '../../history';
+import Label from '../Label';
 
 const handleProfileClick = ({ id }) => {
   history.push(`/accounts/${id}`);
@@ -118,6 +119,7 @@ class StatementsContainer extends React.Component {
       followees,
       updates,
       statements,
+      children,
       createStatement: create,
       updateStatement: update,
       deleteStatement: deleteStmt,
@@ -126,6 +128,7 @@ class StatementsContainer extends React.Component {
       updateUser: follow,
       flag: createFlag,
       solveFlag: mutateFlag,
+      filter,
     } = this.props;
     const { showLayer } = this.state;
     let ownStatementsNode = null;
@@ -187,7 +190,10 @@ class StatementsContainer extends React.Component {
     toRender.sort((a, b) => b.likes - a.likes);
     return (
       <Box column>
-        {ownStatementsNode}
+        <Box align>
+          <Label>{`${statements.length} Statements`}</Label> {children}
+        </Box>
+        {filter === 'all' && ownStatementsNode}
         {toRender.map(s => (
           <Statement
             {...s}

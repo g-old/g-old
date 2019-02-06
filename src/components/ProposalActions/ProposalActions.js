@@ -149,25 +149,27 @@ class ProposalActions extends React.Component<Props, State> {
   }
 
   renderPollState() {
-    const { proposal } = this.props;
+    const {
+      proposal: { state, pollOne, pollTwo },
+    } = this.props;
     const result = [];
-    if (proposal.state === 'survey') {
+    if (state === 'survey') {
       result.push(<Label>Survey</Label>);
     } else {
-      result.push(<Label>Poll One</Label>);
+      result.push(<Label>{pollTwo ? 'VOTING' : 'PROPOSAL'}</Label>);
     }
-    const { pollOne } = proposal;
-    if (pollOne) {
+    const poll = pollTwo || pollOne;
+    if (poll) {
       result.push(
         <div>
           <PollState
             compact
-            allVoters={pollOne.allVoters}
-            upvotes={pollOne.options[0].numVotes}
-            downvotes={pollOne.options[1] && pollOne.options[1].numVotes}
-            thresholdRef={pollOne.mode.thresholdRef}
-            threshold={pollOne.threshold}
-            unipolar={pollOne.mode.unipolar}
+            allVoters={poll.allVoters}
+            upvotes={poll.options[0].numVotes}
+            downvotes={poll.options[1] && poll.options[1].numVotes}
+            thresholdRef={poll.mode.thresholdRef}
+            threshold={poll.threshold}
+            unipolar={poll.mode.unipolar}
           />
         </div>,
       );
@@ -179,12 +181,13 @@ class ProposalActions extends React.Component<Props, State> {
   renderActions() {
     const {
       updates = {},
-      proposal: { pollOne, state, id, workTeamId },
+      proposal: { pollOne, pollTwo, state, id, workTeamId },
       updateProposal,
       user,
     } = this.props;
+    const poll = pollTwo || pollOne;
     const actions = [];
-    if (!pollOne.closedAt) {
+    if (!poll.closedAt) {
       actions.push(
         <AccordionPanel
           heading={
@@ -209,7 +212,7 @@ class ProposalActions extends React.Component<Props, State> {
       );
     }
 
-    if (state !== 'survey') {
+    if (state === 'proposed') {
       actions.push(
         <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
           <Box column>
@@ -234,7 +237,8 @@ class ProposalActions extends React.Component<Props, State> {
     } = this.props;
     let result;
     if (
-      state !== 'survey' &&
+      pollOne &&
+      state === 'proposed' &&
       (pollOne.closedAt || isThresholdPassed(pollOne))
     ) {
       result = <Notification type="alert" message="Ready for voting" />;
@@ -244,40 +248,40 @@ class ProposalActions extends React.Component<Props, State> {
 
   renderDetails() {
     const {
-      proposal: { pollOne, state },
+      proposal: { pollOne, state, pollTwo },
     } = this.props;
-    const details = [
-      <KeyValueRow name="Upvotes" value={pollOne.options[0].numVotes} />,
-    ];
+    const poll = pollTwo || pollOne;
 
-    if (state === 'survey') {
+    const details = [];
+
+    poll.options.forEach(option => {
       details.push(
-        <KeyValueRow name="Downvotes" value={pollOne.options[1].numVotes} />,
+        <KeyValueRow
+          name={option.title || option.description}
+          value={option.numVotes}
+        />,
       );
-    } else {
+    });
+
+    if (state === 'proposed') {
       const numVotersForThreshold = Math.ceil(
-        (pollOne.allVoters * pollOne.threshold) / 100,
+        (poll.allVoters * poll.threshold) / 100,
       );
-      if (pollOne.options[0]) {
-        details.push(
-          <KeyValueRow
-            name="Threshold (votes)"
-            value={numVotersForThreshold}
-          />,
-          <KeyValueRow
-            name="Votes left for threshold"
-            value={numVotersForThreshold - pollOne.options[0].numVotes}
-          />,
-        );
-      }
+      details.push(
+        <KeyValueRow name="Threshold (votes)" value={numVotersForThreshold} />,
+        <KeyValueRow
+          name="Votes left for threshold"
+          value={numVotersForThreshold - poll.options[0].numVotes}
+        />,
+      );
     }
-    if (!pollOne.closedAt) {
+    if (!poll.closedAt) {
       details.push(
         <KeyValueRow
           name="Endtime"
           value={
             <FormattedDate
-              value={pollOne.endTime}
+              value={poll.endTime}
               day="numeric"
               month="numeric"
               year="numeric"
@@ -308,8 +312,8 @@ class ProposalActions extends React.Component<Props, State> {
         <Box pad>
           <Heading tag="h3">{proposal.title}</Heading>
         </Box>
-        <Box flex align justify wrap>
-          <Box column>
+        <Box flex align justify column fill>
+          <Box column fill>
             {error && <Notification type="error" message={errorMessage} />}
             {this.renderPollState()}
             {this.renderDetails()}

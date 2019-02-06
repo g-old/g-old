@@ -1,0 +1,13 @@
+@import '../../components/variables.css';
+
+.root {
+  border-bottom: 3px solid #ff9a0d;
+  border-radius: 3px;
+  text-align: center;
+  padding: 1em 0;
+
+  > span {
+    color: var(--color-accent-3);
+    text-transform: uppercase;
+  }
+}

@@ -138,6 +138,8 @@
 
   /* line-height: 1.3em; */
   box-sizing: border-box;
+  outline: none;
+  border: none;
 }
 
 .inactive {
@@ -146,7 +148,9 @@
   }
 
   .textEdit {
-    height: 1.2em;
+    height: 1.5em;
+    font-size: 1.1875em;
+    resize: none;
   }
 }
 

@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/prefer-default-export
 export const thresholdPassed = poll =>
   // eslint-disable-next-line no-mixed-operators
-  poll.upvotes >= Math.floor(poll.allVoters / 100 * poll.threshold);
+  poll.upvotes >= Math.floor((poll.allVoters / 100) * poll.threshold);
 
 export const validateEmail = email => {
   // http://stackoverflow.com/questions/46155/validate-email-address-in-javascript
@@ -75,7 +75,7 @@ export const getLastActivePoll = (state, proposal) => {
       break;
     }
     case 'voting': {
-      poll = proposal.pollTwo;
+      poll = proposal.pollTwo || proposal.pollOne;
       break;
     }
     case 'accepted': {
@@ -195,7 +195,7 @@ export const genStatusIndicators = data => {
 // from: https://gist.github.com/malko/ff77f0af005f684c44639e4061fa8019
 /* eslint-disable no-mixed-operators */
 export const urlBase64ToUint8Array = base64String => {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding)
     .replace(/\-/g, '+') //eslint-disable-line
     .replace(/_/g, '/'); // eslint-disable-line
