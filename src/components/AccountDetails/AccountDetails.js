@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 
 import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import { fetchUser, deleteUser } from '../../actions/user';

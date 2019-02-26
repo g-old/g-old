@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './NavSidebar.css';
 import Sidebar from '../../../components/Sidebar';
 import Label from '../../../components/Label';
@@ -16,9 +16,11 @@ class Navbar extends React.Component {
     numMembers: PropTypes.number.isRequired,
     handleNavClicks: PropTypes.func.isRequired,
   };
+
   static defaultProps = {
     logo: null,
   };
+
   render() {
     const { logo, displayName, numMembers, handleNavClicks } = this.props;
     let groupImage;

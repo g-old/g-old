@@ -9,7 +9,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { getDroneBranch, getDroneBuild } from '../../reducers';
 import s from './Footer.css';

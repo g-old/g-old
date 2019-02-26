@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './Select.css';
 import Button from '../Button';
 import Drop from '../Drop';
@@ -55,7 +55,8 @@ const renderValue = option => {
   if (Array.isArray(option)) {
     if (option.length === 1) {
       return renderValue(option[0]);
-    } else if (option.length > 1) {
+    }
+    if (option.length > 1) {
       return `Selected ${option.length}`; // TODO FormattedMessage
     }
   } else if (option && typeof option === 'object') {
@@ -99,6 +100,7 @@ class Select extends React.Component {
     multiple: false,
     inField: false,
   };
+
   constructor(props) {
     super(props);
     this.onAddDrop = this.onAddDrop.bind(this);
@@ -152,6 +154,7 @@ class Select extends React.Component {
       this.drop.remove();
     }
   }
+
   onClickOption(option) {
     const { onChange } = this.props;
     const value = this.valueForSelectedOption(option);

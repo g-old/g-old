@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import TransitionGroup from 'react-addons-transition-group'; // 'react-transition-group/TransitionGroup';
 import s from './Collapsible.css';
 
@@ -18,6 +18,7 @@ class Collapsible extends React.Component {
     animate: true,
     active: false,
   };
+
   render() {
     const Component = this.props.animate ? TransitionGroup : Box;
     return (

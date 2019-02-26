@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import MarkdownIt from 'markdown-it';
 import { defineMessages, FormattedMessage } from 'react-intl';
 
@@ -180,36 +180,36 @@ class DiscussionInput extends React.Component {
   }
 
   onTextChange(e) {
-    const html = this.md.render(this.state.textArea.val);
-
-    this.setState({
-      ...this.state,
-      markup: html,
-      textArea: {
-        ...this.state.textArea,
-        val: e.target.value,
-      },
+    this.setState(prevState => {
+      return {
+        markup: this.md.render(prevState.textArea.val),
+        textArea: { ...prevState.textArea, val: e.target.value },
+      };
     });
   }
+
   onTextSelect(e) {
     this.setState({
-      ...this.state,
       textSelection: [e.target.selectionStart, e.target.selectionEnd],
     });
   }
+
   onTitleChange(e) {
-    this.setState({ ...this.state, title: { val: e.target.value } });
+    this.setState({ title: { val: e.target.value } });
   }
+
   onModeChange(e) {
-    this.setState({ ...this.state, value: e.target.value });
+    this.setState({ value: e.target.value });
   }
 
   onStrong() {
     if (this.isSomethingSelected()) this.insertAtSelection('****', '****');
   }
+
   onItalic() {
     if (this.isSomethingSelected()) this.insertAtSelection('*', '*');
   }
+
   onAddLink() {
     const url = prompt('URL', 'https://');
     if (url) {
@@ -258,12 +258,14 @@ class DiscussionInput extends React.Component {
     this.setState({ errors: { ...this.state.errors, ...validated.errors } });
     return validated.failed === 0;
   }
+
   handleBlur(e) {
     const field = e.target.name;
     if (this.state.settings[field]) {
       this.handleValidation([field]);
     }
   }
+
   handleValueChanges(e) {
     let value;
     switch (e.target.name) {
@@ -295,6 +297,7 @@ class DiscussionInput extends React.Component {
       settings: { ...this.state.settings, [e.target.name]: value },
     });
   }
+
   toggleSettings() {
     this.setState({ displaySettings: !this.state.displaySettings });
   }
@@ -302,6 +305,7 @@ class DiscussionInput extends React.Component {
   isSomethingSelected() {
     return this.state.textSelection[0] !== this.state.textSelection[1];
   }
+
   insertAtSelection(pre, post) {
     let val = this.state.settings.body;
     let sel = this.state.textSelection;
@@ -324,6 +328,7 @@ class DiscussionInput extends React.Component {
   handleTagInputChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
+
   handleKeys(e) {
     if (e.key === 'Enter') {
       if (this.state.tagInput) {
@@ -491,6 +496,7 @@ const mapDispatch = {
 DiscussionInput.contextTypes = {
   intl: PropTypes.object,
 };
-export default connect(mapStateToProps, mapDispatch)(
-  withStyles(s)(DiscussionInput),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(withStyles(s)(DiscussionInput));

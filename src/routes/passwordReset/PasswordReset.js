@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import s from './PasswordReset.css';
 import { resetPassword } from '../../actions/password_reset';
@@ -61,6 +61,7 @@ class PasswordReset extends React.Component {
   static defaultProps = {
     updates: null,
   };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -109,6 +110,7 @@ class PasswordReset extends React.Component {
       });
     }
   }
+
   onSubmit() {
     if (this.handleValidation(formFields)) {
       let { password } = this.state;
@@ -122,6 +124,7 @@ class PasswordReset extends React.Component {
       this.props.resetPassword(data);
     }
   }
+
   handleValueChange(e) {
     const field = e.target.name;
     const { value } = e.target;
@@ -153,6 +156,7 @@ class PasswordReset extends React.Component {
       this.handleValidation(fields);
     }
   }
+
   visibleErrors(errorNames) {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
@@ -235,6 +239,7 @@ const mapStateToProps = state => ({
   updates: getAccountUpdates(state, 'pw'),
 });
 
-export default connect(mapStateToProps, mapDispatch)(
-  withStyles(s)(PasswordReset),
-);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(withStyles(s)(PasswordReset));

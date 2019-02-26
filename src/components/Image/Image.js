@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import classnames from 'classnames';
 import s from './Image.css'; // eslint-disable-line css-modules/no-unused-class
 
@@ -12,6 +12,7 @@ class Image extends React.Component {
     fit: PropTypes.bool,
     thumb: PropTypes.bool,
   };
+
   static defaultProps = {
     className: null,
     full: null,

@@ -1,7 +1,7 @@
 // Taken from https://github.com/grommet/grommet/blob/master/src/js/components/Collapsible.js
 
 import React from 'react';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import ReactDOM from 'react-dom';
 import s from './Collapse.css';
 import Box from '../Box';
@@ -18,7 +18,10 @@ class Collapse extends React.Component {
       setTimeout(() => {
         node.classList.add(s.animate);
         node.style.height = `${contentHeight}px`;
-        setTimeout(callback, parseFloat(getComputedStyle(node).transitionDuration) * 1000);
+        setTimeout(
+          callback,
+          parseFloat(getComputedStyle(node).transitionDuration) * 1000,
+        );
       });
     }
   }
@@ -40,7 +43,10 @@ class Collapse extends React.Component {
       setTimeout(() => {
         node.classList.add(s.animate);
         node.style.height = 0;
-        setTimeout(callback, parseFloat(getComputedStyle(node).transitionDuration) * 1000);
+        setTimeout(
+          callback,
+          parseFloat(getComputedStyle(node).transitionDuration) * 1000,
+        );
       });
     }
   }

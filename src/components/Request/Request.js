@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './Request.css';
 import Box from '../Box';
 import ProfilePicture from '../ProfilePicture';
@@ -19,12 +19,14 @@ class Request extends React.Component {
       error: PropTypes.bool,
     }),
   };
+
   static defaultProps = { updates: null };
 
   constructor(props) {
     super(props);
     this.state = {};
   }
+
   componentWillReceiveProps({ workTeam, updates = {} }) {
     const newUpdates = {};
     if (updates.success && !this.props.updates.success) {
@@ -52,9 +54,9 @@ class Request extends React.Component {
           </p>
         )}
         <Box column pad>
-          <Button onClick={onAllow} label={'Allow'} />
-          <Button onClick={onDeny} label={'Deny'} />
-          <Button primary onClick={onCancel} label={'Cancel'} />
+          <Button onClick={onAllow} label="Allow" />
+          <Button onClick={onDeny} label="Deny" />
+          <Button primary onClick={onCancel} label="Cancel" />
         </Box>
       </Box>
     );

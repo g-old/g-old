@@ -3,7 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './FormField.css';
 
 class FormField extends React.Component {
@@ -14,6 +14,7 @@ class FormField extends React.Component {
     help: PropTypes.node,
     overflow: PropTypes.bool,
   };
+
   static defaultProps = {
     error: null,
     label: null,
@@ -28,10 +29,13 @@ class FormField extends React.Component {
     this.onBlur = this.onBlur.bind(this);
     this.onClick = this.onClick.bind(this);
   }
+
   componentDidMount() {
     const contentsElement = this.contentsRef;
     if (contentsElement) {
-      const inputElements = contentsElement.querySelectorAll('input, textarea, select');
+      const inputElements = contentsElement.querySelectorAll(
+        'input, textarea, select',
+      );
       if (inputElements.length === 1) {
         this.inputElement = inputElements[0];
         this.inputElement.addEventListener('focus', this.onFocus);
@@ -64,16 +68,12 @@ class FormField extends React.Component {
 
   render() {
     const { error, children, label, help, overflow } = this.props;
-    const fieldError = error
-      ? (<span className={s.field_error}>
-        {error}
-      </span>)
-      : undefined;
-    const fieldHelp = help
-      ? (<span className={s.help}>
-        {help}
-      </span>)
-      : undefined;
+    const fieldError = error ? (
+      <span className={s.field_error}>{error}</span>
+    ) : (
+      undefined
+    );
+    const fieldHelp = help ? <span className={s.help}>{help}</span> : undefined;
     /* eslint-disable jsx-a11y/no-static-element-interactions */
     return (
       <div

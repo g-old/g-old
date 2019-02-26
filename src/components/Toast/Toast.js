@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 // eslint-disable-next-line css-modules/no-unused-class
 import s from './Toast.css';
 import ToastContents from './ToastContents';
@@ -11,10 +11,12 @@ class Toast extends React.Component {
     id: PropTypes.string,
     onClose: PropTypes.func,
   };
+
   static defaultProps = {
     id: null,
     onClose: null,
   };
+
   static contextTypes = {
     intl: PropTypes.object,
     insertCss: PropTypes.func,
@@ -28,10 +30,12 @@ class Toast extends React.Component {
   getChildContext() {
     return this.context;
   }
+
   componentDidMount() {
     this.addLayer();
     this.renderLayer();
   }
+
   componentDidUpdate() {
     this.renderLayer();
   }
@@ -47,6 +51,7 @@ class Toast extends React.Component {
       onClose();
     }
   }
+
   addLayer() {
     const { id } = this.props;
 

@@ -9,7 +9,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './Page.css';
 
 class Page extends React.Component {
@@ -17,6 +17,7 @@ class Page extends React.Component {
     title: PropTypes.string,
     html: PropTypes.string.isRequired,
   };
+
   static defaultProps = {
     title: null,
   };
@@ -26,9 +27,7 @@ class Page extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <h1>
-            {title}
-          </h1>
+          <h1>{title}</h1>
           <div
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: html }}

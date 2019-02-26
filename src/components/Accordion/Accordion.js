@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './Accordion.css';
 
 class Accordion extends React.Component {
@@ -74,11 +74,7 @@ class Accordion extends React.Component {
       }),
     );
 
-    return (
-      <ul className={s.list}>
-        {accordionChildren}
-      </ul>
-    );
+    return <ul className={s.list}>{accordionChildren}</ul>;
   }
 }
 

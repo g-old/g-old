@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 /* eslint-disable css-modules/no-unused-class */
 import s from './TagTable.css';
 import TableRow from '../TableRow';

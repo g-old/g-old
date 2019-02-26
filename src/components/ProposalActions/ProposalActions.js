@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import { connect } from 'react-redux';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import { defineMessages, FormattedMessage, FormattedDate } from 'react-intl';
 import s from './ProposalActions.css';
 import KeyValueRow from './KeyValueRow';

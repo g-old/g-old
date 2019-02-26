@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './PollOptionPreview.css';
 import Button from '../Button';
 import Box from '../Box';

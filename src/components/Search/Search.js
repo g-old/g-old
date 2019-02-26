@@ -4,7 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { findDOMNode } from 'react-dom';
 import cn from 'classnames';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './Search.css';
 import Drop from '../Drop';
 
@@ -52,6 +52,7 @@ class Search extends React.Component {
     id: null,
     onFocus: null,
   };
+
   constructor(props, context) {
     super(props, context);
 
@@ -131,6 +132,7 @@ class Search extends React.Component {
       this.onRemoveDrop();
     }
   }
+
   // eslint-disable-next-line no-unused-vars
   onChangeInput(event) {
     const { onDOMChange } = this.props;
@@ -198,7 +200,7 @@ class Search extends React.Component {
     if (suggestions) {
       /* eslint-disable  react/no-array-index-key */
       suggestionsNode = suggestions.map(
-        (suggestion, index) =>
+        (suggestion, index) => (
           <div
             key={index}
             className={cn(
@@ -210,16 +212,13 @@ class Search extends React.Component {
             onClick={this.onClickSuggestion.bind(this, suggestion)} // eslint-disable-line
           >
             {renderLabel(suggestion)}
-          </div>,
+          </div>
+        ),
         this,
       );
       /* eslint-enable  react/no-array-index-key */
 
-      suggestionsNode = (
-        <div key="suggestions">
-          {suggestionsNode}
-        </div>
-      );
+      suggestionsNode = <div key="suggestions">{suggestionsNode}</div>;
     }
 
     const contents = [
@@ -229,11 +228,7 @@ class Search extends React.Component {
       </div>,
     ];
 
-    return (
-      <div className={s.searchDrop}>
-        {contents}
-      </div>
-    );
+    return <div className={s.searchDrop}>{contents}</div>;
   }
 
   render() {

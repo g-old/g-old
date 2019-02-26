@@ -6,7 +6,7 @@ import {
   FormattedMessage,
   FormattedRelative,
 } from 'react-intl';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './UserNotification.css';
 import Link from '../Link';
 

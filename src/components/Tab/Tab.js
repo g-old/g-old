@@ -1,7 +1,7 @@
 // inspired by grommet
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import cn from 'classnames';
 import s from './Tab.css';
 import Button from '../Button';
@@ -18,10 +18,12 @@ class Tab extends React.Component {
     active: false,
     onRequestForActive: () => {},
   };
+
   constructor() {
     super();
     this.onTabClick = this.onTabClick.bind(this);
   }
+
   onTabClick(event) {
     const { onRequestForActive } = this.props;
     if (event) {

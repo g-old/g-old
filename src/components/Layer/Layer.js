@@ -3,7 +3,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
+import StyleContext from 'isomorphic-style-loader/StyleContext';
+
 import LayerContents from '../LayerContents';
 import s from './Layer.css';
 
@@ -13,6 +15,7 @@ class Layer extends React.Component {
     id: PropTypes.string,
     hidden: PropTypes.bool,
   };
+
   static defaultProps = {
     id: null,
     hidden: false,
@@ -131,15 +134,17 @@ class Layer extends React.Component {
     if (this.element) {
       this.element.className = s.layer;
       const contents = (
-        <LayerContents
-          {...this.props}
-          className={s.container}
-          insertCss={this.context.insertCss}
-          intl={this.context.intl}
-          store={this.context.store}
-          context={this.context}
-          onClose={this.props.onClose}
-        />
+        <StyleContext.Provider value={{ insertCss: this.context.insertCss }}>
+          <LayerContents
+            {...this.props}
+            className={s.container}
+            insertCss={this.context.insertCss}
+            intl={this.context.intl}
+            store={this.context.store}
+            context={this.context}
+            onClose={this.props.onClose}
+          />
+        </StyleContext.Provider>
       );
       ReactDOM.render(contents, this.element, () => {
         const { hidden } = this.props;

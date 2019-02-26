@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './WorkTeamInput.css';
-import SearchField from '../../components/SearchField';
+import SearchField from '../SearchField';
 import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
@@ -34,6 +34,7 @@ class WorkTeamInput extends React.Component {
     createWorkTeam: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
   };
+
   constructor(props) {
     super(props);
     this.onSubmit = this.onSubmit.bind(this);
@@ -79,6 +80,7 @@ class WorkTeamInput extends React.Component {
       createWorkTeam({ coordinatorId, name: teamName });
     }
   }
+
   handleValidation(fields) {
     const validated = this.Validator(fields);
     this.setState({ errors: { ...this.state.errors, ...validated.errors } });
@@ -91,6 +93,7 @@ class WorkTeamInput extends React.Component {
       this.handleValidation([field]);
     }
   }
+
   visibleErrors(errorNames) {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
@@ -102,14 +105,16 @@ class WorkTeamInput extends React.Component {
       return acc;
     }, {});
   }
+
   handleValueChanges(e) {
-    const value = e.target.value;
+    const { value } = e.target;
     this.setState({ [e.target.name]: value });
   }
 
   openLogoUploader() {
     this.setState({ showLogoUploader: true });
   }
+
   render() {
     const langs = [
       { code: 'de', name: 'german' },
@@ -122,7 +127,7 @@ class WorkTeamInput extends React.Component {
       //  <Layer onClose={this.props.onClose}>
       <Box justify>
         <Box pad column className={s.form}>
-          <h1>{'Create Team'}</h1>
+          <h1>Create Team</h1>
 
           <fieldset>
             <FormField label="Teamname" error={teamNameError}>
@@ -152,7 +157,8 @@ class WorkTeamInput extends React.Component {
                 onChange={e =>
                   this.handleValueChanges({
                     target: { name: 'coordinatorValue', value: e.value },
-                  })}
+                  })
+                }
                 data={this.props.users}
                 fetch={this.props.findUser}
                 displaySelected={data => {

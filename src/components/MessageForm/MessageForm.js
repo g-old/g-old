@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import { defineMessages, FormattedMessage } from 'react-intl';
 import s from './MessageForm.css';
 import Box from '../Box';
-import FormValidation from '../../components/FormValidation';
-import Button from '../../components/Button';
-import FormField from '../../components/FormField';
+import FormValidation from '../FormValidation';
+import Button from '../Button';
+import FormField from '../FormField';
 
 const messages = defineMessages({
   send: {

@@ -42,7 +42,7 @@
     "immutable": "^4.0.0-rc.12",
     "intl": "^1.2.5",
     "intl-locales-supported": "^1.0.0",
-    "isomorphic-style-loader": "^4.0.0",
+    "isomorphic-style-loader": "^5.0.1",
     "iterall": "^1.1.1",
     "join-monster": "^2.0.16",
     "juice": "^5.0.1",
@@ -82,7 +82,7 @@
     "slate-html-serializer": "^0.7.30",
     "slate-react": "^0.21.12",
     "source-map-support": "^0.5.3",
-    "universal-router": "^7.0.0",
+    "universal-router": "^8.0.0",
     "uuid": "^3.1.0",
     "web-push": "^3.3.0",
     "whatwg-fetch": "^3.0.0"

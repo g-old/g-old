@@ -1,7 +1,7 @@
 // Heavily inspired by grommet
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import InfiniteScroll from '../../core/InfiniteScroll';
 import s from './List.css';
 
@@ -14,6 +14,7 @@ class List extends React.Component {
   static defaultProps = {
     onMore: null,
   };
+
   constructor(props, context) {
     super(props, context);
     // this.onClick = this.onClick.bind(this);
@@ -30,12 +31,14 @@ class List extends React.Component {
       );
     }
   }
+
   componentWillReceiveProps() {
     if (this.scroll) {
       InfiniteScroll.stopListeningForScroll(this.scroll);
       this.scroll = undefined;
     }
   }
+
   componentDidUpdate() {
     const { onMore } = this.props;
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import classnames from 'classnames';
 import s from './Form.css';
 
@@ -10,6 +10,7 @@ class Form extends React.Component {
     children: PropTypes.element.isRequired,
     onSubmit: PropTypes.func.isRequired,
   };
+
   static defaultProps = { className: null };
 
   render() {

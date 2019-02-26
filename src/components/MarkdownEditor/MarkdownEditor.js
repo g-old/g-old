@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import MarkdownIt from 'markdown-it';
 
 import s from './MarkdownEditor.css';
@@ -34,17 +34,25 @@ class MarkdownEditor extends React.Component<Props, State> {
       linkify: true,
     });
   }
+
   onStrong: () => void;
+
   onItalic: () => void;
+
   onAddLink: () => void;
+
   onTextSelect: () => void;
+
   onTextChange: () => void;
+
   onStrong() {
     if (this.isSomethingSelected()) this.insertAtSelection('****', '****');
   }
+
   onItalic() {
     if (this.isSomethingSelected()) this.insertAtSelection('*', '*');
   }
+
   onAddLink() {
     const url = prompt('URL', 'https://');
     if (url) {
@@ -61,6 +69,7 @@ class MarkdownEditor extends React.Component<Props, State> {
       selection: [e.target.selectionStart, e.target.selectionEnd],
     });
   }
+
   onTextChange(e) {
     const { onChange, name } = this.props;
     if (e) {
@@ -74,6 +83,7 @@ class MarkdownEditor extends React.Component<Props, State> {
       onChange(newEvent);
     }
   }
+
   isSomethingSelected() {
     return this.state.selection[0] !== this.state.selection[1];
   }

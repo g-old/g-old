@@ -3,7 +3,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { findDOMNode } from 'react-dom';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
+import StyleContext from 'isomorphic-style-loader/StyleContext';
+
 import s from './Menu.css';
 import Box from '../Box';
 import Button from '../Button';
@@ -39,6 +41,7 @@ class Menu extends React.Component {
     withControl: false,
     primary: false,
   };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -99,6 +102,7 @@ class Menu extends React.Component {
   onOpen() {
     this.setState({ state: 'expanded' });
   }
+
   onClose() {
     this.setState({ state: 'collapsed' });
   }
@@ -117,6 +121,7 @@ class Menu extends React.Component {
       this.onClose();
     }
   }
+
   renderMenuDrop() {
     let control = null;
     if (this.props.withControl) {
@@ -134,16 +139,19 @@ class Menu extends React.Component {
     /* eslint-disable no-return-assign */
 
     const onClick = this.props.closeOnClick ? this.onClose : onSink;
+    console.log('CONTEXXT', this.context);
     return (
-      <MenuDrop
-        {...this.context}
-        onClick={onClick}
-        control={control}
-        ref={ref => (this.menuDrop = ref)}
-        align={this.props.dropAlign}
-      >
-        {this.props.children}
-      </MenuDrop>
+      <StyleContext.Provider value={{ insertCss: this.context.insertCss }}>
+        <MenuDrop
+          {...this.context}
+          onClick={onClick}
+          control={control}
+          ref={ref => (this.menuDrop = ref)}
+          align={this.props.dropAlign}
+        >
+          {this.props.children}
+        </MenuDrop>
+      </StyleContext.Provider>
     );
   }
 

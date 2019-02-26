@@ -10,7 +10,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import { connect } from 'react-redux';
 import cn from 'classnames';
 import { getActivityCounter, getSessionUser } from '../../reducers';
@@ -97,6 +97,7 @@ class Navigation extends React.Component {
     path: PropTypes.string.isRequired,
     user: PropTypes.shape({}),
   };
+
   static defaultProps = {
     user: null,
   };
@@ -113,6 +114,7 @@ class Navigation extends React.Component {
       document.title = `(${notice}) ${oldTitle}`;
     }
   }
+
   getMenu() {
     const { activityCounter, path, user } = this.props;
 
@@ -135,6 +137,7 @@ class Navigation extends React.Component {
     }
     return links;
   }
+
   render() {
     return (
       <span role="navigation" style={{ margin: '0 0.2em' }}>
@@ -177,4 +180,7 @@ const mapToProps = state => ({
   user: getSessionUser(state),
 });
 
-export default connect(mapToProps, null)(withStyles(s)(Navigation));
+export default connect(
+  mapToProps,
+  null,
+)(withStyles(s)(Navigation));

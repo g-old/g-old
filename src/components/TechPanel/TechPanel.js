@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 
 import { loadStatistics } from '../../actions/statistics';
 import { getStatistics } from '../../reducers';
@@ -66,6 +66,7 @@ class TechPanel extends React.Component {
     loadStatistics: PropTypes.func.isRequired,
     statistics: PropTypes.shape({}).isRequired,
   };
+
   componentDidMount() {
     this.props.loadStatistics();
   }
@@ -109,7 +110,7 @@ class TechPanel extends React.Component {
       serverInfo = (
         <div className={s.db}>
           <span>{`CPUs: ${numCpus}`}</span>
-          <span>{`Uptime: ${Math.round(uptime / 3600 * 10) / 10} h`}</span>
+          <span>{`Uptime: ${Math.round((uptime / 3600) * 10) / 10} h`}</span>
           <span>
             {`Memory: ${Number(memory[1]) / 1024} FREE ${Number(memory[0]) /
               1024} TOTAL`}
@@ -192,4 +193,7 @@ const mapStateToProps = state => ({ statistics: getStatistics(state) });
 const mapDispatch = {
   loadStatistics,
 };
-export default connect(mapStateToProps, mapDispatch)(withStyles(s)(TechPanel));
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(withStyles(s)(TechPanel));

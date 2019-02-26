@@ -8,7 +8,7 @@ import {
   IntlShape,
 } from 'react-intl';
 import React, { lazy, Suspense } from 'react';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './Discussion.css';
 import UserThumbnail from '../UserThumbnail';
 

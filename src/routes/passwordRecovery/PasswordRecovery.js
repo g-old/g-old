@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import s from './PasswordRecovery.css';
 import { recoverPassword } from '../../actions/password_reset';
@@ -78,10 +78,12 @@ class PasswordRecovery extends React.Component {
     this.visibleErrors = this.visibleErrors.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
   }
+
   onEmailChange(e) {
     const email = e.target.value;
     this.setState({ email });
   }
+
   onSubmit() {
     if (this.handleValidation(['email'])) {
       let { email } = this.state;
@@ -95,6 +97,7 @@ class PasswordRecovery extends React.Component {
       this.setState({ sent: true });
     }
   }
+
   handleValidation(fields) {
     const validated = this.Validator(fields);
     this.setState({ errors: { ...this.state.errors, ...validated.errors } });
@@ -109,11 +112,14 @@ class PasswordRecovery extends React.Component {
       this.handleValidation(fields);
     }
   }
+
   visibleErrors(errorNames) {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
       if (this.state.errors[curr].touched) {
-        acc[err] = <FormattedMessage {...messages[this.state.errors[curr].errorName]} />;
+        acc[err] = (
+          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
+        );
       }
       return acc;
     }, {});
@@ -122,13 +128,20 @@ class PasswordRecovery extends React.Component {
   render() {
     let help = null;
     if (this.state.sent) {
-      help = <div><FormattedMessage {...messages.stepTwo} /></div>;
+      help = (
+        <div>
+          <FormattedMessage {...messages.stepTwo} />
+        </div>
+      );
     } else {
       const { emailError } = this.visibleErrors(['email']);
       help = (
         <Box column pad>
           <FormattedMessage {...messages.stepOne} />
-          <FormField label={<FormattedMessage {...messages.email} />} error={emailError}>
+          <FormField
+            label={<FormattedMessage {...messages.email} />}
+            error={emailError}
+          >
             <input
               value={this.state.email}
               onChange={this.onEmailChange}
@@ -161,4 +174,7 @@ const mapDispatch = {
   recoverPassword,
 };
 
-export default connect(null, mapDispatch)(withStyles(s)(PasswordRecovery));
+export default connect(
+  null,
+  mapDispatch,
+)(withStyles(s)(PasswordRecovery));

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './WorkTeamsList.css'; // eslint-disable-line
 import Box from '../Box';
 import Table from '../Table';
@@ -23,6 +23,7 @@ class WorkTeamsList extends React.Component {
     noWorkTeamsFound: PropTypes.node,
     checkedIndices: PropTypes.arrayOf(PropTypes.number),
   };
+
   static defaultProps = {
     workTeams: null,
     sortIndex: null,

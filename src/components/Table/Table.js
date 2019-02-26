@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import classnames from 'classnames';
 import s from './Table.css';
 import Selection from '../../core/Selection';
@@ -59,7 +59,8 @@ function findHead(children) {
     ) {
       head = child;
       return true;
-    } else if (child.props && child.props.children) {
+    }
+    if (child.props && child.props.children) {
       head = findHead(child.props.children);
       if (head) {
         return true;
@@ -86,6 +87,7 @@ class Table extends React.Component {
     onMouseUp: PropTypes.func,
     onMouseDown: PropTypes.func,
   };
+
   static defaultProps = {
     selected: null,
     scrollable: false,
@@ -204,6 +206,7 @@ class Table extends React.Component {
       }
     }
   }
+
   onClick(event) {
     const { onSelect, selectable, selected } = this.props;
 
@@ -223,11 +226,13 @@ class Table extends React.Component {
       onSelect(selection.length === 1 ? selection[0] : selection);
     }
   }
+
   onResize() {
     // debounce
     clearTimeout(this.resizeTimer);
     this.resizeTimer = setTimeout(this.layout, 50);
   }
+
   setSelection() {
     const { selected } = this.state;
     Selection.setClassFromIndexes({
@@ -237,6 +242,7 @@ class Table extends React.Component {
       selectedIndexes: selected,
     });
   }
+
   container() {
     let containerElement = this.tableRef;
     if (containerElement) {

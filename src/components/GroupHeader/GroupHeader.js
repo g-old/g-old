@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './GroupHeader.css';
 import Image from '../Image';
 
@@ -10,9 +10,11 @@ class GroupHeader extends React.Component {
     className: PropTypes.string,
     imageSrc: PropTypes.string.isRequired,
   };
+
   static defaultProps = {
     className: null,
   };
+
   render() {
     const { imageSrc, children, className } = this.props;
     const backgroundContainer = (

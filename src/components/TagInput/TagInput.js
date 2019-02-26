@@ -3,7 +3,7 @@
 /* @flow */
 import React from 'react';
 import type { ElementRef } from 'react';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './TagInput.css';
 import Box from '../Box';
 import TagPreview from './TagPreview';

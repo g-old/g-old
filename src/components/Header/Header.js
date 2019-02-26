@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './Header.css';
 import Navigation from '../Navigation';
 import UserStatus from '../UserStatus';

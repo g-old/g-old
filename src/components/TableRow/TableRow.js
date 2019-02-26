@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import classnames from 'classnames';
 import s from './TableRow.css';
 
@@ -10,6 +10,7 @@ class TableRow extends React.Component {
     className: PropTypes.string,
     onClick: PropTypes.func,
   };
+
   static defaultProps = {
     children: null,
     className: null,

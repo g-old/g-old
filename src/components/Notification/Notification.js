@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import cn from 'classnames';
 import s from './Notification.css';
 import Box from '../Box';
@@ -11,9 +11,11 @@ class Notification extends React.Component {
     action: PropTypes.node,
     type: PropTypes.oneOf(['success', 'error', 'alert']).isRequired,
   };
+
   static defaultProps = {
     action: null,
   };
+
   render() {
     const { message, type, action } = this.props;
     let className;
@@ -37,10 +39,7 @@ class Notification extends React.Component {
     }
     return (
       <Box pad className={cn(className, s.notification)}>
-
-        <span>
-          {message}
-        </span>
+        <span>{message}</span>
         {action}
       </Box>
     );

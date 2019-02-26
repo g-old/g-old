@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './Message.css';
 import Box from '../Box';
 import UserThumbnail from '../UserThumbnail';
@@ -14,6 +14,7 @@ class Message extends React.Component {
     preview: PropTypes.bool,
     createdAt: PropTypes.string.isRequired,
   };
+
   static defaultProps = {
     preview: null,
   };

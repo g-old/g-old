@@ -5,7 +5,7 @@ import {
   FormattedMessage,
   defineMessages,
 } from 'react-intl';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import cn from 'classnames';
 import s from './ActivityLog.css';
 import UserThumbnail from '../UserThumbnail';

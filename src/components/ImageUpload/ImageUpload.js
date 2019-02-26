@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import AvatarEditor from 'react-avatar-editor';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './ImageUpload.css';
 import Box from '../Box';
 import Button from '../Button';
@@ -51,6 +51,7 @@ class ImageUpload extends React.Component {
     ratio: PropTypes.number,
     serverResizing: PropTypes.bool,
   };
+
   static defaultProps = {
     uploadError: null,
     uploadSuccess: false,
@@ -58,6 +59,7 @@ class ImageUpload extends React.Component {
     ratio: null,
     serverResizing: null,
   };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -118,6 +120,7 @@ class ImageUpload extends React.Component {
     const rotate = (this.state.rotate + 90) % 360;
     this.setState({ rotate });
   }
+
   handleLeftRotation() {
     const rotate = (this.state.rotate - 90) % 360;
     this.setState({ rotate });
@@ -142,12 +145,13 @@ class ImageUpload extends React.Component {
           scale={this.state.scale}
           rotate={this.state.rotate || 0}
           onLoadFailure={() =>
-            alert('Image could not been loaded -> load another one')}
+            alert('Image could not been loaded -> load another one')
+          }
           onLoadSuccess={() => this.setState({ loaded: true })}
         />
         <Box pad column justify>
           <Box pad justify align>
-            <Label>{'Zoom:'}</Label>
+            <Label>Zoom:</Label>
 
             <Button
               plain
@@ -204,7 +208,7 @@ class ImageUpload extends React.Component {
               label={<FormattedMessage {...messages.rotate} />}
               onClick={this.handleLeftRotation}
             >
-              <svg viewBox={'0 0 24 24'} width={24} height={24}>
+              <svg viewBox="0 0 24 24" width={24} height={24}>
                 <path
                   fill="none"
                   stroke="#000"

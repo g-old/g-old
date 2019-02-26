@@ -1,7 +1,7 @@
 /* @flow */
 import React from 'react';
 import { connect } from 'react-redux';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
 import StepPage from '../StepPage';
 import s from './ProposalInput.css';
@@ -102,11 +102,10 @@ class ProposalInput extends React.Component<Props, State> {
   getNewTags() {
     const { tags: selectedTags } = this.state;
 
-    return selectedTags.map(
-      tag =>
-        tag.id && tag.id.indexOf(TAG_ID_SUFFIX) !== -1
-          ? { text: tag.text }
-          : { id: tag.id },
+    return selectedTags.map(tag =>
+      tag.id && tag.id.indexOf(TAG_ID_SUFFIX) !== -1
+        ? { text: tag.text }
+        : { id: tag.id },
     );
   }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './MenuDrop.css';
 import Box from '../Box';
 
@@ -10,7 +10,6 @@ class MenuDrop extends React.Component {
     intl: PropTypes.shape({}).isRequired,
     router: PropTypes.shape({}),
     store: PropTypes.shape({}),
-    insertCss: PropTypes.func.isRequired,
     control: PropTypes.node.isRequired,
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.node),
@@ -26,15 +25,7 @@ class MenuDrop extends React.Component {
     store: null,
     align: null,
   };
-  getChildContext() {
-    return {
-      intl: this.props.intl,
-      history: this.props.history,
-      router: this.props.router,
-      store: this.props.store,
-      insertCss: this.props.insertCss,
-    };
-  }
+
   render() {
     const { control, children, onClick, align /* column */ } = this.props;
     /* const contents = [];
@@ -76,7 +67,6 @@ class MenuDrop extends React.Component {
         React.cloneElement(control, { key: 'control', fill: true }),
       );
     }
-
     return (
       <Box
         ref={ref => (this.menuDropRef = ref)} // eslint-disable-line
@@ -91,12 +81,5 @@ class MenuDrop extends React.Component {
     );
   }
 }
-MenuDrop.childContextTypes = {
-  history: PropTypes.any,
-  intl: PropTypes.any,
-  router: PropTypes.any,
-  store: PropTypes.any,
-  insertCss: PropTypes.any,
-};
 
 export default withStyles(s)(MenuDrop);

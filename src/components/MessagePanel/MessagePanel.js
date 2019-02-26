@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import { createMessage, updateMessage } from '../../actions/message';
 import s from './MessagePanel.css';
 import MessageInput from '../MessageInput';

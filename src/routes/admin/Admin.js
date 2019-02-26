@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import PropTypes from 'prop-types';
 import s from './Admin.css';
 import Tab from '../../components/Tab';

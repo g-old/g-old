@@ -1,6 +1,6 @@
 /* @flow */
 import React from 'react';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import { Spring, animated } from 'react-spring';
 import s from './VoteBar.css';
 

@@ -5,7 +5,7 @@ import {
   FormattedMessage,
   defineMessages,
 } from 'react-intl';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './Activity.css';
 import Avatar from '../Avatar';
 import Statement from '../Statement';
@@ -222,8 +222,8 @@ class Activity extends React.Component {
             info.extended
               ? '#8cc800'
               : positions[0].pos === 0
-                ? '#8cc800'
-                : '#ff324d'
+              ? '#8cc800'
+              : '#ff324d'
           }
           strokeWidth="2"
           d={ICONS.thumbUpAlt}
@@ -231,8 +231,8 @@ class Activity extends React.Component {
             info.extended
               ? ''
               : positions[0].pos === 0
-                ? ''
-                : 'scale(1,-1) translate(0,-24)'
+              ? ''
+              : 'scale(1,-1) translate(0,-24)'
           }
         />
       </svg>

@@ -2,7 +2,7 @@
 import React from 'react';
 import type { ElementRef } from 'react';
 
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import FormValidation from '../FormValidation';
 import s from './ProposalBody.css';
 import FormField from '../FormField';

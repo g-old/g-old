@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withstyles from 'isomorphic-style-loader/lib/withStyles';
+import withstyles from 'isomorphic-style-loader/withStyles';
 import cn from 'classnames';
 import { connect } from 'react-redux';
 import { loadFeed } from '../../actions/feed';
@@ -51,7 +51,9 @@ class FeedContainer extends React.Component {
       }));
       return (
         <div className={cn(s.container)}>
-          {placeHolder.map(() => <ActivitySkeleton />)}
+          {placeHolder.map(() => (
+            <ActivitySkeleton />
+          ))}
         </div>
       );
     }

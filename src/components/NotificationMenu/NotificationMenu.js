@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import cn from 'classnames';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
+import StyleContext from 'isomorphic-style-loader/StyleContext';
 import s from './NotificationMenu.css';
 import { ICONS } from '../../constants';
 import Drop from '../Drop';
@@ -30,10 +31,12 @@ class NotificationMenu extends React.Component {
     clearNotifications: PropTypes.func.isRequired,
     status: PropTypes.shape({}).isRequired,
   };
+
   static defaultProps = {
     user: null,
     notifications: null,
   };
+
   constructor(props) {
     super(props);
     this.onOpenMenu = this.onOpenMenu.bind(this);
@@ -42,11 +45,10 @@ class NotificationMenu extends React.Component {
     this.renderNotifications = this.renderNotifications.bind(this);
     this.onMarkAsRead = this.onMarkAsRead.bind(this);
 
-    this.state = { dropActive: false };
+    this.state = {
+      dropActive: false,
+    };
     this.toggleMenu = this.toggleMenu.bind(this);
-  }
-  componentDidMount() {
-    //
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -96,6 +98,7 @@ class NotificationMenu extends React.Component {
   onCloseMenu() {
     this.setState({ dropActive: false });
   }
+
   onMarkAsRead(e) {
     if (e) {
       e.stopPropagation();
@@ -114,8 +117,10 @@ class NotificationMenu extends React.Component {
       this.onOpenMenu();
     }
   }
+
   renderNotifications() {
     const { notifications, status, user } = this.props;
+    let component;
     if (status.pending && !notifications.length) {
       let n = 1;
       /* eslint-disable */
@@ -123,7 +128,7 @@ class NotificationMenu extends React.Component {
         length: 5,
       }).map(() => ({ id: n++ }));
       /* eslint-enable */
-      return (
+      component = (
         <NotificationDrop
           notifications={placeHolder}
           unreadNotifications={user.unreadNotifications}
@@ -132,16 +137,22 @@ class NotificationMenu extends React.Component {
           onMarkAsRead={this.onMarkAsRead}
         />
       );
+    } else {
+      component = (
+        <NotificationDrop
+          notifications={notifications}
+          unreadNotifications={user.unreadNotifications}
+          showSpinner={status.pending}
+          notificationComponent={Notification}
+          onMarkAsRead={this.onMarkAsRead}
+        />
+      );
     }
-
+    // Should the DropComponent handle all the context-related code?
     return (
-      <NotificationDrop
-        notifications={notifications}
-        unreadNotifications={user.unreadNotifications}
-        showSpinner={status.pending}
-        notificationComponent={Notification}
-        onMarkAsRead={this.onMarkAsRead}
-      />
+      <StyleContext.Provider value={{ insertCss: this.context.insertCss }}>
+        {component}
+      </StyleContext.Provider>
     );
   }
 
@@ -173,10 +184,12 @@ class NotificationMenu extends React.Component {
     );
   }
 }
+
 NotificationMenu.contextTypes = {
   intl: PropTypes.object,
   insertCss: PropTypes.func,
 };
+
 const mapPropsToState = state => ({
   notifications: getAllNotifications(state).slice(0, 10),
   user: getSessionUser(state),
@@ -187,6 +200,7 @@ const mapDispatch = {
   clearNotifications,
 };
 
-export default connect(mapPropsToState, mapDispatch)(
-  withStyles(s)(NotificationMenu),
-);
+export default connect(
+  mapPropsToState,
+  mapDispatch,
+)(withStyles(s)(NotificationMenu));

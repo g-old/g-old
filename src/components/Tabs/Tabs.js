@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './Tabs.css';
 
 class Tabs extends React.Component {
@@ -12,10 +12,12 @@ class Tabs extends React.Component {
     children: PropTypes.node,
     onActive: PropTypes.func,
   };
+
   static defaultProps = {
     children: null,
     onActive: null,
   };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -32,6 +34,7 @@ class Tabs extends React.Component {
       this.setState({ activeIndex: nextProps.activeIndex });
     }
   }
+
   activateTab(index) {
     // eslint-disable-next-line no-prototype-builtins
     if (!this.props.hasOwnProperty('activeIndex')) {

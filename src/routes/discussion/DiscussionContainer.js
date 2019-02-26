@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { findDOMNode } from 'react-dom';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import WorkteamHeader from '../../components/WorkteamHeader';
 import Notification from '../../components/Notification';
 import s from './DiscussionContainer.css';

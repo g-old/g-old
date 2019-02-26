@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 /**
  * React Starter Kit (https://www.reactstarterkit.com/)
  *
@@ -11,6 +12,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { IntlProvider } from 'react-intl';
 import { Provider as ReduxProvider } from 'react-redux';
+import StyleContext from 'isomorphic-style-loader/StyleContext';
 
 const ContextType = {
   // Enables critical path CSS rendering
@@ -113,15 +115,19 @@ class App extends React.PureComponent {
     this.intl = (state && state.intl) || {};
     const { initialNow, locale, messages } = this.intl;
     const localeMessages = (messages && messages[locale]) || {};
-   return (
-      <IntlProvider
-        initialNow={initialNow}
-        locale={locale}
-        messages={localeMessages}
-        defaultLocale="de-DE"
+    return (
+      <StyleContext.Provider
+        value={{ insertCss: this.props.context.insertCss }}
       >
-        {React.Children.only(this.props.children)}
-      </IntlProvider>
+        <IntlProvider
+          initialNow={initialNow}
+          locale={locale}
+          messages={localeMessages}
+          defaultLocale="de-DE"
+        >
+          {React.Children.only(this.props.children)}
+        </IntlProvider>
+      </StyleContext.Provider>
     );
     /* return React.Children.only(this.props.children) */
   }

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FormattedMessage, defineMessages } from 'react-intl';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './UserPanel.css';
 import { createMessage, updateMessage } from '../../actions/message';
 import { updateUser, loadUserList, findUser } from '../../actions/user';
@@ -155,8 +155,9 @@ class UserPanel extends React.Component {
                 loadUsers({ group: Groups.GUEST });
               }}
             >
-              {guestArrayStatus.pending &&
-                !guestArray.length && <p>Loading...</p>}
+              {guestArrayStatus.pending && !guestArray.length && (
+                <p>Loading...</p>
+              )}
               {!guestArrayStatus.pending &&
                 !guestArray.length &&
                 !guestArrayStatus.error && <p> No data</p>}
@@ -187,8 +188,9 @@ class UserPanel extends React.Component {
                 loadUsers({ group: VIEWERS });
               }}
             >
-              {viewerArrayStatus.pending &&
-                !viewerArray.length && <p>Loading...</p>}
+              {viewerArrayStatus.pending && !viewerArray.length && (
+                <p>Loading...</p>
+              )}
               {!viewerArrayStatus.pending &&
                 !viewerArray.length &&
                 !viewerArrayStatus.error && <p> No data</p>}

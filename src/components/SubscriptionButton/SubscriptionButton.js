@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import { defineMessages, intlShape, injectIntl } from 'react-intl';
 import s from './SubscriptionButton.css';
 import Box from '../Box';
@@ -56,9 +56,11 @@ class SubscriptionButton extends React.Component {
     targetType: PropTypes.oneOf(['DISCUSSION', 'PROPOSAL']).isRequired,
     status: PropTypes.shape({ pending: PropTypes.bool }).isRequired,
   };
+
   static defaultProps = {
     subscription: null,
   };
+
   constructor(props) {
     super(props);
     this.state = {};

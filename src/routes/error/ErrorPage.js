@@ -9,7 +9,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './ErrorPage.css';
 
 class ErrorPage extends React.Component {
@@ -29,12 +29,8 @@ class ErrorPage extends React.Component {
     if (__DEV__ && this.props.error) {
       return (
         <div>
-          <h1>
-            {this.props.error.name}
-          </h1>
-          <pre>
-            {this.props.error.stack}
-          </pre>
+          <h1>{this.props.error.name}</h1>
+          <pre>{this.props.error.stack}</pre>
         </div>
       );
     }

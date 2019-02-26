@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './TagTable.css'; // eslint-disable-line
 import Box from '../Box';
 import Table from '../Table';
@@ -23,6 +23,7 @@ class TagsList extends React.Component {
     noTagsFound: PropTypes.node,
     checkedIndices: PropTypes.arrayOf(PropTypes.number),
   };
+
   static defaultProps = {
     tags: null,
     sortIndex: null,
