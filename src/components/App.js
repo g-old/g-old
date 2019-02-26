@@ -21,13 +21,18 @@ const ContextType = {
   // Universal HTTP client
   fetch: PropTypes.func.isRequired,
   pathname: PropTypes.string.isRequired,
-  query: PropTypes.object,
+  query: PropTypes.string,
   // Integrate Redux
   // http://redux.js.org/docs/basics/UsageWithReact.html
   ...ReduxProvider.childContextTypes,
   // ReactIntl
   intl: IntlProvider.childContextTypes.intl,
   locale: PropTypes.string,
+  store: PropTypes.shape({
+    subscribe: PropTypes.func.isRequired,
+    dispatch: PropTypes.func.isRequired,
+    getState: PropTypes.func.isRequired,
+  }),
 };
 
 /**
@@ -119,14 +124,16 @@ class App extends React.PureComponent {
       <StyleContext.Provider
         value={{ insertCss: this.props.context.insertCss }}
       >
-        <IntlProvider
-          initialNow={initialNow}
-          locale={locale}
-          messages={localeMessages}
-          defaultLocale="de-DE"
-        >
-          {React.Children.only(this.props.children)}
-        </IntlProvider>
+        <ReduxProvider store={store}>
+          <IntlProvider
+            initialNow={initialNow}
+            locale={locale}
+            messages={localeMessages}
+            defaultLocale="de-DE"
+          >
+            {React.Children.only(this.props.children)}
+          </IntlProvider>
+        </ReduxProvider>
       </StyleContext.Provider>
     );
     /* return React.Children.only(this.props.children) */
