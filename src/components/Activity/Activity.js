@@ -287,6 +287,7 @@ class Activity extends React.Component {
         result.content = (
           <Link // eslint-disable-line
             to={`/proposal/${infoData.proposalId || 'xxx'}/${content.pollId}`}
+            style={{ outline: 'none' }}
           >
             <Statement {...content} />
           </Link>

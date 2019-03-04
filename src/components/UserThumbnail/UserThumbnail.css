@@ -14,10 +14,16 @@
   display: inline-flex;
   align-items: center;
   color: #666;
+  outline: none;
 
   > *:not(:last-child) {
     margin-right: 0.5rem;
   }
+}
+
+.root:active {
+  color: white;
+  background-color: var(--color-clicked);
 }
 
 .thumbnail {

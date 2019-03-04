@@ -54,7 +54,7 @@
   border-radius: 6px;
   width: 100%;
   border: 1px solid #aaa;
-  outline: none;
+  outline: none !important;
   background-color: transparent;
 }
 

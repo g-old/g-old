@@ -9,8 +9,12 @@
 
 .header {
   align-items: center;
-  padding: 1em;
+  padding: 0.7em;
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid #d0cdcd;
+}
+
+.listItem {
+  margin: 0.5em 0;
 }

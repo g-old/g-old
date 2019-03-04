@@ -31,6 +31,8 @@
   --color-accent-3-shade: #eee7f5;
   --color-accent-5: #8078c8;
   --color-border: #bbb;
+  --color-hover: #eee7f5;
+  --color-clicked: #e0d6e4;
 
   /*
    * Layout
