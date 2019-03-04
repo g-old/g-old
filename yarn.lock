@@ -10667,12 +10667,12 @@ react-redux@^6.0.1:
     prop-types "^15.7.2"
     react-is "^16.8.2"
 
-react-spring@^6.1.10:
-  version "6.1.10"
-  resolved "https://registry.yarnpkg.com/react-spring/-/react-spring-6.1.10.tgz#ae28796dccfb32baa02d34fb94289c2088f63a1b"
-  integrity sha512-msMoHyXHzb3KdHNY6Yo6wm1t+1GKjy6k2kqaYT3bG6nM//HOL5798OD6Qg719SEDskRDh2vXxIyJ5KEoAUbecA==
+react-spring@^8.0.11:
+  version "8.0.11"
+  resolved "https://registry.yarnpkg.com/react-spring/-/react-spring-8.0.11.tgz#73b11e04bb61b3c297d2a92364fb32d6c9c34c32"
+  integrity sha512-CCW4Nj6pWJyZrBp/PWF1PopI9x0lj+6imx4sWzzPLXYoLuhUQbbYQgcNRh6KvshwiGJJABlVREUIB/Tm8/36/g==
   dependencies:
-    "@babel/runtime" "^7.0.0"
+    "@babel/runtime" "^7.3.1"
 
 react-test-renderer@^16.1.1:
   version "16.8.2"
