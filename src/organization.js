@@ -150,6 +150,8 @@ export const canChangeGroups = (actor, targetUser, updatedGroups) => {
 };
 
 export const isAdmin = viewer => viewer && (viewer.groups & Groups.ADMIN) > 0;
+export const isSuperuser = viewer =>
+  viewer && (viewer.groups & Groups.SUPER_USER) > 0;
 
 export const getUpdatedGroup = (oldGroups: number, updatedGroups: number) => {
   let groupDiff = oldGroups ^ updatedGroups;

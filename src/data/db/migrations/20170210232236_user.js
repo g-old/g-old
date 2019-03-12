@@ -10,18 +10,18 @@ exports.up = function(knex, Promise) {
             .string('email')
             .notNullable()
             .unique();
-          table.string('avatar_path');
+          table.string('thumbnail');
           table
             .boolean('email_verified')
             .notNullable()
             .defaultsTo(false);
           table.string('password_hash');
           table
-            .integer('role_id')
+            .integer('groups')
             .unsigned()
-            .notNullable();
-          table.foreign('role_id').references('roles.id');
-          table.integer('privilege').defaultsTo(1);
+            .defaultsTo(0);
+          table.enu('locale', ['it-IT', 'de-DE', 'lld-IT']).defaultsTo('de-DE');
+
           table.timestamp('last_login_at');
           table.timestamps();
           table.timestamp('deleted_at'); // defaultTo(knex.raw('now()')).notNullable();

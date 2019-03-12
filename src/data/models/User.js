@@ -7,6 +7,7 @@ import {
   calcRights,
   Groups,
   getUpdatedGroup,
+  isSuperuser,
 } from '../../organization';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import log from '../../logger';
@@ -14,15 +15,16 @@ import EventManager from '../../core/EventManager';
 import { transactify } from './utils';
 
 const NOTIFICATION_FIELDS = [
-  'proposal',
-  'survey',
   'comment',
   'discussion',
   'update',
   'reply',
   'message',
-  'statement',
 ];
+const MIN_PASSWORD_LENGTH = 6;
+
+const validatePassword = password =>
+  password && password.trim().length >= MIN_PASSWORD_LENGTH;
 
 export type UserProps = {
   id: ID,
@@ -56,6 +58,12 @@ const sanitizeName = name =>
         })
         .join(' ')
     : name;
+
+const protectedAccount = (account, viewer) =>
+  isSuperuser(account) ||
+  // eslint-disable-next-line eqeqeq
+  (account.id != viewer.id && account.groups !== Groups.GUEST);
+
 class User {
   id: ID;
 
@@ -168,14 +176,16 @@ class User {
     // throw Error('TESTERROR');
     const errors = [];
     if (!data.id) return { errors: ['Arguments missing'] };
-    if (!canMutate(viewer, data, Models.USER)) {
+    const userInDB = await User.gen(viewer, data.id, loaders);
+
+    if (!canMutate(viewer, { ...data, user: userInDB }, Models.USER)) {
       return { errors: ['Permission denied!'] };
     }
     // validate - if something seems corrupted, return.
-    if (data.password && data.password.trim().length <= 6)
-      return { errors: ['Wrong argument'] };
-    if (data.passwordOld && data.passwordOld.trim().length <= 6)
-      return { errors: ['Wrong argument'] };
+    if (data.password && !validatePassword(data.password))
+      return { errors: ['password-wrong-size'] };
+    if (data.passwordOld && !validatePassword(data.passwordOld))
+      return { errors: ['password-wrong-size'] };
     // TODO write fn which gets all the props with the right name
     // TODO Allow only specific updates, take care of role
     const newData = { updated_at: new Date() };
@@ -289,14 +299,12 @@ class User {
       if (!hash) throw Error('Hash generation failed');
       newData.password_hash = hash;
     }
-    let userInDB;
 
     if (data.groups != null) {
       // check i valid roles
       /* eslint-disable no-bitwise */
       const groups = Number(data.groups);
       // TODO make it a member method - pro -cons?
-      userInDB = await User.gen(viewer, data.id, loaders);
       if (!canChangeGroups(viewer, userInDB, groups)) {
         log.warn({ data, viewer }, 'Group change denied!');
         return { user: null, errors: ['Permission denied'] };
@@ -422,7 +430,7 @@ class User {
     // validate
     if (!data) return null;
     if (!canMutate(viewer, data, Models.USER)) return null;
-    let { name, surname, email, password } = data;
+    let { name, surname, email } = data;
 
     name = sanitizeName(name);
 
@@ -431,14 +439,14 @@ class User {
     email = email.trim().toLowerCase();
     if (!email) return null;
     if (!validateEmail(email)) return null;
-    password = password.trim();
-    if (!password) return null;
-    if (password.length < 6) return null;
+    if (!validatePassword(data.password)) {
+      return null;
+    }
     // eslint-disable-next-line camelcase
     // const thumbnail = `https://api.adorable.io/avatars/32/${name}${surname}.io.png`;
     // create
     // TODO check if locking with forUpdate is necessary (duplicate emails)
-    const hash = await bcrypt.hash(data.password, 10);
+    const hash = await bcrypt.hash(data.password.trim(), 10);
     if (!hash) throw Error('Something went wrong');
     const newUserData = {
       name,
@@ -456,7 +464,7 @@ class User {
         .insert(newUserData)
         .into('users')
         .returning('*');
-      await trx.insert({ user_id: userData.id }).into('notification_settings');
+      //  await trx.insert({ user_id: userData.id }).into('notification_settings');
       return userData;
     });
     if (!newUser) return null;
@@ -508,12 +516,22 @@ class User {
       result.errors.push('Permission denied');
       return result;
     }
+    // eslint-disable-next-line eqeqeq
+    if (data.id == viewer.id && data.password) {
+      const [hash = ''] = await knex('users')
+        .where({ id: data.id })
+        .pluck('password_hash');
+      if (!(await bcrypt.compare(data.password, hash))) {
+        result.errors.push('password');
+        return result;
+      }
+    }
     let deletedUser;
     try {
       deletedUser = await knex.transaction(async trx => {
         const userInDB = await User.gen(viewer, data.id, loaders);
 
-        if (!userInDB || userInDB.groups !== Groups.GUEST) {
+        if (!userInDB || protectedAccount(userInDB, viewer)) {
           throw new Error(userInDB ? 'Permission denied' : 'User not found');
         }
         let rowCount;
@@ -601,11 +619,19 @@ class User {
                 .where({ requester_id: data.id })
                 .del();
               // wt memberships
-              await knex('user_work_teams')
+              const workTeamIds = await knex('user_work_teams')
                 .transacting(transaction)
                 .forUpdate()
                 .where({ user_id: data.id })
-                .del();
+                .del()
+                .returning('work_team_id');
+              if (workTeamIds && workTeamIds.length) {
+                await knex('work_teams')
+                  .transacting(transaction)
+                  .forUpdate()
+                  .whereIn('id', workTeamIds)
+                  .decrement('num_members', 1);
+              }
               // messages
               // ???
 

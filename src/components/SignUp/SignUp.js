@@ -122,6 +122,8 @@ const messages = defineMessages({
   },
 });
 
+const PATH_TO_PRIVACY = '/privacy';
+
 const onBlurValidation = (fieldName, state, fields) => {
   if (fieldName && state) {
     if (fieldName === 'password' && state.passwordAgain.length > 0) {
@@ -296,8 +298,29 @@ class SignUp extends React.Component {
     }
     return (
       <Box tag="article" align column pad>
-        <FormValidation // eslint-disable-next-line
-          ref={el => (this.form = el)} eager onBlur={onBlurValidation} options={{ invalidEmails: this.state.invalidEmails }} validations={{ name: { args: { required: true, min: 2 } }, surname: { args: { required: true, min: 2 } }, password: { fn: passwordValidation, args: { required: true, min: 6 } }, passwordAgain: { fn: passwordAgainValidation, args: { required: true, min: 6 } }, email: { fn: emailValidation, args: { required: true } }, consent: { fn: consentValidation, args: { required: true } } }} submit={this.executeCaptcha}>
+        <FormValidation
+          ref={
+            el => (this.form = el) // eslint-disable-next-line
+          }
+          eager
+          onBlur={onBlurValidation}
+          options={{ invalidEmails: this.state.invalidEmails }}
+          validations={{
+            name: { args: { required: true, min: 2 } },
+            surname: { args: { required: true, min: 2 } },
+            password: {
+              fn: passwordValidation,
+              args: { required: true, min: 6 },
+            },
+            passwordAgain: {
+              fn: passwordAgainValidation,
+              args: { required: true, min: 6 },
+            },
+            email: { fn: emailValidation, args: { required: true } },
+            consent: { fn: consentValidation, args: { required: true } },
+          }}
+          submit={this.executeCaptcha}
+        >
           {({
             errorMessages,
             onBlur,
@@ -427,7 +450,11 @@ class SignUp extends React.Component {
                       {...messages.readPrivacy}
                       values={{
                         link: (
-                          <a target="_blank" href="/about">
+                          <a
+                            target="_blank"
+                            href={PATH_TO_PRIVACY}
+                            rel="noopener noreferrer"
+                          >
                             <FormattedMessage {...messages.privacy} />
                           </a>
                         ),
@@ -452,7 +479,11 @@ class SignUp extends React.Component {
                 </FormField>
               </fieldset>
               <p>
-                <a target="_blank" href="/about">
+                <a
+                  target="_blank"
+                  href={PATH_TO_PRIVACY}
+                  rel="noopener noreferrer"
+                >
                   <FormattedMessage {...messages.privacy} />
                 </a>
               </p>
@@ -467,7 +498,9 @@ class SignUp extends React.Component {
             </Form>
           )}
         </FormValidation>
-        <Recaptcha ref={e => (this.recaptchaInstance = e) // eslint-disable-line
+        <Recaptcha
+          ref={
+            e => (this.recaptchaInstance = e) // eslint-disable-line
           }
           size="invisible"
           render="explicit"
