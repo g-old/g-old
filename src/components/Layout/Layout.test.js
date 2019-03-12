@@ -24,23 +24,6 @@ const mockStore = configureStore(middlewares);
 const setupApp = (store, intl, element) => (
   <App
     context={{
-      /* intl: {
-          initialNow: 1501773564065,
-          formattedMessage: () => 'translated text',
-          formatDate: () => 'formatted date',
-          formatTime: () => 'formatted time',
-          formatRelative: () => 'formatted relative',
-          formatNumber: () => 'formatted number',
-          formatPlural: () => 'formatted plural',
-          formatMessage: () => 'formatted message',
-          formatHTMLMessage: () => 'formatted html',
-          now: () => new Date(),
-          locale: 'de-DE',
-          newLocale: null,
-          messages: {
-            'de-DE': {},
-          },
-        },*/
       intl,
       fetch: () => {},
       insertCss: () => {},
