@@ -24,7 +24,7 @@ async function action({ store }) {
     if (!canAccess(user, title)) {
       return { redirect: '/account' };
     }
-    return { redirect: '/feed' };
+    return { redirect: '/private' };
   }
   return {
     chunks: ['home'],

@@ -12,13 +12,13 @@
    * Typography
    * ======================================================================== */
 
-  --font-family-base: "Work Sans", "Segoe UI", "HelveticaNeue-Light", sans-serif;
+  --font-family-base: 'Work Sans', 'Segoe UI', 'HelveticaNeue-Light', sans-serif;
 
   /*
    * Colors
    * ======================================================================== */
 
-  --color-gold: #e0b000;
+  --color-brand: #555245;
   --color-accent-1: #25149b;
   --color-accent: #930793;
   --color-green: #8cc800;

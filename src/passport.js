@@ -46,7 +46,6 @@ passport.use(
           'email',
           'thumbnail',
           'groups',
-          'can_vote_since',
           'email_verified',
         ])
         .update({ last_login_at: new Date() })

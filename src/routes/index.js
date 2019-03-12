@@ -29,6 +29,22 @@ const routes = {
       path: '/admin',
       load: () => import(/* webpackChunkName: 'admin' */ './admin'),
     },
+    {
+      path: '/account',
+      load: () => import(/* webpackChunkName: 'account' */ './account'),
+    },
+    {
+      path: '/private',
+      load: () => import(/* webpackChunkName: 'private' */ './private'),
+    },
+    {
+      path: '/home',
+      load: () => import(/* webpackChunkName: 'home' */ './home'),
+    },
+    {
+      path: '/privacy',
+      load: () => import(/* webpackChunkName: 'privacy' */ './privacy'),
+    },
 
     {
       path: '/signup',
@@ -66,7 +82,7 @@ const routes = {
     const route = await next();
 
     // Provide default values for title, description etc.
-    route.title = `${route.title || 'Untitled Page'} - g-old.org`;
+    route.title = `${route.title || 'Untitled Page'} - mycompany.org`;
     route.description = route.description || '';
 
     return route;

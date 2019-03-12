@@ -15,14 +15,6 @@ exports[`Layout renders children correctly 1`] = `
     }
   />
   <div
-    className="banner"
-  >
-    <img
-      alt="banner"
-      src="/banner01.jpg"
-    />
-  </div>
-  <div
     className="root"
   >
     <div
@@ -44,105 +36,74 @@ exports[`Layout renders children correctly 1`] = `
         className="brand"
       >
         <span>
-          G O L D
+          T I T L E
         </span>
       </span>
       <div
-        role="navigation"
+        className="right"
       >
-        <div
-          className="navBar"
-        >
-          <a
-            className="link"
-            href="/feed"
-            onClick={[Function]}
-          >
-            <span>
-              Feed
-            </span>
-          </a>
-          <a
-            className="link"
-            href="/proposals/active"
-            onClick={[Function]}
-          >
-            <span>
-              Proposals
-            </span>
-          </a>
-          <a
-            className="link"
-            href="/surveys"
-            onClick={[Function]}
-          >
-            <span>
-              Surveys
-            </span>
-          </a>
-          <a
-            className="link"
-            href="/admin"
-            onClick={[Function]}
-          >
-            <span>
-              Admin
-            </span>
-          </a>
-          <a
-            className="link"
-            href="/about"
-            onClick={[Function]}
-          >
-            <span>
-              About
-            </span>
-          </a>
-        </div>
-        <div
-          className="menu"
+        <span
+          role="navigation"
+          style={
+            Object {
+              "margin": "0 0.2em",
+            }
+          }
         >
           <div
-            className="root primary column"
-            onClick={null}
+            className="navBar"
           >
-            <button
-              className="button plain"
-              disabled={false}
+            <a
+              className="link"
+              href="/about"
               onClick={[Function]}
             >
-              <span
-                className="icon"
-              >
-                <svg
-                  aria-label="menu"
-                  height="24px"
-                  role="img"
-                  version="1.1"
-                  viewBox="0 0 24 24"
-                  width="24px"
-                >
-                  <path
-                    d="M2,19 L22,19 M2,5 L22,5 M2,12 L22,12"
-                    fill="none"
-                    stroke="#000"
-                    strokeWidth="2"
-                  />
-                </svg>
+              <span>
+                About
               </span>
-            </button>
+            </a>
           </div>
-        </div>
+          <div
+            className="menu"
+          >
+            <div
+              className="root primary column"
+              onClick={null}
+            >
+              <button
+                className="button plain"
+                disabled={false}
+                onClick={[Function]}
+              >
+                <span
+                  className="icon"
+                >
+                  <svg
+                    aria-label="menu"
+                    height="24px"
+                    role="img"
+                    version="1.1"
+                    viewBox="0 0 24 24"
+                    width="24px"
+                  >
+                    <path
+                      d="M2,19 L22,19 M2,5 L22,5 M2,12 L22,12"
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </div>
+        </span>
       </div>
     </div>
   </div>
   <div
     className="content"
-  >
-    <div
-      className="child"
-    />
-  </div>
+  />
   <div
     className="footer"
   >
@@ -155,20 +116,40 @@ exports[`Layout renders children correctly 1`] = `
         <span
           className="text"
         >
-          © G O L D
+           © MyCompany 
         </span>
         <span
-          className="spacer"
+          className="buildinfo"
         >
-          ·
+          <svg
+            preserveAspectRatio="xMidYMid"
+            style={
+              Object {
+                "fill": "white",
+                "height": "0.9em",
+              }
+            }
+            viewBox="0 0 256 218"
+          >
+            <g>
+              <path
+                d="M128.224307,0.72249586 C32.0994301,0.72249586 0.394430682, 84.5663333 0.394430682,115.221578 L78.3225537,115.221578 C78.3225537, 115.221578 89.3644231,75.2760497 128.224307,75.2760497 C167.08419, 75.2760497 178.130047,115.221578 178.130047,115.221578 L255.605569, 115.221578 C255.605569,84.5623457 224.348186,0.72249586 128.224307, 0.72249586"
+              />
+              <path
+                d="M227.043854,135.175898 L178.130047,135.175898 C178.130047, 135.175898 169.579477,175.122423 128.224307,175.122423 C86.8691361, 175.122423 78.3225537,135.175898 78.3225537,135.175898 L30.2571247, 135.175898 C30.2571247,145.426215 67.9845088,217.884246 128.699837, 217.884246 C189.414168,217.884246 227.043854,158.280482 227.043854, 135.175898"
+              />
+              <circle
+                cx="128"
+                cy="126.076531"
+                r="32.7678394"
+              />
+            </g>
+          </svg>
+          <span>
+             
+            fff
+          </span>
         </span>
-        <a
-          className="link"
-          href="/"
-          onClick={[Function]}
-        >
-          Home
-        </a>
         <div>
           <span>
             <span>

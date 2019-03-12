@@ -9,7 +9,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import LanguageSwitcher from '../LanguageSwitcher';
 import { getDroneBranch, getDroneBuild } from '../../reducers';
 import s from './Footer.css';
@@ -23,7 +23,7 @@ class Footer extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <span className={s.text}> © G O L D </span>
+          <span className={s.text}> © MyCompany </span>
           {branch && (
             <span className={s.buildinfo}>
               <img src="/git.png" alt="#" style={{ height: '1em' }} />

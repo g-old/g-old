@@ -1,7 +1,7 @@
 /*
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import cn from 'classnames';
 import s from './MainNav.css';
 import Box from '../Box';
@@ -16,7 +16,7 @@ class MainNav extends React.Component {
     let titleElement = this.props.icon;
     const leftAnchor = 'LEFTACNHOR';
     const pageMenu = [
-      { id: 1, path: '/feed', name: 'feed' },
+      { id: 1, path: '/private', name: 'feed' },
       { id: 2, path: '/proposals/active', name: 'proposals' },
       { id: 3, path: '/surveys', name: 'surveys' },
       { id: 4, path: '/admin', name: 'admin' },
@@ -24,7 +24,7 @@ class MainNav extends React.Component {
     ];
 
     const navLinks = [
-      { id: 1, path: '/feed', name: 'feed', role: [] },
+      { id: 1, path: '/private', name: 'feed', role: [] },
       { id: 2, path: '/proposals/active', name: 'proposals', role: [] },
       { id: 3, path: '/surveys', name: 'surveys', role: [] },
       { id: 4, path: '/admin', name: 'admin', role: [] },

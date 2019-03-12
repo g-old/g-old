@@ -20,11 +20,11 @@ import Layout from './Layout';
 
 const middlewares = [thunk.withExtraArgument({ fetch: () => {} })];
 const mockStore = configureStore(middlewares);
-const setupApp = (store, element) => (
-  <IntlProvider locale="de-DE" initialNow={new Date()}>
-    <App
-      context={{
-        intl: {
+
+const setupApp = (store, intl, element) => (
+  <App
+    context={{
+      /* intl: {
           initialNow: 1501773564065,
           formattedMessage: () => 'translated text',
           formatDate: () => 'formatted date',
@@ -40,15 +40,15 @@ const setupApp = (store, element) => (
           messages: {
             'de-DE': {},
           },
-        },
-        fetch: () => {},
-        insertCss: () => {},
-        store,
-      }}
-    >
-      {element}
-    </App>
-  </IntlProvider>
+        },*/
+      intl,
+      fetch: () => {},
+      insertCss: () => {},
+      store,
+    }}
+  >
+    {element}
+  </App>
 );
 const initialState = {
   user: null,
@@ -79,15 +79,25 @@ const initialState = {
       status: false,
     },
   },
+  system: {
+    droneBuild: 'fff',
+  },
 };
 
 describe('Layout', () => {
   test('renders children correctly', () => {
     const store = mockStore(initialState);
+    const intl = new IntlProvider({
+      initialNow: new Date(15e11),
+      defaultLocale: 'de-DE',
+      locale: 'de-DE',
+      messages: {},
+    }).getChildContext();
     const wrapper = renderer
       .create(
         setupApp(
           store,
+          intl,
           <Layout>
             <div className="child" />
           </Layout>,

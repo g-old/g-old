@@ -1,7 +1,7 @@
 // Heavily inspired by grommet
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import InfiniteScroll from '../../core/InfiniteScroll';
 import s from './List.css';
 

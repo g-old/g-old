@@ -56,7 +56,7 @@ const context = {
     };
   },
   store,
-  storeSubscription: null,
+  // storeSubscription: null,
   // Universal HTTP client
   fetch,
   // intl instance as it can be get with injectIntl

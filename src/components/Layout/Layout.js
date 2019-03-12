@@ -9,10 +9,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
-import {ButtonTest} from 'componentslib_test';
 import normalizeCss from 'normalize.css';
 import { allowCookies } from '../../actions/session';
 import { getConsent } from '../../reducers';
@@ -41,41 +40,36 @@ class Layout extends React.Component {
 
   constructor(props) {
     super(props);
-    this.consent = this.consent.bind(this);
+    this.agreeToTOS = this.agreeToTOS.bind(this);
   }
 
-  consent() {
-    this.props.allowCookies();
+  agreeToTOS() {
+    const { allowCookies: allow } = this.props;
+    allow();
   }
 
   render() {
-    const { consent } = this.props;
+    const { consent, children, loading } = this.props;
     let toast;
     if (!consent) {
       toast = (
-        <Toast alert onClose={this.consent}>
+        <Toast alert onClose={this.agreeToTOS}>
           <FormattedMessage {...messages.cookieBanner} />
         </Toast>
       );
     }
 
-    const banner = (
-      <div className={s.banner}>
-        <img alt="banner" src="/banner01.jpg" />
-      </div>
-    );
-    return <div className={s.layout}>
-        <div className={this.props.loading ? s.loader : null} />
+    return (
+      <div className={s.layout}>
+        <div className={loading ? s.loader : null} />
         {toast}
-        {banner}
         <Header />
-        <div className={s.content}>
-          <ButtonTest label={'TESTLABEL'} /> {this.props.children}
-        </div>
+        <div className={s.content}>{children}</div>
         <div className={s.footer}>
           <Footer />
         </div>
-      </div>;
+      </div>
+    );
   }
 }
 

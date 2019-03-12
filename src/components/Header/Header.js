@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './Header.css';
 import Navigation from '../Navigation';
 import UserStatus from '../UserStatus';
@@ -17,12 +17,12 @@ import UserStatus from '../UserStatus';
 const messages = defineMessages({
   brand: {
     id: 'header.brand',
-    defaultMessage: 'M5',
+    defaultMessage: 'MyBrand',
     description: 'Brand name displayed in header',
   },
   bannerTitle: {
     id: 'header.banner.title',
-    defaultMessage: 'G O L D',
+    defaultMessage: 'T I T L E',
     description: 'Title in page header',
   },
 });

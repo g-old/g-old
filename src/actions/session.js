@@ -126,7 +126,7 @@ export function login(data) {
         });
       }
 
-      history.push(redirect || '/feed');
+      history.push(redirect || '/private');
     } catch (error) {
       dispatch({
         type: SESSION_LOGIN_ERROR,

@@ -68,12 +68,17 @@ export const PermissionsSchema = {
   [Groups.SYSTEM]: Privileges.NONE,
 };
 
-export const AccessMasks = {};
+export const AccessMasks = {
+  LEVEL_1:
+    Permissions.CHANGE_OWN_PROFILE |
+    Permissions.DELETE_OWN_ACCOUNT |
+    Permissions.MUTATE_PROFILES,
+  LEVEL_2: Groups.ADMIN,
+};
 
 export const GroupConditions = {
   [Groups.ADMIN]: Privileges.GRANT_ADMIN,
   [Groups.USER]: Privileges.GRANT_USER,
-  [Groups.VIEWER]: Privileges.GRANT_VIEWER,
   [Groups.GUEST]: Privileges.GRANT_GUEST,
 };
 
@@ -93,6 +98,7 @@ export const calcRights = userGroups =>
 
 const protectedViews = {
   Home: { type: 'permissions', name: 'LEVEL_1' },
+  Private: { type: 'permissions', name: 'LEVEL_1' },
   Admin: { type: 'groups', name: 'LEVEL_2' },
   GroupsPanel: { type: 'privileges', name: 'GROUPS_MANAGER' },
   SSE: { type: 'permissions', name: 'LEVEL_1' },
@@ -100,6 +106,9 @@ const protectedViews = {
 export const canAccess = (user, name) => {
   if (user) {
     const qualification = protectedViews[name];
+    if (!qualification) {
+      return true;
+    } // view is not protected
     if (user[qualification.type] & AccessMasks[qualification.name]) {
       return true;
     }

@@ -15,7 +15,7 @@
 }
 
 .root {
-  background: var(--color-gold);
+  background: var(--color-brand);
   color: #2a2a2a;
   box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.11);
 }

@@ -2,7 +2,7 @@
 
 .button {
   background-color: transparent;
-  border: 2px solid #e0b000;
+  border: 2px solid var(--color-brand);
   border-radius: 5px;
   color: #333;
   font-size: 1.1875rem;
@@ -17,37 +17,27 @@
   transition: 0.1s ease-in-out;
 }
 
+.label {
+  text-decoration: none;
+}
+
 .button:not(.fill) {
   flex: 0 0 auto;
 }
 
-.button:not(.disabled):not(.accent):not(.plain):hover {
-  box-shadow: 0 0 0 2px #e0b000;
-}
-
 .primary {
   color: #fff;
-  background-color: #e0b000;
+  background-color: var(--color-brand);
 }
 
 .primary :not(.disabled):hover {
-  box-shadow: 0 0 0 2px #e0b000;
+  box-shadow: 0 0 0 2px var(--color-brand);
 }
 
 .icon {
   display: inline-block;
   width: 24px;
   height: 24px;
-}
-
-.button:not(.plain) {
-  .icon + .label {
-    margin-left: 12px;
-  }
-}
-
-.label {
-  text-decoration: none;
 }
 
 .plain {
@@ -85,9 +75,21 @@
   border: 2px solid var(--color-accent-1);
 }
 
+.disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.button:not(.plain) {
+  .icon + .label {
+    margin-left: 12px;
+  }
+}
+
 .accent:not(.disabled):not(.plain):hover {
   box-shadow: 0 0 0 2px var(--color-accent-1);
 }
+/* stylelint-disable */
 
 .button:not(.plain) {
   .icon {
@@ -104,8 +106,8 @@
     }
   }
 }
+/* stylelint-enable */
 
-.disabled {
-  opacity: 0.3;
-  cursor: default;
+.button:not(.disabled):not(.accent):not(.plain):hover {
+  box-shadow: 0 0 0 2px var(--color-brand);
 }

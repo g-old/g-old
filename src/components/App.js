@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 /**
  * React Starter Kit (https://www.reactstarterkit.com/)
  *
@@ -11,6 +12,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { IntlProvider } from 'react-intl';
 import { Provider as ReduxProvider } from 'react-redux';
+import StyleContext from 'isomorphic-style-loader/StyleContext';
 
 const ContextType = {
   // Enables critical path CSS rendering
@@ -19,13 +21,18 @@ const ContextType = {
   // Universal HTTP client
   fetch: PropTypes.func.isRequired,
   pathname: PropTypes.string.isRequired,
-  query: PropTypes.object,
+  query: PropTypes.string,
   // Integrate Redux
   // http://redux.js.org/docs/basics/UsageWithReact.html
   ...ReduxProvider.childContextTypes,
   // ReactIntl
   intl: IntlProvider.childContextTypes.intl,
   locale: PropTypes.string,
+  store: PropTypes.shape({
+    subscribe: PropTypes.func.isRequired,
+    dispatch: PropTypes.func.isRequired,
+    getState: PropTypes.func.isRequired,
+  }),
 };
 
 /**
@@ -114,14 +121,20 @@ class App extends React.PureComponent {
     const { initialNow, locale, messages } = this.intl;
     const localeMessages = (messages && messages[locale]) || {};
     return (
-      <IntlProvider
-        initialNow={initialNow}
-        locale={locale}
-        messages={localeMessages}
-        defaultLocale="de-DE"
+      <StyleContext.Provider
+        value={{ insertCss: this.props.context.insertCss }}
       >
-        {React.Children.only(this.props.children)}
-      </IntlProvider>
+        <ReduxProvider store={store}>
+          <IntlProvider
+            initialNow={initialNow}
+            locale={locale}
+            messages={localeMessages}
+            defaultLocale="de-DE"
+          >
+            {React.Children.only(this.props.children)}
+          </IntlProvider>
+        </ReduxProvider>
+      </StyleContext.Provider>
     );
     /* return React.Children.only(this.props.children) */
   }

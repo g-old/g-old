@@ -131,15 +131,16 @@ class Login extends React.Component {
 
   render() {
     const { status } = this.props;
+    const { errors, password, email } = this.state;
     /*  if (status.login && status.login.success) {
-      // /  history.push('/feed');
+      // /  history.push('/private');
     } */
-    const emailError = this.state.errors.email.errorName ? (
-      <FormattedMessage {...messages[this.state.errors.email.errorName]} />
+    const emailError = errors.email.errorName ? (
+      <FormattedMessage {...messages[errors.email.errorName]} />
     ) : null;
 
-    const passwordError = this.state.errors.password.errorName ? (
-      <FormattedMessage {...messages[this.state.errors.password.errorName]} />
+    const passwordError = errors.password.errorName ? (
+      <FormattedMessage {...messages[errors.password.errorName]} />
     ) : null;
 
     const loginError =
@@ -161,7 +162,7 @@ class Login extends React.Component {
               <input
                 name="email"
                 type="text"
-                value={this.state.email}
+                value={email}
                 onChange={this.onEmailChange}
               />
             </FormField>
@@ -172,7 +173,7 @@ class Login extends React.Component {
               <input
                 name="password"
                 type="password"
-                value={this.state.password}
+                value={password}
                 onChange={this.onPasswordChange}
               />
             </FormField>

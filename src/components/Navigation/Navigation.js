@@ -10,7 +10,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import { connect } from 'react-redux';
 import cn from 'classnames';
 import { getSessionUser } from '../../reducers';
@@ -20,31 +20,28 @@ import Menu from '../Menu';
 import { canAccess } from '../../organization';
 
 const messages = defineMessages({
-  feed: {
-    id: 'navigation.feed',
-    defaultMessage: 'Feed',
-    description: 'Feed label',
-  },
   about: {
     id: 'about',
     defaultMessage: 'About',
     description: 'About label',
   },
-  proposals: {
-    id: 'proposals',
-    defaultMessage: 'Proposals',
-    description: 'Proposals label',
-  },
+
   admin: {
     id: 'navigation.admin',
     defaultMessage: 'Admin',
     description: 'Admin link in header',
   },
-  surveys: {
-    id: 'surveys',
-    defaultMessage: 'Surveys',
-    description: 'Surveys label',
+  private: {
+    id: 'private',
+    defaultMessage: 'Private',
+    description: 'Private label',
   },
+  privacy: {
+    id: 'privacy',
+    defaultMessage: 'Privacy',
+    description: 'Privacy label',
+  },
+
   profile: {
     id: 'profile',
     defaultMessage: 'Profile',
@@ -55,20 +52,9 @@ const messages = defineMessages({
     defaultMessage: 'Users',
     description: 'Users label',
   },
-  workTeams: {
-    id: 'workTeams',
-    defaultMessage: 'Workteams',
-    description: 'Workteam label',
-  },
 });
 
-const contents = [
-  { id: 1, path: '/feed', name: 'feed' },
-  { id: 2, path: '/proposals/active', name: 'proposals' },
-  { id: 3, path: '/surveys/active', name: 'surveys' },
-  { id: 4, path: '/workteams', name: 'workTeams' },
-  { id: 5, path: '/accounts', name: 'users' },
-];
+const contents = [{ id: 'private', name: 'private', path: '/private' }];
 
 const makeLink = (linkData, currentPath) => {
   const label = [
@@ -105,6 +91,10 @@ class Navigation extends React.Component {
       links.push(contents.map(p => makeLink(p, path)));
     }
     links.push(makeLink({ id: 6, path: '/about', name: 'about' }, path));
+    links.push(
+      makeLink({ id: 'privacy', path: '/privacy', name: 'privacy' }, path),
+    );
+
     if (canAccess(user, 'Admin')) {
       links.push(makeLink({ id: 7, path: '/admin', name: 'admin' }, path));
     }

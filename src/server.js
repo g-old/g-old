@@ -126,12 +126,9 @@ app.post(
 );
 
 app.post('/login', passport.authenticate('local'), async (req, res) => {
-  const [count] = await knex('notifications')
-    .where({ user_id: req.user.id, read: false })
-    .count('id');
   res.status(200).json({
-    user: { ...req.session.passport.user, unreadNotifications: count.count },
-    redirect: '/feed',
+    user: { ...req.session.passport.user },
+    redirect: '/home',
   });
 });
 app.post('/logout', (req, res) => {
@@ -296,16 +293,12 @@ app.use('/graphql', graphqlMiddleware);
 app.get('*', async (req, res, next) => {
   try {
     const css = new Set();
-    console.log('CSS INSERTING')
     // Enables critical path CSS rendering
     // https://github.com/kriasoft/isomorphic-style-loader
     const insertCss = (...styles) => {
-      console.log('STYLES SSR',{styles})
       // eslint-disable-next-line no-underscore-dangle
       styles.forEach(style => css.add(style._getCss()));
     };
-        console.log('AFTER CSS INSERTING/Generation');
-
 
     // Universal HTTP client
     const fetch = createFetch(nodeFetch, {
@@ -385,12 +378,10 @@ app.get('*', async (req, res, next) => {
       return;
     }
     const data = { ...route };
-    console.log('BEFORE RENDERING TO STRING', {data,css})
     data.children = ReactDOM.renderToString(
       <App context={context} /* store={store} */>{route.component}</App>,
     );
     data.styles = [{ id: 'css', cssText: [...css].join('') }];
-    console.log('DATA STYLES', {styles: data.styles})
     const scripts = new Set();
     const addChunk = chunk => {
       if (chunks[chunk]) {

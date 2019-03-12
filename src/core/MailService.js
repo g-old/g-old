@@ -30,7 +30,7 @@ class MailService {
   constructor(transporter = throwIfMissing('Transport layer'), options = {}) {
     this.mailer = transporter;
     this.MAX_CONTENT_LENGTH = options.maxContentLength || 10000;
-    this.DEFAULT_SENDER = options.defaultSender || 'info@g-old.org';
+    this.DEFAULT_SENDER = options.defaultSender || 'info@mycompany.org';
     this.MAX_RECEIVERS = options.maxReceivers || 200; // check if realistic
   }
 
