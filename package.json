@@ -34,7 +34,7 @@
     "express-request-language": "^1.1.12",
     "express-session": "^1.15.1",
     "faker": "^4.1.0",
-    "graphql": "^0.13.0",
+    "graphql": "^14.1.1",
     "graphql-tag": "^2.10.1",
     "handlebars": "^4.1.0",
     "handlebars-layouts": "^3.1.4",
