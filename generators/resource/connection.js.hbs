@@ -1,12 +1,6 @@
 import { GraphQLInt, GraphQLString, GraphQLID } from 'graphql';
-
-import PageType from '../types/PageType';
 import {{properCase name}}Type from '../types/{{properCase name}}Type';
 import {{properCase name}} from '../models/{{properCase name}}';
-import knex from '../knex';
-
-import ProblemType from '../types/ProblemType';
-import Problem from '../models/Problem';
 import knex from '../knex';
 import { createConnection } from '../utils';
 
@@ -14,16 +8,16 @@ const all{{properCase name}}s = createConnection(
   {{properCase name}}Type,
   {{properCase name}},
   async (cursorDate, cursorId, batchSize) => {
-    return (
+    return(
       knex('{{snakecase}}s')
-        .whereRaw('({{snakecase}}s.created_at, {{snakecase}}s.id) < (?,?)', [
+        .whereRaw('({{snakecase name}}s.created_at, {{snakecase name}}s.id) < (?,?)', [
           cursorDate,
           cursorId,
         ])
         .limit(batchSize)
-        .orderBy('{{snakecase}}s.created_at', 'desc')
-        .orderBy('{{snakecase}}s.id', 'desc')
-        .select('{{snakecase}}s.id as id', '{{snakecase}}s.created_at as time')
+        .orderBy('{{snakecase name}}s.created_at', 'desc')
+        .orderBy('{{snakecase name}}s.id', 'desc')
+        .select('{{snakecase name}}s.id as id', '{{snakecase name}}s.created_at as time')
     );
   },
 );
