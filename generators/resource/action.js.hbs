@@ -17,13 +17,13 @@ import {
   LOAD_{{constantCase name}}S_ERROR,
   {{/if}}
 } from '../constants';
+import { createMutation } from './utils';
 import {
   {{camelCase name}} as {{camelCase name}}Schema,
   {{#if list}}
   {{camelCase name}}List as {{camelCase name}}ListSchema,
   {{/if}}
 } from '../store/schema';
-import { genStatusIndicators } from '../core/helpers';
 
 const {{camelCase name}}Fields = `
 id
@@ -71,112 +71,30 @@ query ($first:Int $after:String) {
 `;
 {{/if}}
 
-export function create{{properCase name}}({{camelCase name}}) {
-  return async (dispatch, getState, { graphqlRequest }) => {
-    const virtualId = '0000';
-    const properties = genStatusIndicators(['create{{properCase name}}']);
-    dispatch({
-      type: CREATE_{{constantCase name}}_START,
-      id: virtualId,
-      properties,
-    });
-    try {
-      const { data } = await graphqlRequest(create{{properCase name}}Mutation, { {{camelCase name}} });
-      const normalizedData = normalize(data.create{{properCase name}}, {{camelCase name}}Schema);
-      dispatch({
-        type: CREATE_{{constantCase name}}_SUCCESS,
-        payload: normalizedData,
-        id: virtualId,
-        properties,
-        {{camelCase name}},
-      });
-    } catch (error) {
-      dispatch({
-        type: CREATE_{{constantCase name}}_ERROR,
-        payload: {
-          error,
-        },
-        message: error.message || 'Something went wrong',
-        id: virtualId,
-        {{camelCase name}},
-        properties,
-      });
-      return false;
-    }
+export const create{{properCase name}} = createMutation(
+  [CREATE_{{constantCase name}}_START, CREATE_{{constantCase name}}_SUCCESS, CREATE_{{constantCase name}}_ERROR],
+  '{{camelCase name}}',
+  create{{properCase name}}Mutation,
+  {{camelCase name}}Schema,
+  data => data.create{{properCase name}},
+);
 
-    return true;
-  };
-}
+export const update{{properCase name}} = createMutation(
+  [UPDATE_{{constantCase name}}_START, UPDATE_{{constantCase name}}_SUCCESS, UPDATE_{{constantCase name}}_ERROR],
+  '{{camelCase name}}',
+  update{{properCase name}}Mutation,
+  {{camelCase name}}Schema,
+  data => data.update{{properCase name}},
+);
 
-export function update{{properCase name}}({{camelCase name}}) {
-  return async (dispatch, getState, { graphqlRequest }) => {
-    const properties = genStatusIndicators(['update{{camelCase name}}']);
-    dispatch({
-      type: UPDATE_{{constantCase name}}_START,
-      id: {{camelCase name}}.id,
-      properties,
-    });
-    try {
-      const { data } = await graphqlRequest(update{{properCase name}}Mutation, { {{camelCase name}} });
-      const normalizedData = normalize(data.update{{properCase name}}, {{camelCase name}}Schema);
-      dispatch({
-        type: UPDATE_{{constantCase name}}_SUCCESS,
-        payload: normalizedData,
-        properties,
-        id: {{camelCase name}}.id,
-      });
-    } catch (error) {
-      dispatch({
-        type: UPDATE_{{constantCase name}}_ERROR,
-        payload: {
-          error,
-        },
-        properties,
-        message: error.message || 'Something went wrong',
-        id: {{camelCase name}}.id,
-        {{camelCase name}},
-      });
-      return false;
-    }
+export const delete{{properCase name}} = createMutation(
+  [DELETE_{{constantCase name}}_START, DELETE_{{constantCase name}}_SUCCESS, DELETE_{{constantCase name}}_ERROR],
+  '{{camelCase name}}',
+  delete{{properCase name}}Mutation,
+  {{camelCase name}}Schema,
+  data => data.delete{{properCase name}},
+);
 
-    return true;
-  };
-}
-
-export function delete{{properCase name}}({{camelCase name}}) {
-  return async (dispatch, getState, { graphqlRequest }) => {
-    const properties = genStatusIndicators(['delete{{properCase name}}']);
-    dispatch({
-      type: DELETE_{{constantCase name}}_START,
-      id: {{camelCase name}}.id,
-      properties,
-    });
-    try {
-      const { data } = await graphqlRequest(delete{{properCase name}}Mutation, { {{camelCase name}} });
-      const normalizedData = normalize(data.delete{{properCase name}}, {{camelCase name}}Schema);
-      dispatch({
-        type: DELETE_{{constantCase name}}_SUCCESS,
-        payload: normalizedData,
-        properties,
-        id: {{camelCase name}}.id,
-      });
-    } catch (error) {
-      dispatch({
-        type: DELETE_{{constantCase name}}_ERROR,
-        payload: {
-          error,
-        },
-        message: error.message || 'Something went wrong',
-        id: {{camelCase name}}.id,
-        properties,
-        {{camelCase name}}: { delete: true },
-      });
-      return false;
-    }
-
-    return true;
-  };
-}
 
 {{#if list}}
 export function load{{properCase name}}List({ first, after }) {

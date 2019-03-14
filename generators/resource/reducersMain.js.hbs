@@ -13,9 +13,14 @@ export default combineReducers({
 });
 
 const hydrateList = (state, data, entities) =>
-  denormalize(data, {{camelCase name}}ListSchema, {
-    ...entities,
-  });
+  denormalize(
+    { {{camelCase name}}s: data },
+    { {{camelCase name}}s: {{camelCase name}}ListSchema },
+    {
+      ...entities,
+      {{camelCase name}}s: state.byId,
+    },
+  );
 
 export const getStatus = (state,filter) => fromList.getStatus(state.listByFilter[filter])
 const hydrateEntity = (data, entities) => denormalize(data, {{camelCase name}}Schema, entities);
@@ -27,6 +32,5 @@ export const getEntity = (state, id, entities) => {
 
 export const getVisible = (state, filter, entities) => {
   const ids = fromList.getIds(state.listByFilter[filter]);
-  const data = ids.map(id => fromById.getEntity(state.byId, id));
-  return hydrateList(state, data, entities);
+  return hydrateList(state, ids, entities).{{camelCase name}}s ||[];
 }
