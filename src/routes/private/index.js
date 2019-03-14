@@ -27,7 +27,7 @@ async function action({ store }) {
     return { redirect: '/home' };
   }
   return {
-    chunks: ['home'],
+    chunks: ['private'],
     title,
     component: <Layout>Private Area</Layout>,
   };
