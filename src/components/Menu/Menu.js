@@ -139,7 +139,6 @@ class Menu extends React.Component {
     /* eslint-disable no-return-assign */
 
     const onClick = this.props.closeOnClick ? this.onClose : onSink;
-    console.log('CONTEXXT', this.context);
     return (
       <StyleContext.Provider value={{ insertCss: this.context.insertCss }}>
         <MenuDrop

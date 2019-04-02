@@ -9,8 +9,6 @@ class LayerContents extends React.Component {
     onClose: PropTypes.func.isRequired,
     className: PropTypes.string.isRequired,
     intl: PropTypes.shape({}).isRequired,
-    insertCss: PropTypes.func.isRequired,
-    store: PropTypes.func.isRequired,
     overlayClose: PropTypes.bool,
   };
 
@@ -26,11 +24,9 @@ class LayerContents extends React.Component {
   }
 
   getChildContext() {
-    const { intl, insertCss, store } = this.props;
+    const { intl } = this.props;
     return {
       intl,
-      insertCss,
-      store,
     };
   }
 
@@ -103,8 +99,6 @@ class LayerContents extends React.Component {
 LayerContents.childContextTypes = {
   history: PropTypes.shape({}),
   intl: PropTypes.node,
-  store: PropTypes.shape({}),
-  insertCss: PropTypes.func,
 };
 
 export default LayerContents;
