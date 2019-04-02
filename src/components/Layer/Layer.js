@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import withStyles from 'isomorphic-style-loader/withStyles';
 import StyleContext from 'isomorphic-style-loader/StyleContext';
+import { Provider as ReduxProvider } from 'react-redux';
+import { IntlProvider } from 'react-intl';
 
 import LayerContents from '../LayerContents';
 import s from './Layer.css';
@@ -76,7 +78,7 @@ class Layer extends React.Component {
     const appElements = document.querySelectorAll('#app');
     let beforeElement;
     if (appElements.length > 0) {
-      beforeElement = appElements[0];
+      [beforeElement] = appElements;
     } else {
       beforeElement = document.body.firstChild;
     }
@@ -133,17 +135,18 @@ class Layer extends React.Component {
   renderLayer() {
     if (this.element) {
       this.element.className = s.layer;
+      const { insertCss, store, intl } = this.context;
+      const { onClose } = this.props;
       const contents = (
-        <StyleContext.Provider value={{ insertCss: this.context.insertCss }}>
-          <LayerContents
-            {...this.props}
-            className={s.container}
-            insertCss={this.context.insertCss}
-            intl={this.context.intl}
-            store={this.context.store}
-            context={this.context}
-            onClose={this.props.onClose}
-          />
+        <StyleContext.Provider value={{ insertCss }}>
+          <ReduxProvider store={store}>
+            <LayerContents
+              {...this.props}
+              className={s.container}
+              intl={intl}
+              onClose={onClose}
+            />
+          </ReduxProvider>
         </StyleContext.Provider>
       );
       ReactDOM.render(contents, this.element, () => {
@@ -163,11 +166,14 @@ class Layer extends React.Component {
 }
 
 Layer.contextTypes = {
-  history: PropTypes.any,
-  intl: PropTypes.any,
-  router: PropTypes.any,
-  store: PropTypes.any,
-  insertCss: PropTypes.any,
+  insertCss: PropTypes.func.isRequired,
+  intl: IntlProvider.childContextTypes.intl,
+  locale: PropTypes.string,
+  store: PropTypes.shape({
+    subscribe: PropTypes.func.isRequired,
+    dispatch: PropTypes.func.isRequired,
+    getState: PropTypes.func.isRequired,
+  }),
 };
 
 export default withStyles(s)(Layer);

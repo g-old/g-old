@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '../Button';
+import { ICONS } from '../../constants';
 
 class LayerContents extends React.Component {
   static propTypes = {
@@ -8,8 +9,6 @@ class LayerContents extends React.Component {
     onClose: PropTypes.func.isRequired,
     className: PropTypes.string.isRequired,
     intl: PropTypes.shape({}).isRequired,
-    insertCss: PropTypes.func.isRequired,
-    store: PropTypes.func.isRequired,
     overlayClose: PropTypes.bool,
   };
 
@@ -21,18 +20,19 @@ class LayerContents extends React.Component {
     super(props, context);
     this.state = {};
     this.onClickOverlay = this.onClickOverlay.bind(this);
+    this.setRef = this.setRef.bind(this);
   }
 
   getChildContext() {
+    const { intl } = this.props;
     return {
-      intl: this.props.intl,
-      insertCss: this.props.insertCss,
-      store: this.props.store,
+      intl,
     };
   }
 
   componentDidMount() {
-    if (this.props.onClose && this.props.overlayClose) {
+    const { onClose, overlayClose } = this.props;
+    if (onClose && overlayClose) {
       const layerParent = this.containerRef.parentNode;
       layerParent.addEventListener('click', this.onClickOverlay);
     }
@@ -50,25 +50,23 @@ class LayerContents extends React.Component {
     }
   }
 
+  setRef(ref) {
+    this.containerRef = ref;
+  }
+
   render() {
     const { onClose, children, className } = this.props;
     let closeNode = null;
     if (onClose) {
       closeNode = (
         <div
-          ref={ref => (this.containerRef = ref)} // eslint-disable-line
-          style={{
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            zIndex: 1,
-            margin: '0.75em',
-          }}
+          ref={this.setRef}
+          style={
+            { position: 'absolute', top: 0, right: 0, zIndex: 1 } // eslint-disable-line
+          }
         >
-          <Button
-            onClick={onClose}
-            plain
-            icon={
+          <Button onClick={onClose} plain>
+            <span style={{ padding: '10px', display: 'inline-block' }}>
               <svg
                 version="1.1"
                 viewBox="0 0 24 24"
@@ -81,11 +79,11 @@ class LayerContents extends React.Component {
                   fill="none"
                   stroke="#000"
                   strokeWidth="2"
-                  d="M3,3 L21,21 M3,21 L21,3"
+                  d={ICONS.close}
                 />
               </svg>
-            }
-          />
+            </span>
+          </Button>
         </div>
       );
     }
@@ -99,11 +97,8 @@ class LayerContents extends React.Component {
 }
 
 LayerContents.childContextTypes = {
-  history: PropTypes.any,
-  intl: PropTypes.any,
-  router: PropTypes.any,
-  store: PropTypes.any,
-  insertCss: PropTypes.any,
+  history: PropTypes.shape({}),
+  intl: PropTypes.node,
 };
 
 export default LayerContents;
