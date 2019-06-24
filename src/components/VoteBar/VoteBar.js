@@ -1,7 +1,7 @@
 /* @flow */
 import React from 'react';
 import withStyles from 'isomorphic-style-loader/withStyles';
-import { Spring, animated } from 'react-spring/renderprops';
+import { Spring, animated } from 'react-spring/renderprops.cjs';
 import s from './VoteBar.css';
 
 /* taken from https://github.com/grommet/grommet/blob/master/src/js/utils/graphics.js */
