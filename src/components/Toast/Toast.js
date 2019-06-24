@@ -2,6 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/withStyles';
+import StyleContext from 'isomorphic-style-loader/StyleContext';
+import { IntlProvider } from 'react-intl';
+import { Provider as ReduxProvider } from 'react-redux';
+
 // eslint-disable-next-line css-modules/no-unused-class
 import s from './Toast.css';
 import ToastContents from './ToastContents';
@@ -18,13 +22,23 @@ class Toast extends React.Component {
   };
 
   static contextTypes = {
-    intl: PropTypes.object,
+    intl: IntlProvider.childContextTypes.intl,
     insertCss: PropTypes.func,
+    store: PropTypes.shape({
+      subscribe: PropTypes.func.isRequired,
+      dispatch: PropTypes.func.isRequired,
+      getState: PropTypes.func.isRequired,
+    }),
   };
 
   static childContextTypes = {
-    intl: PropTypes.object,
+    intl: IntlProvider.childContextTypes.intl,
     insertCss: PropTypes.func,
+    store: PropTypes.shape({
+      subscribe: PropTypes.func.isRequired,
+      dispatch: PropTypes.func.isRequired,
+      getState: PropTypes.func.isRequired,
+    }),
   };
 
   getChildContext() {
@@ -63,7 +77,7 @@ class Toast extends React.Component {
     const appElements = document.querySelectorAll('#app');
     let beforeElement;
     if (appElements.length > 0) {
-      beforeElement = appElements[0];
+      [beforeElement] = appElements;
     } else {
       beforeElement = document.body.firstChild;
     }
@@ -86,14 +100,17 @@ class Toast extends React.Component {
   renderLayer() {
     if (this.element) {
       this.element.className = s.container;
+      const { insertCss, intl, store } = this.context; // TODO change to a single provider
       const contents = (
-        <ToastContents
-          {...this.props}
-          intl={this.context.intl}
-          store={this.context.store}
-          insertCss={this.context.insertCss}
-          onClose={() => this.onClose()}
-        />
+        <StyleContext.Provider value={{ insertCss }}>
+          <ReduxProvider store={store}>
+            <ToastContents
+              {...this.props}
+              intl={intl}
+              onClose={() => this.onClose()}
+            />
+          </ReduxProvider>
+        </StyleContext.Provider>
       );
       ReactDOM.render(contents, this.element);
     }
