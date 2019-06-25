@@ -170,10 +170,12 @@ const config = {
               importLoaders: 1,
               sourceMap: isDebug,
               // CSS Modules https://github.com/css-modules/css-modules
-              modules: true,
-              localIdentName: isDebug
-                ? '[name]-[local]-[hash:base64:5]'
-                : '[hash:base64:5]',
+              modules: {
+                mode: 'local',
+                localIdentName: isDebug
+                  ? '[name]-[local]-[hash:base64:5]'
+                  : '[hash:base64:5]',
+              },
             },
           },
 
@@ -447,21 +449,20 @@ const serverConfig = {
           ...rule,
           options: {
             ...rule.options,
-            presets: rule.options.presets.map(
-              preset =>
-                preset[0] !== '@babel/preset-env'
-                  ? preset
-                  : [
-                      '@babel/preset-env',
-                      {
-                        targets: {
-                          node: pkg.engines.node.match(/(\d+\.?)+/)[0],
-                        },
-                        modules: false,
-                        useBuiltIns: false,
-                        debug: false,
+            presets: rule.options.presets.map(preset =>
+              preset[0] !== '@babel/preset-env'
+                ? preset
+                : [
+                    '@babel/preset-env',
+                    {
+                      targets: {
+                        node: pkg.engines.node.match(/(\d+\.?)+/)[0],
                       },
-                    ],
+                      modules: false,
+                      useBuiltIns: false,
+                      debug: false,
+                    },
+                  ],
             ),
           },
         };
