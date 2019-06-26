@@ -27,6 +27,18 @@ pipeline:
       event: push
       branch: [ dev, testing ]
 
+  publish-vip:
+    image: plugins/docker
+    repo: tobiasmayr/gold
+    tags: [ vip ]
+    secrets: [ docker_username, docker_password ]
+    build_args:
+      - DRONE_BUILD_NUMBER=${DRONE_BUILD_NUMBER}
+      - DRONE_BRANCH=${DRONE_BRANCH}
+    when:
+      event: push
+      branch: [ vip ]
+
   publish-live:
     image: plugins/docker
     repo: tobiasmayr/gold
@@ -52,4 +64,4 @@ pipeline:
     when:
       status: [ success, failure ]
 
-branches: [ dev, testing ]
+branches: [ dev, testing, vip ]
