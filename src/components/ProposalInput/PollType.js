@@ -162,24 +162,22 @@ class PollType extends React.Component<Props, State> {
               checked={values.withStatements}
               label="with statements"
             />
-            {!showSettings &&
-              advancedModeOn && (
-                <Button
-                  onClick={this.toggleSettings}
-                  label="Show advanced settings"
-                />
-              )}
-            {showSettings &&
-              advancedModeOn && (
-                <PollSettings
-                  referenceOptions={referenceOptions}
-                  onValueChange={handleValueChanges}
-                  secret={values.secret}
-                  threshold={values.threshold}
-                  thresholdRef={values.thresholdRef}
-                  unipolar={values.unipolar}
-                />
-              )}
+            {!showSettings && advancedModeOn && (
+              <Button
+                onClick={this.toggleSettings}
+                label="Show advanced settings"
+              />
+            )}
+            {showSettings && advancedModeOn && (
+              <PollSettings
+                referenceOptions={referenceOptions}
+                onValueChange={handleValueChanges}
+                secret={values.secret}
+                threshold={values.threshold}
+                thresholdRef={values.thresholdRef}
+                unipolar={values.unipolar}
+              />
+            )}
           </Box>
         )}
       </FormValidation>

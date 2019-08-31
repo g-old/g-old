@@ -266,7 +266,7 @@ class MessageInput extends React.Component<Props, State> {
       recipients: recipients || [],
       subject,
       isDraft,
-      enforceEmail: values.enforceEmail,
+      enforceEmail: !!values.enforceEmail,
     };
 
     if (options && options.update) {
