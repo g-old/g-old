@@ -23,7 +23,7 @@ const messages = defineMessages({
   },
   bannerTitle: {
     id: 'header.banner.title',
-    defaultMessage: 'T I T L E',
+    defaultMessage: 'G O L D',
     description: 'Title in page header',
   },
 });

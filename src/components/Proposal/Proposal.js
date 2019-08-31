@@ -33,11 +33,17 @@ class Proposal extends React.Component {
       surname: PropTypes.string,
       id: PropTypes.string,
     }),
+    workteam: PropTypes.shape({
+      id: PropTypes.number,
+      displayName: PropTypes.string,
+      logo: PropTypes.string,
+    }),
   };
 
   static defaultProps = {
     spokesman: null,
     deletedAt: null,
+    workteam: null,
   };
 
   render() {
@@ -85,7 +91,7 @@ class Proposal extends React.Component {
                   d={ICONS.edit}
                 />
               </svg>{' '}
-              <FormattedRelative value={publishedAt} />
+              <FormattedRelative value={parseInt(publishedAt, 10)} />
             </div>
           </div>
           <div className={s.body} dangerouslySetInnerHTML={{ __html: body }} />

@@ -42,8 +42,8 @@
     font-weight: 100;
     font-size: 1.1875rem;
     line-height: 1.26316;
-    border-bottom: 4px solid var(--color-gold);
-    border-color: var(--color-gold);
+    border-bottom: 4px solid var(--color-brand);
+    border-color: var(--color-brand);
   }
 }
 

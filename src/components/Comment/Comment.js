@@ -504,10 +504,10 @@ class Comment extends React.Component {
               {editedAt ? (
                 <FormattedMessage
                   {...messages.edited}
-                  values={{ time: intl.formatRelative(editedAt) }}
+                  values={{ time: intl.formatRelative(parseInt(editedAt, 10)) }}
                 />
               ) : (
-                <FormattedRelative value={createdAt} />
+                <FormattedRelative value={parseInt(createdAt, 10)} />
               )}
             </div>
           )}

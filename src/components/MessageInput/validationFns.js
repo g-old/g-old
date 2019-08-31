@@ -1,6 +1,6 @@
 export const EMPTY = '<p></p>';
 
-const isHtmlEmpty = html => {
+export const isHtmlEmpty = html => {
   if (html) {
     const str = html.trim();
     return !str || !str.length || str === EMPTY;

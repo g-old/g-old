@@ -44,6 +44,11 @@ class ActivityLog extends React.Component {
       msg: PropTypes.string,
       title: PropTypes.string,
       position: PropTypes.string,
+      positions: PropTypes.shape({ pos: PropTypes.number }),
+      vote: PropTypes.arrayOf(PropTypes.shape({ pos: PropTypes.number })),
+      recipients: PropTypes.arrayOf(PropTypes.shape()),
+      subject: PropTypes.string,
+      type: PropTypes.string,
     }),
     date: PropTypes.string.isRequired,
     verb: PropTypes.string.isRequired,
@@ -275,7 +280,7 @@ class ActivityLog extends React.Component {
           verb === 'delete' ? s.deleted : null,
         )}
       >
-        <FormattedRelative value={date} />
+        <FormattedRelative value={parseInt(date, 10)} />
 
         <div>{activity}</div>
       </div>

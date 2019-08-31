@@ -152,7 +152,7 @@ class ProposalPreview extends React.Component {
 
             <div style={{ paddingLeft: '1em' }}>
               <div className={s.date}>
-                <FormattedRelative value={poll.endTime} />
+                <FormattedRelative value={parseInt(poll.endTime, 10)} />
               </div>
               <div className={s.header}>{proposal.title}</div>
               {/* <div className={s.body}>
