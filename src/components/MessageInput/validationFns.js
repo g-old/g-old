@@ -1,12 +1,13 @@
 export const EMPTY = '<p></p>';
 
-const isHtmlEmpty = html => {
+export const isHtmlEmpty = html => {
   if (html) {
     const str = html.trim();
     return !str || !str.length || str === EMPTY;
   }
   return true;
 };
+
 const translationVal = fieldName => (input, state) => {
   let result = { touched: false };
   if (isHtmlEmpty(input)) {
