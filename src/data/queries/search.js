@@ -11,7 +11,8 @@ const search = {
     },
   },
 
-  resolve: (parent, { term }, { viewer, loaders }) => User.find(viewer, term, loaders),
+  resolve: (parent, { term }, { viewer, loaders }) =>
+    User.find(viewer, term, loaders),
 };
 
 export default search;

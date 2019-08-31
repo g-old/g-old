@@ -49,4 +49,7 @@ const mapDispatch = {
   setLocale,
 };
 
-export default connect(mapState, mapDispatch)(LanguageSwitcher);
+export default connect(
+  mapState,
+  mapDispatch,
+)(LanguageSwitcher);

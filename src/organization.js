@@ -242,6 +242,9 @@ const protectedViews = {
 export const canAccess = (user, name) => {
   if (user) {
     const qualification = protectedViews[name];
+    if (!qualification) {
+      return true;
+    } // view is not protected
     if (user[qualification.type] & AccessMasks[qualification.name]) {
       return true;
     }

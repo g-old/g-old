@@ -118,7 +118,9 @@ const routes = {
     {
       path: '/verify',
       load: () =>
-        import(/* webpackChunkName: 'emailVerification' */ './emailVerification'),
+        import(
+          /* webpackChunkName: 'emailVerification' */ './emailVerification'
+        ),
     },
 
     // Wildcard routes, e.g. { path: '*', ... } (must go last)

@@ -9,11 +9,10 @@
 
 import React from 'react';
 import Layout from '../../components/Layout';
-import Home from './Home';
 import { getSessionUser } from '../../reducers';
 import { canAccess } from '../../organization';
 
-const title = 'Home';
+const title = 'Private';
 
 async function action({ store }) {
   const state = store.getState();
@@ -24,16 +23,13 @@ async function action({ store }) {
     if (!canAccess(user, title)) {
       return { redirect: '/account' };
     }
-    return { redirect: '/feed' };
+  } else {
+    return { redirect: '/home' };
   }
   return {
-    chunks: ['home'],
+    chunks: ['private'],
     title,
-    component: (
-      <Layout>
-        <Home title={title} />
-      </Layout>
-    ),
+    component: <Layout>Private Area</Layout>,
   };
 }
 

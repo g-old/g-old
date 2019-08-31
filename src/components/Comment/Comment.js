@@ -95,7 +95,7 @@ class Comment extends React.Component {
     ownLike: PropTypes.shape({ id: PropTypes.string }),
     user: PropTypes.shape({
       id: PropTypes.string,
-
+      permissions: PropTypes.number,
       role: PropTypes.shape({
         type: PropTypes.string,
       }),
@@ -115,6 +115,8 @@ class Comment extends React.Component {
       updateCom: PropTypes.shape({ pending: PropTypes.bool }),
       success: PropTypes.bool,
       pending: PropTypes.bool,
+      errorMessage: PropTypes.string,
+      comment: PropTypes.shape({ content: PropTypes.string }),
     }),
     onProfileClick: PropTypes.func,
     loadReplies: PropTypes.func,

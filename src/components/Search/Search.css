@@ -76,7 +76,7 @@
 
   &:focus {
     border-width: 2px;
-    border-color: var(--color-gold);
+    border-color: var(--color-brand);
     padding: 10px 22px;
   }
 

@@ -107,8 +107,12 @@ ConfirmLayer.propTypes = {
   note: PropTypes.string,
   title: PropTypes.string.isRequired,
   intl: intlShape.isRequired,
+  children: PropTypes.node,
+  pending: PropTypes.bool,
 };
 
 ConfirmLayer.defaultProps = {
   note: null,
+  children: null,
+  pending: false,
 };

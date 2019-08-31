@@ -10,47 +10,36 @@ import {
   DELETE_{{constantCase name}}_SUCCESS,
 } from '../../constants';
 
-import { getErrors, getSuccessState } from '../../core/helpers';
-
 const {{camelCase name}}s = (state = {}, action) => {
   switch (action.type) {
     case CREATE_{{constantCase name}}_START:
     case UPDATE_{{constantCase name}}_START:
     case DELETE_{{constantCase name}}_START: {
-      return {
-        ...state,
-        [action.id]: {
-          ...state[action.id],
-          ...action.properties,
-        },
+         return {
+        pending: true,
+        success: false,
+        error: null,
       };
     }
 
     case CREATE_{{constantCase name}}_ERROR:
     case UPDATE_{{constantCase name}}_ERROR:
     case DELETE_{{constantCase name}}_ERROR: {
-      const current = state[action.id];
-      const newState = getErrors(current, action);
-      return {
-        ...state,
-        [action.id]: {
-          ...state[action.id],
-          ...newState,
-        },
+
+         return {
+        pending: false,
+        success: false,
+        error: action.message,
       };
     }
     case CREATE_{{constantCase name}}_SUCCESS:
     case UPDATE_{{constantCase name}}_SUCCESS:
     case DELETE_{{constantCase name}}_SUCCESS:{
-      const id = action.id; // Is initial id!
-      const current = state[id];
-      const newState = getSuccessState(current, action);
-      return {
-        ...state,
-        [id]: {
-          ...state[id],
-          ...newState,
-        },
+
+          return {
+        pending: false,
+        success: true,
+        error: null,
       };
     }
 

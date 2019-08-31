@@ -16,7 +16,12 @@ class MenuDrop extends React.Component {
       PropTypes.node,
     ]).isRequired,
     onClick: PropTypes.func.isRequired,
-    align: PropTypes.shape({ right: PropTypes.string }),
+    align: PropTypes.shape({
+      right: PropTypes.string,
+      top: PropTypes.string,
+      left: PropTypes.string,
+      bottom: PropTypes.string,
+    }),
   };
 
   static defaultProps = {
@@ -72,9 +77,7 @@ class MenuDrop extends React.Component {
         ref={ref => (this.menuDropRef = ref)} // eslint-disable-line
         onClick={onClick}
         column
-        className={
-          this.props.align.right ? s.menu_drop_right : s.menu_drop_left
-        }
+        className={align.right ? s.menu_drop_right : s.menu_drop_left}
       >
         {contents}
       </Box>

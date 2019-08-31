@@ -19,11 +19,25 @@ export const createRedirectLink = (path, query) => {
 
 export const sortActiveProposals = (a, b) => {
   const timeA = new Date(
-    a.state === 'proposed' ? (a.pollOne ? a.pollOne.endTime : 0) : (a.pollTwo ? a.pollTwo.endTime : 0),
+    // eslint-disable-next-line no-nested-ternary
+    a.state === 'proposed'
+      ? a.pollOne
+        ? a.pollOne.endTime
+        : 0
+      : a.pollTwo
+      ? a.pollTwo.endTime
+      : 0,
   );
 
   const timeB = new Date(
-    b.state === 'proposed' ? (b.pollOne ? b.pollOne.endTime : 0) : (b.pollTwo ? b.pollTwo.endTime : 0),
+    // eslint-disable-next-line no-nested-ternary
+    b.state === 'proposed'
+      ? b.pollOne
+        ? b.pollOne.endTime
+        : 0
+      : b.pollTwo
+      ? b.pollTwo.endTime
+      : 0,
   );
   return timeA - timeB;
 };

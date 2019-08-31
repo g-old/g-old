@@ -36,18 +36,20 @@ class MessagesLayer extends React.Component {
   }
 
   componentDidMount() {
+    // eslint-disable-next-line react/destructuring-assignment
     this.props.loadMessages({ messageType: 'NOTE', isPublished: false });
   }
 
   componentWillReceiveProps({ messages }) {
+    // eslint-disable-next-line react/destructuring-assignment
     if (messages !== this.props.messages) {
-      this.setState({
+      this.setState(prevState => ({
         filteredMessages: messages.filter(
           m =>
-            m.messageObject.category === this.state.category &&
-            m.messageObject.isPublished === this.state.isPublished,
+            m.messageObject.category === prevState.category &&
+            m.messageObject.isPublished === prevState.isPublished,
         ),
-      });
+      }));
     }
   }
 
@@ -55,6 +57,7 @@ class MessagesLayer extends React.Component {
     let value;
     switch (e.target.type) {
       case 'checkbox':
+        // eslint-disable-next-line react/destructuring-assignment
         value = !this.state.isPublished;
         break;
 
@@ -62,24 +65,30 @@ class MessagesLayer extends React.Component {
         ({ value } = e.target);
     }
     this.setState({ [e.target.name]: value }, () =>
+      // eslint-disable-next-line react/destructuring-assignment
       this.props.loadMessages({
         messageType: 'NOTE',
+        // eslint-disable-next-line react/destructuring-assignment
         isPublished: this.state.isPublished,
+        // eslint-disable-next-line react/destructuring-assignment
         category: this.state.category,
       }),
     );
   }
 
   render() {
+    const { onClose, onSelection } = this.props;
+    const { category, isPublished, filteredMessages } = this.state;
+
     return (
-      <Layer onClose={this.props.onClose}>
+      <Layer onClose={onClose}>
         <Box column>
           <Heading tag="h3"> Drafts </Heading>
           <Box align wrap>
             <div style={{ justifyContent: 'flex-end', display: 'flex' }}>
               <span style={{ maxWidth: '10em' }}>
                 <Select
-                  value={this.state.category}
+                  value={category}
                   onChange={e => {
                     this.handleFilterChanges({
                       target: { name: 'category', value: e.value },
@@ -91,7 +100,7 @@ class MessagesLayer extends React.Component {
             </div>
             <CheckBox
               label="Published"
-              checked={this.state.isPublished}
+              checked={isPublished}
               onChange={this.handleFilterChanges}
               name="isPublished"
             />
@@ -99,11 +108,11 @@ class MessagesLayer extends React.Component {
           <Box>
             <AssetsTable
               onClickCheckbox={this.onClickCheckbox}
-              onClickMenu={this.props.onSelection}
+              onClickMenu={onSelection}
               searchTerm=""
               noRequestsFound="No messages found"
               checkedIndices={[]}
-              assets={this.state.filteredMessages || []}
+              assets={filteredMessages || []}
               row={MessageRow}
               tableHeaders={[
                 'content',
@@ -128,4 +137,7 @@ const mapDispatch = {
   loadMessages,
 };
 
-export default connect(mapStateToProps, mapDispatch)(MessagesLayer);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(MessagesLayer);

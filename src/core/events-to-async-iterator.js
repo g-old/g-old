@@ -4,9 +4,10 @@ import { $$asyncIterator } from 'iterall';
 export function eventsToAsyncIterator(eventEmitter, eventsNames) {
   const pullQueue = [];
   const pushQueue = [];
-  const eventsArray = typeof eventsNames === 'string' ? [eventsNames] : eventsNames;
+  const eventsArray =
+    typeof eventsNames === 'string' ? [eventsNames] : eventsNames;
   let listening = true;
-  const pushValue = (event) => {
+  const pushValue = event => {
     if (pullQueue.length !== 0) {
       pullQueue.shift()({ value: event, done: false });
     } else {
@@ -15,7 +16,7 @@ export function eventsToAsyncIterator(eventEmitter, eventsNames) {
   };
 
   const pullValue = () =>
-    new Promise((resolve) => {
+    new Promise(resolve => {
       if (pushQueue.length !== 0) {
         resolve({ value: pushQueue.shift(), done: false });
       } else {
@@ -24,11 +25,15 @@ export function eventsToAsyncIterator(eventEmitter, eventsNames) {
     });
 
   const addEventListener = () => {
-    eventsArray.forEach(eventName => eventEmitter.addListener(eventName, pushValue));
+    eventsArray.forEach(eventName =>
+      eventEmitter.addListener(eventName, pushValue),
+    );
   };
 
   const removeEventListeners = () => {
-    eventsArray.forEach(eventName => eventEmitter.removeListener(eventName, pushValue));
+    eventsArray.forEach(eventName =>
+      eventEmitter.removeListener(eventName, pushValue),
+    );
   };
   const emptyQueue = () => {
     if (listening) {

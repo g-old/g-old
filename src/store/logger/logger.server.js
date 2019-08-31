@@ -8,8 +8,9 @@ function inspectObject(object) {
 
 const actionFormatters = {
   SET_LOCALE_SUCCESS: a =>
-    `locale ${a.payload.locale}: ${Object.keys(a.payload.messages)
-      .length} messages`,
+    `locale ${a.payload.locale}: ${
+      Object.keys(a.payload.messages).length
+    } messages`,
 };
 
 // Server side redux action logger

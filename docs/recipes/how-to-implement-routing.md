@@ -54,8 +54,7 @@ function matchURI(path, uri) {
   if (!match) return null;
   const params = Object.create(null);
   for (let i = 1; i < match.length; i++) {
-    params[keys[i - 1].name] =
-      match[i] !== undefined ? match[i] : undefined;
+    params[keys[i - 1].name] = match[i] !== undefined ? match[i] : undefined;
   }
   return params;
 }
@@ -138,10 +137,12 @@ function renderRouteOutput({ title, component }) {
 }
 
 function render(location) {
-  router.resolve(routes, location)
+  router
+    .resolve(routes, location)
     .then(renderRouteOutput)
-    .catch(error => router.resolve(routes, { ...location, error })
-    .then(renderRouteOutput));
+    .catch(error =>
+      router.resolve(routes, { ...location, error }).then(renderRouteOutput),
+    );
 }
 
 render(history.getCurrentLocation()); // render the current URL
@@ -164,15 +165,27 @@ class App extends React.Component {
     event.preventDefault();
     history.push({
       pathname: event.currentTarget.pathname,
-      search: event.currentTarget.search
+      search: event.currentTarget.search,
     });
   };
   render() {
     return (
       <ul>
-        <li><a href="/" onClick={this.transition}>Home</a></li>
-        <li><a href="/one" onClick={this.transition}>One</a></li>
-        <li><a href="/two" onClick={this.transition}>Two</a></li>
+        <li>
+          <a href="/" onClick={this.transition}>
+            Home
+          </a>
+        </li>
+        <li>
+          <a href="/one" onClick={this.transition}>
+            One
+          </a>
+        </li>
+        <li>
+          <a href="/two" onClick={this.transition}>
+            Two
+          </a>
+        </li>
       </ul>
     );
   }

@@ -15,15 +15,18 @@ class ToastContents extends React.Component {
     duration: PropTypes.number,
     alert: PropTypes.bool,
   };
+
   static defaultProps = {
     onClose: null,
     duration: 0,
     alert: false,
   };
+
   static childContextTypes = {
     intl: PropTypes.shape({}),
     insertCss: PropTypes.func,
   };
+
   constructor() {
     super();
     this.onClose = this.onClose.bind(this);
@@ -31,11 +34,13 @@ class ToastContents extends React.Component {
   }
 
   getChildContext() {
+    const { intl, insertCss } = this.props;
     return {
-      intl: this.props.intl,
-      insertCss: this.props.insertCss,
+      intl,
+      insertCss,
     };
   }
+
   componentDidMount() {
     const { duration } = this.props;
     if (duration) {

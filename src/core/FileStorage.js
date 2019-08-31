@@ -39,9 +39,8 @@ function writeFile(filePath, content) {
 
 const deleteFileOnCloudinary = file =>
   new Promise((resolve, reject) => {
-    cloudinary.uploader.destroy(
-      file,
-      (err, data) => (err ? reject(err) : resolve(data)),
+    cloudinary.uploader.destroy(file, (err, data) =>
+      err ? reject(err) : resolve(data),
     );
   });
 const uploadToCloudinaryStream = (buffer, options) =>

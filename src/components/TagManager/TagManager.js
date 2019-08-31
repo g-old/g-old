@@ -20,10 +20,12 @@ class TagManager extends React.Component {
     deleteTag: PropTypes.func.isRequired,
     tags: PropTypes.arrayOf(PropTypes.shape({})),
   };
+
   static defaultProps = {
     tagUpdates: null,
     tags: null,
   };
+
   constructor(props) {
     super(props);
     this.state = {};
@@ -42,6 +44,7 @@ class TagManager extends React.Component {
       this.setState({ showTag: true, currentTag: data });
     }
   }
+
   onCancelClick() {
     this.setState({ showTag: false });
   }
@@ -57,18 +60,27 @@ class TagManager extends React.Component {
   onLayerClose() {
     this.setState({ showLayer: false, showTag: false });
   }
+
   onDelete() {
+    // eslint-disable-next-line react/destructuring-assignment
     this.props.deleteTag({ id: this.state.currentTag.id });
   }
 
   render() {
-    if (this.state.showTag) {
+    const { showTag, currentTag, showLayer } = this.state;
+    const {
+      tagUpdates,
+      updateTag: updateFn,
+      createTag: createFn,
+      tags,
+    } = this.props;
+    if (showTag) {
       return (
         <TagForm
-          tag={this.state.currentTag}
-          updates={this.props.tagUpdates || {}}
-          updateTag={this.props.updateTag}
-          createTag={this.props.createTag}
+          tag={currentTag}
+          updates={tagUpdates || {}}
+          updateTag={updateFn}
+          createTag={createFn}
           onCancel={this.onCancelClick}
         />
       );
@@ -76,23 +88,23 @@ class TagManager extends React.Component {
 
     return (
       <Box column>
-        {this.state.showLayer && (
+        {showLayer && (
           <ConfirmLayer
-            success={this.props.tagUpdates.success}
-            pending={this.props.tagUpdates.pending}
+            success={tagUpdates.success}
+            pending={tagUpdates.pending}
             onSubmit={this.onDelete}
             onClose={this.onLayerClose}
           />
         )}
-        <Button icon={'+'} label={'Add Tag'} onClick={this.onCreateTagClick} />
+        <Button icon="+" label="Add Tag" onClick={this.onCreateTagClick} />
         <TagTable
           onClickCheckbox={this.onClickCheckbox}
           onClickMenu={this.onTagClick}
           allowMultiSelect
           searchTerm=""
-          noRequestsFound={'No requests found'}
+          noRequestsFound="No requests found"
           checkedIndices={[]}
-          tags={this.props.tags || []}
+          tags={tags || []}
           tableHeaders={[
             'default',
             'name german',
@@ -118,4 +130,7 @@ const mapDispatch = {
   deleteTag,
 };
 
-export default connect(mapStateToProps, mapDispatch)(TagManager);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(TagManager);

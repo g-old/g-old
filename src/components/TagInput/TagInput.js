@@ -10,28 +10,6 @@ import TagPreview from './TagPreview';
 import Tag from '../Tag';
 import RemoveMe from './RemoveMe';
 
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-
-/* class Suggestions extends React.Component {
-  render() {
-    const suggestions = this.props.suggestions.map((s, index) => (
-      <li
-        key={index}
-        onMouseDown={() => {}}
-        className={index === this.props.selectedIndex ? s.active : null}
-      >
-        <span key={s.id}> {s.text}</span>
-      </li>
-    ));
-    return (
-      <div className={s.suggestions}>
-        <ul> {suggestions}</ul>
-      </div>
-    );
-  }
-} */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-
 export type TagType = {
   id?: ID,
   text: string,
@@ -56,6 +34,7 @@ class TagInput extends React.Component<Props, State> {
     name: null,
   };
 
+  // eslint-disable-next-line react/sort-comp
   constructor(props) {
     super(props);
     this.state = {
