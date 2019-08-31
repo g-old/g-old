@@ -322,13 +322,6 @@ class MainEditor extends React.Component {
       {this.renderMarkButton('link')}
       {this.renderMarkButton('underline')}
       {this.renderImageButton()}
-      {/* {this.renderMarkButton('underline', 'format_underline')}
-      {this.renderMarkButton('code', 'code')}
-      {this.renderBlockButton('heading-one', 'looks_one')}
-      {this.renderBlockButton('heading-two', 'looks_two')}
-      {this.renderBlockButton('block-quote', 'format_quote')}
-      {this.renderBlockButton('numbered-list', 'format_list_numbered')}
-  {this.renderBlockButton('bulleted-list', 'format_list_bulleted')} */}
     </Box>
   );
 
@@ -449,7 +442,7 @@ class MainEditor extends React.Component {
     }
   }
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     const { attributes, children, node } = props;
     switch (node.type) {
       case 'paragraph':
@@ -489,11 +482,11 @@ class MainEditor extends React.Component {
         const style = { display: 'block', maxWidth: '100%', margin: '0 auto' };
         return (
           <img
+            {...attributes}
             alt="img"
             src={src}
             className={className}
             style={style}
-            {...attributes}
           />
         );
       }
@@ -511,7 +504,7 @@ class MainEditor extends React.Component {
         ref={this.ref}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
-        renderNode={this.renderNode}
+        renderBlock={this.renderBlock}
         renderMark={this.renderMark}
         autoFocus
       />

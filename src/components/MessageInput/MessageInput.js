@@ -26,7 +26,7 @@ import Editor from '../MainEditor';
 import NoticeLayer from './NoticeLayer';
 import Notification from '../Notification';
 
-import { ICONS, FLAG_STATEMENT_START } from '../../constants';
+import { ICONS } from '../../constants';
 
 const messages = defineMessages({
   send: {
@@ -203,13 +203,6 @@ class MessageInput extends React.Component<Props, State> {
     }
   }
 
-  sendMessage(message) {
-    const { notifyUser: notify } = this.props;
-    if (message) {
-      notify(message);
-    }
-  }
-
   // TODO refactor
   onNotify(newValues, state, options) {
     const {
@@ -308,6 +301,13 @@ class MessageInput extends React.Component<Props, State> {
     this.setState({ layerOpen: false });
   }
 
+  sendMessage(message) {
+    const { notifyUser: notify } = this.props;
+    if (message) {
+      notify(message);
+    }
+  }
+
   handleLanguageSelection(locale) {
     this.setState({ activeLocale: locale });
     const initialValue =
@@ -388,7 +388,7 @@ class MessageInput extends React.Component<Props, State> {
       localStorage.removeItem(`${this.storageKey}draftId`);
       localStorage.removeItem(`${this.storageKey}isPublished`);
 
-      this.setState({ draftId: null, isPublished: FLAG_STATEMENT_START });
+      this.setState({ draftId: null, isPublished: false });
     }
   }
 
