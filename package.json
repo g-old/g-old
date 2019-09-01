@@ -13,7 +13,7 @@
     "not ie < 9"
   ],
   "dependencies": {
-    "@babel/polyfill": "7.2.5",
+    "@babel/polyfill": "7.4.4",
     "@sendgrid/mail": "^6.1.4",
     "autosuggest-highlight": "^3.1.0",
     "bcrypt": "^3.0.4",
@@ -29,7 +29,7 @@
     "diff-match-patch": "^1.0.4",
     "dotenv-extended": "^2.4.0",
     "express": "^4.16.4",
-    "express-graphql": "^0.8.0",
+    "express-graphql": "^0.9.0",
     "express-jwt": "^5.3.0",
     "express-request-language": "^1.1.12",
     "express-session": "^1.15.1",
@@ -45,9 +45,9 @@
     "isomorphic-style-loader": "^5.0.1",
     "iterall": "^1.1.1",
     "juice": "^5.1.0",
-    "knex": "^0.17.6",
+    "knex": "^0.19.3",
     "lodash.merge": "^4.6.0",
-    "markdown-it": "^8.4.2",
+    "markdown-it": "^9.1.0",
     "multer": "^1.4.1",
     "node-fetch": "^2.3.0",
     "nodemailer": "^6.2.1",
@@ -102,7 +102,7 @@
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.5.0",
     "babel-loader": "^8.0.0",
-    "babel-plugin-react-intl": "^3.0.1",
+    "babel-plugin-react-intl": "^4.1.15",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.18",
     "browser-sync": "^2.26.3",
     "chokidar": "^3.0.1",
@@ -111,27 +111,27 @@
     "cssnano": "^4.1.10",
     "enzyme": "^3.9.0",
     "eslint": "^6.0.1",
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-config-prettier": "^5.1.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-prettier": "^6.1.0",
     "eslint-import-resolver-node": "^0.3.1",
-    "eslint-loader": "^2.1.2",
+    "eslint-loader": "^3.0.0",
     "eslint-plugin-css-modules": "^2.11.0",
-    "eslint-plugin-flowtype": "^3.4.2",
+    "eslint-plugin-flowtype": "^4.2.0",
     "eslint-plugin-import": "^2.18.0",
     "eslint-plugin-jsx-a11y": "^6.2.1",
     "eslint-plugin-prettier": "^3.0.1",
     "eslint-plugin-react": "^7.12.4",
     "file-loader": "^4.0.0",
-    "flow-bin": "^0.101.1",
+    "flow-bin": "^0.106.3",
     "front-matter": "^3.0.1",
     "glob": "^7.1.3",
-    "husky": "^2.5.0",
+    "husky": "^3.0.4",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24.5.0",
     "jest-codemods": "^0.20.0",
     "jest-transform-graphql": "^2.1.0",
     "jscodeshift": "^0.6.3",
-    "lint-staged": "^8.1.5",
+    "lint-staged": "^9.2.5",
     "mkdirp": "^0.5.1",
     "null-loader": "^3.0.0",
     "opn-cli": "^5.0.0",
@@ -157,16 +157,16 @@
     "raw-loader": "^3.0.0",
     "react-deep-force-update": "^2.1.3",
     "react-dev-utils": "^9.0.1",
-    "react-error-overlay": "^5.1.4",
+    "react-error-overlay": "^6.0.1",
     "react-test-renderer": "^16.8.4",
     "redux-mock-store": "^1.2.3",
-    "rimraf": "^2.6.3",
-    "sharp": "^0.22.1",
+    "rimraf": "^3.0.0",
+    "sharp": "^0.23.0",
     "sinon": "^7.2.7",
     "stylelint": "^10.1.0",
     "stylelint-config-standard": "^18.0.0",
     "stylelint-order": "^3.0.0",
-    "svg-url-loader": "^2.3.0",
+    "svg-url-loader": "^3.0.1",
     "url-loader": "^2.0.1",
     "webpack": "^4.29.6",
     "webpack-assets-manifest": "^3.1.1",
@@ -177,23 +177,18 @@
     "webpack-sources": "^1.3.0"
   },
   "lint-staged": {
-    "ignore": [
-      "package.json"
+    "*.{js,jsx}": [
+      "eslint --no-ignore --fix",
+      "git add --force"
     ],
-    "linters": {
-      "*.{js,jsx}": [
-        "eslint --no-ignore --fix",
-        "git add --force"
-      ],
-      "*.{json,md,graphql}": [
-        "prettier --write",
-        "git add --force"
-      ],
-      "*.{css,less,styl,scss,sass,sss}": [
-        "stylelint --fix",
-        "git add --force"
-      ]
-    }
+    "*.{json,md,graphql}": [
+      "prettier --write",
+      "git add --force"
+    ],
+    "*.{css,less,styl,scss,sass,sss}": [
+      "stylelint --fix",
+      "git add --force"
+    ]
   },
   "husky": {
     "hooks": {
