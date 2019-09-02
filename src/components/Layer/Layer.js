@@ -161,7 +161,7 @@ class Layer extends React.Component {
   }
 
   render() {
-    return <span style={{ display: 'none' }} />;
+    return null;
   }
 }
 
