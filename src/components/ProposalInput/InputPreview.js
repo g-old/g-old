@@ -22,6 +22,7 @@ const InputPreview = ({
   title,
   body,
   spokesman,
+  user,
   threshold,
   thresholdRef,
   unipolar,
@@ -80,7 +81,7 @@ const InputPreview = ({
           <Statement
             onCreate={() => {}}
             vote={fakeVote}
-            author={spokesman}
+            author={user || spokesman}
             asInput
           />
         </Box>
@@ -94,6 +95,7 @@ InputPreview.propTypes = {
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
   spokesman: PropTypes.shape({}).isRequired,
+  user: PropTypes.shape({}).isRequired,
   threshold: PropTypes.number.isRequired,
   thresholdRef: PropTypes.string.isRequired,
   unipolar: PropTypes.bool.isRequired,
