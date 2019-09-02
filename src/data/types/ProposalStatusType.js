@@ -7,6 +7,7 @@ import {
 /* eslint-disable import/no-cycle */
 import ProposalType from './ProposalDLType';
 /* eslint-enable import/no-cycle */
+import GraphQLDate from './GraphQLDateType';
 
 import Proposal from '../models/Proposal';
 
@@ -40,7 +41,7 @@ const ProposalStatusType = new ObjectType({
       resolve: data => data.group_type,
     },
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
       resolve: data => data.created_at,
     },
   },

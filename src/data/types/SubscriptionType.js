@@ -8,6 +8,7 @@ import UserType from './UserType';
 import User from '../models/User';
 import TargetType from './TargetTypeEnum';
 import SubscriptionTypeEnum from './SubscriptionTypeEnum';
+import GraphQLDate from './GraphQLDateType';
 
 const SubscriptionType = new GraphQLObjectType({
   name: 'Subscription',
@@ -35,10 +36,10 @@ const SubscriptionType = new GraphQLObjectType({
       type: ObjectType,
     }, */
     createdAt: {
-      type: String,
+      type: GraphQLDate,
     },
     updatedAt: {
-      type: String,
+      type: GraphQLDate,
     },
   }),
 });

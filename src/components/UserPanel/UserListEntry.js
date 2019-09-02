@@ -34,12 +34,10 @@ class UserListEntry extends React.Component {
         </td>
         <td>{`${user.name} ${user.surname}`}</td>
         <td>
-          <FormattedDate value={parseInt(user.createdAt, 10)} />
+          <FormattedDate value={user.createdAt} />
         </td>
         <td>
-          {user.lastLogin ? (
-            <FormattedDate value={parseInt(user.lastLogin, 10)} />
-          ) : null}
+          {user.lastLogin ? <FormattedDate value={user.lastLogin} /> : null}
         </td>
       </tr>
     );

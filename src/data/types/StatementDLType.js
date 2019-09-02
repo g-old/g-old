@@ -9,7 +9,7 @@ import VoteType from './VoteDLType';
 import User from '../models/User';
 import Vote from '../models/Vote';
 import UserType from './UserType';
-// import Poll from '../models/Poll';
+import GraphQLDate from './GraphQLDateType';
 
 const StatementType = new ObjectType({
   name: 'StatementDL',
@@ -45,13 +45,13 @@ const StatementType = new ObjectType({
     },
 
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     updatedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     deletedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
   }),
 });

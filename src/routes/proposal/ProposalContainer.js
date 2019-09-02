@@ -278,7 +278,7 @@ class ProposalContainer extends React.Component {
       filterNode = <Filter filter={filter} filterFn={this.filterStatements} />;
     }
     return (
-      <React.Fragment>
+      <>
         <Poll
           {...poll}
           canVote={proposal.canVote}
@@ -305,7 +305,7 @@ class ProposalContainer extends React.Component {
             {poll.closedAt && (
               <Box align>
                 <ProposalState state={proposal.state} />{' '}
-                <FormattedRelative value={parseInt(poll.closedAt, 10)} />
+                <FormattedRelative value={poll.closedAt} />
               </Box>
             )}
             {showSubscription && (
@@ -330,7 +330,7 @@ class ProposalContainer extends React.Component {
         </StatementsContainer>
 
         {switchPollBtn}
-      </React.Fragment>
+      </>
     );
   }
 

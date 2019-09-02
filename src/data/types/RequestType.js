@@ -6,6 +6,7 @@ import {
 } from 'graphql';
 import UserType from './UserType';
 import User from '../models/User';
+import GraphQLDate from './GraphQLDateType';
 
 const Request = new ObjectType({
   name: 'Request',
@@ -35,13 +36,13 @@ const Request = new ObjectType({
       },
     },
     deniedAt: {
-      type: String,
+      type: GraphQLDate,
     },
     createdAt: {
-      type: String,
+      type: GraphQLDate,
     },
     updatedAt: {
-      type: String,
+      type: GraphQLDate,
     },
   }),
 });

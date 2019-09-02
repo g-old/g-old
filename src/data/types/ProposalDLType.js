@@ -22,6 +22,7 @@ import Subscription from '../models/Subscription';
 import { TargetType } from '../models/utils';
 import knex from '../knex';
 import WorkTeam from '../models/WorkTeam';
+import GraphQLDate from './GraphQLDateType';
 
 const ProposalType = new ObjectType({
   name: 'ProposalDL',
@@ -90,11 +91,11 @@ const ProposalType = new ObjectType({
     },
 
     publishedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
       resolve: data => data.createdAt,
     },
     deletedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
 
     subscribed: {

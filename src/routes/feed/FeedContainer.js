@@ -128,7 +128,7 @@ class FeedContainer extends React.Component {
             <Activity
               key={activity.id}
               actor={activity.actor}
-              date={parseInt(activity.createdAt, 10)}
+              date={activity.createdAt}
               verb={activity.verb}
               content={activity.object}
               info={activity.info}

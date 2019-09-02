@@ -4,6 +4,7 @@ import {
   GraphQLID,
   GraphQLNonNull,
 } from 'graphql';
+import GraphQLDate from './GraphQLDateType';
 import User from '../models/User';
 /* eslint-disable import/no-cycle */
 import UserType from './UserType';
@@ -192,7 +193,7 @@ const ActivityType = new GraphQLObjectType({
       },
     },
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     info: {
       type: GraphQLString,

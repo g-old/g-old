@@ -52,7 +52,7 @@ class DiscussionPreview extends React.Component {
       <Box column onClick={this.handleClick}>
         <div>
           <div className={s.date}>
-            <FormattedRelative value={parseInt(discussion.createdAt, 10)} />
+            <FormattedRelative value={discussion.createdAt} />
           </div>
           <div className={s.header}>{discussion.title}</div>
           <FormattedMessage

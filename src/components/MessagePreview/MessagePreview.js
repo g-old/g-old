@@ -16,7 +16,7 @@ const MessagePreview = ({ sender, subject, numReplies, createdAt }) => {
         <span className={s.subject}>{subject}</span>
         {messageCount}
       </div>
-      <FormattedRelative value={parseInt(createdAt, 10)} />
+      <FormattedRelative value={createdAt} />
     </div>
   );
 };

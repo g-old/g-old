@@ -1,5 +1,4 @@
 import {
-  GraphQLString as String,
   GraphQLObjectType as ObjectType,
   GraphQLID as ID,
   GraphQLBoolean,
@@ -7,6 +6,7 @@ import {
 
 import Activity from '../models/Activity';
 import ActivityType from './ActivityType';
+import GraphQLDate from './GraphQLDateType';
 
 const NotificationType = new ObjectType({
   name: 'Notification',
@@ -23,10 +23,10 @@ const NotificationType = new ObjectType({
       type: GraphQLBoolean,
     },
     createdAt: {
-      type: String,
+      type: GraphQLDate,
     },
     updatedAt: {
-      type: String,
+      type: GraphQLDate,
     },
   }),
 });

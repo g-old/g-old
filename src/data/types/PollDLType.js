@@ -1,5 +1,4 @@
 import {
-  GraphQLString,
   GraphQLObjectType as ObjectType,
   GraphQLNonNull as NonNull,
   GraphQLID as ID,
@@ -18,6 +17,7 @@ import Vote from '../models/Vote';
 import knex from '../knex';
 import PollingMode from '../models/PollingMode';
 import OptionType from './OptionType';
+import GraphQLDate from './GraphQLDateType';
 
 const PollType = new ObjectType({
   name: 'PollDL',
@@ -30,13 +30,13 @@ const PollType = new ObjectType({
       type: GraphQLInt,
     },
     endTime: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     startTime: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     closedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     mode: {
       type: PollingModeType,
@@ -147,7 +147,7 @@ const PollType = new ObjectType({
     },
 
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
   }),
 });

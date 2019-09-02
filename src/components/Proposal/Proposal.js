@@ -91,7 +91,7 @@ class Proposal extends React.Component {
                   d={ICONS.edit}
                 />
               </svg>{' '}
-              <FormattedRelative value={parseInt(publishedAt, 10)} />
+              <FormattedRelative value={publishedAt} />
             </div>
           </div>
           <div className={s.body} dangerouslySetInnerHTML={{ __html: body }} />

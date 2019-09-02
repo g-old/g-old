@@ -69,12 +69,13 @@ class ActivityLog extends React.Component {
     let activity = null;
     switch (type) {
       case 'StatementDL': {
-        const obj = Object.assign({}, content, {
+        const obj = {
+          ...content,
           vote: {
             positions: content.vote.positions,
             id: content.vote.id,
           },
-        });
+        };
         activity = ( // eslint-disable-next-line
           <Link to={`/proposal/xxx/${content.pollId}`}>
             <Statement {...obj} />
@@ -280,7 +281,7 @@ class ActivityLog extends React.Component {
           verb === 'delete' ? s.deleted : null,
         )}
       >
-        <FormattedRelative value={parseInt(date, 10)} />
+        <FormattedRelative value={date} />
 
         <div>{activity}</div>
       </div>

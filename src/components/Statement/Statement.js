@@ -468,7 +468,7 @@ class Statement extends React.Component {
                   {author && author.name} {author && author.surname}
                 </span>
                 <span className={s.date}>
-                  {createdAt && intl.formatRelative(parseInt(createdAt, 10))}
+                  {createdAt && intl.formatRelative(createdAt)}
                 </span>
               </div>
             </div>

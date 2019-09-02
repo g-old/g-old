@@ -14,6 +14,7 @@ import Vote from '../models/Vote';
 import Comment from '../models/Comment';
 import Request from '../models/Request';
 import { ActivityType } from '../models/Activity';
+import GraphQLDate from './GraphQLDateType';
 
 const LogType = new GraphQLObjectType({
   name: 'Log',
@@ -138,7 +139,7 @@ const LogType = new GraphQLObjectType({
       },
     },
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
   },
 });
