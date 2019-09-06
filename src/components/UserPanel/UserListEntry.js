@@ -5,26 +5,34 @@ import Avatar from '../Avatar';
 
 class UserListEntry extends React.Component {
   static propTypes = {
-    user: PropTypes.shape({ id: PropTypes.string }).isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      surname: PropTypes.string,
+      createdAt: PropTypes.string,
+      lastLogin: PropTypes.string,
+    }).isRequired,
     onProfileClick: PropTypes.func.isRequired,
   };
+
   constructor(props) {
     super(props);
     this.onClick = this.onClick.bind(this);
   }
+
   onClick() {
+    // eslint-disable-next-line react/destructuring-assignment
     this.props.onProfileClick({ id: this.props.user.id });
   }
+
   render() {
-    const user = this.props.user;
+    const { user } = this.props;
     return (
       <tr onClick={this.onClick}>
         <td>
           <Avatar user={user} />
         </td>
-        <td>
-          {`${user.name} ${user.surname}`}
-        </td>
+        <td>{`${user.name} ${user.surname}`}</td>
         <td>
           <FormattedDate value={user.createdAt} />
         </td>

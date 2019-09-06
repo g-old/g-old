@@ -9,7 +9,10 @@ exports.up = function(knex, Promise) {
             .unsigned()
             .notNullable()
             .unique();
-          table.foreign('user_id').references('users.id');
+          table
+            .foreign('user_id')
+            .references('users.id')
+            .onDelete('CASCADE');
           table.string('token');
           table.string('email').notNullable();
           table.timestamp('token_expires').notNullable();

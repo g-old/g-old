@@ -174,7 +174,7 @@ exports[`Layout renders children correctly 1`] = `
             <span>
               Deutsch
             </span>
-             
+
           </span>
         </div>
       </div>

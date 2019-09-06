@@ -44,6 +44,11 @@ class ActivityLog extends React.Component {
       msg: PropTypes.string,
       title: PropTypes.string,
       position: PropTypes.string,
+      positions: PropTypes.shape({ pos: PropTypes.number }),
+      vote: PropTypes.arrayOf(PropTypes.shape({ pos: PropTypes.number })),
+      recipients: PropTypes.arrayOf(PropTypes.shape()),
+      subject: PropTypes.string,
+      type: PropTypes.string,
     }),
     date: PropTypes.string.isRequired,
     verb: PropTypes.string.isRequired,
@@ -64,12 +69,13 @@ class ActivityLog extends React.Component {
     let activity = null;
     switch (type) {
       case 'StatementDL': {
-        const obj = Object.assign({}, content, {
+        const obj = {
+          ...content,
           vote: {
             positions: content.vote.positions,
             id: content.vote.id,
           },
-        });
+        };
         activity = ( // eslint-disable-next-line
           <Link to={`/proposal/xxx/${content.pollId}`}>
             <Statement {...obj} />

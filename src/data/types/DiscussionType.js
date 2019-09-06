@@ -19,6 +19,7 @@ import User from '../models/User';
 
 import Subscription from '../models/Subscription';
 import { TargetType } from '../models/utils';
+import GraphQLDate from './GraphQLDateType';
 
 const DiscussionType = new ObjectType({
   name: 'Discussion',
@@ -109,16 +110,16 @@ const DiscussionType = new ObjectType({
     },
 
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     updatedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     closedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     deletedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
   }),
 });

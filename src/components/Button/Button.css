@@ -2,7 +2,7 @@
 
 .button {
   background-color: transparent;
-  border: 2px solid #e0b000;
+  border: 2px solid var(--color-brand);
   border-radius: 5px;
   color: #333;
   font-size: 1.1875rem;
@@ -21,10 +21,17 @@
   text-decoration: none;
 }
 
-.fill {
-  max-width: none;
-  width: 100%;
-  flex-grow: 1;
+.button:not(.fill) {
+  flex: 0 0 auto;
+}
+
+.primary {
+  color: #fff;
+  background-color: var(--color-brand);
+}
+
+.primary :not(.disabled):hover {
+  box-shadow: 0 0 0 2px var(--color-brand);
 }
 
 .icon {
@@ -33,18 +40,10 @@
   height: 24px;
 }
 
-.disabled {
-  opacity: 0.3;
-  cursor: default;
-}
-
-.accent {
-  border: 2px solid var(--color-accent-1);
-}
-
 .plain {
   border: 2px solid transparent;
   padding: 0;
+  width: auto;
   height: auto;
   min-width: 0;
   max-width: none;
@@ -56,33 +55,43 @@
   .label {
     margin: 0 12px;
   }
+
+  .icon {
+    /*  padding: 12px; */
+
+    + .label {
+      margin-left: 0;
+    }
+  }
 }
 
-.button:not(.fill) {
-  flex: 0 0 auto;
+.fill {
+  max-width: none;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.accent {
+  border: 2px solid var(--color-accent-1);
+}
+
+.disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.button:not(.plain) {
+  .icon + .label {
+    margin-left: 12px;
+  }
 }
 
 .accent:not(.disabled):not(.plain):hover {
   box-shadow: 0 0 0 2px var(--color-accent-1);
 }
-
-.primary :not(.disabled):hover {
-  box-shadow: 0 0 0 2px #e0b000;
-}
-
-.primary {
-  color: #fff;
-  background-color: #e0b000;
-}
-
 /* stylelint-disable */
-.button:not(.plain) {
-  .label {
-    + .icon {
-      margin-left: 12px;
-    }
-  }
 
+.button:not(.plain) {
   .icon {
     + .label {
       margin-left: 12px;
@@ -90,8 +99,15 @@
   }
 }
 
+.button:not(.plain) {
+  .label {
+    + .icon {
+      margin-left: 12px;
+    }
+  }
+}
 /* stylelint-enable */
 
 .button:not(.disabled):not(.accent):not(.plain):hover {
-  box-shadow: 0 0 0 2px #e0b000;
+  box-shadow: 0 0 0 2px var(--color-brand);
 }

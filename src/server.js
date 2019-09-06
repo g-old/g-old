@@ -677,7 +677,6 @@ app.use('/graphql', graphqlMiddleware);
 app.get('*', async (req, res, next) => {
   try {
     const css = new Set();
-
     // Enables critical path CSS rendering
     // https://github.com/kriasoft/isomorphic-style-loader
     const insertCss = (...styles) => {
@@ -769,13 +768,11 @@ app.get('*', async (req, res, next) => {
       res.redirect(route.status || 302, route.redirect);
       return;
     }
-
     const data = { ...route };
     data.children = ReactDOM.renderToString(
       <App context={context} /* store={store} */>{route.component}</App>,
     );
     data.styles = [{ id: 'css', cssText: [...css].join('') }];
-
     const scripts = new Set();
     const addChunk = chunk => {
       if (chunks[chunk]) {
@@ -800,7 +797,6 @@ app.get('*', async (req, res, next) => {
       state: context.store.getState(),
       lang: locale,
     };
-
     const html = ReactDOM.renderToStaticMarkup(<Html {...data} />);
     res.status(route.status || 200);
     res.send(`<!doctype html>${html}`);

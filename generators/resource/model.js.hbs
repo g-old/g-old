@@ -1,5 +1,7 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
+import { transactify } from './utils';
+
 
 class {{properCase name}} {
   constructor(data) {
@@ -12,53 +14,64 @@ class {{properCase name}} {
     return canSee(viewer, data, Models.{{constantCase name}}) ? new {{properCase name}}(data) : null;
   }
 
-  static async create(viewer, data) {
+  static async create(viewer, data,loaders,trx) {
     if (!data) return null;
     if (!canMutate(viewer, data, Models.{{constantCase name}})) return null;
 
     const newData = {
       created_at: new Date(),
     };
-    const {{camelCase name}}InDB = await knex.transaction(async trx => {
+
+    const create{{properCase name}} = async (transaction) =>{
       const  [{{camelCase name}} = null] = await knex('{{snakeCase name}}s')
-        .transacting(trx)
-        .insert(newData)
-        .returning('*');
+      .transacting(transaction)
+      .insert(newData)
+      .returning('*');
 
       return {{camelCase name}};
-    });
+    }
+
+    const {{camelCase name}}InDB = transactify(create{{properCase name}},knex, trx)
 
     return {{camelCase name}}InDB ? new {{properCase name}}({{camelCase name}}InDB) : null;
   }
 
-  static async update(viewer, data, loaders) {
+  static async update(viewer, data, loaders,trx) {
     if (!data || !data.id) return null;
     if (!canMutate(viewer, data, Models.{{constantCase name}})) return null;
     const newData = { updated_at: new Date() };
-    const updated{{properCase name}} = await knex.transaction(async trx => {
-      let [{{camelCase name}} = null] = await knex('{{snakeCase name}}s')
+
+    const update{{properCase name}} = async (transaction) =>{
+      const  [{{camelCase name}} = null] = await knex('{{snakeCase name}}s')
         .where({id: data.id})
-        .transacting(trx)
+        .transacting(transaction)
         .forUpdate()
         .update(newData)
         .returning('*');
 
       return {{camelCase name}};
-    });
+    }
+
+    const updated{{properCase name}}= transactify(update{{properCase name}},knex, trx)
 
     return updated{{properCase name}} ? new {{properCase name}}(updated{{properCase name}}) : null;
   }
 
-  static async delete(viewer, data, loaders) {
+  static async delete(viewer, data, loaders,trx) {
     if (!data || !data.id) return null;
     if (!canMutate(viewer, data, Models.{{constantCase name}})) return null;
-    const deleted{{properCase name}} = await knex.transaction(async trx => {
-      await knex('{{snakeCase name}}s')
+
+      const delete{{properCase name}} = async (transaction) =>{
+      const  [{{camelCase name}} = null] = await knex('{{snakeCase name}}s')
         .where({id: data.id})
-        .transacting(trx)
+        .transacting(transaction)
         .forUpdate()
         .del()
-    });
+
+      return {{camelCase name}};
+    }
+
+    const deleted{{properCase name}}= transactify(delete{{properCase name}},knex, trx)
 
     return deleted{{properCase name}} ? new {{properCase name}}(deleted{{properCase name}}) : null;
   }

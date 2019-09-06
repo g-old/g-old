@@ -53,8 +53,7 @@ passport.use(
         .then(userData => {
           const user = userData[0];
           if (!user) {
-            done(null, false);
-            return null;
+            return done(null, false);
           }
           return verifyUser(user, password).then(verified => {
             if (verified) {

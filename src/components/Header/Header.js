@@ -18,7 +18,7 @@ import NotificationMenu from '../NotificationMenu';
 const messages = defineMessages({
   brand: {
     id: 'header.brand',
-    defaultMessage: 'M5',
+    defaultMessage: 'MyBrand',
     description: 'Brand name displayed in header',
   },
   bannerTitle: {

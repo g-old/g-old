@@ -18,6 +18,7 @@ import Note from '../models/Note';
 import TranslationType from './TranslationType';
 import Communication from '../models/Communication';
 import Message from '../models/Message';
+import GraphQLDate from './GraphQLDateType';
 
 const localeMapper = { 'de-DE': 'de', 'it-IT': 'it', 'lld-IT': 'lld' };
 const MessageType = new ObjectType({
@@ -128,7 +129,7 @@ const MessageType = new ObjectType({
     },
 
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
   }),
 });

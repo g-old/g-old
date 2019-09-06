@@ -3,25 +3,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const Icon = (props) => {
+const Icon = ({ color, size, vBox, icon, transform }) => {
   const styles = {
     svg: {
       display: 'inline-block',
       verticalAlign: 'middle',
     },
     path: {
-      fill: props.color,
+      fill: color,
     },
   };
   // viewBox is a hack - should be 1024 1024
   return (
     <svg
       style={styles.svg}
-      width={`${props.size}px`}
-      height={`${props.size}px`}
-      viewBox={`0 0 ${props.vBox} ${props.vBox}`}
+      width={`${size}px`}
+      height={`${size}px`}
+      viewBox={`0 0 ${vBox} ${vBox}`}
     >
-      <path style={styles.path} d={props.icon} transform={props.transform} />
+      <path style={styles.path} d={icon} transform={transform} />
     </svg>
   );
 };

@@ -9,7 +9,7 @@ import Label from '../Label';
 import Form from '../Form';
 
 import { nameValidation, createValidator } from '../../core/validation';
-import Notification from '../../components/Notification';
+import Notification from '../Notification';
 
 const messages = defineMessages({
   empty: {
@@ -67,6 +67,7 @@ class TagForm extends React.Component {
     updates: PropTypes.shape({
       success: PropTypes.bool,
       error: PropTypes.bool,
+      pending: PropTypes.bool,
     }),
     onCancel: PropTypes.func.isRequired,
   };
@@ -74,6 +75,7 @@ class TagForm extends React.Component {
   static defaultProps = {
     updates: null,
   };
+
   constructor(props) {
     super(props);
     this.handleValueChanges = this.handleValueChanges.bind(this);
@@ -107,9 +109,11 @@ class TagForm extends React.Component {
 
   componentWillReceiveProps({ tag, updates = {} }) {
     const newUpdates = {};
+    // eslint-disable-next-line react/destructuring-assignment
     if (updates.success && !this.props.updates.success) {
       this.onCancel();
     }
+    // eslint-disable-next-line react/destructuring-assignment
     if (updates.error && !this.props.updates.error) {
       newUpdates.error = true;
     }
@@ -123,6 +127,7 @@ class TagForm extends React.Component {
       e.preventDefault();
       e.stopPropagation();
     }
+    // eslint-disable-next-line react/destructuring-assignment
     this.props.onCancel();
   }
 
@@ -133,15 +138,13 @@ class TagForm extends React.Component {
     // sTODO implement auth
     if (this.handleValidation(formFields)) {
       const inputFields = ['deName', 'itName', 'lldName', 'text'];
-      const inputValues = getChangedFields(
-        inputFields,
-        this.state,
-        this.props.tag,
-      );
+      const inputValues = getChangedFields(inputFields, this.state, tag);
       // check coordinator
       if (tag.id) {
+        // eslint-disable-next-line react/destructuring-assignment
         this.props.updateTag({ id: this.state.id, ...inputValues });
       } else {
+        // eslint-disable-next-line react/destructuring-assignment
         this.props.createTag({ ...inputValues });
       }
     }
@@ -149,32 +152,41 @@ class TagForm extends React.Component {
 
   handleValidation(fields) {
     const validated = this.Validator(fields);
-    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
+    this.setState(prevstate => ({
+      errors: { ...prevstate.errors, ...validated.errors },
+    }));
     return validated.failed === 0;
   }
 
   handleBlur(e) {
     const field = e.target.name;
+    // eslint-disable-next-line react/destructuring-assignment
     if (this.state[field]) {
       this.handleValidation([field]);
     }
   }
+
   visibleErrors(errorNames) {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
+      // eslint-disable-next-line react/destructuring-assignment
       if (this.state.errors[curr].touched) {
         acc[err] = (
+          // eslint-disable-next-line react/destructuring-assignment
           <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
         );
       }
       return acc;
     }, {});
   }
+
   handleValueChanges(e) {
     let value;
     if (e.target.type === 'checkbox') {
+      // eslint-disable-next-line react/destructuring-assignment
       value = !this.state[e.target.name];
     } else {
+      // eslint-disable-next-line prefer-destructuring
       value = e.target.value;
     }
 
@@ -190,7 +202,7 @@ class TagForm extends React.Component {
       <Box column padding="medium">
         <Box type="section" align column pad>
           <Form onSubmit={this.onSubmit}>
-            <Label>{'Tag names'}</Label>
+            <Label>Tag names</Label>
             <fieldset>
               <FormField label="Default name" error={errors.textError}>
                 <input

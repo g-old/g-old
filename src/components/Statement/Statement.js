@@ -3,7 +3,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/withStyles';
-import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
+import {
+  defineMessages,
+  FormattedMessage,
+  injectIntl,
+  intlShape,
+} from 'react-intl';
 import Textarea from 'react-textarea-autosize'; // TODO replace with contenteditable
 import cn from 'classnames';
 import s from './Statement.css';
@@ -50,7 +55,9 @@ class Statement extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
     vote: PropTypes.shape({
-      positions: PropTypes.arrayOf(PropTypes.shape({})),
+      positions: PropTypes.arrayOf(
+        PropTypes.shape({ pos: PropTypes.number, value: PropTypes.string }),
+      ),
       id: PropTypes.string.isRequired,
     }).isRequired,
     pollId: PropTypes.string.isRequired,
@@ -70,7 +77,7 @@ class Statement extends React.Component {
     ownStatement: PropTypes.bool,
     user: PropTypes.shape({
       id: PropTypes.string,
-
+      permissions: PropTypes.number,
       role: PropTypes.shape({
         type: PropTypes.string,
       }),
@@ -87,8 +94,18 @@ class Statement extends React.Component {
     onDeleteLike: PropTypes.func,
     updates: PropTypes.shape({
       updateStmt: PropTypes.shape({ pending: PropTypes.bool }),
+      success: PropTypes.bool,
+      errorMessage: PropTypes.string,
+      pending: PropTypes.bool,
+      statement: PropTypes.shape({
+        text: PropTypes.string,
+        delete: PropTypes.bool,
+      }),
     }),
     onProfileClick: PropTypes.func,
+    neutral: PropTypes.bool,
+    createdAt: PropTypes.string,
+    intl: intlShape.isRequired,
   };
 
   static defaultProps = {
@@ -110,6 +127,8 @@ class Statement extends React.Component {
     updates: null,
     onProfileClick: null,
     pollClosed: null,
+    neutral: false,
+    createdAt: null,
   };
 
   constructor(props) {

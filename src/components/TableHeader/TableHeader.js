@@ -10,11 +10,13 @@ class TableHeader extends React.Component {
     sortAscending: PropTypes.bool,
     sortIndex: PropTypes.number,
   };
+
   static defaultProps = {
     onSort: null,
     sortAscending: null,
     sortIndex: null,
   };
+
   onSort(index) {
     const { onSort, sortAscending, sortIndex } = this.props;
     let nextAscending;
@@ -34,11 +36,7 @@ class TableHeader extends React.Component {
       if (sortIndex >= 0) {
         let sortIndicator;
         if (index === sortIndex) {
-          sortIndicator = sortAscending ? (
-            <span>{'ASC'}</span>
-          ) : (
-            <span>{'DESC'}</span>
-          );
+          sortIndicator = sortAscending ? <span>ASC</span> : <span>DESC</span>;
         }
         content = (
           <Box

@@ -5,7 +5,7 @@ import {
   GraphQLID as ID,
   GraphQLBoolean,
 } from 'graphql';
-
+import GraphQLDate from './GraphQLDateType';
 
 const PollingModeType = new ObjectType({
   name: 'PollingMode',
@@ -30,12 +30,9 @@ const PollingModeType = new ObjectType({
     },
 
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
       sqlColumn: 'created_at',
     },
-
-
   },
-
 });
 export default PollingModeType;

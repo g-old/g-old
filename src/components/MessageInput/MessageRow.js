@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 // import { FormattedRelative } from 'react-intl';
-import TableRow from '../../components/TableRow';
+import TableRow from '../TableRow';
 
 function MessageRow({ messageType, messageObject, onClickMenu }) {
   /* eslint-disable react/no-danger */
@@ -24,7 +24,12 @@ function MessageRow({ messageType, messageObject, onClickMenu }) {
 
 MessageRow.propTypes = {
   onClickMenu: PropTypes.func.isRequired,
-  messageObject: PropTypes.shape({}).isRequired,
+  messageObject: PropTypes.shape({
+    content: PropTypes.string,
+    keyword: PropTypes.string,
+    category: PropTypes.string,
+    isPublished: PropTypes.bool,
+  }).isRequired,
   messageType: PropTypes.string.isRequired,
 };
 

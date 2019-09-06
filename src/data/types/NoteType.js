@@ -7,6 +7,7 @@ import {
 } from 'graphql';
 import CategoryTypeEnum from './CategoryTypeEnum';
 import TranslationType from './TranslationType';
+import GraphQLDate from './GraphQLDateType';
 
 const localeMapper = { 'de-DE': 'de', 'it-IT': 'it', 'lld-IT': 'lld' };
 
@@ -45,10 +46,10 @@ const NoteType = new ObjectType({
     },
 
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     updatedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
   }),
 });

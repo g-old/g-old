@@ -110,11 +110,11 @@ class PhaseTwoWizard extends React.Component<Props, State> {
         multipleChoice: extended,
         startTime,
         endTime,
-        secret,
+        secret: !!secret,
         threshold,
         mode: {
           withStatements,
-          unipolar,
+          unipolar: !!unipolar,
           thresholdRef: thresholdRef.value,
         },
       },
@@ -168,6 +168,7 @@ class PhaseTwoWizard extends React.Component<Props, State> {
               <Step id="preview">
                 <InputPreview
                   {...this.state}
+                  user={user}
                   pollOnly
                   onExit={this.handleValueSaving}
                   state={pollType.value}

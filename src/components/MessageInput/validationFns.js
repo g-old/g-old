@@ -7,6 +7,7 @@ export const isHtmlEmpty = html => {
   }
   return true;
 };
+
 const translationVal = fieldName => (input, state) => {
   let result = { touched: false };
   if (isHtmlEmpty(input)) {

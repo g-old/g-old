@@ -50,11 +50,9 @@ class Post extends React.Component {
 
 #### Related articles
 
-* [That's so fetch!](https://jakearchibald.com/2015/thats-so-fetch/) by [Jake Archibald](https://twitter.com/jaffathecake)
-
+- [That's so fetch!](https://jakearchibald.com/2015/thats-so-fetch/) by [Jake Archibald](https://twitter.com/jaffathecake)
 
 [fetch]: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
 [wfetch]: https://github.com/github/fetchno
 [nfetch]: https://github.com/bitinn/node-fetch
 [nodeapi]: https://github.com/kriasoft/nodejs-api-starter
-

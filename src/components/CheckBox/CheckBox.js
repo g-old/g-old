@@ -18,7 +18,7 @@ class CheckBox extends React.Component {
   static defaultProps = {
     checked: false,
     disabled: false,
-    label: '',
+    label: 'No label',
     onChange: null,
     name: 'name',
     toggle: false,
@@ -62,7 +62,8 @@ class CheckBox extends React.Component {
     ];
 
     return (
-      /* eslint-disable jsx-a11y/label-has-for , jsx-a11y/label-has-associated-control */
+      /* eslint-disable jsx-a11y/label-has-for */
+      // eslint-disable-next-line jsx-a11y/label-has-associated-control
       <label
         className={cn(
           s.checkBox,

@@ -9,6 +9,7 @@ import UserType from './UserType';
 import StatementType from './StatementDLType';
 import Statement from '../models/Statement';
 import User from '../models/User';
+import GraphQLDate from './GraphQLDateType';
 
 const FlaggedStatementType = new ObjectType({
   name: 'FlaggedStatement',
@@ -16,7 +17,8 @@ const FlaggedStatementType = new ObjectType({
     id: { type: new NonNull(ID) },
     flagger: {
       type: new NonNull(UserType),
-      resolve: (data, args, { viewer, loaders }) => User.gen(viewer, data.flagger_id, loaders),
+      resolve: (data, args, { viewer, loaders }) =>
+        User.gen(viewer, data.flagger_id, loaders),
     },
     statement: {
       type: StatementType,
@@ -25,11 +27,13 @@ const FlaggedStatementType = new ObjectType({
     },
     solver: {
       type: UserType,
-      resolve: (data, args, { viewer, loaders }) => User.gen(viewer, data.solver_id, loaders),
+      resolve: (data, args, { viewer, loaders }) =>
+        User.gen(viewer, data.solver_id, loaders),
     },
     flaggedUser: {
       type: UserType,
-      resolve: (data, args, { viewer, loaders }) => User.gen(viewer, data.flagged_id, loaders),
+      resolve: (data, args, { viewer, loaders }) =>
+        User.gen(viewer, data.flagged_id, loaders),
     },
     content: {
       type: new NonNull(GraphQLString),
@@ -42,11 +46,11 @@ const FlaggedStatementType = new ObjectType({
       resolve: data => data.flag_count,
     },
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
       resolve: data => data.created_at,
     },
     updatedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
       resolve: data => data.created_at,
     },
   },

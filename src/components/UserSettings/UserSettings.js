@@ -26,7 +26,6 @@ const messages = defineMessages({
     defaultMessage: "You can't leave this empty",
     description: 'Help for empty fields',
   },
-
   invalidEmail: {
     id: 'form.error-invalidEmail',
     defaultMessage: 'Your email address seems to be invalid',
@@ -57,7 +56,6 @@ const messages = defineMessages({
     defaultMessage: 'New email address',
     description: 'Email label in settings for new address',
   },
-
   success: {
     id: 'action.success',
     defaultMessage: 'Success!',
@@ -98,7 +96,6 @@ const messages = defineMessages({
     defaultMessage: 'Name',
     description: 'Heading of name section',
   },
-
   locale: {
     id: 'label.locale',
     defaultMessage: 'Language',
@@ -125,7 +122,11 @@ const initState = {
   },
   showEmailInput: false,
 };
-
+const ResponseShape = PropTypes.shape({
+  success: PropTypes.bool,
+  pending: PropTypes.bool,
+  error: PropTypes.bool,
+});
 class UserSettings extends React.Component {
   static propTypes = {
     user: PropTypes.shape({
@@ -135,17 +136,31 @@ class UserSettings extends React.Component {
       name: PropTypes.string,
       surname: PropTypes.string,
       locale: PropTypes.string,
+      emailVerified: PropTypes.bool,
+      requests: PropTypes.arrayOf(PropTypes.string),
+      groups: PropTypes.number,
     }).isRequired,
     updateUser: PropTypes.func.isRequired,
     resendEmail: PropTypes.func.isRequired,
-    updates: PropTypes.shape({}).isRequired,
-    requestUpdates: PropTypes.shape({}).isRequired,
+    updates: PropTypes.shape({
+      passwordOld: PropTypes.shape({
+        error: PropTypes.shape({ passwordOld: PropTypes.bool }),
+      }),
+      password: ResponseShape,
+      verifyEmail: ResponseShape,
+      name: ResponseShape,
+      surname: ResponseShape,
+      locale: ResponseShape,
+    }).isRequired,
+    requestUpdates: ResponseShape.isRequired,
     workTeams: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     onJoinWorkTeam: PropTypes.func.isRequired,
     onLeaveWorkTeam: PropTypes.func.isRequired,
     smallSize: PropTypes.bool.isRequired,
     createRequest: PropTypes.func.isRequired,
     deleteRequest: PropTypes.func.isRequired,
+    onDeleteAccount: PropTypes.func.isRequired,
+    onLogout: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -364,7 +379,6 @@ class UserSettings extends React.Component {
       (requestUpdates && requestUpdates.success);
     const passwordPending =
       updates && updates.password && updates.password.pending;
-
     const nameSuccess =
       updates &&
       ((updates.name && updates.name.success) ||

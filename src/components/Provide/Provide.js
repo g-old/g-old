@@ -6,9 +6,7 @@ import IntlProvider from './IntlProvider';
 function Provide({ store, children }) {
   return (
     <Provider store={store}>
-      <IntlProvider>
-        {children}
-      </IntlProvider>
+      <IntlProvider>{children}</IntlProvider>
     </Provider>
   );
 }

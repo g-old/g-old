@@ -20,7 +20,6 @@ type tOptions = {
   className?: string,
   context: any,
 };
-
 class Drop {
   control: any;
 

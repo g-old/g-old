@@ -20,6 +20,7 @@ import Notification from '../models/Notification';
 import Message from '../models/Message';
 import User from '../models/User';
 import { Permissions } from '../../organization';
+import GraphQLDate from './GraphQLDateType';
 
 /* eslint-disable */
 const canSee = (viewer, data) =>
@@ -56,13 +57,13 @@ const UserType = new ObjectType({
       },
     },
     lastLogin: {
-      type: GraphQLString,
+      type: GraphQLDate,
       resolve(data, args, { viewer }) {
         return canSee(viewer, data) ? data.lastLogin : null;
       },
     },
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     groups: {
       type: GraphQLInt,
@@ -206,11 +207,8 @@ const UserType = new ObjectType({
           ? knex('notification_settings')
               .where({ user_id: parent.id })
               .select('settings')
-              .then(
-                ([data]) =>
-                  data
-                    ? JSON.stringify(data.settings || {})
-                    : JSON.stringify({}),
+              .then(([data]) =>
+                data ? JSON.stringify(data.settings || {}) : JSON.stringify({}),
               )
           : {},
     },

@@ -198,7 +198,7 @@ class ProposalInput extends React.Component<Props, State> {
         multipleChoice: extended,
         startTime,
         endTime,
-        secret,
+        secret: !!secret,
         threshold,
         mode: {
           withStatements,
@@ -224,6 +224,7 @@ class ProposalInput extends React.Component<Props, State> {
       dateTo: '',
       timeTo: '',
       title: '',
+      secret: false,
       body: '<p></p>',
     });
 

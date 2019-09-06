@@ -63,7 +63,6 @@ const messages = defineMessages({
     defaultMessage: 'Next step',
     description: 'Next',
   },
-
   error: {
     id: 'signup.error',
     defaultMessage: 'Could not create your account',
@@ -96,6 +95,8 @@ const messages = defineMessages({
     description: 'Call to read linked privac policy',
   },
 });
+
+const PATH_TO_PRIVACY = '/privacy';
 
 const onBlurValidation = (fieldName, state, fields) => {
   if (fieldName && state) {
@@ -426,7 +427,11 @@ class SignUp extends React.Component {
                       {...messages.readPrivacy}
                       values={{
                         link: (
-                          <a target="_blank" href="/about">
+                          <a
+                            target="_blank"
+                            href={PATH_TO_PRIVACY}
+                            rel="noopener noreferrer"
+                          >
                             <FormattedMessage {...messages.privacy} />
                           </a>
                         ),
@@ -451,7 +456,11 @@ class SignUp extends React.Component {
                 </FormField>
               </fieldset>
               <p>
-                <a target="_blank" href="/about">
+                <a
+                  target="_blank"
+                  href={PATH_TO_PRIVACY}
+                  rel="noopener noreferrer"
+                >
                   <FormattedMessage {...messages.privacy} />
                 </a>
               </p>

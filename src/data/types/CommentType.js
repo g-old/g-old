@@ -6,6 +6,7 @@ import {
   GraphQLInt,
   GraphQLNonNull,
 } from 'graphql';
+import GraphQLDate from './GraphQLDateType';
 import knex from '../knex';
 
 import UserType from './UserType';
@@ -48,13 +49,13 @@ const CommentType = new ObjectType({
     },
 
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     updatedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     editedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
   }),
 });

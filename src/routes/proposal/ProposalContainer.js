@@ -65,14 +65,21 @@ const messages = defineMessages({
     description: 'Poll closing time',
   },
 });
+const PollShape = PropTypes.shape({
+  id: PropTypes.number,
+  mode: PropTypes.shape({}),
+});
 class ProposalContainer extends React.Component {
   static propTypes = {
     proposal: PropTypes.shape({
-      pollOne: PropTypes.shape({ mode: PropTypes.shape({}) }),
-      pollTwo: PropTypes.shape({ mode: PropTypes.shape({}) }),
+      pollOne: PollShape,
+      pollTwo: PollShape,
       id: PropTypes.string,
       subscribed: PropTypes.bool,
-      subscription: PropTypes.shape({}),
+      subscription: PropTypes.shape({ id: PropTypes.number }),
+      state: PropTypes.string,
+      deletedAt: PropTypes.string,
+      canVote: PropTypes.bool,
     }).isRequired,
     user: PropTypes.shape({}).isRequired,
     proposalId: PropTypes.number.isRequired,
@@ -91,6 +98,10 @@ class ProposalContainer extends React.Component {
     deleteSubscription: PropTypes.func.isRequired,
     updateSubscription: PropTypes.func.isRequired,
     subscriptionStatus: PropTypes.shape({}),
+    updates: PropTypes.shape({
+      isFetching: PropTypes.bool,
+      errorMessage: PropTypes.string,
+    }).isRequired,
   };
 
   static defaultProps = {
@@ -267,7 +278,7 @@ class ProposalContainer extends React.Component {
       filterNode = <Filter filter={filter} filterFn={this.filterStatements} />;
     }
     return (
-      <React.Fragment>
+      <>
         <Poll
           {...poll}
           canVote={proposal.canVote}
@@ -319,7 +330,7 @@ class ProposalContainer extends React.Component {
         </StatementsContainer>
 
         {switchPollBtn}
-      </React.Fragment>
+      </>
     );
   }
 

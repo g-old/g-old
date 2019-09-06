@@ -4,8 +4,8 @@ import Notification from '../Notification';
 import Button from '../Button';
 import { ICONS } from '../../constants';
 
-const FetchError = ({ message, onRetry, isFetching }) =>
-  (<Notification
+const FetchError = ({ message, onRetry, isFetching }) => (
+  <Notification
     state="error"
     message={`Could not fetch the data. ${message}`}
     action={
@@ -14,14 +14,15 @@ const FetchError = ({ message, onRetry, isFetching }) =>
         primary
         onClick={onRetry}
         icon={
-          <svg viewBox={'0 0 24 24'} width={24} height={24}>
+          <svg viewBox="0 0 24 24" width={24} height={24}>
             <path fill="none" stroke="#fff" strokeWidth="2" d={ICONS.retry} />
           </svg>
         }
         label="Retry"
       />
     }
-  />);
+  />
+);
 
 FetchError.propTypes = {
   message: PropTypes.string.isRequired,

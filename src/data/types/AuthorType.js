@@ -3,9 +3,8 @@ import {
   GraphQLObjectType as ObjectType,
   GraphQLNonNull as NonNull,
   GraphQLID as ID,
-
 } from 'graphql';
-
+import GraphQLDate from './GraphQLDateType';
 
 const AuthorType = new ObjectType({
   name: 'Author',
@@ -22,10 +21,9 @@ const AuthorType = new ObjectType({
       type: GraphQLString,
     },
     createdAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
       sqlColumn: 'created_at',
     },
   },
-
 });
 export default AuthorType;

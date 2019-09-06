@@ -1,7 +1,11 @@
 /* eslint-disable import/prefer-default-export */
 import { normalize } from 'normalizr';
 import { user as userSchema } from '../store/schema';
-import { RESET_PASSWORD_START, RESET_PASSWORD_SUCCESS, RESET_PASSWORD_ERROR } from '../constants';
+import {
+  RESET_PASSWORD_START,
+  RESET_PASSWORD_SUCCESS,
+  RESET_PASSWORD_ERROR,
+} from '../constants';
 
 export function recoverPassword(email) {
   return async () => {
@@ -25,7 +29,7 @@ export function recoverPassword(email) {
 
 const initialId = 'pw';
 export function resetPassword({ token, password }) {
-  return async (dispatch) => {
+  return async dispatch => {
     const properties = ['password'].reduce((acc, curr) => {
       // eslint-disable-next-line no-param-reassign
       acc[curr] = {

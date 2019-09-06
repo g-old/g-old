@@ -1,5 +1,5 @@
-/* eslint eqeqeq: "off"*/
-/* eslint no-nested-ternary: "off"*/
+/* eslint eqeqeq: "off" */
+/* eslint no-nested-ternary: "off" */
 /* eslint-disable one-var */
 export default [
   {
@@ -13,8 +13,14 @@ export default [
       return a
         ? t == 1 && r != 11
           ? 'un'
-          : t == 2 && r != 12 ? 'dos' : t == 3 && r != 13 ? 'pauc' : 'autre'
-        : e == 1 && l ? 'un' : 'autre';
+          : t == 2 && r != 12
+          ? 'dos'
+          : t == 3 && r != 13
+          ? 'pauc'
+          : 'autre'
+        : e == 1 && l
+        ? 'un'
+        : 'autre';
     },
     fields: {
       year: {

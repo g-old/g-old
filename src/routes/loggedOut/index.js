@@ -1,39 +1,39 @@
-import React from "react";
-import Layout from "../../components/Layout";
-import Login from "../../components/Login";
+import React from 'react';
+import Layout from '../../components/Layout';
+import Login from '../../components/Login';
 
 async function action() {
   return {
-    chunks: ["loggedOut"],
-    title: "Logged out",
+    chunks: ['loggedOut'],
+    title: 'Logged out',
     component: (
       <Layout>
         <div
           style={{
-            paddingLeft: "20px",
-            paddingRight: "20px",
-            paddingTop: "20px"
+            paddingLeft: '20px',
+            paddingRight: '20px',
+            paddingTop: '20px',
           }}
         >
           <div
             style={{
-              padding: "0 0 40px",
-              maxWidth: "380px"
+              padding: '0 0 40px',
+              maxWidth: '380px',
             }}
           >
-            <div style={{ marginBottom: "3em" }}>
-              <span style={{ fontSize: "1.5em" }}>LOGGED OUT </span>
+            <div style={{ marginBottom: '3em' }}>
+              <span style={{ fontSize: '1.5em' }}>LOGGED OUT </span>
               <br />
-              <span style={{ fontSize: "1em" }}>Thank you for the visit </span>
+              <span style={{ fontSize: '1em' }}>Thank you for the visit </span>
 
               <br />
-              <span style={{ fontSize: "1em" }}>Come back? </span>
+              <span style={{ fontSize: '1em' }}>Come back? </span>
             </div>
             <Login />
           </div>
         </div>
       </Layout>
-    )
+    ),
   };
 }
 

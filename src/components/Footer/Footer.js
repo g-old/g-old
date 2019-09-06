@@ -10,15 +10,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/withStyles';
+import { connect } from 'react-redux';
+
 import LanguageSwitcher from '../LanguageSwitcher';
 import { getDroneBranch, getDroneBuild } from '../../reducers';
 import s from './Footer.css';
 
 class Footer extends React.Component {
   render() {
-    const state = this.context.store.getState();
-    const build = getDroneBuild(state);
-    const branch = getDroneBranch(state);
+    const { build, branch } = this.props;
 
     return (
       <div className={s.root}>
@@ -67,8 +67,14 @@ class Footer extends React.Component {
   }
 }
 
-Footer.contextTypes = {
-  store: PropTypes.any,
+Footer.propTypes = {
+  build: PropTypes.string.isRequired,
+  branch: PropTypes.string.isRequired,
 };
 
-export default withStyles(s)(Footer);
+const mapStateToProps = state => ({
+  build: getDroneBuild(state),
+  branch: getDroneBranch(state),
+});
+
+export default connect(mapStateToProps)(withStyles(s)(Footer));

@@ -1,4 +1,4 @@
-@import "../../components/variables.css";
+@import '../../components/variables.css';
 
 .avatar {
   width: 256px;
@@ -63,7 +63,7 @@
   width: 42px;
   height: 42px;
   display: flex;
-  background-color: var(--color-gold);
+  background-color: var(--color-brand);
   border-radius: 32px;
 
   svg {

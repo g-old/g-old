@@ -20,6 +20,7 @@ import PageType from './PageType';
 import Request from '../models/Request';
 import User from '../models/User';
 import knex from '../knex';
+import GraphQLDate from './GraphQLDateType';
 
 const WorkTeamType = new ObjectType({
   name: 'WorkTeam',
@@ -136,7 +137,7 @@ const WorkTeamType = new ObjectType({
       type: GraphQLInt,
     },
     deletedAt: {
-      type: GraphQLString,
+      type: GraphQLDate,
     },
     discussionConnection,
 

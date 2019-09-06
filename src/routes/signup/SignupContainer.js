@@ -28,7 +28,7 @@ class SignupContainer extends React.Component {
   static propTypes = {
     createUser: PropTypes.func.isRequired,
     // uploadAvatar: PropTypes.func.isRequired,
-    updates: PropTypes.shape({}).isRequired,
+    updates: PropTypes.shape({ email: PropTypes.string }).isRequired,
     // locale: PropTypes.string.isRequired,
     user: PropTypes.shape({}),
     recaptchaKey: PropTypes.string.isRequired,
@@ -51,50 +51,57 @@ class SignupContainer extends React.Component {
     if (updates) {
       const success =
         Object.keys(updates).find(key => !updates[key].success) == null;
-      const error = Object.keys(updates).some(key => updates[key].error);
-      const pending = Object.keys(updates).some(
+      const updateError = Object.keys(updates).some(key => updates[key].error);
+      const updatePending = Object.keys(updates).some(
         key => updates[key].pending === true,
       );
-      if (error !== this.state.error) {
-        this.setState({ error });
+      const { error, pending, step, serverCalled } = this.state;
+      if (updateError !== error) {
+        this.setState({ error: updateError });
       }
-      if (pending !== this.state.pending) {
-        this.setState({ pending });
+      if (updatePending !== pending) {
+        this.setState({ pending: updatePending });
       }
-      if (success && this.state.serverCalled) {
+      if (success && serverCalled) {
         history.push(`/account`);
         this.setState({ step: 1 });
       }
-      if (this.state.step === 0 && user) {
+      if (step === 0 && user) {
         this.setState({ step: 1 });
       }
     }
   }
+
   onCreateUser(data, captchaResponse) {
     // dispatch
+
+    // eslint-disable-next-line react/destructuring-assignment
     this.props.createUser(data, captchaResponse);
     this.setState({ serverCalled: true });
   }
+
   componentDidCatch() {
     this.setState({ hasError: true });
   }
 
   render() {
     const { updates, recaptchaKey } = this.props;
-    if (this.state.hasError || !this.props.recaptchaKey) {
+    const { error, hasError, pending, step } = this.state;
+
+    if (hasError || !recaptchaKey) {
       return <h1>Please reload the browser</h1>;
     }
     let emailError = false;
     if (updates.email && updates.email.error) {
       emailError = updates.email.error.unique === false;
     }
-    switch (this.state.step) {
+    switch (step) {
       case 0:
         return (
           <SignUp
-            pending={this.state.pending}
+            pending={pending}
             notUniqueEmail={emailError}
-            error={this.state.error}
+            error={error}
             onCreateUser={this.onCreateUser}
             recaptchaKey={recaptchaKey}
           />
@@ -127,4 +134,7 @@ const mapDispatch = {
   createUser,
   uploadAvatar,
 };
-export default connect(mapStateToProps, mapDispatch)(SignupContainer);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(SignupContainer);
