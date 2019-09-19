@@ -1,4 +1,4 @@
-exports.up = function(knex, Promise) {
+exports.up = function(knex) {
   return Promise.all([
     knex.schema.table('user_work_teams', table => {
       table.boolean('inactive').defaultsTo('false');
@@ -13,7 +13,7 @@ exports.up = function(knex, Promise) {
   ]);
 };
 
-exports.down = function(knex, Promise) {
+exports.down = function(knex) {
   return Promise.all([
     knex.schema.table('user_work_teams', table => {
       table.dropColumn('updated_at');

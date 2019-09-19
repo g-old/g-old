@@ -64,7 +64,7 @@ const convertVoteActivity = (activity, voteData) => {
   };
 };
 
-exports.up = function(knex, Promise) {
+exports.up = function(knex) {
   const voteData = {};
   const activityData = {};
   const pollData = {};
@@ -202,7 +202,7 @@ exports.up = function(knex, Promise) {
     .then(addNewData);
 };
 
-exports.down = function(knex, Promise) {
+exports.down = function(knex) {
   return Promise.all([
     knex.schema.table('polls', table => {
       table.dropColumn('options');

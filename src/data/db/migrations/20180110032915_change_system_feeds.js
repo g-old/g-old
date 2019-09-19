@@ -1,5 +1,5 @@
 // TODO better design when including groups
-exports.up = function(knex, Promise) {
+exports.up = function(knex) {
   return Promise.all([
     knex.schema
       .table('system_feeds', table => {
@@ -17,7 +17,7 @@ exports.up = function(knex, Promise) {
   ]);
 };
 
-exports.down = function(knex, Promise) {
+exports.down = function(knex) {
   return Promise.all([
     knex.schema.table('system_feeds', table => {
       table.dropUnique(['group_id', 'type']);

@@ -1,4 +1,4 @@
-exports.up = function(knex, Promise) {
+exports.up = function(knex) {
   return Promise.all([
     knex.schema
       .raw(
@@ -21,7 +21,7 @@ exports.up = function(knex, Promise) {
 };
 
 // prettier-ignore
-exports.down = function(knex, Promise) {
+exports.down = function(knex) {
    return Promise.all([knex.schema
        .raw(`
      ALTER TABLE "activities"

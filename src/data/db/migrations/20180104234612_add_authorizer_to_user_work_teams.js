@@ -1,4 +1,4 @@
-exports.up = function(knex, Promise) {
+exports.up = function(knex) {
   return Promise.all([
     knex.schema.table('user_work_teams', table => {
       table.dropForeign('work_team_id');
@@ -13,7 +13,7 @@ exports.up = function(knex, Promise) {
   ]);
 };
 
-exports.down = function(knex, Promise) {
+exports.down = function(knex) {
   return Promise.all([
     knex.schema.table('user_work_teams', table => {
       table.dropForeign('authorizer_id');
