@@ -23,7 +23,7 @@ class Footer extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <span className={s.text}> © G O L D </span>
+          <span className={s.text}> © V I P </span>
           {branch && (
             <span className={s.buildinfo}>
               <img src="/git.png" alt="#" style={{ height: '1em' }} />

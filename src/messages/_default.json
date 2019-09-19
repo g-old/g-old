@@ -316,7 +316,7 @@
   {
     "id": "header.brand",
     "description": "Brand name displayed in header",
-    "defaultMessage": "M5",
+    "defaultMessage": "MyBrand",
     "message": "",
     "files": ["src/components/Header/Header.js"]
   },
@@ -329,7 +329,7 @@
   },
   {
     "id": "action.error",
-    "description": "Short failure notification",
+    "description": "Short failure notification ",
     "defaultMessage": "Action failed. Please retry!",
     "message": "",
     "files": [
@@ -616,7 +616,7 @@
   {
     "id": "form.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters ",
     "message": "",
     "files": ["src/components/FormValidation/FormValidation.js"]
   },
@@ -717,7 +717,7 @@
   },
   {
     "id": "action.success",
-    "description": "Short success notification",
+    "description": "Short success notification ",
     "defaultMessage": "Success!",
     "message": "",
     "files": [
@@ -754,7 +754,7 @@
   },
   {
     "id": "settings.email.notVerified",
-    "description": "Email not yet verified",
+    "description": "Email not yet verified ",
     "defaultMessage": "Email not verified",
     "message": "",
     "files": [
@@ -764,7 +764,7 @@
   },
   {
     "id": "settings.email.resend",
-    "description": "Resend verification email",
+    "description": "Resend verification email ",
     "defaultMessage": "Resend verification email",
     "message": "",
     "files": [
@@ -774,7 +774,7 @@
   },
   {
     "id": "settings.email.verified",
-    "description": "Email got verified",
+    "description": "Email got verified ",
     "defaultMessage": "Email verified!",
     "message": "",
     "files": [
@@ -817,7 +817,7 @@
   {
     "id": "userSettings.oldPW",
     "description": "Current account password for form label",
-    "defaultMessage": "Enter your current password",
+    "defaultMessage": "Enter your current password ",
     "message": "",
     "files": [
       "src/components/UserSettings/ConfirmDelete.js",
@@ -893,7 +893,7 @@
   {
     "id": "signup.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters ",
     "message": "",
     "files": ["src/routes/passwordReset/PasswordReset.js"]
   },
@@ -920,7 +920,7 @@
   },
   {
     "id": "notifications.error.undefined",
-    "description": "Server or network error",
+    "description": "Server or network error ",
     "defaultMessage": "Something went wrong",
     "message": "",
     "files": ["src/components/GroupManager/GroupManager.js"]
@@ -1008,7 +1008,7 @@
   },
   {
     "id": "settings.email.resendNotification",
-    "description": "Verification mail sending success",
+    "description": "Verification mail sending success ",
     "defaultMessage": "An email was sent to your new mail address ({email})",
     "message": "",
     "files": ["src/components/UserSettings/EmailField.js"]
@@ -1286,7 +1286,7 @@
   {
     "id": "notifications.proposal.new",
     "description": "Status message for notifications",
-    "defaultMessage": "New proposal published:",
+    "defaultMessage": "New proposal published: ",
     "message": "",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
@@ -1335,7 +1335,7 @@
   {
     "id": "notifications.survey.new",
     "description": "Status message for notifications",
-    "defaultMessage": "New survey published:",
+    "defaultMessage": "New survey published: ",
     "message": "",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
@@ -1405,14 +1405,14 @@
   {
     "id": "notifications.user.update.roleAdded",
     "description": "Status message for notifications",
-    "defaultMessage": "You got a new role:",
+    "defaultMessage": "You got a new role: ",
     "message": "",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
     "id": "notifications.user.update.roleLost",
     "description": "Status message for notifications",
-    "defaultMessage": "You lost your role:",
+    "defaultMessage": "You lost your role: ",
     "message": "",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
@@ -1479,7 +1479,7 @@
   },
   {
     "id": "label.notificationSettings.statements",
-    "description": "Label for notifications on new statements",
+    "description": "Label for notifications on new statements ",
     "defaultMessage": "Statements",
     "message": "",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
@@ -1648,7 +1648,7 @@
   {
     "id": "irreversible",
     "description": "Action which can not be undone",
-    "defaultMessage": "Cannot be undone!",
+    "defaultMessage": "Cannot be undone! ",
     "message": "",
     "files": ["src/components/UserSettings/ConfirmDelete.js"]
   },

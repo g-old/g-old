@@ -195,10 +195,8 @@ const generatePlainTextMail = (
   content,
   link,
 ) =>
-  `${
-    emailNotificationTranslations[locale].teaser
-  }\n\n${actorName} ${notification}\n\n${title}\n\n${content}\n\n${link}\n` +
-  `G O L D 2018 `;
+  `${emailNotificationTranslations[locale].teaser}\n\n${actorName} ${notification}\n\n${title}\n\n${content}\n\n${link}\n` +
+  `V I P 2019 `;
 
 const mapLocale = {
   'de-DE': 'de',
@@ -390,9 +388,7 @@ const getProposalLink = (
   referrer: Referrer,
 ): string => {
   if (proposal.poll_two_id && proposal.poll_one_id) {
-    return `/proposal/${proposal.id}/${
-      proposal.poll_two_id
-    }?ref=${referrer}&refId=`;
+    return `/proposal/${proposal.id}/${proposal.poll_two_id}?ref=${referrer}&refId=`;
   }
   return `/proposal/${proposal.id}/${proposal.poll_two_id ||
     proposal.poll_one_id}?ref=${referrer}&refId=`;
@@ -405,9 +401,7 @@ const getDiscussionLink = (
   discussion: DiscussionProps,
   referrer: Referrer,
 ): string =>
-  `/workteams/${discussion.work_team_id}/discussions/${
-    discussion.id
-  }?ref=${referrer}&refId=`;
+  `/workteams/${discussion.work_team_id}/discussions/${discussion.id}?ref=${referrer}&refId=`;
 
 const getMessageLink = (messageId: ID, referrer) =>
   `/message/${messageId}?ref=${referrer}&refId=`;
@@ -1039,13 +1033,12 @@ class NotificationService {
             return this.dbConnector('activities')
               .whereIn('object_id', comment.replyIds)
               .pluck('id')
-              .then(
-                replyActivityIds =>
-                  replyActivityIds.length
-                    ? this.dbConnector('notifications')
-                        .whereIn('activity_id', replyActivityIds)
-                        .del()
-                    : Promise.resolve(),
+              .then(replyActivityIds =>
+                replyActivityIds.length
+                  ? this.dbConnector('notifications')
+                      .whereIn('activity_id', replyActivityIds)
+                      .del()
+                  : Promise.resolve(),
               )
               .then(() =>
                 this.deleteNotifications(comment.id, ActivityType.COMMENT),

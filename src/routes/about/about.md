@@ -3,4 +3,4 @@ title: About Us
 component: ContentPage
 ---
 
-GOLD 2019.
+VIP 2019.

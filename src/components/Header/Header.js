@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /**
  * React Starter Kit (https://www.reactstarterkit.com/)
  *
@@ -23,7 +24,7 @@ const messages = defineMessages({
   },
   bannerTitle: {
     id: 'header.banner.title',
-    defaultMessage: 'G O L D',
+    defaultMessage: 'V I P',
     description: 'Title in page header',
   },
 });
