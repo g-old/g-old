@@ -1,5 +1,9 @@
+/* See organization.js for the values */
 const SUPER_USER = 1;
-exports.seed = function(knex, Promise) {
+const SYSTEM = 512;
+const hash = '$2a$10$2ZX.2Lgicib1coH163pIH.WsQdCcEnqAyglEa.6LYTVHnFqEVlOhe';
+
+exports.seed = function(knex) {
   /* eslint-disable comma-dangle */
 
   function createUser(
@@ -36,13 +40,24 @@ exports.seed = function(knex, Promise) {
   }
 
   function createSuperUser() {
-    const hash = '$2a$10$2ZX.2Lgicib1coH163pIH.WsQdCcEnqAyglEa.6LYTVHnFqEVlOhe';
     return createUser(
       'Superuser',
       'Superuser',
       hash,
       'superuser@example.com',
       SUPER_USER,
+      new Date(),
+      false,
+    );
+  }
+
+  function createBot() {
+    return createUser(
+      'VIP',
+      'Bot',
+      hash,
+      'vip-bot@example.com',
+      SYSTEM,
       new Date(),
       false,
     );
@@ -80,6 +95,7 @@ exports.seed = function(knex, Promise) {
   return Promise.resolve(
     createPollingmodes()
       .then(createSuperUser)
+      .then(createBot)
       .then(() => createSystemFeeds({ proposalFeedID: 1, statementFeedID: 2 }))
       .catch(e => console.error(e)),
   );

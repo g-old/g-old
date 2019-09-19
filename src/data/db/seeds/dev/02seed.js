@@ -1,5 +1,8 @@
+/* eslint-disable guard-for-in */
+/* eslint-disable no-bitwise */
 const faker = require('faker');
 const bcrypt = require('bcrypt');
+
 const Groups = {
   SUPER_USER: 1,
   ADMIN: 2,
@@ -10,6 +13,7 @@ const Groups = {
   VOTER: 64,
   VIEWER: 128,
   GUEST: 256,
+  SYSTEM: 512,
 };
 const numUsers = 50;
 const numMods = numUsers / 10 > 0 ? numUsers / 10 : 1;
@@ -31,13 +35,14 @@ function randomNumber(max) {
 function random(array) {
   return array[Math.floor(array.length * Math.random())];
 }
-const dedup = (arr) => {
+const dedup = arr => {
   const hashTable = {};
 
-  return arr.filter((el) => {
+  return arr.filter(el => {
     const key = JSON.stringify(el);
     const match = Boolean(hashTable[key]);
 
+    // eslint-disable-next-line no-return-assign
     return match ? false : (hashTable[key] = true);
   });
 };
@@ -58,19 +63,26 @@ function shuffle(array) {
 }
 /* eslint-enable no-param-reassign */
 
-exports.seed = function (knex, Promise) {
+exports.seed = function(knex, Promise) {
   /* eslint-disable comma-dangle */
 
-
-
-  function createUser(name, surname, passwordHash, email, groups, time, emailVerified, voteSince) {
+  function createUser(
+    name,
+    surname,
+    passwordHash,
+    email,
+    groups,
+    time,
+    emailVerified,
+    voteSince,
+  ) {
     return knex('users').insert({
       name,
       surname,
       password_hash: passwordHash,
       email,
       groups,
-      can_vote_since : voteSince||new Date(),
+      can_vote_since: voteSince || new Date(),
       created_at: time,
       updated_at: time,
       email_verified: emailVerified,
@@ -85,24 +97,79 @@ exports.seed = function (knex, Promise) {
     const testSuperUser = Promise.resolve(
       bcrypt
         .hash('password', 10)
-        .then(hash => createUser('superuser', 'superuser', hash, 'superuser@example.com', Groups.SUPER_USER, time, true))
+        .then(hash =>
+          createUser(
+            'superuser',
+            'superuser',
+            hash,
+            'superuser@example.com',
+            Groups.SUPER_USER,
+            time,
+            true,
+          ),
+        ),
     );
+    users.push(testSuperUser);
+
     const testAdmin = Promise.resolve(
       bcrypt
         .hash('password', 10)
-        .then(hash => createUser('admin', 'admin', hash, 'admin@example.com', Groups.GUEST|Groups.VIEWER|Groups.VOTER| Groups.RELATOR|Groups.MEMBER_MANAGER| Groups.ADMIN, time, true))
+        .then(hash =>
+          createUser(
+            'admin',
+            'admin',
+            hash,
+            'admin@example.com',
+            Groups.GUEST |
+              Groups.VIEWER |
+              Groups.VOTER |
+              Groups.RELATOR |
+              Groups.MEMBER_MANAGER |
+              Groups.ADMIN,
+            time,
+            true,
+          ),
+        ),
     );
     users.push(testAdmin);
+
+    const bot = Promise.resolve(
+      bcrypt
+        .hash('password', 10)
+        .then(hash =>
+          createUser(
+            'VIP',
+            'Bot',
+            hash,
+            'vip-bot@example.com',
+            Groups.SYSTEM,
+            new Date(),
+            false,
+          ),
+        ),
+    );
+    users.push(bot);
     const testMods = [];
     for (let i = 0; i < numMods; i += 1) {
       const name = 'mod_' + i;
-      const groups = Groups.GUEST|Groups.VIEWER|Groups.VOTER|Groups.MODERATOR
+      const groups =
+        Groups.GUEST | Groups.VIEWER | Groups.VOTER | Groups.MODERATOR;
       testMods.push(
         Promise.resolve(
           bcrypt
             .hash('password', 10)
-            .then(hash => createUser(name, name, hash, name + '@example.com', groups, time, true))
-        )
+            .then(hash =>
+              createUser(
+                name,
+                name,
+                hash,
+                name + '@example.com',
+                groups,
+                time,
+                true,
+              ),
+            ),
+        ),
       );
     }
     users = users.concat(testMods);
@@ -113,16 +180,35 @@ exports.seed = function (knex, Promise) {
         Promise.resolve(
           bcrypt
             .hash('password', 10)
-            .then(hash => createUser(name, name, hash, name + '@example.com', Groups.GUEST|Groups.VIEWER|Groups.VOTER, time, true))
-        )
+            .then(hash =>
+              createUser(
+                name,
+                name,
+                hash,
+                name + '@example.com',
+                Groups.GUEST | Groups.VIEWER | Groups.VOTER,
+                time,
+                true,
+              ),
+            ),
+        ),
       );
     }
     users = users.concat(testUsers);
-    const numUsersCalculated = numUsers - numMods - 1 - numTestUsers - numTestGuests - numGuests;
+    const numUsersCalculated =
+      numUsers - numMods - 1 - numTestUsers - numTestGuests - numGuests;
     for (let i = 0; i < numUsersCalculated; i += 1) {
       const name = faker.name.firstName();
       const surname = faker.name.lastName();
-      const user = createUser(name, surname, null, faker.internet.email(), Groups.GUEST|Groups.VIEWER|Groups.VOTER, time, true);
+      const user = createUser(
+        name,
+        surname,
+        null,
+        faker.internet.email(),
+        Groups.GUEST | Groups.VIEWER | Groups.VOTER,
+        time,
+        true,
+      );
       users.push(user);
     }
 
@@ -134,8 +220,18 @@ exports.seed = function (knex, Promise) {
         Promise.resolve(
           bcrypt
             .hash('password', 10)
-            .then(hash => createUser(name, name, hash, name + '@example.com', Groups.GUEST, time, true))
-        )
+            .then(hash =>
+              createUser(
+                name,
+                name,
+                hash,
+                name + '@example.com',
+                Groups.GUEST,
+                time,
+                true,
+              ),
+            ),
+        ),
       );
     }
     /* eslint-enable prefer-template */
@@ -151,7 +247,7 @@ exports.seed = function (knex, Promise) {
         faker.internet.email(),
         Groups.GUEST,
         time,
-        Math.random() > 0.5
+        Math.random() > 0.5,
       );
       guestUsers.push(guest);
     }
@@ -160,37 +256,45 @@ exports.seed = function (knex, Promise) {
     return Promise.resolve(
       Promise.all(guestUsers).then(() =>
         Promise.all(users).then(() =>
-          knex('users').whereNot('groups', Groups.GUEST).pluck('id').then(userIds => userIds)))
+          knex('users')
+            .whereNot('groups', Groups.GUEST)
+            .pluck('id')
+            .then(userIds => userIds),
+        ),
+      ),
     );
   }
 
   function createFollowees() {
-    return knex('users').pluck('id').then((userIds) => {
-      const users = userIds.slice(0);
-      shuffle(users);
-      const time = new Date();
-      const followeeData = [];
-      for (let i = 0; i < numUsersWithFollowees; i += 1) {
-        const followerId = users.pop();
-        const numFollowees = Math.max(1, randomNumber(maxNumFollowees));
-        const followees = userIds.slice(0);
-        shuffle(followees);
+    return knex('users')
+      .pluck('id')
+      .then(userIds => {
+        const users = userIds.slice(0);
+        shuffle(users);
+        const time = new Date();
+        const followeeData = [];
+        for (let i = 0; i < numUsersWithFollowees; i += 1) {
+          const followerId = users.pop();
+          const numFollowees = Math.max(1, randomNumber(maxNumFollowees));
+          const followees = userIds.slice(0);
+          shuffle(followees);
 
-        for (let j = 0; j < numFollowees; j += 1) {
-          let followeeId = followees.pop();
-          followeeId = followeeId === followerId ? followees.pop() : followeeId;
+          for (let j = 0; j < numFollowees; j += 1) {
+            let followeeId = followees.pop();
+            followeeId =
+              followeeId === followerId ? followees.pop() : followeeId;
 
-          const data = {
-            follower_id: followerId,
-            followee_id: followeeId,
-            created_at: time,
-            updated_at: time,
-          };
-          followeeData.push(data);
+            const data = {
+              follower_id: followerId,
+              followee_id: followeeId,
+              created_at: time,
+              updated_at: time,
+            };
+            followeeData.push(data);
+          }
         }
-      }
-      return Promise.resolve(knex('user_follows').insert(followeeData));
-    });
+        return Promise.resolve(knex('user_follows').insert(followeeData));
+      });
   }
 
   function createTags() {
@@ -199,51 +303,69 @@ exports.seed = function (knex, Promise) {
       tags.push({ text: faker.lorem.word() });
     }
     tags = dedup(tags);
-    return Promise.resolve(knex('tags').insert(tags).returning('id').then(ids => ids));
+    return Promise.resolve(
+      knex('tags')
+        .insert(tags)
+        .returning('id')
+        .then(ids => ids),
+    );
   }
 
   function createProposalTags(tagIds) {
     return Promise.resolve(
-      knex('proposals').pluck('id').then((proposalIds) => {
-        const time = new Date();
-        const tagsData = [];
+      knex('proposals')
+        .pluck('id')
+        .then(proposalIds => {
+          const time = new Date();
+          const tagsData = [];
 
-        const tagCounter = {};
-        for (let i = 0; i < proposalIds.length; i += 1) {
-          const numTagsOnProposal = randomNumber(tagIds.length);
-          const tags = tagIds.slice(0);
-          shuffle(tags);
-          for (let j = 0; j < numTagsOnProposal; j += 1) {
-            const tagId = tags.pop();
-            const data = {
-              proposal_id: proposalIds[i],
-              tag_id: tagId,
-              created_at: time,
-              updated_at: time,
-            };
-            tagCounter[tagId] = tagCounter[tagId] ? tagCounter[tagId] + 1 : 1;
-            tagsData.push(data);
-          }
-        }
-
-        return knex('proposal_tags').insert(tagsData).then(() => {
-          const updates = [];
-          // eslint-disable-next-line no-restricted-syntax
-          for (const id in tagCounter) {  // eslint-disable-line guard-for-in
-            updates.push(knex('tags').where({ id }).update({ count: tagCounter[id] }));
+          const tagCounter = {};
+          for (let i = 0; i < proposalIds.length; i += 1) {
+            const numTagsOnProposal = randomNumber(tagIds.length);
+            const tags = tagIds.slice(0);
+            shuffle(tags);
+            for (let j = 0; j < numTagsOnProposal; j += 1) {
+              const tagId = tags.pop();
+              const data = {
+                proposal_id: proposalIds[i],
+                tag_id: tagId,
+                created_at: time,
+                updated_at: time,
+              };
+              tagCounter[tagId] = tagCounter[tagId] ? tagCounter[tagId] + 1 : 1;
+              tagsData.push(data);
+            }
           }
 
-          return Promise.resolve(Promise.all(updates));
-        });
-      })
+          return knex('proposal_tags')
+            .insert(tagsData)
+            .then(() => {
+              const updates = [];
+              // eslint-disable-next-line no-restricted-syntax
+              for (const id in tagCounter) {
+                updates.push(
+                  knex('tags')
+                    .where({ id })
+                    .update({ count: tagCounter[id] }),
+                );
+              }
+
+              return Promise.resolve(Promise.all(updates));
+            });
+        }),
     );
   }
 
   function updatePolls(pollCounts) {
     const updates = [];
     // eslint-disable-next-line no-restricted-syntax
-    for (const id in pollCounts) { // eslint-disable-line guard-for-in
-      updates.push(knex('polls').where({ id }).update(pollCounts[id]));
+    for (const id in pollCounts) {
+      // eslint-disable-line guard-for-in
+      updates.push(
+        knex('polls')
+          .where({ id })
+          .update(pollCounts[id]),
+      );
     }
 
     return Promise.resolve(Promise.all(updates).then(x => x));
@@ -259,7 +381,11 @@ exports.seed = function (knex, Promise) {
     for (let i = 0; i < stmtIds.length; i += 1) {
       numLikes = randomNumber(userIds.length / 2);
 
-      updates.push(knex('statements').where({ id: stmtIds[i] }).update({ likes: numLikes }));
+      updates.push(
+        knex('statements')
+          .where({ id: stmtIds[i] })
+          .update({ likes: numLikes }),
+      );
       const users = userIds.slice(0);
       shuffle(users);
       for (let j = 0; j < numLikes; j += 1) {
@@ -276,14 +402,16 @@ exports.seed = function (knex, Promise) {
     return Promise.resolve(
       knex
         .batchInsert('statement_likes', likes, chunkSize)
-        .then(() => Promise.all(updates).then(data => data))
+        .then(() => Promise.all(updates).then(data => data)),
     );
   }
 
   function createStatements({ voteIds, voteData, userIds }) {
     if (voteIds.length !== voteData.length) throw Error('Inconsistent data');
     const statements = [];
-    const numStatements = Math.floor((voteIds.length * statementPercentage) / 100);
+    const numStatements = Math.floor(
+      (voteIds.length * statementPercentage) / 100,
+    );
     const time = new Date();
     for (let i = 0; i < numStatements; i += 1) {
       const statement = {
@@ -301,7 +429,7 @@ exports.seed = function (knex, Promise) {
       knex
         .batchInsert('statements', statements, chunkSize)
         .returning('id')
-        .then(stmtIds => ({ stmtIds, stmtData: statements, userIds }))
+        .then(stmtIds => ({ stmtIds, stmtData: statements, userIds })),
     );
   }
 
@@ -352,9 +480,10 @@ exports.seed = function (knex, Promise) {
         // TODO make with Object.assign
         pollTwoVoteCount[pollTwoId] = pollTwoVoteCount[pollTwoId]
           ? {
-            [column[index]]: pollTwoVoteCount[pollTwoId][column[index]] + 1,
-            [column[1 - index]]: pollTwoVoteCount[pollTwoId][column[1 - index]],
-          }
+              [column[index]]: pollTwoVoteCount[pollTwoId][column[index]] + 1,
+              [column[1 - index]]:
+                pollTwoVoteCount[pollTwoId][column[1 - index]],
+            }
           : { [column[index]]: 1, [column[1 - index]]: 0 };
 
         const vote = {
@@ -372,13 +501,20 @@ exports.seed = function (knex, Promise) {
     return Promise.resolve(
       Promise.all([
         knex.batchInsert('votes', userVotes, chunkSize).returning('id'),
-        knex.batchInsert('votes', votesWithStatement, chunkSize).returning('id'),
+        knex
+          .batchInsert('votes', votesWithStatement, chunkSize)
+          .returning('id'),
       ])
         .then(voteIds =>
           updatePolls(pollOneVoteCount)
             .then(() => updatePolls(pollTwoVoteCount))
-            .then(() => Promise.resolve(voteIds)))
-        .then(voteIds => ({ voteIds: voteIds[1], voteData: votesWithStatement, userIds }))
+            .then(() => Promise.resolve(voteIds)),
+        )
+        .then(voteIds => ({
+          voteIds: voteIds[1],
+          voteData: votesWithStatement,
+          userIds,
+        })),
     );
   }
 
@@ -407,40 +543,65 @@ exports.seed = function (knex, Promise) {
         updated_at: time,
       };
       if (i % 5 === 0) {
-        proposedProposal.push(Object.assign({}, proposal, { state: 'proposed' }));
+        proposedProposal.push({ ...proposal, state: 'proposed' });
       } else if (i % 3 === 0) {
-        votableProposals.push(Object.assign({}, proposal, { state: 'voting' }));
+        votableProposals.push({ ...proposal, state: 'voting' });
       } else if (i % 7 === 0) {
-        rejectedProposals.push(Object.assign({}, proposal, { state: 'rejected' }));
+        rejectedProposals.push({ ...proposal, state: 'rejected' });
       } else if (i % 9 === 0) {
-        revokedProposals.push(Object.assign({}, proposal, { state: 'revoked' }));
+        revokedProposals.push({ ...proposal, state: 'revoked' });
       } else {
-        acceptedProposals.push(Object.assign({}, proposal, { state: 'accepted' }));
+        acceptedProposals.push({ ...proposal, state: 'accepted' });
       }
     }
 
     return Promise.resolve(
       Promise.all([
-        knex.batchInsert('proposals', proposedProposal, chunkSize).returning('id'),
-        knex.batchInsert('proposals', votableProposals, chunkSize).returning('id'),
-        knex.batchInsert('proposals', acceptedProposals, chunkSize).returning('id'),
-        knex.batchInsert('proposals', rejectedProposals, chunkSize).returning('id'),
-        knex.batchInsert('proposals', revokedProposals, chunkSize).returning('id'),
-      ]).then(data => ({ userIds, proposalIds: data, pollData }))
+        knex
+          .batchInsert('proposals', proposedProposal, chunkSize)
+          .returning('id'),
+        knex
+          .batchInsert('proposals', votableProposals, chunkSize)
+          .returning('id'),
+        knex
+          .batchInsert('proposals', acceptedProposals, chunkSize)
+          .returning('id'),
+        knex
+          .batchInsert('proposals', rejectedProposals, chunkSize)
+          .returning('id'),
+        knex
+          .batchInsert('proposals', revokedProposals, chunkSize)
+          .returning('id'),
+      ]).then(data => ({ userIds, proposalIds: data, pollData })),
     );
   }
 
   function createPollingmodes() {
     const data = [
-      {  name: 'propose', unipolar: true, with_statements: false, threshold_ref: 'all' },
-      {  name: 'vote', unipolar: false, with_statements: true, threshold_ref: 'voters' },
-      {  name: 'survey', unipolar: false, with_statements: false, threshold_ref: 'voters' },
+      {
+        name: 'propose',
+        unipolar: true,
+        with_statements: false,
+        threshold_ref: 'all',
+      },
+      {
+        name: 'vote',
+        unipolar: false,
+        with_statements: true,
+        threshold_ref: 'voters',
+      },
+      {
+        name: 'survey',
+        unipolar: false,
+        with_statements: false,
+        threshold_ref: 'voters',
+      },
     ];
     return Promise.resolve(
       knex('polling_modes')
         .insert(data)
         .returning('id')
-        .then(ids => ({ proposeId: ids[0], voteId: ids[1] }))
+        .then(ids => ({ proposeId: ids[0], voteId: ids[1] })),
     );
   }
 
@@ -464,13 +625,14 @@ exports.seed = function (knex, Promise) {
         num_voter: numUsers - numGuests - numTestGuests,
       };
       if (i % 2 === 0) {
-        poll = Object.assign({}, poll, { polling_mode_id: proposeId });
+        poll = { ...poll, polling_mode_id: proposeId };
         phaseOnePolls.push(poll);
       } else {
-        poll = Object.assign({}, poll, {
+        poll = {
+          ...poll,
           polling_mode_id: voteId,
           threshold: poll.threshold < 50 ? 50 : poll.threshold,
-        });
+        };
         phaseTwoPolls.push(poll);
       }
     }
@@ -479,21 +641,23 @@ exports.seed = function (knex, Promise) {
       Promise.all([
         knex.batchInsert('polls', phaseOnePolls, chunkSize).returning('id'),
         knex.batchInsert('polls', phaseTwoPolls, chunkSize).returning('id'),
-      ]).then(ids => ids)
+      ]).then(ids => ids),
     );
   }
 
   return Promise.resolve(
-    //createRoles()
+    // createRoles()
     createPollingmodes()
       .then(createPolls)
-      .then(pollData => createUsers().then(userIds => createProposals(userIds, pollData)))
+      .then(pollData =>
+        createUsers().then(userIds => createProposals(userIds, pollData)),
+      )
       .then(createVotes)
       .then(createStatements)
       .then(createStatementLikes)
       .then(createFollowees)
       .then(createTags)
       .then(createProposalTags)
-      .catch(e => console.log(e))
+      .catch(e => console.info(e)),
   );
 };
