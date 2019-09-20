@@ -53,6 +53,11 @@
   }
 }
 
+.fill {
+  width: 90%;
+  height: 100%;
+}
+
 .hidden {
   position: fixed;
   width: 100%; /* bg shrinks without it, maybe change on layout */

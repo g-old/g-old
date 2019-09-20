@@ -1,7 +1,0 @@
-.container {
-  bottom: 50%;
-  right: 50%;
-  max-height: calc(100vh - 48px);
-  max-width: calc(100vw - 48px);
-  transform: translate(50%, 50%);
-}

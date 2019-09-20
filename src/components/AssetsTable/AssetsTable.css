@@ -1,6 +1,7 @@
 .table {
   width: 100%;
-  min-height: 750px;
+
+  /* min-height: 750px; */
   max-width: 100vw !important;
   box-sizing: border-box;
 
