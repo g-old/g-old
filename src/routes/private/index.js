@@ -32,6 +32,7 @@ import AccordionPanel from '../../components/AccordionPanel';
 import CheckBox from '../../components/CheckBox/CheckBox';
 import SearchField from '../../components/SearchField';
 import Card from '../../components/Card';
+import Uploader from '../../components/Uploader';
 
 const title = 'Private';
 
@@ -236,6 +237,11 @@ async function action({ store }) {
               <Card>Some nice text on a Card</Card>
               <Card>Some nice text on a Card</Card>
               <Card>Some nice text on a Card</Card>
+            </Box>
+            <Heading tag="h2">File Uploader</Heading>
+
+            <Box fill>
+              <Uploader />
             </Box>
             <Box fill>
               <div style={{ flex: 1, display: 'flex', backgroundColor: 'red' }}>
