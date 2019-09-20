@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Button from '../../components/Button/Button';
-import Layer from '../../components/Layer/Layer';
-import Box from '../../components/Box/Box';
+import Layer from '../../components/Layer';
+import Box from '../../components/Box';
 
 class LayerExample extends React.Component {
   constructor() {
