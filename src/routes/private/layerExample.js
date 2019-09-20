@@ -7,12 +7,12 @@ import Box from '../../components/Box/Box';
 class LayerExample extends React.Component {
   constructor() {
     super();
-    this.state = { openA: false, openB: false };
+    this.state = { openA: false, openB: false, openFill: false };
   }
 
   render() {
     const { children } = this.props;
-    const { openA, openB } = this.state;
+    const { openA, openB, openFill } = this.state;
     return (
       <Box>
         <Button onClick={() => this.setState({ openA: true })}>
@@ -32,6 +32,14 @@ class LayerExample extends React.Component {
               {children}
               {children}
             </Box>
+          </Layer>
+        )}
+        <Button onClick={() => this.setState({ openFill: true })}>
+          openFill Layer
+        </Button>
+        {openFill && (
+          <Layer fill onClose={() => this.setState({ openFill: false })}>
+            {children}
           </Layer>
         )}
       </Box>
