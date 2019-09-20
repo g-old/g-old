@@ -45,6 +45,11 @@ export type PollSettingsShape = {
   thresholdRef?: 'all' | 'voters',
   unipolar?: boolean,
 };
+type UpdateShape = {
+  success?: ID,
+  errorMessage?: string,
+  pending: boolean,
+};
 
 type State = {
   ...PollSettingsShape,
@@ -67,13 +72,12 @@ type Props = {
   findUser: () => Promise<boolean>,
   workTeamId?: ID,
   defaultPollSettings: { [PollTypeTypes]: PollSettingsShape },
+  availablePolls: { [PollTypeTypes]: PollSettingsShape },
+  locale: 'de' | 'it' | 'lld',
+  updates: UpdateShape,
 };
 
 class ProposalInput extends React.Component<Props, State> {
-  static defaultProps = {
-    workTeamId: null,
-  };
-
   constructor(props) {
     super(props);
     this.state = {
@@ -194,15 +198,15 @@ class ProposalInput extends React.Component<Props, State> {
           pos: i,
           order: i,
         })),
-        extended,
-        multipleChoice: extended,
+        extended: !!extended,
+        multipleChoice: !!extended,
         startTime,
         endTime,
         secret: !!secret,
         threshold,
         mode: {
-          withStatements,
-          unipolar,
+          withStatements: !!withStatements,
+          unipolar: !!unipolar,
           thresholdRef: thresholdRef.value,
         },
       },
@@ -235,8 +239,10 @@ class ProposalInput extends React.Component<Props, State> {
     const {
       updates: { success },
     } = this.props;
-    localStorage.removeItem(this.storageKey);
-    history.push(`/proposal/${success}`);
+    if (success) {
+      localStorage.removeItem(this.storageKey);
+      history.push(`/proposal/${success}`);
+    }
   }
 
   render() {
