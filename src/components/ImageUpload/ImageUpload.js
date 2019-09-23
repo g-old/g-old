@@ -14,7 +14,7 @@ const standardValues = {
   scale: 1,
   borderRadius: 0,
   preview: null,
-  rotate: 0,
+  rotation: 0,
   loaded: false,
 };
 
@@ -66,7 +66,6 @@ class ImageUpload extends React.Component {
     this.handleSave = this.handleSave.bind(this);
     this.onChange = this.onChange.bind(this);
     this.handleScaling = this.handleScaling.bind(this);
-    this.handleRightRotation = this.handleRightRotation.bind(this);
     this.handleLeftRotation = this.handleLeftRotation.bind(this);
   }
 

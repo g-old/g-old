@@ -114,7 +114,7 @@ class ProposalContainer extends React.Component {
             s =>
               s && (
                 <ProposalPreview
-                  proposal={s}
+                  proposal={{ ...s, image: s.image && `/s460/${s.image}` }}
                   onClick={this.handleProposalClick}
                 />
               ),
@@ -140,4 +140,7 @@ const mapDispatch = {
   loadProposalsList,
 };
 
-export default connect(mapStateToProps, mapDispatch)(ProposalContainer);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(ProposalContainer);
