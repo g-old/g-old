@@ -11,6 +11,8 @@ import s from './Proposal.css';
 import UserThumbnail from '../UserThumbnail';
 import WorkteamHeader from '../WorkteamHeader';
 import { ICONS } from '../../constants';
+import Image from '../Image';
+import Box from '../Box';
 
 const messages = defineMessages({
   spokesman: {
@@ -21,31 +23,6 @@ const messages = defineMessages({
 });
 
 class Proposal extends React.Component {
-  static propTypes = {
-    title: PropTypes.string.isRequired,
-    state: PropTypes.string.isRequired,
-    body: PropTypes.string.isRequired,
-    publishedAt: PropTypes.string.isRequired,
-    deletedAt: PropTypes.string,
-    spokesman: PropTypes.shape({
-      thumbnail: PropTypes.string,
-      name: PropTypes.string,
-      surname: PropTypes.string,
-      id: PropTypes.string,
-    }),
-    workteam: PropTypes.shape({
-      id: PropTypes.number,
-      displayName: PropTypes.string,
-      logo: PropTypes.string,
-    }),
-  };
-
-  static defaultProps = {
-    spokesman: null,
-    deletedAt: null,
-    workteam: null,
-  };
-
   render() {
     const {
       deletedAt,
@@ -54,10 +31,11 @@ class Proposal extends React.Component {
       body,
       spokesman,
       workteam,
+      image,
     } = this.props;
     return (
       <div className={cn(s.root, deletedAt && s.deleted)}>
-        <div className={s.container}>
+        <Box column pad className={s.container}>
           {workteam && (
             <WorkteamHeader
               displayName={workteam.displayName}
@@ -66,11 +44,14 @@ class Proposal extends React.Component {
             />
           )}
           <div className={s.headline}>{title}</div>
+          {image && <Image fit src={image} style={{ borderRadius: '6px' }} />}
+
           <div className={s.details}>
             {spokesman && (
               <div>
                 <UserThumbnail
                   marked
+                  // eslint-disable-next-line react/jsx-props-no-spreading
                   label={<FormattedMessage {...messages.spokesman} />}
                   user={spokesman}
                 />
@@ -95,10 +76,37 @@ class Proposal extends React.Component {
             </div>
           </div>
           <div className={s.body} dangerouslySetInnerHTML={{ __html: body }} />
-        </div>
+        </Box>
       </div>
     );
   }
 }
+
+Proposal.propTypes = {
+  title: PropTypes.string.isRequired,
+  state: PropTypes.string.isRequired,
+  body: PropTypes.string.isRequired,
+  publishedAt: PropTypes.string.isRequired,
+  deletedAt: PropTypes.string,
+  image: PropTypes.string,
+  spokesman: PropTypes.shape({
+    thumbnail: PropTypes.string,
+    name: PropTypes.string,
+    surname: PropTypes.string,
+    id: PropTypes.string,
+  }),
+  workteam: PropTypes.shape({
+    id: PropTypes.number,
+    displayName: PropTypes.string,
+    logo: PropTypes.string,
+  }),
+};
+
+Proposal.defaultProps = {
+  spokesman: null,
+  deletedAt: null,
+  workteam: null,
+  image: null,
+};
 
 export default withStyles(s)(Proposal);

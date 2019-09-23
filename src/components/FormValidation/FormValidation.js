@@ -33,6 +33,11 @@ const messages = defineMessages({
     defaultMessage: 'Enter atleast {value} chars or numbers',
     description: 'Min',
   },
+  max: {
+    id: 'form.error-max',
+    defaultMessage: 'Enter less than {value} chars or numbers',
+    description: 'Max',
+  },
   invalidEmail: {
     id: 'form.error-invalidEmail',
     defaultMessage: 'Your email address seems to be invalid',

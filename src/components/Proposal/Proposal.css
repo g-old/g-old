@@ -17,9 +17,9 @@
 .headline {
   font-size: 1.5rem;
   font-weight: 600;
-  padding-top: 0;
+  padding-top: 1em;
   word-break: break-word;
-  color: #540b97;
+  color: var(--color-four);
   text-align: center;
 }
 
@@ -42,7 +42,6 @@
 
 .container {
   margin: 0 auto;
-  padding: 1em;
   max-width: 36em;
 }
 
@@ -53,7 +52,6 @@
 
 .body {
   padding-top: 1em;
-  text-align: justify;
 
   /* TODO implement with html-sanitizer */
   table {
