@@ -1,6 +1,7 @@
 /* @flow */
 
 import PollingMode from './PollingMode';
+import Poll from './Poll';
 
 export const computeNextState = (
   state: ProposalStateType,
