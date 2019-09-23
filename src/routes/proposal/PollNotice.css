@@ -1,13 +1,21 @@
 @import '../../components/variables.css';
 
 .root {
-  border-bottom: 3px solid #ff9a0d;
+  display: flex;
+  border-bottom: 3px solid var(--color-one);
   border-radius: 3px;
   text-align: center;
   padding: 1em 0;
+  justify-content: center;
 
-  > span {
-    color: var(--color-accent-3);
-    text-transform: uppercase;
+  div {
+    background-color: var(--color-five);
+    padding: 1em;
+    border-radius: 6px;
+
+    > span {
+      color: #fff;
+      text-transform: uppercase;
+    }
   }
 }

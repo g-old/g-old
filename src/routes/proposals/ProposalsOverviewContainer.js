@@ -10,6 +10,9 @@ import ListView from '../../components/ListView';
 import ProposalPreview from '../../components/ProposalPreview';
 import { sortActiveProposals, sortClosedProposals } from '../utils';
 import ProposalInputLayer from '../../components/ProposalInputLayer';
+import Box from '../../components/Box';
+import Heading from '../../components/Heading';
+import Label from '../../components/Label';
 
 const onFilterChange = e => {
   if (e) {
@@ -60,7 +63,15 @@ class ProposalsOverviewContainer extends React.Component {
     const { filter, proposals, pageInfo } = this.props;
 
     return (
-      <div>
+      <Box column>
+        <Box pad column>
+          <Heading tag="h2"> Vorschläge </Heading>
+          <Label>
+            Citizens' proposals are an opportunity for neighbours and
+            collectives to decide directly how they want their city to be, after
+            getting sufficient support and submitting to a citizens' vote.
+          </Label>
+        </Box>
         <ProposalInputLayer />
         <StateFilter
           states={['active', 'accepted', 'repelled']}
@@ -75,11 +86,14 @@ class ProposalsOverviewContainer extends React.Component {
           {proposals.map(
             s =>
               s && (
-                <ProposalPreview proposal={s} onClick={this.onProposalClick} />
+                <ProposalPreview
+                  proposal={{ ...s, image: s.image && `/s460/${s.image}` }}
+                  onClick={this.onProposalClick}
+                />
               ),
           )}
         </ListView>
-      </div>
+      </Box>
     );
   }
 }

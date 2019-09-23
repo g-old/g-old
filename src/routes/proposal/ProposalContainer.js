@@ -358,7 +358,12 @@ class ProposalContainer extends React.Component {
         <div>
           <Box column padding="medium">
             {!poll.closedAt && <PollNotice poll={poll} />}
-            <Proposal {...proposal} />
+            <Proposal
+              {...{
+                ...proposal,
+                image: proposal.image && `/s720/${proposal.image}`,
+              }}
+            />
             {this.renderInteractions()}
           </Box>
         </div>

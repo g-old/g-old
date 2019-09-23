@@ -16,8 +16,10 @@ const messages = defineMessages({
 });
 const PollNotice = ({ poll }) => (
   <div className={s.root}>
-    <FormattedMessage {...messages.notice} />{' '}
-    <FormattedRelative value={poll.endTime} />
+    <div>
+      <FormattedMessage {...messages.notice} />{' '}
+      <FormattedRelative value={poll.endTime} />
+    </div>
   </div>
 );
 

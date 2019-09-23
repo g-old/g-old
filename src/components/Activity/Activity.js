@@ -300,7 +300,14 @@ class Activity extends React.Component {
         result.content = content.deletedAt ? (
           <Notification type="alert" message="Proposal not accessible" />
         ) : (
-          <ProposalPreview proposal={content} onClick={this.onProposalClick} />
+          <ProposalPreview
+            proposal={{
+              ...content,
+              summary: '', // stupid hack not to show the summary on the feed
+              image: content.image && `/s460/${content.image}`,
+            }}
+            onClick={this.onProposalClick}
+          />
         );
         let header = getProposalHeader(verb, content);
         if (content.workTeamId) {

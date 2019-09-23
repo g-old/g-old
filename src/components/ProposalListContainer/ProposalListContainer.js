@@ -27,7 +27,13 @@ class ProposalListContainer extends React.Component {
     return (
       <ListView onRetry={onRetry} onLoadMore={onLoadMore} pageInfo={pageInfo}>
         {items.map(
-          d => d && <ProposalPreview proposal={d} onClick={onItemClick} />,
+          d =>
+            d && (
+              <ProposalPreview
+                proposal={{ ...d, image: d.image && `/s460/${d.image}` }}
+                onClick={onItemClick}
+              />
+            ),
         )}
       </ListView>
     );
