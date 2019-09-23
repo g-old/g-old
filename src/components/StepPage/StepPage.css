@@ -2,4 +2,6 @@
 
 .root {
   height: 100%;
+  padding: 3em 0;
+  overflow-y: auto;
 }

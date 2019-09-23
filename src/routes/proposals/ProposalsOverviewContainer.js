@@ -67,9 +67,9 @@ class ProposalsOverviewContainer extends React.Component {
         <Box pad column>
           <Heading tag="h2"> Vorschläge </Heading>
           <Label>
-            Citizens' proposals are an opportunity for neighbours and
+            {` Citizens' proposals are an opportunity for neighbours and
             collectives to decide directly how they want their city to be, after
-            getting sufficient support and submitting to a citizens' vote.
+            getting sufficient support and submitting to a citizens' vote.`}
           </Label>
         </Box>
         <ProposalInputLayer />

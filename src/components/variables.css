@@ -18,9 +18,14 @@
    * Colors
    * ======================================================================== */
 
-  --color-brand: #e0b000;
-  --color-accent-1: #25149b;
-  --color-accent: #930793;
+  --color-brand: #4d702f;
+  --color-one: #a9bf02;
+  --color-two: #b31a3a;
+  --color-three: #f4d203;
+  --color-four: #414c7d;
+  --color-five: #af2abd;
+  --color-accent-1: #a4c7e3;
+  --color-accent: #d86c01;
   --color-green: #8cc800;
   --color-red: #ff324d;
   --color-alert: #ffd602;

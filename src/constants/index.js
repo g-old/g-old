@@ -1,6 +1,9 @@
 /* eslint-disable import/prefer-default-export */
 
 /* GENERATOR */
+export const UPLOAD_FILE_START = 'UPLOAD_FILE_START';
+export const UPLOAD_FILE_SUCCESS = 'UPLOAD_FILE_SUCCESS';
+export const UPLOAD_FILE_ERROR = 'UPLOAD_FILE_ERROR';
 export const SCROLL_TO_RESOURCE = 'SCROLL_TO_RESOURCE';
 export const CREATE_MESSAGE_START = 'CREATE_MESSAGE_START';
 export const CREATE_MESSAGE_SUCCESS = 'CREATE_MESSAGE_SUCCESS';

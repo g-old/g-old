@@ -10,7 +10,7 @@ type Props = {
 };
 
 const StepPage = ({ children }: Props) => (
-  <Box className={s.root} pad column>
+  <Box className={s.root} column>
     {children}
   </Box>
 );

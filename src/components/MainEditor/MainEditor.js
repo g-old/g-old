@@ -497,9 +497,10 @@ class MainEditor extends React.Component {
 
   /* eslint-enable class-methods-use-this */
   renderEditor() {
+    const { placeholder } = this.props;
     return (
       <Editor
-        placeholder="Enter some text..."
+        placeholder={placeholder || 'Enter some Text'}
         value={this.state.value} // eslint-disable-line
         ref={this.ref}
         onChange={this.onChange}
