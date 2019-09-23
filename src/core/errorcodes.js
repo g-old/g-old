@@ -1,0 +1,6 @@
+export default {
+  DATABASE: 1,
+  ARGUMENT_MISSING: 2,
+  NOT_AUTHENTICATED: 3,
+  ARGUMENT_ERROR: 4,
+};
