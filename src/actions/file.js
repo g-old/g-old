@@ -7,6 +7,9 @@ import {
   UPLOAD_AVATAR_START,
   UPLOAD_AVATAR_SUCCESS,
   UPLOAD_AVATAR_ERROR,
+  UPLOAD_FILE_START,
+  UPLOAD_FILE_SUCCESS,
+  UPLOAD_FILE_ERROR,
 } from '../constants';
 
 // only clientside!
@@ -70,5 +73,129 @@ export function uploadAvatar(data) {
     }
 
     return true;
+  };
+}
+
+export function uploadFile(data) {
+  const initialId = data.id || '0000';
+  return async (dispatch, getState, { fetch }) => {
+    const formData = new FormData();
+    formData.append('image', data.dataUrl);
+    if (data.id) {
+      formData.append('id', data.id);
+    }
+    const { id, ...avatar } = data;
+    const properties = Object.keys(avatar).reduce((acc, curr) => {
+      // eslint-disable-next-line no-param-reassign
+      acc[curr] = {
+        pending: true,
+        success: false,
+        error: null,
+      };
+      return acc;
+    }, {});
+    dispatch({
+      type: UPLOAD_AVATAR_START,
+      id: initialId,
+      properties,
+    });
+
+    try {
+      const resp = await fetch('/upload', {
+        method: 'post',
+        body: formData, // JSON.stringify(avatar),
+        credentials: 'include',
+      });
+      if (resp.status !== 200) throw new Error(resp.statusText);
+      const user = await resp.json();
+      if (user.message) throw new Error(user.message);
+      if (!user.avatar && !user.thumbnail)
+        throw new Error('Avatar upload failed');
+      const normalizedData = normalize(user, userSchema);
+      dispatch({
+        type: UPLOAD_AVATAR_SUCCESS,
+        payload: normalizedData,
+        id: initialId,
+        properties,
+      });
+      /*  dispatch({
+        type: UPLOAD_AVATAR_SUCCESS,
+        payload: { user },
+      }); */
+    } catch (error) {
+      dispatch({
+        type: UPLOAD_AVATAR_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
+        id: initialId,
+        properties,
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+// gallery fn
+export function uploadFiles(data, params) {
+  const initialId = '0000';
+  return async (dispatch, getState, { fetch }) => {
+    const formData = new FormData();
+    let uploadData;
+    if (data.constructor !== Array) {
+      uploadData = [data];
+    } else {
+      uploadData = data;
+    }
+
+    uploadData.forEach(img => {
+      formData.append('images', img);
+    });
+
+    formData.append('params', JSON.stringify(params));
+
+    // eslint-disable-line
+    dispatch({
+      type: UPLOAD_FILE_START,
+      id: initialId,
+    });
+
+    try {
+      const resp = await fetch('/upload/files', {
+        method: 'post',
+        body: formData,
+        credentials: 'include',
+      });
+      if (resp.status !== 200) throw new Error(resp.statusText);
+      const responseData = await resp.json();
+      // const normalizedData = normalize(uploadedData.result, imageList);
+
+      dispatch({
+        type: UPLOAD_FILE_SUCCESS,
+        // payload: normalizedData,
+        id: initialId,
+      });
+      /*  dispatch({
+        type: UPLOAD_AVATAR_SUCCESS,
+        payload: { user },
+      }); */
+      // only one filename is necessary
+      return responseData.result && responseData.result.length
+        ? responseData.result[0]
+        : null;
+    } catch (error) {
+      dispatch({
+        type: UPLOAD_FILE_ERROR,
+        payload: {
+          error,
+        },
+        message: error.message || 'Something went wrong',
+        id: initialId,
+      });
+      return false;
+    }
   };
 }

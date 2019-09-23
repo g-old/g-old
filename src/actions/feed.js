@@ -71,6 +71,8 @@ id
       votes
       workTeamId
       deletedAt
+      image
+      summary
       pollOne {
         ${pollFieldsForList}
       }

@@ -1,4 +1,6 @@
 /* eslint-disable import/prefer-default-export */
+/* @flow */
+
 export const TargetType = {
   PROPOSAL: 'proposal',
   DISCUSSION: 'discussion',

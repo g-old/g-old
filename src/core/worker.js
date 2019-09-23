@@ -1,6 +1,7 @@
 import knex from '../data/knex';
 import log from '../logger';
-import Proposal, { computeNextState } from '../data/models/Proposal';
+import Proposal from '../data/models/Proposal';
+import { computeNextState } from '../data/models/helpers';
 import createLoaders from '../data/dataLoader';
 import { Permissions, Groups } from '../organization';
 

@@ -54,6 +54,8 @@ import EventManager from './core/EventManager';
 import root from './compositionRoot';
 import { EmailType } from './core/BackgroundService';
 import Request from './data/models/Request';
+import ImageManager from './core/ImageManager';
+
 /* eslint-enable import/first */
 
 process.on('unhandledRejection', (reason, p) => {
@@ -144,6 +146,8 @@ if (config.profiling) {
 }
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '/avatars')));
+app.use(express.static(path.join(__dirname, '/images')));
+
 app.use(cookieParser());
 app.use(
   requestLanguage({
@@ -407,6 +411,33 @@ app.post('/signup', (req, res) => {
 });
 const storage = multer.memoryStorage();
 const FileStore = FileStorage(AvatarManager({ local: !!__DEV__ }));
+const IManager = new ImageManager({ folder: 'images', imageSizes: [460, 720] });
+IManager.init();
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const ensureAuthenicated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.redirect('/login');
+  }
+};
+
+app.post(
+  '/upload/files',
+  ensureAuthenicated,
+  multer({ storage, limits: { fieldSize: MAX_FILE_SIZE } }).array('images', 10),
+  async (req, res) => {
+    if (!req.user) res.status(505);
+    const result = await IManager.storeImages({
+      viewer: req.user,
+      data: { images: req.files, params: JSON.parse(req.body.params) },
+      loaders: createLoaders(),
+    });
+    res.json(result);
+  },
+);
+
 app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
   if (!req.user) res.status(505);
   FileStore.save(
@@ -628,13 +659,13 @@ app.post('/verify', (req, res) => {
 
 const subscriptionManager = new SubscriptionManager({ schema, pubsub });
 SubscriptionServer({
-  onSubscribe: (msg, params) =>
-    Object.assign({}, params, {
-      context: {
-        loaders: createLoaders(),
-        pubsub,
-      },
-    }),
+  onSubscribe: (msg, params) => ({
+    ...params,
+    context: {
+      loaders: createLoaders(),
+      pubsub,
+    },
+  }),
   subscriptionManager,
   express: app,
   path: '/updates',

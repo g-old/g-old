@@ -90,6 +90,18 @@ const ProposalType = new ObjectType({
       type: GraphQLInt,
     },
 
+    image: {
+      type: GraphQLString,
+    },
+
+    isVerified: {
+      type: GraphQLBoolean,
+    },
+
+    summary: {
+      type: GraphQLString,
+    },
+
     publishedAt: {
       type: GraphQLDate,
       resolve: data => data.createdAt,

@@ -60,6 +60,12 @@ const ProposalInputType = new GraphQLInputObjectType({
     workTeamId: {
       type: ID,
     },
+    image: {
+      type: String,
+    },
+    summary: {
+      type: String,
+    },
   },
 });
 export default ProposalInputType;

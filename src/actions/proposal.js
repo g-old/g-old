@@ -109,6 +109,9 @@ spokesman{
 }
 pollOne ${pollFields}
 pollTwo ${pollFields}
+image
+isVerified
+summary
 `;
 
 const query = `
@@ -155,6 +158,9 @@ query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID $closed
         title
         publishedAt
         state
+        image
+        summary
+        isVerified
         body
         workTeamId,
         tags{
@@ -172,8 +178,8 @@ query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID $closed
 `;
 
 const createProposalMutation = `
-mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput] $spokesmanId:ID $workTeamId:ID){
-  createProposal (proposal:{title:$title workTeamId:$workTeamId text:$text state:$state poll:$poll tags:$tags spokesmanId:$spokesmanId}){
+mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput] $spokesmanId:ID $workTeamId:ID $summary:String $image:String){
+  createProposal (proposal:{title:$title workTeamId:$workTeamId text:$text state:$state poll:$poll tags:$tags spokesmanId:$spokesmanId summary:$summary image:$image}){
     ${proposal}
     tags{
       id
@@ -327,6 +333,31 @@ export function createProposal(proposalData) {
         createProposalMutation,
         proposalData,
       );
+      // send files
+      /*
+      const formData = new FormData();
+      let uploadData;
+      if (files.constructor !== Array) {
+        uploadData = [files];
+      } else {
+        uploadData = files;
+      }
+
+      uploadData.forEach(img => {
+        formData.append('images', img);
+      });
+
+      formData.append('params', JSON.stringify(params));
+
+      const resp = await fetch('/upload', {
+        method: 'post',
+        body: formData, // JSON.stringify(avatar),
+        credentials: 'include',
+      });
+
+      if (resp.status !== 200) throw new Error(resp.statusText);
+      const uploadedData = await resp.json(); */
+
       const normalizedData = normalize(data.createProposal, proposalSchema);
       // TODO change filter structure of reducer
       const filter = getFilter(data.createProposal);
