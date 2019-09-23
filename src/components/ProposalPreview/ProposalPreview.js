@@ -9,25 +9,12 @@ import history from '../../history';
 import ProposalState from '../ProposalState';
 import { ICONS } from '../../constants';
 import Meter from '../Meter';
+import Image from '../Image';
 
 import { getLastActivePoll } from '../../core/helpers';
 // import { DOMParser } from 'xmldom';
 
 class ProposalPreview extends React.Component {
-  static propTypes = {
-    proposal: PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      state: PropTypes.string.isRequired,
-      body: PropTypes.string.isRequired,
-      publishedAt: PropTypes.string,
-      pollOne: PropTypes.object,
-      pollTwo: PropTypes.object,
-      tags: PropTypes.arrayOf(PropTypes.object),
-    }).isRequired,
-    onClick: PropTypes.func.isRequired,
-  };
-
   constructor(props) {
     super(props);
     this.state = {};
@@ -136,7 +123,15 @@ class ProposalPreview extends React.Component {
     }
 
     return (
-      <div className={cn(s.root)}>
+      <div className={cn(s.root, proposal.image && s.center)}>
+        {proposal.image && (
+          <Image
+            size="medium"
+            src={proposal.image}
+            style={{ borderRadius: '6px' }}
+          />
+        )}
+
         <div className={s.container}>
           <div // eslint-disable-line
             style={{ display: 'flex', cursor: 'pointer' }}
@@ -155,6 +150,14 @@ class ProposalPreview extends React.Component {
                 <FormattedRelative value={poll.endTime} />
               </div>
               <div className={s.header}>{proposal.title}</div>
+              <div>{proposal.summary}</div>
+              {/* <div
+                style={{
+                  backgroundImage: `url(${proposal.image})`,
+                  width: 'auto',
+                  height: '4em',
+                }}
+              /> */}
               {/* <div className={s.body}>
                 {body}
               </div> */}
@@ -183,5 +186,21 @@ class ProposalPreview extends React.Component {
     /* eslint-enable jsx-a11y/no-static-element-interactions */
   }
 }
+
+ProposalPreview.propTypes = {
+  proposal: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    state: PropTypes.string.isRequired,
+    body: PropTypes.string.isRequired,
+    publishedAt: PropTypes.string,
+    pollOne: PropTypes.object,
+    pollTwo: PropTypes.object,
+    tags: PropTypes.arrayOf(PropTypes.object),
+    summary: PropTypes.string.isRequired,
+    image: PropTypes.string,
+  }).isRequired,
+  onClick: PropTypes.func.isRequired,
+};
 
 export default withStyles(s)(ProposalPreview);

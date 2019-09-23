@@ -4,6 +4,13 @@
 
 .root {
   max-width: var(--max-content-width);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.center {
+  justify-content: center;
 }
 
 a:link,
@@ -28,7 +35,10 @@ a:visited {
 
 .container {
   /*  border: solid 1px gray; */
-  padding: 0.4em;
+  padding: 1em;
+  max-width: 30em;
+  flex-basis: 1;
+  width: 100%;
 
   /* border-bottom: 1px solid rgba(0, 0, 0, 0.15); */
 
@@ -44,6 +54,7 @@ a:visited {
   padding-top: 0;
   color: black;
   word-break: break-word;
+  font-style: normal;
 }
 
 .header:hover {
@@ -75,8 +86,8 @@ a:visited {
 .tag {
   margin: 0 0.3em 0.3em;
   padding: 0 0.3em;
-  background-color: rgba(37, 20, 155, 0.21); /* #7f4d4e */
-  color: #666; /* #f9e793 */
+  background-color: #ae1837; /* #7f4d4e */
+  color: #fff; /* #f9e793 */
   height: 2em;
   line-height: 2em;
   cursor: pointer;
