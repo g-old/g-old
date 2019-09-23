@@ -6,10 +6,9 @@ import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './ImageUpload.css';
 import Box from '../Box';
 import Button from '../Button';
-import Label from '../Label';
 import Layer from '../Layer';
 import FormField from '../FormField';
-import { ICONS } from '../../constants';
+import ImageControls from './ImageControls';
 
 const standardValues = {
   scale: 1,
@@ -25,11 +24,7 @@ const messages = defineMessages({
     defaultMessage: 'Upload',
     description: 'Short command for uploading',
   },
-  rotate: {
-    id: 'commands.rotate',
-    defaultMessage: 'Rotate',
-    description: 'Short command for rotation',
-  },
+
   cancel: {
     id: 'commands.cancel',
     defaultMessage: 'Cancel',
@@ -70,7 +65,7 @@ class ImageUpload extends React.Component {
     this.setEditorRef = this.setEditorRef.bind(this); // es2016 bind syntax!
     this.handleSave = this.handleSave.bind(this);
     this.onChange = this.onChange.bind(this);
-    this.handleScale = this.handleScale.bind(this);
+    this.handleScaling = this.handleScaling.bind(this);
     this.handleRightRotation = this.handleRightRotation.bind(this);
     this.handleLeftRotation = this.handleLeftRotation.bind(this);
   }
@@ -111,26 +106,20 @@ class ImageUpload extends React.Component {
     this.props.uploadAvatar({ dataUrl: img });
   }
 
-  handleScale(e) {
-    const scale = parseFloat(e.target.value);
+  handleScaling(newValue) {
+    const scale = parseFloat(newValue);
     this.setState({ scale });
   }
 
-  handleRightRotation() {
-    const rotate = (this.state.rotate + 90) % 360;
-    this.setState({ rotate });
-  }
-
-  handleLeftRotation() {
-    const rotate = (this.state.rotate - 90) % 360;
-    this.setState({ rotate });
+  handleLeftRotation(newRotation) {
+    this.setState({ rotation: newRotation });
   }
 
   render() {
     let editor = null;
     const { uploadPending, uploadError, onClose, ratio = 1 } = this.props;
     const disableControls = !this.state.src;
-
+    const { scale, rotation } = this.state;
     editor = (
       <Box pad justify column>
         <AvatarEditor
@@ -143,81 +132,20 @@ class ImageUpload extends React.Component {
           border={50}
           color={[255, 255, 255, 0.6]} // RGBA
           scale={this.state.scale}
-          rotate={this.state.rotate || 0}
+          rotate={this.state.rotation || 0}
           onLoadFailure={() =>
             alert('Image could not been loaded -> load another one')
           }
           onLoadSuccess={() => this.setState({ loaded: true })}
         />
         <Box pad column justify>
-          <Box pad justify align>
-            <Label>Zoom:</Label>
-
-            <Button
-              plain
-              disable={disableControls}
-              onClick={() => {
-                this.setState({ scale: this.state.scale + 0.1 });
-              }}
-              icon={
-                <svg
-                  viewBox="0 0 24 24"
-                  width="24px"
-                  height="24px"
-                  role="img"
-                  aria-label="add"
-                >
-                  <path
-                    fill="none"
-                    stroke="#000"
-                    strokeWidth="2"
-                    d="M12,22 L12,2 M2,12 L22,12"
-                  />
-                </svg>
-              }
-            />
-
-            <Button
-              plain
-              disable={disableControls}
-              onClick={() => {
-                this.setState({ scale: Math.max(this.state.scale - 0.1, 1) });
-              }}
-              icon={
-                <svg
-                  viewBox="0 0 24 24"
-                  width="24px"
-                  height="24px"
-                  role="img"
-                  aria-label="subtract"
-                >
-                  <path
-                    fill="none"
-                    stroke="#000"
-                    strokeWidth="2"
-                    d="M2,12 L22,12"
-                  />
-                </svg>
-              }
-            />
-          </Box>
-          <Box justify>
-            <Button
-              disable={disableControls}
-              plain
-              label={<FormattedMessage {...messages.rotate} />}
-              onClick={this.handleLeftRotation}
-            >
-              <svg viewBox="0 0 24 24" width={24} height={24}>
-                <path
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  d={ICONS.retry}
-                />
-              </svg>
-            </Button>
-          </Box>
+          <ImageControls
+            scale={scale}
+            rotation={rotation}
+            disabled={disableControls}
+            onScaleChanged={this.handleScaling}
+            onRotationChanged={this.handleLeftRotation}
+          />
         </Box>
       </Box>
     );
