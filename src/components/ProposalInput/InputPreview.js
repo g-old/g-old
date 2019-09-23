@@ -4,8 +4,11 @@ import Box from '../Box';
 import Proposal from '../Proposal';
 import Poll from '../Poll';
 import Statement from '../Statement';
+import Heading from '../Heading';
 
 import { concatDateAndTime, utcCorrectedDate } from '../../core/helpers';
+import ProposalPreview from '../ProposalPreview';
+import Card from '../Card';
 
 const validate = (name, data) => {
   let validated = data && data.trim();
@@ -16,6 +19,21 @@ const validate = (name, data) => {
   }
   return validated;
 };
+
+const defaultOptions = [
+  {
+    id: 0,
+    order: 0,
+    description: { _default: 'up' },
+    numVotes: 0,
+  },
+  {
+    id: 0,
+    order: 0,
+    description: { _default: 'down' },
+    numVotes: 0,
+  },
+];
 
 const InputPreview = ({
   state,
@@ -31,13 +49,39 @@ const InputPreview = ({
   dateTo,
   timeTo,
   pollOnly,
+  tags,
+  previewImage,
+  summary,
 }) => {
   const date = dateTo || utcCorrectedDate(3).slice(0, 10);
   const time = timeTo || utcCorrectedDate().slice(11, 16);
   const fakeVote = { id: 1, positions: [{ pos: 0, value: 1 }] };
   const endTime = concatDateAndTime(date, time);
+  const extended = state === 'survey' && options.length > 1;
   return (
     <Box column>
+      <Heading tag="h2">Preview</Heading>
+      <Card>
+        <ProposalPreview
+          proposal={{
+            id: '0000',
+            state,
+            publishedAt: new Date(),
+            title: validate('Title', title),
+            spokesman,
+            tags,
+            image: previewImage,
+            summary,
+            pollOne: {
+              mode: { thresholdRef, withStatements, unipolar },
+              options: options.length ? options : defaultOptions,
+              endTime,
+              extended,
+              threshold,
+            },
+          }}
+        />
+      </Card>
       {!pollOnly && (
         <Proposal
           id="0000"
@@ -46,30 +90,14 @@ const InputPreview = ({
           title={validate('Title', title)}
           body={validate('Body', body)}
           spokesman={spokesman}
+          image={previewImage}
         />
       )}
       <Poll
-        extended={state === 'survey' && options.length > 1}
+        extended={extended}
         endTime={endTime}
         onFetchVoters={() => {}}
-        options={
-          options.length
-            ? options
-            : [
-                {
-                  id: 0,
-                  order: 0,
-                  description: { _default: 'up' },
-                  numVotes: 0,
-                },
-                {
-                  id: 0,
-                  order: 0,
-                  description: { _default: 'down' },
-                  numVotes: 0,
-                },
-              ]
-        }
+        options={options.length ? options : defaultOptions}
         threshold={threshold}
         updates={{}}
         canVote
@@ -104,6 +132,9 @@ InputPreview.propTypes = {
   dateTo: PropTypes.string,
   timeTo: PropTypes.string,
   pollOnly: PropTypes.bool.isRequired,
+  tags: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+  previewImage: PropTypes.shape({}).isRequired,
+  summary: PropTypes.string.isRequired,
 };
 InputPreview.defaultProps = {
   dateTo: null,

@@ -129,6 +129,7 @@ class TagInput extends React.Component<Props, State> {
   render() {
     const { suggestions, maxTags } = this.props;
     const { selectedTags } = this.state;
+    console.log('TAGSUGGESTIONS', suggestions);
 
     return (
       <Box column>
@@ -140,7 +141,7 @@ class TagInput extends React.Component<Props, State> {
             onAddTag={this.handleAddTag}
             onDeleteTag={this.handleRemoveTag}
             numTagsLimit={maxTags}
-            predefinedTagsOnly={false}
+            predefinedTagsOnly
           />
         </FormField>
       </Box>

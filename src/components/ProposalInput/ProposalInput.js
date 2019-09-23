@@ -13,11 +13,11 @@ import Meter from '../Meter';
 import PollType from './PollType';
 import ProposalBody from './ProposalBody';
 import OptionInput from './OptionInput';
-import DateInput from './DateInput';
 import TagInput, { TAG_ID_SUFFIX } from './TagInput';
-import SpokesmanInput from './SpokesmanInput';
 import InputPreview from './InputPreview';
+import FileUpload from './Uploader';
 import { createProposal } from '../../actions/proposal';
+import { uploadFiles } from '../../actions/file';
 import { findUser } from '../../actions/user';
 import type { TagType } from '../TagInput';
 import ResultPage from './ResultPage';
@@ -32,7 +32,6 @@ import {
   getSessionUser,
   getLocale,
 } from '../../reducers';
-import { isAdmin } from '../../organization';
 
 export type Callback = (string, () => boolean) => boolean;
 export type ValueType = { name: string, value: any };
@@ -62,6 +61,11 @@ type State = {
   pollType: { value: PollTypeTypes, label: string },
   options: OptionShape[],
   tags: TagType[],
+  files: File[],
+  cropCoordinates: {},
+  scale: number,
+  rotation: number,
+  summary: string,
 };
 type Props = {
   defaultPollType: PollTypeTypes,
@@ -91,10 +95,14 @@ class ProposalInput extends React.Component<Props, State> {
       dateTo: '',
       timeTo: '',
       withOptions: false,
+      cropCoordinates: null,
+      scale: 1,
+      rotation: 0,
+      transferRights: false,
       ...props.defaultPollSettings[props.defaultPollType || 'proposed'],
     };
 
-    this.storageKey = `proposalDraft${props.workTeamId}`;
+    this.storageKey = `proposalDraft${props.workTeamId || '-public'}`;
 
     this.handleAddOption = this.handleAddOption.bind(this);
     this.handleValueSaving = this.handleValueSaving.bind(this);
@@ -139,8 +147,9 @@ class ProposalInput extends React.Component<Props, State> {
     this.setState(newData);
   }
 
-  calculateNextStep({ step, push }) {
-    switch (step.id) {
+  calculateNextStep({ push }) {
+    push();
+    /* switch (step.id) {
       case 'body': {
         const { pollType, withOptions } = this.state;
         push(
@@ -152,7 +161,7 @@ class ProposalInput extends React.Component<Props, State> {
       default:
         push();
         break;
-    }
+    }*/
   }
 
   handleSubmission() {
@@ -172,6 +181,11 @@ class ProposalInput extends React.Component<Props, State> {
       spokesman,
       pollType,
       options,
+      files,
+      cropCoordinates,
+      scale,
+      rotation,
+      summary,
     } = this.state;
 
     if (dateTo || timeTo) {
@@ -184,9 +198,10 @@ class ProposalInput extends React.Component<Props, State> {
     const newTags = this.getNewTags();
     const spokesmanId = spokesman ? spokesman.id : null;
     const extended = !!options.length;
-    create({
+    const proposalProps = {
       ...(workTeamId && { workTeamId }),
       title: title.trim(),
+      summary: summary && summary.trim(),
       text: body,
       state: pollType.value,
       poll: {
@@ -212,8 +227,21 @@ class ProposalInput extends React.Component<Props, State> {
       },
       ...(newTags.length ? { tags: newTags } : {}),
       spokesmanId,
-    });
-    return true;
+    };
+    if (files) {
+      // send file
+      return this.props
+        .uploadFiles(files, { scale, cropCoordinates, rotation })
+        .then(result => {
+          if (result) {
+            create({
+              ...proposalProps,
+              ...(result.length && { image: result[0] }),
+            });
+          }
+        });
+    }
+    return create(proposalProps);
   }
 
   reset() {
@@ -228,8 +256,14 @@ class ProposalInput extends React.Component<Props, State> {
       dateTo: '',
       timeTo: '',
       title: '',
+      summary: '',
       secret: false,
       body: '<p></p>',
+      cropCoordinates: null,
+      files: null,
+      scale: 1,
+      rotation: 0,
+      transferRights: false,
     });
 
     localStorage.removeItem(this.storageKey);
@@ -247,93 +281,56 @@ class ProposalInput extends React.Component<Props, State> {
 
   render() {
     const {
-      options,
       pollType,
       body,
       title,
-      spokesman,
-      dateTo,
-      timeTo,
+      summary,
       tags: selectedTags,
-      secret,
-      unipolar,
-      withStatements,
-      threshold,
-      thresholdRef,
       withOptions,
+      files,
+      cropCoordinates,
+      previewImage,
+      scale,
+      rotation,
+      transferRights,
     } = this.state;
-    const {
-      users,
-      user,
-      tags,
-      findUser: fetchUser,
-      availablePolls,
-      defaultPollSettings,
-      updates = {},
-      workTeamId,
-    } = this.props;
+    const { tags, updates = {} } = this.props;
     return (
-      <Box column>
+      <Box fill column>
         <Wizard onNext={this.calculateNextStep} basename="">
-          {({ steps, step, push }) => (
+          {({ steps, step }) => (
             <StepPage>
-              <Meter
-                trailWidth={2}
-                trailColor="#eee"
-                strokeColor="#930793"
-                strokeWidth={1}
-                percent={((steps.indexOf(step) + 1) / steps.length) * 100}
-              />
+              <Box pad>
+                <Meter
+                  className={s.stroke}
+                  trailWidth={2}
+                  trailColor="#eee"
+                  strokeWidth={1}
+                  percent={((steps.indexOf(step) + 1) / steps.length) * 100}
+                />
+              </Box>
               <Steps>
-                <Step id="poll">
-                  <PollType
-                    availablePolls={availablePolls}
-                    defaultPollSettings={defaultPollSettings}
-                    data={{
-                      pollType,
-                      secret,
-                      unipolar,
-                      withStatements,
-                      threshold,
-                      thresholdRef,
-                      withOptions,
-                    }}
-                    onExit={this.handleValueSaving}
-                    advancedModeOn={isAdmin(user)}
-                  />
-                </Step>
                 <Step id="body">
                   <ProposalBody
                     storageKey={this.storageKey}
-                    data={{ body, title }}
+                    data={{ body, title, summary }}
                     onExit={this.handleValueSaving}
                     withOptions={withOptions}
                   />
                 </Step>
-                <Step id="options">
-                  <OptionInput
-                    data={options}
+                <Step id="file">
+                  <FileUpload
+                    data={{
+                      files,
+                      cropCoordinates,
+                      scale,
+                      rotation,
+                      transferRights,
+                    }}
                     onExit={this.handleValueSaving}
-                    onAddOption={this.handleAddOption}
-                    withOptions={withOptions}
-                    workTeamId={workTeamId}
                   />
                 </Step>
 
-                <Step id="spokesman">
-                  <SpokesmanInput
-                    onExit={this.handleValueSaving}
-                    data={spokesman}
-                    users={users}
-                    onFetchUser={fetchUser}
-                  />
-                </Step>
-                <Step id="date">
-                  <DateInput
-                    onExit={this.handleValueSaving}
-                    data={{ timeTo, dateTo }}
-                  />
-                </Step>
                 <Step id="tags">
                   <TagInput
                     suggestions={tags}
@@ -354,10 +351,6 @@ class ProposalInput extends React.Component<Props, State> {
                     success={updates.success}
                     error={updates.errorMessage}
                     onSuccess={this.handleOnSuccess}
-                    onRestart={() => {
-                      this.reset();
-                      push('poll');
-                    }}
                   />
                 </Step>
               </Steps>
@@ -381,6 +374,7 @@ const mapStateToProps = state => ({
 const mapDispatch = {
   createProposal,
   findUser,
+  uploadFiles,
 };
 
 export default connect(

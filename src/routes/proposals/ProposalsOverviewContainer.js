@@ -9,6 +9,7 @@ import StateFilter from '../../components/StateFilter';
 import ListView from '../../components/ListView';
 import ProposalPreview from '../../components/ProposalPreview';
 import { sortActiveProposals, sortClosedProposals } from '../utils';
+import ProposalInputLayer from '../../components/ProposalInputLayer';
 
 const onFilterChange = e => {
   if (e) {
@@ -60,7 +61,7 @@ class ProposalsOverviewContainer extends React.Component {
 
     return (
       <div>
-        {/* <Navigation filter={filter} /> */}
+        <ProposalInputLayer />
         <StateFilter
           states={['active', 'accepted', 'repelled']}
           filter={filter}

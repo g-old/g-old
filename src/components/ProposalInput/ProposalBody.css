@@ -1,3 +1,16 @@
 .editor {
   padding: 0 1.5em;
 }
+
+.textEdit {
+  font-family: var(--font-family-base);
+  width: 99%;
+  line-height: 1.3rem;
+  box-sizing: border-box;
+}
+textarea::placeholder {
+  color: #b7b9bb;
+}
+input::placeholder {
+  color: #b7b9bb;
+}

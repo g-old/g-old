@@ -21,22 +21,6 @@ import {
 import NotificationDrop from '../NotificationDrop/NotificationDrop';
 
 class NotificationMenu extends React.Component {
-  static propTypes = {
-    loadNotificationList: PropTypes.func.isRequired,
-    user: PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-      unreadNotifications: PropTypes.number,
-    }),
-    notifications: PropTypes.arrayOf(PropTypes.shape({})),
-    clearNotifications: PropTypes.func.isRequired,
-    status: PropTypes.shape({}).isRequired,
-  };
-
-  static defaultProps = {
-    user: null,
-    notifications: null,
-  };
-
   constructor(props) {
     super(props);
     this.onOpenMenu = this.onOpenMenu.bind(this);
@@ -91,7 +75,8 @@ class NotificationMenu extends React.Component {
   }
 
   onOpenMenu() {
-    this.props.loadNotificationList({ first: 10, userId: this.props.user.id });
+    const { user, loadNotificationList: loadNotifications } = this.props;
+    loadNotifications({ first: 10, userId: user.id });
     this.setState({ dropActive: true });
   }
 
@@ -104,6 +89,7 @@ class NotificationMenu extends React.Component {
       e.stopPropagation();
       e.preventDefault();
     }
+    // eslint-disable-next-line react/destructuring-assignment
     this.props.clearNotifications();
   }
 
@@ -157,18 +143,26 @@ class NotificationMenu extends React.Component {
   }
 
   render() {
-    if (!this.props.user) {
+    const { user } = this.props;
+    if (!user) {
       return null;
     }
     let numUnread;
-    if (this.props.user.unreadNotifications > 0) {
-      numUnread = this.props.user.unreadNotifications;
+    if (user.unreadNotifications > 0) {
+      numUnread = user.unreadNotifications;
     }
+    const { dropActive } = this.state;
     return (
       // eslint-disable-next-line
       <div onClick={this.toggleMenu} ref={elm => (this.componentRef = elm)}>
-        <div className={cn(s.notification, numUnread ? s.unread : null)}>
-          <span>{numUnread && this.props.user.unreadNotifications}</span>
+        <div
+          className={cn(
+            s.notification,
+            numUnread ? s.unread : null,
+            dropActive && s.active,
+          )}
+        >
+          <span>{numUnread && user.unreadNotifications}</span>
           <svg
             version="1.1"
             viewBox="0 0 24 24"
@@ -177,7 +171,11 @@ class NotificationMenu extends React.Component {
             role="img"
             aria-label="menu"
           >
-            <path fill="none" strokeWidth="2" d={ICONS.bell} />
+            <path
+              fill="none"
+              strokeWidth="2"
+              d={dropActive ? ICONS.close : ICONS.bell}
+            />
           </svg>
         </div>
       </div>
@@ -185,9 +183,25 @@ class NotificationMenu extends React.Component {
   }
 }
 
+NotificationMenu.propTypes = {
+  loadNotificationList: PropTypes.func.isRequired,
+  user: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    unreadNotifications: PropTypes.number,
+  }),
+  notifications: PropTypes.arrayOf(PropTypes.shape({})),
+  clearNotifications: PropTypes.func.isRequired,
+  status: PropTypes.shape({ pending: PropTypes.bool }).isRequired,
+};
+
 NotificationMenu.contextTypes = {
   intl: PropTypes.object,
   insertCss: PropTypes.func,
+};
+
+NotificationMenu.defaultProps = {
+  user: null,
+  notifications: null,
 };
 
 const mapPropsToState = state => ({

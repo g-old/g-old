@@ -13,6 +13,7 @@ import RemoveMe from './RemoveMe';
 export type TagType = {
   id?: ID,
   text: string,
+  displayName: string,
 };
 type Props = {
   onAddTag: TagType => void,
@@ -104,7 +105,12 @@ class TagInput extends React.Component<Props, State> {
   renderSuggestions() {
     const { suggestions = [], onAddTag } = this.props;
     return suggestions.map(tag => (
-      <Tag key={tag.id} id={tag.id} text={tag.text} handleTagClick={onAddTag} />
+      <Tag
+        key={tag.id}
+        id={tag.id}
+        text={tag.text || tag.displayName}
+        handleTagClick={onAddTag}
+      />
     ));
   }
 
@@ -115,7 +121,7 @@ class TagInput extends React.Component<Props, State> {
         className={s.availableTag}
         key={tag.id}
         id={tag.id}
-        text={tag.text}
+        text={tag.text || tag.displayName}
         onClick={() => tag.id && this.handleDelete(tag.id)}
       >
         <RemoveMe />

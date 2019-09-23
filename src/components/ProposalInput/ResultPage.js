@@ -1,8 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import Notification from '../Notification';
 import Box from '../Box';
 import Button from '../Button';
+import Spinner from '../Spinner';
 
 const messages = defineMessages({
   success: {
@@ -20,6 +22,7 @@ const ResultPage = ({ success, onRestart, error, onSuccess }) => {
     component = (
       <Notification
         type="success"
+        // eslint-disable-next-line react/jsx-props-no-spreading
         message={<FormattedMessage {...messages.success} />}
         action={
           <Button
@@ -41,14 +44,26 @@ const ResultPage = ({ success, onRestart, error, onSuccess }) => {
         }
       />
     );
+  } else {
+    component = <Spinner />;
   }
 
   return (
     <Box column align>
       {component}
-      <Button label="Restart" onClick={onRestart} />
+      {success && onRestart && <Button label="Restart" onClick={onRestart} />}
     </Box>
   );
+};
+
+ResultPage.propTypes = {
+  success: PropTypes.bool.isRequired,
+  onRestart: PropTypes.func,
+  error: PropTypes.bool.isRequired,
+  onSuccess: PropTypes.func.isRequired,
+};
+ResultPage.defaultProps = {
+  onRestart: null,
 };
 
 export default ResultPage;

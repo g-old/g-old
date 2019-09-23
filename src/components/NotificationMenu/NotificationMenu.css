@@ -29,5 +29,9 @@
 .unread {
   color: #fff;
   stroke: #fff;
-  background-color: #ff324d;
+  background-color: var(--color-five);
+  /*background-color: #ff324d;*/
+}
+.active {
+  color: var(--color-five);
 }
