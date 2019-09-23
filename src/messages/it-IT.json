@@ -422,6 +422,7 @@
       "src/components/MessageForm/MessageForm.js",
       "src/components/MessageInput/MessageInput.js",
       "src/components/MessageInput/NoticeLayer.js",
+      "src/components/ProposalInput/Navigation.js",
       "src/components/Statement/EditMenu.js"
     ]
   },
@@ -469,7 +470,7 @@
   {
     "id": "header.banner.title",
     "description": "Title in page header",
-    "defaultMessage": "G O L D",
+    "defaultMessage": "V I P",
     "message": "",
     "files": ["src/components/Header/Header.js"]
   },
@@ -519,7 +520,7 @@
     "description": "Short command for rotation",
     "defaultMessage": "Rotate",
     "message": "Ruota",
-    "files": ["src/components/ImageUpload/ImageUpload.js"]
+    "files": ["src/components/ImageUpload/ImageControls.js"]
   },
   {
     "id": "commands.upload",
@@ -1736,5 +1737,61 @@
     "defaultMessage": "Poll is closing",
     "message": "",
     "files": ["src/routes/proposal/PollNotice.js"]
+  },
+  {
+    "id": "form.error-max",
+    "description": "Max",
+    "defaultMessage": "Enter less than {value} chars or numbers",
+    "message": "",
+    "files": ["src/components/FormValidation/FormValidation.js"]
+  },
+  {
+    "id": "command.back",
+    "description": "Back",
+    "defaultMessage": "Back",
+    "message": "",
+    "files": ["src/components/ProposalInput/Navigation.js"]
+  },
+  {
+    "id": "command.next",
+    "description": "Next",
+    "defaultMessage": "Next",
+    "message": "",
+    "files": ["src/components/ProposalInput/Navigation.js"]
+  },
+  {
+    "id": "label.body",
+    "description": "Text",
+    "defaultMessage": "Text",
+    "message": "",
+    "files": ["src/components/ProposalInput/ProposalBody.js"]
+  },
+  {
+    "id": "label.enterText",
+    "description": "Hint to enter text in field",
+    "defaultMessage": "Enter some text",
+    "message": "",
+    "files": ["src/components/ProposalInput/ProposalBody.js"]
+  },
+  {
+    "id": "label.summary",
+    "description": "Summary",
+    "defaultMessage": "Summary",
+    "message": "",
+    "files": ["src/components/ProposalInput/ProposalBody.js"]
+  },
+  {
+    "id": "label.title",
+    "description": "Title",
+    "defaultMessage": "Title",
+    "message": "",
+    "files": ["src/components/ProposalInput/ProposalBody.js"]
+  },
+  {
+    "id": "label.image",
+    "description": "Image upload",
+    "defaultMessage": "Image",
+    "message": "",
+    "files": ["src/components/ProposalInput/Uploader.js"]
   }
 ]

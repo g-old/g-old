@@ -135,7 +135,7 @@
     "id": "navigation.proposals",
     "description": "Proposals link in header",
     "defaultMessage": "Proposals",
-    "message": "Beschlüsse"
+    "message": "Vorschläge"
   },
   {
     "id": "account.changeRights",
@@ -497,7 +497,7 @@
     "description": "Short command for rotation",
     "defaultMessage": "Rotate",
     "message": "Drehen",
-    "files": ["src/components/ImageUpload/ImageUpload.js"]
+    "files": ["src/components/ImageUpload/ImageControls.js"]
   },
   {
     "id": "manager.close",
@@ -641,6 +641,7 @@
       "src/components/MessageForm/MessageForm.js",
       "src/components/MessageInput/MessageInput.js",
       "src/components/MessageInput/NoticeLayer.js",
+      "src/components/ProposalInput/Navigation.js",
       "src/components/Statement/EditMenu.js"
     ]
   },
@@ -962,7 +963,7 @@
   {
     "id": "header.banner.title",
     "description": "Title in page header",
-    "defaultMessage": "G O L D",
+    "defaultMessage": "V I P",
     "message": "",
     "files": ["src/components/Header/Header.js"]
   },
@@ -1874,5 +1875,61 @@
     "defaultMessage": "Poll is closing",
     "message": "Abstimmung schließt",
     "files": ["src/routes/proposal/PollNotice.js"]
+  },
+  {
+    "id": "form.error-max",
+    "description": "Max",
+    "defaultMessage": "Enter less than {value} chars or numbers",
+    "message": "Weniger als {value} Zeichen eingeben",
+    "files": ["src/components/FormValidation/FormValidation.js"]
+  },
+  {
+    "id": "command.back",
+    "description": "Back",
+    "defaultMessage": "Back",
+    "message": "Zurück",
+    "files": ["src/components/ProposalInput/Navigation.js"]
+  },
+  {
+    "id": "command.next",
+    "description": "Next",
+    "defaultMessage": "Next",
+    "message": "Weiter",
+    "files": ["src/components/ProposalInput/Navigation.js"]
+  },
+  {
+    "id": "label.body",
+    "description": "Text",
+    "defaultMessage": "Text",
+    "message": "Vorschlagstext",
+    "files": ["src/components/ProposalInput/ProposalBody.js"]
+  },
+  {
+    "id": "label.enterText",
+    "description": "Hint to enter text in field",
+    "defaultMessage": "Enter some text",
+    "message": "Text eingeben...",
+    "files": ["src/components/ProposalInput/ProposalBody.js"]
+  },
+  {
+    "id": "label.summary",
+    "description": "Summary",
+    "defaultMessage": "Summary",
+    "message": "Zusammenfassung",
+    "files": ["src/components/ProposalInput/ProposalBody.js"]
+  },
+  {
+    "id": "label.title",
+    "description": "Title",
+    "defaultMessage": "Title",
+    "message": "Überschrift",
+    "files": ["src/components/ProposalInput/ProposalBody.js"]
+  },
+  {
+    "id": "label.image",
+    "description": "Image upload",
+    "defaultMessage": "Image",
+    "message": "Bild",
+    "files": ["src/components/ProposalInput/Uploader.js"]
   }
 ]

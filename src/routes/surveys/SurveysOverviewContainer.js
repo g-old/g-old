@@ -76,7 +76,7 @@ class SurveysOverviewContainer extends React.Component {
             s =>
               s && (
                 <ProposalPreview
-                  proposal={s}
+                  proposal={{ ...s, image: s.image && `/s460/${s.image}` }}
                   onClick={this.handleSurveyClick}
                 />
               ),
