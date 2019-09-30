@@ -21,6 +21,9 @@ import Heading from '../Heading';
 import PhaseTwoWizard from './PhaseTwoWizard';
 import type { PollTypeTypes, PollSettingsShape } from '../ProposalInput';
 import withPollSettings from '../ProposalInput/withPollSettings';
+import ApprovalProcess from '../ApprovalProcess';
+import Tabs from '../Tabs';
+import Tab from '../Tab';
 
 const WizardWithSettings = withPollSettings(PhaseTwoWizard, ['voting']);
 const messages = defineMessages({
@@ -59,6 +62,16 @@ const messages = defineMessages({
     id: 'form.error-past',
     defaultMessage: 'Time already passed',
     description: 'Help for wrong time settings',
+  },
+  approve: {
+    id: 'command.approve',
+    defaultMessage: 'Bestätigen',
+    description: 'Command for proposal verification',
+  },
+  reject: {
+    id: 'command.reject',
+    defaultMessage: 'Reject',
+    description: 'Command for proposal rejection',
   },
 });
 
@@ -114,8 +127,11 @@ class ProposalActions extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.handleStateChange = this.handleStateChange.bind(this);
+    this.handleApproval = this.handleApproval.bind(this);
+    this.toggleLayer = this.toggleLayer.bind(this);
     this.state = {
       error: false,
+      open: false,
     };
   }
 
@@ -146,6 +162,26 @@ class ProposalActions extends React.Component<Props, State> {
         workTeamId,
       }),
     });
+  }
+
+  handleApproval(values) {
+    const {
+      proposal: { id },
+      updateProposal,
+    } = this.props;
+    let approvalState = values.reduce((approval, current) => {
+      approval |= current.value;
+      return approval;
+    }, 0);
+
+    updateProposal({
+      id,
+      approvalState,
+    });
+  }
+
+  toggleLayer() {
+    return this.setState(prevState => ({ open: !prevState.open }));
   }
 
   renderPollState() {
@@ -227,6 +263,7 @@ class ProposalActions extends React.Component<Props, State> {
         </AccordionPanel>,
       );
     }
+    actions.push(<Button onClick={this.toggleLayer}>Approval</Button>);
 
     return actions.length ? <Accordion>{actions}</Accordion> : [];
   }
@@ -305,22 +342,35 @@ class ProposalActions extends React.Component<Props, State> {
       updates: { errorMessage },
       proposal,
     } = this.props;
-    const { error } = this.state;
+    const { error, open } = this.state;
+    if (open) {
+      return <ApprovalProcess proposal={this.props.proposal} />;
+    }
 
     return (
       <Box column fill className={s.root}>
-        <Box pad>
-          <Heading tag="h3">{proposal.title}</Heading>
-        </Box>
-        <Box flex align justify column fill>
-          <Box column fill>
-            {error && <Notification type="error" message={errorMessage} />}
-            {this.renderPollState()}
-            {this.renderDetails()}
-            {this.renderNotifications()}
-          </Box>
-          {this.renderActions()}
-        </Box>
+        <Tabs>
+          <Tab title="Overview">
+            <Box pad>
+              <Heading tag="h3">{proposal.title}</Heading>
+            </Box>
+            <Box flex align justify column fill>
+              <Box column fill>
+                {error && <Notification type="error" message={errorMessage} />}
+                {this.renderPollState()}
+                {this.renderDetails()}
+                {this.renderNotifications()}
+              </Box>
+              {this.renderActions()}
+            </Box>
+          </Tab>
+          <Tab title="Approvations">
+            <ApprovalProcess
+              proposal={this.props.proposal}
+              onSubmit={this.handleApproval}
+            />
+          </Tab>
+        </Tabs>
       </Box>
     );
   }

@@ -3,7 +3,7 @@ exports.up = function(knex) {
     knex.schema.table('proposals', table => {
       table.text('summary');
       table.string('image');
-      table.boolean('is_verified').defaultsTo(false);
+      table.integer('approval_state').defaultsTo(0);
     }),
   ]);
 };
@@ -11,9 +11,9 @@ exports.up = function(knex) {
 exports.down = function(knex) {
   return Promise.all([
     knex.schema.table('proposals', table => {
-      table.dropColumn('deleted_at');
+      table.dropColumn('summary');
       table.dropColumn('image');
-      table.dropColumn('is_verified');
+      table.dropColumn('approval_state');
     }),
   ]);
 };

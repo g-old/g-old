@@ -82,4 +82,7 @@ declare type ProposalShape = {
   pollTwo?: PollShape,
   title: string,
   body: string,
+  summary: string,
+  approvalState: Number,
+  image: ?string,
 };

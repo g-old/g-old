@@ -69,7 +69,7 @@ class Proposal {
     this.deletedAt = data.deleted_at;
     this.updatedAt = data.updated_at;
     this.summary = data.summary;
-    this.isVerified = data.is_verified;
+    this.approvalState = data.approval_state;
     this.image = data.image;
   }
 
@@ -177,6 +177,9 @@ class Proposal {
             `State transition not allowed from ${proposalInDB.state} to ${data.state}`,
           );
         }
+      }
+      if (data.approvalState) {
+        newValues.approval_state = data.approvalState;
       }
 
       if (proposalInDB.isSurveyAndShouldClose(data.poll)) {

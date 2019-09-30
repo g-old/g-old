@@ -94,8 +94,8 @@ const ProposalType = new ObjectType({
       type: GraphQLString,
     },
 
-    isVerified: {
-      type: GraphQLBoolean,
+    approvalState: {
+      type: GraphQLInt,
     },
 
     summary: {

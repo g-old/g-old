@@ -110,7 +110,7 @@ spokesman{
 pollOne ${pollFields}
 pollTwo ${pollFields}
 image
-isVerified
+approvalState
 summary
 `;
 
@@ -160,7 +160,7 @@ query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID $closed
         state
         image
         summary
-        isVerified
+        approvalState
         body
         workTeamId,
         tags{
@@ -191,8 +191,8 @@ mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $ta
 `;
 
 const updateProposalMutation = `
-mutation($id:ID  $poll:PollInput $state:ProposalState $workTeamId:ID ){
-  updateProposal (proposal:{ id:$id poll:$poll state:$state workTeamId:$workTeamId}){
+mutation($id:ID  $poll:PollInput $state:ProposalState $workTeamId:ID $approvalState:Int ){
+  updateProposal (proposal:{ id:$id poll:$poll state:$state workTeamId:$workTeamId approvalState:$approvalState}){
     ${proposal}
     tags{
       id
@@ -250,6 +250,7 @@ export function loadProposalsList({
   tagId,
   workTeamId,
   closed,
+  approvalState,
 }) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
@@ -281,6 +282,7 @@ export function loadProposalsList({
         tagId,
         workTeamId,
         closed,
+        approvalState,
       });
       const proposals = data.proposalConnection.edges.map(p => p.node);
       const normalizedData = normalize(proposals, proposalListSchema);

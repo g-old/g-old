@@ -4,6 +4,7 @@ import {
   GraphQLID as ID,
   GraphQLList,
   GraphQLEnumType,
+  GraphQLInt,
 } from 'graphql';
 import PollInput from './PollInputType';
 import TagInputType from './TagInputType';
@@ -65,6 +66,9 @@ const ProposalInputType = new GraphQLInputObjectType({
     },
     summary: {
       type: String,
+    },
+    approvalState: {
+      type: GraphQLInt,
     },
   },
 });

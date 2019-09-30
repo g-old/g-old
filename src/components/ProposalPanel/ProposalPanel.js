@@ -89,12 +89,6 @@ class ProposalPanel extends React.Component {
       <div>
         <Accordion>
           <AccordionPanel
-            heading={<FormattedMessage {...messages.proposalInput} />}
-            onActive={this.fetchTags}
-          >
-            <ProposalInputAllSettings maxTags={8} />
-          </AccordionPanel>
-          <AccordionPanel
             heading={<FormattedMessage {...messages.proposalManager} />}
             onActive={this.fetchProposals}
           >
@@ -107,16 +101,6 @@ class ProposalPanel extends React.Component {
               pageInfo={pageInfo}
               updateProposal={mutateProposal}
               loadProposals={this.fetchProposals}
-            />
-          </AccordionPanel>
-          <AccordionPanel heading="Manage surveys" onActive={this.fetchSurveys}>
-            <ProposalsManager
-              proposals={(surveys || []).filter(s =>
-                s.pollOne ? !s.pollOne.closedAt : false,
-              )}
-              pageInfo={pageInfo}
-              updateProposal={mutateProposal}
-              loadProposals={this.fetchSurveys}
             />
           </AccordionPanel>
           <AccordionPanel

@@ -68,7 +68,7 @@ class ProposalsManager extends React.Component {
     return (
       <Box column>
         {showDetails && (
-          <Layer onClose={this.handleLayerClosing}>
+          <Layer fill onClose={this.handleLayerClosing}>
             <ProposalActions
               intl={intl}
               updateProposal={updateProposal}
@@ -86,7 +86,14 @@ class ProposalsManager extends React.Component {
             checkedIndices={[]}
             assets={proposals}
             row={ProposalRow}
-            tableHeaders={['Title', 'State', 'Poll', 'Endtime', '']}
+            tableHeaders={[
+              'Title',
+              'Approvation',
+              'State',
+              'Poll',
+              'Endtime',
+              '',
+            ]}
           />
         </Box>
 
