@@ -20,6 +20,10 @@
   box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.11);
 }
 
+.small {
+  box-shadow: none;
+}
+
 .container {
   margin: 0 auto;
   height: 2.8rem;
@@ -32,8 +36,10 @@
 
 .brand {
   font-size: 2.5em;
-  font-weight: 600;
+  font-weight: 900;
   color: rgba(255, 255, 255, 0.35);
+
+  /* transform: rotate(-5.5deg); */
 }
 
 .right {

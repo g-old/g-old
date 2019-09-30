@@ -9,12 +9,15 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import withStyles from 'isomorphic-style-loader/withStyles';
+import cn from 'classnames';
 import s from './Header.css';
 import Navigation from '../Navigation';
 import UserStatus from '../UserStatus';
 import NotificationMenu from '../NotificationMenu';
+import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
 
 const messages = defineMessages({
   brand: {
@@ -31,14 +34,16 @@ const messages = defineMessages({
 
 class Header extends React.Component {
   render() {
+    const { user, small } = this.props;
     return (
-      <div className={s.root}>
+      <div className={cn(s.root, small && s.small)}>
         <div className={s.container}>
-          <UserStatus />
+          {user && <UserStatus />}
           <span className={s.brand}>
             <FormattedMessage {...messages.bannerTitle} />
           </span>
           <div className={s.right}>
+            <LanguageSwitcher />
             <Navigation />
             <NotificationMenu />
           </div>
@@ -47,5 +52,13 @@ class Header extends React.Component {
     );
   }
 }
+Header.propTypes = {
+  user: PropTypes.shape({}),
+  small: PropTypes.bool.isRequired,
+};
+
+Header.defaultProps = {
+  user: null,
+};
 
 export default withStyles(s)(Header);

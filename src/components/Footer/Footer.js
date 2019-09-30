@@ -11,8 +11,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/withStyles';
 import { connect } from 'react-redux';
-
-import LanguageSwitcher from '../LanguageSwitcher';
 import { getDroneBranch, getDroneBuild } from '../../reducers';
 import s from './Footer.css';
 
@@ -60,7 +58,6 @@ class Footer extends React.Component {
               <span> {build}</span>
             </span>
           )}
-          <LanguageSwitcher />
         </div>
       </div>
     );
