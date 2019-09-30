@@ -1,6 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 
 /* GENERATOR */
+export const SET_SIZE_VARIABLE = 'SET_SIZE_VARIABLE';
 export const UPLOAD_FILE_START = 'UPLOAD_FILE_START';
 export const UPLOAD_FILE_SUCCESS = 'UPLOAD_FILE_SUCCESS';
 export const UPLOAD_FILE_ERROR = 'UPLOAD_FILE_ERROR';

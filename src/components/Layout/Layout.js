@@ -16,8 +16,11 @@ import { connect } from 'react-redux';
 import normalizeCss from 'normalize.css';
 import { createSSESub } from '../../actions/sseSubs';
 import { allowCookies } from '../../actions/session';
-import { getConsent } from '../../reducers';
+import { setSizeVariable } from '../../actions/responsive';
+import { getConsent, getLayoutSize, getSessionUser } from '../../reducers';
 import Toast from '../Toast';
+import Responsive from '../../core/Responsive';
+
 // external-global styles must be imported in your JS.
 import s from './Layout.css';
 import Header from '../Header';
@@ -34,12 +37,26 @@ const messages = defineMessages({
 class Layout extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {};
     this.consent = this.consent.bind(this);
+    this.onResponsive = this.onResponsive.bind(this);
   }
 
   componentDidMount() {
     // eslint-disable-next-line react/destructuring-assignment
     this.props.createSSESub();
+    this.responsive = Responsive.start(this.onResponsive);
+  }
+
+  componentWillUnmount() {
+    if (this.responsive) {
+      this.responsive.stop();
+    }
+  }
+
+  onResponsive(small) {
+    // eslint-disable-next-line react/destructuring-assignment
+    this.props.setSizeVariable({ value: !!small });
   }
 
   consent() {
@@ -48,7 +65,7 @@ class Layout extends React.Component {
   }
 
   render() {
-    const { consent, children, loading } = this.props;
+    const { consent, children, loading, small, user } = this.props;
     let toast;
     if (!consent) {
       toast = (
@@ -62,7 +79,7 @@ class Layout extends React.Component {
       <div className={s.layout}>
         <div className={loading ? s.loader : null} />
         {toast}
-        <Header />
+        <Header small={small} user={user} />
         <div className={s.content}>{children}</div>
         <div className={s.footer}>
           <Footer />
@@ -78,15 +95,25 @@ Layout.propTypes = {
   loading: PropTypes.bool.isRequired,
   allowCookies: PropTypes.func.isRequired,
   consent: PropTypes.string.isRequired,
+  small: PropTypes.bool.isRequired,
+  setSizeVariable: PropTypes.func.isRequired,
+  user: PropTypes.shape({}),
+};
+
+Layout.defaultProps = {
+  user: null,
 };
 
 const mapDispatch = {
   createSSESub,
   allowCookies,
+  setSizeVariable,
 };
 const mapStateToProps = state => ({
   loading: state.ui.loading.status,
   consent: getConsent(state),
+  small: getLayoutSize(state),
+  user: getSessionUser(state),
 });
 export default connect(
   mapStateToProps,

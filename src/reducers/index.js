@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import user from './user';
 import runtime from './runtime';
+import layoutSize, * as fromResponsive from './responsive';
 import intl, * as fromIntl from './intl';
 import entities, * as fromEntity from './entities';
 import ui, * as fromUi from './ui';
@@ -13,6 +14,7 @@ import scrollToCounter from './scrollToCounter';
 export default combineReducers({
   user,
   runtime,
+  layoutSize,
   intl,
   entities,
   ui,
@@ -25,6 +27,8 @@ export default combineReducers({
 
 /* GENERATOR */
 
+export const getLayoutSize = state =>
+  fromResponsive.getLayoutSize(state.layoutSize);
 export const getResourcePageInfo = (state, resource, filter) =>
   fromPageInfo.getPageInfo(state.pageInfo, resource, filter);
 export const getScrollCount = state => state.scrollToCounter;

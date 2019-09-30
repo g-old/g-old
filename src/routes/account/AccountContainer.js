@@ -42,6 +42,7 @@ import {
   getLogIsFetching,
   getLogErrorMessage,
   getMessageUpdates,
+  getLayoutSize,
 } from '../../reducers';
 import Avatar from '../../components/Avatar';
 import UserSettings from '../../components/UserSettings';
@@ -56,7 +57,6 @@ import ActivityLog from '../../components/ActivityLog';
 import Notification from '../../components/Notification';
 import Profile from '../../components/UserProfile';
 import s from './AccountContainer.css';
-import Responsive from '../../core/Responsive';
 import NotificationSettings from '../../components/NotificationSettings';
 import MessagePreview from '../../components/MessagePreview/MessagePreview';
 import List from '../../components/List';
@@ -251,7 +251,6 @@ class AccountContainer extends React.Component {
     this.handleWPSubscription = this.handleWPSubscription.bind(this);
     this.handleImageChange = this.handleImageChange.bind(this);
     this.getUserData = this.getUserData.bind(this);
-    this.onResponsive = this.onResponsive.bind(this);
     this.onNotify = this.onNotify.bind(this);
     this.fetchLogs = this.fetchLogs.bind(this);
     this.fetchMessages = this.fetchMessages.bind(this);
@@ -260,7 +259,6 @@ class AccountContainer extends React.Component {
   componentDidMount() {
     const { user } = this.props;
     this.getUserData(user);
-    this.responsive = Responsive.start(this.onResponsive);
   }
 
   componentWillReceiveProps({ updates, subscription, user }) {
@@ -280,19 +278,6 @@ class AccountContainer extends React.Component {
   componentWillUnmount() {
     if (this.responsive) {
       this.responsive.stop();
-    }
-  }
-
-  onResponsive(small) {
-    // deactivate if we change resolutions
-    if (small) {
-      this.setState({
-        smallSize: true,
-      });
-    } else {
-      this.setState({
-        smallSize: false,
-      });
     }
   }
 
@@ -384,14 +369,10 @@ class AccountContainer extends React.Component {
       workTeams,
       deleteUser: deleteAccount,
       logout: onLogout,
+      small,
     } = this.props;
 
-    const {
-      editFollowees,
-      smallSize,
-      showUpload,
-      disableSubscription,
-    } = this.state;
+    const { editFollowees, showUpload, disableSubscription } = this.state;
     if (!user) return null;
     const { followees = [] } = user;
     const notification = getNotification(ownAccount, user);
@@ -505,7 +486,7 @@ class AccountContainer extends React.Component {
     return (
       <Box tag="article" column padding="medium">
         {notification}
-        <Box between column={smallSize}>
+        <Box between column={small}>
           {showUpload && (
             <ImageUpload
               uploadAvatar={data => {
@@ -542,7 +523,7 @@ class AccountContainer extends React.Component {
               >
                 <div style={{ marginTop: '1em' }}>
                   <UserSettings
-                    smallSize={smallSize}
+                    smallSize={small}
                     resendEmail={emailVerification}
                     deleteRequest={cancelRequest}
                     updates={updates}
@@ -614,6 +595,7 @@ const mapStateToProps = (state, { user }) => ({
   logPending: getLogIsFetching(state),
   logError: getLogErrorMessage(state),
   messageUpdates: getMessageUpdates(state),
+  small: getLayoutSize(state),
 });
 
 export default connect(
