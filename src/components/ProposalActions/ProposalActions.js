@@ -169,7 +169,7 @@ class ProposalActions extends React.Component<Props, State> {
       proposal: { id },
       updateProposal,
     } = this.props;
-    let approvalState = values.reduce((approval, current) => {
+    const approvalState = values.reduce((approval, current) => {
       approval |= current.value;
       return approval;
     }, 0);

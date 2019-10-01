@@ -29,10 +29,13 @@ const proposal = {
     closed: {
       type: GraphQLBoolean,
     },
+    approvalState: {
+      type: GraphQLInt,
+    },
   },
   resolve: async (
     parent,
-    { first = 10, after = '', state, tagId, workTeamId, closed },
+    { first = 10, after = '', state, tagId, workTeamId, closed, approvalState },
     { viewer, loaders },
   ) => {
     const pagination = Buffer.from(after, 'base64').toString('ascii');
@@ -63,6 +66,7 @@ const proposal = {
       switch (state) {
         case 'active': {
           cursor = cursor ? new Date(cursor) : new Date(null);
+
           proposals = await knex('proposals')
             .innerJoin('polls', function() {
               this.on(function() {
@@ -77,6 +81,11 @@ const proposal = {
             .where({
               work_team_id: workTeamId || null,
               'proposals.deleted_at': null,
+            })
+            .modify(queryBuilder => {
+              if (approvalState) {
+                return queryBuilder.where({ approval_state: approvalState });
+              }
             })
             .whereRaw('(polls.end_time, polls.id) > (?,?)', [cursor, id])
             .limit(first)
@@ -176,7 +185,9 @@ const proposal = {
       }
     }
 
-    const queries = proposals.map(p => Proposal.gen(viewer, p.id, loaders));
+    const queries = proposals.map(p =>
+      Proposal.gen((viewer = {}), p.id, loaders),
+    );
     const proposalsSet = proposals.reduce((acc, curr) => {
       acc[curr.id] = curr;
       return acc;

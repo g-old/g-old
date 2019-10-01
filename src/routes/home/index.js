@@ -11,7 +11,8 @@ import React from 'react';
 import Layout from '../../components/Layout';
 import Home from './Home';
 import { getSessionUser } from '../../reducers';
-import { canAccess } from '../../organization';
+import { canAccess, ApprovalStates } from '../../organization';
+import { loadProposalsList } from '../../actions/proposal';
 
 const title = 'Home';
 
@@ -26,6 +27,18 @@ async function action({ store }) {
     }
     return { redirect: '/feed' };
   }
+  const props = {
+    state: 'active',
+    first: 3,
+    approvalState:
+      ApprovalStates.CONTENT_APPROVED | ApprovalStates.TOPIC_APPROVED,
+  };
+  if (!process.env.BROWSER) {
+    await store.dispatch(loadProposalsList(props));
+  } else {
+    store.dispatch(loadProposalsList(props));
+  }
+
   return {
     chunks: ['home'],
     title,

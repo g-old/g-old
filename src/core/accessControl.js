@@ -6,6 +6,7 @@ import {
   PermissionsSchema,
   isCoordinator,
   isAdmin,
+  ApprovalStates,
 } from '../organization';
 /* eslint-disable no-bitwise */
 // TODO make object
@@ -164,13 +165,19 @@ function userWriteControl(viewer, data) {
 function userReadControl(viewer, data) {
   return (
     // eslint-disable-next-line eqeqeq
-    viewer.id == data.id ||
-    viewer.groups === Groups.SYSTEM ||
-    (viewer.permissions & AccessMasks.LEVEL_1) > 0
+    viewer &&
+    (viewer.id == data.id ||
+      viewer.groups === Groups.SYSTEM ||
+      (viewer.permissions & AccessMasks.LEVEL_1) > 0)
   );
 }
 
+const APPROVED =
+  ApprovalStates.CONTENT_APPROVED | ApprovalStates.TOPIC_APPROVED;
 function proposalReadControl(viewer, data) {
+  if (data.approvalState & APPROVED) {
+    return true;
+  }
   if (viewer.permissions & Permissions.VIEW_PROPOSALS) {
     return checkIfMember(viewer, data);
   }
@@ -185,6 +192,10 @@ function proposalWriteControl(viewer, data) {
     if (isCoordinator(viewer, data.workTeam)) {
       return true;
     }
+    return (viewer.groups & Groups.ADMIN) > 0;
+  }
+
+  if (data.approvalState !== undefined) {
     return (viewer.groups & Groups.ADMIN) > 0;
   }
 
@@ -266,13 +277,14 @@ function stmtLikeWriteControl(viewer, data) {
 }
 
 function pollReadControl(viewer, data) {
-  if (
+  return true;
+  /* if (
     viewer.permissions &
     (AccessMasks.LEVEL_1 | Permissions.PUBLISH_PROPOSALS)
   ) {
     return true;
   }
-  return false;
+  return false; */
 }
 function pollWriteControl(viewer, data) {
   if (viewer.permissions & PermissionsSchema[Groups.RELATOR]) {

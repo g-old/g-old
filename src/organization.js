@@ -317,3 +317,15 @@ export const getUpdatedGroup = (oldGroups: number, updatedGroups: number) => {
 
   return { added, names: groups, value: groupDiff };
 };
+
+export const ApprovalStates = {
+  CONTENT_PENDING: 2,
+  TOPIC_PENDING: 4,
+  IMAGE_PENDING: 8,
+  CONTENT_APPROVED: 16,
+  TOPIC_APPROVED: 32,
+  IMAGE_APPROVED: 64,
+  CONTENT_DENIED: 128,
+  TOPIC_DENIED: 256,
+  IMAGE_DENIED: 512,
+};

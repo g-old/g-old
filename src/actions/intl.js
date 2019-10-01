@@ -17,9 +17,9 @@ const query = `
   }
 `;
 export const locales = {
-  'de-DE': 'Deutsch',
-  'it-IT': 'Italiano',
-  'lld-IT': 'Ladin',
+  'de-DE': 'DE',
+  'it-IT': 'IT',
+  'lld-IT': 'LLD',
 };
 function getIntlFromState(state) {
   const intl = (state && state.intl) || {};
