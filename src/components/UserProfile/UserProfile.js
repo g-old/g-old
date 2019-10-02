@@ -206,7 +206,7 @@ class UserProfile extends React.Component {
         {contactable && (
           <Button
             onClick={this.toggleLayer}
-            disabled={sessionUser.id === user.id}
+            disabled={sessionUser && sessionUser.id === user.id}
             icon={
               <svg
                 viewBox="0 0 24 24"
