@@ -106,10 +106,12 @@ class ContentApprovation extends React.Component<Props> {
             <Heading tag="h3">Text</Heading>
 
             <div dangerouslySetInnerHTML={{ __html: text }} />
-            <div>
-              <Heading tag="h3">Image</Heading>
-              <Image fit src={image} />
-            </div>
+            {image && (
+              <div>
+                <Heading tag="h3">Image</Heading>
+                <Image fit src={`/s720/${image}`} />
+              </div>
+            )}
 
             <FormField
               label="Is the content is aligned with our TOS?"

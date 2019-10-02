@@ -43,13 +43,13 @@ class ApprovalProcess extends React.Component<Props, State> {
     this.state = {
       contentApproved:
         props.proposal &&
-        getApprovalState(props.proposal.approvalState, [
+        this.getApprovalState(props.proposal.approvalState, [
           ApprovalStates.CONTENT_APPROVED,
           ApprovalStates.CONTENT_DENIED,
         ]),
       topicApproved:
         props.proposal &&
-        getApprovalState(props.proposal.approvalState, [
+        this.getApprovalState(props.proposal.approvalState, [
           ApprovalStates.TOPIC_APPROVED,
           ApprovalStates.TOPIC_DENIED,
         ]),

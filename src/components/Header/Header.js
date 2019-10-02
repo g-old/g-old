@@ -18,6 +18,7 @@ import Navigation from '../Navigation';
 import UserStatus from '../UserStatus';
 import NotificationMenu from '../NotificationMenu';
 import LanguageSwitcher from '../LanguageSwitcher/LanguageSwitcher';
+import Link from '../Link';
 
 const messages = defineMessages({
   brand: {
@@ -39,9 +40,11 @@ class Header extends React.Component {
       <div className={cn(s.root, small && s.small)}>
         <div className={s.container}>
           {user && <UserStatus />}
-          <span className={s.brand}>
-            <FormattedMessage {...messages.bannerTitle} />
-          </span>
+          <Link to="/">
+            <span className={s.brand}>
+              <FormattedMessage {...messages.bannerTitle} />
+            </span>
+          </Link>
           <div className={s.right}>
             <LanguageSwitcher />
             <Navigation />

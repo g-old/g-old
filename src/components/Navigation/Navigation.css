@@ -50,5 +50,10 @@
   .menu {
     position: relative;
     display: block;
+    stroke: #fff;
+  }
+
+  link {
+    color: #000;
   }
 }
