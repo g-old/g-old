@@ -68,31 +68,28 @@ class Home extends React.Component<Props> {
           {/* Card Box */}
         </Box>
         <Box className={small && s.bigCards} fill wrap align between>
-          <div className={s.cardBlack}>
-            <Box column align className={s.proposals}>
-              <Heading tag="h1">Vorschläge</Heading>
-            </Box>
-            {/* <ListView
-              onRetry={this.handleOnRetry}
-              onLoadMore={this.handleLoadMore}
-              pageInfo={pageInfo}
-           > */}
-            <Box column>
-              {proposals.map(
-                proposal =>
-                  proposal && (
-                    <ProposalPreview
-                      proposal={{
-                        ...proposal,
-                        image: proposal.image && `/s460/${proposal.image}`,
-                      }}
-                      onClick={this.onProposalClick}
-                    />
-                  ),
-              )}
-            </Box>
-            {/*   </ListView> */}
-          </div>
+          {proposals && proposals.length && (
+            <div className={s.cardBlack}>
+              <Box column align className={s.proposals}>
+                <Heading tag="h1">Vorschläge</Heading>
+              </Box>
+
+              <Box column>
+                {proposals.map(
+                  proposal =>
+                    proposal && (
+                      <ProposalPreview
+                        proposal={{
+                          ...proposal,
+                          image: proposal.image && `/s460/${proposal.image}`,
+                        }}
+                        onClick={this.onProposalClick}
+                      />
+                    ),
+                )}
+              </Box>
+            </div>
+          )}
           <div className={s.card}>
             <InfoCard
               image="/stop_sign_stp.jpeg"
