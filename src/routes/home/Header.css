@@ -1,0 +1,41 @@
+@import '../../components/variables.css';
+
+.description {
+  display: flex;
+  border: 1px solid #ffffff59;
+  box-shadow: 0 4px 16px 0 #ffffff4d;
+  padding: 1em;
+  align-self: center;
+
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+}
+
+.header {
+  color: #fff;
+  height: 20em;
+  display: inline-flex;
+  justify-content: space-around;
+  background-attachment: fixed; /* slight scrolling effect */
+  background-size: cover;
+
+  /* background-image: url('/sunrise_header.jpeg'); */
+  background:
+    linear-gradient(
+      to right,
+      rgb(15, 12, 41),
+      rgb(48, 43, 99),
+      rgb(36, 36, 62)
+    ); /* background-image: url('https://download.unsplash.com/photo-1428550670225-15f007f6f1ba'); */
+
+  /* background: linear-gradient(to right, rgb(187, 210, 197), rgb(83, 105, 118)); */
+
+  /* background: linear-gradient(to right, rgb(83, 105, 118), rgb(41, 46, 73)); */
+
+  /* background: linear-gradient(to right, rgb(0, 65, 106), rgb(228, 229, 230)); */
+  h1 {
+    padding: 0.5em;
+  }
+}

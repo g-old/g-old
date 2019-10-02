@@ -1,0 +1,24 @@
+.dettCard {
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  background: #333;
+
+  /* height: 75vh; */
+  border-radius: 6px;
+  padding: 2rem;
+  color: #aaa;
+  box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2), 0 0 1rem rgba(0, 0, 0, 0.2);
+
+  img {
+    max-width: 100%;
+  }
+
+  h1 {
+    color: #fff;
+  }
+}
+
+.imgContainer {
+  margin: -2rem -2rem 1rem -2rem;
+}

@@ -1,0 +1,40 @@
+@import '../../components/variables.css';
+
+.root {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.11);
+  padding: 1em;
+  height: 100%;
+  min-width: 25em;
+}
+
+.small {
+  background-image: linear-gradient(to bottom, var(--color-brand), #4d702fdb);
+  min-width: 0;
+
+  fieldset {
+    box-shadow: 0 4px 16px 0 #3333337a;
+  }
+
+  .or {
+    color: #fff;
+  }
+}
+
+.signup {
+  background-color: var(--color-four);
+  color: #fff;
+  border-color: var(--color-four);
+}
+
+.or {
+  color: #000;
+  text-align: center;
+  width: 100%;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+}
