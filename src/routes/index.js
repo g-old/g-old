@@ -122,6 +122,14 @@ const routes = {
           /* webpackChunkName: 'emailVerification' */ './emailVerification'
         ),
     },
+    {
+      path: '/privacy',
+      load: () => import(/* webpackChunkName: 'privacy' */ './privacy'),
+    },
+    {
+      path: '/terms',
+      load: () => import(/* webpackChunkName: 'terms' */ './terms'),
+    },
 
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     {

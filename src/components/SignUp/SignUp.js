@@ -94,9 +94,16 @@ const messages = defineMessages({
     defaultMessage: 'Read our {link}',
     description: 'Call to read linked privac policy',
   },
+
+  terms: {
+    id: 'label.tos',
+    defaultMessage: 'Terms of Service',
+    description: 'Terms of Service',
+  },
 });
 
 const PATH_TO_PRIVACY = '/privacy';
+const PATH_TO_TOS = '/terms';
 
 const onBlurValidation = (fieldName, state, fields) => {
   if (fieldName && state) {
@@ -294,7 +301,8 @@ class SignUp extends React.Component {
               args: { required: true, min: 6 },
             },
             email: { fn: emailValidation, args: { required: true } },
-            consent: { fn: consentValidation, args: { required: true } },
+            consentPrivacy: { fn: consentValidation, args: { required: true } },
+            consentTOS: { fn: consentValidation, args: { required: true } },
           }}
           submit={this.executeCaptcha}
         >
@@ -421,7 +429,7 @@ class SignUp extends React.Component {
               </fieldset>
               <fieldset>
                 <FormField
-                  error={errorMessages.consentError}
+                  error={errorMessages.consentPrivacyError}
                   help={
                     <FormattedMessage
                       {...messages.readPrivacy}
@@ -448,22 +456,47 @@ class SignUp extends React.Component {
                         }}
                       />
                     }
-                    checked={values.consent}
+                    checked={values.consentPrivacy}
                     onChange={handleValueChanges}
                     onBlur={onBlur}
-                    name="consent"
+                    name="consentPrivacy"
+                  />
+                </FormField>
+                <FormField
+                  error={errorMessages.consentTOSError}
+                  help={
+                    <FormattedMessage
+                      {...messages.readPrivacy}
+                      values={{
+                        link: (
+                          <a
+                            target="_blank"
+                            href={PATH_TO_TOS}
+                            rel="noopener noreferrer"
+                          >
+                            <FormattedMessage {...messages.terms} />
+                          </a>
+                        ),
+                      }}
+                    />
+                  }
+                >
+                  <CheckBox
+                    label={
+                      <FormattedMessage
+                        {...messages.consent}
+                        values={{
+                          policy: <FormattedMessage {...messages.terms} />,
+                        }}
+                      />
+                    }
+                    checked={values.consentTOS}
+                    onChange={handleValueChanges}
+                    onBlur={onBlur}
+                    name="consentTOS"
                   />
                 </FormField>
               </fieldset>
-              <p>
-                <a
-                  target="_blank"
-                  href={PATH_TO_PRIVACY}
-                  rel="noopener noreferrer"
-                >
-                  <FormattedMessage {...messages.privacy} />
-                </a>
-              </p>
 
               <Button primary fill disabled={captchaPending || pending}>
                 <FormattedMessage {...messages.nextStep} />
