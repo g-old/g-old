@@ -637,6 +637,7 @@
     "defaultMessage": "Submit",
     "message": "Abschicken",
     "files": [
+      "src/components/ApprovalProcess/Navigation.js",
       "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/MessageForm/MessageForm.js",
       "src/components/MessageInput/MessageInput.js",
@@ -1888,42 +1889,64 @@
     "description": "Back",
     "defaultMessage": "Back",
     "message": "Zurück",
-    "files": ["src/components/ProposalInput/Navigation.js"]
+    "files": [
+      "src/components/ApprovalProcess/Navigation.js",
+      "src/components/ProposalInput/Navigation.js"
+    ]
   },
   {
     "id": "command.next",
     "description": "Next",
     "defaultMessage": "Next",
     "message": "Weiter",
-    "files": ["src/components/ProposalInput/Navigation.js"]
+    "files": [
+      "src/components/ApprovalProcess/Navigation.js",
+      "src/components/ProposalInput/Navigation.js"
+    ]
   },
   {
     "id": "label.body",
     "description": "Text",
     "defaultMessage": "Text",
     "message": "Vorschlagstext",
-    "files": ["src/components/ProposalInput/ProposalBody.js"]
+    "files": [
+      "src/components/ApprovalProcess/ContentApprovation.js",
+      "src/components/ApprovalProcess/TopicApprovation.js",
+      "src/components/ProposalInput/ProposalBody.js"
+    ]
   },
   {
     "id": "label.enterText",
     "description": "Hint to enter text in field",
     "defaultMessage": "Enter some text",
     "message": "Text eingeben...",
-    "files": ["src/components/ProposalInput/ProposalBody.js"]
+    "files": [
+      "src/components/ApprovalProcess/ContentApprovation.js",
+      "src/components/ApprovalProcess/TopicApprovation.js",
+      "src/components/ProposalInput/ProposalBody.js"
+    ]
   },
   {
     "id": "label.summary",
     "description": "Summary",
     "defaultMessage": "Summary",
     "message": "Zusammenfassung",
-    "files": ["src/components/ProposalInput/ProposalBody.js"]
+    "files": [
+      "src/components/ApprovalProcess/ContentApprovation.js",
+      "src/components/ApprovalProcess/TopicApprovation.js",
+      "src/components/ProposalInput/ProposalBody.js"
+    ]
   },
   {
     "id": "label.title",
     "description": "Title",
     "defaultMessage": "Title",
     "message": "Überschrift",
-    "files": ["src/components/ProposalInput/ProposalBody.js"]
+    "files": [
+      "src/components/ApprovalProcess/ContentApprovation.js",
+      "src/components/ApprovalProcess/TopicApprovation.js",
+      "src/components/ProposalInput/ProposalBody.js"
+    ]
   },
   {
     "id": "label.image",
@@ -1931,5 +1954,19 @@
     "defaultMessage": "Image",
     "message": "Bild",
     "files": ["src/components/ProposalInput/Uploader.js"]
+  },
+  {
+    "id": "command.approve",
+    "description": "Command for proposal verification",
+    "defaultMessage": "Bestätigen",
+    "message": "",
+    "files": ["src/components/ProposalActions/ProposalActions.js"]
+  },
+  {
+    "id": "command.reject",
+    "description": "Command for proposal rejection",
+    "defaultMessage": "Reject",
+    "message": "",
+    "files": ["src/components/ProposalActions/ProposalActions.js"]
   }
 ]

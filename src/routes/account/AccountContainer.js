@@ -29,6 +29,7 @@ import {
 import { loadFeed } from '../../actions/feed';
 import { uploadAvatar } from '../../actions/file';
 import { createMessage } from '../../actions/message';
+import { genProposalPageKey } from '../../reducers/pageInfo';
 
 import Label from '../../components/Label';
 import {
@@ -43,6 +44,8 @@ import {
   getLogErrorMessage,
   getMessageUpdates,
   getLayoutSize,
+  getResourcePageInfo,
+  getAllProposals,
 } from '../../reducers';
 import Avatar from '../../components/Avatar';
 import UserSettings from '../../components/UserSettings';
@@ -62,6 +65,8 @@ import MessagePreview from '../../components/MessagePreview/MessagePreview';
 import List from '../../components/List';
 import ListItem from '../../components/ListItem';
 import history from '../../history';
+import ListView from '../../components/ListView';
+import ProposalPreview from '../../components/ProposalPreview';
 
 const messages = defineMessages({
   settings: {
@@ -370,7 +375,10 @@ class AccountContainer extends React.Component {
       deleteUser: deleteAccount,
       logout: onLogout,
       small,
+      proposals,
+      pageInfo,
     } = this.props;
+    console.log('PROPOSALS', proposals);
 
     const { editFollowees, showUpload, disableSubscription } = this.state;
     if (!user) return null;
@@ -558,6 +566,27 @@ class AccountContainer extends React.Component {
               </AccordionPanel>
             </Accordion>
           </Box>
+          <Label>My Proposals</Label>
+          {proposals && (
+            <ListView
+              onRetry={this.handleOnRetry}
+              onLoadMore={this.handleLoadMore}
+              pageInfo={pageInfo}
+            >
+              {proposals.map(
+                proposal =>
+                  proposal && (
+                    <ProposalPreview
+                      proposal={{
+                        ...proposal,
+                        image: proposal.image && `/s460/${proposal.image}`,
+                      }}
+                      onClick={this.onProposalClick}
+                    />
+                  ),
+              )}
+            </ListView>
+          )}
         </Box>
       </Box>
     );
@@ -596,6 +625,14 @@ const mapStateToProps = (state, { user }) => ({
   logError: getLogErrorMessage(state),
   messageUpdates: getMessageUpdates(state),
   small: getLayoutSize(state),
+  proposals: getAllProposals(state, 'active').filter(
+    proposal => proposal.authorId === user.id,
+  ),
+  pageInfo: getResourcePageInfo(
+    state,
+    'proposals',
+    genProposalPageKey({ state: 'active' }),
+  ),
 });
 
 export default connect(

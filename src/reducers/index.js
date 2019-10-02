@@ -27,6 +27,9 @@ export default combineReducers({
 
 /* GENERATOR */
 
+export const getAllProposals = state =>
+  fromEntity.getAllProposals(state.entities);
+
 export const getLayoutSize = state =>
   fromResponsive.getLayoutSize(state.layoutSize);
 export const getResourcePageInfo = (state, resource, filter) =>

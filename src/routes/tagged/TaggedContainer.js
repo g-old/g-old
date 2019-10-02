@@ -37,6 +37,7 @@ class ProposalContainer extends React.Component {
       .isRequired, */
     tagId: PropTypes.string.isRequired,
   };
+
   constructor(props) {
     super(props);
     this.handleOnRetry = this.handleOnRetry.bind(this);
@@ -47,6 +48,7 @@ class ProposalContainer extends React.Component {
   handleProposalClick({ proposalId, pollId }) {
     history.push(`/proposal/${proposalId}/${pollId}`);
   }
+
   handleLoadMore({ after }) {
     this.props.loadProposalsList({
       after,

@@ -70,6 +70,10 @@ export const getProposalsByTag = (state, tagId, entities) => {
   );
   return hydrated.proposals || [];
 };
+export const getAllProposals = (state, entities) => {
+  const hydrated = hydrateProposals(state, Object.keys(state.byId), entities);
+  return hydrated.proposals || [];
+};
 
 export const getPageInfo = (state, filter) => ({
   ...fromList.getPageInfo(state.listByFilter[filter]),
