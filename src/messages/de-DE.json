@@ -196,7 +196,7 @@
     "id": "privilege.postProposals",
     "description": "Account can post proposals",
     "defaultMessage": "post proposals",
-    "message": "Beschlüsse erstellen"
+    "message": "Vorschläge erstellen"
   },
   {
     "id": "privilege.unlockGuest",
@@ -208,7 +208,7 @@
     "id": "proposalInput",
     "description": "Creating new proposal",
     "defaultMessage": "Create a new proposal",
-    "message": "Neuen Beschluss eingeben",
+    "message": "Neuen Vorschlag eingeben",
     "files": [
       "src/components/ProposalPanel/ProposalPanel.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
@@ -218,7 +218,7 @@
     "id": "proposalManager",
     "description": "Manage proposals",
     "defaultMessage": "Manage proposals",
-    "message": "Beschlüsse verwalten",
+    "message": "Vorschläge verwalten",
     "files": [
       "src/components/ProposalPanel/ProposalPanel.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
@@ -274,7 +274,7 @@
     "id": "manager.revoke",
     "description": "Revoke proposal",
     "defaultMessage": "Revoke proposal",
-    "message": "Beschluss zurückziehen",
+    "message": "Vorschlag zurückziehen",
     "files": ["src/components/ProposalActions/ProposalActions.js"]
   },
   {
@@ -503,7 +503,7 @@
     "id": "manager.close",
     "description": "Close the proposal",
     "defaultMessage": "Close proposal",
-    "message": "Beschluss schließen"
+    "message": "Vorschlag schließen"
   },
   {
     "id": "date.to",
@@ -847,7 +847,7 @@
     "id": "proposal.new",
     "description": "Title for activity",
     "defaultMessage": "New proposal",
-    "message": "Neuer Beschluss",
+    "message": "Neuer Vorschlag",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
@@ -868,7 +868,7 @@
     "id": "proposal.valid",
     "description": "Proposal turned valid",
     "defaultMessage": "Proposal accepted!",
-    "message": "Beschluss angenommen",
+    "message": "Vorschlag angenommen",
     "files": ["src/components/Activity/Activity.js"]
   },
   {
@@ -1230,7 +1230,7 @@
     "id": "proposals",
     "description": "Proposals label",
     "defaultMessage": "Proposals",
-    "message": "Beschlüsse",
+    "message": "Vorschläge",
     "files": [
       "src/components/Navigation/Navigation.js",
       "src/components/WorkTeam/WorkTeam.js",
@@ -1499,7 +1499,7 @@
     "id": "notifications.proposal.new",
     "description": "Status message for notifications",
     "defaultMessage": "New proposal published: ",
-    "message": "Neuer Beschluss:",
+    "message": "Neuer Vorschlag:",
     "files": ["src/components/UserNotification/UserNotification.js"]
   },
   {
@@ -1664,7 +1664,7 @@
     "id": "label.newProposals",
     "description": "Label new proposals",
     "defaultMessage": "New Proposals",
-    "message": "Neue Beschlüsse",
+    "message": "Neue Vorschläge",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
@@ -1713,14 +1713,14 @@
     "id": "label.onWatchedProposals",
     "description": "Label for watched proposals/surveys",
     "defaultMessage": "on watched proposals/surveys",
-    "message": "bei abonnierten Beschlüssen/Umfragen",
+    "message": "bei abonnierten Vorschlägen/Umfragen",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {
     "id": "label.proposalAndSurveys",
     "description": "Label proposal and surveys",
     "defaultMessage": "Proposals and Surveys",
-    "message": "Beschlüsse und Umfragen",
+    "message": "Vorschläge und Umfragen",
     "files": ["src/components/NotificationSettings/NotificationSettings.js"]
   },
   {

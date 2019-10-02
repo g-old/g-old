@@ -5,14 +5,12 @@
     "lld-IT": "Ciao"
   },
   "signup": {
-    "de-DE":
-      " Wir freuen uns sehr, Sie hier auf unserer Plattform GOLD begrüßen zu dürfen!",
-    "it-IT": "Siamo lieti di accoglierti nella piattaforma  GOLD!",
-    "lld-IT": "Con plajei Ves saludun sun la plataforma GOLD"
+    "de-DE": " Wir freuen uns sehr, Sie hier auf unserer Plattform VIP begrüßen zu dürfen!",
+    "it-IT": "Siamo lieti di accoglierti nella piattaforma  VIP!",
+    "lld-IT": "Con plajei Ves saludun sun la plataforma VIP"
   },
   "explainConfirmation": {
-    "de-DE":
-      "Jetzt müssen Sie nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
+    "de-DE": "Jetzt müssen Sie nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
     "it-IT": "Attendiamo ancora la conferma del tuo indirizzo email.",
     "lld-IT": "Al mancia ma plu la conferma de vosta miscion email."
   },
@@ -31,18 +29,15 @@
     "it-IT": "Saluti",
     "lld-IT": "De biei saluc"
   },
-  "GOLD password reset requested": {
-    "de-DE": "GOLD Passwortänderung",
-    "it-IT": "Modifica della password di GOLD",
-    "lld-IT": "Mudament dla password de GOLD"
+  "VIP password reset requested": {
+    "de-DE": "VIP Passwortänderung",
+    "it-IT": "Modifica della password di VIP",
+    "lld-IT": "Mudament dla password de VIP"
   },
   "resetRequest": {
-    "de-DE":
-      "Wir schicken Ihnen diese Email, da Sie das Passwort für ihr Konto zurücksetzen möchten.",
-    "it-IT":
-      "Ti mandiamo questa mail perchè  hai chiesto di modificare la password del tuo account",
-    "lld-IT":
-      "Ves manun chesta mail, ajache aveis damandé de mudé la password de vost account"
+    "de-DE": "Wir schicken Ihnen diese Email, da Sie das Passwort für ihr Konto zurücksetzen möchten.",
+    "it-IT": "Ti mandiamo questa mail perchè  hai chiesto di modificare la password del tuo account",
+    "lld-IT": "Ves manun chesta mail, ajache aveis damandé de mudé la password de vost account"
   },
   "clickReset": {
     "de-DE": "Mein Passwort zurücksetzen",
@@ -50,37 +45,29 @@
     "lld-IT": "Reseté la password"
   },
   "resetDisclaimer": {
-    "de-DE":
-      "Wenn die Anfrage nicht von ihnen kommt, ignorieren Sie bitte diese Email. Ihr Passwort bleibt dann unverändert.",
-    "it-IT":
-      "Se non hai mandato tu la richiesta, ignora questa mail. La tua password non verrà modificata",
-    "lld-IT":
-      "Sce ne eis nia Vos damané le mudament dla password, no Ves cruziede. La password restarà la medema"
+    "de-DE": "Wenn die Anfrage nicht von ihnen kommt, ignorieren Sie bitte diese Email. Ihr Passwort bleibt dann unverändert.",
+    "it-IT": "Se non hai mandato tu la richiesta, ignora questa mail. La tua password non verrà modificata",
+    "lld-IT": "Sce ne eis nia Vos damané le mudament dla password, no Ves cruziede. La password restarà la medema"
   },
   "emailVerification": {
-    "de-DE":
-      "Sie haben Ihre E-Mail-Adresse auf der Plattform GOLD geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
-    "it-IT":
-      "Hai appena modificato l'indirizzo email della piattaforma GOLD. Per cortesia puoi confermare la correttezza dell'indirizzo e-mail?",
-    "lld-IT":
-      "Vos eis mudé la miscion e-mail dla paltaforma GOLD. Preibel podeis confermé la nueva miscion e-mail?"
+    "de-DE": "Sie haben Ihre E-Mail-Adresse auf der Plattform VIP geändert. Sie müssen nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben.",
+    "it-IT": "Hai appena modificato l'indirizzo email della piattaforma VIP. Per cortesia puoi confermare la correttezza dell'indirizzo e-mail?",
+    "lld-IT": "Vos eis mudé la miscion e-mail dla paltaforma VIP. Preibel podeis confermé la nueva miscion e-mail?"
   },
-  "GOLD verification mail": {
-    "de-DE": "GOLD - Verifizierung ihrer Email-Adresse",
-    "it-IT": "GOLD - Verifica indirizzo email",
-    "lld-IT": "GOLD -Verifica dla misciun email"
+  "VIP verification mail": {
+    "de-DE": "VIP - Verifizierung ihrer Email-Adresse",
+    "it-IT": "VIP - Verifica indirizzo email",
+    "lld-IT": "VIP -Verifica dla misciun email"
   },
   "resetNotification": {
-    "de-DE":
-      "Wir möchten Ihnen mitteilen, dass Sie das Passwort für ihr Konto gerade erfolgreich geändert haben.",
-    "it-IT":
-      "Confermiamo che la tua password è appena stata modificata correttamente.",
+    "de-DE": "Wir möchten Ihnen mitteilen, dass Sie das Passwort für ihr Konto gerade erfolgreich geändert haben.",
+    "it-IT": "Confermiamo che la tua password è appena stata modificata correttamente.",
     "lld-IT": "Vosta password é vegnuda mudeda coretamenter."
   },
-  "GOLD password changed": {
-    "de-DE": "GOLD - Passwort geändert",
-    "it-IT": "GOLD - password modificata",
-    "lld-IT": "GOLD - password mudeda"
+  "VIP password changed": {
+    "de-DE": "VIP - Passwort geändert",
+    "it-IT": "VIP - password modificata",
+    "lld-IT": "VIP - password mudeda"
   },
   "Visit our site?": {
     "de-DE": "Möchten sie uns besuchen?",
@@ -92,19 +79,19 @@
     "it-IT": "cliccare qui",
     "lld-IT": "cliché chilò"
   },
-  "Welcome on GOLD": {
-    "de-DE": "Herzlich willkommen auf m5sbz.g-old.org",
-    "it-IT": "Benvenuti su m5sbz.g-old.org",
-    "lld-IT": "Benvegnus sun m5sbz.g-old.org"
+  "Welcome on VIP": {
+    "de-DE": "Herzlich willkommen auf volks-ini-pop-bz.org",
+    "it-IT": "Benvenuti su volks-ini-pop-bz.org",
+    "lld-IT": "Benvegnus sun volks-ini-pop-bz.org"
   },
   "messageSubject": {
-    "de-DE": "Persönliche Nachricht für Sie von g-old.org",
-    "it-IT": "Messaggio personale per te da m5sbz.g-old.org",
-    "lld-IT": "Messaje personal per Vos da m5sbz.g-old.org"
+    "de-DE": "Persönliche Nachricht für Sie von volks-ini-pop-bz.org",
+    "it-IT": "Messaggio personale per te da volks-ini-pop-bz.org",
+    "lld-IT": "Messaje personal per Vos da volks-ini-pop-bz.org"
   },
   "proposalNotificationSubject": {
-    "de-DE": "Neuer Beschluss auf m5sbz.g-old.org",
-    "it-IT": "Nuova proposta su m5sbz.g-old.org",
+    "de-DE": "Neuer Beschluss auf volks-ini-pop-bz.org",
+    "it-IT": "Nuova proposta su volks-ini-pop-bz.org",
     "lld-IT": ""
   },
   "clickProposalLink": {

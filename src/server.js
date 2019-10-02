@@ -253,6 +253,7 @@ if (__DEV__) {
             title: 'Title of the proposal',
           },
           locale: req.language,
+          sender: actor,
         });
         break;
       }
