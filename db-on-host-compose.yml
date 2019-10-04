@@ -1,11 +1,12 @@
-version: "3"
+version: '3'
 services:
   web:
     image: index.docker.io/tobiasmayr/gold:${TAG}
     restart: always
-    network_mode: "host"
+    network_mode: 'host'
     volumes:
       - ${BANNER}:/app/public/banner01.jpg
+      - ${IMAGES}:/app/images
     environment:
       - PORT=${PORT}
       - NODE_ENV=production
