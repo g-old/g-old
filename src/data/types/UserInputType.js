@@ -4,6 +4,7 @@ import {
   GraphQLInputObjectType,
   GraphQLID as ID,
 } from 'graphql';
+import VerificationInput from './VerificationInputType';
 
 const UserInputType = new GraphQLInputObjectType({
   name: 'UserInput',
@@ -38,6 +39,9 @@ const UserInputType = new GraphQLInputObjectType({
     },
     notificationSettings: {
       type: String,
+    },
+    verification: {
+      type: VerificationInput,
     },
 
     id: {

@@ -27,10 +27,9 @@ import {
   leaveWorkTeam,
 } from '../../actions/workTeam';
 import { loadFeed } from '../../actions/feed';
-import { uploadAvatar } from '../../actions/file';
+import { uploadAvatar, uploadFiles } from '../../actions/file';
 import { createMessage } from '../../actions/message';
 import { genProposalPageKey } from '../../reducers/pageInfo';
-
 import Label from '../../components/Label';
 import {
   getUser,
@@ -67,6 +66,9 @@ import ListItem from '../../components/ListItem';
 import history from '../../history';
 import ListView from '../../components/ListView';
 import ProposalPreview from '../../components/ProposalPreview';
+import VerificationUploadMask from './VerificationUploadMask';
+import { VerificationTypes } from '../../data/models/constants';
+import Layer from '../../components/Layer/Layer';
 
 const messages = defineMessages({
   settings: {
@@ -89,6 +91,24 @@ const messages = defineMessages({
     id: 'settings.waitCall',
     defaultMessage: 'You will be contacted as soon as possible',
     description: 'Notification to upload photo',
+  },
+  verifyCall: {
+    id: 'settings.verifyCall',
+    defaultMessage:
+      'Verify your identity to vote, comment and work on proposals',
+    description: 'Notification to verify identity',
+  },
+  verifyWaitCall: {
+    id: 'settings.verifyWaitCall',
+    defaultMessage:
+      'Your verification request will be processed as soon as possible',
+    description: 'Notification to verify identity progress',
+  },
+  verifyDeniedCall: {
+    id: 'settings.verifyDeniedCall',
+    defaultMessage:
+      'Your verification request was denied. Try again or contact us directly',
+    description: 'Notification of verification denial',
   },
   followees: {
     id: 'profile.followees',
@@ -133,32 +153,6 @@ const renderFollowee = (data, fn, del) => (
   </li>
 );
 
-const getNotification = (ownAccount, user) => {
-  let messageId;
-  if (ownAccount && !user.emailVerified) {
-    messageId = 'verificationCall';
-  } else if (ownAccount && !user.thumbnail) {
-    messageId = 'uploadCall';
-    // eslint-disable-next-line no-bitwise
-  } else if (ownAccount && user.groups === Groups.GUEST) {
-    messageId = 'waitCall';
-  }
-
-  return (
-    messageId && (
-      <Notification
-        type="alert"
-        message={
-          <FormattedMessage
-            {...messages[messageId]}
-            values={{ email: user.email }}
-          />
-        }
-      />
-    )
-  );
-};
-
 // TODO use ListView OR enhance List w errorhandlers etc
 const renderMessageList = data => {
   if (data) {
@@ -200,8 +194,11 @@ class AccountContainer extends React.Component {
       ),
     }).isRequired,
     updateUser: PropTypes.func.isRequired,
+    uploadFiles: PropTypes.func.isRequired,
+    deleteUser: PropTypes.func.isRequired,
     // eslint-disable-next-line react/forbid-prop-types
     updates: PropTypes.object.isRequired,
+    small: PropTypes.bool.isRequired,
     fetchUser: PropTypes.func.isRequired,
     uploadAvatar: PropTypes.func.isRequired,
     checkSubscription: PropTypes.func.isRequired,
@@ -231,12 +228,15 @@ class AccountContainer extends React.Component {
       name: PropTypes.string,
       surname: PropTypes.string,
     }).isRequired,
+    logout: PropTypes.func.isRequired,
     requestUpdates: PropTypes.shape({}).isRequired,
     deleteRequest: PropTypes.func.isRequired,
     createRequest: PropTypes.func.isRequired,
     loadMessages: PropTypes.func.isRequired,
     createMessage: PropTypes.func.isRequired,
     messageUpdates: PropTypes.shape({}).isRequired,
+    proposals: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    pageInfo: PropTypes.shape({}).isRequired,
   };
 
   static defaultProps = {
@@ -259,6 +259,8 @@ class AccountContainer extends React.Component {
     this.onNotify = this.onNotify.bind(this);
     this.fetchLogs = this.fetchLogs.bind(this);
     this.fetchMessages = this.fetchMessages.bind(this);
+    this.toggleVerification = this.toggleVerification.bind(this);
+    this.getNotification = this.getNotification.bind(this);
   }
 
   componentDidMount() {
@@ -267,9 +269,17 @@ class AccountContainer extends React.Component {
   }
 
   componentWillReceiveProps({ updates, subscription, user }) {
-    const { user: oldUser } = this.props;
+    const { user: oldUser, updates: oldUpdates } = this.props;
     if (updates.dataUrl && updates.dataUrl.success) {
       this.setState({ showUpload: false });
+    }
+
+    if (
+      updates.verification &&
+      updates.verification.success &&
+      !(oldUpdates.verification && oldUpdates.verification.success)
+    ) {
+      this.toggleVerification();
     }
     if (subscription) {
       this.setState({ disableSubscription: subscription.disabled });
@@ -302,6 +312,40 @@ class AccountContainer extends React.Component {
     });
   }
 
+  getNotification(ownAccount, user) {
+    let messageId;
+    let action;
+    if (ownAccount && !user.emailVerified) {
+      messageId = 'verificationCall';
+    } else if (ownAccount && user.groups === Groups.GUEST && !user.thumbnail) {
+      messageId = 'uploadCall';
+      // eslint-disable-next-line no-bitwise
+    } else if (ownAccount && user.groups === Groups.GUEST) {
+      messageId = 'waitCall';
+    } else if (user.verificationStatus === VerificationTypes.UNREQUESTED) {
+      messageId = 'verifyCall';
+      action = <Button onClick={this.toggleVerification}>Verify</Button>;
+    } else if (user.verificationStatus === VerificationTypes.PENDING) {
+      messageId = 'verifyWaitCall';
+    } else if (user.verificationStatus === VerificationTypes.DENIED) {
+      messageId = 'verifyDenied';
+    }
+    return (
+      messageId && (
+        <Notification
+          type="alert"
+          action={action}
+          message={
+            <FormattedMessage
+              {...messages[messageId]}
+              values={{ email: user.email }}
+            />
+          }
+        />
+      )
+    );
+  }
+
   getUserData(user) {
     const { id } = user;
     const {
@@ -322,6 +366,12 @@ class AccountContainer extends React.Component {
     } else if (!fetched) {
       loadProfileData({ id });
     }
+  }
+
+  toggleVerification() {
+    this.setState(prevState => ({
+      openVerification: !prevState.openVerification,
+    }));
   }
 
   handleWPSubscription() {
@@ -366,6 +416,7 @@ class AccountContainer extends React.Component {
       sessionUser,
       updateUser: mutateUser,
       uploadAvatar: saveAvatar,
+      uploadFiles: upload,
       verifyEmail: emailVerification,
       deleteRequest: cancelRequest,
       createRequest: makeRequest,
@@ -378,12 +429,16 @@ class AccountContainer extends React.Component {
       proposals,
       pageInfo,
     } = this.props;
-    console.log('PROPOSALS', proposals);
 
-    const { editFollowees, showUpload, disableSubscription } = this.state;
+    const {
+      editFollowees,
+      showUpload,
+      disableSubscription,
+      openVerification,
+    } = this.state;
     if (!user) return null;
     const { followees = [] } = user;
-    const notification = getNotification(ownAccount, user);
+    const notification = this.getNotification(ownAccount, user);
 
     const profile = (
       <Profile
@@ -395,6 +450,7 @@ class AccountContainer extends React.Component {
         messageUpdates={messageUpdates}
         onSend={this.onNotify}
         sessionUser={sessionUser}
+        toggleVerification={this.toggleVerification}
       />
     );
     if (!ownAccount) {
@@ -491,6 +547,35 @@ class AccountContainer extends React.Component {
     } else {
       displayLog = 'No data';
     }
+
+    let ProposalPanel = <div />;
+    if (proposals && proposals.length) {
+      ProposalPanel = (
+        <AccordionPanel column heading="My proposals">
+          {proposals && (
+            <ListView
+              onRetry={this.handleOnRetry}
+              onLoadMore={this.handleLoadMore}
+              pageInfo={pageInfo}
+            >
+              {proposals.map(
+                proposal =>
+                  proposal && (
+                    <ProposalPreview
+                      proposal={{
+                        ...proposal,
+                        image: proposal.image && `/s460/${proposal.image}`,
+                      }}
+                      onClick={this.onProposalClick}
+                    />
+                  ),
+              )}
+            </ListView>
+          )}
+        </AccordionPanel>
+      );
+    }
+
     return (
       <Box tag="article" column padding="medium">
         {notification}
@@ -508,6 +593,17 @@ class AccountContainer extends React.Component {
                 this.setState({ showUpload: false });
               }}
             />
+          )}
+          {openVerification && (
+            <Layer fill onClose={this.toggleVerification}>
+              <VerificationUploadMask
+                upload={upload}
+                update={mutateUser}
+                pending={updates.verification && updates.verification.pending}
+                error={updates.verification && updates.verification.error}
+                userId={user.id}
+              />
+            </Layer>
           )}
           {profile}
 
@@ -564,29 +660,9 @@ class AccountContainer extends React.Component {
                   disableSubscription={disableSubscription}
                 />
               </AccordionPanel>
+              {ProposalPanel}
             </Accordion>
           </Box>
-          <Label>My Proposals</Label>
-          {proposals && (
-            <ListView
-              onRetry={this.handleOnRetry}
-              onLoadMore={this.handleLoadMore}
-              pageInfo={pageInfo}
-            >
-              {proposals.map(
-                proposal =>
-                  proposal && (
-                    <ProposalPreview
-                      proposal={{
-                        ...proposal,
-                        image: proposal.image && `/s460/${proposal.image}`,
-                      }}
-                      onClick={this.onProposalClick}
-                    />
-                  ),
-              )}
-            </ListView>
-          )}
         </Box>
       </Box>
     );
@@ -612,6 +688,7 @@ const mapDispatch = {
   createMessage,
   deleteUser,
   logout,
+  uploadFiles,
 };
 const mapStateToProps = (state, { user }) => ({
   user: getUser(state, user.id) || user,
@@ -625,8 +702,8 @@ const mapStateToProps = (state, { user }) => ({
   logError: getLogErrorMessage(state),
   messageUpdates: getMessageUpdates(state),
   small: getLayoutSize(state),
-  proposals: getAllProposals(state, 'active').filter(
-    proposal => proposal.authorId === user.id,
+  proposals: getAllProposals(state, 'active').filter(proposal =>
+    proposal.spokesman ? proposal.spokesman.id == user.id : false,
   ),
   pageInfo: getResourcePageInfo(
     state,

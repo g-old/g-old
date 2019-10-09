@@ -14,6 +14,7 @@ import WorkTeamType from './WorkTeamType';
 import NotificationType from './NotificationType';
 import MessageType from './MessageType';
 import requestConnection from '../queries/requestConnection';
+import VerificationType from './VerificationType';
 /* eslint-enable import/no-cycle */
 import WorkTeam from '../models/WorkTeam';
 import Notification from '../models/Notification';
@@ -21,6 +22,8 @@ import Message from '../models/Message';
 import User from '../models/User';
 import { Permissions } from '../../organization';
 import GraphQLDate from './GraphQLDateType';
+import Verification from '../models/Verification';
+import VerificationStatusEnumType from './VerificationStatusEnum';
 
 /* eslint-disable */
 const canSee = (viewer, data) =>
@@ -74,6 +77,14 @@ const UserType = new ObjectType({
         User.followees(viewer, data.id, loaders).then(ids =>
           ids.map(id => User.gen(viewer, id, loaders)),
         ),
+    },
+    verification: {
+      type: VerificationType,
+      resolve: (parent, args, { viewer, loaders }) =>
+        Verification.gen(viewer, parent.id, loaders),
+    },
+    verificationStatus: {
+      type: VerificationStatusEnumType,
     },
     requestConnection,
 
