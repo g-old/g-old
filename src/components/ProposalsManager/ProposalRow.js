@@ -5,7 +5,7 @@ import TableRow from '../TableRow';
 import PollState from '../PollState';
 import { ApprovalStates } from '../../organization';
 
-const Symbols = {
+export const Symbols = {
   approved: (
     <svg
       style={{ stroke: '#333', strokeWidth: '2px', width: '1.5em' }}

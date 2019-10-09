@@ -11,6 +11,7 @@ import MessageForm from '../MessageForm';
 import { Groups, isAdmin } from '../../organization';
 import RoleBadge from './RoleBadge';
 import { ICONS } from '../../constants';
+import VerificationBadge from './VerificationBadge';
 
 const isContactable = (workteams, accountId, accountRoles, visitor) => {
   // eslint-disable-next-line no-bitwise
@@ -36,6 +37,7 @@ class UserProfile extends React.Component {
   static propTypes = {
     user: PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      verificationStatus: PropTypes.string,
       email: PropTypes.string,
       name: PropTypes.string,
       surname: PropTypes.string,
@@ -54,9 +56,13 @@ class UserProfile extends React.Component {
     ownAccount: PropTypes.bool.isRequired,
     onImageChange: PropTypes.func.isRequired,
     updates: PropTypes.shape({ dataUrl: PropTypes.string }).isRequired,
-    sessionUser: PropTypes.shape({}).isRequired,
+    sessionUser: PropTypes.shape({
+      groups: PropTypes.number,
+      id: PropTypes.number,
+    }).isRequired,
     onSend: PropTypes.func.isRequired,
     messageUpdates: PropTypes.func.isRequired,
+    toggleVerification: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -116,6 +122,7 @@ class UserProfile extends React.Component {
       onSend,
       messageUpdates,
       sessionUser,
+      toggleVerification,
     } = this.props;
 
     if (!user) return null;
@@ -147,6 +154,10 @@ class UserProfile extends React.Component {
           {name} {surname}
         </Label>
         <RoleBadge groups={user.groups} />
+        <VerificationBadge
+          onClick={toggleVerification}
+          status={user.verificationStatus}
+        />
         <Box>
           <Value
             icon={
