@@ -151,8 +151,8 @@ export function uploadFiles(data, params) {
       uploadData = data;
     }
 
-    uploadData.forEach(img => {
-      formData.append('images', img);
+    uploadData.forEach(file => {
+      formData.append('files', file);
     });
 
     formData.append('params', JSON.stringify(params));
@@ -185,7 +185,7 @@ export function uploadFiles(data, params) {
       // only one filename is necessary
       return responseData.result && responseData.result.length
         ? responseData.result[0]
-        : null;
+        : false;
     } catch (error) {
       dispatch({
         type: UPLOAD_FILE_ERROR,

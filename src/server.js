@@ -54,9 +54,10 @@ import EventManager from './core/EventManager';
 import root from './compositionRoot';
 import { EmailType } from './core/BackgroundService';
 import Request from './data/models/Request';
-import ImageManager from './core/ImageManager';
+import ImageManager from './FileManager';
 
 /* eslint-enable import/first */
+const PRIVATE_FILE_FOLDER = 'private_files';
 
 process.on('unhandledRejection', (reason, p) => {
   log.error({ err: { position: p, reason } }, 'Unhandled Rejection');
@@ -145,7 +146,9 @@ if (config.profiling) {
   app.use(responseTiming());
 }
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static(path.join(__dirname, '/avatars')));
+if (__DEV__) {
+  app.use(express.static(path.join(__dirname, '/avatars')));
+}
 app.use(express.static(path.join(__dirname, '/images')));
 
 app.use(cookieParser());
@@ -412,8 +415,6 @@ app.post('/signup', (req, res) => {
 });
 const storage = multer.memoryStorage();
 const FileStore = FileStorage(AvatarManager({ local: !!__DEV__ }));
-const IManager = new ImageManager({ folder: 'images', imageSizes: [460, 720] });
-IManager.init();
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ensureAuthenicated = (req, res, next) => {
@@ -427,17 +428,73 @@ const ensureAuthenicated = (req, res, next) => {
 app.post(
   '/upload/files',
   ensureAuthenicated,
-  multer({ storage, limits: { fieldSize: MAX_FILE_SIZE } }).array('images', 10),
+  multer({ storage, limits: { fieldSize: MAX_FILE_SIZE } }).array('files', 10),
   async (req, res) => {
-    if (!req.user) res.status(505);
-    const result = await IManager.storeImages({
-      viewer: req.user,
-      data: { images: req.files, params: JSON.parse(req.body.params) },
-      loaders: createLoaders(),
-    });
-    res.json(result);
+    if (!req.user) {
+      return res.status(505);
+    }
+    try {
+      const params = JSON.parse(req.body.params || {});
+      if (params.private) {
+        if (params.verification) {
+          const result = await ImageManager.storePrivateImages({
+            viewer: req.user,
+            data: { images: req.body.files, params },
+            loaders: createLoaders(),
+          });
+
+          if (!result || !result.result) {
+            return res.json({
+              error: (result && result.error) || 'File saving failed',
+            });
+          }
+
+          return res.json({ result: result.result });
+        }
+      }
+      // it seems, that binary files are stored in req.files, but base64-strings in req.body
+      const result = await ImageManager.storeImages({
+        viewer: req.user,
+        data: { images: req.files, params },
+        loaders: createLoaders(),
+      });
+      return res.json(result);
+    } catch (err) {
+      return res.json({ error: err });
+    }
   },
 );
+// For protected resources
+app.get('/files/:fileName', ensureAuthenicated, (req, res) => {
+  // eslint-disable-next-line no-bitwise
+  if (req.user.groups & Groups.MEMBER_MANAGER) {
+    const { fileName } = req.params;
+    // Maybe not necessary, don't know how much protection path.resolve and sendFile offer
+
+    if (fileName.length && fileName.length < 50 && fileName.length > 5) {
+      const [name, extension] = fileName.split('.');
+      if (extension === 'jpg') {
+        // from https://github.com/parshap/node-sanitize-filename/blob/master/index.js
+        // eslint-disable-next-line no-useless-escape
+        const illegalRe = /[\/\?<>\\:\*\|"]/g;
+        // eslint-disable-next-line no-control-regex
+        const controlRe = /[\x00-\x1f\x80-\x9f]/g;
+        const reservedRe = /^\.+$/;
+
+        if (![illegalRe, controlRe, reservedRe].some(re => name.match(re))) {
+          return res.sendFile(
+            path.resolve(
+              __dirname,
+              `${PRIVATE_FILE_FOLDER}/${req.params.fileName}`,
+            ),
+          );
+        }
+      }
+    }
+    return res.sendStatus(400);
+  }
+  return res.sendStatus(403);
+});
 
 app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
   if (!req.user) res.status(505);

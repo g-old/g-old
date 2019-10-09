@@ -96,6 +96,7 @@ class ImageManager {
     }
 
     this.baseFolder = props.folder;
+    this.privateFolder = props.privateFolder || 'private_files';
     this.maxFileSize = props.maxFileSize || 10 * 1000 * 1000;
     this.maxFileNumber = props.maxFileNumber || 10;
 
@@ -105,15 +106,21 @@ class ImageManager {
 
   init() {
     const basePath = path.resolve(__dirname, this.baseFolder);
+    const privatePath = path.resolve(__dirname, this.privateFolder);
     // return makeDir(basePath);
-    try {
-      return fs.mkdirSync(basePath);
-    } catch (e) {
-      if (e && e.code !== 'EEXIST') {
-        throw new Error(e, 'Cannot make image dir');
+
+    const makeDirSync = fPath => {
+      try {
+        return fs.mkdirSync(fPath);
+      } catch (e) {
+        if (e && e.code !== 'EEXIST') {
+          throw new Error(e, `Cannot make dir at${fPath}`);
+        }
+        return true;
       }
-      return true;
-    }
+    };
+    makeDirSync(basePath);
+    makeDirSync(privatePath);
   }
 
   async saveImageToHDD(buffer, fileName) {
@@ -151,6 +158,7 @@ class ImageManager {
     const { fileData, isBase64 } = getFileData(file);
     const imgBuffer = Buffer.from(fileData, isBase64 ? 'base64' : undefined);
     try {
+      // TODO check filetype
       const image = sharp(imgBuffer);
 
       const fullPath = genFullPath(
@@ -180,7 +188,6 @@ class ImageManager {
   }
 
   async store(viewer, { file, index }) {
-    let result;
     if (file.length > this.maxFileSize) {
       throw new Error(
         `File size at index ${index} is greater than MAX_FILE_SIZE:${this.maxFileSize} File: ${file.length}`,
@@ -195,19 +202,53 @@ class ImageManager {
     const fileName = genFileName('jpg');
 
     try {
-      const success = await this.saveImageToHDD(imgBuffer, fileName);
-      if (success) {
-        /* const imageResult = await Image.create(
-          viewer,
-          { path: fileName, section },
-          loaders,
-        ); */
-        result = true; // imageResult.result;
-      }
-    } catch (e) {
-      console.error('WRITING FAILED', e);
+      const image = sharp(imgBuffer);
+      const fullPath = genFullPath([this.privateFolder], fileName);
+      await image.toFile(fullPath);
+      return path.join('/', 'files', fileName);
+    } catch (err) {
+      log.error({ err }, 'File saving failed');
+      return false;
     }
-    return result;
+  }
+
+  validate(viewer, images, params, loaders, errors) {
+    let files;
+    if (!Array.isArray(images)) {
+      files = [images];
+    } else {
+      if (images.length > this.maxFileNumber) {
+        errors.push(Errors.ARGUMENT_ERROR);
+        return { error: errors };
+      }
+      files = images;
+    }
+    return files;
+  }
+
+  async storePrivateImages({ viewer, data: { images, params }, loaders }) {
+    const errors = [];
+    if (!viewer || !images || !params || !loaders) {
+      errors.push(Errors.ARGUMENT_MISSING);
+      return { error: errors };
+    }
+    let files;
+    if (!Array.isArray(images)) {
+      files = [images];
+    } else {
+      if (images.length > this.maxFileNumber) {
+        errors.push(Errors.ARGUMENT_ERROR);
+        return { error: errors };
+      }
+      files = images;
+    }
+    const promises = files.map((file, index) =>
+      this.store(viewer, { file, index, section: params.section }, loaders),
+    );
+
+    const result = await Promise.all(promises);
+
+    return { errors, result };
   }
 
   async storeImages({ viewer, data: { images, params }, loaders }) {
@@ -255,16 +296,27 @@ class ImageManager {
         return { errors, result };
       }
 
-      const promises = files.map((file, index) =>
-        this.store(viewer, { file, index, section: params.section }, loaders),
-      );
-
-      const result = await Promise.all(promises);
-
-      return { errors, result };
+      return { errors };
     } catch (e) {
       // final catch
       return { errors };
+    }
+  }
+
+  async deletePrivateImage({ viewer, data: { fileName } }) {
+    const errors = [];
+    if (!viewer || !fileName) {
+      errors.push(Errors.ARGUMENT_MISSING);
+      return { error: errors };
+    }
+    const fPath = genFullPath([this.privateFolder], fileName);
+    try {
+      await fileExists(fPath);
+      await deleteFile(fPath);
+      return { result: true };
+    } catch (e) {
+      console.error(`File not found for deletion: ${fPath}`);
+      return { error: e };
     }
   }
 
