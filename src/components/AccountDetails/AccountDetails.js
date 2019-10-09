@@ -22,6 +22,8 @@ import Notification from '../Notification';
 import Label from '../Label';
 import s from './AccountDetails.css';
 import Button from '../Button';
+import VerificationManager from './VerificationManager';
+import { VerificationTypes } from '../../data/models/constants';
 
 const messages = defineMessages({
   headerRights: {
@@ -69,6 +71,11 @@ const messages = defineMessages({
     defaultMessage: "You can't leave this empty",
     description: 'Help for empty fields',
   },
+  verification: {
+    id: 'label.verification',
+    defaultMessage: 'Verification',
+    description: 'Verification',
+  },
 });
 const checkAvatar = url => (url ? url.indexOf('cloudinary') !== -1 : false);
 
@@ -87,10 +94,13 @@ class AccountDetails extends React.Component {
       email: PropTypes.string,
       name: PropTypes.string,
       surname: PropTypes.string,
-      avatar: PropTypes.string,
+      thumbnail: PropTypes.string,
       privilege: PropTypes.string,
       emailVerified: PropTypes.bool,
       lastLogin: PropTypes.string,
+      groups: PropTypes.number,
+      verificationStatus: PropTypes.string.isRequired,
+      verification: PropTypes.shape().isRequired,
       role: PropTypes.shape({
         type: PropTypes.string,
       }),
@@ -100,15 +110,20 @@ class AccountDetails extends React.Component {
     accountId: PropTypes.string.isRequired,
     user: PropTypes.shape({
       id: PropTypes.string,
-      privilege: PropTypes.string,
+      privileges: PropTypes.string,
       role: PropTypes.shape({ type: PropTypes.string }),
     }).isRequired,
     uploadAvatar: PropTypes.func.isRequired,
     updates: PropTypes.shape({
       dataUrl: PropTypes.string,
+      role: PropTypes.string,
+      privileges: PropTypes.number,
       message: PropTypes.shape({
         success: PropTypes.bool,
         pending: PropTypes.bool,
+      }),
+      deleted: PropTypes.shape({
+        success: PropTypes.bool,
       }),
     }).isRequired,
     createMessage: PropTypes.func.isRequired,
@@ -123,6 +138,7 @@ class AccountDetails extends React.Component {
     this.onPromoteToViewer = this.onPromoteToViewer.bind(this);
     this.displayUploadLayer = this.displayUploadLayer.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleVerification = this.handleVerification.bind(this);
     this.state = {
       showUpload: false,
     };
@@ -165,6 +181,21 @@ class AccountDetails extends React.Component {
     }
   }
 
+  handleVerification({ isAdult, livesHere }) {
+    const {
+      update,
+      accountData: { verification, id },
+      onClose,
+    } = this.props;
+    const newStatus =
+      VerificationTypes[isAdult && livesHere ? 'CONFIRMED' : 'DENIED'];
+    // TODO proper error handling
+    update({
+      id,
+      verification: { id: verification.id, status: newStatus },
+    }).then(() => onClose());
+  }
+
   handleDelete() {
     const { deleteUser: eraseUser, accountData } = this.props;
     eraseUser({ id: accountData.id });
@@ -190,14 +221,33 @@ class AccountDetails extends React.Component {
     }
     const {
       id,
-      avatar,
       name,
       surname,
       emailVerified,
       lastLogin,
       groups,
       thumbnail,
+      verification,
     } = accountData;
+
+    let VerificationPanel = <div />;
+    if (verification) {
+      const confirmed =
+        accountData.verificationStatus === VerificationTypes.CONFIRMED;
+
+      VerificationPanel = (
+        <AccordionPanel
+          heading={<FormattedMessage {...messages.verification} />}
+        >
+          <VerificationManager
+            onSubmit={this.handleVerification}
+            user={accountData}
+            livesHere={confirmed}
+            isAdult={confirmed}
+          />
+        </AccordionPanel>
+      );
+    }
 
     let RightsPanel = <div />;
     // eslint-disable-next-line no-bitwise
@@ -207,7 +257,7 @@ class AccountDetails extends React.Component {
           heading={<FormattedMessage {...messages.headerRights} />}
         >
           <RightsManager
-            updates={updates.privilege}
+            updates={updates.privileges}
             updateFn={update}
             account={accountData}
             id={id}
@@ -249,7 +299,7 @@ class AccountDetails extends React.Component {
       );
     }
 
-    const avatarSet = checkAvatar(avatar || thumbnail);
+    const avatarSet = checkAvatar(thumbnail);
     return (
       <Box className={s.root} flex wrap>
         <Box className={s.profile} flex pad align column>
@@ -269,7 +319,7 @@ class AccountDetails extends React.Component {
           )}
           <ProfilePicture
             user={accountData}
-            img={avatar}
+            img={thumbnail}
             canChange
             onChange={this.displayUploadLayer}
             updates={updates.dataUrl}
@@ -307,6 +357,7 @@ class AccountDetails extends React.Component {
         {user.id != id && (
           <Box column flex className={s.details}>
             <Accordion column>
+              {VerificationPanel}
               {GroupPanel}
               {RightsPanel}
               {MessagePanel}

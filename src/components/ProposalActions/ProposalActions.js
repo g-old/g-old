@@ -226,6 +226,7 @@ class ProposalActions extends React.Component<Props, State> {
     if (!poll.closedAt) {
       actions.push(
         <AccordionPanel
+          fill
           heading={
             <FormattedMessage
               {...messages[state === 'survey' ? 'close' : 'revoke']}
@@ -263,7 +264,6 @@ class ProposalActions extends React.Component<Props, State> {
         </AccordionPanel>,
       );
     }
-    actions.push(<Button onClick={this.toggleLayer}>Approval</Button>);
 
     return actions.length ? <Accordion>{actions}</Accordion> : [];
   }
