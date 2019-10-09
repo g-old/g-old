@@ -29,10 +29,19 @@ export const Models = {
   NOTE: 32768,
   COMMUNICATION: 65536,
   POLLING_MODE: 13172,
+  VERIFICATION: 26344,
 };
 
 /* GENERATOR_FN */
 /* eslint-disable no-unused-vars */
+function verificationReadControl(viewer, data) {
+  console.error('Access control for Verification not implemented');
+  return true;
+}
+function verificationWriteControl(viewer, data) {
+  console.error('Write control for Verification not implemented');
+  return true;
+}
 function pollingModeReadControl(viewer, data) {
   console.error('Access control for PollingMode not implemented');
   return true;
@@ -154,6 +163,9 @@ function userWriteControl(viewer, data) {
         // TODO further checks!
       }
     }
+    if (data.verification) {
+      return true;
+    }
   }
   if (data.userId && (viewer.permissions & Permissions.DELETE_ACCOUNTS) > 0) {
     return true;
@@ -164,8 +176,8 @@ function userWriteControl(viewer, data) {
 
 function userReadControl(viewer, data) {
   return (
-    // eslint-disable-next-line eqeqeq
     viewer &&
+    // eslint-disable-next-line eqeqeq
     (viewer.id == data.id ||
       viewer.groups === Groups.SYSTEM ||
       (viewer.permissions & AccessMasks.LEVEL_1) > 0)
@@ -175,10 +187,10 @@ function userReadControl(viewer, data) {
 const APPROVED =
   ApprovalStates.CONTENT_APPROVED | ApprovalStates.TOPIC_APPROVED;
 function proposalReadControl(viewer, data) {
-  if (data.approvalState & APPROVED) {
+  if (data.approvalState === APPROVED) {
     return true;
   }
-  if (viewer.permissions & Permissions.VIEW_PROPOSALS) {
+  if (viewer && viewer.permissions & Permissions.VIEW_PROPOSALS) {
     return checkIfMember(viewer, data);
   }
   return false;
@@ -467,6 +479,10 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
+  [Models.VERIFICATION]: {
+    [ATypes.WRITE]: verificationWriteControl,
+    [ATypes.READ]: verificationReadControl,
+  },
   [Models.COMMUNICATION]: {
     [ATypes.WRITE]: communicationWriteControl,
     [ATypes.READ]: communicationReadControl,
