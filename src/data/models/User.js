@@ -13,6 +13,8 @@ import { canSee, canMutate, Models } from '../../core/accessControl';
 import log from '../../logger';
 import EventManager from '../../core/EventManager';
 import { transactify } from './utils';
+import Verification from './Verification';
+import { VerificationTypes } from './constants';
 
 const NOTIFICATION_FIELDS = [
   'proposal',
@@ -100,6 +102,7 @@ class User {
     this.createdAt = data.created_at;
     this.canVoteSince = data.can_vote_since;
     this.locale = data.locale;
+    this.verificationStatus = data.verification_status;
   }
 
   static async gen(viewer, id, { users }) {
@@ -213,6 +216,34 @@ class User {
     }
     if (data.locale && ['it-IT', 'de-DE', 'lld-IT'].includes(data.locale)) {
       newData.locale = data.locale;
+    }
+    if (data.verification) {
+      // update or create verification?
+      let verification;
+      if (data.verification.id) {
+        verification = await Verification.update(
+          viewer,
+          data.verification,
+          loaders,
+        );
+        if (!verification) {
+          return { errors: ['verification-update-failed'] };
+        }
+        // TODO check methods
+        newData.verification_status = data.verification.status;
+      } else {
+        verification = await Verification.create(
+          viewer,
+          data.verification,
+          loaders,
+        );
+        if (!verification) {
+          return { errors: ['verification-create-failed'] };
+        }
+        newData.verification_status =
+          data.verification.status || VerificationTypes.PENDING;
+      }
+      // set user.verified: true?
     }
     if (data.notificationSettings) {
       // validate

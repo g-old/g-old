@@ -2,27 +2,27 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { FormattedMessage, defineMessages } from 'react-intl';
-import withStyles from 'isomorphic-style-loader/withStyles';
-import s from './UserPanel.css';
 import { createMessage, updateMessage } from '../../actions/message';
 import { updateUser, loadUserList, findUser } from '../../actions/user';
-import FetchError from '../FetchError';
 import AccountDetails from '../AccountDetails';
-import Accordion from '../Accordion';
-import AccordionPanel from '../AccordionPanel';
+
 import SearchField from '../SearchField';
 import Box from '../Box';
 import Button from '../Button';
 import FormField from '../FormField';
 import Layer from '../Layer';
-import UserListEntry from './UserListEntry';
 import { Groups } from '../../organization';
 import {
   getVisibleUsers,
   getUsersStatus,
   getSessionUser,
   getMessageUpdates,
+  getResourcePageInfo,
 } from '../../reducers';
+import UserFilter from './UserFilter';
+import AssetsTable from '../AssetsTable';
+import UserRow from './UserRow';
+import { genUsersPageKey } from '../../reducers/pageInfo';
 
 const messages = defineMessages({
   loadMore: {
@@ -42,13 +42,9 @@ const VIEWERS = Groups.VIEWER | Groups.GUEST;
 
 class UserPanel extends React.Component {
   static propTypes = {
-    guestArray: PropTypes.arrayOf(PropTypes.object),
-    viewerArray: PropTypes.arrayOf(PropTypes.object),
     loadUserList: PropTypes.func.isRequired,
     updateUser: PropTypes.func.isRequired,
-    guestArrayStatus: PropTypes.shape({ pending: PropTypes.bool }).isRequired,
-    viewerArrayStatus: PropTypes.shape({ pending: PropTypes.bool }).isRequired,
-
+    fetchUsers: PropTypes.func.isRequired,
     findUser: PropTypes.func.isRequired,
     userArray: PropTypes.arrayOf(PropTypes.object).isRequired,
     user: PropTypes.shape({
@@ -58,18 +54,28 @@ class UserPanel extends React.Component {
     createMessage: PropTypes.func.isRequired,
     updateMessage: PropTypes.func.isRequired,
     messageUpdates: PropTypes.shape({}).isRequired,
-  };
-
-  static defaultProps = {
-    guestArray: null,
-    viewerArray: null,
+    pageInfo: PropTypes.shape({
+      pagination: PropTypes.shape({ hasNextPage: PropTypes.bool }),
+      pending: PropTypes.bool,
+    }).isRequired,
   };
 
   constructor(props) {
     super(props);
-    this.state = { showAccount: false };
+    this.state = {
+      showAccount: false,
+      filter: {
+        verificationStatus: null,
+        group: null,
+        union: false,
+      },
+    };
     this.handleProfileClick = this.handleProfileClick.bind(this);
     this.handleLayerClosing = this.handleLayerClosing.bind(this);
+    this.fetchUsers = this.fetchUsers.bind(this);
+    this.handleFilterChange = this.handleFilterChange.bind(this);
+    this.onMenuClick = this.onMenuClick.bind(this);
+    this.toggleLayer = this.toggleLayer.bind(this);
   }
 
   componentDidMount() {
@@ -85,58 +91,74 @@ class UserPanel extends React.Component {
     this.setState({ showAccount: false });
   }
 
-  renderUserList(users) {
-    return (
-      <table className={s.userList}>
-        <thead>
-          <tr>
-            <th>Avatar</th>
-            <th>Name</th>
-            <th>Created at</th>
-            <th>Last login</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users &&
-            users.map(u => (
-              <UserListEntry
-                key={u.id}
-                user={u}
-                onProfileClick={this.handleProfileClick}
-              />
-            ))}
-        </tbody>
-      </table>
-    );
+  onMenuClick(action, data) {
+    this.setState({ currentUser: data, showLayer: true });
+  }
+
+  toggleLayer() {
+    this.setState(prevState => ({ showLayer: !prevState.showLayer }));
+  }
+
+  fetchUsers(after) {
+    const { fetchUsers } = this.props;
+    const { filter } = this.state;
+    fetchUsers({
+      after,
+      union: filter.union,
+      group: filter.group && filter.group.value,
+      verificationStatus:
+        filter.verificationStatus && filter.verificationStatus.value,
+    });
+  }
+
+  handleFilterChange(data) {
+    this.setState(prevState => {
+      if (prevState.filter[data.type]) {
+        let toDelete;
+        if (prevState.filter.objectId && data.type === 'type') {
+          toDelete = true;
+        }
+
+        const { [data.type]: omit, ...filter } = prevState.filter;
+        return {
+          filter: {
+            ...filter,
+            ...(omit === data.value ? [] : { [data.type]: data.value }),
+            ...(toDelete ? { objectId: undefined } : []),
+          },
+        };
+      }
+      return { filter: { ...prevState.filter, [data.type]: data.value } };
+    }, this.fetchUsers);
   }
 
   render() {
     const {
-      guestArrayStatus,
-      viewerArrayStatus,
-      viewerArray,
-      guestArray,
       userArray,
       user,
       findUser: fetchUser,
       updateUser: mutateUser,
-      loadUserList: loadUsers,
+      pageInfo,
     } = this.props;
-    const { showAccount, accountId } = this.state;
+    const {
+      showAccount,
+      accountId,
+      filter,
+      showLayer,
+      currentUser,
+    } = this.state;
     if (!user) return null;
     return (
-      <Box wrap>
-        <div style={{ marginLeft: '12px' }}>
-          <FormField overflow label="Username">
-            <SearchField
-              data={userArray}
-              fetch={fetchUser}
-              displaySelected={data => {
-                this.setState({ accountId: data.id, showAccount: true });
-              }}
-            />
-          </FormField>
-        </div>
+      <Box padding="medium" column>
+        <FormField overflow label="Username">
+          <SearchField
+            data={userArray}
+            fetch={fetchUser}
+            displaySelected={data => {
+              this.setState({ accountId: data.id, showAccount: true });
+            }}
+          />
+        </FormField>
         {showAccount && (
           <Layer onClose={this.handleLayerClosing}>
             <AccountDetails
@@ -147,80 +169,41 @@ class UserPanel extends React.Component {
             />
           </Layer>
         )}
-        <div style={{ width: '100%' }}>
-          <Accordion openMulti>
-            <AccordionPanel
-              heading="Guest accounts"
-              onActive={() => {
-                loadUsers({ group: Groups.GUEST });
-              }}
-            >
-              {guestArrayStatus.pending && !guestArray.length && (
-                <p>Loading...</p>
-              )}
-              {!guestArrayStatus.pending &&
-                !guestArray.length &&
-                !guestArrayStatus.error && <p> No data</p>}
-              {guestArrayStatus.error && (
-                <FetchError
-                  message={guestArrayStatus.error}
-                  onRetry={() => loadUsers({ group: Groups.GUEST })}
-                />
-              )}
-              {this.renderUserList(guestArray)}
-              {guestArrayStatus.pageInfo.hasNextPage && (
-                <Button
-                  primary
-                  disabled={guestArrayStatus.pending}
-                  onClick={() => {
-                    loadUsers({
-                      group: Groups.GUEST,
-                      after: guestArrayStatus.pageInfo.endCursor,
-                    });
-                  }}
-                  label={<FormattedMessage {...messages.loadMore} />}
-                />
-              )}
-            </AccordionPanel>
-            <AccordionPanel
-              heading="Viewer accounts"
-              onActive={() => {
-                loadUsers({ group: VIEWERS });
-              }}
-            >
-              {viewerArrayStatus.pending && !viewerArray.length && (
-                <p>Loading...</p>
-              )}
-              {!viewerArrayStatus.pending &&
-                !viewerArray.length &&
-                !viewerArrayStatus.error && <p> No data</p>}
-              {viewerArrayStatus.error && (
-                <FetchError
-                  message={viewerArrayStatus.error}
-                  onRetry={() =>
-                    loadUsers({
-                      group: VIEWERS,
-                    })
-                  }
-                />
-              )}
-              {this.renderUserList(viewerArray)}
-              {viewerArrayStatus.pageInfo.hasNextPage && (
-                <Button
-                  primary
-                  disabled={viewerArrayStatus.pending}
-                  onClick={() => {
-                    loadUsers({
-                      group: VIEWERS,
-                      after: viewerArrayStatus.pageInfo.endCursor,
-                    });
-                  }}
-                  label={<FormattedMessage {...messages.loadMore} />}
-                />
-              )}
-            </AccordionPanel>
-          </Accordion>
-        </div>
+        <UserFilter values={filter} onSelect={this.handleFilterChange} />
+        <AssetsTable
+          onClickMenu={this.onMenuClick}
+          allowMultiSelect
+          searchTerm=""
+          noRequestsFound="No requests found"
+          checkedIndices={[]}
+          assets={userArray || []}
+          row={UserRow}
+          tableHeaders={[
+            'Avatar',
+            'Name',
+            'VerificationStatus',
+            'Last login',
+            'Created at',
+          ]}
+        />
+        {pageInfo.pagination.hasNextPage && (
+          <Button
+            primary
+            disabled={pageInfo.pending}
+            onClick={this.handleLoadMore}
+            label={<FormattedMessage {...messages.loadMore} />}
+          />
+        )}
+        {showLayer && (
+          <Layer onClose={this.toggleLayer}>
+            <AccountDetails
+              user={user}
+              accountId={currentUser.id}
+              update={mutateUser}
+              onClose={this.toggleLayer}
+            />
+          </Layer>
+        )}
       </Box>
     );
   }
@@ -234,11 +217,17 @@ const mapStateToProps = state => ({
   userArray: getVisibleUsers(state, 'all'),
   user: getSessionUser(state),
   messageUpdates: getMessageUpdates(state),
+  pageInfo: getResourcePageInfo(
+    state,
+    'users',
+    genUsersPageKey({ group: state.groups, union: state.asUnion }),
+  ),
 });
 
 const mapDispatch = {
   updateUser,
-  loadUserList,
+  fetchUsers: loadUserList,
+
   findUser,
   createMessage,
   updateMessage,
@@ -247,4 +236,4 @@ const mapDispatch = {
 export default connect(
   mapStateToProps,
   mapDispatch,
-)(withStyles(s)(UserPanel));
+)(UserPanel);
