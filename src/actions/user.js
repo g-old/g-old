@@ -32,9 +32,21 @@ export const userFields = `
   surname,
   thumbnail,
     `;
+
+const verificationFields = `
+  id
+  verificator{
+    ${userFields}
+  }
+  filePath
+  userId
+  createdAt
+  updatedAt
+  idHash
+`;
 const userConnection = `
-query ($group:Int $after:String $union:Boolean) {
-  userConnection (group:$group after:$after union:$union) {
+query ($filterBy:UserFilter $after:String $asUnion:Boolean) {
+  userConnection (filterBy:$filterBy after:$after asUnion:$asUnion) {
     totalCount
     pageInfo{
       endCursor
@@ -44,6 +56,10 @@ query ($group:Int $after:String $union:Boolean) {
       node{
     ${userFields}
     groups
+    verification{
+      ${verificationFields}
+    }
+    verificationStatus
     createdAt,
     lastLogin,
     emailVerified,
@@ -95,6 +111,10 @@ query($id:ID!){
 const userQuery = `
 query ($id:ID!) {
   user (id:$id) {
+    verificationStatus
+    verification{
+      ${verificationFields}
+    }
     lastLogin
     createdAt
     emailVerified
@@ -145,9 +165,10 @@ query ($id:ID!) {
 `;
 
 const updateUserMutation = `
-mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $password:String, $passwordOld:String, $followee:ID, $notificationSettings:String $locale:String){
-  updateUser ( user:{id:$id name:$name, surname:$surname, groups:$groups, email:$email, password:$password passwordOld:$passwordOld followee:$followee notificationSettings:$notificationSettings locale:$locale }){
+mutation($id:ID $name:String, $surname:String, $groups:Int, $email:String, $password:String, $passwordOld:String, $followee:ID, $notificationSettings:String $locale:String $verification:VerificationInput){
+  updateUser ( user:{id:$id name:$name, surname:$surname, groups:$groups, email:$email, password:$password passwordOld:$passwordOld followee:$followee notificationSettings:$notificationSettings locale:$locale verification:$verification }){
     user{${userFields}
+    verificationStatus
     groups
     locale
     email,
@@ -193,11 +214,17 @@ const objectifySettings = userData => {
   return userData;
 };
 
-export function loadUserList({ group, first, after, union = false }) {
+export function loadUserList({
+  group,
+  verificationStatus,
+  first,
+  after,
+  union = false,
+}) {
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
-
-    if (getUsersStatus(getState(), group).pending) {
+    const fakeGroup = 'all';
+    if (getUsersStatus(getState(), fakeGroup).pending) {
       return false;
     }
     const pageKey = genUsersPageKey({ union, group });
@@ -212,16 +239,17 @@ export function loadUserList({ group, first, after, union = false }) {
 
     try {
       const { data } = await graphqlRequest(userConnection, {
-        group,
+        filterBy: { groups: group, verificationStatus },
         first,
         after,
-        union,
+        asUnion: union,
       });
       const users = data.userConnection.edges.map(u => u.node);
       const normalizedData = normalize(users, userArray);
       dispatch({
         type: LOAD_USERS_SUCCESS,
         payload: normalizedData,
+
         filter: group,
         pagination: data.userConnection.pageInfo,
         totalCount: data.userConnection.totalCount,

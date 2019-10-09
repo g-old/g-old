@@ -27,7 +27,9 @@ const createList = filter => {
     switch (action.type) {
       case LOAD_USERS_SUCCESS: {
         return filter === action.filter || filter === 'all'
-          ? [...new Set([...state, ...action.payload.result])]
+          ? [
+              ...action.payload.result /* OR implement live filtering */,
+            ] /* [...new Set([...state, ...action.payload.result])] */
           : state;
       }
       case FIND_USER_SUCCESS: {
