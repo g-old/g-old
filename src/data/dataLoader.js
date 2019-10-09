@@ -369,6 +369,21 @@ const getMessagesById = messageIds =>
         ),
       );
   });
+const getVerificationsByUserId = userIds =>
+  new Promise(resolve => {
+    knex('verifications')
+      .whereIn('user_id', userIds)
+      .select()
+      .then(data =>
+        resolve(
+          userIds.map(
+            id =>
+              data.find(row => row.user_id == id) || // eslint-disable-line eqeqeq
+              new Error(`Row not found: ${id}`),
+          ),
+        ),
+      );
+  });
 
 function createLoaders() {
   return {
@@ -392,6 +407,7 @@ function createLoaders() {
     notes: new DataLoader(ids => getNotesById(ids)),
     communications: new DataLoader(ids => getCommunicationsById(ids)),
     messages: new DataLoader(ids => getMessagesById(ids)),
+    verificationsByUser: new DataLoader(ids => getVerificationsByUserId(ids)),
   };
 }
 
