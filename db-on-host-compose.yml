@@ -7,6 +7,7 @@ services:
     volumes:
       - ${BANNER}:/app/public/banner01.jpg
       - ${IMAGES}:/app/images
+      - ${PRIVATE_DIR}:/app/private_files
     environment:
       - PORT=${PORT}
       - NODE_ENV=production
