@@ -418,13 +418,16 @@
     "defaultMessage": "Submit",
     "message": "Invia",
     "files": [
+      "src/components/AccountDetails/VerificationManager.js",
       "src/components/ApprovalProcess/Navigation.js",
       "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/MessageForm/MessageForm.js",
       "src/components/MessageInput/MessageInput.js",
       "src/components/MessageInput/NoticeLayer.js",
       "src/components/ProposalInput/Navigation.js",
-      "src/components/Statement/EditMenu.js"
+      "src/components/Statement/EditMenu.js",
+      "src/components/UserPanel/UserFilter.js",
+      "src/routes/account/VerificationUploadMask.js"
     ]
   },
   {
@@ -1243,14 +1246,14 @@
     "description": "Label signup",
     "defaultMessage": "Sign Up",
     "message": "Registrati",
-    "files": ["src/routes/home/Home.js"]
+    "files": ["src/routes/home/Home.js", "src/routes/home/VIPMask.js"]
   },
   {
     "id": "label.or",
     "description": "Label or",
     "defaultMessage": "OR",
     "message": "OPPURE",
-    "files": ["src/routes/home/Home.js"]
+    "files": ["src/routes/home/Home.js", "src/routes/home/VIPMask.js"]
   },
   {
     "id": "label.markRead",
@@ -1771,51 +1774,38 @@
     "description": "Text",
     "defaultMessage": "Text",
     "message": "",
-    "files": [
-      "src/components/ApprovalProcess/ContentApprovation.js",
-      "src/components/ApprovalProcess/TopicApprovation.js",
-      "src/components/ProposalInput/ProposalBody.js"
-    ]
+    "files": ["src/components/ProposalInput/ProposalBody.js"]
   },
   {
     "id": "label.enterText",
     "description": "Hint to enter text in field",
     "defaultMessage": "Enter some text",
     "message": "",
-    "files": [
-      "src/components/ApprovalProcess/ContentApprovation.js",
-      "src/components/ApprovalProcess/TopicApprovation.js",
-      "src/components/ProposalInput/ProposalBody.js"
-    ]
+    "files": ["src/components/ProposalInput/ProposalBody.js"]
   },
   {
     "id": "label.summary",
     "description": "Summary",
     "defaultMessage": "Summary",
     "message": "",
-    "files": [
-      "src/components/ApprovalProcess/ContentApprovation.js",
-      "src/components/ApprovalProcess/TopicApprovation.js",
-      "src/components/ProposalInput/ProposalBody.js"
-    ]
+    "files": ["src/components/ProposalInput/ProposalBody.js"]
   },
   {
     "id": "label.title",
     "description": "Title",
     "defaultMessage": "Title",
     "message": "",
-    "files": [
-      "src/components/ApprovalProcess/ContentApprovation.js",
-      "src/components/ApprovalProcess/TopicApprovation.js",
-      "src/components/ProposalInput/ProposalBody.js"
-    ]
+    "files": ["src/components/ProposalInput/ProposalBody.js"]
   },
   {
     "id": "label.image",
     "description": "Image upload",
     "defaultMessage": "Image",
     "message": "",
-    "files": ["src/components/ProposalInput/Uploader.js"]
+    "files": [
+      "src/components/ProposalInput/Uploader.js",
+      "src/routes/account/VerificationUploadMask.js"
+    ]
   },
   {
     "id": "command.approve",
@@ -1830,5 +1820,165 @@
     "defaultMessage": "Reject",
     "message": "",
     "files": ["src/components/ProposalActions/ProposalActions.js"]
+  },
+  {
+    "id": "command.no",
+    "description": "Negative answer",
+    "defaultMessage": "No",
+    "message": "",
+    "files": [
+      "src/components/ApprovalProcess/ApprovalProcess.js",
+      "src/components/ApprovalProcess/ContentApprovation.js",
+      "src/components/ApprovalProcess/TopicApprovation.js"
+    ]
+  },
+  {
+    "id": "command.yes",
+    "description": "Positive answer",
+    "defaultMessage": "Yes",
+    "message": "",
+    "files": [
+      "src/components/ApprovalProcess/ApprovalProcess.js",
+      "src/components/ApprovalProcess/ContentApprovation.js",
+      "src/components/ApprovalProcess/TopicApprovation.js"
+    ]
+  },
+  {
+    "id": "label.tos",
+    "description": "Terms of Service",
+    "defaultMessage": "Terms of Service",
+    "message": "",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "header.addProposal",
+    "description": "Functionality preview - adding a proposal",
+    "defaultMessage": "add a proposal",
+    "message": "",
+    "files": ["src/routes/home/Header.js"]
+  },
+  {
+    "id": "header.initRef",
+    "description": "Functionality preview -referendum",
+    "defaultMessage": "initiate a referendum",
+    "message": "",
+    "files": ["src/routes/home/Header.js"]
+  },
+  {
+    "id": "header.prepareProposal",
+    "description": "Functionality preview - preparation",
+    "defaultMessage": "prepare a legislative proposal with others",
+    "message": "",
+    "files": ["src/routes/home/Header.js"]
+  },
+  {
+    "id": "header.title",
+    "description": "Main title of the start page",
+    "defaultMessage": "Direct Democracy",
+    "message": "",
+    "files": ["src/routes/home/Header.js"]
+  },
+  {
+    "id": "header.voteProposal",
+    "description": "Functionality preview - voting on proposals",
+    "defaultMessage": "vote proposals",
+    "message": "",
+    "files": ["src/routes/home/Header.js"]
+  },
+  {
+    "id": "label.verification",
+    "description": "Verification",
+    "defaultMessage": "Verification",
+    "message": "",
+    "files": [
+      "src/components/AccountDetails/AccountDetails.js",
+      "src/routes/account/VerificationUploadMask.js"
+    ]
+  },
+  {
+    "id": "label.confirmed",
+    "description": "Label confirmed",
+    "defaultMessage": "Confirmed",
+    "message": "",
+    "files": [
+      "src/components/AccountDetails/VerificationManager.js",
+      "src/components/UserPanel/UserFilter.js"
+    ]
+  },
+  {
+    "id": "label.denied",
+    "description": "Label denied",
+    "defaultMessage": "Denied",
+    "message": "",
+    "files": [
+      "src/components/AccountDetails/VerificationManager.js",
+      "src/components/UserPanel/UserFilter.js"
+    ]
+  },
+  {
+    "id": "label.pending",
+    "description": "Label pending",
+    "defaultMessage": "Pending",
+    "message": "",
+    "files": [
+      "src/components/AccountDetails/VerificationManager.js",
+      "src/components/UserPanel/UserFilter.js"
+    ]
+  },
+  {
+    "id": "settings.verifyCall",
+    "description": "Notification to verify identity",
+    "defaultMessage": "Verify your identity to vote, comment and work on proposals",
+    "message": "",
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "settings.verifyDeniedCall",
+    "description": "Notification of verification denial",
+    "defaultMessage": "Your verification request was denied. Try again or contact us directly",
+    "message": "",
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "settings.verifyWaitCall",
+    "description": "Notification to verify identity progress",
+    "defaultMessage": "Your verification request will be processed as soon as possible",
+    "message": "",
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "command.click",
+    "description": "Click command",
+    "defaultMessage": "Click here",
+    "message": "",
+    "files": ["src/routes/account/VerificationUploadMask.js"]
+  },
+  {
+    "id": "help.verification",
+    "description": "Helptext for verification file upload",
+    "defaultMessage": "Please upload a photo of your Identitycard where your name, surname and id-number are clearly visible",
+    "message": "",
+    "files": ["src/routes/account/VerificationUploadMask.js"]
+  },
+  {
+    "id": "label.error",
+    "description": "Unspecific error message",
+    "defaultMessage": "An error occured",
+    "message": "",
+    "files": ["src/routes/account/VerificationUploadMask.js"]
+  },
+  {
+    "id": "label.unrequested",
+    "description": "Label unrequested",
+    "defaultMessage": "Unrequested",
+    "message": "",
+    "files": ["src/components/UserPanel/UserFilter.js"]
+  },
+  {
+    "id": "labels.verify",
+    "description": "Label to open verification process",
+    "defaultMessage": "Verify me",
+    "message": "",
+    "files": ["src/components/UserProfile/VerificationBadge.js"]
   }
 ]
