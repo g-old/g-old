@@ -3,7 +3,7 @@ const config = require('./config');
 
 module.exports = {
   development: {
-    client: 'postgresql',
+    client: 'pg',
     connection: config.dbConfig,
     pool: {
       min: 2,
@@ -19,7 +19,7 @@ module.exports = {
     debug: true,
   },
   production: {
-    client: 'postgresql',
+    client: 'pg',
     connection: config.dbConfig, // process.env.DATABASE_URL,
     pool: {
       min: 2,
@@ -35,7 +35,7 @@ module.exports = {
     ssl: true,
   },
   test: {
-    client: 'postgresql',
+    client: 'pg',
     connection: config.test.dbConfig,
     migrations: {
       tableName: 'knex_migrations',
