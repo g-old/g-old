@@ -241,7 +241,7 @@ async function action({ store }) {
             <Heading tag="h2">File Uploader</Heading>
 
             <Box fill>
-              <Uploader />
+              <Uploader multiple />
             </Box>
             <Box fill>
               <div style={{ flex: 1, display: 'flex', backgroundColor: 'red' }}>
