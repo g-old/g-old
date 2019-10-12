@@ -2,6 +2,7 @@
 import { normalize } from 'normalizr';
 import { pollFieldsForList } from './proposal';
 import { depaginate } from '../core/helpers';
+import { createMutation } from './utils';
 
 import {
   LOAD_WORKTEAMS_START,
@@ -514,29 +515,6 @@ export function loadProposalStatus({ id, first }) {
     }
   };
 }
-
-const createMutation = (types, resource, query, schema, selectorFn) => {
-  const [requestType, successType, errorType] = types;
-  return args => async (dispatch, getState, { graphqlRequest }) => {
-    dispatch({
-      type: requestType,
-    });
-
-    try {
-      const { data } = await graphqlRequest(query, {
-        [resource]: args,
-      });
-      const normalizedData = normalize(selectorFn(data), schema);
-
-      dispatch({ type: successType, payload: normalizedData });
-    } catch (e) {
-      dispatch({
-        type: errorType,
-        message: e.message || 'Something went wrong',
-      });
-    }
-  };
-};
 
 export const createWorkTeam = createMutation(
   [CREATE_WORKTEAM_START, CREATE_WORKTEAM_SUCCESS, CREATE_WORKTEAM_ERROR],

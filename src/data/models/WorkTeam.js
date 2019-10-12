@@ -6,21 +6,25 @@ import Proposal from './Proposal';
 import User from './User';
 import Request from './Request';
 import Discussion from './Discussion'; // eslint-disable-line import/no-cycle
-
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import { Groups, isAdmin } from '../../organization';
+import { transactify } from './utils';
 
-async function validateCoordinator(viewer, id, loaders) {
-  const coordinator = await User.gen(viewer, id, loaders);
-  return coordinator; // TODO val rules
+async function validateCoordinator(viewer, { userId, spokesmanId }, loaders) {
+  const coordinator = await User.gen(viewer, userId, loaders);
+  if (isAdmin(viewer)) {
+    return coordinator;
+  }
+  return userId === spokesmanId ? coordinator : null;
 }
 
-async function updateCoordinatorsGroups(viewer, id, loaders) {
+async function updateCoordinatorsGroups(viewer, id, loaders, trx) {
   const coordinator = await User.gen(viewer, id, loaders);
   if (coordinator) {
     // eslint-disable-next-line no-bitwise
     const newGroups = coordinator.groups | Groups.TEAM_LEADER;
-    await User.update(viewer, { id, groups: newGroups }, loaders);
+    // TODO update user model to use transactions
+    await User.update(viewer, { id, groups: newGroups }, loaders, trx);
     loaders.users.clear(id);
   }
 }
@@ -329,7 +333,7 @@ class WorkTeam {
     return new WorkTeam(data);
   }
 
-  static async create(viewer, data, loaders) {
+  static async create(viewer, data, loaders, trx) {
     if (!canMutate(viewer, data, Models.WORKTEAM)) return null;
     if (!data) return null;
     if (!data.name) return null;
@@ -340,42 +344,129 @@ class WorkTeam {
       ...(data.lldName && { lld_name: data.lldName }),
       ...(data.restricted && { restricted: data.restricted }),
     };
-    if (!data.restricted) {
+    // All teams should be open. Mainteams don't exist anymore
+    /* if (!data.restricted) {
       newData.restricted = false;
     }
     if (typeof data.mainTeam === 'boolean') {
       newData.main = data.mainTeam;
+    } */
+
+    // Transactify all
+    // a proposal must exist
+    const proposal = await Proposal.gen(viewer, data.proposalId, loaders);
+    if (!proposal) {
+      throw new Error('proposal-not-available');
     }
+    // check if proposal is in the right state
+    if (proposal.state !== 'accepted') {
+      if (!isAdmin(viewer)) {
+        throw new Error('proposal-not-accepted');
+      }
+    }
+
+    if (proposal.image) {
+      newData.image = proposal.image;
+    }
+
     if (data.coordinatorId) {
-      if (!validateCoordinator(viewer, data.coordinatorId, loaders))
-        return null;
+      if (
+        !validateCoordinator(
+          viewer,
+          { userId: data.coordinatorId, spokesmanId: proposal.spokesmanId },
+          loaders,
+        )
+      ) {
+        throw new Error('coordinator-not-qualified');
+      }
       newData.coordinator_id = data.coordinatorId;
     }
-    newData.created_at = new Date();
-    const workTeam = await knex.transaction(async trx => {
-      await WorkTeam.checkForMainTeam(newData.main, trx);
-      const [workTeamData = null] = await trx
+
+    if (proposal) newData.created_at = new Date();
+
+    const createWorkteam = async transaction => {
+      const [workteam = null] = await knex('work_teams')
+        .transacting(transaction)
         .insert(newData)
-        .into('work_teams')
         .returning('*');
 
-      if (!workTeamData) {
-        throw new Error('Could not create workTeam');
+      // mainteams don't exist anymore
+      //  await WorkTeam.checkForMainTeam(newData.main, trx);
+
+      if (!workteam) {
+        throw new Error('workteam-creation-failed');
       }
       // make feed;
       await knex('system_feeds')
-        .transacting(trx)
+        .transacting(transaction)
         .insert({
-          group_id: workTeamData.id,
+          group_id: workteam.id,
           type: 'WT',
           main_activities: JSON.stringify([]),
         });
-      return workTeamData;
-    });
-    if (workTeam) {
-      await updateCoordinatorsGroups(viewer, data.coordinatorId, loaders);
-    }
-    return workTeam ? new WorkTeam(workTeam) : null;
+
+      // create discussion with proposal text
+      // TODO replace viewer with BOT
+      await Discussion.create(
+        viewer,
+        {
+          title: proposal.title,
+          authorId: proposal.spokesmanId,
+          content: proposal.body,
+          workTeamId: workteam.id,
+        },
+        loaders,
+        transaction,
+      );
+      // TODO  inscribe all voters  automatically (?)
+      // get all ids
+
+      // inscribe coordinator
+
+      await knex('user_work_teams')
+        .transacting(transaction)
+        .forUpdate()
+        .insert({
+          user_id: data.coordinatorId,
+          work_team_id: workteam.id,
+          created_at: new Date(),
+        });
+
+      // update member count
+      await knex('work_teams')
+        .where({ id: workteam.id })
+        .transacting(trx)
+        .forUpdate()
+        .increment('num_members', 1)
+        .into('work_teams')
+        .returning('*');
+
+      // update proposal
+
+      await Proposal.update(
+        viewer,
+        {
+          id: proposal.id,
+          state: 'working',
+          teamId: workteam.id,
+        },
+        transaction,
+      );
+
+      await updateCoordinatorsGroups(
+        viewer,
+        data.coordinatorId,
+        loaders,
+        transaction,
+      );
+
+      return workteam;
+    };
+
+    const workteamInDB = await transactify(createWorkteam, knex, trx);
+    loaders.workTeams.clear(this.id);
+
+    return workteamInDB ? new WorkTeam(workteamInDB) : null;
   }
 
   static async update(viewer, data, loaders) {

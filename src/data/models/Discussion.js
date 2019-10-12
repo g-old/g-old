@@ -66,11 +66,19 @@ class Discussion {
     return new Discussion(data);
   }
 
-  static async create(viewer, data, loaders) {
+  static async create(viewer, data, loaders, trx) {
     if (!data) return null;
     let workTeam;
     if (data.workTeamId) {
-      workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
+      if (trx) {
+        const [queryResult = null] = await knex('work_teams')
+          .transacting(trx)
+          .where({ id: data.workTeamId })
+          .select('*');
+        workTeam = queryResult ? new WorkTeam(queryResult) : null;
+      } else {
+        workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
+      }
     }
 
     if (
@@ -83,28 +91,34 @@ class Discussion {
         },
         Models.DISCUSSION,
       )
-    )
+    ) {
       return null;
+    }
 
-    const discussionInDB = await knex.transaction(async trx => {
+    const newData = {
+      author_id: data.authorId || viewer.id,
+      title: data.title.trim(),
+      content: sanitize(data.content.trim()),
+      work_team_id: data.workTeamId,
+      created_at: new Date(),
+    };
+
+    const createDiscussion = async transaction => {
       const [discussion = null] = await knex('discussions')
-        .transacting(trx)
-        .insert({
-          author_id: viewer.id,
-          title: data.title.trim(),
-          content: sanitize(data.content.trim()),
-          work_team_id: data.workTeamId,
-          created_at: new Date(),
-        })
+        .transacting(transaction)
+        .insert(newData)
         .returning('*');
-
       if (discussion) {
         await knex('work_teams')
+          .transacting(transaction)
           .where({ id: data.workTeamId })
           .increment('num_discussions', 1);
       }
       return discussion;
-    });
+    };
+
+    const discussionInDB = await transactify(createDiscussion, knex, trx);
+
     const discussion = discussionInDB ? new Discussion(discussionInDB) : null;
     if (discussion) {
       EventManager.publish('onDiscussionCreated', {
@@ -114,6 +128,7 @@ class Discussion {
         subjectId: discussion.workTeamId,
       });
     }
+
     return discussion;
   }
 

@@ -43,6 +43,9 @@ const WorkTeamInputType = new GraphQLInputObjectType({
     backgroundAssetId: {
       type: ID,
     },
+    proposalId: {
+      type: ID,
+    },
     closing: {
       type: GraphQLBoolean,
     },

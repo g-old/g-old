@@ -23,6 +23,18 @@ type ProposalInputArgs = {
   workTeamId: ID,
   state: ProposalStateType,
 };
+async function getResource(viewer, id, loaders, Model, tableName, trx) {
+  let data;
+  if (trx) {
+    const [queryResult = null] = await knex(tableName)
+      .transacting(trx)
+      .where({ id })
+      .select('*');
+    data = queryResult ? new Model(queryResult) : null;
+  }
+  data = await Model.gen(viewer, id, loaders);
+  return data;
+}
 
 class Proposal {
   id: ID;
@@ -73,16 +85,17 @@ class Proposal {
     this.image = data.image;
   }
 
-  async getActivePoll(viewer: ViewerShape, loaders) {
-    const poll = await Poll.gen(
+  async getActivePoll(viewer: ViewerShape, loaders, trx) {
+    const poll = await getResource(
       viewer,
       this.pollTwoId || this.pollOneId,
       loaders,
+      Poll,
+      'polls',
+      trx,
     );
-    if (poll) {
-      return poll;
-    }
-    throw new Error(`Could not load poll: ${poll.id}`);
+
+    return poll;
   }
 
   static async gen(
@@ -133,24 +146,55 @@ class Proposal {
     viewer: ViewerShape,
     data: ProposalInputArgs,
     loaders: DataLoaders,
+    trx,
   ) {
     // throw Error('TESTERROR');
 
     if (!data || !data.id) return null;
-    const proposalInDB = await Proposal.gen(viewer, data.id, loaders);
-    if (!proposalInDB) return null;
+
+    const oldProposal = await getResource(
+      viewer,
+      data.id,
+      loaders,
+      Proposal,
+      'proposals',
+      trx,
+    );
+
+    if (!oldProposal) {
+      throw new Error('proposal-not-available');
+    }
     let workTeam;
-    if (proposalInDB.workTeamId) {
-      workTeam = await WorkTeam.gen(viewer, proposalInDB.workTeamId, loaders);
+    if (oldProposal.workTeamId) {
+      workTeam = await getResource(
+        viewer,
+        oldProposal.workTeamId,
+        loaders,
+        WorkTeam,
+        'work_teams',
+        trx,
+      );
+    }
+    if (!canMutate(viewer, { ...data, workTeam }, Models.PROPOSAL)) {
+      return null;
     }
     // authorize
-    if (!canMutate(viewer, { ...data, workTeam }, Models.PROPOSAL)) return null;
     // validate
-
     const newValues: ProposalRowType = { updated_at: new Date() };
 
-    const [updatedProposal = null] = await knex.transaction(async trx => {
-      const activePoll = await proposalInDB.getActivePoll(viewer, loaders);
+    if (data.approvalState) {
+      newValues.approval_state = data.approvalState;
+    }
+    if (data.teamId) {
+      newValues.team_id = data.teamId;
+    }
+
+    const updateProposal = async transaction => {
+      const activePoll = await oldProposal.getActivePoll(
+        viewer,
+        loaders,
+        transaction,
+      );
       if (!activePoll) {
         throw new Error('Could no load poll');
       }
@@ -162,11 +206,12 @@ class Proposal {
           loaders,
           activePoll,
         });
+        if (data.state === 'working' && oldProposal.state === 'accepted') {
+          newValues.state = data.state;
+        } else if (helper.canTransition(oldProposal)) {
+          await helper.closeOpenPolls(oldProposal);
 
-        if (helper.canTransition(proposalInDB)) {
-          await helper.closeOpenPolls(proposalInDB);
-
-          if (proposalInDB.isNewPollRequired(data.state)) {
+          if (oldProposal.isNewPollRequired(data.state)) {
             const pollTwo = await helper.createNextPoll(data.poll);
             newValues.poll_two_id = pollTwo.id;
           }
@@ -174,27 +219,26 @@ class Proposal {
           newValues.state = data.state;
         } else {
           throw new Error(
-            `State transition not allowed from ${proposalInDB.state} to ${data.state}`,
+            `State transition not allowed from ${oldProposal.state} to ${data.state}`,
           );
         }
       }
-      if (data.approvalState) {
-        newValues.approval_state = data.approvalState;
-      }
-
-      if (proposalInDB.isSurveyAndShouldClose(data.poll)) {
+      if (oldProposal.isSurveyAndShouldClose(data.poll)) {
         await closePoll(viewer, activePoll.id, loaders, trx);
       }
-      return knex('proposals')
-        .transacting(trx)
+      const [proposal = null] = await knex('proposals')
+        .transacting(transaction)
+        .forUpdate()
         .where({
           id: data.id,
         })
         .update(newValues)
         .returning('*');
-    });
+      return proposal;
+    };
+    const proposalInDB = await transactify(updateProposal, knex, trx);
 
-    const proposal = updatedProposal && new Proposal(updatedProposal);
+    const proposal = proposalInDB && new Proposal(proposalInDB);
     if (proposal) {
       EventManager.publish('onProposalUpdated', {
         viewer,
