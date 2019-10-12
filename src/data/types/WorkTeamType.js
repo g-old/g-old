@@ -87,7 +87,7 @@ const WorkTeamType = new ObjectType({
     logo: {
       type: GraphQLString,
     },
-    background: {
+    image: {
       type: GraphQLString,
     },
     ownStatus: {

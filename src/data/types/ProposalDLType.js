@@ -98,6 +98,10 @@ const ProposalType = new ObjectType({
       type: GraphQLInt,
     },
 
+    teamId: {
+      type: ID,
+    },
+
     summary: {
       type: GraphQLString,
     },

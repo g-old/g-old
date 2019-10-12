@@ -61,6 +61,8 @@ class Proposal {
 
   workTeamId: ID;
 
+  teamId: ID;
+
   deletedAt: ?string;
 
   updatedAt: ?string;
@@ -83,6 +85,7 @@ class Proposal {
     this.summary = data.summary;
     this.approvalState = data.approval_state;
     this.image = data.image;
+    this.teamId = data.team_id;
   }
 
   async getActivePoll(viewer: ViewerShape, loaders, trx) {

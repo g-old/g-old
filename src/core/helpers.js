@@ -110,6 +110,10 @@ export const getLastActivePoll = (state, proposal) => {
       poll = proposal.pollOne;
       break;
     }
+    case 'working': {
+      poll = proposal.pollTwo || proposal.pollOne;
+      break;
+    }
 
     default:
       throw Error(`Unknown proposal state: ${proposal.state}`);

@@ -88,6 +88,7 @@ class WorkTeam {
     this.lldName = data.lld_name;
     this.mainTeam = data.main;
     this.deletedAt = data.deleted_at;
+    this.image = data.image;
   }
 
   canNotify(viewer) {
@@ -342,12 +343,13 @@ class WorkTeam {
       ...(data.deName && { de_name: data.deName }),
       ...(data.itName && { it_name: data.itName }),
       ...(data.lldName && { lld_name: data.lldName }),
-      ...(data.restricted && { restricted: data.restricted }),
+      created_at: new Date(),
     };
     // All teams should be open. Mainteams don't exist anymore
-    /* if (!data.restricted) {
+    if (!data.restricted) {
       newData.restricted = false;
     }
+    /*
     if (typeof data.mainTeam === 'boolean') {
       newData.main = data.mainTeam;
     } */
@@ -369,7 +371,9 @@ class WorkTeam {
       newData.image = proposal.image;
     }
 
-    if (data.coordinatorId) {
+    let coordinatorId;
+    if (data.coordinatorId || proposal.spokesmanId) {
+      coordinatorId = data.coordinatorId || proposal.spokesmanId;
       if (
         !validateCoordinator(
           viewer,
@@ -379,10 +383,10 @@ class WorkTeam {
       ) {
         throw new Error('coordinator-not-qualified');
       }
-      newData.coordinator_id = data.coordinatorId;
+      newData.coordinator_id = coordinatorId;
+    } else {
+      throw new Error('coordinator-missing');
     }
-
-    if (proposal) newData.created_at = new Date();
 
     const createWorkteam = async transaction => {
       const [workteam = null] = await knex('work_teams')
@@ -427,7 +431,7 @@ class WorkTeam {
         .transacting(transaction)
         .forUpdate()
         .insert({
-          user_id: data.coordinatorId,
+          user_id: coordinatorId,
           work_team_id: workteam.id,
           created_at: new Date(),
         });
@@ -435,7 +439,7 @@ class WorkTeam {
       // update member count
       await knex('work_teams')
         .where({ id: workteam.id })
-        .transacting(trx)
+        .transacting(transaction)
         .forUpdate()
         .increment('num_members', 1)
         .into('work_teams')
@@ -450,6 +454,7 @@ class WorkTeam {
           state: 'working',
           teamId: workteam.id,
         },
+        loaders,
         transaction,
       );
 

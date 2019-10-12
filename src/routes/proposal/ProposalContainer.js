@@ -80,6 +80,7 @@ class ProposalContainer extends React.Component {
       state: PropTypes.string,
       deletedAt: PropTypes.string,
       canVote: PropTypes.bool,
+      image: PropTypes.string,
     }).isRequired,
     user: PropTypes.shape({}).isRequired,
     proposalId: PropTypes.number.isRequired,
@@ -291,33 +292,31 @@ class ProposalContainer extends React.Component {
           followeeVotes={followeeVotes}
         />
 
-        {
-          <div
-            style={{
-              borderBottom: '1px solid #eee',
-              paddingBottom: '2em',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            {!poll.closedAt && <ProposalState state={proposal.state} />}
-            {poll.closedAt && (
-              <Box align>
-                <ProposalState state={proposal.state} />{' '}
-                <FormattedRelative value={poll.closedAt} />
-              </Box>
-            )}
-            {showSubscription && (
-              <SubscriptionButton
-                status={subscriptionStatus}
-                targetType="PROPOSAL"
-                onSubscribe={this.handleSubscription}
-                subscription={proposal.subscription}
-              />
-            )}
-          </div>
-        }
+        <div
+          style={{
+            borderBottom: '1px solid #eee',
+            paddingBottom: '2em',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          {!poll.closedAt && <ProposalState state={proposal.state} />}
+          {poll.closedAt && (
+            <Box align>
+              <ProposalState state={proposal.state} />{' '}
+              <FormattedRelative value={poll.closedAt} />
+            </Box>
+          )}
+          {showSubscription && (
+            <SubscriptionButton
+              status={subscriptionStatus}
+              targetType="PROPOSAL"
+              onSubscribe={this.handleSubscription}
+              subscription={proposal.subscription}
+            />
+          )}
+        </div>
 
         <StatementsContainer
           hideOwnStatement={hideOwnStatement}
@@ -335,9 +334,9 @@ class ProposalContainer extends React.Component {
   }
 
   render() {
-    const { proposal, updates = {}, pollId } = this.props;
+    const { proposal, updates = {}, pollId, user } = this.props;
     if (updates.isFetching && !proposal) {
-      return <p>{'Loading...'} </p>;
+      return <p>Loading... </p>;
     }
     if (updates.errorMessage && !proposal) {
       return (
@@ -362,6 +361,7 @@ class ProposalContainer extends React.Component {
               {...{
                 ...proposal,
                 image: proposal.image && `/s720/${proposal.image}`,
+                user,
               }}
             />
             {this.renderInteractions()}
