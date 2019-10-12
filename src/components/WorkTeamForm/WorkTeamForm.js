@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 // import { defineMessages, FormattedMessage } from 'react-intl';
-import { defineMessages, FormattedMessage } from 'react-intl';
 import {
   loadWorkTeam,
   updateWorkTeam,
@@ -26,27 +25,9 @@ import Form from '../Form';
 import history from '../../history';
 import { Groups } from '../../organization';
 
-import {
-  nameValidation,
-  selectValidation,
-  createValidator,
-} from '../../core/validation';
-import Notification from '../../components/Notification';
-import FormValidation from '../../components/FormValidation';
-
-const messages = defineMessages({
-  empty: {
-    id: 'form.error-empty',
-    defaultMessage: "You can't leave this empty",
-    description: 'Help for empty fields',
-  },
-  wrongSelect: {
-    id: 'form.error-select',
-    defaultMessage: 'You selection is not correct. Click on a suggestion',
-    description:
-      'Help for selection, when input does not match with a suggestion',
-  },
-});
+import { selectValidation } from '../../core/validation';
+import Notification from '../Notification';
+import FormValidation from '../FormValidation';
 
 // import FetchError from '../../components/FetchError';
 
@@ -66,9 +47,19 @@ const genInitalState = (fields, values) =>
 class WorkTeamManagement extends React.Component {
   static propTypes = {
     id: PropTypes.string.isRequired,
-    users: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
-    workTeam: PropTypes.shape({ id: PropTypes.string }).isRequired,
-    user: PropTypes.shape({ id: PropTypes.string }).isRequired,
+    proposalId: PropTypes.string,
+    users: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.string }))
+      .isRequired,
+    workTeam: PropTypes.shape({
+      id: PropTypes.string,
+      coordinator: PropTypes.shape({
+        id: PropTypes.string,
+        name: PropTypes.string,
+        surname: PropTypes.string,
+      }),
+    }).isRequired,
+    user: PropTypes.shape({ id: PropTypes.string, groups: PropTypes.number })
+      .isRequired,
     findUser: PropTypes.func.isRequired,
     updateWorkTeam: PropTypes.func.isRequired,
     createWorkTeam: PropTypes.func.isRequired,
@@ -80,12 +71,12 @@ class WorkTeamManagement extends React.Component {
 
   static defaultProps = {
     updates: null,
+    proposalId: null,
   };
+
   constructor(props) {
     super(props);
-    this.handleValueChanges = this.handleValueChanges.bind(this);
-    this.visibleErrors = this.visibleErrors.bind(this);
-    this.handleValidation = this.handleValidation.bind(this);
+
     this.handleFormsubmission = this.handleFormsubmission.bind(this);
     this.onCancel = this.onCancel.bind(this);
     this.state = {
@@ -95,27 +86,6 @@ class WorkTeamManagement extends React.Component {
       pending: false,
       success: false, */
     };
-    const testValues = {
-      name: { fn: 'name' },
-      deName: { fn: 'name' },
-      itName: { fn: 'name' },
-      lldName: { fn: 'name' },
-
-      coordinator: {
-        fn: 'coordinator',
-        valuesResolver: obj => obj.state.coordinatorValue,
-      },
-    };
-    this.Validator = createValidator(
-      testValues,
-      {
-        name: nameValidation,
-        coordinator: selectValidation,
-        noCheck: () => {},
-      },
-      this,
-      obj => obj.state,
-    );
   }
 
   componentWillReceiveProps({ workTeam, updates = {} }) {
@@ -136,7 +106,7 @@ class WorkTeamManagement extends React.Component {
       e.preventDefault();
       e.stopPropagation();
     }
-    history.push(`/admin`);
+    history.goBack();
   }
 
   handleFormsubmission(values) {
@@ -144,7 +114,7 @@ class WorkTeamManagement extends React.Component {
     if (!this.canMutate()) {
       alert('You dont have the necessary permissions');
     }
-    const { id, workTeam } = this.props;
+    const { id, workTeam, proposalId } = this.props;
     // eslint-disable-next-line
 
     // check coordinator
@@ -168,7 +138,7 @@ class WorkTeamManagement extends React.Component {
     }
     /* eslint-enable no-param-reassign */
 
-    if (this.props.id) {
+    if (id) {
       this.props.updateWorkTeam({
         id,
         ...values,
@@ -176,9 +146,11 @@ class WorkTeamManagement extends React.Component {
     } else {
       this.props.createWorkTeam({
         ...values,
+        proposalId,
       });
     }
   }
+
   canMutate() {
     const { user, workTeam } = this.props;
     // eslint-disable-next-line no-bitwise
@@ -189,43 +161,11 @@ class WorkTeamManagement extends React.Component {
     return workTeam.coordinator.id == user.id;
   }
 
-  handleValidation(fields) {
-    const validated = this.Validator(fields);
-    this.setState({ errors: { ...this.state.errors, ...validated.errors } });
-    return validated.failed === 0;
-  }
-
-  handleBlur(e) {
-    const field = e.target.name;
-    if (this.state[field]) {
-      this.handleValidation([field]);
-    }
-  }
-  visibleErrors(errorNames) {
-    return errorNames.reduce((acc, curr) => {
-      const err = `${curr}Error`;
-      if (this.state.errors[curr].touched) {
-        acc[err] = (
-          <FormattedMessage {...messages[this.state.errors[curr].errorName]} />
-        );
-      }
-      return acc;
-    }, {});
-  }
-  handleValueChanges(e) {
-    let value;
-    if (e.target.type === 'checkbox') {
-      value = !this.state[e.target.name];
-    } else {
-      ({ value } = e.target);
-    }
-
-    this.setState({ [e.target.name]: value });
-  }
-
   render() {
-    const { mainTeam, error } = this.state;
+    const { error } = this.state;
     const { workTeam, users = [], updates = {} } = this.props;
+
+    const canModify = workTeam && workTeam.id;
     return (
       <Box column padding="medium">
         <Box type="section" align column pad>
@@ -234,16 +174,19 @@ class WorkTeamManagement extends React.Component {
             data={workTeam}
             validations={{
               name: { args: { required: true, min: 3 } },
-              deName: { args: { min: 3 } },
+              ...(canModify && {
+                restricted: {},
+                coordinator: {
+                  fn: selectValidation,
+                  valuesResolver: obj => obj.state.coordinatorValue,
+                  args: { required: true },
+                },
+              }),
+              /*  deName: { args: { min: 3 } },
               itName: { args: { min: 3 } },
               lldName: { args: { min: 3 } },
-              restricted: {},
-              coordinator: {
-                fn: selectValidation,
-                valuesResolver: obj => obj.state.coordinatorValue,
-                args: { required: true },
-              },
-              mainTeam: {},
+
+               */
             }}
           >
             {({
@@ -265,7 +208,7 @@ class WorkTeamManagement extends React.Component {
                       onBlur={onBlur}
                     />
                   </FormField>
-                  <FormField
+                  {/*  <FormField
                     label="Name german"
                     error={errorMessages.deNameError}
                   >
@@ -300,55 +243,57 @@ class WorkTeamManagement extends React.Component {
                       onChange={handleValueChanges}
                       onBlur={onBlur}
                     />
-                  </FormField>
+                  </FormField> */}
                 </fieldset>
-                <Label>Coordinator</Label>
-                <fieldset>
-                  <FormField
-                    overflow
-                    label="Coordinator"
-                    error={errorMessages.coordinatorError}
-                  >
-                    <SearchField
-                      value={
-                        workTeam.coordinator
-                          ? `${workTeam.coordinator.name} ${
-                              workTeam.coordinator.surname
-                            }`
-                          : ''
-                      }
-                      onChange={e =>
-                        handleValueChanges({
-                          target: {
-                            name: 'coordinatorValue',
-                            value: e.value,
-                          },
-                        })
-                      }
-                      data={users}
-                      fetch={this.props.findUser}
-                      displaySelected={data => {
-                        handleValueChanges({
-                          target: { name: 'coordinator', value: data },
-                        });
-                      }}
-                    />
-                  </FormField>
-                </fieldset>
-                <Label>Member access policy</Label>
-                <fieldset>
-                  <FormField>
-                    <CheckBox
-                      label="Restriction"
-                      name="restricted"
-                      checked={values.restricted}
-                      onChange={handleValueChanges}
-                      toggle
-                    />
-                  </FormField>
-                </fieldset>
+                {canModify && <Label>Coordinator</Label>}
+                {canModify && (
+                  <fieldset>
+                    <FormField
+                      overflow
+                      label="Coordinator"
+                      error={errorMessages.coordinatorError}
+                    >
+                      <SearchField
+                        value={
+                          workTeam.coordinator
+                            ? `${workTeam.coordinator.name} ${workTeam.coordinator.surname}`
+                            : ''
+                        }
+                        onChange={e =>
+                          handleValueChanges({
+                            target: {
+                              name: 'coordinatorValue',
+                              value: e.value,
+                            },
+                          })
+                        }
+                        data={users}
+                        fetch={this.props.findUser}
+                        displaySelected={data => {
+                          handleValueChanges({
+                            target: { name: 'coordinator', value: data },
+                          });
+                        }}
+                      />
+                    </FormField>
+                  </fieldset>
+                )}
+                {canModify && <Label>Member access policy</Label>}
+                {canModify && (
+                  <fieldset>
+                    <FormField>
+                      <CheckBox
+                        label="Restriction"
+                        name="restricted"
+                        checked={values.restricted}
+                        onChange={handleValueChanges}
+                        toggle
+                      />
+                    </FormField>
+                  </fieldset>
+                )}
 
-                <Label>
+                {/* <Label>
                   {mainTeam
                     ? 'Current main team (Rat)'
                     : 'Set as main team (Rat)'}
@@ -363,21 +308,21 @@ class WorkTeamManagement extends React.Component {
                       toggle
                     />
                   </FormField>
-                </fieldset>
+                  </fieldset> */}
                 <p>
                   {error && (
                     <Notification type="error" message={updates.error} />
                   )}
                 </p>
-                <div>
+                <Box between>
+                  <Button label="Cancel" onClick={this.onCancel} />
                   <Button
                     disabled={updates.pending}
                     primary
                     label="Save"
                     onClick={onSubmit}
-                  />{' '}
-                  <Button label="Cancel" onClick={this.onCancel} />
-                </div>
+                  />
+                </Box>
               </Form>
             )}
           </FormValidation>
@@ -401,4 +346,7 @@ const mapDispatch = {
   createWorkTeam,
 };
 
-export default connect(mapStateToProps, mapDispatch)(WorkTeamManagement);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(WorkTeamManagement);

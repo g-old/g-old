@@ -77,7 +77,7 @@ export const workTeamFields = `
   deletedAt
   mainTeam
   logo
-  background
+  image
   coordinator{
     name
     surname

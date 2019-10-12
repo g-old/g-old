@@ -104,6 +104,7 @@ state
 body
 votes
 deletedAt
+teamId
 spokesman{
   ${userFields}
 }
