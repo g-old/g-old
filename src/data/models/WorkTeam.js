@@ -451,7 +451,7 @@ class WorkTeam {
         viewer,
         {
           id: proposal.id,
-          state: 'working',
+          //  state: 'working', not sure if needed
           teamId: workteam.id,
         },
         loaders,

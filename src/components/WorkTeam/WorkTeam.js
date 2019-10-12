@@ -21,6 +21,7 @@ import ProposalListContainer from '../ProposalListContainer';
 import SurveyListContainer from '../SurveyListContainer';
 import StateFilter from '../StateFilter';
 import Notification from '../Notification';
+import Image from '../Image/Image';
 
 const messages = defineMessages({
   join: {
@@ -95,6 +96,7 @@ class WorkTeam extends React.Component {
     onDeleteRequest: PropTypes.func.isRequired,
     onLoadDiscussions: PropTypes.func.isRequired,
     onLoadProposals: PropTypes.func.isRequired,
+    image: PropTypes.string,
   };
 
   static defaultProps = {
@@ -103,6 +105,7 @@ class WorkTeam extends React.Component {
     proposals: null,
     mainTeam: null,
     deletedAt: null,
+    image: null,
   };
 
   constructor(props) {
@@ -311,7 +314,6 @@ class WorkTeam extends React.Component {
 
   render() {
     const {
-      logo,
       displayName,
       numMembers,
       numDiscussions,
@@ -323,6 +325,7 @@ class WorkTeam extends React.Component {
       id,
       mainTeam,
       deletedAt,
+      image,
     } = this.props;
     const {
       discussionStatus,
@@ -332,8 +335,10 @@ class WorkTeam extends React.Component {
       showLayer,
     } = this.state;
     let picture;
-    if (logo) {
-      picture = <img alt="Logo" className={s.logo} src={logo} />;
+    if (image) {
+      picture = (
+        <Image fit src={`/s720/${image}`} />
+      ); /* <img alt="Logo" className={s.logo} src={logo} />; */
     } else {
       picture = (
         <svg
