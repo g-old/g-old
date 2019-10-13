@@ -2123,5 +2123,12 @@
     "defaultMessage": "Workteam",
     "message": "",
     "files": ["src/components/Proposal/Proposal.js"]
+  },
+  {
+    "id": "navigation.feed",
+    "description": "Feed label",
+    "defaultMessage": "Feed",
+    "message": "",
+    "files": ["src/components/Navigation/Navigation.js"]
   }
 ]

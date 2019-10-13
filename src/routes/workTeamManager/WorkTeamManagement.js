@@ -10,7 +10,7 @@ import { joinWorkTeam, loadProposalStatus } from '../../actions/workTeam';
 import {
   loadTags,
   loadProposalsList,
-  updateProposal,
+  // updateProposal,
   createProposal,
 } from '../../actions/proposal';
 import { findUser } from '../../actions/user';
@@ -98,7 +98,8 @@ const messages = defineMessages({
 
 class WorkTeamManagement extends React.Component {
   static propTypes = {
-    user: PropTypes.shape({}).isRequired,
+    user: PropTypes.shape({ groups: PropTypes.number, id: PropTypes.number })
+      .isRequired,
     id: PropTypes.string.isRequired,
     loadRequestList: PropTypes.func.isRequired,
     deleteRequest: PropTypes.func.isRequired,
@@ -117,7 +118,7 @@ class WorkTeamManagement extends React.Component {
     proposalUpdates: PropTypes.shape({}),
     createMessage: PropTypes.func.isRequired,
     messageUpdates: PropTypes.shape({}).isRequired,
-    updateProposal: PropTypes.func.isRequired,
+    // updateProposal: PropTypes.func.isRequired,
     // wtProposals: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     discussions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   };
@@ -251,7 +252,7 @@ class WorkTeamManagement extends React.Component {
       proposals,
       createMessage: notify,
       messageUpdates: messageStatus,
-      updateProposal: mutateProposal,
+      // updateProposal: mutateProposal,
     } = this.props;
     const { showRequest, joining, currentRequest } = this.state;
     // eslint-disable-next-line no-bitwise
@@ -291,6 +292,7 @@ class WorkTeamManagement extends React.Component {
         <Tab title={<FormattedMessage {...messages.proposals} />}>
           <Label>Ready for a voting on your law proposal?</Label>
           <WizardWithSettings
+            defaultPollType="voting"
             image={workTeam.image}
             title={discussion.title}
             body={discussion.content}
@@ -403,7 +405,7 @@ const mapDispatch = {
   loadProposalsList,
   loadProposalStatus,
   createMessage,
-  updateProposal,
+  //updateProposal,
   createProposal,
 };
 
