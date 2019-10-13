@@ -82,10 +82,8 @@
   {
     "id": "signup.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage":
-      "Short passwords are easy to guess. Try one with at least 6 characters",
-    "message":
-      "Le password brevi sono facili da indovinare. Prova a utilizzarne una con almeno 6 caratteri",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters ",
+    "message": "Le password brevi sono facili da indovinare. Prova a utilizzarne una con almeno 6 caratteri",
     "files": ["src/routes/passwordReset/PasswordReset.js"]
   },
   {
@@ -376,8 +374,7 @@
   },
   {
     "id": "form.error-select",
-    "description":
-      "Help for selection, when input does not match with a suggestion",
+    "description": "Help for selection, when input does not match with a suggestion",
     "defaultMessage": "You selection is not correct. Click on a suggestion",
     "message": "La scelta è errata. Seleziona una delle opzioni proposte",
     "files": [
@@ -400,14 +397,14 @@
   {
     "id": "header.banner.title",
     "description": "Title in page header",
-    "defaultMessage": "G O L D",
+    "defaultMessage": "T I T L E",
     "message": "",
     "files": ["src/components/Header/Header.js"]
   },
   {
     "id": "header.brand",
     "description": "Brand name displayed in header",
-    "defaultMessage": "M5",
+    "defaultMessage": "MyBrand",
     "message": "M5S 5SB",
     "files": ["src/components/Header/Header.js"]
   },
@@ -419,7 +416,7 @@
   },
   {
     "id": "action.error",
-    "description": "Short failure notification",
+    "description": "Short failure notification ",
     "defaultMessage": "Action failed. Please retry!",
     "message": "Operazione fallita. Riprova!",
     "files": [
@@ -495,8 +492,7 @@
     "id": "navigation.feed",
     "description": "Feed label",
     "defaultMessage": "Feed",
-    "message": "Bacheca",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Bacheca"
   },
   {
     "id": "poll.notify",
@@ -621,8 +617,7 @@
   {
     "id": "form.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage":
-      "Short passwords are easy to guess. Try one with at least 6 characters",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters ",
     "message": "Per la tua password utilizza almeno 6 caratteri",
     "files": [
       "src/components/FormValidation/FormValidation.js",
@@ -679,7 +674,7 @@
   },
   {
     "id": "action.success",
-    "description": "Short success notification",
+    "description": "Short success notification ",
     "defaultMessage": "Success!",
     "message": "Operazione eseguita correttamente",
     "files": [
@@ -711,7 +706,7 @@
   },
   {
     "id": "settings.email.notVerified",
-    "description": "Email not yet verified",
+    "description": "Email not yet verified ",
     "defaultMessage": "Email not verified",
     "message": "Indirizzo email non verificato",
     "files": [
@@ -721,7 +716,7 @@
   },
   {
     "id": "settings.email.resend",
-    "description": "Resend verification email",
+    "description": "Resend verification email ",
     "defaultMessage": "Resend verification email",
     "message": "Richiedi nuova email di verifica",
     "files": [
@@ -731,7 +726,7 @@
   },
   {
     "id": "settings.email.verified",
-    "description": "Email got verified",
+    "description": "Email got verified ",
     "defaultMessage": "Email verified!",
     "message": "Indirizzo email verificato",
     "files": [
@@ -774,7 +769,7 @@
   {
     "id": "userSettings.oldPW",
     "description": "Current account password for form label",
-    "defaultMessage": "Enter your current password",
+    "defaultMessage": "Enter your current password ",
     "message": "Inserisci la tua password attuale",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
@@ -815,19 +810,15 @@
   {
     "id": "passwordRecovery.stepOne",
     "description": "Password recovery instruction",
-    "defaultMessage":
-      "Enter your email address below and we'll send you a link to reset your password",
-    "message":
-      "Inserisci il tuo indirizzo email qui sotto e ti invieremo un link per resettare la tua password",
+    "defaultMessage": "Enter your email address below and we'll send you a link to reset your password",
+    "message": "Inserisci il tuo indirizzo email qui sotto e ti invieremo un link per resettare la tua password",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
     "id": "passwordRecovery.stepTwo",
     "description": "Password recovery instruction",
-    "defaultMessage":
-      "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
-    "message":
-      "Controlla la tua casella di posta per i prossimi passi. Se non ricevi un'email, e non è nella tua cartella spam, questo potrebbe significare che ti sei registrato con un indirizzo diverso.",
+    "defaultMessage": "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
+    "message": "Controlla la tua casella di posta per i prossimi passi. Se non ricevi un'email, e non è nella tua cartella spam, questo potrebbe significare che ti sei registrato con un indirizzo diverso.",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
@@ -943,7 +934,7 @@
   },
   {
     "id": "settings.email.resendNotification",
-    "description": "Verification mail sending success",
+    "description": "Verification mail sending success ",
     "defaultMessage": "An email was sent to your new mail address ({email})",
     "message": "Un'email è stata inviata al tuo nuovo indirizzo ({email})",
     "files": ["src/components/UserSettings/EmailField.js"]
@@ -951,17 +942,14 @@
   {
     "id": "settings.verificationCall",
     "description": "Notification to verify mail address",
-    "defaultMessage":
-      "Confirm your email address. A confirmation message was sent to ({email})",
-    "message":
-      "Conferma il tuo indirizzo email. Messaggio di conferma inviato a ({email})"
+    "defaultMessage": "Confirm your email address. A confirmation message was sent to ({email})",
+    "message": "Conferma il tuo indirizzo email. Messaggio di conferma inviato a ({email})"
   },
   {
     "id": "proposals",
     "description": "Proposals label",
     "defaultMessage": "Proposals",
-    "message": "Proposte",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Proposte"
   },
   {
     "id": "users",
@@ -974,8 +962,7 @@
     "id": "workTeams",
     "description": "Workteam label",
     "defaultMessage": "Workteams",
-    "message": "Gruppi di lavoro",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Gruppi di lavoro"
   },
   {
     "id": "logout",
@@ -1035,8 +1022,7 @@
     "id": "surveys",
     "description": "Surveys label",
     "defaultMessage": "Surveys",
-    "message": "Sondaggi",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Sondaggi"
   },
   {
     "id": "faq",
@@ -1049,7 +1035,10 @@
     "description": "Privacy label",
     "defaultMessage": "Privacy",
     "message": "Privacy",
-    "files": ["src/components/SignUp/SignUp.js"]
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/SignUp/SignUp.js"
+    ]
   },
   {
     "id": "coordinator",
@@ -1431,5 +1420,12 @@
     "description": "Filter for closed proposals/surveys/discussions",
     "defaultMessage": "closed",
     "message": "chiuse"
+  },
+  {
+    "id": "private",
+    "description": "Private label",
+    "defaultMessage": "Private",
+    "message": "",
+    "files": ["src/components/Navigation/Navigation.js"]
   }
 ]

@@ -90,20 +90,20 @@
   {
     "id": "header.banner.title",
     "description": "Title in page header",
-    "defaultMessage": "G O L D",
+    "defaultMessage": "T I T L E",
     "message": "G O L D",
     "files": ["src/components/Header/Header.js"]
   },
   {
     "id": "header.brand",
     "description": "Brand name displayed in header",
-    "defaultMessage": "M5",
+    "defaultMessage": "MyBrand",
     "message": "M5",
     "files": ["src/components/Header/Header.js"]
   },
   {
     "id": "action.error",
-    "description": "Short failure notification",
+    "description": "Short failure notification ",
     "defaultMessage": "Action failed. Please retry!",
     "message": "Azion faleda. Prova da nuef!",
     "files": [
@@ -426,10 +426,8 @@
   {
     "id": "form.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage":
-      "Short passwords are easy to guess. Try one with at least 6 characters",
-    "message":
-      "Passwords curtes é saurides da giaté ora. Prova una con almanco 6 caraters",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters ",
+    "message": "Passwords curtes é saurides da giaté ora. Prova una con almanco 6 caraters",
     "files": [
       "src/components/FormValidation/FormValidation.js",
       "src/components/SignUp/SignUp.js",
@@ -540,7 +538,7 @@
   },
   {
     "id": "action.success",
-    "description": "Short success notification",
+    "description": "Short success notification ",
     "defaultMessage": "Success!",
     "message": "Suzés!",
     "files": [
@@ -561,7 +559,7 @@
   },
   {
     "id": "settings.email.notVerified",
-    "description": "Email not yet verified",
+    "description": "Email not yet verified ",
     "defaultMessage": "Email not verified",
     "message": "Email nia verificheda",
     "files": [
@@ -571,7 +569,7 @@
   },
   {
     "id": "settings.email.resend",
-    "description": "Resend verification email",
+    "description": "Resend verification email ",
     "defaultMessage": "Resend verification email",
     "message": "Ortié da nuef l'email de verifica",
     "files": [
@@ -581,7 +579,7 @@
   },
   {
     "id": "settings.email.verified",
-    "description": "Email got verified",
+    "description": "Email got verified ",
     "defaultMessage": "Email verified!",
     "message": "Email verificheda!",
     "files": [
@@ -610,7 +608,7 @@
   {
     "id": "userSettings.oldPW",
     "description": "Current account password for form label",
-    "defaultMessage": "Enter your current password",
+    "defaultMessage": "Enter your current password ",
     "message": "Dé ite vosta password atuala",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
@@ -659,19 +657,15 @@
   {
     "id": "passwordRecovery.stepOne",
     "description": "Password recovery instruction",
-    "defaultMessage":
-      "Enter your email address below and we'll send you a link to reset your password",
-    "message":
-      "Dede ite vosta adressa email y ves menaron en link por fé l reset dla password",
+    "defaultMessage": "Enter your email address below and we'll send you a link to reset your password",
+    "message": "Dede ite vosta adressa email y ves menaron en link por fé l reset dla password",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
     "id": "passwordRecovery.stepTwo",
     "description": "Password recovery instruction",
-    "defaultMessage":
-      "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
-    "message":
-      "Cialede te vosta posta por i proscims varesc. Sce ne aveis nia giaté na email, y ala ne é nia ruvada tl spam, possel ester che i ves eis anunzié cun en autra adressa",
+    "defaultMessage": "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
+    "message": "Cialede te vosta posta por i proscims varesc. Sce ne aveis nia giaté na email, y ala ne é nia ruvada tl spam, possel ester che i ves eis anunzié cun en autra adressa",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
@@ -690,10 +684,8 @@
   {
     "id": "signup.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage":
-      "Short passwords are easy to guess. Try one with at least 6 characters",
-    "message":
-      "Passwords curtes é saurides da giaté ora. Prova una con almanco 6 caraters",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters ",
+    "message": "Passwords curtes é saurides da giaté ora. Prova una con almanco 6 caraters",
     "files": ["src/routes/passwordReset/PasswordReset.js"]
   },
   {
@@ -781,8 +773,7 @@
   },
   {
     "id": "form.error-select",
-    "description":
-      "Help for selection, when input does not match with a suggestion",
+    "description": "Help for selection, when input does not match with a suggestion",
     "defaultMessage": "You selection is not correct. Click on a suggestion",
     "message": "",
     "files": [
@@ -796,13 +787,6 @@
     "defaultMessage": "By using this site you accept our privacy policy.",
     "message": "",
     "files": ["src/components/Layout/Layout.js"]
-  },
-  {
-    "id": "navigation.feed",
-    "description": "Feed label",
-    "defaultMessage": "Feed",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
   },
   {
     "id": "command.loadMore",
@@ -884,29 +868,15 @@
   },
   {
     "id": "settings.email.resendNotification",
-    "description": "Verification mail sending success",
+    "description": "Verification mail sending success ",
     "defaultMessage": "An email was sent to your new mail address ({email})",
     "message": "",
     "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
-    "id": "proposals",
-    "description": "Proposals label",
-    "defaultMessage": "Proposals",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
     "id": "users",
     "description": "Users label",
     "defaultMessage": "Users",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
-    "id": "workTeams",
-    "description": "Workteam label",
-    "defaultMessage": "Workteams",
     "message": "",
     "files": ["src/components/Navigation/Navigation.js"]
   },
@@ -938,15 +908,17 @@
     "id": "surveys",
     "description": "Surveys label",
     "defaultMessage": "Surveys",
-    "message": "Enrescides",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Enrescides"
   },
   {
     "id": "privacy",
     "description": "Privacy label",
     "defaultMessage": "Privacy",
     "message": "",
-    "files": ["src/components/SignUp/SignUp.js"]
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/SignUp/SignUp.js"
+    ]
   },
   {
     "id": "form.error-min",
@@ -1052,5 +1024,12 @@
     "defaultMessage": "Read our {link}",
     "message": "",
     "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "private",
+    "description": "Private label",
+    "defaultMessage": "Private",
+    "message": "",
+    "files": ["src/components/Navigation/Navigation.js"]
   }
 ]

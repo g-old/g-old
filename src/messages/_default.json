@@ -105,8 +105,7 @@
   },
   {
     "id": "form.error-select",
-    "description":
-      "Help for selection, when input does not match with a suggestion",
+    "description": "Help for selection, when input does not match with a suggestion",
     "defaultMessage": "You selection is not correct. Click on a suggestion",
     "message": "",
     "files": [
@@ -117,20 +116,20 @@
   {
     "id": "header.banner.title",
     "description": "Title in page header",
-    "defaultMessage": "G O L D",
+    "defaultMessage": "T I T L E",
     "message": "",
     "files": ["src/components/Header/Header.js"]
   },
   {
     "id": "header.brand",
     "description": "Brand name displayed in header",
-    "defaultMessage": "M5",
+    "defaultMessage": "MyBrand",
     "message": "",
     "files": ["src/components/Header/Header.js"]
   },
   {
     "id": "action.error",
-    "description": "Short failure notification",
+    "description": "Short failure notification ",
     "defaultMessage": "Action failed. Please retry!",
     "message": "",
     "files": [
@@ -210,13 +209,6 @@
     "files": ["src/components/Navigation/Navigation.js"]
   },
   {
-    "id": "navigation.feed",
-    "description": "Feed label",
-    "defaultMessage": "Feed",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
     "id": "command.loadMore",
     "description": "To get more data",
     "defaultMessage": "Load more",
@@ -249,8 +241,7 @@
   {
     "id": "form.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage":
-      "Short passwords are easy to guess. Try one with at least 6 characters",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters ",
     "message": "",
     "files": [
       "src/components/FormValidation/FormValidation.js",
@@ -338,7 +329,7 @@
   },
   {
     "id": "action.success",
-    "description": "Short success notification",
+    "description": "Short success notification ",
     "defaultMessage": "Success!",
     "message": "",
     "files": [
@@ -370,7 +361,7 @@
   },
   {
     "id": "settings.email.notVerified",
-    "description": "Email not yet verified",
+    "description": "Email not yet verified ",
     "defaultMessage": "Email not verified",
     "message": "",
     "files": [
@@ -380,7 +371,7 @@
   },
   {
     "id": "settings.email.resend",
-    "description": "Resend verification email",
+    "description": "Resend verification email ",
     "defaultMessage": "Resend verification email",
     "message": "",
     "files": [
@@ -390,7 +381,7 @@
   },
   {
     "id": "settings.email.verified",
-    "description": "Email got verified",
+    "description": "Email got verified ",
     "defaultMessage": "Email verified!",
     "message": "",
     "files": [
@@ -433,7 +424,7 @@
   {
     "id": "userSettings.oldPW",
     "description": "Current account password for form label",
-    "defaultMessage": "Enter your current password",
+    "defaultMessage": "Enter your current password ",
     "message": "",
     "files": ["src/components/UserSettings/UserSettings.js"]
   },
@@ -457,16 +448,14 @@
   {
     "id": "passwordRecovery.stepOne",
     "description": "Password recovery instruction",
-    "defaultMessage":
-      "Enter your email address below and we'll send you a link to reset your password",
+    "defaultMessage": "Enter your email address below and we'll send you a link to reset your password",
     "message": "",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
   {
     "id": "passwordRecovery.stepTwo",
     "description": "Password recovery instruction",
-    "defaultMessage":
-      "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
+    "defaultMessage": "Check your inbox for the next steps. If you don't receive an email, and it's not in your spam folder this could mean you signed up with a different address.",
     "message": "",
     "files": ["src/routes/passwordRecovery/PasswordRecovery.js"]
   },
@@ -480,8 +469,7 @@
   {
     "id": "signup.error-shortPassword",
     "description": "Help for short passwords",
-    "defaultMessage":
-      "Short passwords are easy to guess. Try one with at least 6 characters",
+    "defaultMessage": "Short passwords are easy to guess. Try one with at least 6 characters ",
     "message": "",
     "files": ["src/routes/passwordReset/PasswordReset.js"]
   },
@@ -544,29 +532,15 @@
   },
   {
     "id": "settings.email.resendNotification",
-    "description": "Verification mail sending success",
+    "description": "Verification mail sending success ",
     "defaultMessage": "An email was sent to your new mail address ({email})",
     "message": "",
     "files": ["src/components/UserSettings/EmailField.js"]
   },
   {
-    "id": "proposals",
-    "description": "Proposals label",
-    "defaultMessage": "Proposals",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
     "id": "users",
     "description": "Users label",
     "defaultMessage": "Users",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
-    "id": "workTeams",
-    "description": "Workteam label",
-    "defaultMessage": "Workteams",
     "message": "",
     "files": ["src/components/Navigation/Navigation.js"]
   },
@@ -595,18 +569,14 @@
     "files": ["src/components/Navigation/Navigation.js"]
   },
   {
-    "id": "surveys",
-    "description": "Surveys label",
-    "defaultMessage": "Surveys",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
     "id": "privacy",
     "description": "Privacy label",
     "defaultMessage": "Privacy",
     "message": "",
-    "files": ["src/components/SignUp/SignUp.js"]
+    "files": [
+      "src/components/Navigation/Navigation.js",
+      "src/components/SignUp/SignUp.js"
+    ]
   },
   {
     "id": "form.error-min",
@@ -712,5 +682,12 @@
     "defaultMessage": "Read our {link}",
     "message": "",
     "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "private",
+    "description": "Private label",
+    "defaultMessage": "Private",
+    "message": "",
+    "files": ["src/components/Navigation/Navigation.js"]
   }
 ]
