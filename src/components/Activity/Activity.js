@@ -91,19 +91,12 @@ function renderGroupHeader(info, title, locale) {
           'IMPLEMENT LOGO'
         ) : (
           <svg
-            version="1.1"
+            width="24px"
+            height="24px"
+            aria-label="Group"
             viewBox="0 0 24 24"
-            role="img"
-            width="48px"
-            height="48px"
-            aria-label="cloud"
           >
-            <path
-              fill="none"
-              stroke="#000"
-              strokeWidth="2"
-              d={ICONS.workteam}
-            />
+            <path fill="none" strokeWidth="2" d={ICONS.group} />
           </svg>
         )}
         <span>{info[langSchema[locale]] || info.name || ':('}</span>

@@ -24,6 +24,21 @@
 .groupHeader {
   padding: 0.5em;
   border-bottom: 3px solid #eee;
+  flex-wrap: wrap;
+
+  button {
+    flex-shrink: 1 !important;
+    flex-direction: row;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  svg {
+    display: flex;
+    padding-right: 0.5em;
+    min-width: 24px;
+    stroke: var(--color-three);
+  }
 
   label {
     color: var(--color-accent-3);
