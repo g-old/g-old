@@ -17,11 +17,15 @@
 .headline {
   font-size: 1.5rem;
   font-weight: 600;
-
-  /* margin-top: -1.5em; */
+  fill: var(--color-accent-1);
+  margin-top: -1.5em;
   word-break: break-word;
   color: var(--color-four);
   text-align: center;
+}
+
+.resetMargin {
+  margin-top: 0;
 }
 
 .details {
@@ -31,7 +35,11 @@
 .actionBtn {
   align-self: center;
   position: relative;
-  top: -2.5em;
+  top: -2.25em;
+}
+
+.lower {
+  top: -0.5em;
 }
 
 /*

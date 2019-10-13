@@ -15,7 +15,11 @@ import Image from '../Image';
 import Box from '../Box';
 import Button from '../Button';
 import history from '../../history';
+import { ApprovalStates } from '../../organization';
 
+const APPROVED =
+  // eslint-disable-next-line no-bitwise
+  ApprovalStates.CONTENT_APPROVED | ApprovalStates.TOPIC_APPROVED;
 const messages = defineMessages({
   spokesman: {
     id: 'spokesman',
@@ -48,7 +52,11 @@ class Proposal extends React.Component {
       state,
       teamId,
       user,
+      approvalState,
     } = this.props;
+
+    // eslint-disable-next-line no-bitwise
+    const isApproved = (approvalState & APPROVED) > 0;
     return (
       <Box column fill className={cn(s.root, deletedAt && s.deleted)}>
         {image && (
@@ -66,13 +74,7 @@ class Proposal extends React.Component {
           <Button
             onClick={() => history.push(`/workteams/${teamId}`)}
             icon={
-              <svg
-                version="1.1"
-                viewBox="0 0 24 24"
-                width="24px"
-                height="24px"
-                role="img"
-              >
+              <svg version="1.1" viewBox="0 0 24 24" role="img">
                 <path
                   fill="none"
                   stroke="#fff"
@@ -81,7 +83,7 @@ class Proposal extends React.Component {
                 />
               </svg>
             }
-            className={s.actionBtn}
+            className={cn(s.actionBtn, !image && s.lower)}
             primary
           >
             <FormattedMessage {...messages.workteam} />
@@ -95,7 +97,14 @@ class Proposal extends React.Component {
               logo={workteam.logo}
             />
           )}
-          <div className={s.headline}>{title}</div>
+          <div className={cn(s.headline, !teamId && s.resetMargin)}>
+            {title}{' '}
+            {isApproved && (
+              <svg width="24px" height="24px" viewBox="0 0 24 24">
+                <path d="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />
+              </svg>
+            )}
+          </div>
 
           <div className={s.details}>
             {spokesman && (
@@ -176,6 +185,7 @@ Proposal.propTypes = {
     displayName: PropTypes.string,
     logo: PropTypes.string,
   }),
+  approvalState: PropTypes.number.isRequired,
 };
 
 Proposal.defaultProps = {
