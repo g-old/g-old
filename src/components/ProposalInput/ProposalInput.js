@@ -66,10 +66,14 @@ type State = {
   scale: number,
   rotation: number,
   summary: string,
+  previewImage: mixed,
 };
 type Props = {
   defaultPollType: PollTypeTypes,
   user: UserShape,
+  title?: string,
+  body?: string,
+  image?: string,
   createProposal: ({ workTeamId?: ID, ...State }) => Promise<boolean>,
   tags: TagType[],
   users: UserShape[],
@@ -80,26 +84,33 @@ type Props = {
   locale: 'de' | 'it' | 'lld',
   updates: UpdateShape,
 };
+const DEFAULT_POLL_TYPE = 'voting';
 
 class ProposalInput extends React.Component<Props, State> {
   constructor(props) {
     super(props);
     this.state = {
       options: [],
-      pollType:
-        props.availablePolls.find(
-          poll => poll.value === props.defaultPollType,
-        ) || props.availablePolls[0],
+      pollType: props.availablePolls
+        ? props.availablePolls.find(
+            poll => poll.value === props.defaultPollType,
+          ) || props.availablePolls[0]
+        : DEFAULT_POLL_TYPE,
       spokesman: props.user,
       tags: [],
       dateTo: '',
       timeTo: '',
       withOptions: false,
       cropCoordinates: null,
+      title: props.title,
+      body: props.body,
+      image: props.image,
       scale: 1,
+      state: props.defaultPollType || DEFAULT_POLL_TYPE,
       rotation: 0,
       transferRights: false,
-      ...props.defaultPollSettings[props.defaultPollType || 'proposed'],
+      ...(props.defaultPollSettings &&
+        props.defaultPollSettings[props.defaultPollType || DEFAULT_POLL_TYPE]),
     };
 
     this.storageKey = `proposalDraft${props.workTeamId || '-public'}`;
@@ -161,11 +172,11 @@ class ProposalInput extends React.Component<Props, State> {
       default:
         push();
         break;
-    }*/
+    } */
   }
 
   handleSubmission() {
-    const { createProposal: create, workTeamId, locale } = this.props;
+    const { createProposal: create, workTeamId, locale, image } = this.props;
     const startTime = null;
     let endTime = null;
     const {
@@ -217,6 +228,7 @@ class ProposalInput extends React.Component<Props, State> {
         multipleChoice: !!extended,
         startTime,
         endTime,
+        ...(image && { image }),
         secret: !!secret,
         threshold,
         mode: {
@@ -294,7 +306,7 @@ class ProposalInput extends React.Component<Props, State> {
       rotation,
       transferRights,
     } = this.state;
-    const { tags, updates = {} } = this.props;
+    const { tags, updates = {}, image } = this.props;
     return (
       <Box fill column>
         <Wizard onNext={this.calculateNextStep} basename="">
@@ -318,18 +330,20 @@ class ProposalInput extends React.Component<Props, State> {
                     withOptions={withOptions}
                   />
                 </Step>
-                <Step id="file">
-                  <FileUpload
-                    data={{
-                      files,
-                      cropCoordinates,
-                      scale,
-                      rotation,
-                      transferRights,
-                    }}
-                    onExit={this.handleValueSaving}
-                  />
-                </Step>
+                {!image && (
+                  <Step id="file">
+                    <FileUpload
+                      data={{
+                        files,
+                        cropCoordinates,
+                        scale,
+                        rotation,
+                        transferRights,
+                      }}
+                      onExit={this.handleValueSaving}
+                    />
+                  </Step>
+                )}
 
                 <Step id="tags">
                   <TagInput

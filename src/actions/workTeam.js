@@ -65,6 +65,7 @@ const discussionFields = `
   closedAt
   numComments
   workTeamId
+  content
 `;
 
 export const workTeamFields = `

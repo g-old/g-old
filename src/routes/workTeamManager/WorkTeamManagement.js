@@ -11,9 +11,9 @@ import {
   loadTags,
   loadProposalsList,
   updateProposal,
+  createProposal,
 } from '../../actions/proposal';
 import { findUser } from '../../actions/user';
-import ProposalsManager from '../../components/ProposalsManager';
 
 import { deleteRequest, updateRequest } from '../../actions/request';
 
@@ -25,8 +25,9 @@ import {
   getWorkTeamStatus,
   getVisibleProposals,
   getMessageUpdates,
-  getWTProposalsByState,
+  // getWTProposalsByState,
   getResourcePageInfo,
+  getWTDiscussionsByState,
 } from '../../reducers';
 import { genProposalPageKey } from '../../reducers/pageInfo';
 
@@ -41,6 +42,7 @@ import { createMessage } from '../../actions/message';
 import UpstreamProposalsView from './UpstreamProposalsView';
 import RequestsView from './RequestsView';
 import withPollSettings from '../../components/ProposalInput/withPollSettings';
+import Label from '../../components/Label';
 
 const WizardWithSettings = withPollSettings(ProposalInput);
 
@@ -116,7 +118,8 @@ class WorkTeamManagement extends React.Component {
     createMessage: PropTypes.func.isRequired,
     messageUpdates: PropTypes.shape({}).isRequired,
     updateProposal: PropTypes.func.isRequired,
-    wtProposals: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    // wtProposals: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    discussions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   };
 
   static defaultProps = {
@@ -242,7 +245,8 @@ class WorkTeamManagement extends React.Component {
       requestUpdates = {},
       id,
       discussionUpdates,
-      wtProposals,
+      // wtProposals,
+      discussions,
       pageInfo,
       proposals,
       createMessage: notify,
@@ -281,9 +285,22 @@ class WorkTeamManagement extends React.Component {
           </Tab>,
         );
       }
+      const discussion =
+        discussions && discussions.length ? discussions[0] : {};
       tabs.push(
         <Tab title={<FormattedMessage {...messages.proposals} />}>
-          <Accordion>
+          <Label>Ready for a voting on your law proposal?</Label>
+          <WizardWithSettings
+            image={workTeam.image}
+            title={discussion.title}
+            body={discussion.content}
+            workTeamId={id}
+          />
+          {/* <ProposalInput image={workTeam.image}
+            title={discussion.title}
+      body={discussion.content} /> */}
+
+          {/* <Accordion>
             <AccordionPanel
               heading={<FormattedMessage {...messages.proposalInput} />}
               onActive={this.fetchTags}
@@ -302,9 +319,12 @@ class WorkTeamManagement extends React.Component {
                 loadProposals={this.fetchWTProposals}
               />
             </AccordionPanel>
-          </Accordion>
+          </Accordion> */}
         </Tab>,
-
+      );
+    }
+    if (workTeam.restricted && (isCoordinator || isAdmin)) {
+      tabs.push(
         <Tab title={<FormattedMessage {...messages.requests} />}>
           <RequestsView
             showRequest={showRequest}
@@ -361,6 +381,7 @@ const mapStateToProps = (state, { id }) => ({
   workTeam: getWorkTeam(state, id),
   requests: getVisibleRequests(state, 'all'),
   discussionUpdates: getDiscussionUpdates(state),
+  discussions: getWTDiscussionsByState(state, id, 'active'),
   requestUpdates: getRequestUpdates(state),
   workTeamUpdates: getWorkTeamStatus(state),
   pageInfo: getResourcePageInfo(
@@ -370,7 +391,7 @@ const mapStateToProps = (state, { id }) => ({
   ), // getProposalsPage(state, 'pending'),
   proposals: getVisibleProposals(state, 'pending'),
   messageUpdates: getMessageUpdates(state),
-  wtProposals: getWTProposalsByState(state, id, 'active'),
+  // wtProposals: getWTProposalsByState(state, id, 'active'),
 });
 
 const mapDispatch = {
@@ -383,6 +404,7 @@ const mapDispatch = {
   loadProposalStatus,
   createMessage,
   updateProposal,
+  createProposal,
 };
 
 export default connect(
