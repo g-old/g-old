@@ -142,6 +142,7 @@ class WorkTeamManagement extends React.Component {
       this.props.updateWorkTeam({
         id,
         ...values,
+        restricted: !!values.restricted,
       });
     } else {
       this.props.createWorkTeam({
@@ -173,7 +174,7 @@ class WorkTeamManagement extends React.Component {
             submit={this.handleFormsubmission}
             data={workTeam}
             validations={{
-              name: { args: { required: true, min: 3 } },
+              name: { args: { required: true, min: 3, max: 35 } },
               ...(canModify && {
                 restricted: {},
                 coordinator: {

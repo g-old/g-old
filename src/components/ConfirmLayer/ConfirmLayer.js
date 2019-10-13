@@ -74,23 +74,21 @@ function ConfirmLayer({
           {message}
           {children}
           <Box tag="footer" justify padding="medium">
-            <div>
-              <Button
-                label={intl.formatMessage({
-                  ...messages[actionId],
-                })}
-                onClick={onSubmit}
-                disabled={pending}
-              />{' '}
-              <Button
-                label={intl.formatMessage({
-                  ...messages.cancel,
-                })}
-                primary
-                disabled={pending}
-                onClick={onClose}
-              />
-            </div>
+            <Button
+              label={intl.formatMessage({
+                ...messages[actionId],
+              })}
+              onClick={onSubmit}
+              disabled={pending}
+            />{' '}
+            <Button
+              label={intl.formatMessage({
+                ...messages.cancel,
+              })}
+              primary
+              disabled={pending}
+              onClick={onClose}
+            />
           </Box>
         </Form>
       </Box>

@@ -345,7 +345,6 @@
       "src/components/ProposalActions/ProposalActions.js",
       "src/components/TagForm/TagForm.js",
       "src/components/UserSettings/UserSettings.js",
-      "src/components/WorkTeamForm/WorkTeamForm.js",
       "src/components/WorkTeamInput/WorkTeamInput.js",
       "src/routes/passwordRecovery/PasswordRecovery.js",
       "src/routes/passwordReset/PasswordReset.js"
@@ -714,7 +713,6 @@
       "src/components/DiscussionInput/DiscussionInput.js",
       "src/components/FormValidation/FormValidation.js",
       "src/components/TagForm/TagForm.js",
-      "src/components/WorkTeamForm/WorkTeamForm.js",
       "src/components/WorkTeamInput/WorkTeamInput.js"
     ]
   },
@@ -2118,5 +2116,19 @@
     "defaultMessage": "Verify me",
     "message": "",
     "files": ["src/components/UserProfile/VerificationBadge.js"]
+  },
+  {
+    "id": "command.createWt",
+    "description": "command to create a workteam",
+    "defaultMessage": "Create workteam",
+    "message": "",
+    "files": ["src/components/Proposal/Proposal.js"]
+  },
+  {
+    "id": "label.workteam",
+    "description": "label workteam",
+    "defaultMessage": "Workteam",
+    "message": "",
+    "files": ["src/components/Proposal/Proposal.js"]
   }
 ]

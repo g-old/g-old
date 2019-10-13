@@ -13,8 +13,8 @@ import { getWorkTeams, getWorkTeamStatus } from '../../reducers';
 import history from '../../history';
 import AssetsTable from '../AssetsTable';
 import WorkteamRow from './WorkteamRow';
-import Button from '../Button';
 import ConfirmLayer from '../ConfirmLayer';
+import Label from '../Label';
 
 class WorkTeamPanel extends React.Component {
   static propTypes = {
@@ -22,7 +22,10 @@ class WorkTeamPanel extends React.Component {
     workTeams: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     updateWorkTeam: PropTypes.func.isRequired,
     deleteWorkteam: PropTypes.func.isRequired,
-    updates: PropTypes.shape({}).isRequired,
+    updates: PropTypes.shape({
+      success: PropTypes.bool,
+      pending: PropTypes.bool,
+    }).isRequired,
   };
 
   static defaultProps = {};
@@ -123,10 +126,17 @@ class WorkTeamPanel extends React.Component {
             onSubmit={this.onMutate}
           />
         )}
-        <Box>
+        {/* <Box>
           <Button icon="+" onClick={this.onAdd}>
             {'Add Workteam'}
           </Button>
+       </Box> */}
+        <Box column padding="medium">
+          <Label>
+            Control all the workteams on the platform. You can edit the title,
+            change the coordinator, make them go inactive and even delete
+            workteams.
+          </Label>
         </Box>
         <AssetsTable
           onClickMenu={this.onMenuClick}

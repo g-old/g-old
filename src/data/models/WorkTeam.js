@@ -74,6 +74,38 @@ async function changeWTStatus(viewer, loaders, deactivate, workteamId) {
   return updatedWorkTeam ? new WorkTeam(updatedWorkTeam) : null;
 }
 
+async function modifySessions(userId, add, workteamId) {
+  const oldSessions = await knex('sessions')
+    .whereRaw("sess->'passport'->'user'->>'id'=?", [userId])
+    .select('sess', 'sid');
+  const updates = oldSessions.map(data => {
+    const session = data.sess;
+    const wtMemberships = add
+      ? [...session.passport.user.wtMemberships, workteamId]
+      : session.passport.user.wtMemberships.filter(id => id != workteamId); // eslint-disable-line
+    const newSession = {
+      ...session,
+      passport: {
+        ...session.passport,
+        user: {
+          ...session.passport.user,
+          wtMemberships,
+        },
+      },
+    };
+    return knex('sessions')
+      .where({ sid: data.sid })
+      .forUpdate()
+      .update({ sess: JSON.stringify(newSession) });
+  });
+  // TODO UPDATE TO POSTGRES 9.6!!
+  await Promise.all(updates);
+  /* await knex.raw(
+      "update sessions set sess = jsonb_set(sess::jsonb, '{passport}',?) where sess->'passport'->'user'->>'id'=?",
+      [serializedUser, this.id],
+    ); */
+}
+
 class WorkTeam {
   constructor(data) {
     this.id = data.id;
@@ -114,43 +146,11 @@ class WorkTeam {
   }
 
   async addMembershipToSessions(userId) {
-    return this.modifySessions(userId, true);
+    return modifySessions(userId, true, this.id);
   }
 
   async removeMembershipFromSessions(userId) {
-    return this.modifySessions(userId, false);
-  }
-
-  async modifySessions(userId, add) {
-    const oldSessions = await knex('sessions')
-      .whereRaw("sess->'passport'->'user'->>'id'=?", [userId])
-      .select('sess', 'sid');
-    const updates = oldSessions.map(data => {
-      const session = data.sess;
-      const wtMemberships = add
-        ? [...session.passport.user.wtMemberships, this.id]
-        : session.passport.user.wtMemberships.filter(id => id != this.id); // eslint-disable-line
-      const newSession = {
-        ...session,
-        passport: {
-          ...session.passport,
-          user: {
-            ...session.passport.user,
-            wtMemberships,
-          },
-        },
-      };
-      return knex('sessions')
-        .where({ sid: data.sid })
-        .forUpdate()
-        .update({ sess: JSON.stringify(newSession) });
-    });
-    // TODO UPDATE TO POSTGRES 9.6!!
-    await Promise.all(updates);
-    /* await knex.raw(
-      "update sessions set sess = jsonb_set(sess::jsonb, '{passport}',?) where sess->'passport'->'user'->>'id'=?",
-      [serializedUser, this.id],
-    ); */
+    return modifySessions(userId, false, this.id);
   }
 
   async join(viewer, memberId, loaders) {
@@ -337,12 +337,12 @@ class WorkTeam {
   static async create(viewer, data, loaders, trx) {
     if (!canMutate(viewer, data, Models.WORKTEAM)) return null;
     if (!data) return null;
-    if (!data.name) return null;
+    if (!data.name || data.name.length > 30) return null;
     const newData = {
       ...(data.name && { name: data.name }),
-      ...(data.deName && { de_name: data.deName }),
+      /* ...(data.deName && { de_name: data.deName }),
       ...(data.itName && { it_name: data.itName }),
-      ...(data.lldName && { lld_name: data.lldName }),
+      ...(data.lldName && { lld_name: data.lldName }), */
       created_at: new Date(),
     };
     // All teams should be open. Mainteams don't exist anymore
@@ -460,10 +460,11 @@ class WorkTeam {
 
       await updateCoordinatorsGroups(
         viewer,
-        data.coordinatorId,
+        coordinatorId,
         loaders,
         transaction,
       );
+      await modifySessions(coordinatorId, true, workteam.id);
 
       return workteam;
     };
