@@ -991,13 +991,6 @@
     "files": ["src/components/Navigation/Navigation.js"]
   },
   {
-    "id": "navigation.feed",
-    "description": "Feed label",
-    "defaultMessage": "Feed",
-    "message": "",
-    "files": ["src/components/Navigation/Navigation.js"]
-  },
-  {
     "id": "navigation.profile",
     "description": "Profile link in header",
     "defaultMessage": "Profile",

@@ -10,6 +10,18 @@
   background-color: #eee;
 }
 
+.close {
+  display: flex;
+  width: 1em;
+  height: 1em;
+  background-color: #eee;
+  border-radius: 3px;
+
+  /* position: relative;
+  top: -1.5em;
+  right: -1.5em; */
+}
+
 .container {
   padding: 2rem 0;
 }
@@ -20,8 +32,6 @@
 
 .closerBtn {
   position: absolute;
-  top: 0;
-  right: 0;
 
   span {
     padding: 1px !important;

@@ -12,6 +12,7 @@ import webpack from 'webpack';
 import WebpackAssetsManifest from 'webpack-assets-manifest';
 import nodeExternals from 'webpack-node-externals';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import TerserPlugin from 'terser-webpack-plugin';
 import overrideRules from './lib/overrideRules';
 import pkg from '../package.json';
 
@@ -398,6 +399,23 @@ const clientConfig = {
         },
       },
     },
+    minimize: !isDebug,
+    minimizer: !isDebug
+      ? [
+          // replace UglifyJS
+          new TerserPlugin({
+            terserOptions: {
+              //  ecma: 6,// Pass 6 or greater to enable compress options that will transform ES5 code into smaller ES6+ equivalent forms.
+              warnings: false,
+              extractComments: false,
+              compress: {
+                drop_console: true, // remove console
+              },
+              ie8: false,
+            },
+          }),
+        ]
+      : [],
   },
 
   // Some libraries import Node modules but don't use them in the browser.

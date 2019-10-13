@@ -10,6 +10,7 @@ import Box from '../Box';
 import Button from '../Button';
 import Image from '../Image';
 import Label from '../Label';
+import { ICONS } from '../../constants';
 
 function supportsDragDrop(document) {
   if (document) {
@@ -45,25 +46,6 @@ function getFileTransfer(event, allowMultiple) {
 }
 
 class Uploader extends React.Component {
-  static propTypes = {
-    fullDropTarget: PropTypes.bool.isRequired,
-    files: PropTypes.arrayOf(PropTypes.shape({})),
-    onClick: PropTypes.func,
-    multiple: PropTypes.bool.isRequired,
-    onDOMChange: PropTypes.func,
-    className: PropTypes.string,
-    label: PropTypes.string.isRequired,
-    uploadPending: PropTypes.bool,
-  };
-
-  static defaultProps = {
-    files: null,
-    onClick: null,
-    onDOMChange: null,
-    className: null,
-    uploadPending: false,
-  };
-
   constructor() {
     super();
     this.onClick = this.onClick.bind(this);
@@ -237,7 +219,23 @@ class Uploader extends React.Component {
               a11yTitle="Clear image preview"
               onClick={this.onClearFilePreview.bind(this, i)} // eslint-disable-line
               className={s.closerBtn}
-              icon="X"
+              icon={
+                <svg
+                  version="1.1"
+                  viewBox="0 0 24 24"
+                  width="24px"
+                  height="24px"
+                  role="img"
+                  className={s.close}
+                >
+                  <path
+                    fill="none"
+                    stroke="#000"
+                    strokeWidth="2"
+                    d={ICONS.close}
+                  />
+                </svg>
+              }
             />
             <Image size="thumb" src={item.preview} />
           </div>
@@ -267,6 +265,7 @@ class Uploader extends React.Component {
         {dragDropSupported ? (
           <Box
             justify
+            // eslint-disable-next-line react/jsx-props-no-spreading
             {...boxProps}
             onDrop={this.onDrop}
             onDragEnter={this.onDragEnter}
@@ -293,5 +292,23 @@ class Uploader extends React.Component {
     );
   }
 }
+Uploader.propTypes = {
+  fullDropTarget: PropTypes.bool.isRequired,
+  files: PropTypes.arrayOf(PropTypes.shape({})),
+  onClick: PropTypes.func,
+  multiple: PropTypes.bool.isRequired,
+  onDOMChange: PropTypes.func,
+  className: PropTypes.string,
+  label: PropTypes.string.isRequired,
+  uploadPending: PropTypes.bool,
+};
+
+Uploader.defaultProps = {
+  files: null,
+  onClick: null,
+  onDOMChange: null,
+  className: null,
+  uploadPending: false,
+};
 
 export default withStyles(s)(Uploader);

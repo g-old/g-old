@@ -569,8 +569,7 @@
     "id": "navigation.feed",
     "description": "Feed label",
     "defaultMessage": "Feed",
-    "message": "Bacheca",
-    "files": ["src/components/Navigation/Navigation.js"]
+    "message": "Bacheca"
   },
   {
     "id": "poll.notify",
