@@ -55,7 +55,7 @@ class ProposalsManager extends React.Component {
     const { showDetails, activeProposal } = this.state;
     const { intl } = this.context;
     if (pending && !proposals.length) {
-      return <p>{'Loading...'} </p>;
+      return <p>Loading... </p>;
     }
     if (errorMessage && !proposals.length) {
       return <FetchError message={errorMessage} onRetry={loadProposals} />;

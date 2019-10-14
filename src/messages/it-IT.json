@@ -699,6 +699,7 @@
     "message": "Crea una nuova proposta",
     "files": [
       "src/components/ProposalPanel/ProposalPanel.js",
+      "src/components/ProposalPanel/ProposalTable.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
     ]
   },
@@ -709,6 +710,7 @@
     "message": "Gestisci la proposta",
     "files": [
       "src/components/ProposalPanel/ProposalPanel.js",
+      "src/components/ProposalPanel/ProposalTable.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
     ]
   },
@@ -719,6 +721,7 @@
     "message": "",
     "files": [
       "src/components/ProposalPanel/ProposalPanel.js",
+      "src/components/ProposalPanel/ProposalTable.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
     ]
   },
@@ -1640,28 +1643,40 @@
     "description": "Filter for accepted proposals",
     "defaultMessage": "accepted",
     "message": "approvate",
-    "files": ["src/components/StateFilter/StateFilter.js"]
+    "files": [
+      "src/components/ProposalPanel/ProposalFilter.js",
+      "src/components/StateFilter/StateFilter.js"
+    ]
   },
   {
     "id": "proposals.repelled",
     "description": "Filter for repelled proposals",
     "defaultMessage": "repelled",
     "message": "respinte",
-    "files": ["src/components/StateFilter/StateFilter.js"]
+    "files": [
+      "src/components/ProposalPanel/ProposalFilter.js",
+      "src/components/StateFilter/StateFilter.js"
+    ]
   },
   {
     "id": "resource.active",
     "description": "Filter for active proposals/surveys/discussions",
     "defaultMessage": "active",
     "message": "in corso",
-    "files": ["src/components/StateFilter/StateFilter.js"]
+    "files": [
+      "src/components/ProposalPanel/ProposalFilter.js",
+      "src/components/StateFilter/StateFilter.js"
+    ]
   },
   {
     "id": "resource.closed",
     "description": "Filter for closed proposals/surveys/discussions",
     "defaultMessage": "closed",
     "message": "chiuse",
-    "files": ["src/components/StateFilter/StateFilter.js"]
+    "files": [
+      "src/components/ProposalPanel/ProposalFilter.js",
+      "src/components/StateFilter/StateFilter.js"
+    ]
   },
   {
     "id": "command.close",
@@ -1992,5 +2007,12 @@
     "defaultMessage": "Workteam",
     "message": "",
     "files": ["src/components/Proposal/Proposal.js"]
+  },
+  {
+    "id": "proposals.revoked",
+    "description": "Filter for revoked proposals",
+    "defaultMessage": "revoked",
+    "message": "",
+    "files": ["src/components/ProposalPanel/ProposalFilter.js"]
   }
 ]
