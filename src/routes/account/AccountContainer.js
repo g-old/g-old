@@ -45,6 +45,7 @@ import {
   getLayoutSize,
   getResourcePageInfo,
   getAllProposals,
+  getUploadStatus,
 } from '../../reducers';
 import Avatar from '../../components/Avatar';
 import UserSettings from '../../components/UserSettings';
@@ -172,7 +173,7 @@ const renderMessageList = data => {
     );
   }
 
-  return <List> {'No item found'} </List>;
+  return <List> No item found </List>;
 };
 
 class AccountContainer extends React.Component {
@@ -237,12 +238,14 @@ class AccountContainer extends React.Component {
     messageUpdates: PropTypes.shape({}).isRequired,
     proposals: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     pageInfo: PropTypes.shape({}).isRequired,
+    uploadStatus: PropTypes.shape({ pending: PropTypes.bool }),
   };
 
   static defaultProps = {
     logs: null,
     logError: null,
     workTeams: null,
+    uploadStatus: null,
   };
 
   constructor(props) {
@@ -428,6 +431,7 @@ class AccountContainer extends React.Component {
       small,
       proposals,
       pageInfo,
+      uploadStatus,
     } = this.props;
 
     const {
@@ -575,7 +579,6 @@ class AccountContainer extends React.Component {
         </AccordionPanel>
       );
     }
-
     return (
       <Box tag="article" column padding="medium">
         {notification}
@@ -599,7 +602,10 @@ class AccountContainer extends React.Component {
               <VerificationUploadMask
                 upload={upload}
                 update={mutateUser}
-                pending={updates.verification && updates.verification.pending}
+                pending={
+                  uploadStatus.pending ||
+                  (updates.verification && updates.verification.pending)
+                }
                 error={updates.verification && updates.verification.error}
                 userId={user.id}
               />
@@ -710,6 +716,7 @@ const mapStateToProps = (state, { user }) => ({
     'proposals',
     genProposalPageKey({ state: 'active' }),
   ),
+  uploadStatus: getUploadStatus(state),
 });
 
 export default connect(

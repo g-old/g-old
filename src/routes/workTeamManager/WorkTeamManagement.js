@@ -25,7 +25,7 @@ import {
   getWorkTeamStatus,
   getVisibleProposals,
   getMessageUpdates,
-  // getWTProposalsByState,
+  getWTProposalsByState,
   getResourcePageInfo,
   getWTDiscussionsByState,
 } from '../../reducers';
@@ -43,6 +43,7 @@ import UpstreamProposalsView from './UpstreamProposalsView';
 import RequestsView from './RequestsView';
 import withPollSettings from '../../components/ProposalInput/withPollSettings';
 import Label from '../../components/Label';
+import Link from '../../components/Link/Link';
 
 const WizardWithSettings = withPollSettings(ProposalInput);
 
@@ -119,7 +120,9 @@ class WorkTeamManagement extends React.Component {
     createMessage: PropTypes.func.isRequired,
     messageUpdates: PropTypes.shape({}).isRequired,
     // updateProposal: PropTypes.func.isRequired,
-    // wtProposals: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    wtProposals: PropTypes.arrayOf(
+      PropTypes.shape({ pollTwo: PropTypes.shape({ id: PropTypes.string }) }),
+    ).isRequired,
     discussions: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   };
 
@@ -246,7 +249,7 @@ class WorkTeamManagement extends React.Component {
       requestUpdates = {},
       id,
       discussionUpdates,
-      // wtProposals,
+      wtProposals,
       discussions,
       pageInfo,
       proposals,
@@ -288,16 +291,32 @@ class WorkTeamManagement extends React.Component {
       }
       const discussion =
         discussions && discussions.length ? discussions[0] : {};
+      const isRunning = wtProposals && wtProposals.length;
       tabs.push(
         <Tab title={<FormattedMessage {...messages.proposals} />}>
-          <Label>Ready for a voting on your law proposal?</Label>
-          <WizardWithSettings
-            defaultPollType="voting"
-            image={workTeam.image}
-            title={discussion.title}
-            body={discussion.content}
-            workTeamId={id}
-          />
+          {isRunning && (
+            <Label>
+              You have already a{' '}
+              <Link
+                to={`/proposal/${wtProposals[0].id}/${wtProposals[0].pollTwo.id}`}
+              >
+                proposal{' '}
+              </Link>
+              running. Wait until it finishes.
+            </Label>
+          )}
+          {!isRunning && (
+            <Label>Ready for a voting on your law proposal?</Label>
+          )}
+          {!isRunning && (
+            <WizardWithSettings
+              defaultPollType="voting"
+              image={workTeam.image}
+              title={discussion.title}
+              body={discussion.content}
+              workTeamId={id}
+            />
+          )}
           {/* <ProposalInput image={workTeam.image}
             title={discussion.title}
       body={discussion.content} /> */}
@@ -393,7 +412,7 @@ const mapStateToProps = (state, { id }) => ({
   ), // getProposalsPage(state, 'pending'),
   proposals: getVisibleProposals(state, 'pending'),
   messageUpdates: getMessageUpdates(state),
-  // wtProposals: getWTProposalsByState(state, id, 'active'),
+  wtProposals: getWTProposalsByState(state, id, 'active'),
 });
 
 const mapDispatch = {
@@ -405,7 +424,7 @@ const mapDispatch = {
   loadProposalsList,
   loadProposalStatus,
   createMessage,
-  //updateProposal,
+  // updateProposal,
   createProposal,
 };
 

@@ -320,7 +320,7 @@ class AccountDetails extends React.Component {
           <ProfilePicture
             user={accountData}
             img={thumbnail}
-            canChange
+            canChange={false} // does atm not work with layers, store is not transfered with refs
             onChange={this.displayUploadLayer}
             updates={updates.dataUrl}
           />

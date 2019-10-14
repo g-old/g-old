@@ -26,7 +26,7 @@ export default combineReducers({
 });
 
 /* GENERATOR */
-
+export const getUploadStatus = state => fromUi.getUploadStatus(state.ui);
 export const getAllProposals = state =>
   fromEntity.getAllProposals(state.entities);
 

@@ -80,7 +80,13 @@ const allUsers = createConnection(
               );
             });
           })
+
           .where({ work_team_id: args.workTeamId || null })
+          .modify(queryBuilder => {
+            if (args.approvalState) {
+              queryBuilder.where({ approval_state: args.approvalState });
+            }
+          })
           .where('proposals.state', '=', 'accepted')
           .whereRaw('(polls.end_time, polls.id) < (?,?)', [
             cursorDate,
@@ -161,7 +167,29 @@ const allUsers = createConnection(
         break;
       }
       default:
-        throw Error(`State not recognized: ${args.state}`);
+        proposals = await knex('proposals')
+          .innerJoin('polls', function() {
+            this.on(function() {
+              this.on(
+                knex.raw(
+                  'coalesce (proposals.poll_two_id, proposals.poll_one_id) = polls.id',
+                ),
+              );
+            });
+          })
+          .where({ work_team_id: args.workTeamId || null })
+          .modify(queryBuilder => {
+            if (args.approvalState) {
+              queryBuilder.where({ approval_state: args.approvalState });
+            }
+          })
+          .whereRaw('(polls.end_time, polls.id) < (?,?)', [
+            cursorDate,
+            cursorId,
+          ])
+          .limit(batchSize)
+          .orderBy('polls.end_time', 'desc')
+          .select('proposals.id as id', 'polls.closed_at as time');
     }
     return proposals;
   },
