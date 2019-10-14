@@ -58,6 +58,7 @@ class VerificationUploadMask extends React.Component<Props, State> {
   constructor() {
     super();
     this.state = {};
+    this.form = React.createRef();
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -92,6 +93,7 @@ class VerificationUploadMask extends React.Component<Props, State> {
   render() {
     const { pending, error } = this.props;
     const { uploadError } = this.state;
+    const hasError = uploadError || error;
     return (
       <FormValidation
         submit={this.handleSubmit}
@@ -111,37 +113,34 @@ class VerificationUploadMask extends React.Component<Props, State> {
             <Heading tag="h2">
               <FormattedMessage {...messages.verification} />
             </Heading>
-            {uploadError ||
-              (error && (
-                <Notification
-                  message={<FormattedMessage {...messages.error} />}
-                />
-              ))}
+            {hasError && (
+              <Notification
+                message={<FormattedMessage {...messages.error} />}
+              />
+            )}
             <FormField
               help={<FormattedMessage {...messages.verificationHelp} />}
               label={<FormattedMessage {...messages.image} />}
               error={errorMessages.filesError}
             >
               <Box fill column>
-                {
-                  <FileUploader
-                    label={<FormattedMessage {...messages.click} />}
-                    files={values.files}
-                    onDOMChange={files => {
-                      handleValueChanges({
-                        target: {
-                          type: 'uploader',
-                          name: 'files',
-                          value: files,
-                        },
-                      });
-                    }}
-                  />
-                }
+                <FileUploader
+                  label={<FormattedMessage {...messages.click} />}
+                  files={values.files}
+                  onDOMChange={files => {
+                    handleValueChanges({
+                      target: {
+                        type: 'uploader',
+                        name: 'files',
+                        value: files,
+                      },
+                    });
+                  }}
+                />
               </Box>
             </FormField>
-            {inputChanged && (
-              <Button primary onClick={onSubmit}>
+            {!hasError && inputChanged && (
+              <Button disabled={pending} primary onClick={onSubmit}>
                 <FormattedMessage {...messages.submit} />
               </Button>
             )}

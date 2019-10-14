@@ -12,6 +12,8 @@ import {
   UPLOAD_FILE_ERROR,
 } from '../constants';
 
+import { getUploadStatus } from '../reducers';
+
 // only clientside!
 export function uploadAvatar(data) {
   const initialId = data.id || '0000';
@@ -143,6 +145,9 @@ export function uploadFile(data) {
 export function uploadFiles(data, params) {
   const initialId = '0000';
   return async (dispatch, getState, { fetch }) => {
+    if (getUploadStatus(getState()).pending) {
+      return false;
+    }
     const formData = new FormData();
     let uploadData;
     if (data.constructor !== Array) {
@@ -172,20 +177,29 @@ export function uploadFiles(data, params) {
       if (resp.status !== 200) throw new Error(resp.statusText);
       const responseData = await resp.json();
       // const normalizedData = normalize(uploadedData.result, imageList);
-
+      const success =
+        responseData.result &&
+        responseData.result.length &&
+        !!responseData.result[0];
+      if (success) {
+        dispatch({
+          type: UPLOAD_FILE_SUCCESS,
+          // payload: normalizedData,
+          id: initialId,
+        });
+        return responseData.result[0];
+      }
       dispatch({
-        type: UPLOAD_FILE_SUCCESS,
-        // payload: normalizedData,
+        type: UPLOAD_FILE_ERROR,
+        payload: {
+          responseData,
+        },
+        message: 'Something went wrong',
         id: initialId,
       });
-      /*  dispatch({
-        type: UPLOAD_AVATAR_SUCCESS,
-        payload: { user },
-      }); */
+      return false;
+
       // only one filename is necessary
-      return responseData.result && responseData.result.length
-        ? responseData.result[0]
-        : false;
     } catch (error) {
       dispatch({
         type: UPLOAD_FILE_ERROR,
