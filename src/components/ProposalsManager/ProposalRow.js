@@ -54,11 +54,13 @@ function ProposalRow({
   state,
   onClickMenu,
   approvalState,
+  teamId,
 }) {
   /* eslint-disable react/no-danger */
   /* eslint-disable jsx-a11y/click-events-have-key-events */
   /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
   const poll = pollOne || pollTwo;
+  const team = teamId ? 'YES' : 'NO';
   return (
     <TableRow onClick={() => onClickMenu({ id })}>
       <td>{title}</td>
@@ -75,6 +77,7 @@ function ProposalRow({
           unipolar={poll.mode.unipolar}
         />
       </td>
+      <td>{team}</td>
       <td>
         <FormattedDate
           value={poll.endTime}
@@ -97,10 +100,13 @@ ProposalRow.propTypes = {
   id: PropTypes.string.isRequired,
   state: PropTypes.string.isRequired,
   approvalState: PropTypes.number.isRequired,
+  teamId: PropTypes.number,
 };
+
 ProposalRow.defaultProps = {
   pollOne: null,
   pollTwo: null,
+  teamId: null,
 };
 
 export default ProposalRow;

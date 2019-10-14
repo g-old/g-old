@@ -91,6 +91,7 @@ class ProposalsManager extends React.Component {
               'Approvation',
               'State',
               'Poll',
+              'has team',
               'Endtime',
               '',
             ]}
