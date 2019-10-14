@@ -24,6 +24,7 @@ import knexSession from 'connect-session-knex';
 import { IntlProvider } from 'react-intl';
 import multer from 'multer';
 import { normalize } from 'normalizr';
+import rateLimit from 'express-rate-limit';
 import knex from './data/knex';
 import './serverIntlPolyfill';
 import App from './components/App';
@@ -190,7 +191,9 @@ sessionConfig.store = sessionDB;
 app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
-
+// ratelimiting
+const uploadLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
+app.use('/upload/', uploadLimiter);
 // if (__DEV__) {
 app.enable('trust proxy');
 // }
@@ -430,7 +433,7 @@ app.post(
   ensureAuthenicated,
   multer({ storage, limits: { fieldSize: MAX_FILE_SIZE } }).array('files', 10),
   async (req, res) => {
-    if (!req.user) {
+    if (!req.user || !req.user.emailVerified) {
       return res.status(505);
     }
     try {
@@ -452,6 +455,7 @@ app.post(
           return res.json({ result: result.result });
         }
       }
+      // user must be of group user(?)
       // it seems, that binary files are stored in req.files, but base64-strings in req.body
       const result = await ImageManager.storeImages({
         viewer: req.user,
@@ -497,37 +501,42 @@ app.get('/files/:fileName', ensureAuthenicated, (req, res) => {
 });
 
 app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
-  if (!req.user) res.status(505);
-  FileStore.save(
-    {
-      viewer: req.user,
-      data: { dataUrl: req.body.avatar, id: req.body.id },
-      loaders: createLoaders(),
-    },
-    'avatars/',
-  ) // eslint-disable-next-line no-confusing-arrow
-    // TODO update session
-    // .then(user => user ? res.status(200).json(user) : res.status(500))
-    .then(user => {
-      if (!user) {
-        throw Error('User update failed');
-      }
-      // eslint-disable-next-line eqeqeq
-      if (req.user.id != user.id) {
-        // mod, etc
-        return res.json(user);
-      }
-      return new Promise((resolve, reject) => {
-        // eslint-disable-next-line no-confusing-arrow
-        req.login(user, err => (err ? reject(err) : resolve()));
-      }).then(() =>
-        new Promise((resolve, reject) => {
+  // we have to take care not everyone can flood our webspace
+  if (!req.user || !req.user.emailVerified) {
+    return res.status(505);
+  }
+  return (
+    FileStore.save(
+      {
+        viewer: req.user,
+        data: { dataUrl: req.body.avatar, id: req.body.id },
+        loaders: createLoaders(),
+      },
+      'avatars/',
+    ) // eslint-disable-next-line no-confusing-arrow
+      // TODO update session
+      // .then(user => user ? res.status(200).json(user) : res.status(500))
+      .then(user => {
+        if (!user) {
+          throw Error('User update failed');
+        }
+        // eslint-disable-next-line eqeqeq
+        if (req.user.id != user.id) {
+          // mod, etc
+          return res.json(user);
+        }
+        return new Promise((resolve, reject) => {
           // eslint-disable-next-line no-confusing-arrow
-          req.session.save(err => (err ? reject(err) : resolve()));
-        }).then(() => res.json(req.session.passport.user)),
-      );
-    })
-    .catch(e => res.status(500).json({ message: e.message }));
+          req.login(user, err => (err ? reject(err) : resolve()));
+        }).then(() =>
+          new Promise((resolve, reject) => {
+            // eslint-disable-next-line no-confusing-arrow
+            req.session.save(err => (err ? reject(err) : resolve()));
+          }).then(() => res.json(req.session.passport.user)),
+        );
+      })
+      .catch(e => res.status(500).json({ message: e.message }))
+  );
 });
 
 app.post('/forgot', (req, res) => {
