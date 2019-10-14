@@ -18,12 +18,13 @@ import {
   LOAD_TAGS_SUCCESS,
 } from '../constants';
 import { genProposalPageKey } from '../reducers/pageInfo';
+
 import {
   proposal as proposalSchema,
   proposalList as proposalListSchema,
   tagArray as tagArraySchema,
 } from '../store/schema';
-import { getProposalsIsFetching, getProposalUpdates } from '../reducers';
+import { getResourcePageInfo, getProposalUpdates } from '../reducers';
 import { getFilter } from '../core/helpers';
 import { subscriptionFields } from './subscription';
 import { voteFields } from './vote';
@@ -160,6 +161,7 @@ query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID $closed
         publishedAt
         state
         image
+        teamId
         summary
         approvalState
         body
@@ -256,15 +258,26 @@ export function loadProposalsList({
   return async (dispatch, getState, { graphqlRequest }) => {
     // TODO caching!
     // Dont fetch if pending
-
+    const pageInfo = getResourcePageInfo(
+      getState(),
+      'proposals',
+      genProposalPageKey({
+        state,
+        workteamId: workTeamId,
+        closed,
+        approvalState,
+        tagId,
+      }),
+    ); // getProposalsPage(state, 'active'),
     if (process.env.BROWSER) {
-      if (getProposalsIsFetching(getState(), state)) {
+      if (pageInfo.pending) {
         return false;
       }
     }
     const pageKey = genProposalPageKey({
       state,
       workteamId: workTeamId,
+      approvalState,
       closed,
       tagId,
     });

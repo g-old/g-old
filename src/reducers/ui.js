@@ -16,6 +16,7 @@ import tags, * as fromTag from './ui/tags';
 import subscriptions, * as fromSubscription from './ui/subscriptions';
 import notifications, * as fromNotification from './ui/notifications';
 import messages, * as fromMessage from './ui/messages';
+import upload, * as fromUpload from './ui/upload';
 
 /* GENERATOR_IMPORTS */
 
@@ -37,6 +38,7 @@ const uiReducer = combineReducers({
   discussions,
   tags,
   messages,
+  upload,
 });
 export default (state, action) => {
   if (action.type === SESSION_LOGOUT_SUCCESS) {
@@ -47,6 +49,8 @@ export default (state, action) => {
 };
 
 /* GENERATOR_EXPORTS */
+
+export const getUploadStatus = state => fromUpload.getStatus(state.upload);
 
 export const getVoteUpdates = state => fromPoll.getStatus(state.polls);
 

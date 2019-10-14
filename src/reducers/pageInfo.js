@@ -88,9 +88,10 @@ export default combineReducers({
 export const genProposalPageKey = ({
   state = 'state',
   workteamId = 'workteamId',
+  approval = 'approval',
   closed = false,
   tagId = 'tagId',
-}) => `${state}$${workteamId}$${closed}$${tagId}`;
+}) => `${state}$${workteamId}$${approval}$${closed}$${tagId}`;
 
 export const genUsersPageKey = ({ union = false, group = 'group' }) =>
   `${group}$${union}`;

@@ -79,7 +79,7 @@ class UserPanel extends React.Component {
   }
 
   componentDidMount() {
-    // this.props.loadUserList('viewer');
+    this.fetchUsers();
   }
 
   handleProfileClick({ id }) {
