@@ -138,7 +138,8 @@
       "src/components/Poll/Poll.js",
       "src/components/Statement/EditMenu.js",
       "src/components/UserSettings/EmailField.js",
-      "src/components/UserSettings/UserSettings.js"
+      "src/components/UserSettings/UserSettings.js",
+      "src/components/WorkTeamForm/WorkTeamForm.js"
     ]
   },
   {
@@ -373,6 +374,7 @@
       "src/components/ProposalInput/Navigation.js",
       "src/components/Statement/EditMenu.js",
       "src/components/UserPanel/UserFilter.js",
+      "src/components/WorkTeamForm/WorkTeamForm.js",
       "src/routes/account/VerificationUploadMask.js"
     ]
   },
@@ -2046,7 +2048,10 @@
     "description": "command to create a workteam",
     "defaultMessage": "Create workteam",
     "message": "",
-    "files": ["src/components/Proposal/Proposal.js"]
+    "files": [
+      "src/components/Proposal/Proposal.js",
+      "src/routes/workTeamCreate/WorkTeamCreate.js"
+    ]
   },
   {
     "id": "label.workteam",

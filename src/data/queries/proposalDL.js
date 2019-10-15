@@ -19,8 +19,9 @@ const proposal = {
     let result;
     if (id) {
       result = await Proposal.gen(viewer, id, loaders);
+    } else if (pollId) {
+      result = await Proposal.genByPoll(viewer, pollId, loaders);
     }
-    result = await Proposal.genByPoll(viewer, pollId, loaders);
     if (result.deletedAt) {
       return {
         id: result.id,

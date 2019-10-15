@@ -7,7 +7,7 @@ import { createConnection } from '../utils';
 import Proposal from '../models/Proposal';
 import knex from '../knex';
 
-const allUsers = createConnection(
+const allProposals = createConnection(
   ProposalType,
   Proposal,
   async (viewer, { cursorDate, cursorId, batchSize = 10 }, args) => {
@@ -212,4 +212,4 @@ const allUsers = createConnection(
   },
 );
 
-export default allUsers;
+export default allProposals;

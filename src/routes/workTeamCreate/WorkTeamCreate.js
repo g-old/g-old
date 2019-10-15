@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import WorkTeamForm from '../../components/WorkTeamForm';
 import Box from '../../components/Box';
 import Heading from '../../components/Heading';
-import { defineMessages, FormattedMessage } from 'react-intl';
 
 const messages = defineMessages({
   create: {
