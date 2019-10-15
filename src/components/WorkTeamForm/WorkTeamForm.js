@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-// import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
 import {
   loadWorkTeam,
   updateWorkTeam,
@@ -30,6 +30,19 @@ import Notification from '../Notification';
 import FormValidation from '../FormValidation';
 
 // import FetchError from '../../components/FetchError';
+
+const messages = defineMessages({
+  cancel: {
+    id: 'commands.cancel',
+    description: 'Short command to cancel a operation',
+    defaultMessage: 'Cancel',
+  },
+  submit: {
+    id: 'command.submit',
+    description: 'Short command for sending data to the server',
+    defaultMessage: 'Submit',
+  },
+});
 
 const formFields = ['name', 'coordinator'];
 // TODO Form HOC
@@ -168,13 +181,13 @@ class WorkTeamManagement extends React.Component {
 
     const canModify = workTeam && workTeam.id;
     return (
-      <Box column padding="medium">
+      <Box fill justify column>
         <Box type="section" align column pad>
           <FormValidation
             submit={this.handleFormsubmission}
             data={workTeam}
             validations={{
-              name: { args: { required: true, min: 3, max: 35 } },
+              name: { args: { required: true, min: 3, max: 30 } },
               ...(canModify && {
                 restricted: {},
                 coordinator: {
@@ -198,7 +211,9 @@ class WorkTeamManagement extends React.Component {
               errorMessages,
             }) => (
               <Form>
-                <Label>Workteam names</Label>
+                {/*                <Label>Workteam names</Label>
+                 */}
+                <Label>Please name your workteam</Label>
                 <fieldset>
                   <FormField label="Name" error={errorMessages.nameError}>
                     <input
@@ -293,7 +308,6 @@ class WorkTeamManagement extends React.Component {
                     </FormField>
                   </fieldset>
                 )}
-
                 {/* <Label>
                   {mainTeam
                     ? 'Current main team (Rat)'
@@ -316,11 +330,14 @@ class WorkTeamManagement extends React.Component {
                   )}
                 </p>
                 <Box between>
-                  <Button label="Cancel" onClick={this.onCancel} />
+                  <Button
+                    label={<FormattedMessage {...messages.cancel} />}
+                    onClick={this.onCancel}
+                  />
                   <Button
                     disabled={updates.pending}
                     primary
-                    label="Save"
+                    label={<FormattedMessage {...messages.submit} />}
                     onClick={onSubmit}
                   />
                 </Box>

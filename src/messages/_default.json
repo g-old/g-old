@@ -543,6 +543,7 @@
     "files": [
       "src/components/ActivityPanel/ActivityPanel.js",
       "src/components/ListView/ListView.js",
+      "src/components/ProposalPanel/ProposalTable.js",
       "src/components/UserPanel/UserPanel.js",
       "src/routes/notifications/NotificationListContainer.js"
     ]
@@ -1587,6 +1588,7 @@
     "message": "",
     "files": [
       "src/components/ProposalPanel/ProposalFilter.js",
+      "src/components/ProposalPanel/ProposalPanel.js",
       "src/components/StateFilter/StateFilter.js"
     ]
   },
@@ -1900,7 +1902,10 @@
     "description": "Unspecific error message",
     "defaultMessage": "An error occured",
     "message": "",
-    "files": ["src/routes/account/VerificationUploadMask.js"]
+    "files": [
+      "src/components/ProposalInput/ResultPage.js",
+      "src/routes/account/VerificationUploadMask.js"
+    ]
   },
   {
     "id": "label.unrequested",

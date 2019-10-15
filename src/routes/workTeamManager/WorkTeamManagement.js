@@ -291,7 +291,7 @@ class WorkTeamManagement extends React.Component {
       }
       const discussion =
         discussions && discussions.length ? discussions[0] : {};
-      const isRunning = wtProposals && wtProposals.length;
+      const isRunning = wtProposals && wtProposals.length > 0;
       tabs.push(
         <Tab title={<FormattedMessage {...messages.proposals} />}>
           {isRunning && (

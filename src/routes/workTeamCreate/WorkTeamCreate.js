@@ -2,6 +2,16 @@
 import React from 'react';
 import WorkTeamForm from '../../components/WorkTeamForm';
 import Box from '../../components/Box';
+import Heading from '../../components/Heading';
+import { defineMessages, FormattedMessage } from 'react-intl';
+
+const messages = defineMessages({
+  create: {
+    id: 'command.createWt',
+    description: 'command to create a workteam',
+    defaultMessage: 'Create workteam',
+  },
+});
 
 type Props = { proposalId: ID };
 
@@ -10,7 +20,9 @@ class WorkTeamCreate extends React.Component<Props> {
     const { proposalId } = this.props;
     return (
       <Box align column>
-        <h1>Create workteam</h1>
+        <Heading tag="h2">
+          <FormattedMessage {...messages.create} />
+        </Heading>
         <WorkTeamForm proposalId={proposalId} />
       </Box>
     );
