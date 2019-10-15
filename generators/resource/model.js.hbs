@@ -31,7 +31,7 @@ class {{properCase name}} {
       return {{camelCase name}};
     }
 
-    const {{camelCase name}}InDB = transactify(create{{properCase name}},knex, trx)
+    const {{camelCase name}}InDB = await transactify(create{{properCase name}},knex, trx)
 
     return {{camelCase name}}InDB ? new {{properCase name}}({{camelCase name}}InDB) : null;
   }
@@ -52,7 +52,7 @@ class {{properCase name}} {
       return {{camelCase name}};
     }
 
-    const updated{{properCase name}}= transactify(update{{properCase name}},knex, trx)
+    const updated{{properCase name}}= await transactify(update{{properCase name}},knex, trx)
 
     return updated{{properCase name}} ? new {{properCase name}}(updated{{properCase name}}) : null;
   }
@@ -71,7 +71,7 @@ class {{properCase name}} {
       return {{camelCase name}};
     }
 
-    const deleted{{properCase name}}= transactify(delete{{properCase name}},knex, trx)
+    const deleted{{properCase name}}= await transactify(delete{{properCase name}},knex, trx)
 
     return deleted{{properCase name}} ? new {{properCase name}}(deleted{{properCase name}}) : null;
   }
