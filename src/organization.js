@@ -37,6 +37,7 @@ export const Permissions = {
   MANAGE_WORKTEAMS: 33554432,
   PUBLISH_DISCUSSIONS: 67108864,
   MAKE_COMMENT: 134217728,
+  DELETE_COMMENTS: 268435456,
 };
 
 /* Add new groups here - DON'T FORGET TO UPDATE THE SCHEMA */
@@ -79,7 +80,8 @@ const voterMask =
   Permissions.FLAG_STATEMENTS;
 
 /* Moderators */
-const moderatorMask = Permissions.DELETE_STATEMENTS;
+const moderatorMask =
+  Permissions.DELETE_STATEMENTS | Permissions.DELETE_COMMENTS;
 
 /* Relators */
 const relatorMask =

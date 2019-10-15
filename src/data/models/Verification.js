@@ -47,7 +47,7 @@ class Verification {
       return verification;
     };
 
-    const verificationInDB = transactify(createVerification, knex, trx);
+    const verificationInDB = await transactify(createVerification, knex, trx);
 
     return verificationInDB ? new Verification(verificationInDB) : null;
   }
@@ -86,7 +86,11 @@ class Verification {
       return verification;
     };
 
-    const updatedVerification = transactify(updateVerification, knex, trx);
+    const updatedVerification = await transactify(
+      updateVerification,
+      knex,
+      trx,
+    );
 
     return updatedVerification ? new Verification(updatedVerification) : null;
   }
