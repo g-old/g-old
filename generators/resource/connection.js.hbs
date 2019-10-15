@@ -9,15 +9,15 @@ const all{{properCase name}}s = createConnection(
   {{properCase name}},
   async (cursorDate, cursorId, batchSize) => {
     return(
-      knex('{{snakecase}}s')
-        .whereRaw('({{snakecase name}}s.created_at, {{snakecase name}}s.id) < (?,?)', [
+      knex('{{snakeCase}}s')
+        .whereRaw('({{snakeCase name}}s.created_at, {{snakeCase name}}s.id) < (?,?)', [
           cursorDate,
           cursorId,
         ])
         .limit(batchSize)
-        .orderBy('{{snakecase name}}s.created_at', 'desc')
-        .orderBy('{{snakecase name}}s.id', 'desc')
-        .select('{{snakecase name}}s.id as id', '{{snakecase name}}s.created_at as time')
+        .orderBy('{{snakeCase name}}s.created_at', 'desc')
+        .orderBy('{{snakeCase name}}s.id', 'desc')
+        .select('{{snakeCase name}}s.id as id', '{{snakeCase name}}s.created_at as time')
     );
   },
 );
