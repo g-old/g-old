@@ -52,12 +52,14 @@ const InputPreview = ({
   tags,
   previewImage,
   summary,
+  image,
 }) => {
   const date = dateTo || utcCorrectedDate(3).slice(0, 10);
   const time = timeTo || utcCorrectedDate().slice(11, 16);
   const fakeVote = { id: 1, positions: [{ pos: 0, value: 1 }] };
   const endTime = concatDateAndTime(date, time);
   const extended = state === 'survey' && options.length > 1;
+  const picture = image ? `/s720/${image}` : previewImage;
   return (
     <Box column>
       <Heading tag="h2">Preview</Heading>
@@ -70,7 +72,7 @@ const InputPreview = ({
             title: validate('Title', title),
             spokesman,
             tags,
-            image: previewImage,
+            image: picture,
             summary,
             pollOne: {
               mode: { thresholdRef, withStatements, unipolar },
@@ -90,7 +92,7 @@ const InputPreview = ({
           title={validate('Title', title)}
           body={validate('Body', body)}
           spokesman={spokesman}
-          image={previewImage}
+          image={picture}
         />
       )}
       <Poll
@@ -135,9 +137,11 @@ InputPreview.propTypes = {
   tags: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
   previewImage: PropTypes.shape({}).isRequired,
   summary: PropTypes.string.isRequired,
+  image: PropTypes.string,
 };
 InputPreview.defaultProps = {
   dateTo: null,
   timeTo: null,
+  image: null,
 };
 export default InputPreview;

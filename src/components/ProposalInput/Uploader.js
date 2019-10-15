@@ -83,7 +83,7 @@ class Uploader extends React.Component {
       <FormValidation
         submit={this.handleNext}
         validations={{
-          files: { args: { required: true } },
+          files: { args: { required: false } },
           cropCoordinates: { args: {} },
           previewImage: { args: {} },
           scale: { args: {} },
@@ -100,21 +100,19 @@ class Uploader extends React.Component {
               error={errorMessages.filesError}
             >
               <Box fill column>
-                {
-                  <FileUploader
-                    files={values.files}
-                    onDOMChange={files => {
-                      this.onFilesChanged(files);
-                      handleValueChanges({
-                        target: {
-                          type: 'uploader',
-                          name: 'files',
-                          value: files,
-                        },
-                      });
-                    }}
-                  />
-                }
+                <FileUploader
+                  files={values.files}
+                  onDOMChange={files => {
+                    this.onFilesChanged(files);
+                    handleValueChanges({
+                      target: {
+                        type: 'uploader',
+                        name: 'files',
+                        value: files,
+                      },
+                    });
+                  }}
+                />
               </Box>
             </FormField>
             {imageLoaded && (

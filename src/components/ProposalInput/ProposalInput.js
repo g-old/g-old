@@ -10,9 +10,9 @@ import Wizard from '../Wizard';
 import Steps from '../Steps';
 import Step from '../Steps/Step';
 import Meter from '../Meter';
-import PollType from './PollType';
+// import PollType from './PollType';
 import ProposalBody from './ProposalBody';
-import OptionInput from './OptionInput';
+import DateInput from './DateInput';
 import TagInput, { TAG_ID_SUFFIX } from './TagInput';
 import InputPreview from './InputPreview';
 import FileUpload from './Uploader';
@@ -31,6 +31,7 @@ import {
   getVisibleUsers,
   getSessionUser,
   getLocale,
+  getUploadStatus,
 } from '../../reducers';
 
 export type Callback = (string, () => boolean) => boolean;
@@ -83,6 +84,8 @@ type Props = {
   availablePolls: { [PollTypeTypes]: PollSettingsShape },
   locale: 'de' | 'it' | 'lld',
   updates: UpdateShape,
+  uploadFiles: () => void,
+  uploadStatus?: { pending?: boolean, error?: string },
 };
 const DEFAULT_POLL_TYPE = 'voting';
 
@@ -215,6 +218,8 @@ class ProposalInput extends React.Component<Props, State> {
       summary: summary && summary.trim(),
       text: body,
       state: pollType.value,
+      ...(image && { image }),
+
       poll: {
         options: options.map((o, i) => ({
           ...(isHtmlEmpty(o.description)
@@ -228,7 +233,6 @@ class ProposalInput extends React.Component<Props, State> {
         multipleChoice: !!extended,
         startTime,
         endTime,
-        ...(image && { image }),
         secret: !!secret,
         threshold,
         mode: {
@@ -300,13 +304,15 @@ class ProposalInput extends React.Component<Props, State> {
       tags: selectedTags,
       withOptions,
       files,
+      dateTo,
+      timeTo,
       cropCoordinates,
       previewImage,
       scale,
       rotation,
       transferRights,
     } = this.state;
-    const { tags, updates = {}, image } = this.props;
+    const { tags, updates = {}, image, uploadStatus } = this.props;
     return (
       <Box fill column>
         <Wizard onNext={this.calculateNextStep} basename="">
@@ -344,18 +350,25 @@ class ProposalInput extends React.Component<Props, State> {
                     />
                   </Step>
                 )}
+                <Step id="date">
+                  <DateInput
+                    data={{ dateTo, timeTo }}
+                    onExit={this.handleValueSaving}
+                  />
+                </Step>
 
                 <Step id="tags">
                   <TagInput
                     suggestions={tags}
                     selectedTags={selectedTags}
-                    maxTags={8}
+                    maxTags={5}
                     onExit={this.handleValueSaving}
                   />
                 </Step>
                 <Step id="preview">
                   <InputPreview
                     {...this.state}
+                    image={image}
                     onExit={this.handleValueSaving}
                     state={pollType.value}
                   />
@@ -363,7 +376,10 @@ class ProposalInput extends React.Component<Props, State> {
                 <Step id="final">
                   <ResultPage
                     success={updates.success}
-                    error={updates.errorMessage}
+                    error={
+                      (uploadStatus && uploadStatus.error) ||
+                      updates.errorMessage
+                    }
                     onSuccess={this.handleOnSuccess}
                   />
                 </Step>
@@ -383,6 +399,7 @@ const mapStateToProps = state => ({
   users: getVisibleUsers(state, 'all'),
   user: getSessionUser(state),
   locale: getLocale(state).split('-')[0],
+  uploadStatus: getUploadStatus(state),
 });
 
 const mapDispatch = {

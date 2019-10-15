@@ -15,7 +15,7 @@ class Steps extends React.Component {
     const { wizard } = this.props;
     /* eslint-disable react/destructuring-assignment */
     const steps = React.Children.map(
-      this.props.children,
+      React.Children.toArray(this.props.children).filter(o => o),
       ({ props: { children, render, ...config } }) => config,
     );
     /* eslint-enable react/destructuring-assignment */

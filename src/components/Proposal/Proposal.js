@@ -137,6 +137,7 @@ class Proposal extends React.Component {
             </div>
             {state === 'accepted' &&
               !teamId &&
+              !(workteam && workteam.id) &&
               spokesman &&
               spokesman.id === user.id && (
                 <Button

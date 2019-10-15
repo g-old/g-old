@@ -12,12 +12,22 @@ const messages = defineMessages({
     defaultMessage: 'Success!',
     description: 'Should notify a successful action',
   },
+  error: {
+    id: 'label.error',
+    description: 'Unspecific error message',
+    defaultMessage: 'An error occured',
+  },
 });
 
 const ResultPage = ({ success, onRestart, error, onSuccess }) => {
   let component;
   if (error) {
-    component = <Notification type="error" message={error} />;
+    component = (
+      <Notification
+        type="error"
+        message={<FormattedMessage {...messages.error} />}
+      />
+    );
   } else if (success && onSuccess) {
     component = (
       <Notification

@@ -192,8 +192,10 @@ app.use(session(sessionConfig));
 app.use(passport.initialize());
 app.use(passport.session());
 // ratelimiting
-const uploadLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
-app.use('/upload/', uploadLimiter);
+if (!__DEV__) {
+  const uploadLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
+  app.use('/upload/', uploadLimiter);
+}
 // if (__DEV__) {
 app.enable('trust proxy');
 // }
@@ -433,10 +435,10 @@ app.post(
   ensureAuthenicated,
   multer({ storage, limits: { fieldSize: MAX_FILE_SIZE } }).array('files', 10),
   async (req, res) => {
-    if (!req.user || !req.user.emailVerified) {
-      return res.status(505);
-    }
     try {
+      if (!req.user || !req.user.emailVerified) {
+        return res.sendStatus(401);
+      }
       const params = JSON.parse(req.body.params || {});
       if (params.private) {
         if (params.verification) {
@@ -503,7 +505,7 @@ app.get('/files/:fileName', ensureAuthenicated, (req, res) => {
 app.post('/upload', multer({ storage }).single('avatar'), (req, res) => {
   // we have to take care not everyone can flood our webspace
   if (!req.user || !req.user.emailVerified) {
-    return res.status(505);
+    return res.sendStatus(401);
   }
   return (
     FileStore.save(
