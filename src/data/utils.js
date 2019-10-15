@@ -43,7 +43,6 @@ export const createConnection = (
       return acc;
     }, {});
     const results = await Promise.all(queries);
-    // if model returns null... filter or try/catch, maybe faster
     const edges = results.map(p => ({ node: p }));
     let endCursor;
     try {
