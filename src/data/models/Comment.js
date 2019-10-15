@@ -2,6 +2,9 @@
 import knex from '../knex';
 import { canSee, canMutate, Models } from '../../core/accessControl';
 import EventManager from '../../core/EventManager';
+import { isAdmin, Groups } from '../../organization';
+import { transactify } from './utils';
+import log from '../../logger';
 
 type ID = string | number;
 export type CommentProps = {
@@ -37,6 +40,8 @@ class Comment {
   updatedAt: string;
 
   editedAt: string;
+
+  deletedAt: string;
 
   constructor(data: CommentProps) {
     this.id = data.id;
@@ -253,6 +258,124 @@ class Comment {
       });
     }
     return comment;
+  }
+
+  static async flag(viewer, data, loaders, trx) {
+    if (!viewer.id || !data.id) {
+      return null;
+    }
+    const time = new Date();
+    const createFlag = async transaction => {
+      // check if comment still exists;
+      try {
+        const [commentData = null] = await knex('comments')
+          .transacting(transaction)
+          .where({ id: data.id })
+          .select('*');
+        if (!commentData) {
+          throw new Error('comment-not-existing');
+        }
+        if (commentData.deleted_at) {
+          throw new Error('comment-already-deleted');
+        }
+
+        const [flaggedCommentData = null] = await knex('flagged_comments')
+          .transacting(transaction)
+          .where({ comment_id: data.id })
+          .select('*');
+        let discussionData;
+
+        // permission check
+        let canDelete =
+          isAdmin(viewer) ||
+          (viewer.permissions & Permissions.DELETE_COMMENTS) > 0;
+        if (!canDelete && (viewer.groups & Groups.TEAM_LEADER) > 0) {
+          // check if is coordinator
+          [discussionData = null] = await knex('discussions')
+            .where({
+              id: commentData.discussion_id,
+            })
+            .select('*');
+          const [workteamData = null] = await knex('workteams')
+            .where({ id: discussionData.work_team_id })
+            .select('*');
+          if (workteamData && workteamData.coordinator_id == viewer.id) {
+            canDelete = true;
+          }
+        }
+
+        if (!flaggedCommentData) {
+          // create
+          if (!discussionData) {
+            [discussionData = null] = await knex('discussions')
+              .where({
+                id: commentData.discussion_id,
+              })
+              .select('*');
+            if (!discussionData) {
+              throw new Error('discussion-not-existing');
+            }
+          }
+          const newData = {
+            flagger_id: viewer.id,
+            comment_id: data.id,
+            content: commentData.content,
+            state: 'open',
+            workteam_id: discussionData.work_team_id,
+            created_at: time,
+          };
+
+          if (canDelete) {
+            newData.solver_id = viewer.id;
+            newData.state = 'deleted';
+          }
+          await knex('flagged_comments')
+            .transacting(transaction)
+            .insert(newData);
+        } else {
+          // update the record
+          const updatedData = {
+            updated_at: time,
+          };
+
+          if (canDelete) {
+            updatedData.state = 'deleted';
+            updatedData.solver_id = viewer.id;
+          }
+          await knex('flagged_comments')
+            .transacting(transaction)
+            .forUpdate()
+            .modify(queryBuilder => {
+              if (!canDelete) {
+                queryBuilder.increment('num_flags', 1);
+              }
+            })
+            .update({
+              updated_at: new Date(),
+              solver_id: viewer.id,
+              state: 'deleted',
+            });
+        }
+        // update comment with new text
+        if (canDelete) {
+          const newText = `Deleted by moderation at ${time.toDateString()}`;
+
+          const [comment = null] = await knex('comments')
+            .transacting(transaction)
+            .forUpdate()
+            .where({ id: data.id })
+            .update({ content: newText, deleted_at: time, updated_at: time })
+            .returning('*');
+          return comment;
+        }
+        return commentData;
+      } catch (err) {
+        log.error(err);
+        return null;
+      }
+    };
+    const commentInDB = await transactify(createFlag, knex, trx);
+    return commentInDB ? new Comment(commentInDB) : null;
   }
 }
 

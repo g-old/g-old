@@ -14,6 +14,7 @@ import {
   loadComments,
   updateComment,
   deleteComment,
+  flagComment,
   scrollToResource,
 } from '../../actions/comment';
 import {
@@ -374,6 +375,7 @@ class DiscussionContainer extends React.Component {
       updates,
       updateComment: mutateComment,
       deleteComment: eraseComment,
+      flagComment: flag,
     } = this.props;
     const { replying, activeId, isEditing } = this.state;
     if (isFetching && !discussion) {
@@ -510,6 +512,7 @@ class DiscussionContainer extends React.Component {
                       loadReplies={this.handleCommentFetching}
                       onCreate={this.handleCommentCreation}
                       onVote={this.handleVoting}
+                      onModeration={flag}
                       onUpdate={mutateComment}
                       onDelete={eraseComment}
                       onProfileClick={handleProfileClick}
@@ -529,6 +532,7 @@ class DiscussionContainer extends React.Component {
                             onReply={!discussion.closedAt && this.handleReply}
                             reply
                             onVote={this.handleVoting}
+                            onModeration={flag}
                             onCreate={this.handleCommentCreation}
                             onUpdate={mutateComment}
                             onDelete={eraseComment}
@@ -578,6 +582,7 @@ const mapDispatch = {
   createVote: createCommentVote,
   updateVote: updateCommentVote,
   deleteVote: deleteCommentVote,
+  flagComment,
 };
 
 export default connect(

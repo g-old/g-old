@@ -455,10 +455,12 @@ class Comment extends React.Component {
       /* eslint-disable no-bitwise */
       if (user) {
         // canLike = !asInput && !own && (user.permissions & Permissions.LIKE) > 0;
+
         canDelete =
           (own && onReply) ||
           (!deletedAt && (user.permissions & Permissions.DELETE_COMMENTS) > 0);
         canFlag =
+          !canDelete &&
           !own &&
           !deletedAt &&
           (user.permissions & Permissions.FLAG_STATEMENTS) > 0;
@@ -706,7 +708,6 @@ class Comment extends React.Component {
       user,
       preview,
       deletedAt,
-
       //  updates,
     } = this.props;
     const {
@@ -723,6 +724,7 @@ class Comment extends React.Component {
     let header;
     const body = [];
     let footer;
+
     if (asInput) {
       header = this.renderHeader(user, asInput);
       body.push(
@@ -736,7 +738,20 @@ class Comment extends React.Component {
           disabled={pending}
         />,
       );
-    } else {
+    } /* else if (deletedAt) {
+      header = (
+        <div>
+          <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
+            <path
+              fill="none"
+              stroke="#666"
+              strokeWidth="2"
+              d="M3,13 L3,11 L5,11 L5,13 L3,13 Z M11,12.9995001 L11,11 L12.9995001,11 L12.9995001,12.9995001 L11,12.9995001 Z M19,12.9995001 L19,11 L20.9995001,11 L20.9995001,12.9995001 L19,12.9995001 Z"
+            />
+          </svg>
+        </div>
+      );
+    } */ else {
       header = this.renderHeader(author, asInput);
       if (!editing) {
         body.push(
@@ -771,7 +786,9 @@ class Comment extends React.Component {
     }
     const interactions = this.renderInteractions();
     return (
-      <div className={cn(s.root, active ? s.active : null)}>
+      <div
+        className={cn(s.root, active ? s.active : null, deletedAt && s.deleted)}
+      >
         {header}
         {/* eslint-disable no-return-assign */}
         <div className={s.text} ref={ref => (this.textBox = ref)}>

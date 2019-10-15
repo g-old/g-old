@@ -32,6 +32,7 @@ content
 numReplies
 numVotes
 discussionId
+deletedAt
 createdAt
 ownVote{
   position
@@ -85,6 +86,14 @@ query($parentId:ID!){
     ${commentFields}
   }
 }
+`;
+
+const flagCommentMutation = `
+  mutation($commentId:ID){
+    flagComment(commentId:$commentId){
+      ${commentFields}
+    }
+  }
 `;
 
 export function createComment(comment) {
@@ -236,6 +245,42 @@ export function loadComments(comment) {
         message: error.message || 'Something went wrong',
         properties,
         id: comment.parentId,
+      });
+      return false;
+    }
+
+    return true;
+  };
+}
+
+export function flagComment({ commentId }) {
+  return async (dispatch, getState, { graphqlRequest }) => {
+    const properties = genStatusIndicators(['updateCom']);
+    dispatch({
+      type: UPDATE_COMMENT_START,
+      id: commentId,
+      properties,
+    });
+    try {
+      const { data } = await graphqlRequest(flagCommentMutation, {
+        commentId,
+      });
+      const normalizedData = normalize(data.flagComment, commentSchema);
+      dispatch({
+        type: UPDATE_COMMENT_SUCCESS,
+        payload: normalizedData,
+        properties,
+        id: commentId,
+      });
+    } catch (error) {
+      dispatch({
+        type: UPDATE_COMMENT_ERROR,
+        payload: {
+          error,
+        },
+        properties,
+        message: error.message || 'Something went wrong',
+        id: commentId,
       });
       return false;
     }

@@ -35,6 +35,7 @@ import user from './queries/user';
 import tags from './queries/tags';
 import flaggedStatements from './queries/flaggedStatements';
 import flag from './mutations/createFlaggedStatement';
+import flagComment from './mutations/createFlaggedComment';
 import solveFlag from './mutations/updateFlaggedStatement';
 import feed from './queries/feed';
 import pollingModes from './queries/pollingModes';
@@ -170,6 +171,7 @@ const schema = new Schema({
       createCommentVote,
       updateCommentVote,
       deleteCommentVote,
+      flagComment,
       /* GENERATOR_MUTATIONS */
     },
   }),

@@ -12,6 +12,10 @@
   width: 100%;
 }
 
+.deleted {
+  opacity: 0.4;
+}
+
 .header {
   display: flex;
   align-items: center;

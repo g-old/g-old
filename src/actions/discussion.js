@@ -21,6 +21,7 @@ import {
 } from '../store/schema';
 import { getIsDiscussionFetching, getDiscussionUpdates } from '../reducers';
 import { userFields } from './user';
+import { commentFields } from './comment';
 
 export const discussionFields = `
   id
@@ -61,15 +62,7 @@ ${discussionFields}
     coordinatorId
   }
   comments{
-    id
-    content
-    numReplies
-    parentId
-    createdAt
-    editedAt
-    author{
-      ${userFields}
-    }
+    ${commentFields}
   }`;
 const discussionQuery = `query($id:ID $parentId:ID){
   discussion(id:$id parentId:$parentId){

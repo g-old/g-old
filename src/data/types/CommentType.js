@@ -73,6 +73,9 @@ const CommentType = new ObjectType({
     editedAt: {
       type: GraphQLDate,
     },
+    deletedAt: {
+      type: GraphQLDate,
+    },
   }),
 });
 
