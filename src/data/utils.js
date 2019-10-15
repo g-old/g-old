@@ -34,14 +34,19 @@ export const createConnection = (resultType, resultModel, resolverFn) => {
       }, {});
       const results = await Promise.all(queries);
       const edges = results.map(p => ({ node: p }));
-      const endCursor =
-        edges.length > 0
-          ? Buffer.from(
-              `${new Date(
-                dataSet[edges[edges.length - 1].node.id].time,
-              ).toJSON()}$${edges[edges.length - 1].node.id}`,
-            ).toString('base64')
-          : null;
+      let endCursor;
+      try {
+        endCursor =
+          edges.length > 0
+            ? Buffer.from(
+                `${new Date(
+                  dataSet[edges[edges.length - 1].node.id].time,
+                ).toJSON()}$${edges[edges.length - 1].node.id}`,
+              ).toString('base64')
+            : null;
+      } catch {
+        endCursor = null;
+      }
 
       const hasNextPage = edges.length === first;
       return { edges, pageInfo: { startCursor: null, endCursor, hasNextPage } };
