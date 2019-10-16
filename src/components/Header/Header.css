@@ -42,6 +42,12 @@
   /* transform: rotate(-5.5deg); */
 }
 
+.logo {
+  width: 1.5em;
+  height: auto;
+  object-fit: contain;
+}
+
 .right {
   display: flex;
   align-items: center;

@@ -42,7 +42,9 @@ class Header extends React.Component {
           {user && <UserStatus />}
           <Link to="/">
             <span className={s.brand}>
-              <FormattedMessage {...messages.bannerTitle} />
+              <img alt="logo" className={s.logo} src="/tile.png" />
+              {/*              <FormattedMessage {...messages.bannerTitle} />
+               */}{' '}
             </span>
           </Link>
           <div className={s.right}>

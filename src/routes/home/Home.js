@@ -68,7 +68,7 @@ class Home extends React.Component<Props> {
           {/* Card Box */}
         </Box>
         <Box className={small && s.bigCards} fill wrap align between>
-          {proposals && proposals.length && (
+          {proposals && proposals.length > 0 && (
             <div className={s.cardBlack}>
               <Box column align className={s.proposals}>
                 <Heading tag="h1">Vorschläge</Heading>

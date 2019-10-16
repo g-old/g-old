@@ -139,7 +139,7 @@ class Comment extends React.Component {
       id: PropTypes.number,
       position: PropTypes.string,
     }),
-    onVote: PropTypes.func.isRequired,
+    onVote: PropTypes.func,
   };
 
   static defaultProps = {
@@ -519,7 +519,7 @@ class Comment extends React.Component {
   }
 
   renderHeader(actor, asInput) {
-    const { preview, own, createdAt, editedAt, intl, numVotes } = this.props;
+    const { preview, own, createdAt, editedAt, intl } = this.props;
     const menu = preview ? null : this.renderMenu(asInput);
 
     return (

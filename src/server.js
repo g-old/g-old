@@ -193,7 +193,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 // ratelimiting
 if (!__DEV__) {
-  const uploadLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 5 });
+  const uploadLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 8 });
   app.use('/upload/', uploadLimiter);
 }
 // if (__DEV__) {

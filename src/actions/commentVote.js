@@ -12,7 +12,7 @@ import {
 import { createMutation } from './utils';
 import { commentFields } from './comment';
 import {
-  //commentVote as commentVoteSchema,
+  // commentVote as commentVoteSchema,
   comment as commentSchema,
   commentVoteList as commentVoteListSchema,
 } from '../store/schema';
