@@ -30,8 +30,10 @@
   color: #fff;
   stroke: #fff;
   background-color: var(--color-five);
-  /*background-color: #ff324d;*/
+
+  /* background-color: #ff324d; */
 }
+
 .active {
   color: var(--color-five);
 }

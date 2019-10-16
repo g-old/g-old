@@ -15,7 +15,7 @@
 }
 
 .alert {
-  background-color: var(--color-three);
+  background-color: var(--color-brand-light-shade-2);
   stroke: #000;
   fill: #000;
   color: #000;

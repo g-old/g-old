@@ -202,8 +202,20 @@ class User {
       newData.email = data.email.trim();
       // newData.email_verified = !!data.emailVerified;
     }
+    let autoStatusUpdate;
     if (data.emailVerified) {
       newData.email_verified = true;
+      // autoupdate guest to viewer on first(!) email_verification
+      if ((viewer.groups & Groups.SYSTEM) > 0) {
+        if (Number(data.groups) === Groups.VIEWER) {
+          // update call from verification route!
+          // check if user had email not verified, so that we can prevent penalized users using
+          // e-verification as hole to get viewer-status
+          if (!userInDB.emailVerified && userInDB.groups > Groups.GUEST > 0)
+            newData.groups = Groups.GUEST | Groups.VIEWER;
+          autoStatusUpdate = true;
+        }
+      }
     }
     if (data.name) {
       newData.name = sanitizeName(data.name);
@@ -334,7 +346,7 @@ class User {
       newData.password_hash = hash;
     }
 
-    if (data.groups != null) {
+    if (data.groups != null && !autoStatusUpdate) {
       // check i valid roles
       /* eslint-disable no-bitwise */
       const groups = Number(data.groups);

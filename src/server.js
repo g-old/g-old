@@ -636,7 +636,12 @@ app.get('/verify/:token', (req, res) => {
       if (data) {
         return User.update(
           systemViewer,
-          { email: data.email, id: data.userId, emailVerified: true },
+          {
+            email: data.email,
+            id: data.userId,
+            emailVerified: true,
+            groups: Groups.VIEWER,
+          },
           loaders,
         ).then(result => (result ? result.user : null));
       }
