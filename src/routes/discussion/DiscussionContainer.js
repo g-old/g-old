@@ -26,6 +26,11 @@ import {
   getScrollCount,
 } from '../../reducers';
 import {
+  createCommentVote,
+  updateCommentVote,
+  deleteCommentVote,
+} from '../../actions/commentVote';
+import {
   createSubscription,
   updateSubscription,
   deleteSubscription,
@@ -49,12 +54,25 @@ const handleProfileClick = ({ id }) => {
 class DiscussionContainer extends React.Component {
   static propTypes = {
     discussion: PropTypes.shape({
+      content: PropTypes.string,
+      title: PropTypes.string,
+      updatedAt: PropTypes.string,
+      createdAt: PropTypes.string,
       comments: PropTypes.arrayOf(PropTypes.shape({})),
       id: PropTypes.oneOfType(PropTypes.string, PropTypes.number),
-      subscription: PropTypes.shape({}),
+      subscription: PropTypes.shape({ id: PropTypes.string }),
       closedAt: PropTypes.string,
+      deletedAt: PropTypes.string,
+      workTeam: PropTypes.shape({
+        logo: PropTypes.string,
+        id: PropTypes.string,
+        coordinatorId: PropTypes.string,
+        displayName: PropTypes.string,
+      }),
+      author: PropTypes.shape({}),
     }).isRequired,
-    user: PropTypes.shape({}).isRequired,
+    user: PropTypes.shape({ id: PropTypes.string, groups: PropTypes.number })
+      .isRequired,
     isFetching: PropTypes.bool.isRequired,
     errorMessage: PropTypes.string,
     followees: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
@@ -63,6 +81,9 @@ class DiscussionContainer extends React.Component {
     loadComments: PropTypes.func.isRequired,
     updateComment: PropTypes.func.isRequired,
     deleteComment: PropTypes.func.isRequired,
+    createVote: PropTypes.func.isRequired,
+    updateVote: PropTypes.func.isRequired,
+    deleteVote: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
     updates: PropTypes.shape({ '0000': PropTypes.shape({}) }).isRequired,
     childId: PropTypes.string,
@@ -71,6 +92,7 @@ class DiscussionContainer extends React.Component {
     updateSubscription: PropTypes.func.isRequired,
     deleteSubscription: PropTypes.func.isRequired,
     updateDiscussion: PropTypes.func.isRequired,
+    flagComment: PropTypes.func.isRequired,
     scrollToResource: PropTypes.func.isRequired,
     subscriptionStatus: PropTypes.shape({}).isRequired,
     scrollCounter: PropTypes.shape({
@@ -111,6 +133,7 @@ class DiscussionContainer extends React.Component {
     this.handleDiscussionUpdate = this.handleDiscussionUpdate.bind(this);
     this.storageKey = `discussionMutation${props.discussion.id}`;
     this.deleteStoredData = this.deleteStoredData.bind(this);
+    this.handleVoting = this.handleVoting.bind(this);
   }
 
   componentDidMount() {
@@ -297,6 +320,19 @@ class DiscussionContainer extends React.Component {
     }
   }
 
+  handleVoting({ commentId, ownVote, position }) {
+    const { createVote, updateVote, deleteVote } = this.props;
+    if (ownVote) {
+      if (ownVote.position === position) {
+        deleteVote({ ...ownVote, commentId });
+      } else {
+        updateVote({ id: ownVote.id, position });
+      }
+    } else {
+      createVote({ commentId, position });
+    }
+  }
+
   handleSubscription({ targetType, subscriptionType }) {
     const {
       discussion: { id, subscription },
@@ -341,7 +377,7 @@ class DiscussionContainer extends React.Component {
     } = this.props;
     const { replying, activeId, isEditing } = this.state;
     if (isFetching && !discussion) {
-      return <p>{'Loading...'} </p>;
+      return <p>Loading... </p>;
     }
     if (errorMessage && !discussion) {
       return (
@@ -473,6 +509,7 @@ class DiscussionContainer extends React.Component {
                       onReply={!discussion.closedAt && this.handleReply}
                       loadReplies={this.handleCommentFetching}
                       onCreate={this.handleCommentCreation}
+                      onVote={this.handleVoting}
                       onUpdate={mutateComment}
                       onDelete={eraseComment}
                       onProfileClick={handleProfileClick}
@@ -491,6 +528,7 @@ class DiscussionContainer extends React.Component {
                             key={r.id}
                             onReply={!discussion.closedAt && this.handleReply}
                             reply
+                            onVote={this.handleVoting}
                             onCreate={this.handleCommentCreation}
                             onUpdate={mutateComment}
                             onDelete={eraseComment}
@@ -537,6 +575,9 @@ const mapDispatch = {
   deleteSubscription,
   updateDiscussion,
   scrollToResource,
+  createVote: createCommentVote,
+  updateVote: updateCommentVote,
+  deleteVote: deleteCommentVote,
 };
 
 export default connect(

@@ -75,6 +75,11 @@ const messages = defineMessages({
     defaultMessage: '{time} (edited)',
     description: 'Comment edited',
   },
+  points: {
+    id: 'label.points',
+    defaultMessage: 'points',
+    description: 'Label for points',
+  },
 });
 
 class Comment extends React.Component {
@@ -129,6 +134,12 @@ class Comment extends React.Component {
     intl: PropTypes.shape({ formatRelative: PropTypes.func }).isRequired,
     showReplies: PropTypes.bool,
     active: PropTypes.bool,
+    numVotes: PropTypes.number.isRequired,
+    ownVote: PropTypes.shape({
+      id: PropTypes.number,
+      position: PropTypes.string,
+    }),
+    onVote: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -159,6 +170,8 @@ class Comment extends React.Component {
     preview: null,
     showReplies: null,
     active: null,
+    ownVote: null,
+    onVote: null,
   };
 
   constructor(props) {
@@ -186,6 +199,8 @@ class Comment extends React.Component {
     this.toggleReplies = this.toggleReplies.bind(this);
     this.renderHeader = this.renderHeader.bind(this);
     this.renderMenu = this.renderMenu.bind(this);
+    this.handleDownVote = this.handleDownVote.bind(this);
+    this.handleUpVote = this.handleUpVote.bind(this);
   }
 
   componentDidMount() {
@@ -374,6 +389,24 @@ class Comment extends React.Component {
     this.setState({ editing: false });
   }
 
+  handleUpVote() {
+    const { id, onVote, ownVote } = this.props;
+    onVote({
+      position: 'pro',
+      commentId: id,
+      ownVote,
+    });
+  }
+
+  handleDownVote() {
+    const { id, onVote, ownVote } = this.props;
+    onVote({
+      position: 'con',
+      commentId: id,
+      ownVote,
+    });
+  }
+
   renderMenu(asInput) {
     const { textArea, editing } = this.state;
     let menu;
@@ -484,7 +517,7 @@ class Comment extends React.Component {
   }
 
   renderHeader(actor, asInput) {
-    const { preview, own, createdAt, editedAt, intl } = this.props;
+    const { preview, own, createdAt, editedAt, intl, numVotes } = this.props;
     const menu = preview ? null : this.renderMenu(asInput);
 
     return (
@@ -496,7 +529,9 @@ class Comment extends React.Component {
         />
         <div className={s.details}>
           <div className={s.bar}>
-            <span className={s.author}>{`${actor.name} ${actor.surname}`}</span>
+            <span className={s.author}>
+              {`${actor.name} ${actor.surname}`}{' '}
+            </span>
             {menu}
           </div>
           {createdAt && (
@@ -610,6 +645,56 @@ class Comment extends React.Component {
     return footer;
   }
 
+  renderInteractions() {
+    const { ownVote, numVotes, intl, asInput, deletedAt, onVote } = this.props;
+    const { pending } = this.state;
+    if (!onVote || asInput || deletedAt) {
+      return <div />;
+    }
+    return (
+      <div className={s.interactions}>
+        <button
+          type="button"
+          disabled={pending}
+          className={cn(
+            s.voteBtn,
+            ownVote && ownVote.position === 'pro' && s.upvote,
+          )}
+          onClick={this.handleUpVote}
+        >
+          <svg aria-label="LinkUp" viewBox="0 0 24 24" width="1em" height="1em">
+            <path fill="none" d="M12,2 L12,22 M3,11 L12,2 L21,11" />
+          </svg>
+        </button>
+        <span style={{ fontWeight: 300, color: '#aaa' }}>
+          {numVotes} {intl.formatMessage(messages.points)}
+        </span>
+        <button
+          type="button"
+          disabled={pending}
+          className={cn(
+            s.voteBtn,
+            ownVote && ownVote.position === 'con' && s.downvote,
+          )}
+          onClick={this.handleDownVote}
+        >
+          <svg
+            aria-label="LinkDown"
+            viewBox="0 0 24 24"
+            width="1em"
+            height="1em"
+          >
+            <path
+              fill="none"
+              d="M12,2 L12,22 M3,11 L12,2 L21,11"
+              transform="matrix(1 0 0 -1 0 24)"
+            />
+          </svg>
+        </button>
+      </div>
+    );
+  }
+
   render() {
     //  const { mutationIsPending, mutationSuccess, mutationError } = this.props;
     // TODO create authorization decorator
@@ -620,6 +705,7 @@ class Comment extends React.Component {
       asInput,
       user,
       preview,
+      deletedAt,
 
       //  updates,
     } = this.props;
@@ -683,6 +769,7 @@ class Comment extends React.Component {
       }
       footer = preview ? null : this.renderFooter(user);
     }
+    const interactions = this.renderInteractions();
     return (
       <div className={cn(s.root, active ? s.active : null)}>
         {header}
@@ -690,6 +777,7 @@ class Comment extends React.Component {
         <div className={s.text} ref={ref => (this.textBox = ref)}>
           {body}
         </div>
+        {interactions}
         {footer}
       </div>
     );

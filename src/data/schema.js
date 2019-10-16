@@ -82,6 +82,9 @@ import message from './queries/message';
 import messageConnection from './queries/messageConnection';
 import discussionConnection from './queries/discussionConnection';
 import activityConnection from './queries/activityConnection';
+import createCommentVote from './mutations/createCommentVote';
+import updateCommentVote from './mutations/updateCommentVote';
+import deleteCommentVote from './mutations/deleteCommentVote';
 
 /* GENERATOR */
 
@@ -164,6 +167,9 @@ const schema = new Schema({
       updateNotification,
       deleteNotification,
       clearNotifications,
+      createCommentVote,
+      updateCommentVote,
+      deleteCommentVote,
       /* GENERATOR_MUTATIONS */
     },
   }),

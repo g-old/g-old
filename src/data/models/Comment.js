@@ -14,6 +14,8 @@ export type CommentProps = {
   created_at: string,
   updated_at: string,
   edited_at: string,
+  deleted_at: string,
+  num_votes: number,
 };
 
 const MAX_CONTENT_LENGTH = 10000;
@@ -46,6 +48,8 @@ class Comment {
     this.createdAt = data.created_at;
     this.updatedAt = data.updated_at;
     this.editedAt = data.edited_at;
+    this.deletedAt = data.deleted_at;
+    this.numVotes = data.num_votes;
   }
 
   static async gen(viewer, id, { comments, discussions }) {

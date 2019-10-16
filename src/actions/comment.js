@@ -30,8 +30,13 @@ id
 parentId
 content
 numReplies
+numVotes
 discussionId
 createdAt
+ownVote{
+  position
+  id
+}
 editedAt
 author{
   id

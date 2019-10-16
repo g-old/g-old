@@ -22,6 +22,29 @@
   font-weight: 600;
 }
 
+.voteBtn {
+  background-color: transparent;
+  border: 2px solid transparent;
+  outline: none;
+  cursor: pointer;
+}
+
+.interactions {
+  float: right;
+  stroke: #666;
+  stroke-width: 2px;
+
+  .upvote {
+    stroke: var(--color-one);
+    stroke-width: 3px;
+  }
+
+  .downvote {
+    stroke: var(--color-two);
+    stroke-width: 3px;
+  }
+}
+
 .avatar {
   display: inline-block;
   margin-right: 0.5em;

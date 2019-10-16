@@ -140,4 +140,6 @@ export const subscriptionList = [subscription];
 export const notificationList = [notification];
 export const messageList = [message];
 
+export const commentVote = new schema.Entity('commentVotes', {});
+export const commentVoteList = [commentVote];
 /* GENERATOR */
