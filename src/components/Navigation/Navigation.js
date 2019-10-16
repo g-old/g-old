@@ -80,7 +80,11 @@ const makeLink = (linkData, currentPath, counter) => {
   return (
     <Link //eslint-disable-line
       key={linkData.id}
-      className={cn(s.link, currentPath === linkData.path ? s.current : null)}
+      className={cn(
+        s.link,
+        currentPath === linkData.path ? s.current : null,
+        s.small,
+      )}
       to={linkData.path}
     >
       {label}
@@ -96,6 +100,7 @@ class Navigation extends React.Component {
     }).isRequired,
     path: PropTypes.string.isRequired,
     user: PropTypes.shape({}),
+    small: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
@@ -139,11 +144,12 @@ class Navigation extends React.Component {
   }
 
   render() {
+    const { small } = this.props;
     return (
       <span role="navigation" style={{ margin: '0 0.2em' }}>
         <div className={s.navBar}>{this.getMenu()}</div>
 
-        <div className={s.menu}>
+        <div className={cn(s.menu, small && s.small)}>
           <Menu
             withControl
             primary

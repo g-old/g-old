@@ -3,6 +3,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import withStyles from 'isomorphic-style-loader/withStyles';
+import s from './LanguageSwitcher.css';
 import { setLocale, locales } from '../../actions/intl';
 import Menu from '../Menu';
 import Link from '../Link';
@@ -30,6 +32,7 @@ function LanguageSwitcher({ currentLocale, availableLocales, setLocale }) {
           .filter(locale => locale !== currentLocale)
           .map(locale => (
             <Link
+              className={s.link}
               href={`?lang=${locale}`}
               onClick={e => {
                 setLocale({ locale });

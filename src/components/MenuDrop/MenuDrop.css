@@ -3,7 +3,7 @@
 }
 
 .menu_contents > *:hover {
-  background-color: rgba(150, 8, 150, 0.3);
+  background-color: var(--color-brand-light-shade-3);
 }
 
 .menu_drop_left {

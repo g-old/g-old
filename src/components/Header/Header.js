@@ -49,7 +49,7 @@ class Header extends React.Component {
           </Link>
           <div className={s.right}>
             <LanguageSwitcher />
-            <Navigation />
+            <Navigation small={small} />
             <NotificationMenu />
           </div>
         </div>

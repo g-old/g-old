@@ -137,7 +137,10 @@ class UserProfile extends React.Component {
       workTeams,
     } = user;
     const canChangeImg =
-      (ownAccount && sessionUser && sessionUser.groups === Groups.GUEST) ||
+      (ownAccount &&
+        sessionUser &&
+        sessionUser.emailVerified &&
+        sessionUser.groups === Groups.GUEST) ||
       isAdmin(sessionUser);
 
     return (
@@ -154,10 +157,12 @@ class UserProfile extends React.Component {
           {name} {surname}
         </Label>
         <RoleBadge groups={user.groups} />
-        <VerificationBadge
-          onClick={toggleVerification}
-          status={user.verificationStatus}
-        />
+        {sessionUser && sessionUser.emailVerified && (
+          <VerificationBadge
+            onClick={toggleVerification}
+            status={user.verificationStatus}
+          />
+        )}
         <Box>
           <Value
             icon={

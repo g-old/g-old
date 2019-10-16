@@ -57,7 +57,7 @@ body {
 }
 
 a {
-  color: #0074c2;
+  color: var(--color-brand);
   text-decoration: none;
 }
 

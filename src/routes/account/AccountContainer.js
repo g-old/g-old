@@ -325,7 +325,11 @@ class AccountContainer extends React.Component {
       // eslint-disable-next-line no-bitwise
     } else if (ownAccount && user.groups === Groups.GUEST) {
       messageId = 'waitCall';
-    } else if (user.verificationStatus === VerificationTypes.UNREQUESTED) {
+    } else if (
+      ownAccount &&
+      user.emailVerified &&
+      user.verificationStatus === VerificationTypes.UNREQUESTED
+    ) {
       messageId = 'verifyCall';
       action = <Button onClick={this.toggleVerification}>Verify</Button>;
     } else if (user.verificationStatus === VerificationTypes.PENDING) {

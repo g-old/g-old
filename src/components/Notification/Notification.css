@@ -15,7 +15,7 @@
 }
 
 .alert {
-  background-color: #ffd602;
+  background-color: var(--color-three);
   stroke: #000;
   fill: #000;
   color: #000;
@@ -27,4 +27,5 @@
   padding: 1.5rem;
   justify-content: space-between;
   align-items: center;
+  border-radius: 1em;
 }

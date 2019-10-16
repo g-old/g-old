@@ -46,7 +46,7 @@
   position: relative;
   width: 256px;
   height: 256px;
-  stroke: var(--color-accent-5);
+  stroke: var(--color-four-light-shade);
 }
 
 .overlay {

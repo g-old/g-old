@@ -19,10 +19,16 @@
    * ======================================================================== */
 
   --color-brand: #4d702f;
+  --color-brand-dark-shade: #253617;
+  --color-brand-light-shade-1: #70a244;
+  --color-brand-light-shade-2: #9bc676;
+  --color-brand-light-shade-3: #edf4e6;
   --color-one: #a9bf02;
-  --color-two: #b31a3a;
+  --color-two: #702f4d;
   --color-three: #f4d203;
   --color-four: #414c7d;
+  --color-four-dark-shade: #1f253d;
+  --color-four-light-shade: #7884ba;
   --color-five: #af2abd;
   --color-accent-1: #a4c7e3;
   --color-accent: #d86c01;
