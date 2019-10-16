@@ -46,7 +46,7 @@ import { ICONS } from '../../constants';
 import Comment from '../../components/Comment';
 import history from '../../history';
 import SubscriptionButton from '../../components/SubscriptionButton';
-import { Groups } from '../../organization';
+import { Groups, isVoter } from '../../organization';
 
 const handleProfileClick = ({ id }) => {
   if (id) history.push(`/accounts/${id}`);
@@ -490,7 +490,7 @@ class DiscussionContainer extends React.Component {
               )}
             </div>
             <Box tag="section" column pad fill className={s.commentsSection}>
-              {!discussion.closedAt && (
+              {!discussion.closedAt && isVoter(user) && (
                 <Comment
                   asInput
                   user={user}

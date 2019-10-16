@@ -69,7 +69,6 @@ const viewerMask =
   Permissions.VIEW_PROPOSALS |
   Permissions.VIEW_STATEMENTS |
   Permissions.VIEW_VOTES |
-  Permissions.MAKE_COMMENT |
   Permissions.TAKE_SURVEYS;
 
 /* Voters */
@@ -77,6 +76,7 @@ const voterMask =
   Permissions.VOTE |
   Permissions.MODIFY_OWN_STATEMENTS |
   Permissions.LIKE |
+  Permissions.MAKE_COMMENT |
   Permissions.FLAG_STATEMENTS;
 
 /* Moderators */

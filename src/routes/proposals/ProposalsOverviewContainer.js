@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { loadProposalsList, loadProposal } from '../../actions/proposal';
 import history from '../../history';
-import { getVisibleProposals, getResourcePageInfo } from '../../reducers/index';
+import {
+  getVisibleProposals,
+  getResourcePageInfo,
+  getSessionUser,
+} from '../../reducers';
 import { genProposalPageKey } from '../../reducers/pageInfo';
 import StateFilter from '../../components/StateFilter';
 import ListView from '../../components/ListView';
@@ -13,6 +17,7 @@ import ProposalInputLayer from '../../components/ProposalInputLayer';
 import Box from '../../components/Box';
 import Heading from '../../components/Heading';
 import Label from '../../components/Label';
+import { isVoter } from '../../organization';
 
 const onFilterChange = e => {
   if (e) {
@@ -29,6 +34,7 @@ class ProposalsOverviewContainer extends React.Component {
     filter: PropTypes.string.isRequired,
     loadProposalsList: PropTypes.func.isRequired,
     pageInfo: PropTypes.shape({}).isRequired,
+    user: PropTypes.shape({}).isRequired,
   };
 
   constructor(props) {
@@ -60,7 +66,7 @@ class ProposalsOverviewContainer extends React.Component {
   }
 
   render() {
-    const { filter, proposals, pageInfo } = this.props;
+    const { filter, proposals, pageInfo, user } = this.props;
 
     return (
       <Box column>
@@ -72,7 +78,7 @@ class ProposalsOverviewContainer extends React.Component {
             getting sufficient support and submitting to a citizens' vote.`}
           </Label>
         </Box>
-        <ProposalInputLayer />
+        {isVoter(user) && <ProposalInputLayer />}
         <StateFilter
           states={['active', 'accepted', 'repelled']}
           filter={filter}
@@ -107,6 +113,7 @@ const mapStateToProps = (state, { filter = '' }) => ({
     'proposals',
     genProposalPageKey({ state: filter }),
   ),
+  user: getSessionUser(state),
 });
 
 const mapDispatch = {
