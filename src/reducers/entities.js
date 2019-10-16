@@ -49,6 +49,7 @@ export default combineReducers({
 });
 
 /* GENERATOR_EXPORTS */
+
 export const getAllProposals = state =>
   fromProposals.getAllProposals(state.proposals, state);
 

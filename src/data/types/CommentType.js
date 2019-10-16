@@ -11,6 +11,9 @@ import knex from '../knex';
 
 import UserType from './UserType';
 import User from '../models/User';
+import CommentVoteType from './CommentVoteType';
+import CommentVote from '../models/CommentVote';
+import { commentVoteList } from '../../store/schema';
 
 const CommentType = new ObjectType({
   name: 'Comment',
@@ -46,6 +49,19 @@ const CommentType = new ObjectType({
     },
     numReplies: {
       type: GraphQLInt,
+    },
+    numVotes: {
+      type: GraphQLInt,
+    },
+    ownVote: {
+      type: CommentVoteType,
+      resolve: async (data, args, { viewer, loaders }) => {
+        const commentVote = await knex('comment_votes') // TODO as loader
+          .where({ comment_id: data.id, user_id: viewer.id })
+          .first('*');
+
+        return commentVote ? new CommentVote(commentVote) : null;
+      },
     },
 
     createdAt: {

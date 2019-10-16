@@ -30,9 +30,14 @@ id
 parentId
 content
 numReplies
+numVotes
 discussionId
 deletedAt
 createdAt
+ownVote{
+  position
+  id
+}
 editedAt
 author{
   id

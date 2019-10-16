@@ -30,9 +30,18 @@ export const Models = {
   COMMUNICATION: 65536,
   POLLING_MODE: 13172,
   VERIFICATION: 26344,
+  COMMENT_VOTE: 52688,
 };
 
 /* GENERATOR_FN */
+function commentVoteReadControl(viewer, data) {
+  console.error('Access control for CommentVote not implemented');
+  return true;
+}
+function commentVoteWriteControl(viewer, data) {
+  console.error('Access control for CommentVote not implemented');
+  return true;
+}
 /* eslint-disable no-unused-vars */
 function verificationReadControl(viewer, data) {
   console.error('Access control for Verification not implemented');
@@ -479,6 +488,10 @@ const ATypes = {
 };
 const accessFilter = {
   /* GENERATOR_FILTER */
+  [Models.COMMENT_VOTE]: {
+    [ATypes.WRITE]: commentVoteWriteControl,
+    [ATypes.READ]: commentVoteReadControl,
+  },
   [Models.VERIFICATION]: {
     [ATypes.WRITE]: verificationWriteControl,
     [ATypes.READ]: verificationReadControl,
