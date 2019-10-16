@@ -50,12 +50,13 @@ import { checkToken } from './core/tokens';
 import log from './logger';
 import { SubscriptionManager, SubscriptionServer } from './core/sse';
 import responseTiming from './core/timing';
-import { Groups, Permissions } from './organization';
+import { Groups } from './organization';
 import EventManager from './core/EventManager';
 import root from './compositionRoot';
 import { EmailType } from './core/BackgroundService';
 import Request from './data/models/Request';
 import ImageManager from './FileManager';
+import BotLoader from './bot';
 
 /* eslint-enable import/first */
 const PRIVATE_FILE_FOLDER = 'private_files';
@@ -63,6 +64,7 @@ const PRIVATE_FILE_FOLDER = 'private_files';
 process.on('unhandledRejection', (reason, p) => {
   log.error({ err: { position: p, reason } }, 'Unhandled Rejection');
   if (__DEV__) {
+    console.error('ERROR', reason, p);
     // send entire app down.
     process.exit(1);
   }
@@ -623,19 +625,22 @@ app.post('/reset/:token', (req, res) =>
     }),
 );
 
-app.get('/verify/:token', (req, res) => {
+app.get('/verify/:token', async (req, res) => {
   // ! No check if user is logged in !
-  const systemViewer = {
+  /* const systemViewer = {
     id: -1,
     groups: Groups.SYSTEM,
     permissions: Permissions.VIEW_USER_INFO,
-  };
+  }; */
+
   const loaders = createLoaders();
-  checkToken({ token: req.params.token, table: 'verify_tokens' })
+  const bot = await BotLoader.getBot();
+
+  return checkToken({ token: req.params.token, table: 'verify_tokens' })
     .then(data => {
       if (data) {
         return User.update(
-          systemViewer,
+          bot,
           {
             email: data.email,
             id: data.userId,
@@ -656,7 +661,7 @@ app.get('/verify/:token', (req, res) => {
           .pluck('id')
           .then(([id]) => {
             if (id) {
-              return Request.delete(systemViewer, { id }, loaders);
+              return Request.delete(bot, { id }, loaders);
             }
             return null;
           })

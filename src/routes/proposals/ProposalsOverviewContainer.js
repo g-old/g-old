@@ -100,7 +100,7 @@ class ProposalsOverviewContainer extends React.Component {
 // TODO implement memoiziation with reselect
 const mapStateToProps = (state, { filter = '' }) => ({
   proposals: getVisibleProposals(state, filter)
-    .filter(p => !p.workTeamId)
+    .filter(p => p && !p.workTeamId)
     .sort(filter === 'active' ? sortActiveProposals : sortClosedProposals),
   pageInfo: getResourcePageInfo(
     state,

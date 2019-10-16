@@ -211,9 +211,10 @@ class User {
           // update call from verification route!
           // check if user had email not verified, so that we can prevent penalized users using
           // e-verification as hole to get viewer-status
-          if (!userInDB.emailVerified && userInDB.groups > Groups.GUEST > 0)
+          if (!userInDB.emailVerified && userInDB.groups === Groups.GUEST) {
             newData.groups = Groups.GUEST | Groups.VIEWER;
-          autoStatusUpdate = true;
+            autoStatusUpdate = true;
+          }
         }
       }
     }

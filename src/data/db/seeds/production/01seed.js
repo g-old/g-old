@@ -14,6 +14,7 @@ exports.seed = function(knex) {
     groups,
     time,
     emailVerified,
+    thumbnail,
   ) {
     return knex('users').insert({
       name,
@@ -24,7 +25,9 @@ exports.seed = function(knex) {
       created_at: time,
       updated_at: time,
       email_verified: emailVerified,
-      thumbnail: `https://api.adorable.io/avatars/32/${name}${surname}.io.png`,
+      thumbnail:
+        thumbnail ||
+        `https://api.adorable.io/avatars/32/${name}${surname}.io.png`,
     });
   }
 
@@ -60,6 +63,7 @@ exports.seed = function(knex) {
       SYSTEM,
       new Date(),
       false,
+      '/tile.png',
     );
   }
 

@@ -140,7 +140,7 @@ class UserProfile extends React.Component {
       (ownAccount &&
         sessionUser &&
         sessionUser.emailVerified &&
-        sessionUser.groups === Groups.GUEST) ||
+        !sessionUser.thumbnail) ||
       isAdmin(sessionUser);
 
     return (

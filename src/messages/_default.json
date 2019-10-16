@@ -1946,5 +1946,12 @@
     "defaultMessage": "revoked",
     "message": "",
     "files": ["src/components/ProposalPanel/ProposalFilter.js"]
+  },
+  {
+    "id": "label.points",
+    "description": "Label for points",
+    "defaultMessage": "points",
+    "message": "",
+    "files": ["src/components/Comment/Comment.js"]
   }
 ]
