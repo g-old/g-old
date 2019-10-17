@@ -40,9 +40,10 @@ class MainEditor extends React.Component {
   static propTypes = {
     onChange: PropTypes.func.isRequired,
     className: PropTypes.string,
+    placeholder: PropTypes.string,
   };
 
-  static defaultProps = { className: null };
+  static defaultProps = { className: null, placeholder: null };
 
   constructor(props) {
     super(props);
@@ -525,15 +526,16 @@ class MainEditor extends React.Component {
   render() {
     const { className } = this.props;
     const { mobile } = this.state;
+    if (mobile) {
+      return (
+        <Notification
+          type="error"
+          message="Editor currently not working on mobile"
+        />
+      );
+    }
     return (
       <div className={className}>
-        {mobile && (
-          <Notification
-            type="error"
-            message="Editor currently not working on mobile"
-          />
-        )}
-
         {this.renderToolbar()}
         {this.renderEditor()}
       </div>
