@@ -2,6 +2,12 @@
 
 .mark {
   background-color: var(--color-four-dark-shade);
+  color: #fff;
+  stroke: #fff;
+
+  span {
+    color: #fff;
+  }
 }
 
 .big {
@@ -13,8 +19,8 @@
   border-radius: 4px;
   display: inline-flex;
   align-items: center;
-  color: #fff;
   outline: none;
+  color: #666;
 
   > *:not(:last-child) {
     margin-right: 0.5rem;

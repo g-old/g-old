@@ -40,6 +40,7 @@ class Uploader extends React.Component {
 
   onBeforeNextStep() {
     if (this.form && this.form.current) {
+      // check if files are set...
       const validationResult = this.form.current.enforceValidation([
         'files',
         'cropCoordinates',
@@ -88,7 +89,7 @@ class Uploader extends React.Component {
           previewImage: { args: {} },
           scale: { args: {} },
           rotation: { args: {} },
-          transferRights: { args: { required: true } },
+          transferRights: { args: { required: true, dependsOn: 'files' } },
         }}
         data={data}
         ref={this.form}

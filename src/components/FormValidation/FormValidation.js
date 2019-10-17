@@ -97,13 +97,18 @@ const genValidateFn = ({ fn, args = {} }) => {
     let error;
 
     if (value) {
+      // current value of the field
       for (let i = 0; i < allFns.length; i += 1) {
         error = allFns[i](value, state, options, fieldName);
         if (error.touched) {
           break;
         }
       }
-    } else if (args.required) {
+      // if value is required, fail- but if value is only required if another exists, check that!
+    } else if (
+      (args.required && !args.dependsOn) ||
+      (args.dependsOn && state[args.dependsOn])
+    ) {
       error = { touched: true, errorName: 'empty' };
     }
 
@@ -136,7 +141,7 @@ class FormValidation extends React.Component {
         args: PropTypes.shape({}),
       }),
     ).isRequired,
-    data: PropTypes.shape({}),
+    data: PropTypes.shape({ names: PropTypes.string }),
     submit: PropTypes.func.isRequired,
     children: PropTypes.func.isRequired,
     names: PropTypes.shape({}),
