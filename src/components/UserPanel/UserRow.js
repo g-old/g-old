@@ -27,12 +27,21 @@ function UserTableRow({
       }}
     >
       <td style={{ textAlign: 'left' }}>
-        <UserThumbnail user={{ thumbnail, name, surname }} />
+        <UserThumbnail noLink user={{ thumbnail, name, surname }} />
       </td>
-      <td>{name}</td>
       <td>{verificationStatus}</td>
       <td>
-        {
+        <FormattedDate
+          day="numeric"
+          month="numeric"
+          year="numeric"
+          hour="numeric"
+          minute="numeric"
+          value={lastLogin}
+        />
+      </td>
+      <td>
+        {createdAt && (
           <FormattedDate
             day="numeric"
             month="numeric"
@@ -41,19 +50,7 @@ function UserTableRow({
             minute="numeric"
             value={createdAt}
           />
-        }
-      </td>
-      <td>
-        {
-          <FormattedDate
-            day="numeric"
-            month="numeric"
-            year="numeric"
-            hour="numeric"
-            minute="numeric"
-            value={lastLogin}
-          />
-        }
+        )}
       </td>
     </TableRow>
   );

@@ -179,8 +179,7 @@ class UserPanel extends React.Component {
           assets={userArray || []}
           row={UserRow}
           tableHeaders={[
-            'Avatar',
-            'Name',
+            'User',
             'VerificationStatus',
             'Last login',
             'Created at',

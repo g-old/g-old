@@ -70,10 +70,14 @@ class GroupManager extends React.Component {
     account: PropTypes.shape({
       groups: PropTypes.number,
       id: PropTypes.string,
+      verificationStatus: PropTypes.string,
+      emailVerified: PropTypes.bool.isRequired,
+      //thumbnail: PropTypes.string.isRequired,
     }).isRequired,
     user: PropTypes.shape({
       groups: PropTypes.number,
       id: PropTypes.string,
+      privileges: PropTypes.number,
     }).isRequired,
 
     updateFn: PropTypes.func.isRequired,
@@ -115,10 +119,10 @@ class GroupManager extends React.Component {
     // TODO VALIDATION FN
     // dont allow change from guest if no profile, no workteam and no email verification
     /* eslint-disable no-bitwise */
-    const { emailVerified, thumbnail, groups, id } = account;
+    const { emailVerified, groups, id } = account;
     if (
       (user.groups & (Groups.ADMIN | Groups.SUPER_USER)) > 0 ||
-      (emailVerified && thumbnail)
+      emailVerified /*&& thumbnail*/
     ) {
       // eslint-disable-next-line react/destructuring-assignment
       if (this.state[e.target.name].status === true) {
@@ -177,7 +181,14 @@ class GroupManager extends React.Component {
           {!promoteButton &&
             this.availableGroups.map(r => (
               <CheckBox
-                label={r}
+                label={
+                  r === 'VOTER' &&
+                  account.verificationStatus !== 'confirmed' ? (
+                    <span style={{ color: 'red' }}>{r} not verified !</span>
+                  ) : (
+                    r
+                  )
+                }
                 disabled={updates && updates.pending}
                 // eslint-disable-next-line
                 checked={this.state[r].status}
