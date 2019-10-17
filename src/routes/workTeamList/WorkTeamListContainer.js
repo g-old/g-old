@@ -58,6 +58,7 @@ class WorkTeamListContainer extends React.Component {
           </div>
         </Heading>
         <ListView
+          boxed
           onRetry={this.handleOnRetry}
           pageInfo={{ pending, errorMessage: error }}
         >

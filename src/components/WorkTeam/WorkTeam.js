@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/withStyles';
+import cn from 'classnames';
 import { defineMessages, FormattedMessage } from 'react-intl';
 import s from './WorkTeam.css';
 import Heading from '../Heading';
@@ -18,10 +19,16 @@ import Link from '../Link';
 import UserThumbnail from '../UserThumbnail';
 import DiscussionListContainer from '../DiscussionListContainer';
 import ProposalListContainer from '../ProposalListContainer';
-import SurveyListContainer from '../SurveyListContainer';
+// import SurveyListContainer from '../SurveyListContainer';
 import StateFilter from '../StateFilter';
 import Notification from '../Notification';
 import Image from '../Image/Image';
+
+const Discussion = lazy(() =>
+  import('../../routes/discussion/DiscussionContainer'),
+);
+
+const Proposal = lazy(() => import('../../routes/proposal/ProposalContainer'));
 
 const messages = defineMessages({
   join: {
@@ -97,6 +104,7 @@ class WorkTeam extends React.Component {
     onLoadDiscussions: PropTypes.func.isRequired,
     onLoadProposals: PropTypes.func.isRequired,
     image: PropTypes.string,
+    small: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -106,6 +114,7 @@ class WorkTeam extends React.Component {
     mainTeam: null,
     deletedAt: null,
     image: null,
+    small: null,
   };
 
   constructor(props) {
@@ -129,19 +138,17 @@ class WorkTeam extends React.Component {
     this.handleLoadMoreSurveys = this.handleLoadMoreSurveys.bind(this);
     this.fetchDiscussions = this.fetchDiscussions.bind(this);
     this.fetchProposals = this.fetchProposals.bind(this);
+    this.handleProposalClick = this.handleProposalClick.bind(this);
 
     this.state = {
       showLayer: false,
       activeTabIndex: 1,
       discussionStatus: 'active',
       proposalStatus: 'active',
-      surveyStatus: 'active',
+      // surveyStatus: 'active',
+      currentContainer: null,
     };
     this.activateTab = this.activateTab.bind(this);
-  }
-
-  static onProposalClick({ proposalId, pollId }) {
-    history.push(`/proposal/${proposalId}/${pollId}`);
   }
 
   onOpenLayer() {
@@ -164,8 +171,28 @@ class WorkTeam extends React.Component {
   }
 
   handleDiscussionClick({ discussionId }) {
-    const { id } = this.props;
-    history.push(`${id}/discussions/${discussionId}`);
+    const { id, small } = this.props;
+    if (small) {
+      history.push(`${id}/discussions/${discussionId}`);
+    } else {
+      this.setState({
+        currentContainer: { type: 'discussion', args: { id: discussionId } },
+      });
+    }
+  }
+
+  handleProposalClick({ proposalId, pollId }) {
+    const { id, small } = this.props;
+    if (small) {
+      history.push(`/proposal/${proposalId}/${pollId}`);
+    } else {
+      this.setState({
+        currentContainer: {
+          type: 'proposal',
+          args: { proposalId, pollId },
+        },
+      });
+    }
   }
 
   handleLoadMoreDiscussions({ after }) {
@@ -326,6 +353,7 @@ class WorkTeam extends React.Component {
       mainTeam,
       deletedAt,
       image,
+      small,
     } = this.props;
     const {
       discussionStatus,
@@ -333,11 +361,12 @@ class WorkTeam extends React.Component {
       surveyStatus,
       activeTabIndex,
       showLayer,
+      currentContainer,
     } = this.state;
     let picture;
     if (image) {
       picture = (
-        <Image fit src={`/s720/${image}`} />
+        <Image className={s.image} fit src={`/s720/${image}`} />
       ); /* <img alt="Logo" className={s.logo} src={logo} />; */
     } else {
       picture = (
@@ -385,13 +414,17 @@ class WorkTeam extends React.Component {
           </Link>,
         );
       }
-      actionBtns = <Box align>{controls}</Box>;
+      actionBtns = (
+        <Box padding="small" align>
+          {controls}
+        </Box>
+      );
     }
 
     let contentSection;
     if (ownStatus.status === 'MEMBER' && !deletedAt) {
       contentSection = (
-        <Box tag="section" column fill>
+        <Box className={cn(s.container, s.big)} tag="section" column fill>
           <Tabs activeIndex={activeTabIndex} onActive={this.activateTab}>
             <Tab title={<FormattedMessage {...messages.proposals} />}>
               <StateFilter
@@ -403,7 +436,7 @@ class WorkTeam extends React.Component {
                 id={id}
                 status={proposalStatus}
                 onLoadMore={this.handleLoadMoreProposals}
-                onItemClick={WorkTeam.onProposalClick}
+                onItemClick={this.handleProposalClick}
                 onRetry={this.fetchProposals}
               />
             </Tab>
@@ -421,7 +454,7 @@ class WorkTeam extends React.Component {
                 onRetry={this.fetchDiscussions}
               />
             </Tab>
-            <Tab title={<FormattedMessage {...messages.surveys} />}>
+            {/* <Tab title={<FormattedMessage {...messages.surveys} />}>
               <StateFilter
                 states={['active', 'closed']}
                 filter={surveyStatus}
@@ -434,7 +467,7 @@ class WorkTeam extends React.Component {
                 onItemClick={WorkTeam.onProposalClick}
                 onRetry={this.fetchSurveys}
               />
-            </Tab>
+      </Tab> */}
           </Tabs>
         </Box>
       );
@@ -466,78 +499,113 @@ class WorkTeam extends React.Component {
       );
     }
     return (
-      <Box align column padding="medium" pad fill>
-        {picture}
-        <Heading tag="h2">{displayName}</Heading>
-        <Box column align>
-          <FormattedMessage {...messages.coordinator} />
-          <Box align>
-            <svg viewBox="0 0 24 24" width="24px" height="24px">
-              <path fill="#222" d={ICONS.coordinator} />
-            </svg>
-            <UserThumbnail big marked user={coordinator} />
+      <Box wrap={small} column={small} between fill>
+        <Box className={cn(s.container, small && s.big)} justify align column>
+          <Box align column>
+            {picture}
+            <Heading tag="h2">{displayName}</Heading>
+            <Box column align>
+              <FormattedMessage {...messages.coordinator} />
+              <Box align>
+                <svg viewBox="0 0 24 24" width="24px" height="24px">
+                  <path fill="#222" d={ICONS.coordinator} />
+                </svg>
+                <UserThumbnail big marked user={coordinator} />
+              </Box>
+            </Box>
+            <Box wrap>
+              <Value
+                onClick={() => {
+                  history.push(`/workteams/${id}/members`);
+                }}
+                icon={
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24px"
+                    height="24px"
+                    role="img"
+                  >
+                    <path
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      d="M12,13 C14.209139,13 16,11.209139 16,9 C16,6.790861 14.209139,5 12,5 C9.790861,5 8,6.790861 8,9 C8,11.209139 9.790861,13 12,13 Z M6,22 L6,19 C6,15.6862915 8.6862915,13 12,13 C15.3137085,13 18,15.6862915 18,19 L18,22 M13,5 C13.4037285,3.33566165 15.0151447,2 17,2 C19.172216,2 20.98052,3.790861 21,6 C20.98052,8.209139 19.172216,10 17,10 L16,10 L17,10 C20.287544,10 23,12.6862915 23,16 L23,18 M11,5 C10.5962715,3.33566165 8.98485529,2 7,2 C4.82778404,2 3.01948003,3.790861 3,6 C3.01948003,8.209139 4.82778404,10 7,10 L8,10 L7,10 C3.71245602,10 1,12.6862915 1,16 L1,18"
+                    />
+                  </svg>
+                }
+                label={<FormattedMessage {...messages.members} />}
+                value={numMembers || 0}
+              />
+              <Value
+                onClick={() => this.activateTab(0)}
+                icon={
+                  <svg
+                    version="1.1"
+                    viewBox="0 0 24 24"
+                    width="24px"
+                    height="24px"
+                    role="img"
+                    aria-label="proposal"
+                  >
+                    <path
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      d="M16,7 L19,7 L19,11 L16,11 L16,7 Z M9,15 L20,15 M9,11 L13,11 M9,7 L13,7 M6,18.5 C6,19.8807119 4.88071187,21 3.5,21 C2.11928813,21 1,19.8807119 1,18.5 L1,7 L6.02493781,7 M6,18.5 L6,3 L23,3 L23,18.5 C23,19.8807119 21.8807119,21 20.5,21 L3.5,21"
+                    />
+                  </svg>
+                }
+                label={<FormattedMessage {...messages.proposals} />}
+                value={numProposals || 0}
+              />
+              <Value
+                onClick={() => this.activateTab(1)}
+                icon={
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24px"
+                    height="24px"
+                    role="img"
+                  >
+                    <path
+                      fill="none"
+                      stroke="#000"
+                      strokeWidth="2"
+                      d="M6,16 L16,16 L6,16 L6,16 Z M6,12 L18,12 L6,12 L6,12 Z M6,8 L11,8 L6,8 L6,8 Z M14,1 L14,8 L21,8 M3,23 L3,1 L15,1 L21,7 L21,23 L3,23 Z"
+                    />
+                  </svg>
+                }
+                label={<FormattedMessage {...messages.discussions} />}
+                value={numDiscussions || 0}
+              />
+            </Box>
+            {actionBtns}
           </Box>
+          {layer}
         </Box>
-        <Box wrap>
-          <Value
-            onClick={() => {
-              history.push(`/workteams/${id}/members`);
-            }}
-            icon={
-              <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-                <path
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  d="M12,13 C14.209139,13 16,11.209139 16,9 C16,6.790861 14.209139,5 12,5 C9.790861,5 8,6.790861 8,9 C8,11.209139 9.790861,13 12,13 Z M6,22 L6,19 C6,15.6862915 8.6862915,13 12,13 C15.3137085,13 18,15.6862915 18,19 L18,22 M13,5 C13.4037285,3.33566165 15.0151447,2 17,2 C19.172216,2 20.98052,3.790861 21,6 C20.98052,8.209139 19.172216,10 17,10 L16,10 L17,10 C20.287544,10 23,12.6862915 23,16 L23,18 M11,5 C10.5962715,3.33566165 8.98485529,2 7,2 C4.82778404,2 3.01948003,3.790861 3,6 C3.01948003,8.209139 4.82778404,10 7,10 L8,10 L7,10 C3.71245602,10 1,12.6862915 1,16 L1,18"
-                />
-              </svg>
-            }
-            label={<FormattedMessage {...messages.members} />}
-            value={numMembers || 0}
-          />
-          <Value
-            onClick={() => this.activateTab(0)}
-            icon={
-              <svg
-                version="1.1"
-                viewBox="0 0 24 24"
-                width="24px"
-                height="24px"
-                role="img"
-                aria-label="proposal"
-              >
-                <path
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  d="M16,7 L19,7 L19,11 L16,11 L16,7 Z M9,15 L20,15 M9,11 L13,11 M9,7 L13,7 M6,18.5 C6,19.8807119 4.88071187,21 3.5,21 C2.11928813,21 1,19.8807119 1,18.5 L1,7 L6.02493781,7 M6,18.5 L6,3 L23,3 L23,18.5 C23,19.8807119 21.8807119,21 20.5,21 L3.5,21"
-                />
-              </svg>
-            }
-            label={<FormattedMessage {...messages.proposals} />}
-            value={numProposals || 0}
-          />
-          <Value
-            onClick={() => this.activateTab(1)}
-            icon={
-              <svg viewBox="0 0 24 24" width="24px" height="24px" role="img">
-                <path
-                  fill="none"
-                  stroke="#000"
-                  strokeWidth="2"
-                  d="M6,16 L16,16 L6,16 L6,16 Z M6,12 L18,12 L6,12 L6,12 Z M6,8 L11,8 L6,8 L6,8 Z M14,1 L14,8 L21,8 M3,23 L3,1 L15,1 L21,7 L21,23 L3,23 Z"
-                />
-              </svg>
-            }
-            label={<FormattedMessage {...messages.discussions} />}
-            value={numDiscussions || 0}
-          />
+        <Box className={s.row} column>
+          {contentSection}
+          {currentContainer && (
+            <Box className={cn(s.container, s.big)}>
+              <Suspense fallback={<div> Loading content ....</div>}>
+                {currentContainer.type === 'discussion' && (
+                  <Discussion
+                    sideLoading
+                    id={currentContainer.args.id}
+                    user={user}
+                  />
+                )}
+                {currentContainer.type === 'proposal' && (
+                  <Proposal
+                    sideLoading
+                    {...currentContainer.args}
+                    user={user}
+                  />
+                )}
+              </Suspense>
+            </Box>
+          )}
         </Box>
-
-        {actionBtns}
-        {contentSection}
-        {layer}
       </Box>
     );
   }

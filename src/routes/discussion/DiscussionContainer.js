@@ -102,12 +102,14 @@ class DiscussionContainer extends React.Component {
       containerId: PropTypes.string,
       type: PropTypes.string,
     }),
+    sideLoading: PropTypes.bool,
   };
 
   static defaultProps = {
     errorMessage: null,
     childId: null,
     scrollCounter: null,
+    sideLoading: null,
   };
 
   constructor(props) {
@@ -138,7 +140,11 @@ class DiscussionContainer extends React.Component {
   }
 
   componentDidMount() {
+    const { sideLoading } = this.props;
     this.findComment();
+    if (sideLoading) {
+      this.fetchDiscussion();
+    }
   }
 
   componentDidUpdate(prevProps) {

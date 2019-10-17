@@ -3,18 +3,9 @@ import log from '../logger';
 import Proposal from '../data/models/Proposal';
 import { computeNextState } from '../data/models/helpers';
 import createLoaders from '../data/dataLoader';
-import { Permissions, Groups } from '../organization';
+import BotInstance from '../bot';
 
-/* eslint-disable no-bitwise */
-const SYSTEM = {
-  id: 1,
-  permissions:
-    Permissions.MODIFY_PROPOSALS |
-    Permissions.CLOSE_POLLS |
-    Permissions.VIEW_PROPOSALS,
-  groups: Groups.SYSTEM | Groups.RELATOR,
-};
-/* eslint-enable no-bitwise */
+let workerBot;
 
 async function proposalPolling() {
   const proposals = await knex('proposals')
@@ -46,12 +37,15 @@ async function proposalPolling() {
   let loaders = null;
   if (proposals.length > 0) {
     loaders = createLoaders();
+    if (!workerBot) {
+      workerBot = await BotInstance.getBot();
+    }
   }
   const mutations = proposals.map(proposal => {
     // TODO in transaction!
     const newState = computeNextState(proposal.state, proposal, proposal.ref);
     return Proposal.update(
-      SYSTEM,
+      workerBot,
       { id: proposal.id, state: newState },
       loaders,
     ).catch(err => {

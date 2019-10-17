@@ -103,11 +103,13 @@ class ProposalContainer extends React.Component {
       isFetching: PropTypes.bool,
       errorMessage: PropTypes.string,
     }).isRequired,
+    sideLoading: PropTypes.bool,
   };
 
   static defaultProps = {
     errorMessage: null,
     subscriptionStatus: null,
+    sideLoading: null,
   };
 
   constructor(props) {
@@ -117,6 +119,15 @@ class ProposalContainer extends React.Component {
     this.handlePollSwitching = this.handlePollSwitching.bind(this);
     this.handleVoting = this.handleVoting.bind(this);
     this.handleSubscription = this.handleSubscription.bind(this);
+  }
+
+  componentDidMount() {
+    const { sideLoading } = this.props;
+
+    // very hacky, should detect if proposal is mounted in own route...
+    if (sideLoading) {
+      this.fetchProposal();
+    }
   }
 
   isReady() {

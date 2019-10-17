@@ -378,46 +378,45 @@ app.post('/signup', (req, res) => {
       return null;
     })
     .then(() =>
-      User.create(
-        { id: 1, groups: Groups.SYSTEM },
-        { ...userData, locale: req.language },
-      )
-        .then(user => {
-          if (!user) throw Error('User creation failed');
-          EventManager.publish('sendWelcomeMail', {
-            viewer: user,
-            request: {
-              content: {
-                email: user.email,
-                lang: req.cookies.lang,
-                host: req.hostname,
-                protocol: __DEV__ ? 'http' : 'https',
+      BotLoader.getBot().then(bot =>
+        User.create(bot, { ...userData, locale: req.language })
+          .then(user => {
+            if (!user) throw Error('User creation failed');
+            EventManager.publish('sendWelcomeMail', {
+              viewer: user,
+              request: {
+                content: {
+                  email: user.email,
+                  lang: req.cookies.lang,
+                  host: req.hostname,
+                  protocol: __DEV__ ? 'http' : 'https',
+                },
               },
-            },
-          });
+            });
 
-          return new Promise((resolve, reject) => {
-            // eslint-disable-next-line no-confusing-arrow
-            req.login(user, err => (err ? reject(err) : resolve()));
-          });
-        })
-        .then(
-          () =>
-            new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => {
               // eslint-disable-next-line no-confusing-arrow
-              req.session.save(err => (err ? reject(err) : resolve()));
-            }),
-        )
-        .then(() => res.status(200).json({ user: req.session.passport.user }))
-        .catch(error => {
-          if (error && error.code === '23505') {
-            return res
-              .status(200)
-              .json({ error: { fields: { email: { unique: false } } } });
-          }
-          log.error({ err: error, req }, 'Signup failed');
-          return res.status(500).json({ error: error.message });
-        }),
+              req.login(user, err => (err ? reject(err) : resolve()));
+            });
+          })
+          .then(
+            () =>
+              new Promise((resolve, reject) => {
+                // eslint-disable-next-line no-confusing-arrow
+                req.session.save(err => (err ? reject(err) : resolve()));
+              }),
+          )
+          .then(() => res.status(200).json({ user: req.session.passport.user }))
+          .catch(error => {
+            if (error && error.code === '23505') {
+              return res
+                .status(200)
+                .json({ error: { fields: { email: { unique: false } } } });
+            }
+            log.error({ err: error, req }, 'Signup failed');
+            return res.status(500).json({ error: error.message });
+          }),
+      ),
     );
 });
 const storage = multer.memoryStorage();
@@ -582,10 +581,12 @@ app.post('/reset/:token', (req, res) =>
   checkToken({ token: req.params.token, table: 'reset_tokens' }) // TODO checkToken and delete it
     .then(data => {
       if (!data) throw Error('Token invalid');
-      return User.update(
-        { id: 0, groups: Groups.SYSTEM },
-        { password: req.body.password, id: data.userId },
-        createLoaders(),
+      return BotLoader.getBot().then(bot =>
+        User.update(
+          bot,
+          { password: req.body.password, id: data.userId },
+          createLoaders(),
+        ),
       );
     })
     .then(userData => {

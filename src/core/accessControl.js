@@ -220,7 +220,7 @@ function proposalWriteControl(viewer, data) {
     return (viewer.groups & Groups.ADMIN) > 0;
   }
 
-  if (viewer.groups & Groups.VOTER) {
+  if (viewer.groups & Groups.VOTER || viewer.groups & Groups.SYSTEM) {
     // voters can post
     if (data.id && data.state) {
       // updates

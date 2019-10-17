@@ -1215,7 +1215,7 @@ class NotificationService {
         const emailHTML = this.MailComposer.getDiscussionMail({
           discussion: activityObject,
           sender: {
-            fullName: 'GOLD',
+            fullName: 'VIP',
             thumbnail: `${this.linkPrefix}/tile.png`,
           },
           notification: text,
@@ -1228,7 +1228,7 @@ class NotificationService {
           receivers,
           text: generatePlainTextMail(
             locale,
-            'GOLD',
+            'VIP',
             text,
             activityObject.title,
             '',
@@ -1245,7 +1245,7 @@ class NotificationService {
         }: ${activityObject.title}`;
         const message = this.MailComposer.getProposalMail({
           sender: {
-            fullName: 'GOLD',
+            fullName: 'VIP',
             thumbnail: `${this.linkPrefix}/tile.png`,
           },
           proposal: activityObject,
@@ -1260,7 +1260,7 @@ class NotificationService {
           receivers,
           text: generatePlainTextMail(
             locale,
-            'GOLD',
+            'VIP',
             text,
             activityObject.title,
             '',

@@ -22,6 +22,7 @@ const UpstreamProposalsView = ({
       onActive={loadProposals}
     >
       <ListView
+        boxed
         onRetry={loadProposals}
         onLoadMore={loadMoreProposals}
         pageInfo={pageInfo}

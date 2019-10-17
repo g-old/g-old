@@ -9,7 +9,7 @@ import {
 } from '../../actions/workTeam';
 import { loadDiscussions } from '../../actions/discussion';
 import { createRequest, deleteRequest } from '../../actions/request';
-import { getWorkTeam, getWorkTeamStatus } from '../../reducers';
+import { getWorkTeam, getWorkTeamStatus, getLayoutSize } from '../../reducers';
 import WorkTeam from '../../components/WorkTeam';
 import Box from '../../components/Box';
 import Nav from './NavSidebar';
@@ -18,8 +18,6 @@ import ProposalPreview from '../../components/ProposalPreview';
 import { loadProposalsList } from '../../actions/proposal';
 
 import history from '../../history';
-
-import Responsive from '../../core/Responsive';
 
 // import FetchError from '../../components/FetchError';
 
@@ -42,6 +40,7 @@ class WorkTeamContainer extends React.Component {
       id: PropTypes.string,
       discussions: PropTypes.arrayOf(PropTypes.shape({})),
     }),
+    small: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
@@ -53,31 +52,13 @@ class WorkTeamContainer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
-    this.onResponsive = this.onResponsive.bind(this);
     this.renderDiscussions = this.renderDiscussions.bind(this);
     this.renderProposals = this.renderProposals.bind(this);
     this.handleDiscussionClick = this.handleDiscussionClick.bind(this);
   }
 
-  componentDidMount() {
-    this.responsive = Responsive.start(this.onResponsive);
-  }
-
   static onProposalClick({ proposalId, pollId }) {
     history.push(`/proposal/${proposalId}/${pollId}`);
-  }
-
-  onResponsive(small) {
-    // deactivate if we change resolutions
-    if (small) {
-      this.setState({
-        smallSize: true,
-      });
-    } else {
-      this.setState({
-        smallSize: false,
-      });
-    }
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -138,6 +119,7 @@ class WorkTeamContainer extends React.Component {
       deleteRequest: eraseRequest,
       loadDiscussions: fetchDiscussions,
       loadProposalsList: loadProposals,
+      small,
     } = this.props;
     const { smallSize, content } = this.state;
     let sidebar;
@@ -160,6 +142,7 @@ class WorkTeamContainer extends React.Component {
     } else {
       element = (
         <WorkTeam
+          small={small}
           {...workTeamData}
           onJoinRequest={makeRequest}
           updates={workTeamUpdates}
@@ -173,7 +156,7 @@ class WorkTeamContainer extends React.Component {
       );
     }
     return (
-      <Box justify={smallSize || !isResponsive}>
+      <Box justify={small} padding="small" column={small}>
         {sidebar}
         {element}
       </Box>
@@ -184,6 +167,7 @@ class WorkTeamContainer extends React.Component {
 const mapStateToProps = (state, { id }) => ({
   workTeamData: getWorkTeam(state, id),
   workTeamUpdates: getWorkTeamStatus(state),
+  small: getLayoutSize(state),
 });
 
 const mapDispatch = {

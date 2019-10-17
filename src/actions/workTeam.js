@@ -66,6 +66,9 @@ const discussionFields = `
   numComments
   workTeamId
   content
+  author{
+    ${userFields}
+  }
 `;
 
 export const workTeamFields = `
@@ -120,6 +123,7 @@ itName
 const proposalFields = `
     id
     title
+    image
     state
     body
     workTeamId

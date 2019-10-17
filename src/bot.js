@@ -1,6 +1,6 @@
 import knex from './data/knex';
 import User from './data/models/User';
-import { Permissions } from './organization';
+import { Permissions, Groups } from './organization';
 import log from './logger';
 
 // not sure if this works as expected...
@@ -20,9 +20,15 @@ class Bot {
         .returning('*');
       this.bot = new User({
         ...botData,
-        permissions: Permissions.VIEW_USER_INFO,
+        groups: botData.groups | Groups.RELATOR, // for worker
+
         thumbnail: '/tile.png',
       });
+      this.bot.permissions =
+        Permissions.VIEW_USER_INFO |
+        Permissions.MODIFY_PROPOSALS |
+        Permissions.CLOSE_POLLS |
+        Permissions.VIEW_PROPOSALS;
     }
     return this.bot;
   }

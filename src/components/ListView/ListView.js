@@ -24,12 +24,15 @@ class ListView extends React.Component {
     onRetry: PropTypes.func.isRequired,
     pageInfo: PropTypes.shape({
       pagination: PropTypes.shape({ endCursor: PropTypes.string }),
+      pending: PropTypes.bool,
+      errorMessage: PropTypes.string,
     }).isRequired,
     isFetching: PropTypes.bool.isRequired,
     errorMessage: PropTypes.string,
+    boxed: PropTypes.bool,
   };
 
-  static defaultProps = { errorMessage: null };
+  static defaultProps = { errorMessage: null, boxed: null };
 
   constructor(props) {
     super(props);
@@ -44,12 +47,15 @@ class ListView extends React.Component {
   }
 
   renderChildren() {
-    const { children } = this.props;
-    return React.Children.map(children, child => (
-      <div>
-        <Card>{child} </Card>
-      </div>
-    ));
+    const { children, boxed } = this.props;
+    if (boxed) {
+      return React.Children.map(children, child => (
+        <div>
+          <Card>{child} </Card>
+        </div>
+      ));
+    }
+    return React.Children.map(children, child => <div>{child}</div>);
   }
 
   render() {

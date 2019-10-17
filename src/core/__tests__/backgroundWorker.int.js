@@ -4,7 +4,6 @@ import backgroundWorker from '../backgroundWorker';
 import { createTestActor, createTestUser, clearDB } from '../../../test/utils';
 import { Permissions } from '../../organization';
 import knex from '../../data/knex';
-import { EmailTypes } from '../BackgroundService';
 
 /*
 const FILE_PATH = './backgroundWorker';
@@ -30,9 +29,9 @@ describe.skip('Background Worker Integration', () => {
     const notificationMessageData = {
       type: 'mail',
       data: {
-        mailType: EmailTypes.MESSAGE,
+        mailType: 'message',
         message: `Integration @ ${new Date()}`,
-        subject: 'Info from GOLD',
+        subject: 'Info from VIP',
         address: VALID_TEST_EMAIL,
         viewer: testActor,
         mail_settings: {
@@ -68,7 +67,7 @@ describe.skip('Background Worker Integration', () => {
     const resetMessageData = {
       type: 'mail',
       data: {
-        mailType: EmailTypes.RESET_REQUEST,
+        mailType: 'reet-request',
 
         address: testUser.email,
         viewer: testActor,

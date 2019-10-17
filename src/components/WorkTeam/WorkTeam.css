@@ -5,3 +5,37 @@
   border-radius: 6px;
   background-color: #fff;
 }
+
+.container {
+  align-self: flex-start;
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.11);
+  max-width: 30em;
+  border-radius: 6px;
+  background-color: white;
+  margin-top: 1em;
+
+  h2 {
+    margin-top: 0;
+    text-align: center;
+    background-color: #414c7d;
+    color: #fff;
+    width: 100%;
+  }
+}
+
+.row {
+  width: 100%;
+  flex-shrink: 2;
+}
+
+.big {
+  max-width: none;
+  flex-shrink: 2;
+  width: 100%;
+}
+
+.image {
+  border-radius: 6px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}

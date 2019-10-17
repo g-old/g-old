@@ -1,7 +1,7 @@
 @import '../variables';
 
 .mark {
-  background-color: #e8cf0c96;
+  background-color: var(--color-four-dark-shade);
 }
 
 .big {
@@ -13,7 +13,7 @@
   border-radius: 4px;
   display: inline-flex;
   align-items: center;
-  color: #666;
+  color: #fff;
   outline: none;
 
   > *:not(:last-child) {

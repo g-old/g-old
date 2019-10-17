@@ -2169,5 +2169,12 @@
     "defaultMessage": "points",
     "message": "",
     "files": ["src/components/Comment/Comment.js"]
+  },
+  {
+    "id": "created",
+    "description": "Creation description",
+    "defaultMessage": "posted by {author} {date}",
+    "message": "{date} erstellt von {author}",
+    "files": ["src/components/DiscussionPreview/DiscussionPreview.js"]
   }
 ]

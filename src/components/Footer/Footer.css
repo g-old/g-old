@@ -10,7 +10,7 @@
 @import '../variables.css';
 
 .root {
-  background: #6b263d;
+  background: var(--color-brand-dark-shade);
   color: #fff;
 }
 

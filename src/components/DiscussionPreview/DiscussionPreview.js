@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/withStyles';
 import Box from '../Box';
 import s from './DiscussionPreview.css';
+import UserThumbnail from '../UserThumbnail/UserThumbnail';
 // import history from '../../history';
 
 const messages = defineMessages({
@@ -16,11 +17,20 @@ const messages = defineMessages({
     defaultMessage: '{cnt} comments',
     description: 'Number of comments',
   },
+  created: {
+    id: 'created',
+    defaultMessage: 'posted by {author} {date}',
+    description: 'Creation description',
+  },
 });
 
 class DiscussionPreview extends React.Component {
   static propTypes = {
     discussion: PropTypes.shape({
+      author: PropTypes.shape({
+        name: PropTypes.string,
+        surname: PropTypes.string,
+      }).isRequired,
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
       createdAt: PropTypes.string,
@@ -47,18 +57,32 @@ class DiscussionPreview extends React.Component {
 
   render() {
     const { discussion } = this.props;
-
     return (
-      <Box column onClick={this.handleClick}>
+      <Box column padding="small" onClick={this.handleClick}>
         <div>
+          <UserThumbnail marked user={discussion.author} />
           <div className={s.date}>
-            <FormattedRelative value={discussion.createdAt} />
+            <FormattedMessage
+              {...messages.created}
+              values={{
+                author: `${discussion.author.name} ${discussion.author.surname}`,
+                date: <FormattedRelative value={discussion.createdAt} />,
+              }}
+            />
           </div>
           <div className={s.header}>{discussion.title}</div>
-          <FormattedMessage
-            {...messages.numComments}
-            values={{ cnt: discussion.numComments }}
-          />
+          <div className={s.footer}>
+            <svg width="24px" height="24px" viewBox="0 0 24 24">
+              <path
+                fill="#666"
+                d="M12,23A1,1 0 0,1 11,22V19H7A2,2 0 0,1 5,17V7C5,5.89 5.9,5 7,5H21A2,2 0 0,1 23,7V17A2,2 0 0,1 21,19H16.9L13.2,22.71C13,22.9 12.75,23 12.5,23V23H12M13,17V20.08L16.08,17H21V7H7V17H13M3,15H1V3A2,2 0 0,1 3,1H19V3H3V15Z"
+              />
+            </svg>
+            <FormattedMessage
+              {...messages.numComments}
+              values={{ cnt: discussion.numComments }}
+            />
+          </div>
         </div>
       </Box>
     );

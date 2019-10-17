@@ -4,12 +4,19 @@
   font-weight: 300;
   font-size: 1.25rem;
   line-height: 1.25em;
-  padding-top: 0;
-  color: black;
+  padding: 1em 0;
+  color: #222;
 }
 
 .date {
-  text-align: right;
+  display: inline;
+  float: right;
   font-size: 0.8em;
   font-style: italic;
+}
+
+.footer {
+  svg {
+    padding-right: 1em;
+  }
 }

@@ -19,7 +19,12 @@ class SurveyListContainer extends React.Component {
   render() {
     const { items, onRetry, onLoadMore, onItemClick, pageInfo } = this.props;
     return (
-      <ListView onRetry={onRetry} onLoadMore={onLoadMore} pageInfo={pageInfo}>
+      <ListView
+        boxed
+        onRetry={onRetry}
+        onLoadMore={onLoadMore}
+        pageInfo={pageInfo}
+      >
         {items.map(
           d => d && <ProposalPreview proposal={d} onClick={onItemClick} />,
         )}

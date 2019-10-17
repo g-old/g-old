@@ -7,6 +7,7 @@ import rules from './rules';
 import Button from '../Button';
 import { ICONS } from '../../constants';
 import Box from '../Box';
+import Notification from '../Notification';
 
 // plugin for tables https://github.com/GitbookIO/slate-edit-table
 
@@ -72,10 +73,19 @@ class MainEditor extends React.Component {
   }
 
   componentDidMount() {
-    // eslint-disable-next-line react/no-did-mount-set-state
-    /*  this.setState({
-      value: html.deserialize(this.props.initialValue),
-    }); */
+    if (window && window.innerWidth < 1000) {
+      const agent = navigator.userAgent || navigator.vendor || window.opera;
+      if (agent) {
+        // detectmobilebrowsers.com/mobile
+        if (
+          /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(
+            agent,
+          )
+        ) {
+          this.setState({ mobile: true });
+        }
+      }
+    }
   }
 
   onChange = ({ value }) => {
@@ -514,8 +524,16 @@ class MainEditor extends React.Component {
 
   render() {
     const { className } = this.props;
+    const { mobile } = this.state;
     return (
       <div className={className}>
+        {mobile && (
+          <Notification
+            type="error"
+            message="Editor currently not working on mobile"
+          />
+        )}
+
         {this.renderToolbar()}
         {this.renderEditor()}
       </div>

@@ -43,7 +43,12 @@ export default function AccountsView({
           <FormattedMessage {...messages.users} /> {label} ({userCount})
         </div>
       </Heading>
-      <ListView onRetry={onRetry} onLoadMore={onLoadMore} pageInfo={pageInfo}>
+      <ListView
+        boxed
+        onRetry={onRetry}
+        onLoadMore={onLoadMore}
+        pageInfo={pageInfo}
+      >
         {users.map(u => u && <UserListItem user={u} onClick={onUserClick} />)}
       </ListView>
     </Box>

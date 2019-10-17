@@ -9,7 +9,7 @@ const composeMail = ({ lang, type, connection, token, address, name }) => {
   const mailContent = {
     'de-DE': {
       resetMail: {
-        subject: 'G-old Passwortänderung',
+        subject: 'VIP Passwortänderung',
         text: `Hallo ${name}! \n\n
           Wir schicken Ihnen diese Email, da Sie (oder jemand anderes) das Password für ihr Konto zurücksetzen möchten.\n\n
           Bitte klicken Sie auf den folgenden Link, oder fügen Sie ihn in Ihrem Browser ein, um den Vorgang abzuschließen:\n\n
@@ -19,12 +19,12 @@ const composeMail = ({ lang, type, connection, token, address, name }) => {
           Wenn Sie das nicht angefragt haben, ignorieren Sie bitte diese Email, ihr Passwort bleibt dann unverändert.\n`,
       },
       resetSuccess: {
-        subject: 'G-old - Ihr Passwort wurde geändert!',
-        text: `Hallo ${name},\n\n dies ist die Bestätigung, dass das Password für ihr Konto ${address} gerade geändert wurde.\n`,
+        subject: 'VIP - Ihr Passwort wurde geändert!',
+        text: `Hallo ${name},\n\n dies ist die Bestätigung, dass das Passwort für ihr Konto ${address} gerade geändert wurde.\n`,
       },
       verification: {
-        subject: 'G-old - Bestätigungslink',
-        text: `Hallo ${name}! \n\n Wir freuen uns sehr, dass Sie sich hier auf der Plattform G-old angemeldet haben. Jetzt müssen Sie \n nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben. \n \n
+        subject: 'VIP - Bestätigungslink',
+        text: `Hallo ${name}! \n\n Wir freuen uns sehr, dass Sie sich hier auf der Plattform VIP angemeldet haben. Jetzt müssen Sie \n nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben. \n \n
         Bitte klicken Sie auf den folgenden Link, oder fügen Sie ihn in Ihrem Browser ein:\n\n ${
           connection.protocol
         }://${connection.host}${
@@ -33,8 +33,8 @@ const composeMail = ({ lang, type, connection, token, address, name }) => {
         `,
       },
       mailChange: {
-        subject: 'G-old Email-Adresse geändert!',
-        text: `Hallo ${name}! \n\n Sie haben Ihre Email-Adresse auf der Plattform G-old geändert. Sie müssen \n nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben. \n \n
+        subject: 'VIP Email-Adresse geändert!',
+        text: `Hallo ${name}! \n\n Sie haben Ihre Email-Adresse auf der Plattform VIP geändert. Sie müssen \n nur noch bestätigen, dass wir die korrekte Email-Adresse erhalten haben. \n \n
         Bitte klicken Sie auf den folgenden Link, oder fügen Sie ihn in Ihrem Browser ein:\n\n ${
           connection.protocol
         }://${connection.host}${
@@ -45,7 +45,7 @@ const composeMail = ({ lang, type, connection, token, address, name }) => {
     },
     'en-EN': {
       resetMail: {
-        subject: 'G-old Password Reset',
+        subject: 'VIP Password Reset',
         text: `Hi ${name}! \n\n
           You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
           Please click on the following link, or paste this into your browser to complete the process:\n\n
@@ -59,8 +59,8 @@ const composeMail = ({ lang, type, connection, token, address, name }) => {
         text: `Hello ${name},\n\n This is a confirmation that the password for your account ${address} has just been changed.\n`,
       },
       verification: {
-        subject: 'G-old Verification Link',
-        text: `Hi ${name}! \n\n Thanks so much for joining GOLD. To finish signing up, you just \n need to confirm that we got your email right. \n \n
+        subject: 'VIP Verification Link',
+        text: `Hi ${name}! \n\n Thanks so much for joining VIP. To finish signing up, you just \n need to confirm that we got your email right. \n \n
         Please click on the following link, or paste this into your browser :\n\n ${
           connection.protocol
         }://${connection.host}${
@@ -69,8 +69,8 @@ const composeMail = ({ lang, type, connection, token, address, name }) => {
         `,
       },
       mailChange: {
-        subject: 'G-old Email changed',
-        text: `Hi ${name}! \n\n You have changed your email address for your account on GOLD. You just \n need to confirm that we got your email right. \n \n
+        subject: 'VIP Email changed',
+        text: `Hi ${name}! \n\n You have changed your email address for your account on VIP. You just \n need to confirm that we got your email right. \n \n
         Please click on the following link, or paste this into your browser :\n\n ${
           connection.protocol
         }://${connection.host}${
@@ -101,7 +101,7 @@ export const resetLinkMail = (email, connection, token, name, lang) => {
     type: 'resetMail',
   });
   return {
-    from: mailOptions.sender || 'passwordreset@g-old.com',
+    from: mailOptions.sender || 'passwordreset@VIP.com',
     to: email,
     subject: content.subject,
     text: content.text,
@@ -131,7 +131,7 @@ export const resetSuccessMail = ({ address, name, connection, lang }) => {
     type: 'resetSuccess',
   });
   return {
-    from: mailOptions.sender || 'passwordreset@g-old.com',
+    from: mailOptions.sender || 'passwordreset@VIP.com',
     to: address,
     subject: content.subject,
     text: content.text,
@@ -160,7 +160,7 @@ export const emailVerificationMail = (email, connection, token, name, lang) => {
     type: 'verification',
   });
   return {
-    from: mailOptions.sender || 'emailverification@g-old.com',
+    from: mailOptions.sender || 'emailverification@VIP.com',
     to: email,
     subject: content.subject,
     text: content.text,
@@ -189,7 +189,7 @@ export const emailChangedMail = (email, connection, token, name, lang) => {
     type: 'mailChange',
   });
   return {
-    from: mailOptions.sender || 'emailverification@g-old.com',
+    from: mailOptions.sender || 'emailverification@VIP.com',
     to: email,
     subject: content.subject,
     text: content.text,
@@ -199,7 +199,7 @@ export const emailChangedMail = (email, connection, token, name, lang) => {
 export const notificationMail = ({ address, message, subject }) => {
   if (!address || !message) throw Error('Mail details not provided');
   return {
-    from: mailOptions.sender || 'info@g-old.com',
+    from: mailOptions.sender || 'info@dirdemdi.org',
     to: address,
     subject,
     text: message,

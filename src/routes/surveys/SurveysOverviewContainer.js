@@ -68,6 +68,7 @@ class SurveysOverviewContainer extends React.Component {
         />
 
         <ListView
+          boxed
           onRetry={this.handleOnRetry}
           onLoadMore={this.handleLoadMore}
           pageInfo={pageInfo}

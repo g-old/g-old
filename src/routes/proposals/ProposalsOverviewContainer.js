@@ -85,6 +85,7 @@ class ProposalsOverviewContainer extends React.Component {
           onChange={onFilterChange}
         />
         <ListView
+          boxed
           onRetry={this.handleOnRetry}
           onLoadMore={this.handleLoadMore}
           pageInfo={pageInfo}
