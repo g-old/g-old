@@ -1,16 +1,14 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withStyles from 'isomorphic-style-loader/withStyles';
 import Box from '../Box';
 import Layer from '../Layer';
 import Button from '../Button';
-import ProposalInput from '../ProposalInput';
-import withPollSettings from '../ProposalInput/withPollSettings';
 import s from './ProposalInputLayer.css';
 import { loadTags } from '../../actions/proposal';
 
-const ProposalInputAllSettings = withPollSettings(ProposalInput);
+const ProposalInput = lazy(() => import('./ProposalInputWithSettings'));
 
 class ProposalInputLayer extends React.Component {
   constructor() {
@@ -36,7 +34,9 @@ class ProposalInputLayer extends React.Component {
     if (open) {
       return (
         <Layer fill onClose={this.toggleLayer}>
-          <ProposalInputAllSettings defaultPollType="voting" />
+          <Suspense fallback={<div> Loading content ....</div>}>
+            <ProposalInput defaultPollType="voting" />
+          </Suspense>
         </Layer>
       );
     }
