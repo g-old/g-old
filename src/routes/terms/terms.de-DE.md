@@ -3,6 +3,8 @@ title: Nutzungsbedingungen
 component: ContentPage
 ---
 
+# DRAFT!! - ENTWURF!! - NICHT VOLLSTÄNDIG!!
+
 ## Initiative für mehr Demokratie
 
 VOLKS-INI-POP-BZ.ORG

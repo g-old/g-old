@@ -64,7 +64,9 @@ class ApprovalProcess extends React.Component<Props, State> {
 
   handleValueSaving(data) {
     const newData = data.reduce((acc, curr) => {
-      acc[curr.name] = curr.value;
+      if (curr.value) {
+        acc[curr.name] = curr.value;
+      }
       return acc;
     }, {});
     this.setState(newData);
@@ -86,6 +88,7 @@ class ApprovalProcess extends React.Component<Props, State> {
     if (value & state[1]) {
       return { value: state[1], label: intl.formatMessage(messages.no) };
     }
+    throw new Error('state-not-recognized');
   }
 
   render() {

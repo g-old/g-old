@@ -3,6 +3,8 @@ title: Privacy
 component: ContentPage
 ---
 
+# DRAFT!! - ENTWURF!! - NICHT VOLLSTÄNDIG!!
+
 # Datenschutzerklärung
 
 ## Stand 17 Oktober 2019

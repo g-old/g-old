@@ -119,71 +119,75 @@ class Home extends React.Component<Props> {
           </Box>
         </Box>
         {/* Hero  - imgurl: https://unsplash.com/photos/IBWJsMObnnU */}
-        <Box align column={small} className={s.dynContent}>
+        <Box align justify column={small} className={s.dynContent}>
           <Box column className={s.motivation} pad align justify>
             <h3 style={{ textAlign: 'center' }}>{data.motivation.title}</h3>
             <div className={s.divider} />
             <p className={s.explanation}>{data.motivation.text}</p>
           </Box>
 
-          <Wizard basename="">
-            {({ steps, step, next, push }) => {
-              return (
-                <StepPage>
-                  <Steps>
-                    {proposals.map(
-                      proposal =>
-                        proposal && (
-                          <Step id={proposal.id}>
-                            <InfoCard
-                              onClick={() => {
-                                if (steps.indexOf(step) < steps.length - 1) {
-                                  next();
-                                } else {
-                                  push(steps[0].id);
+          {proposals && proposals.length > 0 && (
+            <Wizard basename="">
+              {({ steps, step, next, push }) => {
+                return (
+                  <StepPage>
+                    <Steps>
+                      {proposals.map(
+                        proposal =>
+                          proposal && (
+                            <Step id={proposal.id}>
+                              <InfoCard
+                                onClick={() => {
+                                  if (steps.indexOf(step) < steps.length - 1) {
+                                    next();
+                                  } else {
+                                    push(steps[0].id);
+                                  }
+                                }}
+                                title={proposal.title}
+                                poll={proposal.pollTwo}
+                                content={proposal.summary}
+                                image={
+                                  proposal.image && `/s460/${proposal.image}`
                                 }
-                              }}
-                              title={proposal.title}
-                              poll={proposal.pollTwo}
-                              content={proposal.summary}
-                              image={
-                                proposal.image && `/s460/${proposal.image}`
-                              }
+                              />
+                            </Step>
+                          ),
+                      )}
+                    </Steps>
+                    {proposals.length > 1 && (
+                      <Button
+                        plain
+                        icon={
+                          <svg
+                            version="1.1"
+                            viewBox="0 0 24 24"
+                            width="32px"
+                            height="32px"
+                            role="img"
+                          >
+                            <path
+                              fill="none"
+                              stroke="#666"
+                              strokeWidth="2"
+                              d={ICONS.leftArrow}
                             />
-                          </Step>
-                        ),
+                          </svg>
+                        }
+                        onClick={() => {
+                          if (steps.indexOf(step) < steps.length - 1) {
+                            next();
+                          } else {
+                            push(steps[0].id);
+                          }
+                        }}
+                      />
                     )}
-                  </Steps>
-                  <Button
-                    plain
-                    icon={
-                      <svg
-                        version="1.1"
-                        viewBox="0 0 24 24"
-                        width="32px"
-                        height="32px"
-                        role="img"
-                      >
-                        <path
-                          fill="none"
-                          stroke="#666"
-                          strokeWidth="2"
-                          d={ICONS.leftArrow}
-                        />
-                      </svg>
-                    }
-                    onClick={() => {
-                      if (steps.indexOf(step) < steps.length - 1) {
-                        next();
-                      } else {
-                        push(steps[0].id);
-                      }
-                    }}
-                  />
-                </StepPage>
-              );
-            }}
-          </Wizard>
+                  </StepPage>
+                );
+              }}
+            </Wizard>
+          )}
 
           {/* Card Box */}
         </Box>
