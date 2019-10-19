@@ -1,0 +1,44 @@
+{
+  "header": {
+    "title": "Volksinitiative - Iniziativa popolare",
+    "actions": [
+      "einen Vorschag veröffentlichen",
+      "über Vorschläge abstimmen",
+      "Vorschläge gemeinsam ausarbeiten"
+    ]
+  },
+  "hero": {
+    "title": "Direkte Demokratie für Südtirol",
+    "explanation": "VIP ist dein Startpunkt, um deine dir zuerkannte demokratische Entscheidungsmacht direkt ausüben zu können. Stelle deine Idee zur Verbesserung der Gesellschaft zur Wahl!"
+  },
+  "featureCards": [
+    {
+      "text": "Hast du einen Vorschlag für eine Gesetzesinitiative, oder ein Referendum? Tausch dich darüber mit anderen politisch interessierten Menschen aus und entdecke das Potential deiner Idee!",
+      "call": "Registriere dich!"
+    },
+    {
+      "text": "Finde heraus, was deine Mitmenschen politisch bewegt. Hilf bei der Ausarbeitung von Volksinitiativen mit, suche gemeinsam mit anderen nach der optimale Lösung.",
+      "call": "Melde dich an"
+    },
+    {
+      "text": " Bringe gesellschaftliche Verbesserungen mit deiner Unterstützung mit ins Rollen. Deine Stimme ist auch ein Signal für anderen Menschen."
+    }
+  ],
+  "motivation": {
+    "title": "Das Vetorecht des Volkes",
+    "text": "Als Bürger steht dir das Kontroll- und das Initiativrecht zu."
+  },
+  "content": {
+    "boxes": [
+      {
+        "title": "Vetorecht",
+        "text": "Bisher wurde hier bei uns, trotz Demokratie und wie in den meisten \"demokratischen\" Ländern, über das Volk geherrscht. Ab jetzt muss mit dem Volk regiert werden, so wie es sich für eine echte Demokratie gehört. Mit dieser Woche ist das neue Gesetz zur Direkten Demokratie in Kraft!",
+        "image": "/stop_sign_stp.jpeg"
+      },
+      {
+        "title": "Referendumsrecht",
+        "text": "Alle vom Landtag nicht mit Zweidrittelmehrheit verabschiedeten Gesetze können vor ihrem Inkrafttreten dem Referendum unterworfen werden, wenn das innerhalb von 20 Tagen nach Verabschiedung von 300 Promotoren verlangt wird."
+      }
+    ]
+  }
+}

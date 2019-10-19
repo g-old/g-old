@@ -1,18 +1,18 @@
 @import '../../components/variables.css';
 
 .root {
-  padding-left: 20px;
-  padding-right: 20px;
-  padding-top: 20px;
-  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.11);
+  /* box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.11); */
   padding: 1em;
   height: 100%;
   min-width: 25em;
+  border-radius: 6px;
+  border: 3px solid var(--color-four);
 }
 
 .small {
   background-image: linear-gradient(to bottom, var(--color-brand), #4d702fdb);
   min-width: 0;
+  border: none;
 
   fieldset {
     box-shadow: 0 4px 16px 0 #3333337a;
@@ -40,5 +40,6 @@
 }
 
 .formGroup {
-  margin-bottom: 15px;
+  margin-bottom: 1em;
+  padding: 1.5em 1.5em 0.5em;
 }

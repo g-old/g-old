@@ -16,7 +16,7 @@ import { loadProposalsList } from '../../actions/proposal';
 
 const title = 'Home';
 
-async function action({ store }) {
+async function action({ store, locale }) {
   const state = store.getState();
 
   const user = getSessionUser(state);
@@ -33,10 +33,28 @@ async function action({ store }) {
     approvalState:
       ApprovalStates.CONTENT_APPROVED | ApprovalStates.TOPIC_APPROVED,
   };
+  let data;
+
+  const fetchTextContent = () =>
+    new Promise(resolve => {
+      require.ensure(
+        [],
+        require => {
+          try {
+            resolve(require(`./content/data.${locale}.json`)); // eslint-disable-line import/no-dynamic-require
+          } catch (e) {
+            resolve(require('./content/data.json'));
+          }
+        },
+        'home',
+      );
+    });
   if (!process.env.BROWSER) {
     await store.dispatch(loadProposalsList(props));
+    data = await fetchTextContent();
   } else {
     store.dispatch(loadProposalsList(props));
+    data = await fetchTextContent();
   }
 
   return {
@@ -44,7 +62,7 @@ async function action({ store }) {
     title,
     component: (
       <Layout>
-        <Home title={title} />
+        <Home title={title} data={data} />
       </Layout>
     ),
   };

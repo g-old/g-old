@@ -12,8 +12,8 @@
   }
 }
 
-.card {
-  /* max-width: 25em; */
+/* .card {
+  max-width: 25em;
   flex: 1 0 24em;
   margin: 1em 0;
 }
@@ -25,13 +25,56 @@
   position: relative;
   background: #333;
 
-  /* height: 75vh; */
+  height: 75vh;
   border-radius: 6px;
   color: #aaa;
   box-shadow: 0 0.25rem 0.25rem rgba(0, 0, 0, 0.2), 0 0 1rem rgba(0, 0, 0, 0.2);
 }
+*/
 
-.hero {
+.motivation {
+  text-align: center;
+  padding-bottom: 3em;
+}
+
+.featureCard {
+  box-shadow: 0 4px 8px rgba(59, 64, 69, 0.2);
+  padding: 1.5em;
+  text-align: center;
+  flex-basis: 33%;
+  max-width: 26rem;
+  padding: 2rem;
+}
+
+.dynContent {
+  padding: 5em 0;
+  clip-path: polygon(0 0, 100% 2vw, 100% 100%, 0 100%);
+  background-color: var(--color-brand-light-shade-3);
+  margin-top: 3em;
+}
+
+.dictionary {
+  clip-path: polygon(0 0, 100% 2vw, 100% 100%, 0 calc(100% - 2vw));
+  background-color: var(--color-brand-dark-shade);
+}
+
+.divider {
+  width: 10em;
+  height: 0.4em;
+  background: var(--color-brand);
+}
+
+.explanation {
+  max-width: 40rem;
+  font-size: 1.2rem;
+  width: 80%;
+
+  @media only screen and (max-width: 35rem) {
+    font-size: 1rem;
+  }
+}
+
+/* .hero {
   padding: 2em 0;
   background-image: url('/voting_picture_blue.jpeg');
   height: 25em;
@@ -43,8 +86,11 @@
     border-radius: 6px;
     padding: 1em;
   }
+} */
+.lower {
+  margin-top: 3rem;
 }
-
+/*
 .proposals {
   align-items: center;
   background-size: auto;
@@ -52,7 +98,7 @@
   height: 10em;
 
   /* background-image: url('https://images.unsplash.com/photo-1495291916458-c12f594151e7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=750&q=80'); */
-  background-image: url('/lightbulb_yellow.jpeg');
+/* background-image: url('/lightbulb_yellow.jpeg');
 
   h1 {
     color: #fff;
@@ -65,4 +111,4 @@
   div {
     margin: 0;
   }
-}
+} */
