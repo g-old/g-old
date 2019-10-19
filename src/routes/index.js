@@ -134,6 +134,10 @@ const routes = {
       path: '/terms',
       load: () => import(/* webpackChunkName: 'terms' */ './terms'),
     },
+    {
+      path: '/cookies',
+      load: () => import(/* webpackChunkName: 'cookies' */ './cookies'),
+    },
 
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     {

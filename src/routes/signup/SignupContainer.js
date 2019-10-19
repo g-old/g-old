@@ -1,28 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-// import { defineMessages, FormattedMessage } from 'react-intl';
+import { defineMessages, FormattedMessage } from 'react-intl';
+import withStyles from 'isomorphic-style-loader/withStyles';
+import s from './SignupContainer.css';
 import SignUp from '../../components/SignUp';
 import { createUser } from '../../actions/user';
 import { uploadAvatar } from '../../actions/file';
 import { getAccountUpdates, getLocale, getRecaptchaKey } from '../../reducers';
 // import Button from '../../components/Button';
 import history from '../../history';
+import Box from '../../components/Box/Box';
+import Heading from '../../components/Heading/Heading';
 // import Headline from '../../components/Headline';
 // import Help from '../../components/Help';
 
-/* const messages = defineMessages({
-  welcome: {
-    id: 'signup.welcome-title',
-    defaultMessage: 'Welcome on board!',
-    description: 'Welcome message header',
+const messages = defineMessages({
+  title: {
+    id: 'signup.title',
+    defaultMessage:
+      "Create your VIP account. I'ts free and only takes a minute",
+    description: 'Heading of signup form',
   },
-  next: {
-    id: 'signup.next',
-    defaultMessage: 'Next step',
-    description: 'Next',
-  },
-}); */
+});
 
 class SignupContainer extends React.Component {
   static propTypes = {
@@ -98,13 +98,18 @@ class SignupContainer extends React.Component {
     switch (step) {
       case 0:
         return (
-          <SignUp
-            pending={pending}
-            notUniqueEmail={emailError}
-            error={error}
-            onCreateUser={this.onCreateUser}
-            recaptchaKey={recaptchaKey}
-          />
+          <Box className={s.root} column align>
+            <Heading tag="h3">
+              <FormattedMessage {...messages.title} />
+            </Heading>
+            <SignUp
+              pending={pending}
+              notUniqueEmail={emailError}
+              error={error}
+              onCreateUser={this.onCreateUser}
+              recaptchaKey={recaptchaKey}
+            />
+          </Box>
         );
       case 1:
         return 'Loading, please wait';
@@ -137,4 +142,4 @@ const mapDispatch = {
 export default connect(
   mapStateToProps,
   mapDispatch,
-)(SignupContainer);
+)(withStyles(s)(SignupContainer));

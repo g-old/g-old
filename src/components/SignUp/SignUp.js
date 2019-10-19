@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Recaptcha from 'react-recaptcha';
-
+import withStyles from 'isomorphic-style-loader/withStyles';
 import { defineMessages, FormattedMessage } from 'react-intl';
+import s from './SignUp.css';
+
 import Button from '../Button';
 import FormField from '../FormField';
 import Box from '../Box';
 import Form from '../Form';
 import Label from '../Label';
-import Header from '../Header2';
-import Heading from '../Heading';
+
 import { ICONS } from '../../constants';
 
 import {
@@ -25,7 +26,8 @@ const SCRIPT_ID = 'gold-recaptcha-script';
 const messages = defineMessages({
   title: {
     id: 'signup.title',
-    defaultMessage: 'Please fill out the form below',
+    defaultMessage:
+      "Create your VIP account. I'ts free and only takes a minute",
     description: 'Heading of signup form',
   },
   email: {
@@ -62,6 +64,11 @@ const messages = defineMessages({
     id: 'signup.next',
     defaultMessage: 'Next step',
     description: 'Next',
+  },
+  signup: {
+    id: 'label.signup',
+    defaultMessage: 'Sign Up',
+    description: 'Label signup',
   },
   error: {
     id: 'signup.error',
@@ -100,10 +107,22 @@ const messages = defineMessages({
     defaultMessage: 'Terms of Service',
     description: 'Terms of Service',
   },
+  notice: {
+    id: 'signupNotice',
+    defaultMessage:
+      'By clicking "{signup}", you agree to our {tos}, {privacy} and {cookies}.',
+    description: 'Notice under signup button',
+  },
+  cookies: {
+    id: 'label.cookie-policiy',
+    defaultMessage: 'cookie policy',
+    description: 'Cookie policy',
+  },
 });
 
 const PATH_TO_PRIVACY = '/privacy';
 const PATH_TO_TOS = '/terms';
+const PATH_TO_COOKIES = '/cookies';
 
 const onBlurValidation = (fieldName, state, fields) => {
   if (fieldName && state) {
@@ -121,6 +140,38 @@ const consentValidation = consent => {
   }
   return { touched: true, errorName: 'empty' };
 };
+
+const TOSLink = () => (
+  <a
+    style={{ textDecoration: 'underline' }}
+    target="_blank"
+    href={PATH_TO_TOS}
+    rel="noopener noreferrer"
+  >
+    <FormattedMessage {...messages.terms} />
+  </a>
+);
+
+const PrivacyLink = () => (
+  <a
+    style={{ textDecoration: 'underline' }}
+    target="_blank"
+    href={PATH_TO_PRIVACY}
+    rel="noopener noreferrer"
+  >
+    <FormattedMessage {...messages.privacy} />
+  </a>
+);
+const CookieLink = () => (
+  <a
+    style={{ textDecoration: 'underline' }}
+    target="_blank"
+    href={PATH_TO_COOKIES}
+    rel="noopener noreferrer"
+  >
+    <FormattedMessage {...messages.cookies} />
+  </a>
+);
 
 class SignUp extends React.Component {
   static removeScript() {
@@ -283,7 +334,7 @@ class SignUp extends React.Component {
       return <h1>Please reload the page</h1>;
     }
     return (
-      <Box tag="article" align column pad>
+      <Box tag="article" align column>
         <FormValidation // eslint-disable-next-line
           ref={el => (this.form = el)}
           eager
@@ -313,12 +364,12 @@ class SignUp extends React.Component {
             values,
             onSubmit,
           }) => (
-            <Form onSubmit={onSubmit}>
-              <Header align between>
-                <Heading tag="h2" strong>
+            <Form className={s.container} onSubmit={onSubmit}>
+              {/* <Header align between>
+                <Heading tag="h3" strong>
                   <FormattedMessage {...messages.title} />
                 </Heading>
-              </Header>
+              </Header> */}
               <fieldset>
                 <FormField
                   label={<FormattedMessage {...messages.forename} />}
@@ -434,15 +485,7 @@ class SignUp extends React.Component {
                     <FormattedMessage
                       {...messages.readPrivacy}
                       values={{
-                        link: (
-                          <a
-                            target="_blank"
-                            href={PATH_TO_PRIVACY}
-                            rel="noopener noreferrer"
-                          >
-                            <FormattedMessage {...messages.privacy} />
-                          </a>
-                        ),
+                        link: <PrivacyLink />,
                       }}
                     />
                   }
@@ -468,15 +511,7 @@ class SignUp extends React.Component {
                     <FormattedMessage
                       {...messages.readPrivacy}
                       values={{
-                        link: (
-                          <a
-                            target="_blank"
-                            href={PATH_TO_TOS}
-                            rel="noopener noreferrer"
-                          >
-                            <FormattedMessage {...messages.terms} />
-                          </a>
-                        ),
+                        link: <TOSLink />,
                       }}
                     />
                   }
@@ -499,8 +534,19 @@ class SignUp extends React.Component {
               </fieldset>
 
               <Button primary fill disabled={captchaPending || pending}>
-                <FormattedMessage {...messages.nextStep} />
+                <FormattedMessage {...messages.signup} />
               </Button>
+              <p>
+                <FormattedMessage
+                  {...messages.notice}
+                  values={{
+                    tos: <TOSLink />,
+                    privacy: <PrivacyLink />,
+                    cookies: <CookieLink />,
+                    signup: <FormattedMessage {...messages.signup} />,
+                  }}
+                />
+              </p>
             </Form>
           )}
         </FormValidation>
@@ -525,4 +571,4 @@ class SignUp extends React.Component {
   }
 }
 
-export default SignUp;
+export default withStyles(s)(SignUp);
