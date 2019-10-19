@@ -57,7 +57,7 @@ body {
 }
 
 a {
-  color: var(--color-brand);
+  color: var(--color-brand-dark-shade);
   text-decoration: none;
 }
 

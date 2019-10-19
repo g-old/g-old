@@ -162,7 +162,7 @@ const PrivacyLink = () => (
     <FormattedMessage {...messages.privacy} />
   </a>
 );
-const CookieLink = () => (
+export const CookieLink = () => (
   <a
     style={{ textDecoration: 'underline' }}
     target="_blank"
@@ -236,7 +236,7 @@ class SignUp extends React.Component {
 
   onSubmit() {
     const { validatedInputs, captchaResponse } = this.state;
-    const { onCreateUser } = this.props;
+    const { onCreateUser, allowCookies } = this.props;
     if (validatedInputs) {
       let { name, surname, email, password } = validatedInputs;
       name = name.trim();
@@ -252,6 +252,8 @@ class SignUp extends React.Component {
         password,
       };
       //  alert(JSON.stringify(data));
+      // set consens cookie if not set!
+      allowCookies();
       onCreateUser(data, captchaResponse);
     }
   }

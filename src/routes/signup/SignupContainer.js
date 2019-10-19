@@ -6,7 +6,9 @@ import withStyles from 'isomorphic-style-loader/withStyles';
 import s from './SignupContainer.css';
 import SignUp from '../../components/SignUp';
 import { createUser } from '../../actions/user';
-import { uploadAvatar } from '../../actions/file';
+import { allowCookies } from '../../actions/session';
+
+// import { uploadAvatar } from '../../actions/file';
 import { getAccountUpdates, getLocale, getRecaptchaKey } from '../../reducers';
 // import Button from '../../components/Button';
 import history from '../../history';
@@ -27,7 +29,7 @@ const messages = defineMessages({
 class SignupContainer extends React.Component {
   static propTypes = {
     createUser: PropTypes.func.isRequired,
-    // uploadAvatar: PropTypes.func.isRequired,
+    setCookie: PropTypes.func.isRequired,
     updates: PropTypes.shape({ email: PropTypes.string }).isRequired,
     // locale: PropTypes.string.isRequired,
     user: PropTypes.shape({}),
@@ -85,7 +87,7 @@ class SignupContainer extends React.Component {
   }
 
   render() {
-    const { updates, recaptchaKey } = this.props;
+    const { updates, recaptchaKey, setCookie } = this.props;
     const { error, hasError, pending, step } = this.state;
 
     if (hasError || !recaptchaKey) {
@@ -105,6 +107,7 @@ class SignupContainer extends React.Component {
             <SignUp
               pending={pending}
               notUniqueEmail={emailError}
+              allowCookies={setCookie}
               error={error}
               onCreateUser={this.onCreateUser}
               recaptchaKey={recaptchaKey}
@@ -137,7 +140,7 @@ const mapStateToProps = state => ({
 });
 const mapDispatch = {
   createUser,
-  uploadAvatar,
+  setCookie: allowCookies,
 };
 export default connect(
   mapStateToProps,

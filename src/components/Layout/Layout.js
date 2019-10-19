@@ -18,8 +18,11 @@ import { createSSESub } from '../../actions/sseSubs';
 import { allowCookies } from '../../actions/session';
 import { setSizeVariable } from '../../actions/responsive';
 import { getConsent, getLayoutSize, getSessionUser } from '../../reducers';
+import { CookieLink } from '../SignUp';
 import Toast from '../Toast';
 import Responsive from '../../core/Responsive';
+import Button from '../Button';
+import Box from '../Box';
 
 // external-global styles must be imported in your JS.
 import s from './Layout.css';
@@ -29,8 +32,14 @@ import Footer from '../Footer';
 const messages = defineMessages({
   cookieBanner: {
     id: 'cookieBanner',
-    defaultMessage: 'By using this site you accept our privacy policy.',
+    defaultMessage:
+      'This site uses cookies to ensure you get the best browsing experience. More information: {link}',
     description: 'Cookie banner, should comply to EU regulations',
+  },
+  consent: {
+    id: 'command.consent',
+    defaultMessage: 'Accept',
+    description: 'Commant to allow an action',
   },
 });
 
@@ -69,8 +78,16 @@ class Layout extends React.Component {
     let toast;
     if (!consent) {
       toast = (
-        <Toast alert onClose={this.consent}>
-          <FormattedMessage {...messages.cookieBanner} />
+        <Toast stay bottom>
+          <Box align between>
+            <FormattedMessage
+              {...messages.cookieBanner}
+              values={{ link: <CookieLink /> }}
+            />
+            <Button primary onClick={this.consent}>
+              <FormattedMessage {...messages.consent} />
+            </Button>
+          </Box>
         </Toast>
       );
     }
@@ -78,10 +95,10 @@ class Layout extends React.Component {
     return (
       <div className={s.layout}>
         <div className={loading ? s.loader : null} />
-        {toast}
         <Header small={small} user={user} />
         <div className={s.content}>{children}</div>
         <div className={s.footer}>
+          {toast}
           <Footer />
         </div>
       </div>
