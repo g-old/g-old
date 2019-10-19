@@ -96,9 +96,12 @@
   {
     "id": "signup.title",
     "description": "Heading of signup form",
-    "defaultMessage": "Please fill out the form below",
+    "defaultMessage": "Create your VIP account. I'ts free and only takes a minute",
     "message": "Crea il tuo account",
-    "files": ["src/components/SignUp/SignUp.js"]
+    "files": [
+      "src/components/SignUp/SignUp.js",
+      "src/routes/signup/SignupContainer.js"
+    ]
   },
   {
     "id": "signup.password",
@@ -537,7 +540,7 @@
     "id": "cookieBanner",
     "description": "Cookie banner, should comply to EU regulations",
     "defaultMessage": "By using this site you accept our privacy policy.",
-    "message": "Utilizzando questo sito accetti le nostre regole sulla privacy",
+    "message": "",
     "files": ["src/components/Layout/Layout.js"]
   },
   {
@@ -1250,7 +1253,11 @@
     "description": "Label signup",
     "defaultMessage": "Sign Up",
     "message": "Registrati",
-    "files": ["src/routes/home/Home.js", "src/routes/home/VIPMask.js"]
+    "files": [
+      "src/components/SignUp/SignUp.js",
+      "src/routes/home/Home.js",
+      "src/routes/home/VIPMask.js"
+    ]
   },
   {
     "id": "label.or",
@@ -2038,5 +2045,25 @@
     "defaultMessage": "posted by {author} {date}",
     "message": "",
     "files": ["src/components/DiscussionPreview/DiscussionPreview.js"]
+  },
+  {
+    "id": "label.cookie-policiy",
+    "description": "Cookie policy",
+    "defaultMessage": "cookie policy",
+    "message": "",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "signupNotice",
+    "description": "Notice under signup button",
+    "defaultMessage": "By clicking \"{signup}\", you agree to our {tos}, {privacy} and {cookies}.",
+    "message": "",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "poll.endtime",
+    "defaultMessage": "Voting ends {time}",
+    "message": "",
+    "files": ["src/routes/home/InfoCard.js"]
   }
 ]

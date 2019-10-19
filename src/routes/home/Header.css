@@ -13,6 +13,7 @@
     padding-left: 0;
   }
 }
+
 .small {
   margin-top: -1.6em;
 }
@@ -26,12 +27,13 @@
 
   /* background-image: url('/sunrise_header.jpeg'); */
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 4vw), 0 100%);
-  background: linear-gradient(
-    to right,
-    rgb(15, 12, 41),
-    rgb(48, 43, 99),
-    rgb(36, 36, 62)
-  ); /* background-image: url('https://download.unsplash.com/photo-1428550670225-15f007f6f1ba'); */
+  background-image:
+    linear-gradient(
+      to right,
+      rgb(15, 12, 41),
+      rgb(48, 43, 99),
+      rgb(36, 36, 62)
+    ); /* background-image: url('https://download.unsplash.com/photo-1428550670225-15f007f6f1ba'); */
 
   /* background: linear-gradient(to right, rgb(187, 210, 197), rgb(83, 105, 118)); */
 

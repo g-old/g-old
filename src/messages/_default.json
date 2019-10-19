@@ -696,9 +696,12 @@
   {
     "id": "signup.title",
     "description": "Heading of signup form",
-    "defaultMessage": "Please fill out the form below",
+    "defaultMessage": "Create your VIP account. I'ts free and only takes a minute",
     "message": "",
-    "files": ["src/components/SignUp/SignUp.js"]
+    "files": [
+      "src/components/SignUp/SignUp.js",
+      "src/routes/signup/SignupContainer.js"
+    ]
   },
   {
     "id": "commands.delete",
@@ -1178,7 +1181,11 @@
     "description": "Label signup",
     "defaultMessage": "Sign Up",
     "message": "",
-    "files": ["src/routes/home/Home.js", "src/routes/home/VIPMask.js"]
+    "files": [
+      "src/components/SignUp/SignUp.js",
+      "src/routes/home/Home.js",
+      "src/routes/home/VIPMask.js"
+    ]
   },
   {
     "id": "label.or",
@@ -1960,5 +1967,25 @@
     "defaultMessage": "posted by {author} {date}",
     "message": "",
     "files": ["src/components/DiscussionPreview/DiscussionPreview.js"]
+  },
+  {
+    "id": "label.cookie-policiy",
+    "description": "Cookie policy",
+    "defaultMessage": "cookie policy",
+    "message": "",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "signupNotice",
+    "description": "Notice under signup button",
+    "defaultMessage": "By clicking \"{signup}\", you agree to our {tos}, {privacy} and {cookies}.",
+    "message": "",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "poll.endtime",
+    "defaultMessage": "Voting ends {time}",
+    "message": "",
+    "files": ["src/routes/home/InfoCard.js"]
   }
 ]

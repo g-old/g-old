@@ -15,8 +15,9 @@ h2 {
 .heading {
   line-height: 1.125;
   font-weight: 300;
-  max-width: 100%;
   color: var(--color-brand-dark-shade);
+  text-align: center;
+  max-width: 30em;
 }
 
 .strong {

@@ -48,9 +48,9 @@ const InfoCard = ({ image, title, content, poll, onClick }: Props) => {
               <path
                 fill="none"
                 stroke="#666"
-                stroke-width="2"
+                strokeWidth="2"
                 d="M12,2 L12,22 M3,11 L12,2 L21,11"
-              ></path>
+              />
             </svg>
             {poll.options[0].numVotes}
           </div>
@@ -59,10 +59,10 @@ const InfoCard = ({ image, title, content, poll, onClick }: Props) => {
               <path
                 fill="none"
                 stroke="#666"
-                stroke-width="2"
+                strokeWidth="2"
                 d="M12,2 L12,22 M3,11 L12,2 L21,11"
                 transform="matrix(1 0 0 -1 0 24)"
-              ></path>
+              />
             </svg>
             {poll.options[1].numVotes}
           </div>

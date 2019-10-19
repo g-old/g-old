@@ -96,9 +96,12 @@
   {
     "id": "signup.title",
     "description": "Heading of signup form",
-    "defaultMessage": "Please fill out the form below",
-    "message": "Konto erstellen",
-    "files": ["src/components/SignUp/SignUp.js"]
+    "defaultMessage": "Create your VIP account. I'ts free and only takes a minute",
+    "message": "Erstelle dein Konto auf VIP. Es ist kostenlos und schnell gemacht.",
+    "files": [
+      "src/components/SignUp/SignUp.js",
+      "src/routes/signup/SignupContainer.js"
+    ]
   },
   {
     "id": "signup.password",
@@ -985,7 +988,7 @@
     "id": "cookieBanner",
     "description": "Cookie banner, should comply to EU regulations",
     "defaultMessage": "By using this site you accept our privacy policy.",
-    "message": "Wenn Sie diese Seite benützen, akzeptieren Sie damit unsere Datenschutzregelung ",
+    "message": "Diese Webseite nutzt Cookies um Ihre Weberlebnis zu verbessern. Mehr Informationen: {link}",
     "files": ["src/components/Layout/Layout.js"]
   },
   {
@@ -1375,7 +1378,11 @@
     "description": "Label signup",
     "defaultMessage": "Sign Up",
     "message": "Registrieren",
-    "files": ["src/routes/home/Home.js", "src/routes/home/VIPMask.js"]
+    "files": [
+      "src/components/SignUp/SignUp.js",
+      "src/routes/home/Home.js",
+      "src/routes/home/VIPMask.js"
+    ]
   },
   {
     "id": "label.or",
@@ -1995,7 +2002,7 @@
     "id": "label.tos",
     "description": "Terms of Service",
     "defaultMessage": "Terms of Service",
-    "message": "",
+    "message": "Nutzungsbedingungen",
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
@@ -2129,7 +2136,7 @@
     "id": "labels.verify",
     "description": "Label to open verification process",
     "defaultMessage": "Verify me",
-    "message": "",
+    "message": "Verifizieren",
     "files": ["src/components/UserProfile/VerificationBadge.js"]
   },
   {
@@ -2146,7 +2153,7 @@
     "id": "label.workteam",
     "description": "label workteam",
     "defaultMessage": "Workteam",
-    "message": "",
+    "message": "Arbeitsgruppe",
     "files": ["src/components/Proposal/Proposal.js"]
   },
   {
@@ -2167,7 +2174,7 @@
     "id": "label.points",
     "description": "Label for points",
     "defaultMessage": "points",
-    "message": "",
+    "message": "Punkte",
     "files": ["src/components/Comment/Comment.js"]
   },
   {
@@ -2176,5 +2183,25 @@
     "defaultMessage": "posted by {author} {date}",
     "message": "{date} erstellt von {author}",
     "files": ["src/components/DiscussionPreview/DiscussionPreview.js"]
+  },
+  {
+    "id": "label.cookie-policiy",
+    "description": "Cookie policy",
+    "defaultMessage": "cookie policy",
+    "message": "Cookie-Richtlinien",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "signupNotice",
+    "description": "Notice under signup button",
+    "defaultMessage": "By clicking \"{signup}\", you agree to our {tos}, {privacy} and {cookies}.",
+    "message": " Mit einem Klick auf \"{signup}\" stimmen sie unseren {tos}, der {privacy} und den {cookies} zu.",
+    "files": ["src/components/SignUp/SignUp.js"]
+  },
+  {
+    "id": "poll.endtime",
+    "defaultMessage": "Voting ends {time}",
+    "message": "Abstimmung endet {time}",
+    "files": ["src/routes/home/InfoCard.js"]
   }
 ]

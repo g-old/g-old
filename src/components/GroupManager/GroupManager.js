@@ -72,7 +72,7 @@ class GroupManager extends React.Component {
       id: PropTypes.string,
       verificationStatus: PropTypes.string,
       emailVerified: PropTypes.bool.isRequired,
-      //thumbnail: PropTypes.string.isRequired,
+      // thumbnail: PropTypes.string.isRequired,
     }).isRequired,
     user: PropTypes.shape({
       groups: PropTypes.number,
@@ -122,7 +122,7 @@ class GroupManager extends React.Component {
     const { emailVerified, groups, id } = account;
     if (
       (user.groups & (Groups.ADMIN | Groups.SUPER_USER)) > 0 ||
-      emailVerified /*&& thumbnail*/
+      emailVerified /* && thumbnail */
     ) {
       // eslint-disable-next-line react/destructuring-assignment
       if (this.state[e.target.name].status === true) {

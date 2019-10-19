@@ -158,7 +158,7 @@ class ProposalPanel extends React.Component {
 
   render() {
     const {
-      // updateProposal: mutateProposal,
+      updateProposal: mutateProposal,
       // surveys,
       workteams,
       intl,
@@ -181,7 +181,7 @@ class ProposalPanel extends React.Component {
           <Layer onClose={this.toggleLayer}>
             <ProposalActions
               intl={intl}
-              updateProposal={updateProposal}
+              updateProposal={mutateProposal}
               id={currentProposal.id}
               onFinish={this.toggleLayer}
             />

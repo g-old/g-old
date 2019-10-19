@@ -5,7 +5,7 @@ component: ContentPage
 
 VOLKS-INI-POP-BZ.ORG
 
-##
+## Stand: 19. Oktober 2019
 
 ## Welche Cookies wir verwenden
 
@@ -22,7 +22,7 @@ Diese sind zwingend nötig für die Nutzung der angebotenen Dienste.
 
 Beim Zugriff auf die Webseite setzen wir ein Cookie, dass die Sprachauswahl des Benutzers enthält. Aufgrund der auf der Webseite möglichen Sprachauswahl ist dieser Wert für den technischen Betrieb zwingend notwendig.
 
-Wenn Sie die Cookie-Richtlinien über den Banner oder mit der Registrierung akzeptieren, speicher wir das in einem Cookie ab.
+Wenn Sie die Cookie-Richtlinien über den Banner oder mit der Registrierung akzeptieren, speichern wir das in einem Cookie ab.
 
 Wenn Sie sich auf der Webseite anmelden, setzen wir ein Cookie mit einer Identifikationsnummer, welches uns erlaubt sicherzustellen, dass Sie angemeldet sind. Dies ist für den technischen Betrieb zwingend notwendig.
 
