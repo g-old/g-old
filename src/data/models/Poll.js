@@ -356,10 +356,10 @@ class Poll {
 
       if (pollingMode.thresholdRef === 'all') {
         // TODO change completely in case of group model
-        if (data.workTeamId) {
+        if (data.workteamId) {
           numVoter = await knex('user_work_teams')
             .transacting(transaction)
-            .where({ work_team_id: data.workTeamId })
+            .where({ work_team_id: data.workteamId })
             .join('users', 'users.id', 'user_work_teams.user_id') // bc also viewers can be members
             .whereRaw('users.groups & ? > 0', [Groups.VIEWER]) // TODO whitelist
             .count('users.id');

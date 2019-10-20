@@ -64,7 +64,7 @@ const discussionFields = `
   createdAt
   closedAt
   numComments
-  workTeamId
+  workteamId
   content
   author{
     ${userFields}
@@ -126,7 +126,7 @@ const proposalFields = `
     image
     state
     body
-    workTeamId
+    workteamId
     pollOne {${pollFieldsForList}}
     pollTwo {${pollFieldsForList}}`;
 
@@ -142,7 +142,7 @@ const discussionConnection = `discussionConnection(closed:$closed, workteamId:$i
       }
     }`;
 
-const proposalConnection = `proposalConnection(state:$state workTeamId:$id){
+const proposalConnection = `proposalConnection(state:$state workteamId:$id){
       pageInfo{
         endCursor
         hasNextPage
@@ -154,7 +154,7 @@ const proposalConnection = `proposalConnection(state:$state workTeamId:$id){
       }
     }`;
 
-const surveyConnection = `surveyConnection: proposalConnection(state:"survey" workTeamId:$id){
+const surveyConnection = `surveyConnection: proposalConnection(state:"survey" workteamId:$id){
       pageInfo{
         endCursor
         hasNextPage

@@ -46,9 +46,9 @@ const DiscussionType = new ObjectType({
     workTeam: {
       type: WorkTeamType,
       resolve: (data, args, { viewer, loaders }) =>
-        WorkTeam.gen(viewer, data.workTeamId, loaders),
+        WorkTeam.gen(viewer, data.workteamId, loaders),
     },
-    workTeamId: {
+    workteamId: {
       type: ID,
     },
     // TODO or more
@@ -71,7 +71,7 @@ const DiscussionType = new ObjectType({
         // experimental!
         if (
           viewer &&
-          viewer.wtMemberships.includes(data.workTeamId) &&
+          viewer.wtMemberships.includes(data.workteamId) &&
           !data.deletedAt
         ) {
           return (

@@ -20,7 +20,7 @@ type ProposalRowType = $Shape<ProposalProps>;
 type ProposalInputArgs = {
   id?: ID,
   poll?: $Shape<PollShape>,
-  workTeamId: ID,
+  workteamId: ID,
   state: ProposalStateType,
 };
 async function getResource(viewer, id, loaders, Model, tableName, trx) {
@@ -59,7 +59,7 @@ class Proposal {
 
   notifiedAt: string;
 
-  workTeamId: ID;
+  workteamId: ID;
 
   teamId: ID;
 
@@ -79,7 +79,7 @@ class Proposal {
     this.createdAt = data.created_at;
     this.spokesmanId = data.spokesman_id;
     this.notifiedAt = data.notified_at;
-    this.workTeamId = data.work_team_id;
+    this.workteamId = data.work_team_id;
     this.deletedAt = data.deleted_at;
     this.updatedAt = data.updated_at;
     this.summary = data.summary;
@@ -168,10 +168,10 @@ class Proposal {
       throw new Error('proposal-not-available');
     }
     let workTeam;
-    if (oldProposal.workTeamId) {
+    if (oldProposal.workteamId) {
       workTeam = await getResource(
         viewer,
-        oldProposal.workTeamId,
+        oldProposal.workteamId,
         loaders,
         WorkTeam,
         'work_teams',
@@ -247,8 +247,8 @@ class Proposal {
         viewer,
         proposal,
         ...(newValues.state && { info: { newState: newValues.state } }),
-        ...(data.workTeamId && { groupId: data.workTeamId }),
-        subjectId: data.workTeamId,
+        ...(data.workteamId && { groupId: data.workteamId }),
+        subjectId: data.workteamId,
       });
     }
     return proposal;
@@ -259,8 +259,8 @@ class Proposal {
     // throw Error('TestError');
     // authorize
     let workTeam;
-    if (data.workTeamId) {
-      workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
+    if (data.workteamId) {
+      workTeam = await WorkTeam.gen(viewer, data.workteamId, loaders);
     }
     if (!canMutate(viewer, { ...data, workTeam }, Models.PROPOSAL)) return null;
     // validate
@@ -280,8 +280,8 @@ class Proposal {
       newData.image = data.image;
     }
 
-    if (data.workTeamId) {
-      newData.work_team_id = data.workTeamId;
+    if (data.workteamId) {
+      newData.work_team_id = data.workteamId;
     }
 
     if (data.spokesmanId) {
@@ -309,7 +309,7 @@ class Proposal {
         {
           ...data.poll,
           pollingModeId: pollingMode.id,
-          workTeamId: data.workTeamId,
+          workteamId: data.workteamId,
         },
         loaders,
         trx,
@@ -334,11 +334,11 @@ class Proposal {
           );
         }
 
-        if (data.workTeamId && proposal.state !== 'survey') {
+        if (data.workteamId && proposal.state !== 'survey') {
           await knex('work_teams')
             .transacting(trx)
             .forUpdate()
-            .where({ id: data.workTeamId })
+            .where({ id: data.workteamId })
             .increment('num_proposals', 1);
         }
       }
@@ -352,8 +352,8 @@ class Proposal {
       EventManager.publish('onProposalCreated', {
         viewer,
         proposal,
-        ...(data.workTeamId && { groupId: data.workTeamId }),
-        subjectId: data.workTeamId,
+        ...(data.workteamId && { groupId: data.workteamId }),
+        subjectId: data.workteamId,
       });
     }
     return proposal;
@@ -462,11 +462,11 @@ class Proposal {
           .del();
 
         // decrement counters
-        if (proposalInDB.workTeamId && proposalInDB.state !== 'survey') {
+        if (proposalInDB.workteamId && proposalInDB.state !== 'survey') {
           await knex('work_teams')
             .transacting(transaction)
             .forUpdate()
-            .where({ id: proposalInDB.workTeamId })
+            .where({ id: proposalInDB.workteamId })
             .decrement('num_proposals', 1);
         }
       }
@@ -480,10 +480,10 @@ class Proposal {
   async isVotable(viewer) {
     if (['proposed', 'voting', 'survey'].indexOf(this.state) !== -1 && viewer) {
       // eslint-disable-next-line no-bitwise
-      if (this.workTeamId && viewer.groups & Groups.VIEWER) {
+      if (this.workteamId && viewer.groups & Groups.VIEWER) {
         // TODO try to find a better way since it cannot be cached easily and voting isF common
         const [data = null] = await knex('user_work_teams')
-          .where({ user_id: viewer.id, work_team_id: this.workTeamId })
+          .where({ user_id: viewer.id, work_team_id: this.workteamId })
           .select('created_at');
 
         if (data && data.created_at) {
@@ -510,14 +510,14 @@ const makeVisibleForMainteam = async proposal => {
     if (!proposal) {
       throw new Error('Proposal not existing');
     }
-    if (proposal.workTeamId) {
+    if (proposal.workteamId) {
       const [mainId = null] = await knex('work_teams')
         .where({ main: true })
         .pluck('id');
 
       if (mainId) {
         // eslint-disable-next-line eqeqeq
-        if (mainId == proposal.workTeamId) {
+        if (mainId == proposal.workteamId) {
           return Promise.resolve();
         }
         return knex('proposal_groups').insert({

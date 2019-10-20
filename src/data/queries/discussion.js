@@ -19,7 +19,7 @@ const discussion = {
       return {
         id: result.id,
         deletedAt: result.deletedAt,
-        workTeamId: result.workTeamId,
+        workteamId: result.workteamId,
       };
     }
     result.parentId = parentId; // to pass args to subresolver

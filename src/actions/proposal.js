@@ -148,8 +148,8 @@ query{
 `;
 
 const proposalConnection = `
-query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID $closed:Boolean $approvalState:Int) {
-  proposalConnection (state:$state first:$first after:$after tagId:$tagId workTeamId:$workTeamId closed:$closed approvalState:$approvalState) {
+query ($state:String $first:Int, $after:String, $tagId:ID $workteamId:ID $closed:Boolean $approvalState:Int) {
+  proposalConnection (state:$state first:$first after:$after tagId:$tagId workteamId:$workteamId closed:$closed approvalState:$approvalState) {
     pageInfo{
       endCursor
       hasNextPage
@@ -165,7 +165,7 @@ query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID $closed
         summary
         approvalState
         body
-        workTeamId,
+        workteamId,
         tags{
           displayName
           id
@@ -181,8 +181,8 @@ query ($state:String $first:Int, $after:String, $tagId:ID $workTeamId:ID $closed
 `;
 
 const createProposalMutation = `
-mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput] $spokesmanId:ID $workTeamId:ID $summary:String $image:String){
-  createProposal (proposal:{title:$title workTeamId:$workTeamId text:$text state:$state poll:$poll tags:$tags spokesmanId:$spokesmanId summary:$summary image:$image}){
+mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $tags:[TagInput] $spokesmanId:ID $workteamId:ID $summary:String $image:String){
+  createProposal (proposal:{title:$title workteamId:$workteamId text:$text state:$state poll:$poll tags:$tags spokesmanId:$spokesmanId summary:$summary image:$image}){
     ${proposal}
     tags{
       id
@@ -194,8 +194,8 @@ mutation( $title: String, $text:String, $state:ProposalState $poll:PollInput $ta
 `;
 
 const updateProposalMutation = `
-mutation($id:ID  $poll:PollInput $state:ProposalState $workTeamId:ID $approvalState:Int ){
-  updateProposal (proposal:{ id:$id poll:$poll state:$state workTeamId:$workTeamId approvalState:$approvalState}){
+mutation($id:ID  $poll:PollInput $state:ProposalState $workteamId:ID $approvalState:Int ){
+  updateProposal (proposal:{ id:$id poll:$poll state:$state workteamId:$workteamId approvalState:$approvalState}){
     ${proposal}
     tags{
       id
@@ -251,7 +251,7 @@ export function loadProposalsList({
   first,
   after,
   tagId,
-  workTeamId,
+  workteamId,
   closed,
   approvalState,
 }) {
@@ -263,7 +263,7 @@ export function loadProposalsList({
       'proposals',
       genProposalPageKey({
         state,
-        workteamId: workTeamId,
+        workteamId,
         closed,
         approvalState,
         tagId,
@@ -276,7 +276,7 @@ export function loadProposalsList({
     }
     const pageKey = genProposalPageKey({
       state,
-      workteamId: workTeamId,
+      workteamId,
       approvalState,
       closed,
       tagId,
@@ -287,14 +287,13 @@ export function loadProposalsList({
       filter: state,
       pageKey,
     });
-
     try {
       const { data } = await graphqlRequest(proposalConnection, {
         state,
         first,
         after,
         tagId,
-        workTeamId,
+        workteamId,
         closed,
         approvalState,
       });

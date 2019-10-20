@@ -30,12 +30,19 @@ export type tActivityVerb = $Values<typeof ActivityVerb>;
 
 class Activity {
   id: ID;
+
   actorId: ID;
+
   verb: $Values<typeof ActivityVerb>;
+
   objectId: ID;
+
   type: ID;
+
   content: {};
+
   createdAt: string;
+
   subjectId: ID;
 
   constructor(data) {
@@ -48,6 +55,7 @@ class Activity {
     this.createdAt = data.created_at;
     this.subjectId = data.subject_id;
   }
+
   static async gen(viewer, id, { activities }) {
     const data = await activities.load(id);
     if (data === null) return null;
@@ -77,7 +85,7 @@ class Activity {
       EventManager.publish('onActivityCreated', {
         viewer,
         activity: newActivity,
-        ...(data.workTeamId && { workTeamId: data.workTeamId }),
+        ...(data.workteamId && { workteamId: data.workteamId }),
         subjectId: data.subjectId,
       });
     }

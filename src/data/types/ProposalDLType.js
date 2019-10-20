@@ -56,14 +56,14 @@ const ProposalType = new ObjectType({
             .then(tagIds => tagIds.map(tId => Tag.gen(viewer, tId, loaders))),
         ),
     },
-    workTeamId: {
+    workteamId: {
       type: ID,
     },
     workteam: {
       type: WorkTeamType,
       resolve: (parent, args, { viewer, loaders }) =>
-        parent.workTeamId
-          ? WorkTeam.gen(viewer, parent.workTeamId, loaders)
+        parent.workteamId
+          ? WorkTeam.gen(viewer, parent.workteamId, loaders)
           : null,
     },
     pollOne: {

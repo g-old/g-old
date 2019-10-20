@@ -66,7 +66,7 @@ class Comment {
     if (
       !canSee(
         viewer,
-        { ...data, discussion: { workTeamId: discussion.work_team_id } },
+        { ...data, discussion: { workteamId: discussion.work_team_id } },
         Models.COMMENT,
       )
     )
@@ -87,7 +87,7 @@ class Comment {
         {
           ...data,
           discussion: {
-            workTeamId: discussion.work_team_id,
+            workteamId: discussion.work_team_id,
             closedAt: discussion.closed_at,
           },
           creating: true,
@@ -98,7 +98,7 @@ class Comment {
       return null;
     }
 
-    let workTeamId;
+    let workteamId;
     const commentInDB = await knex.transaction(async trx => {
       const content = data.content.substring(0, MAX_CONTENT_LENGTH);
 
@@ -114,7 +114,7 @@ class Comment {
         .returning('*');
 
       if (comment) {
-        [workTeamId] = await knex('discussions')
+        [workteamId] = await knex('discussions')
           .where({ id: data.discussionId })
           .transacting(trx)
           .forUpdate()
@@ -133,13 +133,13 @@ class Comment {
     });
 
     const comment = commentInDB ? new Comment(commentInDB) : null;
-    if (comment && workTeamId) {
+    if (comment && workteamId) {
       EventManager.publish('onCommentCreated', {
         viewer,
         comment,
         subjectId: data.discussionId,
-        groupId: workTeamId,
-        info: { workTeamId },
+        groupId: workteamId,
+        info: { workteamId },
       });
     }
 
@@ -204,7 +204,7 @@ class Comment {
       return null;
     }
 
-    let workTeamId;
+    let workteamId;
     let replyIds;
     const commentInDB = await knex.transaction(async trx => {
       // search for replies - pass ids as eventprops;
@@ -221,7 +221,7 @@ class Comment {
           .transacting(trx)
           .forUpdate()
           .decrement('num_replies', 1);
-        [workTeamId = null] = await knex('discussions')
+        [workteamId = null] = await knex('discussions')
           .where({ id: oldComment.discussion_id })
           .transacting(trx)
           .forUpdate()
@@ -233,7 +233,7 @@ class Comment {
           .where({ parent_id: oldComment.id })
           .pluck('id');
 
-        [workTeamId = null] = await knex('discussions')
+        [workteamId = null] = await knex('discussions')
           .where({ id: oldComment.discussion_id })
           .transacting(trx)
           .forUpdate()
@@ -248,13 +248,13 @@ class Comment {
       return statusOK;
     });
     const comment = commentInDB ? new Comment(commentInDB) : null;
-    if (comment && workTeamId) {
+    if (comment && workteamId) {
       EventManager.publish('onCommentDeleted', {
         viewer,
         comment: { ...comment, replyIds },
         subjectId: data.discussionId,
-        groupId: workTeamId,
-        info: { workTeamId, replyIds },
+        groupId: workteamId,
+        info: { workteamId, replyIds },
       });
     }
     return comment;

@@ -26,7 +26,7 @@ describe('Discussion', () => {
         .insert(createTestUser({ groups: Groups.RELATOR }))
         .returning('id');
       const actor = createTestActor({ id: vId, groups: Groups.RELATOR });
-      const testData = { workTeamId: wtId, title: 'title', content: 'content' };
+      const testData = { workteamId: wtId, title: 'title', content: 'content' };
       const discussion = await Discussion.create(
         actor,
         testData,

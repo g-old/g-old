@@ -25,7 +25,7 @@ const proposal = {
     if (result.deletedAt) {
       return {
         id: result.id,
-        workTeamId: result.workTeamId,
+        workteamId: result.workteamId,
         deletedAt: result.deletedAt,
       };
     }

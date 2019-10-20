@@ -69,7 +69,7 @@ id
       state
       body
       votes
-      workTeamId
+      workteamId
       deletedAt
       image
       summary

@@ -29,7 +29,7 @@ class Discussion {
 
   authorId: ID;
 
-  workTeamId: ID;
+  workteamId: ID;
 
   content: string;
 
@@ -47,7 +47,7 @@ class Discussion {
     this.id = data.id;
     this.title = data.title;
     this.authorId = data.author_id;
-    this.workTeamId = data.work_team_id;
+    this.workteamId = data.work_team_id;
     this.content = data.content;
     this.numComments = data.num_comments;
     this.createdAt = data.created_at;
@@ -69,15 +69,15 @@ class Discussion {
   static async create(viewer, data, loaders, trx) {
     if (!data) return null;
     let workTeam;
-    if (data.workTeamId) {
+    if (data.workteamId) {
       if (trx) {
         const [queryResult = null] = await knex('work_teams')
           .transacting(trx)
-          .where({ id: data.workTeamId })
+          .where({ id: data.workteamId })
           .select('*');
         workTeam = queryResult ? new WorkTeam(queryResult) : null;
       } else {
-        workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
+        workTeam = await WorkTeam.gen(viewer, data.workteamId, loaders);
       }
     }
 
@@ -99,7 +99,7 @@ class Discussion {
       author_id: data.authorId || viewer.id,
       title: data.title.trim(),
       content: sanitize(data.content.trim()),
-      work_team_id: data.workTeamId,
+      work_team_id: data.workteamId,
       created_at: new Date(),
     };
 
@@ -111,7 +111,7 @@ class Discussion {
       if (discussion) {
         await knex('work_teams')
           .transacting(transaction)
-          .where({ id: data.workTeamId })
+          .where({ id: data.workteamId })
           .increment('num_discussions', 1);
       }
       return discussion;
@@ -124,8 +124,8 @@ class Discussion {
       EventManager.publish('onDiscussionCreated', {
         viewer,
         discussion,
-        groupId: discussion.workTeamId,
-        subjectId: discussion.workTeamId,
+        groupId: discussion.workteamId,
+        subjectId: discussion.workteamId,
       });
     }
 
@@ -135,8 +135,8 @@ class Discussion {
   static async update(viewer, data, loaders) {
     if (!data || !data.id) return null;
     let workTeam;
-    if (data.workTeamId) {
-      workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
+    if (data.workteamId) {
+      workTeam = await WorkTeam.gen(viewer, data.workteamId, loaders);
     }
 
     if (
@@ -174,8 +174,8 @@ class Discussion {
   static async delete(viewer, data, loaders, trx) {
     if (!data || !data.id) return null;
     let workTeam;
-    if (data.workTeamId) {
-      workTeam = await WorkTeam.gen(viewer, data.workTeamId, loaders);
+    if (data.workteamId) {
+      workTeam = await WorkTeam.gen(viewer, data.workteamId, loaders);
     }
 
     if (
@@ -222,7 +222,7 @@ class Discussion {
         await knex('work_teams')
           .transacting(transaction)
           .forUpdate()
-          .where({ id: discussion.workTeamId })
+          .where({ id: discussion.workteamId })
           .decrement('num_discussions', 1);
       }
       return discussion;

@@ -104,9 +104,9 @@ class Statement {
         statement: deletedStatement,
         subjectId: proposal.id,
 
-        ...(proposal.workTeamId && {
-          groupId: proposal.workTeamId,
-          info: { workTeamId: proposal.workTeamId },
+        ...(proposal.workteamId && {
+          groupId: proposal.workteamId,
+          info: { workteamId: proposal.workteamId },
         }),
       });
     }
@@ -165,9 +165,9 @@ class Statement {
         viewer,
         statement,
         subjectId: proposal.id,
-        ...(proposal.workTeamId && {
-          groupId: proposal.workTeamId,
-          info: { workTeamId: proposal.workTeamId },
+        ...(proposal.workteamId && {
+          groupId: proposal.workteamId,
+          info: { workteamId: proposal.workteamId },
         }),
       });
     }
@@ -228,9 +228,9 @@ class Statement {
         viewer,
         statement,
         subjectId: proposal.id,
-        ...(proposal.workTeamId && {
-          groupId: proposal.workTeamId,
-          info: { workTeamId: proposal.workTeamId },
+        ...(proposal.workteamId && {
+          groupId: proposal.workteamId,
+          info: { workteamId: proposal.workteamId },
         }),
       });
     }

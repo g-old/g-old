@@ -22,7 +22,7 @@ const allProposals = createConnection(
           [args.tagId],
         ),
       )
-        .where({ work_team_id: args.workTeamId || null })
+        .where({ work_team_id: args.workteamId || null })
         .whereRaw('(proposals.created_at, proposals.id) < (?,?)', [
           cursorDate,
           cursorId,
@@ -49,7 +49,7 @@ const allProposals = createConnection(
           //  .where({ 'polls.closed_at': null }) TODO find some other way to p1 to p2 transitioning
 
           .where({
-            work_team_id: args.workTeamId || null,
+            work_team_id: args.workteamId || null,
             'proposals.deleted_at': null,
           })
           .modify(queryBuilder => {
@@ -81,7 +81,7 @@ const allProposals = createConnection(
             });
           })
 
-          .where({ work_team_id: args.workTeamId || null })
+          .where({ work_team_id: args.workteamId || null })
           .modify(queryBuilder => {
             if (args.approvalState) {
               queryBuilder.where({ approval_state: args.approvalState });
@@ -109,7 +109,7 @@ const allProposals = createConnection(
               );
             });
           })
-          .where({ work_team_id: args.workTeamId || null })
+          .where({ work_team_id: args.workteamId || null })
           .whereRaw('(polls.closed_at, polls.id) < (?,?)', [
             cursorDate,
             cursorId,
@@ -122,7 +122,7 @@ const allProposals = createConnection(
       case 'survey': {
         proposals = await knex('proposals')
           .innerJoin('polls', 'proposals.poll_one_id', 'polls.id')
-          .where({ work_team_id: args.workTeamId || null })
+          .where({ work_team_id: args.workteamId || null })
           .where('proposals.state', '=', 'survey')
           .modify(queryBuilder => {
             if (args.closed) {
@@ -153,7 +153,7 @@ const allProposals = createConnection(
               );
             });
           })
-          .whereNot({ work_team_id: args.workTeamId })
+          .whereNot({ work_team_id: args.workteamId })
           .whereNotNull('work_team_id')
           .whereNull('proposals.deleted_at')
           .where('proposals.state', '=', 'accepted')
@@ -177,7 +177,7 @@ const allProposals = createConnection(
               );
             });
           })
-          .where({ work_team_id: args.workTeamId || null })
+          .where({ work_team_id: args.workteamId || null })
           .modify(queryBuilder => {
             if (args.approvalState) {
               queryBuilder.where({ approval_state: args.approvalState });
@@ -200,7 +200,7 @@ const allProposals = createConnection(
     tagId: {
       type: GraphQLID,
     },
-    workTeamId: {
+    workteamId: {
       type: GraphQLID,
     },
     closed: {

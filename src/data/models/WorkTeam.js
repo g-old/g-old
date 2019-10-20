@@ -417,7 +417,7 @@ class WorkTeam {
           title: proposal.title,
           authorId: proposal.spokesmanId,
           content: proposal.body,
-          workTeamId: workteam.id,
+          workteamId: workteam.id,
         },
         loaders,
         transaction,

@@ -38,16 +38,16 @@ const addProposalInfo = async (viewer, loaders, pollId, data = {}) => {
   );
 };
 
-const addWorkTeamInfo = async (viewer, loaders, workTeamId) => {
-  if (!workTeamId) {
+const addWorkTeamInfo = async (viewer, loaders, workteamId) => {
+  if (!workteamId) {
     return JSON.stringify({});
   }
-  const data = await WorkTeam.gen(viewer, workTeamId, loaders);
+  const data = await WorkTeam.gen(viewer, workteamId, loaders);
 
   return JSON.stringify(
     data
       ? {
-          workTeamId: data.id,
+          workteamId: data.id,
           name: data.name,
           logo: data.logo,
           itName: data.itName,
@@ -67,7 +67,7 @@ const addDiscussionInfo = async (viewer, loaders, discussionId) => {
   return JSON.stringify(
     data
       ? {
-          workTeamId: data.workTeamId,
+          workteamId: data.workteamId,
           title: data.title,
         }
       : {},
@@ -153,7 +153,7 @@ const ActivityType = new GraphQLObjectType({
             return new Proposal({
               id: result.id,
               deleted_at: result.deletedAt,
-              work_team_id: result.workTeamId,
+              work_team_id: result.workteamId,
             });
           }
 
@@ -174,7 +174,7 @@ const ActivityType = new GraphQLObjectType({
             return new Discussion({
               id: result.id,
               deleted_at: result.deletedAt,
-              work_team_id: result.workTeamId,
+              work_team_id: result.workteamId,
             });
           }
 
@@ -214,11 +214,11 @@ const ActivityType = new GraphQLObjectType({
             });
           }
           case AType.PROPOSAL: {
-            return addWorkTeamInfo(viewer, loaders, parent.content.workTeamId);
+            return addWorkTeamInfo(viewer, loaders, parent.content.workteamId);
           }
 
           case AType.DISCUSSION: {
-            return addWorkTeamInfo(viewer, loaders, parent.content.workTeamId);
+            return addWorkTeamInfo(viewer, loaders, parent.content.workteamId);
           }
           case AType.COMMENT: {
             return addDiscussionInfo(

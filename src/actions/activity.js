@@ -52,7 +52,7 @@ __typename
   state
   body
   votes
-  workTeamId
+  workteamId
   deletedAt
   pollOne {
     ${pollFieldsForList}

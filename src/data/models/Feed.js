@@ -54,8 +54,8 @@ const aggregateActivities = (activities, viewer) =>
       // TODO make groupId field on activities?
       if (
         curr.content &&
-        curr.content.workTeamId &&
-        !viewer.wtMemberships.includes(curr.content.workTeamId)
+        curr.content.workteamId &&
+        !viewer.wtMemberships.includes(curr.content.workteamId)
       ) {
         return agg;
       }

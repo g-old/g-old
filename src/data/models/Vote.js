@@ -121,9 +121,9 @@ class Vote {
       EventManager.publish('onVoteDeleted', {
         viewer,
         vote: delVote,
-        ...(proposal.workTeamId && {
-          groupId: proposal.workTeamId,
-          info: { workTeamId: proposal.workTeamId },
+        ...(proposal.workteamId && {
+          groupId: proposal.workteamId,
+          info: { workteamId: proposal.workteamId },
         }),
       });
     }
@@ -131,9 +131,9 @@ class Vote {
       EventManager.publish('onStatementDeleted', {
         viewer,
         statement: deletedStatement,
-        ...(proposal.workTeamId && {
-          groupId: proposal.workTeamId,
-          info: { workTeamId: proposal.workTeamId },
+        ...(proposal.workteamId && {
+          groupId: proposal.workteamId,
+          info: { workteamId: proposal.workteamId },
         }),
       });
     }
@@ -304,9 +304,9 @@ class Vote {
           extended: poll.extended,
           ...(poll.extended ? { positionAdded: data.positions[0].value } : {}),
         }, // or save only voteInput
-        ...(proposal.workTeamId && {
-          groupId: proposal.workTeamId,
-          info: { workTeamId: proposal.workTeamId },
+        ...(proposal.workteamId && {
+          groupId: proposal.workteamId,
+          info: { workteamId: proposal.workteamId },
         }),
       });
     }
@@ -315,9 +315,9 @@ class Vote {
         viewer,
         subjectId: proposal.id,
         statement: deletedStatement,
-        ...(proposal.workTeamId && {
-          groupId: proposal.workTeamId,
-          info: { workTeamId: proposal.workTeamId },
+        ...(proposal.workteamId && {
+          groupId: proposal.workteamId,
+          info: { workteamId: proposal.workteamId },
         }),
       });
     }
@@ -407,9 +407,9 @@ class Vote {
         viewer,
         vote: { ...newVote, extended: poll.extended },
 
-        ...(proposal.workTeamId && {
-          groupId: proposal.workTeamId,
-          info: { workTeamId: proposal.workTeamId },
+        ...(proposal.workteamId && {
+          groupId: proposal.workteamId,
+          info: { workteamId: proposal.workteamId },
         }),
       });
     }

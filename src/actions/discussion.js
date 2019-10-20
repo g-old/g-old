@@ -31,7 +31,7 @@ export const discussionFields = `
   deletedAt
   updatedAt
   numComments
-  workTeamId
+  workteamId
   content
   author{
     ${userFields}
@@ -74,8 +74,8 @@ const discussionQuery = `query($id:ID $parentId:ID){
   }
 }`;
 
-const createDiscussionMutation = `mutation($workTeamId:ID $content:String $title:String){
-  createDiscussion(discussion:{workTeamId:$workTeamId content:$content title:$title}){
+const createDiscussionMutation = `mutation($workteamId:ID $content:String $title:String){
+  createDiscussion(discussion:{workteamId:$workteamId content:$content title:$title}){
     ${discussionFragment}
   }
 }`;
