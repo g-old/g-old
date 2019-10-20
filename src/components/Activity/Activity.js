@@ -85,7 +85,7 @@ function renderGroupHeader(info, title, locale) {
     <Box align between className={s.groupHeader}>
       <Button
         plain
-        onClick={() => history.push(`/workteams/${info.workTeamId}`)}
+        onClick={() => history.push(`/workteams/${info.workteamId}`)}
       >
         {info.logo ? (
           'IMPLEMENT LOGO'
@@ -171,7 +171,7 @@ class Activity extends React.Component {
       state: PropTypes.string,
       pollId: PropTypes.string,
       position: PropTypes.string,
-      workTeamId: PropTypes.string,
+      workteamId: PropTypes.string,
       discussionId: PropTypes.string,
     }),
     info: PropTypes.string.isRequired,
@@ -252,14 +252,14 @@ class Activity extends React.Component {
     );
   }
 
-  renderComment(workTeamId) {
+  renderComment(workteamId) {
     const { content } = this.props;
     const parent = content.parentId;
     const child = parent ? content.id : null;
 
     return (
       <Link // eslint-disable-line
-        to={`/workteams/${workTeamId}/discussions/${
+        to={`/workteams/${workteamId}/discussions/${
           content.discussionId
         }?comment=${parent || content.id}${child ? `&child=${child}` : ''}`}
       >
@@ -303,7 +303,7 @@ class Activity extends React.Component {
           />
         );
         let header = getProposalHeader(verb, content);
-        if (content.workTeamId) {
+        if (content.workteamId) {
           header = renderGroupHeader(infoData, header, locale);
         }
         result.header = header;
@@ -323,7 +323,7 @@ class Activity extends React.Component {
             discussion={content}
             onClick={() =>
               history.push(
-                `/workteams/${infoData.workTeamId}/discussions/${content.id}`,
+                `/workteams/${infoData.workteamId}/discussions/${content.id}`,
               )
             }
           />
@@ -338,7 +338,7 @@ class Activity extends React.Component {
       }
 
       case 'Comment': {
-        result.content = this.renderComment(infoData.workTeamId);
+        result.content = this.renderComment(infoData.workteamId);
         result.header = infoData.title;
         break;
       }

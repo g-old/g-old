@@ -30,7 +30,7 @@ class Request extends React.Component {
   componentWillReceiveProps({ workTeam, updates = {} }) {
     const newUpdates = {};
     if (updates.success && !this.props.updates.success) {
-      // h istory.push(`/workteams/${this.props.workTeamId}/admin`);
+      // h istory.push(`/workteams/${this.props.workteamId}/admin`);
       this.props.onCancel();
     }
     if (updates.error && !this.props.updates.error) {

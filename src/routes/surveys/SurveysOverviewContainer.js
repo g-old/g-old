@@ -90,7 +90,7 @@ class SurveysOverviewContainer extends React.Component {
 // TODO implement memoiziation with reselect
 const mapStateToProps = (state, { filter }) => ({
   surveys: getVisibleProposals(state, 'survey')
-    .filter(s => surveyStateFilter(s, filter) && !s.workTeamId)
+    .filter(s => surveyStateFilter(s, filter) && !s.workteamId)
     .sort(filter === 'active' ? sortActiveProposals : sortClosedProposals),
   pageInfo: getResourcePageInfo(
     state,

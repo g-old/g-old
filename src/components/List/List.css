@@ -19,6 +19,6 @@
   }
 
   :active {
-    background-color: var(--color-clicked);
+    background-color: var(--color-brand-light-shade-2);
   }
 }

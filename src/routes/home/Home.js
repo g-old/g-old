@@ -230,7 +230,7 @@ Tagen nach Verabschiedung von 300 Promotoren verlangt wird.`}
 
 const mapStateToProps = (state, { filter = '' }) => ({
   proposals: getVisibleProposals(state, 'active')
-    .filter(p => !p.workTeamId)
+    .filter(p => !p.workteamId)
     .sort(filter === 'active' ? sortActiveProposals : sortClosedProposals),
   pageInfo: getResourcePageInfo(
     state,

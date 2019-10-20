@@ -1,3 +1,5 @@
+@import '../variables';
+
 .root {
   margin-left: 0.15rem;
   box-shadow: 0 0 0 2px white;
@@ -5,5 +7,5 @@
   height: 2.2rem;
   width: 2.2rem;
   vertical-align: bottom;
-  stroke: #e9ca57;
+  stroke: var(--color-brand-dark-shade);
 }

@@ -35,7 +35,7 @@ class DiscussionPreview extends React.Component {
       title: PropTypes.string.isRequired,
       createdAt: PropTypes.string,
       numComments: PropTypes.number.isRequired,
-      workTeamId: PropTypes.string.isRequired,
+      workteamId: PropTypes.string.isRequired,
     }).isRequired,
     onClick: PropTypes.func.isRequired,
   };
@@ -50,7 +50,7 @@ class DiscussionPreview extends React.Component {
     if (onClick) {
       onClick({
         discussionId: discussion.id,
-        workTeamId: discussion.workTeamId,
+        workteamId: discussion.workteamId,
       });
     }
   }

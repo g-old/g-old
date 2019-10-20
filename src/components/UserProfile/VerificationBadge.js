@@ -6,7 +6,7 @@ import Button from '../Button/Button';
 
 const messages = defineMessages({
   verify: {
-    id: 'labels.verify',
+    id: 'labels.verifyMe',
     defaultMessage: 'Verify me',
     description: 'Label to open verification process',
   },

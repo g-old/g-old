@@ -82,7 +82,7 @@ Recaptcha ermöglicht es uns effektiv zu unterscheiden, ob jemand, der sich auf 
 
 ## Warum wir personenbezogene Daten verarbeiten
 
-Die auf der Webseite angebotenen Möglichkeiten der Mitwirkung und Abstimmung über Vorschläge sind nur dann aussagekräftig, wenn wir die Benutzer verifizieren können. Auch zur Vermeidung vorn Mehrfachanmeldungen führen wir ein Verifizierungsverfahren durch. Dazu muss das Foto eines Dokuments hochgeladen werden, welches die Wahlvoraussetzungen belegen soll. Auf das Foto können nur bestimmte Personen zugreifen. Das Foto wird sofort automatisch nach dem Verifizierungsvorgang gelöscht - unabhängig von dessen Ergebnis.
+Die auf der Webseite angebotenen Möglichkeiten der Mitwirkung und Abstimmung über Vorschläge sind nur dann aussagekräftig, wenn wir die Benutzer verifizieren und Mehrfachanmeldungen verhindern können. Die für die Verifizierung gelieferten Daten sind nur für die dafür vorgesehenen Mitarbeiter zugänglich, sie werden nur zum Zwecke der Verifizierung des Kontoinhabers bearbeiter und sofort danach automatisch gelöscht.
 Datenbackups, die zum Betrieb der Webseite notwendig sind, werden nach einer kurzen Zeit ebenfalls gelöscht.
 
 ## Wo wir Ihre Daten verarbeiten

@@ -124,8 +124,8 @@ class Navigation extends React.Component {
     const { activityCounter, path, user } = this.props;
 
     const links = [];
-
-    if (user && user.id) {
+    // or check for VIEWER-Group...
+    if (user && user.emailVerified) {
       links.push(contents.map(p => makeLink(p, path, activityCounter)));
     }
     links.push(

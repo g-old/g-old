@@ -1,5 +1,5 @@
 ---
-title: About Us
+title: Über uns
 component: ContentPage
 ---
 

@@ -13,6 +13,7 @@
   background-image: linear-gradient(to bottom, var(--color-brand), #4d702fdb);
   min-width: 0;
   border: none;
+  border-radius: 0;
 
   fieldset {
     box-shadow: 0 4px 16px 0 #3333337a;

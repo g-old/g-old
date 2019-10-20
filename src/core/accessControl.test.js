@@ -164,7 +164,7 @@ describe('proposalReadControl', () => {
   it('Should deny access to protected proposals', () => {
     const testViewer = createTestActor({ groups: Groups.VIEWER });
     const testData = {
-      workTeamId: 1,
+      workteamId: 1,
     };
     expect(canSee(testViewer, testData, Models.PROPOSAL)).toBe(false);
   });
@@ -174,7 +174,7 @@ describe('proposalReadControl', () => {
       memberships: 1,
     });
     const testData = {
-      workTeamId: 1,
+      workteamId: 1,
     };
     expect(canSee(testViewer, testData, Models.PROPOSAL)).toBe(true);
   });

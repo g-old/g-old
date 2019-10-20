@@ -17,7 +17,7 @@ export const feedOptions = [
     ],
     contentModifier: (resource, info) => ({
       ...resource,
-      workTeamId: info.workTeamId,
+      workteamId: info.workteamId,
     }),
   },
   {
@@ -41,7 +41,7 @@ export const feedOptions = [
     ],
     contentModifier: (resource, info) => ({
       ...resource,
-      workTeamId: info.workTeamId,
+      workteamId: info.workteamId,
     }),
   },
   {
@@ -61,7 +61,7 @@ export const feedOptions = [
     ],
     contentModifier: (resource, info) => ({
       ...resource,
-      workTeamId: info.workTeamId,
+      workteamId: info.workteamId,
     }),
   },
 ];
@@ -97,9 +97,11 @@ class ActivityService {
       this.registerResources(resourcePresets);
     }
   }
+
   registerResources(options) {
     options.map(presets => this.register(presets));
   }
+
   register(resource) {
     if (this.checkPreset(resource)) {
       resource.events.map(event =>
@@ -120,6 +122,7 @@ class ActivityService {
       this.createListener(event, resourceName, modifier),
     );
   }
+
   createListener(event, resourceType, modifier) {
     const feedField = event.mainFeed ? 'main_activities' : 'activities';
 
@@ -134,7 +137,7 @@ class ActivityService {
           : payload[resourceType],
         objectId: payload[resourceType] && payload[resourceType].id,
         verb: event.eventType,
-        workTeamId: payload.groupId,
+        workteamId: payload.groupId,
         subjectId: payload.subjectId,
       };
       try {

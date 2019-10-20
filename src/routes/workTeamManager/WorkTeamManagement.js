@@ -199,12 +199,12 @@ class WorkTeamManagement extends React.Component {
 
   handleLoadMore({ after }) {
     const { loadProposalsList: loadProposals, id } = this.props;
-    loadProposals({ after, state: 'pending', workTeamId: id });
+    loadProposals({ after, state: 'pending', workteamId: id });
   }
 
   handleLoadProposals() {
     const { loadProposalsList: loadProposals, id } = this.props;
-    loadProposals({ state: 'pending', workTeamId: id });
+    loadProposals({ state: 'pending', workteamId: id });
   }
 
   canAccess() {
@@ -235,7 +235,7 @@ class WorkTeamManagement extends React.Component {
     const { loadProposalsList: loadProposals, id } = this.props;
     loadProposals({
       state: 'active',
-      workTeamId: id,
+      workteamId: id,
       after,
     });
   }
@@ -268,7 +268,7 @@ class WorkTeamManagement extends React.Component {
           <AccordionPanel
             heading={<FormattedMessage {...messages.createDiscussion} />}
           >
-            <DiscussionInput workTeamId={id} updates={discussionUpdates} />
+            <DiscussionInput workteamId={id} updates={discussionUpdates} />
           </AccordionPanel>
         </Accordion>
       </Tab>,
@@ -314,7 +314,7 @@ class WorkTeamManagement extends React.Component {
               image={workTeam.image}
               title={discussion.title}
               body={discussion.content}
-              workTeamId={id}
+              workteamId={id}
             />
           )}
           {/* <ProposalInput image={workTeam.image}
@@ -326,7 +326,7 @@ class WorkTeamManagement extends React.Component {
               heading={<FormattedMessage {...messages.proposalInput} />}
               onActive={this.fetchTags}
             >
-              <WizardWithSettings workTeamId={id} maxTags={8} />
+              <WizardWithSettings workteamId={id} maxTags={8} />
             </AccordionPanel>
             <AccordionPanel
               heading={<FormattedMessage {...messages.proposalManager} />}
@@ -334,7 +334,7 @@ class WorkTeamManagement extends React.Component {
             >
               <ProposalsManager
                 proposals={wtProposals || []}
-                workTeamId={id}
+                workteamId={id}
                 updateProposal={mutateProposal}
                 pageInfo={pageInfo}
                 loadProposals={this.fetchWTProposals}

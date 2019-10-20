@@ -107,7 +107,7 @@ class DiscussionInput extends React.Component {
         id: PropTypes.string,
       }),
     ).isRequired,
-    workTeamId: PropTypes.string.isRequired,
+    workteamId: PropTypes.string.isRequired,
     workTeam: PropTypes.shape({}),
     updates: PropTypes.shape({
       success: PropTypes.bool,
@@ -232,7 +232,7 @@ class DiscussionInput extends React.Component {
       this.props.createDiscussion({
         title: title.trim(),
         content: this.md.render(body),
-        workTeamId: this.props.workTeamId,
+        workteamId: this.props.workteamId,
       });
     }
   }
@@ -468,9 +468,7 @@ class DiscussionInput extends React.Component {
                   }
                   onClick={() => {
                     history.push(
-                      `/workteams/${this.props.workTeamId}/discussions/${
-                        this.state.success
-                      }`,
+                      `/workteams/${this.props.workteamId}/discussions/${this.state.success}`,
                     );
                   }}
                   label={<FormattedMessage {...messages.visit} />}

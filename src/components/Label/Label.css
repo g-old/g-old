@@ -13,7 +13,7 @@
 }
 
 .big {
-  font-size: 2.5rem;
-  color: var(--color-four-light-shade);
+  font-size: 2rem;
+  color: var(--color-four);
   text-align: center;
 }

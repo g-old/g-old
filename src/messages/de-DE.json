@@ -987,7 +987,7 @@
   {
     "id": "cookieBanner",
     "description": "Cookie banner, should comply to EU regulations",
-    "defaultMessage": "By using this site you accept our privacy policy.",
+    "defaultMessage": "This site uses cookies to ensure you get the best browsing experience. More information: {link}",
     "message": "Diese Webseite nutzt Cookies um Ihre Weberlebnis zu verbessern. Mehr Informationen: {link}",
     "files": ["src/components/Layout/Layout.js"]
   },
@@ -1378,18 +1378,14 @@
     "description": "Label signup",
     "defaultMessage": "Sign Up",
     "message": "Registrieren",
-    "files": [
-      "src/components/SignUp/SignUp.js",
-      "src/routes/home/Home.js",
-      "src/routes/home/VIPMask.js"
-    ]
+    "files": ["src/components/SignUp/SignUp.js", "src/routes/home/VIPMask.js"]
   },
   {
     "id": "label.or",
     "description": "Label or",
     "defaultMessage": "OR",
     "message": "ODER",
-    "files": ["src/routes/home/Home.js", "src/routes/home/VIPMask.js"]
+    "files": ["src/routes/home/VIPMask.js"]
   },
   {
     "id": "label.markRead",
@@ -2006,41 +2002,6 @@
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
-    "id": "header.addProposal",
-    "description": "Functionality preview - adding a proposal",
-    "defaultMessage": "add a proposal",
-    "message": "",
-    "files": ["src/routes/home/Header.js"]
-  },
-  {
-    "id": "header.initRef",
-    "description": "Functionality preview -referendum",
-    "defaultMessage": "initiate a referendum",
-    "message": "",
-    "files": ["src/routes/home/Header.js"]
-  },
-  {
-    "id": "header.prepareProposal",
-    "description": "Functionality preview - preparation",
-    "defaultMessage": "prepare a legislative proposal with others",
-    "message": "",
-    "files": ["src/routes/home/Header.js"]
-  },
-  {
-    "id": "header.title",
-    "description": "Main title of the start page",
-    "defaultMessage": "Direct Democracy",
-    "message": "",
-    "files": ["src/routes/home/Header.js"]
-  },
-  {
-    "id": "header.voteProposal",
-    "description": "Functionality preview - voting on proposals",
-    "defaultMessage": "vote proposals",
-    "message": "",
-    "files": ["src/routes/home/Header.js"]
-  },
-  {
     "id": "label.verification",
     "description": "Verification",
     "defaultMessage": "Verification",
@@ -2084,7 +2045,7 @@
     "id": "settings.verifyCall",
     "description": "Notification to verify identity",
     "defaultMessage": "Verify your identity to vote, comment and work on proposals",
-    "message": "",
+    "message": "Lasse deine Identität verifizieren, damit du Vorschläge einstellen, wählen und daran mitarbeiten kannst",
     "files": ["src/routes/account/AccountContainer.js"]
   },
   {
@@ -2136,8 +2097,7 @@
     "id": "labels.verify",
     "description": "Label to open verification process",
     "defaultMessage": "Verify me",
-    "message": "Verifizieren",
-    "files": ["src/components/UserProfile/VerificationBadge.js"]
+    "message": "Verifizieren"
   },
   {
     "id": "command.createWt",
@@ -2203,5 +2163,22 @@
     "defaultMessage": "Voting ends {time}",
     "message": "Abstimmung endet {time}",
     "files": ["src/routes/home/InfoCard.js"]
+  },
+  {
+    "id": "command.consent",
+    "description": "Commant to allow an action",
+    "defaultMessage": "Accept",
+    "message": "Erlauben",
+    "files": ["src/components/Layout/Layout.js"]
+  },
+  {
+    "id": "labels.verifyMe",
+    "description": "Label to open verification process",
+    "defaultMessage": "Verify me",
+    "message": "Verifizieren",
+    "files": [
+      "src/components/UserProfile/VerificationBadge.js",
+      "src/routes/account/AccountContainer.js"
+    ]
   }
 ]

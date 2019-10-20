@@ -210,7 +210,7 @@ class WorkTeam extends React.Component {
     const { id, onLoadProposals } = this.props;
     onLoadProposals({
       state: proposalStatus,
-      workTeamId: id,
+      workteamId: id,
       after,
     });
   }
@@ -221,7 +221,7 @@ class WorkTeam extends React.Component {
     onLoadProposals({
       state: 'survey',
       closed: surveyStatus === 'closed',
-      workTeamId: id,
+      workteamId: id,
       after,
     });
   }
@@ -274,7 +274,7 @@ class WorkTeam extends React.Component {
     const { proposalStatus } = this.state;
 
     onLoadProposals({
-      workTeamId: id,
+      workteamId: id,
       state: proposalStatus,
     });
   }
@@ -283,7 +283,7 @@ class WorkTeam extends React.Component {
     const { onLoadProposals, id } = this.props;
     const { surveyStatus } = this.state;
     onLoadProposals({
-      workTeamId: id,
+      workteamId: id,
       state: 'survey',
       closed: surveyStatus === 'closed',
     });

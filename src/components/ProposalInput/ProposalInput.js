@@ -75,11 +75,11 @@ type Props = {
   title?: string,
   body?: string,
   image?: string,
-  createProposal: ({ workTeamId?: ID, ...State }) => Promise<boolean>,
+  createProposal: ({ workteamId?: ID, ...State }) => Promise<boolean>,
   tags: TagType[],
   users: UserShape[],
   findUser: () => Promise<boolean>,
-  workTeamId?: ID,
+  workteamId?: ID,
   defaultPollSettings: { [PollTypeTypes]: PollSettingsShape },
   availablePolls: { [PollTypeTypes]: PollSettingsShape },
   locale: 'de' | 'it' | 'lld',
@@ -116,7 +116,7 @@ class ProposalInput extends React.Component<Props, State> {
         props.defaultPollSettings[props.defaultPollType || DEFAULT_POLL_TYPE]),
     };
 
-    this.storageKey = `proposalDraft${props.workTeamId || '-public'}`;
+    this.storageKey = `proposalDraft${props.workteamId || '-public'}`;
 
     this.handleAddOption = this.handleAddOption.bind(this);
     this.handleValueSaving = this.handleValueSaving.bind(this);
@@ -179,7 +179,7 @@ class ProposalInput extends React.Component<Props, State> {
   }
 
   handleSubmission() {
-    const { createProposal: create, workTeamId, locale, image } = this.props;
+    const { createProposal: create, workteamId, locale, image } = this.props;
     const startTime = null;
     let endTime = null;
     const {
@@ -213,7 +213,7 @@ class ProposalInput extends React.Component<Props, State> {
     const spokesmanId = spokesman ? spokesman.id : null;
     const extended = !!options.length;
     const proposalProps = {
-      ...(workTeamId && { workTeamId }),
+      ...(workteamId && { workteamId }),
       title: title.trim(),
       summary: summary && summary.trim(),
       text: body,

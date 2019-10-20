@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import withStyles from 'isomorphic-style-loader/withStyles';
 import Box from '../Box';
+import s from './UserProfile.css';
 import Value from '../Value';
 import Label from '../Label';
 import ProfilePicture from '../ProfilePicture';
@@ -144,7 +146,7 @@ class UserProfile extends React.Component {
       isAdmin(sessionUser);
 
     return (
-      <Box column align>
+      <Box padding="small" className={s.root} column align>
         <ProfilePicture
           user={user}
           img={avatar}
@@ -288,4 +290,4 @@ class UserProfile extends React.Component {
   }
 }
 
-export default UserProfile;
+export default withStyles(s)(UserProfile);

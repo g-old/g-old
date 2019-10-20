@@ -1,7 +1,7 @@
 @import '../variables';
 
 .root {
-  background-color: var(--color-four-light-shade);
+  background-color: var(--color-four);
   border-radius: 6px;
 
   span {

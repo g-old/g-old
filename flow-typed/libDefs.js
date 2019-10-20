@@ -76,7 +76,7 @@ declare type UpdatesShape = {
 
 declare type ProposalShape = {
   id: ID,
-  workTeamId?: ID,
+  workteamId?: ID,
   state: ProposalStateType,
   pollOne: PollShape,
   pollTwo?: PollShape,

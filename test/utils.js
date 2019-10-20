@@ -169,5 +169,5 @@ export const createDiscussion = args => ({
   ...(args.id && { id: args.id }),
   title: args.title || 'Title',
   content: args.content || 'Content of a discussion',
-  work_team_id: args.workTeamId,
+  work_team_id: args.workteamId,
 });

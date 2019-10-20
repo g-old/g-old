@@ -285,7 +285,7 @@ class DiscussionContainer extends React.Component {
     mutateDiscussion({
       id: discussion.id,
       close: !discussion.closedAt,
-      workTeamId: discussion.workTeam.id,
+      workteamId: discussion.workTeam.id,
     });
   }
 
@@ -300,7 +300,7 @@ class DiscussionContainer extends React.Component {
       id: discussion.id,
       ...(content ? { content } : {}),
       ...(title ? { title } : {}),
-      workTeamId: discussion.workTeam.id,
+      workteamId: discussion.workTeam.id,
     }).then(() => {
       this.deleteStoredData();
       this.setState({ isEditing: false });

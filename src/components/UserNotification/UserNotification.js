@@ -105,13 +105,13 @@ class UserNotification extends React.Component {
       case 'statement': {
         if (activity.verb === 'create') {
           message = (
-            <React.Fragment>
+            <>
               <span className={s.important}>
                 {`${activity.actor.name} ${activity.actor.surname}`}
               </span>{' '}
               <FormattedMessage {...messages.statementNew} />{' '}
               <span className={s.important}>{info && info.proposalTitle}</span>
-            </React.Fragment>
+            </>
           );
           path =
             activity.object &&
@@ -127,7 +127,7 @@ class UserNotification extends React.Component {
           activity.object.pollOne || { id: undefined };
         if (activity.verb === 'create') {
           message = (
-            <React.Fragment>
+            <>
               <FormattedMessage
                 {...messages[
                   activity.object.state === 'survey'
@@ -136,13 +136,13 @@ class UserNotification extends React.Component {
                 ]}
               />{' '}
               <span className={s.important}>{activity.object.title}</span>
-            </React.Fragment>
+            </>
           );
           path = `/proposal/${activity.object.id}/${activePoll.id}${param}`;
         } else if (activity.verb === 'update') {
           if (activity.object.state) {
             message = (
-              <React.Fragment>
+              <>
                 <span className={s.important}>{activity.object.title}</span>{' '}
                 <FormattedMessage
                   {...messages[
@@ -151,7 +151,7 @@ class UserNotification extends React.Component {
                       : activity.object.state
                   ]}
                 />
-              </React.Fragment>
+              </>
             );
             path = `/proposal/${activity.object.id}/${activePoll.id}${param}`;
           }
@@ -169,15 +169,15 @@ class UserNotification extends React.Component {
           path = activity.actor.thumbnail;
           ({ thumbnail } = activity.actor);
           message = (
-            <React.Fragment>
+            <>
               <span className={s.important}>
                 {`${activity.actor.name} ${activity.actor.surname}`}
               </span>{' '}
               <FormattedMessage {...messages.commentNew} />{' '}
               <span className={s.important}>{info && info.title}</span>
-            </React.Fragment>
+            </>
           );
-          path = `/workteams/${info && info.workTeamId}/discussions/${
+          path = `/workteams/${info && info.workteamId}/discussions/${
             activity.object.discussionId
           }?comment=${parent || activity.object.id}${
             child ? `&child=${child}` : ''
@@ -188,27 +188,25 @@ class UserNotification extends React.Component {
       case 'discussion': {
         if (activity.verb === 'create') {
           message = (
-            <React.Fragment>
+            <>
               <FormattedMessage {...messages.discussionNew} />{' '}
               <span className={s.important}>{activity.object.title}</span>{' '}
               <span className={s.important}>{info && info.title}</span>
-            </React.Fragment>
+            </>
           );
-          path = `/workteams/${activity.workTeamId}/discussions/${
-            activity.object.id
-          }${param}`;
+          path = `/workteams/${activity.workteamId}/discussions/${activity.object.id}${param}`;
         }
         break;
       }
       case 'message': {
         if (activity.verb === 'create') {
           message = (
-            <React.Fragment>
+            <>
               <FormattedMessage {...messages.messageNew} />{' '}
-              <span className={s.important}>{`${activity.actor.name} ${
-                activity.actor.surname
-              }`}</span>
-            </React.Fragment>
+              <span
+                className={s.important}
+              >{`${activity.actor.name} ${activity.actor.surname}`}</span>
+            </>
           );
           path = `/message/${activity.object.id}${param}`;
         }
@@ -218,12 +216,12 @@ class UserNotification extends React.Component {
       case 'user': {
         if (activity.verb === 'update') {
           message = (
-            <React.Fragment>
+            <>
               <FormattedMessage
                 {...messages[`role${info.added ? 'Added' : 'Lost'}`]}
               />{' '}
               <span className={s.important}>{`${info.diff.join(', ')}`}</span>
-            </React.Fragment>
+            </>
           );
           path = `/account`;
         }

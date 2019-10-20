@@ -10,7 +10,7 @@
 import React from 'react';
 import Layout from '../../components/Layout';
 import Page from '../../components/Page';
-import InfoPage from '../../components/InfoPage';
+// import InfoPage from '../../components/InfoPage';
 
 async function action({ locale }) {
   const data = await new Promise(resolve => {
@@ -32,7 +32,7 @@ async function action({ locale }) {
     title: data.title,
     component: (
       <Layout>
-        <InfoPage locale={locale} />
+        {/* <InfoPage locale={locale} /> */}
         <Page {...data} />
       </Layout>
     ),

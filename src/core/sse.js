@@ -25,10 +25,10 @@ function contextFilter(rootValue, context) {
   if (rootValue.actorId === context.viewer.id) {
     return false;
   }
-  if (rootValue.workTeamId) {
+  if (rootValue.workteamId) {
     return (
       context.viewer.wtMemberships &&
-      context.viewer.wtMemberships.includes(rootValue.workTeamId)
+      context.viewer.wtMemberships.includes(rootValue.workteamId)
     );
   }
   return true;
@@ -36,6 +36,7 @@ function contextFilter(rootValue, context) {
 
 export class SubscriptionManager {
   pubsub: PubSub;
+
   constructor(options) {
     this.schema = options.schema;
     this.subscriptions = {};
@@ -50,7 +51,7 @@ export class SubscriptionManager {
         this.pubsub.publish('activities', {
           id: payload.activity.id,
           actorId: payload.activity.actorId,
-          ...(payload.workTeamId && { workTeamId: payload.workTeamId }),
+          ...(payload.workteamId && { workteamId: payload.workteamId }),
         });
       }
     });
@@ -174,7 +175,7 @@ export function SubscriptionServer(options) {
       return res.status(404).json({ error: 'Not authorized' });
     }
     // subscribe
-    const subscription = Object.assign({}, req.body, options.onSubscribe());
+    const subscription = { ...req.body, ...options.onSubscribe() };
     subscription.context = { ...subscription.context, viewer: req.user };
     let connectionSubId = 0;
     subscription.callback = (error, data) => {

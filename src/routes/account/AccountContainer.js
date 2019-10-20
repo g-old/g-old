@@ -93,6 +93,12 @@ const messages = defineMessages({
     defaultMessage: 'You will be contacted as soon as possible',
     description: 'Notification to upload photo',
   },
+
+  verify: {
+    id: 'labels.verifyMe',
+    defaultMessage: 'Verify me',
+    description: 'Label to open verification process',
+  },
   verifyCall: {
     id: 'settings.verifyCall',
     defaultMessage:
@@ -331,7 +337,11 @@ class AccountContainer extends React.Component {
       user.verificationStatus === VerificationTypes.UNREQUESTED
     ) {
       messageId = 'verifyCall';
-      action = <Button onClick={this.toggleVerification}>Verify</Button>;
+      action = (
+        <Button primary onClick={this.toggleVerification}>
+          <FormattedMessage {...messages.verify} />
+        </Button>
+      );
     } else if (user.verificationStatus === VerificationTypes.PENDING) {
       messageId = 'verifyWaitCall';
     } else if (user.verificationStatus === VerificationTypes.DENIED) {

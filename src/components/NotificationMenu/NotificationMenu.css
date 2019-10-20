@@ -29,7 +29,7 @@
 .unread {
   color: #fff;
   stroke: #fff;
-  background-color: var(--color-five);
+  background-color: var(--color-brand-light-shade-2);
 
   /* background-color: #ff324d; */
 }

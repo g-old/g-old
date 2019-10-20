@@ -151,15 +151,15 @@ class ProposalActions extends React.Component<Props, State> {
 
   handleStateChange() {
     const {
-      proposal: { id, workTeamId, state },
+      proposal: { id, workteamId, state },
       updateProposal,
     } = this.props;
 
     updateProposal({
       id,
       state: state === 'survey' ? 'survey' : 'revoked',
-      ...(workTeamId && {
-        workTeamId,
+      ...(workteamId && {
+        workteamId,
       }),
     });
   }
@@ -217,7 +217,7 @@ class ProposalActions extends React.Component<Props, State> {
   renderActions() {
     const {
       updates = {},
-      proposal: { pollOne, pollTwo, state, id, workTeamId },
+      proposal: { pollOne, pollTwo, state, id, workteamId },
       updateProposal,
       user,
     } = this.props;
@@ -254,7 +254,7 @@ class ProposalActions extends React.Component<Props, State> {
         <AccordionPanel heading={<FormattedMessage {...messages.open} />}>
           <Box column>
             <WizardWithSettings
-              workTeamId={workTeamId}
+              workteamId={workteamId}
               proposalId={id}
               defaultPollType="voting"
               user={user}

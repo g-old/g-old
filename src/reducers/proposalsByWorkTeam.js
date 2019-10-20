@@ -13,7 +13,7 @@ const byWorkTeam = (state = {}, action) => {
     case LOAD_PROPOSAL_LIST_SUCCESS: {
       const { proposals } = action.payload.entities;
       if (!proposals) return state;
-      return sortByWorkTeam(state, proposals, 'workTeamId');
+      return sortByWorkTeam(state, proposals, 'workteamId');
     }
 
     default: {

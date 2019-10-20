@@ -109,14 +109,14 @@ function requestWriteControl(viewer, data) {
 
 function checkIfMember(viewer, resource) {
   if (resource) {
-    if (resource.workTeamId) {
+    if (resource.workteamId) {
       // assumes there exist only workteams
       if (viewer.groups & Groups.SYSTEM) {
         return true;
       }
       return (
         viewer.wtMemberships &&
-        viewer.wtMemberships.includes(resource.workTeamId)
+        viewer.wtMemberships.includes(resource.workteamId)
       );
     }
     return true; // is not owned by wt/group
@@ -209,7 +209,7 @@ function proposalWriteControl(viewer, data) {
   if (data.workTeam && data.workTeam.deletedAt) {
     return false;
   }
-  if (data.workTeamId) {
+  if (data.workteamId) {
     if (isCoordinator(viewer, data.workTeam)) {
       return true;
     }
@@ -260,7 +260,7 @@ function statementWriteControl(viewer, data) {
     return checkIfMember(viewer, data.proposal);
   }
   // To allow viewes in workteams to write statements
-  if (data.proposal.workTeamId && viewer.groups & Groups.VIEWER) {
+  if (data.proposal.workteamId && viewer.groups & Groups.VIEWER) {
     return checkIfMember(viewer, data.proposal);
   }
   return false;
@@ -336,7 +336,7 @@ function voteWriteControl(viewer, data) {
       return checkIfMember(viewer, data.proposal);
     }
   } else if (
-    (data.proposal.workTeamId && viewer.groups & Groups.VIEWER) ||
+    (data.proposal.workteamId && viewer.groups & Groups.VIEWER) ||
     viewer.permissions & Permissions.VOTE
   ) {
     return checkIfMember(viewer, data.proposal);
@@ -438,10 +438,10 @@ function discussionWriteControl(viewer, data) {
   if (data.workTeam && data.workTeam.deletedAt) {
     return false;
   }
-  if (data.workTeamId) {
+  if (data.workteamId) {
     if (
       data.mainTeam &&
-      viewer.wtMemberships.includes(Number(data.workTeamId))
+      viewer.wtMemberships.includes(Number(data.workteamId))
     ) {
       return true;
     }
@@ -456,7 +456,7 @@ function discussionWriteControl(viewer, data) {
   return false;
 }
 function commentReadControl(viewer, data) {
-  if (viewer.wtMemberships.includes(data.discussion.workTeamId)) {
+  if (viewer.wtMemberships.includes(data.discussion.workteamId)) {
     // eslint-disable-line
     return true;
   }
@@ -472,7 +472,7 @@ function commentWriteControl(viewer, data) {
   }
   if (data.creating) {
     // TODO check group etc
-    if (viewer.wtMemberships.includes(data.discussion.workTeamId)) {
+    if (viewer.wtMemberships.includes(data.discussion.workteamId)) {
       // eslint-disable-line
       return (viewer.permissions & Permissions.MAKE_COMMENT) > 0;
     }

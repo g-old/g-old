@@ -980,7 +980,7 @@
   {
     "id": "cookieBanner",
     "description": "Cookie banner, should comply to EU regulations",
-    "defaultMessage": "By using this site you accept our privacy policy.",
+    "defaultMessage": "This site uses cookies to ensure you get the best browsing experience. More information: {link}",
     "message": "",
     "files": ["src/components/Layout/Layout.js"]
   },
@@ -1301,18 +1301,14 @@
     "description": "Label signup",
     "defaultMessage": "Sign Up",
     "message": "Scrive ite",
-    "files": [
-      "src/components/SignUp/SignUp.js",
-      "src/routes/home/Home.js",
-      "src/routes/home/VIPMask.js"
-    ]
+    "files": ["src/components/SignUp/SignUp.js", "src/routes/home/VIPMask.js"]
   },
   {
     "id": "label.or",
     "description": "Label or",
     "defaultMessage": "OR",
     "message": "O",
-    "files": ["src/routes/home/Home.js", "src/routes/home/VIPMask.js"]
+    "files": ["src/routes/home/VIPMask.js"]
   },
   {
     "id": "label.markRead",
@@ -1917,41 +1913,6 @@
     "files": ["src/components/SignUp/SignUp.js"]
   },
   {
-    "id": "header.addProposal",
-    "description": "Functionality preview - adding a proposal",
-    "defaultMessage": "add a proposal",
-    "message": "",
-    "files": ["src/routes/home/Header.js"]
-  },
-  {
-    "id": "header.initRef",
-    "description": "Functionality preview -referendum",
-    "defaultMessage": "initiate a referendum",
-    "message": "",
-    "files": ["src/routes/home/Header.js"]
-  },
-  {
-    "id": "header.prepareProposal",
-    "description": "Functionality preview - preparation",
-    "defaultMessage": "prepare a legislative proposal with others",
-    "message": "",
-    "files": ["src/routes/home/Header.js"]
-  },
-  {
-    "id": "header.title",
-    "description": "Main title of the start page",
-    "defaultMessage": "Direct Democracy",
-    "message": "",
-    "files": ["src/routes/home/Header.js"]
-  },
-  {
-    "id": "header.voteProposal",
-    "description": "Functionality preview - voting on proposals",
-    "defaultMessage": "vote proposals",
-    "message": "",
-    "files": ["src/routes/home/Header.js"]
-  },
-  {
     "id": "label.verification",
     "description": "Verification",
     "defaultMessage": "Verification",
@@ -2044,13 +2005,6 @@
     "files": ["src/components/UserPanel/UserFilter.js"]
   },
   {
-    "id": "labels.verify",
-    "description": "Label to open verification process",
-    "defaultMessage": "Verify me",
-    "message": "",
-    "files": ["src/components/UserProfile/VerificationBadge.js"]
-  },
-  {
     "id": "command.createWt",
     "description": "command to create a workteam",
     "defaultMessage": "Create workteam",
@@ -2107,5 +2061,22 @@
     "defaultMessage": "Voting ends {time}",
     "message": "",
     "files": ["src/routes/home/InfoCard.js"]
+  },
+  {
+    "id": "command.consent",
+    "description": "Commant to allow an action",
+    "defaultMessage": "Accept",
+    "message": "",
+    "files": ["src/components/Layout/Layout.js"]
+  },
+  {
+    "id": "labels.verifyMe",
+    "description": "Label to open verification process",
+    "defaultMessage": "Verify me",
+    "message": "",
+    "files": [
+      "src/components/UserProfile/VerificationBadge.js",
+      "src/routes/account/AccountContainer.js"
+    ]
   }
 ]

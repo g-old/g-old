@@ -34,11 +34,11 @@ class OptionInput extends React.Component {
     stepId: PropTypes.string.isRequired,
     callback: PropTypes.func.isRequired,
     withOptions: PropTypes.bool.isRequired,
-    workTeamId: PropTypes.string,
+    workteamId: PropTypes.string,
   };
 
   static defaultProps = {
-    workTeamId: null,
+    workteamId: null,
   };
 
   constructor(props) {
@@ -53,7 +53,7 @@ class OptionInput extends React.Component {
     this.register = this.register.bind(this);
     this.triggerCb = this.triggerCb.bind(this);
     this.form = React.createRef();
-    this.storageKey = `optionDraft${props.workTeamId}`;
+    this.storageKey = `optionDraft${props.workteamId}`;
   }
 
   componentDidMount() {
@@ -110,8 +110,8 @@ class OptionInput extends React.Component {
   handleSaving(newData) {
     const { onExit, data } = this.props;
     // take all, change saved option
-    const newOptions = data.map(
-      option => (option.pos === newData.pos ? newData : option),
+    const newOptions = data.map(option =>
+      option.pos === newData.pos ? newData : option,
     );
     if (onExit) {
       onExit([{ name: 'options', value: newOptions }]);

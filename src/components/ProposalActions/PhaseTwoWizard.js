@@ -25,7 +25,7 @@ type Props = {
   onUpdate: () => Promise<boolean>,
   defaultPollType: PollTypeTypes,
   user: UserShape,
-  workTeamId?: ID,
+  workteamId?: ID,
   proposalId: ID,
 };
 
@@ -41,7 +41,7 @@ const handleNext = ({ push }) => push();
 
 class PhaseTwoWizard extends React.Component<Props, State> {
   static defaultProps = {
-    workTeamId: null,
+    workteamId: null,
   };
 
   constructor(props) {
@@ -74,7 +74,7 @@ class PhaseTwoWizard extends React.Component<Props, State> {
   }
 
   handleUpdate() {
-    const { onUpdate, workTeamId, proposalId } = this.props;
+    const { onUpdate, workteamId, proposalId } = this.props;
     const startTime = null;
     let endTime = null;
     const {
@@ -97,7 +97,7 @@ class PhaseTwoWizard extends React.Component<Props, State> {
     }
     const extended = !!options.length;
     onUpdate({
-      ...(workTeamId && { workTeamId }),
+      ...(workteamId && { workteamId }),
       id: proposalId,
       state: pollType.value,
       poll: {

@@ -14,7 +14,7 @@ import cn from 'classnames';
 import s from './Comment.css';
 import { ICONS } from '../../constants';
 // import Notification from '../Notification';
-import { Permissions } from '../../organization';
+import { Permissions, isVoter } from '../../organization';
 import Menu from '../Menu';
 import Button from '../Button';
 import Avatar from '../Avatar';
@@ -565,7 +565,7 @@ class Comment extends React.Component {
       children,
     } = this.props;
     const { open, editing, showReplies } = this.state;
-    if (onReply) {
+    if (onReply && isVoter(user)) {
       footer.push(
         <button type="button" onClick={this.handleReply} className={s.command}>
           <FormattedMessage {...messages.reply} />

@@ -11,7 +11,7 @@ VOLKS-INI-POP-BZ.ORG
 
 Ein Cookie ist eine kleine Textdatei, mit dessen Hilfe eine Webseite Ihr Gerät wiedererkennt und so für ein zusammenhängendes Weberlebnis über mehrere Situngen sorgen kann.
 
-Die Initiative für mehr Demokratie ("Initiative", "wir", "uns") benutzt auf der Webseite VOLKS-INI-POP-BZ.IT ("Webseite) die darunter aufgelisteten Cookies. Sie können über ihre Browsereinstellungen bestimmen, welche Webseiten Cookies auf Ihrem Gerät setzen dürfen. Beachten Sie bitte, dass solche Einstellungen Ihr Weberlebnis beeinträchtigen können und möglicherweise gewisse Funktionalitäten (wie die Möglichkeit, sich einzuloggen) dann nicht zur Verfügung stehen.
+Die Initiative für mehr Demokratie ("Initiative", "wir", "uns") benutzt auf der Webseite VOLKS-INI-POP-BZ.IT ("Webseite") die darunter aufgelisteten Cookies. Sie können über ihre Browsereinstellungen bestimmen, welche Webseiten Cookies auf Ihrem Gerät setzen dürfen. Beachten Sie bitte, dass solche Einstellungen Ihr Weberlebnis beeinträchtigen können und möglicherweise gewisse Funktionalitäten (wie die Möglichkeit, sich einzuloggen) dann nicht zur Verfügung stehen.
 Diese Cookie-Richtlinien ("Bestimmungen") beziehen sich nur auf diese Webseite und gelten nicht für andere Webseiten, die über einen Link aus ereichbar sind.
 
 ### Technische Cookies
