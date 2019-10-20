@@ -88,7 +88,7 @@ class ApprovalProcess extends React.Component<Props, State> {
     if (value & state[1]) {
       return { value: state[1], label: intl.formatMessage(messages.no) };
     }
-    throw new Error('state-not-recognized');
+    return undefined;
   }
 
   render() {
