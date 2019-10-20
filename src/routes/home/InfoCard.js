@@ -31,7 +31,9 @@ const InfoCard = ({ image, title, content, poll, onClick }: Props) => {
       <Box align column className={s.dettCard}>
         {image && (
           <div className={s.imgContainer}>
-            <img src={image} alt="" />
+            <div className={s.wrapper}>
+              <img className={s.wrappedImg} src={image} alt="" />
+            </div>
           </div>
         )}
         <div>
