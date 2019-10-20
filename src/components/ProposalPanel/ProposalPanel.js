@@ -242,8 +242,8 @@ class ProposalPanel extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  proposals: getVisibleProposals(state, 'active').filter(p => !p.workTeamId),
-  surveys: getVisibleProposals(state, 'survey').filter(p => !p.workTeamId),
+  proposals: getVisibleProposals(state, 'active').filter(p => !p.workteamId),
+  surveys: getVisibleProposals(state, 'survey').filter(p => !p.workteamId),
   allProposals: getAllProposals(state), // TODO CHANGE
   workteams: getWorkTeams(state),
 

@@ -11,7 +11,7 @@ import Button from '../Button';
 
 export const correctFilter = ({ approvalState, workteam, state }) => ({
   ...(approvalState && { approvalState: approvalState.value }),
-  ...(workteam && { workteam: workteam.value }),
+  ...(workteam && { workteamId: workteam.value }),
   ...(state && { state: state.value }),
 });
 
@@ -54,7 +54,7 @@ const approvalStateFilter = (approvalState, proposal) =>
   approvalState === proposal.approvalState;
 const workteamFilter = (workteamId, proposal) => {
   // eslint-disable-next-line eqeqeq
-  return workteamId == proposal.workTeamId;
+  return workteamId == proposal.workteamId;
 };
 
 const proposalFilter = (filterArgs, proposal) => {
