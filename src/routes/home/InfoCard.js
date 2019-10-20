@@ -28,7 +28,7 @@ type Props = {
 const InfoCard = ({ image, title, content, poll, onClick }: Props) => {
   return (
     <Box onClick={onClick}>
-      <Box align column className={s.dettCard}>
+      <Box column className={s.dettCard}>
         {image && (
           <div className={s.imgContainer}>
             <div className={s.wrapper}>
@@ -44,8 +44,8 @@ const InfoCard = ({ image, title, content, poll, onClick }: Props) => {
           <h2>{title}</h2>
           <p>{content}</p>
         </div>
-        <Box>
-          <div>
+        <Box className={s.footer}>
+          <span>
             <svg viewBox="0 0 24 24" width="16px" height="16px" role="img">
               <path
                 fill="none"
@@ -55,8 +55,8 @@ const InfoCard = ({ image, title, content, poll, onClick }: Props) => {
               />
             </svg>
             {poll.options[0].numVotes}
-          </div>
-          <div>
+          </span>
+          <span>
             <svg viewBox="0 0 24 24" width="16px" height="16px" role="img">
               <path
                 fill="none"
@@ -67,7 +67,7 @@ const InfoCard = ({ image, title, content, poll, onClick }: Props) => {
               />
             </svg>
             {poll.options[1].numVotes}
-          </div>
+          </span>
         </Box>
       </Box>
     </Box>

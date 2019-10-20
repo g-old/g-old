@@ -30,8 +30,16 @@
   padding-bottom: 41.74%; /* calc(192 / 460 * 100%); */
 }
 
+.footer {
+  align-self: center;
+
+  svg {
+    padding: 0 0.5em;
+  }
+}
+
 .wrappedImg {
-  /* position: absolute; */
+  position: absolute;
   top: 0;
   left: 0;
   max-width: 100%;
