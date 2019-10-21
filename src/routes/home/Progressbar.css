@@ -1,0 +1,58 @@
+@import '../../components/variables.css';
+
+.progressbar {
+  position: relative;
+  height: 0.5em;
+  line-height: 1;
+  border-radius: 0.5em;
+  background-color: #eee;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  z-index: 0;
+  margin-bottom: 4em !important;
+}
+
+.step {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  left: 0%;
+  z-index: 0;
+  cursor: pointer;
+}
+
+.active {
+  transform: scale(1.2);
+  transition: scale 0.5s ease-in-out;
+}
+
+.accomplished {
+  opacity: 1;
+  background-color: var(--color-four) !important;
+}
+
+.index {
+  background-color: #eee; /* var(--color-four); */
+  color: #fff;
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progression {
+  height: 0.5em;
+  position: absolute;
+  transition: width 0.3s ease;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 0.5em;
+  background: var(--color-brand);
+
+  /* background-image: linear-gradient(to right, rgb(15, 12, 41), #716abe); */
+  z-index: -1;
+}
