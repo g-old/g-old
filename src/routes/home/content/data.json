@@ -21,7 +21,8 @@
       "call": "Melde dich an"
     },
     {
-      "text": " Bringe gesellschaftliche Verbesserungen mit deiner Unterstützung ins Rollen. Deine Stimme ist auch ein Signal für anderen Menschen."
+      "text": " Bringe gesellschaftliche Verbesserungen mit deiner Unterstützung ins Rollen. Deine Stimme ist auch ein Signal für anderen Menschen.",
+      "call": "Mehr Infos"
     }
   ],
   "motivation": {
@@ -40,11 +41,11 @@
     "title": "In vier Schritten zur Veränderung",
     "cards": [
       {
-        "title": "Der Vorschlag",
+        "title": "Dein Vorschlag",
         "text": "Stelle deine Idee hier auf VIP einer interessierten Community vor. Fasse deine Vision in wenige Zeilen, und erwarte die Rückmeldungen. Ein Team rund um die Initiative wird sicherstellen, dass..."
       },
       {
-        "title": "Deine eigene Arbeitsgruppe",
+        "title": "Deine Arbeitsgruppe",
         "text": "Dein Vorschlag hat mehr positive als negative Stimmen erhalten? Unsere Experten glauben, dass die Zuständigkeit deines Anliegens bei der Provinz Bozen liegt? Dann kannst du mit einem Klick eine Arbeitsgruppe dazu eröffnen."
       },
       {

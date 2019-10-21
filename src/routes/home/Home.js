@@ -43,15 +43,43 @@ type Props = {
 };
 
 const PATH_TO_REGISTER = '/signup';
-
 class Home extends React.Component<Props> {
+  constructor() {
+    super();
+    this.visionRef = React.createRef();
+    this.scrollToLogin = this.scrollToLogin.bind(this);
+    this.scrollToVision = this.scrollToVision.bind(this);
+  }
+
+  scrollToLogin() {
+    const loginHandler = this.loginRef;
+    if (loginHandler) {
+      loginHandler.scrollIntoView({
+        block: 'center',
+        behavior: 'smooth',
+      });
+    }
+  }
+
+  scrollToVision() {
+    const visionHandler = this.visionRef.current;
+    visionHandler.scrollIntoView({
+      block: 'center',
+      behavior: 'smooth',
+    });
+    // scrollToRef(this.visionRef);
+  }
+
   render() {
     const { proposals, small, data } = this.props;
 
     // const testAddText = '';
     return (
       <Box column>
-        {small && <VIPMask small={small} />}
+        {small && (
+          // eslint-disable-next-line no-return-assign
+          <VIPMask small={small} onRef={ref => (this.loginRef = ref)} />
+        )}
         <Header data={data.header} small={small} />
         <Box className={s.motivation} pad align justify>
           <Box column align>
@@ -59,7 +87,10 @@ class Home extends React.Component<Props> {
             <div className={s.divider} />
             <p className={s.explanation}>{data.hero.explanation}</p>
           </Box>
-          {!small && <VIPMask small={small} />}
+          {!small && (
+            // eslint-disable-next-line no-return-assign
+            <VIPMask onRef={ref => (this.loginRef = ref)} small={small} />
+          )}
         </Box>
         {/* Benefits */}
         <Box justify>
@@ -100,7 +131,9 @@ class Home extends React.Component<Props> {
                 />
               </svg>
               <p>{data.featureCards[1].text}</p>
-              <Button primary>{data.featureCards[1].call}</Button>
+              <Button onClick={this.scrollToLogin} primary>
+                {data.featureCards[1].call}
+              </Button>
             </div>
             <div className={cn(s.featureCard, s.lower)}>
               <svg
@@ -117,10 +150,10 @@ class Home extends React.Component<Props> {
                   d={ICONS.thumbUpAlt}
                 />
               </svg>
-              <p>
-                <p>{data.featureCards[2].text}</p>
-              </p>
-              <Button accent>Mehr Info</Button>
+              <p>{data.featureCards[2].text}</p>
+              <Button onClick={this.scrollToVision} accent>
+                {data.featureCards[2].call}
+              </Button>
             </div>
           </Box>
         </Box>
@@ -211,7 +244,7 @@ class Home extends React.Component<Props> {
             />
             {data.steps.cards && (
               <Box className={s.stepCard} align column>
-                <h2>In vier Schritten zur Veränderung</h2>
+                <h2 ref={this.visionRef}>In vier Schritten zur Veränderung</h2>
                 <Wizard basename="/">
                   {({ steps, step, next, push, previous }) => {
                     return (

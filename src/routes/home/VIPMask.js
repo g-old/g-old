@@ -21,10 +21,10 @@ const messages = defineMessages({
     description: 'Label or',
   },
 });
-type Props = { small: boolean };
-const VIPMask = ({ small }: Props) => (
+type Props = { small: boolean, onRef: () => void };
+const VIPMask = ({ small, onRef }: Props) => (
   <Box className={cn(s.root, small && s.small)} column>
-    <div className={s.formGroup}>
+    <div ref={onRef} className={s.formGroup}>
       <Button
         fill
         className={s.signup}
