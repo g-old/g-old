@@ -28,6 +28,35 @@
     "title": "Das Vetorecht des Volkes",
     "text": "Als Bürger steht dir das Kontroll- und das Initiativrecht zu."
   },
+  "vision": {
+    "title": "Gemeinsam für die Zukunft!",
+    "card": {
+      "title": "Die Initiative für mehr Demokratie",
+      "text": "32 Personen haben am 6. Mai 2000 die \"Initiative für mehr Demokratie\" als Organisation neu gegründet. Insgesamt haben über 150 Personen und im sozialen, kulturellen und im Umweltbereich tätige Organisationen und Gruppen uns zum Neustart ermutigt. Schon diese erste Basis war in ihrer Vielfalt eine Garantie dafür, dass in allen gesellschaftlichen Kreisen Menschen an unserem Vorhaben interessiert sind und dafür gewonnen werden können.",
+      "image": "/dirdemdi_cropped.jpg"
+    }
+  },
+  "steps": {
+    "title": "In vier Schritten zur Veränderung",
+    "cards": [
+      {
+        "title": "Der Vorschlag",
+        "text": "Stelle deine Idee hier auf VIP einer interessierten Community vor. Fasse deine Vision in wenige Zeilen, und erwarte die Rückmeldungen. Ein Team rund um die Initiative wird sicherstellen, dass..."
+      },
+      {
+        "title": "Deine eigene Arbeitsgruppe",
+        "text": "Dein Vorschlag hat mehr positive als negative Stimmen erhalten? Unsere Experten glauben, dass die Zuständigkeit deines Anliegens bei der Provinz Bozen liegt? Dann kannst du mit einem Klick eine Arbeitsgruppe dazu eröffnen."
+      },
+      {
+        "title": "Gemeinsam voran",
+        "text": "Hat die Zusammenarbeit mit anderen Menschen deinen Vorschlag zu einem konsensfähiges Vorhaben entwickelt? Das auch die juristischen Hürden einer Volksinitiative nehmen kann? Dann wartet eine letzte Abstimmung auf dich..."
+      },
+      {
+        "title": "Die Zeit deiner Idee",
+        "text": "Nichts ist so mächtig wie eine Idee, deren Zeit gekommen ist. Die Zustimmung der Community als Feuertaufe ist genommen, jetzt kümmert sich ein erfahrenes Team um die Organisation des weiteren Weges. Auf gehts, Unterschriften sammeln!"
+      }
+    ]
+  },
   "content": {
     "boxes": [
       {

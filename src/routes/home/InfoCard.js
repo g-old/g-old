@@ -37,38 +37,42 @@ const InfoCard = ({ image, title, content, poll, onClick }: Props) => {
           </div>
         )}
         <div>
-          <FormattedMessage
-            {...messages.endTime}
-            values={{ time: <FormattedRelative value={poll.endTime} /> }}
-          />
+          {poll && (
+            <FormattedMessage
+              {...messages.endTime}
+              values={{ time: <FormattedRelative value={poll.endTime} /> }}
+            />
+          )}
           <h2>{title}</h2>
           <p>{content}</p>
         </div>
-        <Box className={s.footer}>
-          <span>
-            <svg viewBox="0 0 24 24" width="16px" height="16px" role="img">
-              <path
-                fill="none"
-                stroke="#666"
-                strokeWidth="2"
-                d="M12,2 L12,22 M3,11 L12,2 L21,11"
-              />
-            </svg>
-            {poll.options[0].numVotes}
-          </span>
-          <span>
-            <svg viewBox="0 0 24 24" width="16px" height="16px" role="img">
-              <path
-                fill="none"
-                stroke="#666"
-                strokeWidth="2"
-                d="M12,2 L12,22 M3,11 L12,2 L21,11"
-                transform="matrix(1 0 0 -1 0 24)"
-              />
-            </svg>
-            {poll.options[1].numVotes}
-          </span>
-        </Box>
+        {poll && (
+          <Box className={s.footer}>
+            <span>
+              <svg viewBox="0 0 24 24" width="16px" height="16px" role="img">
+                <path
+                  fill="none"
+                  stroke="#666"
+                  strokeWidth="2"
+                  d="M12,2 L12,22 M3,11 L12,2 L21,11"
+                />
+              </svg>
+              {poll.options[0].numVotes}
+            </span>
+            <span>
+              <svg viewBox="0 0 24 24" width="16px" height="16px" role="img">
+                <path
+                  fill="none"
+                  stroke="#666"
+                  strokeWidth="2"
+                  d="M12,2 L12,22 M3,11 L12,2 L21,11"
+                  transform="matrix(1 0 0 -1 0 24)"
+                />
+              </svg>
+              {poll.options[1].numVotes}
+            </span>
+          </Box>
+        )}
       </Box>
     </Box>
   );
