@@ -11,7 +11,7 @@ const icons = [
     <path fill="none" stroke="#fff" strokeWidth="2" d={ICONS.document} />
   </svg>,
   <svg viewBox="0 0 24 24" width="16px" height="16px" role="img">
-    <path fill="none" stroke="#fff" strokeWidth="2" d={ICONS.group} />{' '}
+    <path fill="none" stroke="#fff" strokeWidth="2" d={ICONS.group} />
   </svg>,
   <svg version="1.1" viewBox="0 0 24 24" width="16px" height="16px" role="img">
     <path fill="none" stroke="#fff" strokeWidth="2" d={ICONS.thumbUpAlt} />

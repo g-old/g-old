@@ -43,6 +43,9 @@ type Props = {
 };
 
 const PATH_TO_REGISTER = '/signup';
+const routeToRegistration = () => {
+  history.push(PATH_TO_REGISTER);
+};
 class Home extends React.Component<Props> {
   constructor() {
     super();
@@ -83,7 +86,7 @@ class Home extends React.Component<Props> {
         <Header data={data.header} small={small} />
         <Box className={s.motivation} pad align justify>
           <Box column align>
-            <h3 style={{ textAlign: 'center' }}>{data.hero.title}</h3>
+            <h2 style={{ textAlign: 'center' }}>{data.hero.title}</h2>
             <div className={s.divider} />
             <p className={s.explanation}>{data.hero.explanation}</p>
           </Box>
@@ -111,7 +114,7 @@ class Home extends React.Component<Props> {
                 />
               </svg>
               <p>{data.featureCards[0].text}</p>
-              <Button onClick={() => history.push(PATH_TO_REGISTER)} accent>
+              <Button onClick={routeToRegistration} accent>
                 {data.featureCards[0].call}
               </Button>
             </div>
@@ -160,7 +163,7 @@ class Home extends React.Component<Props> {
         {/* Hero  - imgurl: https://unsplash.com/photos/IBWJsMObnnU */}
         <Box align justify column={small} className={s.dynContent}>
           <Box column className={s.motivation} pad align justify>
-            <h3 style={{ textAlign: 'center' }}>{data.motivation.title}</h3>
+            <h2 style={{ textAlign: 'center' }}>{data.motivation.title}</h2>
             <div className={s.divider} />
             <p className={s.explanation}>{data.motivation.text}</p>
           </Box>
@@ -231,17 +234,54 @@ class Home extends React.Component<Props> {
           {/* Card Box */}
         </Box>
         <Box column className={s.dictionary}>
-          <h1
+          {/* <h1
             style={{ color: '#fff', textAlign: 'center', marginBottom: '2em' }}
           >
             {data.vision.title}
-          </h1>
+          </h1> */}
+          <Box column className={s.motivation} pad align justify>
+            <h2 style={{ textAlign: 'center', color: '#fff' }}>
+              {data.vision.title}
+            </h2>
+            <div className={s.divider} />
+            <p style={{ color: '#fff' }} className={s.explanation}>
+              Mit der Unterstützung der Initiative für mehr Demokratie hast du
+              einen Partner im Rücken, auf dessen Fachwissen du zählen kannst.
+              Sei es bei der Überprüfung der rechtlichen Voraussetzungen oder
+              der Ausarbeitung des Textes – du bist nicht alleine.
+            </p>
+          </Box>
           <Box between column={small} pad={!small} align>
-            <InfoCard
-              image={data.vision.card.image}
-              title={data.vision.card.title}
-              content={data.vision.card.text}
-            />
+            <Box column align>
+              <InfoCard
+                image={data.vision.card.image}
+                title={data.vision.card.title}
+                content={data.vision.card.text}
+              />
+              <Button primary>
+                <a
+                  style={{ color: '#fff' }}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  href="https://dirdemdi.org"
+                >
+                  Mehr Info
+                </a>
+              </Button>
+            </Box>
+            <svg
+              aria-label="Add"
+              viewBox="0 0 24 24"
+              width="32px"
+              height="32px"
+            >
+              <path
+                fill="none"
+                stroke="#fff"
+                strokeWidth="2"
+                d="M12,22 L12,2 M2,12 L22,12"
+              />
+            </svg>
             {data.steps.cards && (
               <Box className={s.stepCard} align column>
                 <h2 ref={this.visionRef}>In vier Schritten zur Veränderung</h2>
@@ -336,7 +376,172 @@ class Home extends React.Component<Props> {
             )}
           </Box>
         </Box>
-        <Box className={s.dictionary}> </Box>
+        <Box
+          align
+          justify
+          column={small}
+          className={cn(s.dynContent, s.fixGap)}
+        >
+          <div style={{ padding: '1em', flexBasis: '50%' }}>
+            <h2>Die Volksinitiative</h2>
+            <p>
+              Mit der Volksinitiative kann über einen Vorschlag aus der
+              Bevölkerung heraus abgestimmt werden, der eine Materie neu regelt,
+              eine bestehende Regelung abändert oder aufhebt.
+            </p>
+          </div>
+          <div style={{ padding: '1em', flexBasis: '50%' }}>
+            <h2>Das Referendum</h2>
+            <p>
+              Bevor ein Gesetz oder ein Beschluss rechtskräftig und anwendbar
+              wird, sollen alle stimmberechtigten Bürgerinnen und Bürger in
+              einer bindenden Volksabstimmung entscheiden können, ob das
+              Beschlossene in Kraft treten soll oder nicht. Die demokratische
+              Maxime dahinter ist: Es soll nichts gelten, das nicht von einer
+              Mehrheit in der Bevölkerung gewollt wird
+            </p>
+          </div>
+        </Box>
+        <Box column justify align>
+          <h1>Was kann ich tun?</h1>
+          <Box wrap between align justify>
+            <div>
+              <div className={s.action}>
+                <Button
+                  plain
+                  icon={
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="24px"
+                      height="24px"
+                      role="img"
+                    >
+                      <path
+                        fill="none"
+                        stroke="#666"
+                        strokeWidth="2"
+                        d={ICONS.document}
+                      />
+                    </svg>
+                  }
+                >
+                  <span> Einen Vorschlag einstellen</span>
+                </Button>
+              </div>
+              <div className={s.action}>
+                <Button
+                  plain
+                  icon={
+                    <svg
+                      version="1.1"
+                      viewBox="0 0 24 24"
+                      width="24px"
+                      height="24px"
+                      role="img"
+                    >
+                      <path
+                        fill="none"
+                        stroke="#666"
+                        strokeWidth="2"
+                        d={ICONS.thumbUpAlt}
+                      />
+                    </svg>
+                  }
+                >
+                  <span> Abstimmen</span>
+                </Button>
+              </div>
+              <div className={s.action}>
+                <Button
+                  plain
+                  icon={
+                    <svg width="24px" height="24px" viewBox="0 0 24 24">
+                      <path
+                        fill="none"
+                        stroke="#666"
+                        strokeWidth="2"
+                        d="M9,7 L9,1 L23,1 L23,11 L20,11 L20,16 L15,12 M1,7 L15,7 L15,18 L9,18 L4,22 L4,18 L1,18 L1,7 Z"
+                      />
+                    </svg>
+                  }
+                >
+                  <span> Kommentieren</span>
+                </Button>
+              </div>
+            </div>
+            <div>
+              <div className={s.action}>
+                <Button
+                  plain
+                  icon={
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="24px"
+                      height="24px"
+                      role="img"
+                    >
+                      <path
+                        fill="none"
+                        stroke="#666"
+                        strokeWidth="2"
+                        d={ICONS.group}
+                      />
+                    </svg>
+                  }
+                >
+                  <span> Arbeitsgruppen beitreten</span>
+                </Button>
+              </div>
+              <div className={s.action}>
+                <Button
+                  plain
+                  label=" Den Diskussionstext verändern"
+                  icon={
+                    <svg
+                      version="1.1"
+                      viewBox="0 0 24 24"
+                      width="24px"
+                      height="24px"
+                      role="img"
+                    >
+                      <path
+                        fill="none"
+                        stroke="#666"
+                        strokeWidth="2"
+                        d={ICONS.editBig}
+                      />
+                    </svg>
+                  }
+                />
+              </div>
+              <div className={s.action}>
+                <Button
+                  plain
+                  icon={
+                    <svg
+                      aria-label="Star"
+                      viewBox="0 0 24 24"
+                      width="24px"
+                      height="24px"
+                    >
+                      <polygon
+                        fill="#FFC95E"
+                        fillRule="evenodd"
+                        points="12 16.667 5 22 8 14 2 9.5 9.5 9.5 12 2 14.5 9.5 22 9.5 16 14 19 22"
+                      />
+                    </svg>
+                  }
+                >
+                  <span> Anerkennung erhalten</span>
+                </Button>
+              </div>
+            </div>
+          </Box>
+          <Button onClick={routeToRegistration} primary>
+            Registrieren
+          </Button>
+        </Box>
+
         <Box className={small && s.bigCards} fill wrap align between>
           {/* data.content.boxes.map(box => (
             <div className={s.card}>
