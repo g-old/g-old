@@ -37,7 +37,25 @@ type Props = {
     steps: { cards: [{ title: string, text: string }] },
     vision: {
       title: string,
+      text: string,
       card: { title: string, text: string, image: string },
+    },
+    content: {
+      title: string,
+      text: string,
+      tiles: [
+        {
+          title: string,
+          text: string,
+          tags: [string],
+          numPeople: string,
+          time: string,
+        },
+      ],
+      special: {
+        title: string,
+        text: string,
+      },
     },
   },
 };
@@ -198,32 +216,36 @@ class Home extends React.Component<Props> {
                       )}
                     </Steps>
                     {proposals.length > 1 && (
-                      <Button
-                        plain
-                        icon={
-                          <svg
-                            version="1.1"
-                            viewBox="0 0 24 24"
-                            width="32px"
-                            height="32px"
-                            role="img"
-                          >
-                            <path
-                              fill="none"
-                              stroke="#666"
-                              strokeWidth="2"
-                              d={ICONS.leftArrow}
-                            />
-                          </svg>
-                        }
-                        onClick={() => {
-                          if (steps.indexOf(step) < steps.length - 1) {
-                            next();
-                          } else {
-                            push(steps[0].id);
+                      <div>
+                        <Button
+                          primary
+                          reverse
+                          label="Mehr Vorschläge"
+                          icon={
+                            <svg
+                              version="1.1"
+                              viewBox="0 0 24 24"
+                              width="32px"
+                              height="32px"
+                              role="img"
+                            >
+                              <path
+                                fill="none"
+                                stroke="#fff"
+                                strokeWidth="2"
+                                d={ICONS.leftArrow}
+                              />
+                            </svg>
                           }
-                        }}
-                      />
+                          onClick={() => {
+                            if (steps.indexOf(step) < steps.length - 1) {
+                              next();
+                            } else {
+                              push(steps[0].id);
+                            }
+                          }}
+                        />
+                      </div>
                     )}
                   </StepPage>
                 );
@@ -245,10 +267,7 @@ class Home extends React.Component<Props> {
             </h2>
             <div className={s.divider} />
             <p style={{ color: '#fff' }} className={s.explanation}>
-              Mit der Unterstützung der Initiative für mehr Demokratie hast du
-              einen Partner im Rücken, auf dessen Fachwissen du zählen kannst.
-              Sei es bei der Überprüfung der rechtlichen Voraussetzungen oder
-              der Ausarbeitung des Textes – du bist nicht alleine.
+              {data.vision.text}
             </p>
           </Box>
           <Box between column={small} pad={!small} align>
@@ -376,34 +395,66 @@ class Home extends React.Component<Props> {
             )}
           </Box>
         </Box>
-        <Box
-          align
-          justify
-          column={small}
-          className={cn(s.dynContent, s.fixGap)}
-        >
-          <div style={{ padding: '1em', flexBasis: '50%' }}>
-            <h2>Die Volksinitiative</h2>
-            <p>
-              Mit der Volksinitiative kann über einen Vorschlag aus der
-              Bevölkerung heraus abgestimmt werden, der eine Materie neu regelt,
-              eine bestehende Regelung abändert oder aufhebt.
-            </p>
-          </div>
-          <div style={{ padding: '1em', flexBasis: '50%' }}>
-            <h2>Das Referendum</h2>
-            <p>
-              Bevor ein Gesetz oder ein Beschluss rechtskräftig und anwendbar
-              wird, sollen alle stimmberechtigten Bürgerinnen und Bürger in
-              einer bindenden Volksabstimmung entscheiden können, ob das
-              Beschlossene in Kraft treten soll oder nicht. Die demokratische
-              Maxime dahinter ist: Es soll nichts gelten, das nicht von einer
-              Mehrheit in der Bevölkerung gewollt wird
-            </p>
+        <Box column className={cn(s.dynContent, s.fixGap)}>
+          <Box column className={s.motivation} pad align justify>
+            <h2 style={{ textAlign: 'center' }}>{data.content.title}</h2>
+            <div className={s.divider} />
+            <p className={s.explanation}>{data.content.text}</p>
+          </Box>
+          <Box align justify column={small}>
+            {data.content.tiles.map(tile => (
+              <div style={{ padding: '1em', flexBasis: '50%' }}>
+                {tile.tags.map(tag => (
+                  <div>
+                    <div className={s.tag}>{tag}</div>
+                  </div>
+                ))}
+                <h3>{tile.title}</h3>
+                <div className={s.tileDetails}>
+                  <span>
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="16px"
+                      height="16px"
+                      role="img"
+                    >
+                      <path
+                        fill="none"
+                        stroke="#333"
+                        strokeWidth="2"
+                        d={ICONS.group}
+                      />
+                    </svg>
+                    {tile.numPeople}
+                  </span>
+                  <span>
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="16px"
+                      height="16px"
+                      role="img"
+                    >
+                      <path
+                        fill="none"
+                        stroke="#333"
+                        strokeWidth="2"
+                        d={ICONS.clock}
+                      />
+                    </svg>
+                    {tile.time}
+                  </span>
+                </div>
+                <p>{tile.text}</p>
+              </div>
+            ))}
+          </Box>
+          <div className={s.special}>
+            <h3>{data.content.special.title}</h3>
+            <p>{data.content.special.text}</p>
           </div>
         </Box>
         <Box column justify align>
-          <h1>Was kann ich tun?</h1>
+          <h1>Was kann ich hier tun?*</h1>
           <Box wrap between align justify>
             <div>
               <div className={s.action}>
@@ -535,42 +586,12 @@ class Home extends React.Component<Props> {
                   <span> Anerkennung erhalten</span>
                 </Button>
               </div>
+              * in Arbeit
             </div>
           </Box>
           <Button onClick={routeToRegistration} primary>
             Registrieren
           </Button>
-        </Box>
-
-        <Box className={small && s.bigCards} fill wrap align between>
-          {/* data.content.boxes.map(box => (
-            <div className={s.card}>
-              <InfoCard
-                image={box.image}
-                title={box.title}
-                content={box.text}
-              />
-            </div>
-          ))}
-          {/*         <div className={s.card}>
-            <InfoCard
-              image="/stop_sign_stp.jpeg"
-              title="Vetorecht"
-              content={` Bisher wurde hier bei uns, trotz Demokratie und wie in den meisten
-            "demokratischen" Ländern, über das Volk geherrscht. Ab jetzt muss
-            mit dem Volk regiert werden, so wie es sich für eine echte
-            Demokratie gehört. Mit dieser Woche ist das neue Gesetz zur Direkten
-            Demokratie in Kraft!`}
-            />
-          </div>
-          <div className={s.card}>
-            <InfoCard
-              title="Referendum"
-              content={`Alle vom Landtag nicht mit Zweidrittelmehrheit verabschiedeten Gesetze können vor
-ihrem Inkrafttreten dem Referendum unterworfen werden, wenn das innerhalb von 20
-Tagen nach Verabschiedung von 300 Promotoren verlangt wird.`}
-            />
-            </div> */}
         </Box>
       </Box>
     );

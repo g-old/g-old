@@ -35,7 +35,10 @@ class ProposalInputLayer extends React.Component {
       return (
         <Layer fill onClose={this.toggleLayer}>
           <Suspense fallback={<div> Loading content ....</div>}>
-            <ProposalInput defaultPollType="voting" />
+            <ProposalInput
+              onCancel={this.toggleLayer}
+              defaultPollType="voting"
+            />
           </Suspense>
         </Layer>
       );

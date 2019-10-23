@@ -8,17 +8,17 @@
     ]
   },
   "hero": {
-    "title": "Direkte Demokratie für Südtirol",
-    "explanation": "VIP ist dein Startpunkt, um deine dir zuerkannte demokratische Entscheidungsmacht direkt ausüben zu können. Stelle deine Idee zur Verbesserung der Gesellschaft zur Wahl!"
+    "title": "Direkte Demokratie in Südtirol",
+    "explanation": "VIP ist dein Startpunkt, um deine dir zuerkannte demokratische Entscheidungsmacht direkt ausüben zu können. Stelle deine Idee zur Verbesserung der Gesellschaft zur Diskussion!"
   },
   "featureCards": [
     {
-      "text": "Hast du einen Vorschlag für eine Gesetzesinitiative, oder ein Referendum? Tausch dich darüber mit anderen politisch interessierten Menschen aus und entdecke das Potential deiner Idee!",
-      "call": "Registriere dich!"
+      "text": "Hast du einen Vorschlag für eine Gesetzesinitiative, oder für ein Referendum? Tausch dich darüber mit anderen politisch interessierten Menschen aus und entdecke das Potential deiner Idee!",
+      "call": "Erstelle ein Konto!"
     },
     {
       "text": "Finde heraus, was deine Mitmenschen politisch bewegt. Hilf bei der Ausarbeitung von Volksinitiativen mit, suche gemeinsam mit anderen nach der optimale Lösung.",
-      "call": "Melde dich an"
+      "call": "Melde dich an!"
     },
     {
       "text": " Bringe gesellschaftliche Verbesserungen mit deiner Unterstützung ins Rollen. Deine Stimme ist auch ein Signal für anderen Menschen.",
@@ -31,9 +31,10 @@
   },
   "vision": {
     "title": "Gemeinsam für die Zukunft!",
+    "text": "Mit der Unterstützung der Initiative für mehr Demokratie hast du einen Partner im Rücken, auf dessen Fachwissen du zählen kannst. Sei es bei der Überprüfung der rechtlichen Voraussetzungen oder der Ausarbeitung des Textes – du bist nicht alleine.",
     "card": {
       "title": "Die Initiative für mehr Demokratie",
-      "text": "32 Personen haben am 6. Mai 2000 die \"Initiative für mehr Demokratie\" als Organisation neu gegründet. Insgesamt haben über 150 Personen und im sozialen, kulturellen und im Umweltbereich tätige Organisationen und Gruppen uns zum Neustart ermutigt. Schon diese erste Basis war in ihrer Vielfalt eine Garantie dafür, dass in allen gesellschaftlichen Kreisen Menschen an unserem Vorhaben interessiert sind und dafür gewonnen werden können.",
+      "text": "Seit dem Jahr 1994 setzt sich die Initiative für mehr Demokratie zusammen mit vielen Organisationen und zig Tausend Bürgerinnen und Bürgern mit Erfolg für eine Vervollständigung der Demokratie mit gut anwendbarer Direkter Demokratie in unserem Land ein. Weiter geht es in Richtung Konkordanzdemokratie über ein neues Landeswahlgesetz, das auf eine produktive Zusammenarbeit der politischen Vertreter untereinander und mit den Bürgerinnen und Bürgern abzielt.",
       "image": "/dirdemdi_cropped.jpg"
     }
   },
@@ -42,11 +43,11 @@
     "cards": [
       {
         "title": "Dein Vorschlag",
-        "text": "Stelle deine Idee hier auf VIP einer interessierten Community vor. Fasse deine Vision in wenige Zeilen, und erwarte die Rückmeldungen. Ein Team rund um die Initiative wird sicherstellen, dass..."
+        "text": "Präsentiere deine Idee hier auf der Online-Plattform den interessierten Bürgerinnen und Bürgern. Fasse deine Vision in wenige Zeilen und stelle dich den Rückmeldungen. Das Team der Initiative kann Dich beraten."
       },
       {
         "title": "Deine Arbeitsgruppe",
-        "text": "Dein Vorschlag hat mehr positive als negative Stimmen erhalten? Unsere Experten glauben, dass die Zuständigkeit deines Anliegens bei der Provinz Bozen liegt? Dann kannst du mit einem Klick eine Arbeitsgruppe dazu eröffnen."
+        "text": "Dein Vorschlag erhält Zustimmung? Unsere Sachberater haben festgestellt, dass das Anliegen im Zuständigkeitsbereich des Landes Südtirol liegt? Dann ist es Zeit, eine Arbeitsgruppe einzurichten. Mit einem Klick bekommst du die Möglichkeit, zielgerichtet mit anderen Bürgern in einem eigenen Bereich an dem Vorschlag weiterzuarbeiten "
       },
       {
         "title": "Gemeinsam voran",
@@ -59,16 +60,37 @@
     ]
   },
   "content": {
-    "boxes": [
+    "title": "Die Instrumente der Direkten Demokratie",
+    "text": "Referendum, Volksinitiative, Volksbegehren und der Bürgerrat stehen uns zur Verfügung. Wie können wir sie effektiv nutzen?",
+    "tiles": [
       {
-        "title": "Vetorecht",
-        "text": "Bisher wurde hier bei uns, trotz Demokratie und wie in den meisten \"demokratischen\" Ländern, über das Volk geherrscht. Ab jetzt muss mit dem Volk regiert werden, so wie es sich für eine echte Demokratie gehört. Mit dieser Woche ist das neue Gesetz zur Direkten Demokratie in Kraft!",
-        "image": "/stop_sign_stp.jpeg"
+        "title": "Volksabstimmungen durchführen.",
+        "text": "Bürgerinnen und Bürger können eine verbindliche (einführende oder abschaffende) Volksabstimmung erwirken, um ein bestehendes Landesgesetz abzuschaffen oder ein von ihnen verfasstes neues Gesetz einzuführen. ",
+        "numPeople": "13000",
+        "time": "6 Monate",
+        "tags": ["Volksinitiative"]
       },
       {
-        "title": "Referendumsrecht",
-        "text": "Alle vom Landtag nicht mit Zweidrittelmehrheit verabschiedeten Gesetze können vor ihrem Inkrafttreten dem Referendum unterworfen werden, wenn das innerhalb von 20 Tagen nach Verabschiedung von 300 Promotoren verlangt wird."
+        "title": "Kontrollieren und Grenzen setzen!",
+        "text": "Zu Landesgesetzen, die nicht mit einer Zweidrittelmehrheit verabschiedet wurden, können innerhalb von 20 Tagen 300 BürgerInnen ein Referendum verlangen. Das Gesetz tritt nur dann in Kraft, wenn die für die Abstimmung nötigen 13.000 Unterschriften nicht zustande gekommen sind, oder wenn es in der Abstimmung angenommen worden ist.",
+        "numPeople": "300",
+        "time": "20 Tage",
+        "tags": ["Referendum"]
+      },
+      {
+        "title": "Gesetzesentwürfe vorlegen.",
+        "text": "Dem Landtag können mit 8.000 Unterstützungsunterschriften Gesetzentwürfe vorgelegt werden, die innerhalb eines Jahres verpflichtend behandelt werden müssen. Diese können abgelehnt, unverändert oder abgeändert übernommen werden.",
+        "numPeople": "8000",
+        "time": "4 Monate",
+        "tags": ["Voksbegehren"]
       }
-    ]
+    ],
+    "special": {
+      "title": "Empfehlungen abgeben!",
+      "text": "300 Bürgerinnen und Bürger können die Einberufung eines Bürgerrats zu einem bestimmten Thema fordern, das in der Zuständigkeit des Landtages oder der Landesverwaltung liegt. Der Bürgerrat besteht aus 12 Personen, die nach einem Zufallsverfahren ausgewählt werden, aber nach Sprachgruppe, Geschlecht und Alter repräsentativ sind. Er behandelt in eineinhalb Tagen die vorgelegte Sachfrage und verfasst Empfehlungen dazu.",
+      "numPeople": "300",
+      "time": "-",
+      "tags": ["Bürgerrat"]
+    }
   }
 }

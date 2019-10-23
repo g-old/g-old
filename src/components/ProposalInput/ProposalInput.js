@@ -97,8 +97,8 @@ type Props = {
 };
 const DEFAULT_POLL_TYPE = 'voting';
 
-//TODO check for localstorage, etc, return storge.get/storage.set
-//storage.delete
+// TODO check for localstorage, etc, return storge.get/storage.set
+// storage.delete
 const createStorage = masterKey => {
   const keys = {
     title: `${masterKey}_title`,

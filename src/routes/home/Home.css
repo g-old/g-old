@@ -1,5 +1,6 @@
 @import '../../components/variables.css';
 
+/*
 .bigCards {
   .card {
     max-width: none;
@@ -12,7 +13,7 @@
   }
 }
 
-/* .card {
+.card {
   max-width: 25em;
   flex: 1 0 24em;
   margin: 1em 0;
@@ -115,6 +116,33 @@
 } */
 .lower {
   margin-top: 3rem;
+}
+
+.special {
+  width: 80%;
+  align-self: center;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.tag {
+  background-color: #414c7d;
+  color: #fff;
+  padding: 0.25em 0.5em;
+  border-radius: 3px;
+  display: inline;
+}
+
+.tileDetails {
+  font-weight: 600;
+  padding: 0 1em;
+  color: var(--color-brand);
+  display: flex;
+  justify-content: space-between;
+
+  svg {
+    margin-right: 0.5em;
+  }
 }
 
 /*
