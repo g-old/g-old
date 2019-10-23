@@ -81,6 +81,9 @@
 
 .help {
   display: block;
+  font-size: 0.9em;
+  color: var(--color-brand);
+  margin-bottom: 0.5em;
 }
 
 .focus {
