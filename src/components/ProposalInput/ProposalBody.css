@@ -1,3 +1,5 @@
+@import '../variables.css';
+
 .editor {
   padding: 0 1.5em;
 }
@@ -8,9 +10,16 @@
   line-height: 1.3rem;
   box-sizing: border-box;
 }
+
 textarea::placeholder {
   color: #b7b9bb;
 }
+
 input::placeholder {
   color: #b7b9bb;
+}
+
+.root {
+  max-width: 40em;
+  align-self: center;
 }

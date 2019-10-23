@@ -23,9 +23,14 @@ const messages = defineMessages({
     defaultMessage: 'Submit',
     description: 'Short command for sending data to the server',
   },
+  cancel: {
+    id: 'commands.cancel',
+    description: 'Short command to cancel a operation',
+    defaultMessage: 'Cancel',
+  },
 });
 
-const Navigation = ({ onSubmit }) => (
+const Navigation = ({ onSubmit, onCancel }) => (
   <WizardContext.Consumer>
     {({ next, previous, step, steps }) => {
       const onNextClick = () => {
@@ -36,6 +41,12 @@ const Navigation = ({ onSubmit }) => (
       };
       return (
         <Box between>
+          {onCancel && steps.indexOf(step) === 0 && (
+            <Button
+              onClick={onCancel}
+              label={<FormattedMessage {...messages.cancel} />}
+            />
+          )}
           {steps.indexOf(step) > 0 &&
             steps.indexOf(step) < steps.length - 1 && (
               <Button
@@ -65,6 +76,7 @@ const Navigation = ({ onSubmit }) => (
 
 Navigation.propTypes = {
   onSubmit: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default Navigation;

@@ -15,7 +15,7 @@ import FormField from '../FormField';
 import Box from '../Box';
 import MainEditor from '../MainEditor';
 import { isHtmlEmpty } from '../MessageInput/validationFns';
-import type { ValueType, Callback } from './ProposalInput';
+import type { ValueType, Callback, StorageShape } from './ProposalInput';
 
 const messages = defineMessages({
   title: {
@@ -45,7 +45,7 @@ type Props = {
   data: { body?: string, title?: string, summary?: string },
   callback: Callback,
   stepId: string,
-  storageKey: string,
+  storage: StorageShape,
   withOptions: boolean,
   intl: IntlShape,
 };
@@ -67,11 +67,11 @@ class ProposalBody extends React.Component<Props> {
   }
 
   componentDidMount() {
-    const { data, callback, stepId, storageKey } = this.props;
+    const { data, callback, stepId, storage } = this.props;
 
     const initialValue = data.body
       ? data.body
-      : localStorage.getItem(storageKey) || '<p></p>';
+      : storage.getItem('body') || '<p></p>';
     this.editor.setInitialState(initialValue);
     if (callback) {
       callback(stepId, this.onBeforeNextStep);
@@ -95,8 +95,6 @@ class ProposalBody extends React.Component<Props> {
     return false;
   }
 
-  storageKey: string;
-
   editor: MainEditor;
 
   form: ?ElementRef<FormValidation>;
@@ -104,44 +102,48 @@ class ProposalBody extends React.Component<Props> {
   handleNext: () => void;
 
   handleNext(values) {
-    const { onExit, data, storageKey } = this.props;
+    const { onExit, data, storage } = this.props;
     if (onExit) {
       onExit([
         {
           name: 'body',
           value:
-            values.body ||
-            data.body ||
-            localStorage.getItem(storageKey) ||
-            '<p></p>',
+            values.body || data.body || storage.getItem('body') || '<p></p>',
         },
-        { name: 'title', value: values.title || data.title },
-        { name: 'summary', value: values.summary || data.summary },
+        {
+          name: 'title',
+          value: values.title || data.title || storage.getItem('title'),
+        },
+        {
+          name: 'summary',
+          value: values.summary || data.summary || storage.getItem('summary'),
+        },
       ]);
     }
   }
 
   render() {
-    const { data, storageKey, withOptions, intl } = this.props;
+    const { data, storage, withOptions, intl } = this.props;
+
     return (
       <FormValidation
         ref={this.form}
         submit={this.handleNext}
         validations={{
           body: { fn: bodyValidation, args: { required: !withOptions } },
-          summary: { args: { required: true, min: 5, max: 250 } },
-          title: { args: { required: true, min: 3 } },
+          summary: { args: { required: true, min: 5, max: 500 } },
+          title: { args: { required: true, min: 3, max: 80 } },
           withOptions: {}, // hack to circumvent isEmpty check
         }}
         data={{
-          body: data.body || localStorage.getItem(storageKey) || '<p></p>',
-          title: data.title,
-          summary: data.summary,
+          body: data.body || storage.getItem('body') || '<p></p>',
+          title: data.title || storage.getItem('title'),
+          summary: data.summary || storage.getItem('summary'),
           withOptions,
         }}
       >
         {({ handleValueChanges, values, errorMessages }) => (
-          <Box column>
+          <Box fill column className={s.root}>
             <FormField
               label={<FormattedMessage {...messages.title} />}
               error={errorMessages.titleError}
@@ -151,21 +153,25 @@ class ProposalBody extends React.Component<Props> {
                 type="text"
                 value={values.title}
                 placeholder={intl.formatMessage({ ...messages.placeholder })}
-                onChange={handleValueChanges}
+                onChange={evt => {
+                  handleValueChanges(evt);
+                  storage.setItem(evt.target);
+                }}
               />
             </FormField>
             <FormField
+              help={`You should use max 250-300 chars. Count: ${values.summary.length}`}
               error={errorMessages.summaryError}
-              label=<FormattedMessage {...messages.summary} />
+              label={<FormattedMessage {...messages.summary} />}
             >
               <Textarea
                 name="summary"
                 placeholder={intl.formatMessage({ ...messages.placeholder })}
                 useCacheForDOMMeasurements
                 value={values.summary}
-                onChange={value => {
-                  handleValueChanges(value);
-                  /* localStorage.setItem(storageKey, value);*/
+                onChange={evt => {
+                  handleValueChanges(evt);
+                  storage.setItem(evt.target);
                 }}
                 className={s.textEdit}
                 minRows={2}
@@ -183,8 +189,9 @@ class ProposalBody extends React.Component<Props> {
                 value={values.body}
                 placeholder={intl.formatMessage({ ...messages.placeholder })}
                 onChange={value => {
-                  handleValueChanges({ target: { name: 'body', value } });
-                  localStorage.setItem(storageKey, value);
+                  const target = { name: 'body', value };
+                  handleValueChanges({ target });
+                  storage.setItem(target);
                 }}
               />
             </FormField>

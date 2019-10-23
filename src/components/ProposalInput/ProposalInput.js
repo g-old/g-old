@@ -51,6 +51,12 @@ type UpdateShape = {
   pending: boolean,
 };
 
+export type StorageShape = {
+  getItem: string => any,
+  setItem: ValueType => void,
+  clear: () => void,
+};
+
 type State = {
   ...PollSettingsShape,
   dateTo?: string,
@@ -68,6 +74,7 @@ type State = {
   rotation: number,
   summary: string,
   previewImage: mixed,
+  storage?: StorageShape,
 };
 type Props = {
   defaultPollType: PollTypeTypes,
@@ -86,8 +93,31 @@ type Props = {
   updates: UpdateShape,
   uploadFiles: () => void,
   uploadStatus?: { pending?: boolean, error?: string },
+  onCancel?: () => void,
 };
 const DEFAULT_POLL_TYPE = 'voting';
+
+//TODO check for localstorage, etc, return storge.get/storage.set
+//storage.delete
+const createStorage = masterKey => {
+  const keys = {
+    title: `${masterKey}_title`,
+    summary: `${masterKey}_smry`,
+    body: masterKey,
+  };
+  let storage;
+  if (process.env.BROWSER) {
+    storage = window && window.localStorage;
+  }
+  return {
+    setItem: value => storage && storage.setItem(keys[value.name], value.value),
+    getItem: name => storage && storage.getItem(keys[name]),
+    clear: () =>
+      Object.keys(keys).forEach(
+        key => storage && storage.removeItem(keys[key]),
+      ),
+  };
+};
 
 class ProposalInput extends React.Component<Props, State> {
   constructor(props) {
@@ -117,7 +147,7 @@ class ProposalInput extends React.Component<Props, State> {
     };
 
     this.storageKey = `proposalDraft${props.workteamId || '-public'}`;
-
+    this.storage = createStorage(this.storageKey);
     this.handleAddOption = this.handleAddOption.bind(this);
     this.handleValueSaving = this.handleValueSaving.bind(this);
     this.handleSubmission = this.handleSubmission.bind(this);
@@ -282,7 +312,7 @@ class ProposalInput extends React.Component<Props, State> {
       transferRights: false,
     });
 
-    localStorage.removeItem(this.storageKey);
+    this.storage.clear();
   }
 
   handleOnSuccess() {
@@ -290,7 +320,7 @@ class ProposalInput extends React.Component<Props, State> {
       updates: { success },
     } = this.props;
     if (success) {
-      localStorage.removeItem(this.storageKey);
+      this.storage.clear();
       history.push(`/proposal/${success}`);
     }
   }
@@ -312,7 +342,7 @@ class ProposalInput extends React.Component<Props, State> {
       rotation,
       transferRights,
     } = this.state;
-    const { tags, updates = {}, image, uploadStatus } = this.props;
+    const { tags, updates = {}, image, uploadStatus, onCancel } = this.props;
     return (
       <Box fill column>
         <Wizard onNext={this.calculateNextStep} basename="">
@@ -330,7 +360,7 @@ class ProposalInput extends React.Component<Props, State> {
               <Steps>
                 <Step id="body">
                   <ProposalBody
-                    storageKey={this.storageKey}
+                    storage={this.storage}
                     data={{ body, title, summary }}
                     onExit={this.handleValueSaving}
                     withOptions={withOptions}
@@ -384,7 +414,10 @@ class ProposalInput extends React.Component<Props, State> {
                   />
                 </Step>
               </Steps>
-              <Navigation onSubmit={this.handleSubmission} />
+              <Navigation
+                onSubmit={this.handleSubmission}
+                onCancel={onCancel}
+              />
             </StepPage>
           )}
         </Wizard>
