@@ -14,7 +14,7 @@ import { logout } from '../../actions/session';
 
 import { verifyEmail } from '../../actions/verifyEmail';
 import { loadLogs } from '../../actions/log';
-import { Groups } from '../../organization';
+// import { Groups } from '../../organization';
 import { createRequest, deleteRequest } from '../../actions/request';
 import {
   createWebPushSub,
@@ -68,8 +68,9 @@ import history from '../../history';
 import ListView from '../../components/ListView';
 import ProposalPreview from '../../components/ProposalPreview';
 import VerificationUploadMask from './VerificationUploadMask';
-import { VerificationTypes } from '../../data/models/constants';
-import Layer from '../../components/Layer/Layer';
+// import { VerificationTypes } from '../../data/models/constants';
+import Layer from '../../components/Layer';
+import Toast from '../../components/Toast';
 
 const messages = defineMessages({
   settings: {
@@ -117,6 +118,11 @@ const messages = defineMessages({
       'Your verification request was denied. Try again or contact us directly',
     description: 'Notification of verification denial',
   },
+  statusCall: {
+    id: 'settings.statusCall',
+    defaultMessage: 'We are not finished yet. But have a look around.',
+    description: 'Notification site-under-construction',
+  },
   followees: {
     id: 'profile.followees',
     defaultMessage: 'Followees',
@@ -132,6 +138,18 @@ const messages = defineMessages({
     id: 'label.messages',
     description: 'Messages label',
     defaultMessage: 'Messages',
+  },
+  more: {
+    id: 'commands.more',
+    description: 'Load more resources',
+    defaultMessage: 'Show more',
+  },
+  alert: {
+    id: 'alphaAlert',
+    defaultMessage:
+      'The page is currently under construction. We will inform you by mail as soon as everything is ready.',
+
+    description: 'Notice of alpha status',
   },
 });
 
@@ -326,10 +344,19 @@ class AccountContainer extends React.Component {
     let action;
     if (ownAccount && !user.emailVerified) {
       messageId = 'verificationCall';
-    } else if (ownAccount && user.groups === Groups.GUEST && !user.thumbnail) {
+    } /* else if (ownAccount && user.groups === Groups.GUEST && !user.thumbnail) {
       messageId = 'uploadCall';
       // eslint-disable-next-line no-bitwise
-    } else if (ownAccount && user.groups === Groups.GUEST) {
+    } */ else {
+      messageId = 'statusCall';
+      action = (
+        <Button primary onClick={() => history.push('/proposals/active')}>
+          <FormattedMessage {...messages.more} />
+        </Button>
+      );
+    }
+    // Disabled until we start really
+    /* else if (ownAccount && user.groups === Groups.GUEST) {
       messageId = 'waitCall';
     } else if (
       ownAccount &&
@@ -346,12 +373,13 @@ class AccountContainer extends React.Component {
       messageId = 'verifyWaitCall';
     } else if (user.verificationStatus === VerificationTypes.DENIED) {
       messageId = 'verifyDenied';
-    }
+    } */
     return (
       messageId && (
         <Notification
           type="alert"
           action={action}
+          wrap
           message={
             <FormattedMessage
               {...messages[messageId]}
@@ -593,9 +621,17 @@ class AccountContainer extends React.Component {
         </AccordionPanel>
       );
     }
+    const toast = (
+      <Toast alert duration={10000} bottom>
+        <Box align between>
+          <FormattedMessage {...messages.alert} />
+        </Box>
+      </Toast>
+    );
     return (
       <Box tag="article" column padding="medium">
         {notification}
+        {toast}
         <Box between column={small}>
           {showUpload && (
             <ImageUpload

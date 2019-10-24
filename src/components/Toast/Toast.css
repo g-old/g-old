@@ -35,7 +35,7 @@
 }
 
 .alert {
-  background-color: var(--color-red);
+  background-color: var(--color-two);
   color: #fff;
   stroke: #fff;
 }
@@ -70,8 +70,23 @@
   }
 }
 
-.close {
+@keyframes bottom-toast-lower {
+  0% {
+    transform: translateY(0%);
+  }
+
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.closeRaiseUp {
   animation: toast-raise 1s;
+  animation-fill-mode: forwards;
+}
+
+.closeLowerDown {
+  animation: bottom-toast-lower 1s;
   animation-fill-mode: forwards;
 }
 

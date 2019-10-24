@@ -74,7 +74,8 @@ class ToastContents extends React.Component {
     let closeControl;
     const classes = cn(s.toast, {
       [s.alert]: alert,
-      [s.close]: closing,
+      [s.closeRaiseUp]: closing && !bottom,
+      [s.closeLowerDown]: closing && bottom,
       [s.bottomUp]: bottom,
       [s.topDown]: !bottom,
     });

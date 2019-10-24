@@ -58,6 +58,7 @@
 .container {
   margin: 0 auto;
   max-width: 36em;
+  padding: 0 0.2em;
 }
 
 .deleted {

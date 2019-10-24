@@ -8,6 +8,7 @@
   align-items: center;
   flex-wrap: wrap;
   background-color: #fff;
+  cursor: pointer;
 }
 
 .center {

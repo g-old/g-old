@@ -430,6 +430,7 @@
       "src/components/ImageUpload/ImageUpload.js",
       "src/components/MessageInput/NoticeLayer.js",
       "src/components/Poll/Poll.js",
+      "src/components/ProposalInput/Navigation.js",
       "src/components/Statement/EditMenu.js",
       "src/components/UserSettings/EmailField.js",
       "src/components/UserSettings/UserSettings.js",
@@ -620,7 +621,10 @@
     "description": "Load more resources",
     "defaultMessage": "Show more",
     "message": "Mehr anzeigen",
-    "files": ["src/components/SupervisionPanel/SupervisionPanel.js"]
+    "files": [
+      "src/components/SupervisionPanel/SupervisionPanel.js",
+      "src/routes/account/AccountContainer.js"
+    ]
   },
   {
     "id": "commands.reject",
@@ -986,8 +990,8 @@
   },
   {
     "id": "cookieBanner",
-    "description": "Cookie banner, should comply to EU regulations",
-    "defaultMessage": "This site uses cookies to ensure you get the best browsing experience. More information: {link}",
+    "description": "Cookie banner, should comply to EU regulations. Must have: notice of profiling cookies if used, third-party cookies(if used), link to extended info, notice that continued browsing signifies consent",
+    "defaultMessage": "This site uses cookies to ensure you get the best browsing experience. Continued browsing approves the use of cookies. More information: {link}",
     "message": "Diese Webseite nutzt Cookies um Ihre Weberlebnis zu verbessern. Mehr Informationen: {link}",
     "files": ["src/components/Layout/Layout.js"]
   },
@@ -1237,6 +1241,7 @@
     "files": [
       "src/components/Navigation/Navigation.js",
       "src/components/WorkTeam/WorkTeam.js",
+      "src/routes/proposals/ProposalsOverviewContainer.js",
       "src/routes/workTeamManager/WorkTeamManagement.js"
     ]
   },
@@ -2180,5 +2185,19 @@
       "src/components/UserProfile/VerificationBadge.js",
       "src/routes/account/AccountContainer.js"
     ]
+  },
+  {
+    "id": "alphaAlert",
+    "description": "Notice of alpha status",
+    "defaultMessage": "The page is currently under construction. We will inform you by mail as soon as everything is ready.",
+    "message": "Die Webseite ist nocht nicht fertig. Wir informieren dich, wenn alles funktioniert!",
+    "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "settings.statusCall",
+    "description": "Notification site-under-construction",
+    "defaultMessage": "ALPHA-VERSION: We are not done with this page yet. Until then you are welcome to have a look around",
+    "message": "Die Webseite ist noch nicht ganz fertig. Schau dich aber gerne um.",
+    "files": ["src/routes/account/AccountContainer.js"]
   }
 ]

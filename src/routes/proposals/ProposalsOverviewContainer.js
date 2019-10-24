@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FormattedMessage, defineMessages } from 'react-intl';
 import { connect } from 'react-redux';
 import { loadProposalsList, loadProposal } from '../../actions/proposal';
 import history from '../../history';
@@ -16,7 +17,7 @@ import { sortActiveProposals, sortClosedProposals } from '../utils';
 import ProposalInputLayer from '../../components/ProposalInputLayer';
 import Box from '../../components/Box';
 import Heading from '../../components/Heading';
-import Label from '../../components/Label';
+// import Label from '../../components/Label';
 import { isVoter } from '../../organization';
 
 const onFilterChange = e => {
@@ -24,6 +25,15 @@ const onFilterChange = e => {
     history.push(`/proposals/${e.option.value}`);
   }
 };
+
+const messages = defineMessages({
+  proposals: {
+    id: 'proposals',
+    description: 'Proposals label',
+    defaultMessage: 'Proposals',
+  },
+});
+
 class ProposalsOverviewContainer extends React.Component {
   static propTypes = {
     proposals: PropTypes.arrayOf(
@@ -71,12 +81,14 @@ class ProposalsOverviewContainer extends React.Component {
     return (
       <Box column>
         <Box pad column>
-          <Heading tag="h2"> Vorschläge </Heading>
-          <Label>
+          <Heading tag="h2">
+            <FormattedMessage {...messages.proposals} />
+          </Heading>
+          {/* <Label>
             {` Citizens' proposals are an opportunity for neighbours and
             collectives to decide directly how they want their city to be, after
             getting sufficient support and submitting to a citizens' vote.`}
-          </Label>
+          </Label> */}
         </Box>
         {isVoter(user) && <ProposalInputLayer />}
         <StateFilter

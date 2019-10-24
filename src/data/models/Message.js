@@ -246,22 +246,16 @@ const userStatusTranslations = {
   },
   viewer_added: {
     de:
-      'Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen, Beiträge und Beschlüsse lesen sowie an Diskussionen teilnehmen.',
+      'Sie sind als Viewer freigeschalten worden. Ab sofort können Sie Vorschläge lesen, einer Arbeitsgruppe beitreten sowie an Diskussionen teilnehmen.',
     it:
-      'Sei stato abilitato come Visitatore e da adesso puoi partecipare ai sondaggi, iscriverti ai gruppi di lavoro e lì partecipare a tutte le attività previste: discussioni, sondaggi e votazioni.',
+      'Sei stato abilitato come Visitatore e da adesso puoi iscriverti ai gruppi di lavoro e lì partecipare a tutte le attività previste: discussioni e votazioni.',
     lld:
-      'translate: Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, bei Umfragen abstimmen, Beiträge und Beschlüsse lesen sowie an Diskussionen teilnehmen.',
+      'translate: Sie sind als Viewer freigeschalten worden. Ab sofort können Sie einer Arbeitsgruppe beitreten, Beiträge und Vorschläge lesen sowie an Diskussionen teilnehmen.',
   },
   viewer_lost: {
-    de: `Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. ${
-      helpNotice.de
-    }`,
-    it: `Non sei più abilitato come Visitatore (Viewer), per il momento non potrai più partecipare  alle attività della piattaforma. ${
-      helpNotice.it
-    }`,
-    lld: `translate: Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. ${
-      helpNotice.lld
-    }`,
+    de: `Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. ${helpNotice.de}`,
+    it: `Non sei più abilitato come Visitatore (Viewer), per il momento non potrai più partecipare  alle attività della piattaforma. ${helpNotice.it}`,
+    lld: `translate: Sie besitzen nun nicht mehr die Berechtigungen eines Viewers. Bis auf weiteres können Sie an keinen Aktivitäten der Plattformen teilnehmen. ${helpNotice.lld}`,
   },
 
   voter_added: {
@@ -273,15 +267,9 @@ const userStatusTranslations = {
       'translate: Sie sind als Voter freigschalten worden. Ab sofort sind Sie uneingeschränktes Mitglied und können  an allen Abstimmungen teilnehmen, sowie Kommentare und Erklärungen verfassen.',
   },
   voter_lost: {
-    de: `Sie sind ab jetzt kein stimmberechtigtes Mitglied der Plattform. ${
-      helpNotice.de
-    }`,
-    it: `Da questo momento non hai più il ruolo di Votante sulla piattaforma. ${
-      helpNotice.it
-    }`,
-    lld: `translate: Sie sind ab jetzt kein stimmberechtigtes Mitglied der Plattform. ${
-      helpNotice.lld
-    }`,
+    de: `Sie sind ab jetzt kein stimmberechtigtes Mitglied der Plattform. ${helpNotice.de}`,
+    it: `Da questo momento non hai più il ruolo di Votante sulla piattaforma. ${helpNotice.it}`,
+    lld: `translate: Sie sind ab jetzt kein stimmberechtigtes Mitglied der Plattform. ${helpNotice.lld}`,
   },
 
   moderator_added: {
@@ -309,12 +297,8 @@ const userStatusTranslations = {
 
   member_manager_lost: {
     de: `Sie sind ab jetzt kein "Member Manager" mehr. ${helpNotice.de}`,
-    it: `Da questo momento non sei più un gestore utenti ("Member Manager"). ${
-      helpNotice.it
-    }`,
-    lld: `translate: Sie sind ab jetzt kein "Member Manager" mehr. ${
-      helpNotice.lld
-    }`,
+    it: `Da questo momento non sei più un gestore utenti ("Member Manager"). ${helpNotice.it}`,
+    lld: `translate: Sie sind ab jetzt kein "Member Manager" mehr. ${helpNotice.lld}`,
   },
   relator_added: {
     de:
@@ -339,9 +323,7 @@ const userStatusTranslations = {
   },
   team_leader_lost: {
     de: `Sie sind ab jetzt kein "Teamleader" mehr. ${helpNotice.de}`,
-    it: `Da questo momento non sei più coordinatore di un gruppo di lavoro. ${
-      helpNotice.it
-    }`,
+    it: `Da questo momento non sei più coordinatore di un gruppo di lavoro. ${helpNotice.it}`,
     lld: `Sie sind ab jetzt kein "Teamleader" mehr. ${helpNotice.lld}`,
   },
 
@@ -354,9 +336,7 @@ const userStatusTranslations = {
   district_keeper_lost: {
     de: `Sie sind ab jetzt kein "District keeper" mehr. ${helpNotice.de}`,
     it: `Da questo momento non sei più responsabile di zona. ${helpNotice.it}`,
-    lld: `translate: Sie sind ab jetzt kein "District keeper" mehr. ${
-      helpNotice.lld
-    }`,
+    lld: `translate: Sie sind ab jetzt kein "District keeper" mehr. ${helpNotice.lld}`,
   },
   contactee_added: {
     de:
@@ -368,12 +348,8 @@ const userStatusTranslations = {
   },
   contactee_lost: {
     de: `Sie sind ab jetzt kein "Contactee" mehr. ${helpNotice.de}`,
-    it: `Da questo momento non sei più "persona di riferimento". ${
-      helpNotice.it
-    }`,
-    lld: `translate: Sie sind ab jetzt kein "Contactee" mehr. ${
-      helpNotice.lld
-    }`,
+    it: `Da questo momento non sei più "persona di riferimento". ${helpNotice.it}`,
+    lld: `translate: Sie sind ab jetzt kein "Contactee" mehr. ${helpNotice.lld}`,
   },
 };
 

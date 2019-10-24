@@ -123,7 +123,10 @@ class ProposalPreview extends React.Component {
     }
 
     return (
-      <div className={cn(s.root, proposal.image && s.center)}>
+      <div
+        onClick={this.handleClick}
+        className={cn(s.root, proposal.image && s.center)}
+      >
         {proposal.image && (
           <Image
             size="medium"
@@ -134,9 +137,7 @@ class ProposalPreview extends React.Component {
 
         <div className={s.container}>
           <div // eslint-disable-line
-            style={{ display: 'flex', cursor: 'pointer' }}
-            role="link"
-            onClick={this.handleClick}
+            style={{ display: 'flex' }}
           >
             {/* <PollPreview poll={poll} /> */}
             {

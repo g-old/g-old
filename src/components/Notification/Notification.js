@@ -38,7 +38,7 @@ class Notification extends React.Component {
         className = s.error;
     }
     return (
-      <Box pad className={cn(className, s.notification)}>
+      <Box {...this.props} className={cn(className, s.notification)}>
         <span>{message}</span>
         {action}
       </Box>

@@ -33,8 +33,10 @@ const messages = defineMessages({
   cookieBanner: {
     id: 'cookieBanner',
     defaultMessage:
-      'This site uses cookies to ensure you get the best browsing experience. More information: {link}',
-    description: 'Cookie banner, should comply to EU regulations',
+      'This site uses cookies to ensure you get the best browsing experience. Continued browsing approves the use of cookies. More information: {link}',
+    // see https://www.garanteprivacy.it/web/guest/home/docweb/-/docweb-display/docweb/3167654
+    description:
+      'Cookie banner, should comply to EU regulations. Must have: notice of profiling cookies if used, third-party cookies(if used), link to extended info, notice that continued browsing signifies consent',
   },
   consent: {
     id: 'command.consent',

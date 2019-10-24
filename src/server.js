@@ -154,8 +154,10 @@ if (__DEV__) {
 }
 app.use(express.static(path.join(__dirname, '/images')));
 
-app.use(cookieParser());
+app.use(cookieParser()); // needed by requestLanguage
 app.use(
+  /* allowed as technical cookie, if not used for profiling - see also
+   https://www.garanteprivacy.it/web/guest/home/docweb/-/docweb-display/docweb/3167654 1a */
   requestLanguage({
     languages: config.locales,
     queryName: 'lang',
@@ -163,7 +165,7 @@ app.use(
       name: 'lang',
       options: {
         path: '/',
-        maxAge: 3650 * 24 * 3600 * 1000, // 10 years in miliseconds
+        maxAge: 365 * 24 * 3600 * 1000, // 1 year in miliseconds
       },
       url: '/lang/{language}',
     },
@@ -176,11 +178,20 @@ app.use(bodyParser.json());
 // Sessions
 // -----------------------------------------------------------------------------
 
+let sessionSecret;
+if (!__DEV__) {
+  sessionSecret = process.env.SESSION_SECRET;
+  if (!sessionSecret) {
+    throw new Error('cookie-secret-undefined');
+  }
+} else {
+  sessionSecret = 'keyboard cat';
+}
 const sessionConfig = {
-  secret: 'keyboard cat', // TODO change
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: true,
-  cookie: { maxAge: 4 * 60 * 60 * 1000 },
+  cookie: { maxAge: 4 * 60 * 60 * 1000, secure: !__DEV__ },
   // cookie: { secure: true } // Use with SSL : https://github.com/expressjs/session
 };
 

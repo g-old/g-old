@@ -284,7 +284,7 @@ class Home extends React.Component<Props> {
                   target="_blank"
                   href="https://dirdemdi.org"
                 >
-                  Mehr Info
+                  Mehr Infos
                 </a>
               </Button>
             </Box>
