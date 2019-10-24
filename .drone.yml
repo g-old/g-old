@@ -31,7 +31,6 @@ pipeline:
     image: plugins/docker
     repo: tobiasmayr/gold
     auto_tag: true
-    auto_tag_suffix: vip
     secrets: [ docker_username, docker_password ]
     build_args:
       - DRONE_BUILD_NUMBER=${DRONE_BUILD_NUMBER}
