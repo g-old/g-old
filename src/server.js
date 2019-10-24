@@ -191,7 +191,7 @@ const sessionConfig = {
   secret: sessionSecret,
   resave: false,
   saveUninitialized: true,
-  cookie: { maxAge: 4 * 60 * 60 * 1000, secure: !__DEV__ },
+  cookie: { maxAge: 4 * 60 * 60 * 1000 },
   // cookie: { secure: true } // Use with SSL : https://github.com/expressjs/session
 };
 
