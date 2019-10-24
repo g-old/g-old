@@ -2094,8 +2094,29 @@
   {
     "id": "settings.statusCall",
     "description": "Notification site-under-construction",
-    "defaultMessage": "ALPHA-VERSION: We are not done with this page yet. Until then you are welcome to have a look around",
+    "defaultMessage": "We are not finished yet. But have a look around.",
     "message": "",
     "files": ["src/routes/account/AccountContainer.js"]
+  },
+  {
+    "id": "labels.startpage",
+    "description": "label of start page",
+    "defaultMessage": "Start Page",
+    "message": "",
+    "files": ["src/routes/loggedOut/index.js"]
+  },
+  {
+    "id": "labels.thankyou",
+    "description": "notice when sees logged out page",
+    "defaultMessage": "Thank you for the visit!",
+    "message": "",
+    "files": ["src/routes/loggedOut/index.js"]
+  },
+  {
+    "id": "notice.loggedOut",
+    "description": "notice when user is logged out",
+    "defaultMessage": "You are logged out",
+    "message": "",
+    "files": ["src/routes/loggedOut/index.js"]
   }
 ]
