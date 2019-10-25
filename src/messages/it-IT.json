@@ -2029,7 +2029,7 @@
     "id": "command.consent",
     "description": "Commant to allow an action",
     "defaultMessage": "Accept",
-    "message": "",
+    "message": "Accetta",
     "files": ["src/components/Layout/Layout.js"]
   },
   {
@@ -2046,7 +2046,7 @@
     "id": "alphaAlert",
     "description": "Notice of alpha status",
     "defaultMessage": "The page is currently under construction. We will inform you by mail as soon as everything is ready.",
-    "message": "",
+    "message": "La pagina è attualmente in costruzione. Ti informeremo per posta non appena tutto sarà pronto.",
     "files": ["src/routes/account/AccountContainer.js"]
   },
   {
@@ -2060,14 +2060,14 @@
     "id": "labels.startpage",
     "description": "label of start page",
     "defaultMessage": "Start Page",
-    "message": "",
+    "message": "Pagina iniziale",
     "files": ["src/routes/loggedOut/index.js"]
   },
   {
     "id": "labels.thankyou",
     "description": "notice when sees logged out page",
     "defaultMessage": "Thank you for the visit!",
-    "message": "",
+    "message": "Grazie per la visita!",
     "files": ["src/routes/loggedOut/index.js"]
   },
   {

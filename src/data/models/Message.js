@@ -14,7 +14,7 @@ const dmp = new DiffMatchPatch();
 export type MessageType = 'communication' | 'note' | 'meeting';
 
 type RecipientType = 'user' | 'group' | 'role' | 'all';
-
+const CURRENT_EMAIL_ADDRESS = 'info@dirdemdi.org';
 const isDifferent = (oldTextHtml, newTextHtml) => {
   let oldText;
   let newText;
@@ -224,11 +224,9 @@ class Message {
 export default Message;
 
 const helpNotice = {
-  de:
-    'Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an m5sbz@g-old.org',
-  it: 'Se ritieni che ci sia un errore, scrivi una mail a m5sbz@g-old.org',
-  lld:
-    'Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an m5sbz@g-old.org',
+  de: `Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an ${CURRENT_EMAIL_ADDRESS}`,
+  it: `Se ritieni che ci sia un errore, scrivi una mail a ${CURRENT_EMAIL_ADDRESS}`,
+  lld: `translate: Wenn Sie glauben, dass hier ein Fehler vorliegt, schreiben Sie eine E-Mail an ${CURRENT_EMAIL_ADDRESS}`,
 };
 
 const userStatusTranslations = {
