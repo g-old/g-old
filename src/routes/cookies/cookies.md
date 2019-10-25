@@ -5,7 +5,7 @@ component: ContentPage
 
 VOLKS-INI-POP-BZ.ORG
 
-## Stand: 19. Oktober 2019
+## Stand: 24. Oktober 2019
 
 ## Welche Cookies wir verwenden
 
@@ -26,6 +26,10 @@ Wenn Sie die Cookie-Richtlinien über den Banner oder mit der Registrierung akze
 
 Wenn Sie sich auf der Webseite anmelden, setzen wir ein Cookie mit einer Identifikationsnummer, welches uns erlaubt sicherzustellen, dass Sie angemeldet sind. Dies ist für den technischen Betrieb zwingend notwendig.
 
+Wir benutzen diese Cookies nicht für Profilerstellungen.
+
+Lesen Sie auch unsere [Datenschutzerklärung]('/privacy').
+
 ### Analytische Cookies
 
 Damit soll die Verwendung der Webseite durch die Benutzer für den Webseitenbetreiber verständlich gemacht werden. Aus den anonymisierten Daten können (anonymisiert) Rückschlüsse hinsichtlich der Verwendung der Webseite gezogen werden.
@@ -41,6 +45,7 @@ Solche Cookies stammen von Webseiten/Webservern Dritter und dienen deren Zwecken
 #### Unser Gebrauch
 
 Die Nutzung solcher Cookies und der damit zusammenhängenden Techniken kann sich im Laufe der Zeit ändern.
+[Hier](https://cloudinary.com/privacy#section11) finden sie die Datenschutzrichtlinien von Cloudinary, einem Bilder-Hoster der unsere Profilbilder speichert und den Richtlinien des EU-US Privacy Shields unterliegt.
 
 # Cookies einschränken
 

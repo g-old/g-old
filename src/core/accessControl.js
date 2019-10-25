@@ -56,7 +56,7 @@ function pollingModeReadControl(viewer, data) {
   return true;
 }
 function pollingModeWriteControl(viewer, data) {
-  return viewer.groups & Groups.RELATOR;
+  return viewer.groups & Groups.VOTER; // Groups.RELATOR
 }
 function communicationReadControl(viewer, data) {
   console.error('Access control for Communication not implemented');

@@ -1,13 +1,13 @@
 ---
-title: Privacy
+title: Datenschutzerklärung
 component: ContentPage
 ---
 
-# DRAFT!! - ENTWURF!! - NICHT VOLLSTÄNDIG!!
+## Initiative für mehr Demokratie
 
-# Datenschutzerklärung
+VOLKS-INI-POP-BZ.ORG
 
-## Stand 17 Oktober 2019
+## Stand 25. Oktober 2019
 
 Die Initiative für mehr Demokratie ("Initiative" oder "Wir", "Uns") achtet Ihr Recht auf Datenschutz und schützt es durch die Einhaltung dieser Datenschutzerklärung ("Erklärung").
 
@@ -19,7 +19,7 @@ Die Erklärung gilt auschließlich für Daten, die wir
 - in E-Mails, Texten und anderen elektronischen Nachrichten zwischen Ihnen und der Website
   erfassen.
 
-Wenn Sie mit den hier geschilderten Maßnahmen nicht einverstanden sind, haben sie die Möglichkeit, die Webseite nicht zu benutzen. Durch den Aufruf und die Nutzung der Webseite stimmen Sie der Erklärung zu. Die Erklärung kann sich von Zeit zu Zeit ändern. Besuchen Sie die Webseite nach solchen Änderungen, wird dies als Zustimmung zu den Änderungen aufgefasst. Prüfen Sie daher die Erklärung regelmäßig vor dem Besuch der Website auf Aktualisierungen. Siehe dazu die Sektion ("Wie wir die Datenschutzerklärung ändern").
+Wenn Sie mit den hier geschilderten Maßnahmen nicht einverstanden sind, haben sie die Möglichkeit, die Webseite nicht zu benutzen. Durch den Aufruf und die Nutzung der Webseite stimmen Sie der Erklärung zu. Die Erklärung kann sich von Zeit zu Zeit ändern. Besuchen Sie die Webseite nach solchen Änderungen, wird dies als Zustimmung zu den Änderungen aufgefasst. Prüfen Sie daher die Erklärung regelmäßig vor dem Besuch der Website auf Aktualisierungen. Siehe dazu die Sektion ("Änderungen der Datenschutzerklärung").
 
 ## Verantwortliche Stelle und Datenschutzkontakt
 
@@ -27,11 +27,11 @@ Initiative für mehr Demokratie
 
 Anschrift: Silbergasse 15, 39100 Bozen (BZ), Italien (IT).
 
-Kontakt: info(at)dirdemdi(Punkt)org
+Kontakt: info (at) dirdemdi (Punkt) org
 
 ## Welche Informationen und Daten wir erfassen
 
-- Personenbezogene Daten wie Ihre E-Mail-Adresse, Ihren Namen, Foto, Steuerkennnummer, Ihre Anschrift, Ihre IP-Adresse.
+- Personenbezogene Daten wie Ihre E-Mail-Adresse, Ihren Namen, Foto, zum Zweck der Verifizierung ihre Steuerkennnummer, Ihre IP-Adresse.
 - Sensible Daten wie ihre politische Einstellung
 - Ihre bevorzugte Sprache für die Nutzung der Webseite
 - Daten über Ihre Nutzung der Webseite.
@@ -66,9 +66,13 @@ Durch die Interaktion mit der Webseite könne folgende Daten anfallen:
 ## Datenerfassung durch Drittanbieter
 
 Google-Fonts, Cloudinary und Recaptcha erfassen Ihre Verbindungsdaten wie die IP-Adresse.
-Google-Fonts stellt den auf der Webseite eingebetteten Schriftsatz zur Verfügung
+Google-Fonts stellt den auf der Webseite eingebetteten Schriftsatz zur Verfügung.
 Cloudinary speichert die Profilfotos der Benutzer.
 Recaptcha ermöglicht es uns effektiv zu unterscheiden, ob jemand, der sich auf der Webseite registriert, ein Mensch oder ein Bot (computergesteuertes Programm) ist.
+
+Für mehr Informationen zu Google-Fonts und Recaptcha, siehe Googles [Datenschutzrichtlinie](https://policies.google.com/privacy)
+
+Für mehr Informationen zu Cloudinary, siehe deren [Datenschutzrichlinie](https://cloudinary.com/privacy);
 
 ## Wie wir diese Daten verwenden
 
@@ -91,7 +95,9 @@ Die Daten werden in Deutschland in einem Rechenzentrum der Hetzner Online GmbH g
 
 ## Unsere Rechtsgrundlage für die Verarbeitung der Daten
 
-- Die Einwilligung nach Art. 6 Abs.1 a) DSGVO. Der Besucher der Webseite willigt ein, dass die Anfrage zu deren Beantwortung verarbeitet wird. Mit der Anfrage zum Verifizierungsprozess,
+- Die Einwilligung nach Art. 6 Abs.1 a) DSGVO. Der Besucher der Webseite willigt ein, dass die Anfrage zu deren Beantwortung verarbeitet wird. Dasselbe gilt für die Anfrage zum Verifizierungsprozess.
+
+- Die berechtigten Interessen der Initiative nach Art 6 Abs. 1 f) für das Loggen der Daten.
 
 ## Daten, die wir für Dritte offenlegen
 
@@ -123,6 +129,13 @@ Ihre Einwilligung in die Datenverarbeitung kann jederzeit widerrufen werden.
 Eine automatisierte Entscheidung im Sinne von Art. 22 DSGVO findet nicht statt.
 
 ## Datensicherheit
+
+Wir heben Systeme installiert, welche den unberechtigten Zugriff oder den Verlust persönlicher Daten verhindern sollen.
+
+Einige Bereiche der Webseite sind öffentlich und einige Inhalte werden öffentlich zugänglich gemacht. Seien sie daher vorsichtig mit den Informationen, die Sie dort preisgeben.
+Sie sind dafür verantwortlich, ihr Passwort geheim zu halten. Teilen Sie es nicht mit anderen Personen.
+
+Die Übertragung persönlicher Daten über das Internet ist nicht vollständig sicher. Wir können daher die Sicherheit dieser Datenübertragung nicht garantieren. Wir sind nicht veranwortlich für die mögliche Aushebelung von Sicherheitsmechanismen, welche die Webseite oder die persönlichen Daten schützen sollen.
 
 ## Änderungen der Datenschutzerklärung
 
