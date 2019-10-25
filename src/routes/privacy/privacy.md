@@ -19,7 +19,7 @@ Die Erklärung gilt auschließlich für Daten, die wir
 - in E-Mails, Texten und anderen elektronischen Nachrichten zwischen Ihnen und der Website
   erfassen.
 
-Wenn Sie mit den hier geschilderten Maßnahmen nicht einverstanden sind, haben sie die Möglichkeit, die Webseite nicht zu benutzen. Durch den Aufruf und die Nutzung der Webseite stimmen Sie der Erklärung zu. Die Erklärung kann sich von Zeit zu Zeit ändern. Besuchen Sie die Webseite nach solchen Änderungen, wird dies als Zustimmung zu den Änderungen aufgefasst. Prüfen Sie daher die Erklärung regelmäßig vor dem Besuch der Website auf Aktualisierungen. Siehe dazu die Sektion ("Änderungen der Datenschutzerklärung").
+Wenn Sie mit den hier geschilderten Maßnahmen nicht einverstanden sind, haben Sie die Möglichkeit, die Webseite nicht zu nutzen. Durch den Aufruf und die Nutzung der Webseite stimmen Sie der Erklärung zu. Die Erklärung kann sich von Zeit zu Zeit ändern. Besuchen Sie die Webseite nach solchen Änderungen, wird dies als Zustimmung zu den Änderungen aufgefasst. Prüfen Sie daher die Erklärung regelmäßig vor dem Besuch der Website auf Aktualisierungen. Siehe dazu die Sektion ("Änderungen der Datenschutzerklärung").
 
 ## Verantwortliche Stelle und Datenschutzkontakt
 
@@ -27,7 +27,7 @@ Initiative für mehr Demokratie
 
 Anschrift: Silbergasse 15, 39100 Bozen (BZ), Italien (IT).
 
-Kontakt: info (at) dirdemdi (Punkt) org
+Kontakt: info (ät) dirdemdi (Punkt) org
 
 ## Welche Informationen und Daten wir erfassen
 
@@ -47,27 +47,27 @@ Diese Daten, welche wir auf oder mittels der Webseite erfassen, betreffen:
 
 - Informationen, die Sie uns beim Ausfüllen von Formulare übermitteln, etwa beim Registrierungsvorgang, um in den nicht-öffentlichen Bereitch der Webseite zu gelangen, oder um als verifizierter Benutzer freigeschalten zu werden.
 - die elektronische Kommunikation, wenn Sie uns kontaktieren.
-- jene Daten ("Beiträge", "Inhalte"), die sie an uns weiterleiten, die auf der Webseite veröffentlicht oder angezeigt werden sollen, sei es in öffentlichen Bereichen (die Startseite), oder für andere Benutzer zugänglich.
+- jene Daten ("Beiträge", "Inhalte"), die Sie an uns weiterleiten, die auf der Webseite veröffentlicht oder angezeigt werden sollen, sei es in öffentlichen Bereichen (die Startseite), oder für andere Benutzer zugänglich.
 
 Ihre Beiträge werden auf Ihre Verantwortung hin anderen Benutzern zugänglich oder öffentlich gemacht. Wir können und garantieren nicht, dass diese Beiträge nur von autorisierten Benutzern angesehen werden.
 
 ## Daten, die automatisch erfasst werden
 
-Durch die Interaktion mit der Webseite könne folgende Daten anfallen:
+Durch die Interaktion mit der Webseite können folgende Daten anfallen:
 
 - Kommunikationsdaten, Logs und andere Merkmale Ihrer Besuche oder Ihres Besuchs.
 - Informationen über Ihre Verbindung.
 
-  Dazu können Cookies benutzt werden. Ein Cookie ist eine kleine Textdatei auf Ihrem Computer. Sie können die Verwendung von Cookies deaktivieren, allerdings können dann nicht alle Bereiche der Webseite aufgerufen werden. Wenn Sie mit dem Browser die Webseite ansteuern, wird automatisch ein Cookie abgespeichert, falls Sie diesen Vorgang im Browser nicht deaktiviert haben. Im Cookie werden Informationen abgespeichert, welche einen sicheren und komfortablen Besuch der Webseite ermöglichen.
+  Dazu können Cookies benutzt werden. Ein Cookie ist eine kleine Textdatei auf Ihrem Computer. Sie können die Verwendung von Cookies deaktivieren, allerdings können dann nicht alle Bereiche der Webseite aufgerufen werden. Wenn Sie mit dem Browser die Webseite aufrufen, wird automatisch ein Cookie abgespeichert, falls Sie diesen Vorgang im Browser nicht deaktiviert haben. Im Cookie werden Informationen abgespeichert, welche einen sicheren und komfortablen Besuch der Webseite ermöglichen.
 
-  Wir speichern ihre Sprachwahl, die Zustimmung für die Benutzung von Cookies und eine Identifikationsnummer ab, welche die Benutzung des nicht-öffentlichen Bereichs der Webseite ermöglicht. Außerdem speichert Cloudinary, unser Bilderhoster, eine Identifikationsnummer für Google Analytics ab, die jedoch nicht von uns ausgewertet werden.
+  Wir speichern ihre Sprachwahl, die Zustimmung für die Benutzung von Cookies und eine Identifikationsnummer ab, welche die Benutzung des nicht-öffentlichen Bereichs der Webseite ermöglicht. Außerdem speichert Cloudinary, unser Bilderhoster, eine Identifikationsnummer für Google Analytics ab.
   Für mehr Informationen konsultieren Sie bitte unsere [Cookie-Richtlinien](/cookies)
 
 ## Datenerfassung durch Drittanbieter
 
 Google-Fonts, Cloudinary und Recaptcha erfassen Ihre Verbindungsdaten wie die IP-Adresse.
 Google-Fonts stellt den auf der Webseite eingebetteten Schriftsatz zur Verfügung.
-Cloudinary speichert die Profilfotos der Benutzer.
+Cloudinary speichert die Profilfotos der Nutzer.
 Recaptcha ermöglicht es uns effektiv zu unterscheiden, ob jemand, der sich auf der Webseite registriert, ein Mensch oder ein Bot (computergesteuertes Programm) ist.
 
 Für mehr Informationen zu Google-Fonts und Recaptcha, siehe Googles [Datenschutzrichtlinie](https://policies.google.com/privacy)
@@ -77,7 +77,7 @@ Für mehr Informationen zu Cloudinary, siehe deren [Datenschutzrichlinie](https:
 ## Wie wir diese Daten verwenden
 
 - Um die Webseite für Sie zugänglich zu machen.
-- Um Ihnen die gewünschten Informationen zu zeigen.
+- Um Ihnen die gewünschten Informationen anzeigen zu können.
 - Um Ihnen die Mitwirkung an Abstimmungen und anderen interaktiven Bestandteilen der Webseite zu ermöglichen.
 - Um Sie auf Ihren Wunsch hin auf Ereignisse hinzuweisen.
 - Um Ihnen Nachrichten bezüglich Ihres Kontos zukommen zu lassen.
@@ -97,11 +97,11 @@ Die Daten werden in Deutschland in einem Rechenzentrum der Hetzner Online GmbH g
 
 - Die Einwilligung nach Art. 6 Abs.1 a) DSGVO. Der Besucher der Webseite willigt ein, dass die Anfrage zu deren Beantwortung verarbeitet wird. Dasselbe gilt für die Anfrage zum Verifizierungsprozess.
 
-- Die berechtigten Interessen der Initiative nach Art 6 Abs. 1 f) für das Loggen der Daten.
+- Die berechtigten Interessen der Initiative nach Art 6 Abs. 1 f) DSGVO für das Loggen der Daten.
 
 ## Daten, die wir für Dritte offenlegen
 
-Allgemein werden personenbezogene Daten nur an Dritte übermittelt, sofern dies für die Ermöglichung des Webseitenbetriebs erforderlich ist, oder Sie zuvor eingewilligt haben.
+Allgemein werden personenbezogene Daten nur an Dritte übermittelt, sofern dies für den Betrieb der Webseite erforderlich ist, oder Sie zuvor eingewilligt haben.
 Wir werden personenbezogene Daten, die wir nach den Bestimmungen dieser Erklärung erfassen, offenlegen für:
 
 - Vertragspartner, Serviceprovider und andere Drittparteien, die vertraglich zur vertraulichen, zweckgebundenen Behandlung der personenbezogenen Daten verpflichtet sind.
@@ -113,17 +113,17 @@ Wir werden personenbezogene Daten, die wir nach den Bestimmungen dieser Erkläru
 
 ## Ihre Rechte
 
-Haben Sie Fragen oder Beschwerden zum Datenschutz, wenden Sie sich bitte an die Initative, entweder postalisch unter Silbergasse 15, 39100 Bozen (BZ), Italien (IT) oder schreiben Sie an info(ät)dirdemdi(Punkt)org.
+Haben Sie Fragen oder Beschwerden zum Datenschutz, wenden Sie sich bitte an die Initative, entweder postalisch unter Silbergasse 15, 39100 Bozen (BZ), Italien (IT) oder schreiben Sie an info (ät) dirdemdi (Punkt) org.
 
 Sie haben das Recht
 
-- auf Auskunft, ob über Sie personenbezogene Daten verarbeitet werden nach Art. 15 DSVGO
+- auf Auskunft, ob über Sie personenbezogene Daten verarbeitet werden nach Art. 15 DSVGO,
 - auf Berichtigung Ihrer Daten nach Art. 16 DSGVO,
 - auf Löschung Ihrer Daten nach Art. 18 DSVGO
 - nach Einschränkung der Verarbeitung nach Art. 18 DSVGO,
 - auf Widerspruch nach Art. 21 DSVGO,
-- auf Datenübertragbarkeit nach Art. 20 DSVGO.
-- sich bei deiner Aufsichtsbehörde zu beschweren nach Art. 77 DSVGO
+- auf Datenübertragbarkeit nach Art. 20 DSVGO,
+- sich bei deiner Aufsichtsbehörde zu beschweren nach Art. 77 DSVGO.
 
 Ihre Einwilligung in die Datenverarbeitung kann jederzeit widerrufen werden.
 Eine automatisierte Entscheidung im Sinne von Art. 22 DSGVO findet nicht statt.

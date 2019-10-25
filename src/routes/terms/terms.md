@@ -17,7 +17,7 @@ Mit der Benutzung der Webseite erklären Sie sich mit diesen Bestimmungen und de
 
 ## Änderungen der Nutzungsbedingungen
 
-Wir können diese Nutzungsbedingungen nach unserem Ermessen abändern oder erweitern. Die Änderungen treten unmittelbar mit ihrer Veröffentlichung in Kraft. Besuchen Sie nach einer Änderung der Nutzungsbedingungen weiterhin die Webseite, bedeutet dies, dass Sie die Änderungen annehmen und ihnen zustimmen. Daher sollten sie regelmäßig diese Seite aufrufen, damit sie stets über mögliche Änderungen informiert sind. Stimmen Sie den aktualisierten Nutzungsbedingungen nicht mehr zu, können Sie Ihr Konto jederzeit löschen.
+Wir können diese Nutzungsbedingungen nach unserem Ermessen abändern oder erweitern. Die Änderungen treten unmittelbar mit ihrer Veröffentlichung in Kraft. Besuchen Sie nach einer Änderung der Nutzungsbedingungen weiterhin die Webseite, bedeutet dies, dass Sie die Änderungen annehmen und ihnen zustimmen. Daher sollten Sie regelmäßig diese Seite aufrufen, um stets über mögliche Änderungen informiert zu bleiben. Stimmen Sie den aktualisierten Nutzungsbedingungen nicht mehr zu, können Sie Ihr Konto jederzeit löschen.
 
 ## Zugang zur Webseite, Konto und Kontosicherheit
 
@@ -27,7 +27,7 @@ Wir haften nicht, falls aus irgendeinem Grund die gesamte Webseite, oder ein Tei
 
 Wir behalten uns das Recht vor, von Zeit zu Zeit den Zugang zu Teilen der Webseite, oder auch der gesamten Webseite, für registrierte oder nicht registrierte Benutzer einzuschränken.
 
-Sie sind dafür verantwortlich, alle Maßnahmen zu ergreifen, die für Sie notwendig sind, um den Zugang zu der Webseite sicherzustellen.
+Sie sind dafür verantwortlich, alle Maßnahmen zu ergreifen, die für Sie notwendig sind, um den Zugang zur Webseite herzustellen.
 
 Sie sind dafür verantwortlich, dass alle Personen, die über Ihren Internetzugang auf die Webseite zugreifen, die Nutzungsbedingungen kennen und einhalten.
 
@@ -51,7 +51,7 @@ Sie dürfen die Webseite nur zu persönlichen Zwecken nutzen oder weiterverwende
 
 ## Benutzerbeiträge
 
-Um unsere Dienste bereitstellen zu können, brauchen wir von Ihnen die Berechtigung zur Verwendung Ihrer erstellten Inhalte ("Benutzerbeiträge"). Falls Sie Inhalte hochladen, wie - aber nicht begrenzt auf - Ihr Profilfoto oder ein Foto für einen Vorschlag, räumen Sie uns damit eine nicht-ausschließliche, übertragbare gebührenfreie, unterlizenzierbare und weltweite Lizenz ("Lizenz") ein, damit wir diese Inhalte speichern, hosten, nutzen, ändern, öffentlich anzeigen können. Die Lizenz endet für jene Benutzerbeiträge, die Sie löschen, mit der Löschung. Bedenken Sie, dass Vorschläge idR nicht mehr gelöscht werden können.
+Um unsere Dienste bereitstellen zu können, brauchen wir von Ihnen die Berechtigung zur Verwendung Ihrer erstellten Inhalte ("Benutzerbeiträge"). Falls Sie Inhalte hochladen, wie - aber nicht begrenzt auf - Textbeiträge, Ihr Profilfoto oder ein Foto für einen Vorschlag, räumen Sie uns damit eine nicht-ausschließliche, übertragbare gebührenfreie, unterlizenzierbare und weltweite Lizenz ("Lizenz") ein, damit wir diese Inhalte speichern, hosten, nutzen, ändern, öffentlich anzeigen können. Die Lizenz endet für jene Benutzerbeiträge, die Sie löschen, mit der Löschung. Bedenken Sie, dass Vorschläge idR nicht mehr gelöscht werden können.
 
 Sie garantieren, dass Sie über die Rechte an diesen Inhalten verfügen und das Recht besitzen, uns und unseren Dienstleistern oder deren Lizenznehmer oder ihren Nachfolgern eine Lizenz zu erteilen.
 
@@ -61,7 +61,7 @@ Sie geben uns die Zustimmung, dass wir ihre Benutzerbeiträge mit Ihrem Namen un
 
 ## Inhaltliche Maßstäbe
 
-Benutzerbeiträge dürfen nicht gegen das anwendbare Recht verstoßen oder diese Nutzungsbedingungen verstoßen.
+Benutzerbeiträge dürfen nicht gegen das anwendbare Recht verstoßen oder gegen diese Nutzungsbedingungen verstoßen.
 
 Benutzerbeiträge dürfen nicht die Rechte einer anderen Person verletzen oder dagegen verstoßen.
 
@@ -77,7 +77,7 @@ Nutzen Sie die Webseite nicht auf eine Art und Weise, die zu Schäden oder Über
 
 Laden Sie keine Viren oder anderen schädlichen Code hoch.
 
-Verwenden Sie keine Inhalte der Webseite ohne unsere schriftliche Zustimmung weiter, es sei denn die Nutzungsbedingungen sehen das Recht vor.
+Verwenden Sie keine Inhalte der Webseite ohne unsere schriftliche Zustimmung weiter, es sei denn, die Nutzungsbedingungen sehen das Recht vor.
 
 Benutzen Sie keine automatischen Systeme wie spider oder robots, um auf die Webseite zuzugreifen, sie zu überwachen oder Inhalte zu kopieren.
 
@@ -95,7 +95,7 @@ Die Initiative übernimmt keine Gewähr für die Richtigkeit, Aktualität oder V
 
 Die Initiative übernimmt keine Haftung für mögliche Schäden, die direkt oder indirekt durch die Benutzung der Webseite oder durch das Herunterladen von Inhalten entstehen.
 
-Sollten Teile oder Formulierungen des Haftungsbeschränkung oder der anderen Nutzungsbedingungen der geltenden Gesetzeslage nicht, nicht mehr oder nicht vollständig entsprechen, bleiben die übrigen Teile davon in ihrer Gültigkeit unberührt.
+Sollten Teile oder Formulierungen der Haftungsbeschränkung oder der anderen Bestimmungen der geltenden Gesetzeslage nicht, nicht mehr oder nicht vollständig entsprechen, bleiben die übrigen Teile davon in ihrer Gültigkeit unberührt.
 
 ## Änderungen an der Webseite
 
@@ -105,9 +105,11 @@ Die Webseite ändert ihren Inhalt von Zeit zu Zeit. Wir sind nicht verpflichtet,
 
 Alle über Sie erfassten Informationen unterliegen der [Datenschutzerklärung]('/privacy').
 
-## Verlässlichkeit der auf der Webseite zu findenden Informationen.
+## Verlässlichkeit der auf der Webseite befindlichen Daten.
 
-Auf der Webseite befindet sich auch Inhalte Dritter,
+Die Daten auf dieser Webseite erfüllen einen bloß allgemeinen informativen Zweck.
+
+Auf der Webseite können sich auch Inhalte Dritter befinden. Darunter fallen unter anderem Inhalte anderer Nutzer, Lizenznehmer oder automatisierter Berichterstattungsdienste. Alle darin enthaltenen Informationen oder Meinungen geben ausschließlich die Meinung dieser Drittparteien wieder und unterliegen deren Verantwortlichkeit. Wir übernehmen keine Haftung für die Genauigkeit, Vollständigkeit, oder Nützlichkeit dieser Inhalte. Sie verwenden diese Inhalte auf eigene Gefahr und Verantwortung.
 
 ## Verlinkungen aus der Webseite heraus
 
