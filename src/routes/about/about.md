@@ -12,3 +12,11 @@ Kontakt: info (at) dirdemdi (Punkt) org
 Str. Nr. 94058890214
 
 VIP 2019.
+
+# Datenschutzerklärung
+
+[Hier klicken](/privacy)
+
+# Cookie-Richtlinien
+
+[Hier klicken](/cookies)
