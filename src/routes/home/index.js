@@ -29,7 +29,7 @@ async function action({ store, locale }) {
   }
   const props = {
     state: 'active',
-    first: 3,
+    first: 5,
     approvalState:
       ApprovalStates.CONTENT_APPROVED | ApprovalStates.TOPIC_APPROVED,
   };

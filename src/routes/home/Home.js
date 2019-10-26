@@ -21,7 +21,6 @@ import Button from '../../components/Button';
 import Wizard from '../../components/Wizard';
 import Steps from '../../components/Steps';
 import Step from '../../components/Steps/Step';
-import StepPage from '../../components/StepPage';
 import history from '../../history';
 import Progressbar from './Progressbar';
 
@@ -190,7 +189,12 @@ class Home extends React.Component<Props> {
             <Wizard basename="">
               {({ steps, step, next, push }) => {
                 return (
-                  <StepPage>
+                  <Box
+                    column
+                    justify
+                    align
+                    className={cn(s.fixateContent, !small && s.fixateWidth)}
+                  >
                     <Steps>
                       {proposals.map(
                         proposal =>
@@ -247,7 +251,7 @@ class Home extends React.Component<Props> {
                         />
                       </div>
                     )}
-                  </StepPage>
+                  </Box>
                 );
               }}
             </Wizard>

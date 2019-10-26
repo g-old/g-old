@@ -145,6 +145,14 @@
   }
 }
 
+.fixateContent {
+  min-height: 48em;
+}
+
+.fixateWidth {
+  min-width: 28em;
+}
+
 /*
 .proposals {
   align-items: center;
