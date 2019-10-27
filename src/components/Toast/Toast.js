@@ -15,11 +15,13 @@ class Toast extends React.Component {
   static propTypes = {
     id: PropTypes.string,
     onClose: PropTypes.func,
+    bottom: PropTypes.bool,
   };
 
   static defaultProps = {
     id: null,
     onClose: null,
+    bottom: null,
   };
 
   static contextTypes = {
