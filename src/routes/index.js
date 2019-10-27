@@ -67,12 +67,14 @@ const routes = {
     {
       path: '/verify',
       load: () =>
-        import(/* webpackChunkName: 'emailVerification' */ './emailVerification'),
+        import(
+          /* webpackChunkName: 'emailVerification' */ './emailVerification'
+        ),
     },
 
     // Wildcard routes, e.g. { path: '*', ... } (must go last)
     {
-      path: '*',
+      path: '(.*)',
       load: () => import(/* webpackChunkName: 'not-found' */ './not-found'),
     },
   ],
@@ -82,7 +84,7 @@ const routes = {
     const route = await next();
 
     // Provide default values for title, description etc.
-    route.title = `${route.title || 'Untitled Page'} - mycompany.org`;
+    route.title = `${route.title || 'Untitled Page'} | mycompany.org`;
     route.description = route.description || '';
 
     return route;
