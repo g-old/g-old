@@ -23,6 +23,7 @@ import Button from '../../components/Button';
 import Form from '../../components/Form';
 import Select from '../../components/Select';
 import Layer from './layerExample';
+import Toast from './toastExample';
 import Tab from '../../components/Tab/Tab';
 import Tabs from '../../components/Tabs/Tabs';
 import AssetsTable from '../../components/AssetsTable';
@@ -237,6 +238,11 @@ async function action({ store }) {
               <Card>Some nice text on a Card</Card>
               <Card>Some nice text on a Card</Card>
               <Card>Some nice text on a Card</Card>
+            </Box>
+            <Heading tag="h2">Toast</Heading>
+            <Box>
+              <Toast label="Top down toast" />
+              <Toast bottom label="Bottom up toast" />
             </Box>
             <Heading tag="h2">File Uploader</Heading>
 

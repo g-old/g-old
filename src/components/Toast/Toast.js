@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
+import cn from 'classnames';
 import withStyles from 'isomorphic-style-loader/withStyles';
 import StyleContext from 'isomorphic-style-loader/StyleContext';
 import { IntlProvider } from 'react-intl';
@@ -14,11 +15,13 @@ class Toast extends React.Component {
   static propTypes = {
     id: PropTypes.string,
     onClose: PropTypes.func,
+    bottom: PropTypes.bool,
   };
 
   static defaultProps = {
     id: null,
     onClose: null,
+    bottom: null,
   };
 
   static contextTypes = {
@@ -99,7 +102,10 @@ class Toast extends React.Component {
 
   renderLayer() {
     if (this.element) {
-      this.element.className = s.container;
+      this.element.className = cn(
+        s.container,
+        this.props.bottom ? s.bottom : s.top,
+      );
       const { insertCss, intl, store } = this.context; // TODO change to a single provider
       const contents = (
         <StyleContext.Provider value={{ insertCss }}>

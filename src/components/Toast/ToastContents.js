@@ -14,12 +14,16 @@ class ToastContents extends React.Component {
     insertCss: PropTypes.func.isRequired,
     duration: PropTypes.number,
     alert: PropTypes.bool,
+    bottom: PropTypes.bool,
+    stay: PropTypes.bool,
   };
 
   static defaultProps = {
     onClose: null,
     duration: 0,
     alert: false,
+    bottom: null,
+    stay: null,
   };
 
   static childContextTypes = {
@@ -34,9 +38,10 @@ class ToastContents extends React.Component {
   }
 
   getChildContext() {
+    const { intl, insertCss } = this.props;
     return {
-      intl: this.props.intl,
-      insertCss: this.props.insertCss,
+      intl,
+      insertCss,
     };
   }
 
@@ -63,15 +68,18 @@ class ToastContents extends React.Component {
   }
 
   render() {
-    const { onClose, children, alert } = this.props;
+    const { onClose, children, alert, bottom, stay } = this.props;
     const { closing } = this.state;
 
     let closeControl;
     const classes = cn(s.toast, {
       [s.alert]: alert,
-      [s.close]: closing,
+      [s.closeRaiseUp]: closing && !bottom,
+      [s.closeLowerDown]: closing && bottom,
+      [s.bottomUp]: bottom,
+      [s.topDown]: !bottom,
     });
-    if (onClose) {
+    if (onClose && !stay) {
       closeControl = (
         <Button
           plain
