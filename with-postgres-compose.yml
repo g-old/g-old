@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 services:
   db:
     image: postgres:9.6-alpine
@@ -6,8 +6,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=gold
-      - POSTGRES_PASSWORD=gold
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
       - POSTGRES_DB=test
 
   web:
@@ -21,9 +21,8 @@ services:
       - PORT=3005
       - NODE_ENV=production
       - HOST=test.g-old.org
-      - DATABASE_URL=postgresql://gold:gold@db:5432/test
-      - RECAPTCHA_SECRET='6LefH0cUAAAAAAf-XmPeMwE7ObE7DAvG5foUqgdi'
-      - RECAPTCHA_KEY='6LefH0cUAAAAAA1GZB8T57pffEwSWXjN7S74UcRG'
+      - DATABASE_URL=postgresql://user:password@db:5432/test
+      - RECAPTCHA_SECRET=secret
+      - RECAPTCHA_KEY=key
 
-volumes:
-  pgdata:
+volumes: pgdata:

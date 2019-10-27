@@ -1,12 +1,27 @@
-@import "../variables.css";
+@import '../variables.css';
 
 .container {
   position: fixed;
-  top: 0;
   left: 0;
   right: 0;
   z-index: 100;
   stroke: #000;
+}
+
+.bottom {
+  bottom: 0;
+}
+
+.top {
+  top: 0;
+}
+
+.bottomUp {
+  animation: bottom-toast-raise 1s;
+}
+
+.topDown {
+  animation: toast-lower 1s;
 }
 
 .toast {
@@ -14,13 +29,13 @@
   flex-direction: row;
   align-items: center;
   min-height: 72px;
-  background-color: rgba(238, 238, 238, 0.9);
-  animation: toast-lower 1s;
+  background-color: var(--color-brand);
   padding: 0 1rem;
+  animation-fill-mode: forwards;
 }
 
 .alert {
-  background-color: var(--color-red);
+  background-color: var(--color-two);
   color: #fff;
   stroke: #fff;
 }
@@ -45,8 +60,33 @@
   }
 }
 
-.close {
+@keyframes bottom-toast-raise {
+  0% {
+    transform: translateY(100%);
+  }
+
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes bottom-toast-lower {
+  0% {
+    transform: translateY(0%);
+  }
+
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.closeRaiseUp {
   animation: toast-raise 1s;
+  animation-fill-mode: forwards;
+}
+
+.closeLowerDown {
+  animation: bottom-toast-lower 1s;
   animation-fill-mode: forwards;
 }
 

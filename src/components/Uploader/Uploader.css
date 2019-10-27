@@ -1,0 +1,51 @@
+.uploader {
+  border-width: 2px;
+  border-color: #333;
+  border-style: dashed;
+  border-radius: 4px;
+  transition: all 0.5s;
+  width: 15rem;
+  padding: 3rem 0;
+  background-color: #eee;
+}
+
+.close {
+  display: flex;
+  width: 1em;
+  height: 1em;
+  background-color: #eee;
+  border-radius: 3px;
+
+  /* position: relative;
+  top: -1.5em;
+  right: -1.5em; */
+}
+
+.container {
+  padding: 2rem 0;
+}
+
+.input {
+  display: none;
+}
+
+.closerBtn {
+  position: absolute;
+
+  span {
+    padding: 1px !important;
+  }
+}
+
+.active {
+  border-color: #8cc800;
+  border-style: solid;
+}
+
+.preview {
+  position: relative;
+  margin: 0.5rem;
+  width: 48px !important;
+  height: 48px !important;
+  box-sizing: border-box;
+}

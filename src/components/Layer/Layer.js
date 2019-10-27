@@ -7,7 +7,7 @@ import withStyles from 'isomorphic-style-loader/withStyles';
 import StyleContext from 'isomorphic-style-loader/StyleContext';
 import { Provider as ReduxProvider } from 'react-redux';
 import { IntlProvider } from 'react-intl';
-
+import cn from 'classnames';
 import LayerContents from '../LayerContents';
 import s from './Layer.css';
 
@@ -16,11 +16,13 @@ class Layer extends React.Component {
     onClose: PropTypes.func.isRequired,
     id: PropTypes.string,
     hidden: PropTypes.bool,
+    fill: PropTypes.bool,
   };
 
   static defaultProps = {
     id: null,
     hidden: false,
+    fill: false,
   };
 
   componentDidMount() {
@@ -136,13 +138,13 @@ class Layer extends React.Component {
     if (this.element) {
       this.element.className = s.layer;
       const { insertCss, store, intl } = this.context;
-      const { onClose } = this.props;
+      const { onClose, fill } = this.props;
       const contents = (
         <StyleContext.Provider value={{ insertCss }}>
           <ReduxProvider store={store}>
             <LayerContents
               {...this.props}
-              className={s.container}
+              className={cn(s.container, fill && s.fill)}
               intl={intl}
               onClose={onClose}
             />
@@ -161,7 +163,7 @@ class Layer extends React.Component {
   }
 
   render() {
-    return <span style={{ display: 'none' }} />;
+    return null;
   }
 }
 
