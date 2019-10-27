@@ -14,8 +14,11 @@ import { getSessionUser } from '../../reducers';
 import { canAccess, ApprovalStates } from '../../organization';
 import { loadProposalsList } from '../../actions/proposal';
 
-const title = 'Home';
+const title =
+  'Volksinitiative - Initiativa popolare | Volksgesetzgebung online für Südtirol';
 
+const description =
+  'Stimme ab über Vorschläge zu Volksinitiativen und Volksbegehren für Südtirol! Arbeite mit an einem Poliktikwechsel für mehr Direkte Demokratie im Land.';
 async function action({ store, locale }) {
   const state = store.getState();
 
@@ -60,6 +63,7 @@ async function action({ store, locale }) {
   return {
     chunks: ['home'],
     title,
+    description,
     component: (
       <Layout>
         <Home title={title} data={data} />

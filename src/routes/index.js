@@ -151,7 +151,7 @@ const routes = {
     const route = await next();
 
     // Provide default values for title, description etc.
-    route.title = `${route.title || 'Untitled Page'} - vip`;
+    route.title = `${route.title || 'Untitled Page'} | VIP`;
     route.description = route.description || '';
 
     return route;
