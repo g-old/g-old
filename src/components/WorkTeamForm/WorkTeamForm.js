@@ -31,8 +31,8 @@ import {
   selectValidation,
   createValidator,
 } from '../../core/validation';
-import Notification from '../../components/Notification';
-import FormValidation from '../../components/FormValidation';
+import Notification from '../Notification';
+import FormValidation from '../FormValidation';
 
 const messages = defineMessages({
   empty: {
@@ -81,6 +81,7 @@ class WorkTeamManagement extends React.Component {
   static defaultProps = {
     updates: null,
   };
+
   constructor(props) {
     super(props);
     this.handleValueChanges = this.handleValueChanges.bind(this);
@@ -185,6 +186,7 @@ class WorkTeamManagement extends React.Component {
       });
     }
   }
+
   canMutate() {
     const { user, workTeam } = this.props;
     // eslint-disable-next-line no-bitwise
@@ -207,6 +209,7 @@ class WorkTeamManagement extends React.Component {
       this.handleValidation([field]);
     }
   }
+
   visibleErrors(errorNames) {
     return errorNames.reduce((acc, curr) => {
       const err = `${curr}Error`;
@@ -218,6 +221,7 @@ class WorkTeamManagement extends React.Component {
       return acc;
     }, {});
   }
+
   handleValueChanges(e) {
     let value;
     if (e.target.type === 'checkbox') {
