@@ -172,6 +172,12 @@ class WorkTeamManagement extends React.Component {
       this.props.updateWorkTeam({
         id,
         ...values,
+        ...(values.restricted !== undefined && {
+          restricted: !!values.restricted,
+        }),
+        ...(values.mainTeam !== undefined && {
+          mainTeam: !!values.mainTeam,
+        }),
       });
     } else {
       this.props.createWorkTeam({
@@ -312,9 +318,7 @@ class WorkTeamManagement extends React.Component {
                     <SearchField
                       value={
                         workTeam.coordinator
-                          ? `${workTeam.coordinator.name} ${
-                              workTeam.coordinator.surname
-                            }`
+                          ? `${workTeam.coordinator.name} ${workTeam.coordinator.surname}`
                           : ''
                       }
                       onChange={e =>
@@ -401,4 +405,7 @@ const mapDispatch = {
   createWorkTeam,
 };
 
-export default connect(mapStateToProps, mapDispatch)(WorkTeamManagement);
+export default connect(
+  mapStateToProps,
+  mapDispatch,
+)(WorkTeamManagement);
