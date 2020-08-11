@@ -75,7 +75,7 @@
     "redux-thunk": "^2.2.0",
     "reverse-line-reader": "^0.2.6",
     "sanitize-html": "^1.20.0",
-    "serialize-javascript": "^1.6.1",
+    "serialize-javascript": "^3.1.0",
     "session-memory-store": "^1.0.0",
     "slate": "^0.47.8",
     "slate-html-serializer": "^0.8.10",
